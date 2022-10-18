@@ -5,7 +5,7 @@ const { output, poorMansGraphQL } = require('./utils');
 const { etherRouterAddress: networkAddress } = require('../colonyNetwork/etherrouter-address.json');
 
 (async () => {
-  const provider = new ethers.providers.JsonRpcProvider();
+  const provider = new ethers.providers.JsonRpcProvider("http://network-contracts.docker:8545");
 
   const networkClient = getColonyNetworkClient(
     'local',
