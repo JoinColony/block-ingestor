@@ -1,5 +1,5 @@
 {
-  "name": "block-ingestor",
+  "name": "block-ingestor-coin-machine",
   "version": "1.0.0",
   "description": "Ingest blocks and parse events",
   "main": "index.js",

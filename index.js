@@ -1,85 +1,81 @@
 const ethers = require('ethers');
-const { getColonyNetworkClient, getLogs } = require('@colony/colony-js');
+const coinMachineFactory = require('./abi/coinMachineFactoryABI.json');
+const whitelist = require('./abi/whitelistABI.json');
 
 const { output, poorMansGraphQL } = require('./utils');
-const { etherRouterAddress: networkAddress } = require('../colonyNetwork/etherrouter-address.json');
+
+// const subsribeToWhitelist = async (whitelistAddress, provider) => {
+//   try {
+//     const contract = await new ethers.Contract(whitelistAddress, coinMachineFactory.abi, provider);
+//     contract.on('*', async(event) => {
+//       const parsed = contract.interface.parseLog(event);
+//       const { useApprovals, agreementHash } = parsed.args;
+
+//       const query = {
+//         operationName: "UpdateWhitelist",
+//         query: `
+//             mutation UpdateWhitelist {
+//               updateWhitelist(
+//               input: { id: "${whitelistAddress}", agreementHash: "${agreementHash}", useApprovals: "${useApprovals}" }
+//               condition: {}
+//             ) {
+//               id
+//             }
+//           }
+//         `,
+//         variables: null,
+//       };
+//       try {
+//         await poorMansGraphQL(query);
+//         output('Saving whitelist to database');
+//       } catch (error) {
+//         console.log(error);
+//         // silent error
+//       }
+//     });
+
+//   } catch (error) {
+//     console.error(error);
+//   }
+// }
 
 (async () => {
-  const provider = new ethers.providers.JsonRpcProvider("http://network-contracts.docker:8545");
+  const provider = new ethers.providers.JsonRpcProvider();
+  const whitelistContracts = [];
 
-  const networkClient = getColonyNetworkClient(
-    'local',
-    provider,
-    { networkAddress },
-  )
+  const coinmachineFactoryAddress = process.argv[2];
 
-  let currentBlock = await provider.getBlockNumber();
-  output(`Starting at block #${currentBlock}`);
+  try {
+    const contract = await new ethers.Contract(coinmachineFactoryAddress, coinMachineFactory.abi, provider);
+    contract.on('*', async(event) => {
+      const parsed = contract.interface.parseLog(event);
+      const { whitelist, owner } = parsed.args;
+      // subsribeToWhitelist(whitelist);
 
-  provider.on('block', async (blockNumber) => {
-    output(`Processing block #${blockNumber}`);
-
-    if (blockNumber > currentBlock) {
-      const userLabelRegisteredLogs = await getLogs(
-        networkClient,
-        networkClient.filters.UserLabelRegistered(),
-        {
-          fromBlock: blockNumber,
-          toBlock: blockNumber,
-        },
-      );
-
-      userLabelRegisteredLogs.map(async (log) => {
-        const { args: [rawAddress] } = networkClient.interface.parseLog(log);
-
-        const userAddress = ethers.utils.getAddress(rawAddress);
-
-        const fullEnsDomain = await networkClient.lookupRegisteredENSDomainWithNetworkPatches(
-          userAddress,
-        )
-        const username = fullEnsDomain.slice(0, fullEnsDomain.indexOf('.'))
-
-        try {
-          output('Found user:', username, userAddress);
-
-          const query = {
-            operationName: "CreateUser",
-            query: `
-                mutation CreateUser {
-                createUser(
-                  input: { walletAddress: "${userAddress}", username: "${username}" }
-                  condition: {}
-                ) {
-                  displayName
-                  avatarHash
-                }
-              }
-            `,
-            variables: null,
-          };
-
-          try {
-            await poorMansGraphQL(query);
-            output('Saving user to database:', username);
-          } catch (error) {
-            // silent error
+      const query = {
+        operationName: "CreateWhitelist",
+        query: `
+            mutation CreateWhitelist {
+              createWhitelist(
+              input: { id: "${whitelist}", walletAddress: "${owner}" }
+              condition: {}
+            ) {
+              id
+            }
           }
+        `,
+        variables: null,
+      };
+      try {
+        await poorMansGraphQL(query);
+        output('Saving whitelist to database');
+      } catch (error) {
+        console.log(error);
+        // silent error
+      }
+    });
+} catch (error) {
+    console.error(error);
+}
 
-        } catch (error) {
-          console.error(
-            'Could not create user:',
-            username,
-            'with address:',
-            userAddress,
-          )
-          console.error(error)
-        }
-      });
-
-      /*
-       * Only update the current block if we actually processed the new one
-       */
-      currentBlock = blockNumber;
-    }
-  });
 })()
