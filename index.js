@@ -17,11 +17,9 @@ const subsribeToWhitelist = async (whitelistAddress, provider) => {
     const contract = await new ethers.Contract(whitelistAddress, whitelist.abi, provider);
     contract.on('*', async(event) => {
       const parsed = contract.interface.parseLog(event);
-      console.log(parsed, 'parsed');
-      const { useApprovals, agreementHash } = parsed.args;
-
-      const query = WhitelistEvents[event.event](parsed.args, whitelistAddress);
-
+      const handler =  WhitelistEvents[event.event];
+      if (!handler) return;
+      const query = handler(parsed.args, whitelistAddress);
       try {
         await poorMansGraphQL(query);
         output(`Database updated after event: ${event.event}`);
@@ -47,7 +45,7 @@ const subsribeToWhitelist = async (whitelistAddress, provider) => {
     contract.on('*', async(event) => {
       const parsed = contract.interface.parseLog(event);
       const { whitelist, owner } = parsed.args;
-      subsribeToWhitelist(whitelist, provider);
+      await subsribeToWhitelist(whitelist, provider);
 
       const query = {
         operationName: "CreateWhitelist",

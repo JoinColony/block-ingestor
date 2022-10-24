@@ -39,13 +39,14 @@ function handleAgreementSigned(args, whitelistAddress) {
 }
 
 function handleWhitelistInitialised(args, whitelistAddress) {
-  const { approvals, agreementHash } = args;
+
+  const { _approvals, _agreementHash } = args;
   const query = {
     operationName: "UpdateWhitelist",
     query: `
         mutation UpdateWhitelist {
           updateWhitelist(
-          input: { id: "${whitelistAddress}", agreementHash: "${agreementHash}", useApprovals: "${approvals}" }
+          input: { id: ${whitelistAddress}, agreementHash: ${_agreementHash}, useApprovals: ${Boolean(_approvals)} }
           condition: {}
         ) {
           id
