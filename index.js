@@ -14,9 +14,10 @@ const WhitelistEvents = {
 
 const subsribeToWhitelist = async (whitelistAddress, provider) => {
   try {
-    const contract = await new ethers.Contract(whitelistAddress, coinMachineFactory.abi, provider);
+    const contract = await new ethers.Contract(whitelistAddress, whitelist.abi, provider);
     contract.on('*', async(event) => {
       const parsed = contract.interface.parseLog(event);
+      console.log(parsed, 'parsed');
       const { useApprovals, agreementHash } = parsed.args;
 
       const query = WhitelistEvents[event.event](parsed.args, whitelistAddress);
@@ -46,7 +47,7 @@ const subsribeToWhitelist = async (whitelistAddress, provider) => {
     contract.on('*', async(event) => {
       const parsed = contract.interface.parseLog(event);
       const { whitelist, owner } = parsed.args;
-      subsribeToWhitelist(whitelist);
+      subsribeToWhitelist(whitelist, provider);
 
       const query = {
         operationName: "CreateWhitelist",
