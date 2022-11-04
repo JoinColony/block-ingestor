@@ -1,4 +1,7 @@
 import { ApolloClient, InMemoryCache, HttpLink } from '@apollo/client';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const httpLink = new HttpLink({
   uri: `${process.env.AWS_APPSYNC_ENDPOINT}/graphql`,
