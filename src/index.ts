@@ -10,8 +10,6 @@ app.get('/', (req: Request, res: Response) => {
   res.send('OK');
 });
 
-const test: string = 123;
-
 app.listen(port, () => {
   console.log('Transactions Ingestor is Running');
   console.log(`Stats available at https://localhost:${port}/stats`);
