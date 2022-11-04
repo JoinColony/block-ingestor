@@ -19,5 +19,7 @@ module.exports = {
     'comma-dangle': 'off',
     '@typescript-eslint/comma-dangle': ['error', 'always-multiline'],
     '@typescript-eslint/no-misused-promises': 'off',
+    '@typescript-eslint/promise-function-async': 'off',
+    '@typescript-eslint/no-floating-promises': 'off',
   },
 };

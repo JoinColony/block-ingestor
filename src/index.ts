@@ -2,7 +2,8 @@ import express, { Request, Response } from 'express';
 import dotenv from 'dotenv';
 
 import blockListener from './blockListener';
-import { readJsonStats } from './utils';
+import trackColonies from './trackColonies';
+import { output, readJsonStats } from './utils';
 
 import { name, version } from '../package.json';
 
@@ -26,8 +27,10 @@ app.get('/stats', (req, res) => {
 
 blockListener();
 
+trackColonies();
+
 app.listen(port, () => {
-  console.log('Transactions Ingestor is Running');
-  console.log(`Stats available at http://localhost:${port}/stats`);
-  console.log(`Liveness check available at http://localhost:${port}/liveness`);
+  output('Transactions Ingestor is Running');
+  output(`Stats available at http://localhost:${port}/stats`);
+  output(`Liveness check available at http://localhost:${port}/liveness`);
 });
