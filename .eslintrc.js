@@ -18,5 +18,6 @@ module.exports = {
     '@typescript-eslint/restrict-template-expressions': 'off',
     'comma-dangle': 'off',
     '@typescript-eslint/comma-dangle': ['error', 'always-multiline'],
+    '@typescript-eslint/no-misused-promises': 'off',
   },
 };
