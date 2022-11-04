@@ -1,6 +1,8 @@
 import express, { Request, Response } from 'express';
 import dotenv from 'dotenv';
-import path from 'path';
+
+import blockListener from './blockListener';
+import { readJsonStats } from './utils';
 
 import { name, version } from '../package.json';
 
@@ -16,14 +18,13 @@ app.get('/', (req: Request, res: Response) => {
 app.get('/liveness', (req, res) => res.sendStatus(200));
 
 app.get('/stats', (req, res) => {
-  let stats = {};
-  try {
-    stats = require(`${path.resolve(__dirname, '..')}/run/stats.json`);
-  } catch (error) {
-    console.error('Cannot read stats file', error);
-  }
-  res.type('json').send(stats);
+  readJsonStats().then(
+    stats => res.type('json').send(stats),
+    () => {},
+  );
 });
+
+blockListener();
 
 app.listen(port, () => {
   console.log('Transactions Ingestor is Running');
