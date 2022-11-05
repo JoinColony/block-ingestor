@@ -11,9 +11,18 @@ import { ContractEventsSignatures, SortOrder } from './types';
 
 dotenv.config();
 
+/*
+ * Log to console with name and timestamp
+ * Used for basic stuff, which will always be logged
+ */
 export const output = (...messages: any[]): void =>
   console.log(`[TX Ingestor ${new Date().toJSON()}]`, ...messages);
 
+/*
+ * Log to console with name and timestamp
+ * This should be added to internals, which you don't always want to show in production
+ * This is controlled by the `VERBOSE_OUTPUT` env variable
+ */
 export const verbose = (...messages: any[]): void => {
   const verboseOutput = process.env.VERBOSE_OUTPUT === 'true';
   if (verboseOutput) {
@@ -21,6 +30,11 @@ export const verbose = (...messages: any[]): void => {
   }
 };
 
+/*
+ * Read a json file at a specified path.
+ * If the file (including the path) doesn't exist, it will be created and seeded
+ * with an empty object
+ */
 export const readJsonStats = async (
   filePath = `${path.resolve(__dirname, '..')}/run/stats.json`,
 ): Promise<Record<string, unknown>> => {
@@ -35,6 +49,12 @@ export const readJsonStats = async (
   }
 };
 
+/*
+ * Write a json file at a specified path.
+ * It accepts either a object fragment (or full object) that will get appended to the existing file,
+ * or a callback (which receives the current version of the file) and needs to return the new object
+ * that will be written back
+ */
 export const writeJsonStats = async (
   objectOrFunction: Record<string, unknown> | ((jsonFile: Record<string, unknown>) => Record<string, unknown>),
   filePath = `${path.resolve(__dirname, '..')}/run/stats.json`,
@@ -55,6 +75,13 @@ export const writeJsonStats = async (
   verbose('Stats file updated');
 };
 
+/*
+ * Sort an array by a list (object) of priorities
+ * List (object) key is customizable, and priorties are positive integers
+ * Negative integers relegate the items at the back of the array
+ *
+ * See: `contractEventsPriorityMap` from `./types` for an example
+ */
 export const sortByPriority = (
   key: string,
   priorities: Record<string, number>,
@@ -92,10 +119,19 @@ export const sortByPriority = (
   return (order === SortOrder.Desc) ? ~result : result;
 };
 
+/*
+ * Convert a Set that contains a JSON string, back into JS form
+ */
 export const setToJS = (
   set: Set<string>,
 ): Array<Record<string, string>> => Array.from(set).map(entry => JSON.parse(entry));
 
+/*
+ * Generator method for events listeners
+ *
+ * It basically does away with all the boilerplate of setting up topics, setting
+ * the event listener, parsing the received event
+ */
 export const eventListenerGenerator = async (
   eventSignature: ContractEventsSignatures,
   contractAddress?: string,
@@ -135,6 +171,10 @@ export const eventListenerGenerator = async (
   });
 };
 
+/*
+ * Network Client specific event listener,
+ * which uses `eventListenerGenerator` under the hood
+ */
 export const addNetworkEventListener = async (
   eventSignature: ContractEventsSignatures,
   contractAddress: string = networkClient.address,
@@ -144,6 +184,10 @@ export const addNetworkEventListener = async (
   ClientType.NetworkClient,
 );
 
+/*
+ * Colony Client specific event listener,
+ * which uses `eventListenerGenerator` under the hood
+ */
 export const addColonyEventListener = async (
   eventSignature: ContractEventsSignatures,
   contractAddress: string,
@@ -153,6 +197,10 @@ export const addColonyEventListener = async (
   ClientType.ColonyClient,
 );
 
+/*
+ * Token Client specific event listener,
+ * which uses `eventListenerGenerator` under the hood
+ */
 export const addTokenEventListener = async (
   eventSignature: ContractEventsSignatures,
 ): Promise<void> => await eventListenerGenerator(

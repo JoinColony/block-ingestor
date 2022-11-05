@@ -18,6 +18,9 @@ class EventQueue extends EventEmitter {
 
 const eventQueue = new EventQueue();
 
+/*
+ * Process a individual queue event
+ */
 eventQueue.on(QueueEvents.ProcessEvent, function (this: EventQueue, event: ContractEvent) {
   verbose('Processing event:', event.signature);
   eventProcessor(event);
@@ -25,6 +28,8 @@ eventQueue.on(QueueEvents.ProcessEvent, function (this: EventQueue, event: Contr
 
 /*
  * @TODO Add batching logic (if needed)
+ *
+ * Start processing events from the queue
  */
 eventQueue.on(QueueEvents.ProcessEvents, function (this: EventQueue) {
   verbose('Processing', this.queue.length, 'events in queue');
@@ -33,6 +38,9 @@ eventQueue.on(QueueEvents.ProcessEvents, function (this: EventQueue) {
   }
 });
 
+/*
+ * Sort the current queue
+ */
 eventQueue.on(QueueEvents.QueueUpdated, function (this: EventQueue) {
   if (this.queue.length) {
     this.queue = this.queue.sort(sortByPriority(
@@ -44,6 +52,9 @@ eventQueue.on(QueueEvents.QueueUpdated, function (this: EventQueue) {
   this.emit(QueueEvents.ProcessEvents);
 });
 
+/*
+ * Add a new event to the queue
+ */
 eventQueue.on(QueueEvents.NewEvent, function (this: EventQueue, event: ContractEvent) {
   this.queue.push(event);
   verbose('Event added to the queue:', event?.signature || ContractEventsSignatures.UknownEvent);

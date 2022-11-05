@@ -21,18 +21,30 @@ export default async (event: ContractEvent): Promise<void> => {
   }
 
   switch (event.signature) {
+    /*
+     * New Colony Added
+     */
     case ContractEventsSignatures.ColonyAdded: {
       const { colonyAddress, token: tokenAddress } = event?.args ?? {};
 
+      /*
+       * Add it to the Set
+       */
       coloniesSet.add(JSON.stringify({ colonyAddress, tokenAddress }));
       await writeJsonStats({ trackedColonies: coloniesSet.size });
 
       output('Found new Colony:', colonyAddress, 'Total tracked colonies:', coloniesSet.size);
 
+      /*
+       * Setup all Colony specific listeners for it
+       */
       await colonySpecificEventsListener(colonyAddress);
       return;
     }
 
+    /*
+     * New ERC-20 (but not Native Chain Token -- 0x0000...0000) transfers
+     */
     case ContractEventsSignatures.Transfer: {
       const { contractAddress, transactionHash, logIndex, blockNumber } = event ?? {};
       /*
@@ -87,6 +99,9 @@ export default async (event: ContractEvent): Promise<void> => {
       return;
     }
 
+    /*
+     * New Colony transfer claims
+     */
     case ContractEventsSignatures.ColonyFundsClaimed: {
       const { contractAddress } = event ?? {};
       const { token: tokenAddress } = event?.args ?? {};

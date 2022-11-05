@@ -1,5 +1,8 @@
 import { LogDescription } from '@ethersproject/abi';
 
+/*
+ * Custom contract event, since we need some log values as well
+ */
 export interface ContractEvent extends LogDescription {
   transactionHash: string
   logIndex: number
@@ -7,6 +10,9 @@ export interface ContractEvent extends LogDescription {
   blockNumber: number
 }
 
+/*
+ * Event names used for our internal Events Queue System
+ */
 export enum QueueEvents {
   NewEvent = 'NewEvent',
   QueueUpdated = 'QueueUpdated',
@@ -15,6 +21,9 @@ export enum QueueEvents {
   EventProcessed = 'EventProcessed',
 };
 
+/*
+ * All contract events signatures we deal with
+ */
 export enum ContractEventsSignatures {
   UknownEvent = 'UknownEvent()',
   ColonyAdded = 'ColonyAdded(uint256,address,address)',
@@ -22,11 +31,18 @@ export enum ContractEventsSignatures {
   ColonyFundsClaimed = 'ColonyFundsClaimed(address,address,uint256,uint256)',
 }
 
+/*
+ * Sort directions... obviously
+ */
 export enum SortOrder {
   Asc = 'ascending',
   Desc = 'descending',
 }
 
+/*
+ * The internal Ethers event names for which we can set listeners
+ * (Which for some reason Ethers doesn't export the types for)
+ */
 export enum EthersObserverEvents {
   Block = 'block',
 }
