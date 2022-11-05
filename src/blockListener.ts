@@ -1,11 +1,14 @@
-import { JsonRpcProvider } from '@ethersproject/providers';
-
-import provider from './provider';
+import networkClient from './networkClient';
 import { verbose, writeJsonStats } from './utils';
+import { EthersObserverEvents } from './types';
 
-const blockListener = (): JsonRpcProvider => provider.on('block', async (blockNumber) => {
-  verbose(`Processing block #${blockNumber}`);
-  await writeJsonStats({ latestBlock: blockNumber });
-});
+const blockListener = (): typeof networkClient.provider =>
+  networkClient.provider.on(
+    EthersObserverEvents.Block,
+    async (blockNumber) => {
+      verbose('Processing block #', blockNumber);
+      await writeJsonStats({ latestBlock: blockNumber });
+    },
+  );
 
 export default blockListener;

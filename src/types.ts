@@ -29,3 +29,21 @@ export enum SortOrder {
   Asc = 'ascending',
   Desc = 'descending',
 }
+
+export enum EthersObserverEvents {
+  Block = 'block',
+}
+
+/*
+ * Sort priority for events
+ *
+ * If negative priority, it will be relegated to the back of the array
+ * If not listed it will be sorted after the ones with priority set, and
+ * before the ones with negative priority
+ */
+export const contractEventsPriorityMap = {
+  [ContractEventsSignatures.NativeTokenTransfer]: 1,
+  [ContractEventsSignatures.Transfer]: 2,
+  [ContractEventsSignatures.ColonyFundsClaimed]: 3,
+  [ContractEventsSignatures.UknownEvent]: -1,
+};
