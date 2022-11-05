@@ -1,4 +1,5 @@
 import express, { Request, Response } from 'express';
+import { Server } from 'http';
 import dotenv from 'dotenv';
 import { utils } from 'ethers';
 
@@ -32,18 +33,29 @@ app.get('/stats', (req, res) => {
   );
 });
 
-app.listen(port, async () => {
+const startStatsServer = async (): Promise<Server> => app.listen(port, () => {
   output('Transactions Ingestor is Running');
   output(`Stats available at http://localhost:${port}/stats`);
   output(`Liveness check available at http://localhost:${port}/liveness`);
+});
 
+const startIngestort = async (): Promise<void> => {
   /*
-   * Get all colonies currently deployed
-   */
-  trackColonies();
+  * Get all colonies currently deployed
+  */
+  await trackColonies();
   /*
    * Setup all listeners we care about
    */
-  blockListener();
-  eventListener();
-});
+  await blockListener();
+  await eventListener();
+};
+
+const start = async (): Promise<void> => {
+  if (port) {
+    await startStatsServer();
+  }
+  startIngestort();
+};
+
+start();
