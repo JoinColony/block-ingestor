@@ -2,7 +2,8 @@ import dotenv from 'dotenv';
 import { getLogs } from '@colony/colony-js';
 
 import networkClient from './networkClient';
-import { output, writeJsonStats, verbose, addProviderListener } from './utils';
+import { output, writeJsonStats, verbose, addNetworkEventListener, setToJS } from './utils';
+import { colonySpecificEventsListener } from './eventListener';
 import { ContractEventsSignatures } from './types';
 
 dotenv.config();
@@ -29,5 +30,11 @@ export default async (): Promise<void> => {
 
   output('Tracking', colonies.size, 'currently deployed colonies');
 
-  addProviderListener(ContractEventsSignatures.ColonyAdded);
+  await Promise.all(
+    setToJS(coloniesSet).map(
+      async ({ colonyAddress }) => await colonySpecificEventsListener(colonyAddress),
+    ),
+  );
+
+  await addNetworkEventListener(ContractEventsSignatures.ColonyAdded);
 };
