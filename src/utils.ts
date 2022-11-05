@@ -37,6 +37,7 @@ export const writeJsonStats = async (
   };
 
   await writeJson(filePath, newJsonContents);
+  output('Stats file updated');
 };
 
 export const sortByPriority = (

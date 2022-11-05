@@ -22,5 +22,6 @@ module.exports = {
     '@typescript-eslint/promise-function-async': 'off',
     '@typescript-eslint/no-floating-promises': 'off',
     '@typescript-eslint/require-array-sort-compare': 'off',
+    'no-lone-blocks': 'off',
   },
 };

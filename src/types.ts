@@ -1,10 +1,20 @@
-export interface QueueEvent {
-  name: ContractEventsSignatures
+interface ContractEventArguments {
+  colonyAddress?: string
+  token?: string
+}
+
+export interface ContractEvent {
+  name: string
+  signature: ContractEventsSignatures
+  args?: ContractEventArguments
 };
 
 export enum QueueEvents {
   NewEvent = 'NewEvent',
   QueueUpdated = 'QueueUpdated',
+  ProcessEvents = 'ProcessEvents', // start processing events in queue
+  ProcessEvent = 'ProcessEvent', // process a individual event
+  EventProcessed = 'EventProcessed',
 };
 
 export enum ContractEventsSignatures {

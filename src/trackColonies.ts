@@ -4,15 +4,19 @@ import { getLogs } from '@colony/colony-js';
 
 import networkClient from './networkClient';
 import { output, writeJsonStats } from './utils';
+import { addEvent } from './eventQueue';
+import { ContractEvent, ContractEventsSignatures } from './types';
 
 dotenv.config();
+
+export const coloniesSet = new Set();
 
 export default async (): Promise<void> => {
   const { provider } = networkClient;
 
-  const colonies = new Set();
+  const colonies = coloniesSet;
 
-  output('Fetching initial colonies');
+  output('Fetching already deployed colonies');
 
   const colonyAddedLogs = await getLogs(
     networkClient,
@@ -31,15 +35,12 @@ export default async (): Promise<void> => {
 
   const colonyAddedFilter = {
     address: networkClient.address,
-    topics: [utils.id('ColonyAdded(uint256,address,address)')],
+    topics: [utils.id(ContractEventsSignatures.ColonyAdded)],
   };
 
-  output('Starting "ColonyAdded(uint256,address,address)" event listener');
+  output(`Adding "${ContractEventsSignatures.ColonyAdded}" event listener`);
 
   provider.on(colonyAddedFilter, async (log) => {
-    const { args: { colonyAddress, token } } = networkClient.interface.parseLog(log) || {};
-    colonies.add(JSON.stringify({ colonyAddress, tokenAddress: token }));
-    await writeJsonStats({ trackedColonies: colonies.size });
-    output('Found new Colony:', colonyAddress, 'Total colonies:', colonies.size);
+    addEvent(networkClient.interface.parseLog(log) as ContractEvent);
   });
 };
