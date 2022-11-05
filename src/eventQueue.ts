@@ -50,4 +50,8 @@ eventQueue.on(QueueEvents.NewEvent, function (this: EventQueue, event: ContractE
   this.emit(QueueEvents.QueueUpdated);
 });
 
+/*
+ * Once your contract event lister finds a new event, pass it to
+ * the Events Queue System using this method
+ */
 export const addEvent = (event: ContractEvent): boolean => eventQueue.emit(QueueEvents.NewEvent, event);
