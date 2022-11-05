@@ -7,7 +7,7 @@
     "build": "rm -rf dist/* && npx tsc",
     "start": "node dist/index.js",
     "dev": "ts-node-dev src/index.ts",
-    "prod": "npm run build && npm run start",
+    "prod": "npm run build && NODE_ENV=production npm run start",
     "typecheck": "tsc --noEmit",
     "lint": "eslint src/ --ext .ts"
   },

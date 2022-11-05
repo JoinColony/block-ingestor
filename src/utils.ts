@@ -3,10 +3,8 @@ import path from 'path';
 
 import { SortOrder } from './types';
 
-import { name } from '../package.json';
-
 export const output = (...messages: any[]): void =>
-  console.log(`[${name} ${new Date().toJSON()}]`, ...messages);
+  console.log(`[TX Ingestor ${new Date().toJSON()}]`, ...messages);
 
 export const readJsonStats = async (
   filePath = `${path.resolve(__dirname, '..')}/run/stats.json`,
