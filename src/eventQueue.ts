@@ -10,9 +10,8 @@ dotenv.config();
 class EventQueue extends EventEmitter {
   queue: ContractEvent[];
 
-  constructor () {
-    super();
-
+  constructor (options?: Record<string, unknown>) {
+    super(options);
     this.queue = [];
   }
 }
@@ -24,6 +23,9 @@ eventQueue.on(QueueEvents.ProcessEvent, function (this: EventQueue, event: Contr
   eventProcessor(event);
 });
 
+/*
+ * @TODO Add batching logic (if needed)
+ */
 eventQueue.on(QueueEvents.ProcessEvents, function (this: EventQueue) {
   verbose('Processing', this.queue.length, 'events in queue');
   for (let index = 0; index < this.queue.length; index += 1) {

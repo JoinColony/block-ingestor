@@ -1,8 +1,14 @@
 import dotenv from 'dotenv';
 import { ensureFile, readJson, writeJson } from 'fs-extra';
 import path from 'path';
+import { utils } from 'ethers';
+import { Log, EventType } from '@ethersproject/providers';
+import { ClientType, ContractClient, getTokenClient } from '@colony/colony-js';
 
-import { SortOrder } from './types';
+import { coloniesSet } from './trackColonies';
+import networkClient from './networkClient';
+import { addEvent } from './eventQueue';
+import { ContractEventsSignatures, SortOrder, contractEvetsToClientMap } from './types';
 
 dotenv.config();
 
@@ -85,4 +91,59 @@ export const sortByPriority = (
     result = 1;
   }
   return (order === SortOrder.Desc) ? ~result : result;
+};
+
+export const setToJS = (
+  set: Set<string>,
+): Array<Record<string, string>> => Array.from(set).map(entry => JSON.parse(entry));
+
+export const addProviderListener = async (
+  eventSignature: ContractEventsSignatures,
+): Promise<void> => {
+  const { provider } = networkClient;
+  const clientType = contractEvetsToClientMap[eventSignature];
+
+  let filters: EventType[] = [];
+  if (clientType === ClientType.NetworkClient) {
+    filters = [{
+      address: networkClient.address,
+      topics: [utils.id(eventSignature)],
+    }];
+  }
+  if (clientType === ClientType.ColonyClient) {
+    filters = setToJS(coloniesSet)
+      .map(({ colonyAddress }) => ({
+        address: colonyAddress,
+        topics: [utils.id(eventSignature)],
+      }));
+  }
+  if (clientType === ClientType.TokenClient) {
+    filters = [{
+      topics: [utils.id(eventSignature)],
+    }];
+  }
+
+  filters.map(filter => {
+    const { address: contractAddress } = filter as { address?: string, topics: string[] } || {};
+    verbose('Added listener for event', eventSignature, contractAddress ? `filtering address ${contractAddress}` : '');
+    provider.on(filter, async (log: Log) => {
+      const { transactionHash, logIndex, address } = log;
+      let client: ContractClient = networkClient;
+
+      if (clientType === ClientType.ColonyClient) {
+        client = await networkClient.getColonyClient(address);
+      }
+      if (clientType === ClientType.TokenClient) {
+        client = await getTokenClient(address, provider);
+      }
+
+      addEvent({
+        ...client.interface.parseLog(log),
+        transactionHash,
+        logIndex,
+        contractAddress: address,
+      });
+    });
+    return undefined;
+  });
 };

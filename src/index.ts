@@ -4,6 +4,7 @@ import { utils } from 'ethers';
 
 import blockListener from './blockListener';
 import trackColonies from './trackColonies';
+import eventListener from './eventListener';
 import { output, readJsonStats } from './utils';
 
 dotenv.config();
@@ -31,6 +32,6 @@ app.listen(port, async () => {
   output(`Liveness check available at http://localhost:${port}/liveness`);
 
   trackColonies();
-
   blockListener();
+  eventListener();
 });
