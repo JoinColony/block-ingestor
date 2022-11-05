@@ -1,7 +1,7 @@
 import { EventEmitter } from 'events';
 import dotenv from 'dotenv';
 
-import { output, sortByPriority } from './utils';
+import { verbose, sortByPriority } from './utils';
 import { ContractEvent, QueueEvents, ContractEventsSignatures } from './types';
 import eventProcessor from './eventProcessor';
 
@@ -20,12 +20,12 @@ class EventQueue extends EventEmitter {
 const eventQueue = new EventQueue();
 
 eventQueue.on(QueueEvents.ProcessEvent, function (this: EventQueue, event: ContractEvent) {
-  output(`Processing event "${event.signature}"`);
+  verbose(`Processing event "${event.signature}"`);
   eventProcessor(event);
 });
 
 eventQueue.on(QueueEvents.ProcessEvents, function (this: EventQueue) {
-  output('Processing', this.queue.length, 'events in queue');
+  verbose('Processing', this.queue.length, 'events in queue');
   for (let index = 0; index < this.queue.length; index += 1) {
     this.emit(QueueEvents.ProcessEvent, this.queue.shift());
   }
@@ -50,13 +50,13 @@ eventQueue.on(QueueEvents.QueueUpdated, function (this: EventQueue) {
       },
     ));
   }
-  output('Event queue updated');
+  verbose('Event queue updated');
   this.emit(QueueEvents.ProcessEvents);
 });
 
 eventQueue.on(QueueEvents.NewEvent, function (this: EventQueue, event: ContractEvent) {
   this.queue.push(event);
-  output(`Event "${event?.signature || ContractEventsSignatures.UknownEvent}" added to the queue`);
+  verbose(`Event "${event?.signature || ContractEventsSignatures.UknownEvent}" added to the queue`);
   this.emit(QueueEvents.QueueUpdated);
 });
 

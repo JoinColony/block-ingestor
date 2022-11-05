@@ -1,10 +1,20 @@
+import dotenv from 'dotenv';
 import { ensureFile, readJson, writeJson } from 'fs-extra';
 import path from 'path';
 
 import { SortOrder } from './types';
 
+dotenv.config();
+
 export const output = (...messages: any[]): void =>
   console.log(`[TX Ingestor ${new Date().toJSON()}]`, ...messages);
+
+export const verbose = (...messages: any[]): void => {
+  const verboseOutput = process.env.VERBOSE_OUTPUT === 'true';
+  if (verboseOutput) {
+    output(...messages);
+  }
+};
 
 export const readJsonStats = async (
   filePath = `${path.resolve(__dirname, '..')}/run/stats.json`,
@@ -37,7 +47,7 @@ export const writeJsonStats = async (
   };
 
   await writeJson(filePath, newJsonContents);
-  output('Stats file updated');
+  verbose('Stats file updated');
 };
 
 export const sortByPriority = (

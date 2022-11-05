@@ -1,9 +1,9 @@
 import dotenv from 'dotenv';
-import { utils } from 'ethers';
+import { utils, BigNumber } from 'ethers';
 import { getLogs } from '@colony/colony-js';
 
 import networkClient from './networkClient';
-import { output, writeJsonStats } from './utils';
+import { output, writeJsonStats, verbose } from './utils';
 import { addEvent } from './eventQueue';
 import { ContractEvent, ContractEventsSignatures } from './types';
 
@@ -16,7 +16,7 @@ export default async (): Promise<void> => {
 
   const colonies = coloniesSet;
 
-  output('Fetching already deployed colonies');
+  verbose('Fetching already deployed colonies');
 
   const colonyAddedLogs = await getLogs(
     networkClient,
@@ -25,20 +25,25 @@ export default async (): Promise<void> => {
 
   colonyAddedLogs.map(log => {
     const { args: { colonyAddress, token } } = networkClient.interface.parseLog(log) || {};
-    colonies.add(JSON.stringify({ colonyAddress, tokenAddress: token }));
+    colonies.add(JSON.stringify({
+      colonyAddress,
+      nativeTokenAddress: token,
+      balance: BigNumber.from(0),
+      unclaimedBalance: BigNumber.from(0),
+    }));
     return null;
   });
 
   await writeJsonStats({ trackedColonies: colonies.size });
 
-  output('Fetched', colonies.size, 'colonies in total');
+  output('Fetched', colonies.size, 'currently deployed colonies');
 
   const colonyAddedFilter = {
     address: networkClient.address,
     topics: [utils.id(ContractEventsSignatures.ColonyAdded)],
   };
 
-  output(`Adding "${ContractEventsSignatures.ColonyAdded}" event listener`);
+  verbose(`Adding "${ContractEventsSignatures.ColonyAdded}" event listener`);
 
   provider.on(colonyAddedFilter, async (log) => {
     addEvent(networkClient.interface.parseLog(log) as ContractEvent);
