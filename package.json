@@ -9,7 +9,8 @@
     "dev": "ts-node-dev src/index.ts",
     "prod": "npm run build && NODE_ENV=production npm run start",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint src/ --ext .ts"
+    "lint": "eslint src/ --ext .ts",
+    "preinstall": "bash scripts/generate-temp-files.sh"
   },
   "repository": {
     "type": "git",
