@@ -4,7 +4,7 @@ import path from 'path';
 import { name } from '../package.json';
 
 export const output = (...messages: any[]): void =>
-  console.log(`[${name}]`, ...messages);
+  console.log(`[${name} ${new Date().toJSON()}]`, ...messages);
 
 export const readJsonStats = async (
   filePath = `${path.resolve(__dirname, '..')}/run/stats.json`,
