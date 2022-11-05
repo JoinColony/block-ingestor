@@ -1,10 +1,10 @@
 import { LogDescription } from '@ethersproject/abi';
-import { ClientType } from '@colony/colony-js';
 
 export interface ContractEvent extends LogDescription {
   transactionHash: string
   logIndex: number
   contractAddress: string
+  blockNumber: number
 }
 
 export enum QueueEvents {
@@ -39,17 +39,7 @@ export enum EthersObserverEvents {
  * before the ones with negative priority
  */
 export const contractEventsPriorityMap = {
-  [ContractEventsSignatures.Transfer]: 2,
-  [ContractEventsSignatures.ColonyFundsClaimed]: 3,
+  [ContractEventsSignatures.Transfer]: 1,
+  [ContractEventsSignatures.ColonyFundsClaimed]: 2,
   [ContractEventsSignatures.UknownEvent]: -1,
-};
-
-/*
- * Which event should be handled with which colonyJS client type
- */
-export const contractEvetsToClientMap = {
-  [ContractEventsSignatures.UknownEvent]: ClientType.NetworkClient,
-  [ContractEventsSignatures.ColonyAdded]: ClientType.NetworkClient,
-  [ContractEventsSignatures.Transfer]: ClientType.TokenClient,
-  [ContractEventsSignatures.ColonyFundsClaimed]: ClientType.ColonyClient,
 };
