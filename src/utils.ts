@@ -16,7 +16,7 @@ dotenv.config();
  * Used for basic stuff, which will always be logged
  */
 export const output = (...messages: any[]): void =>
-  console.log(`[TX Ingestor ${new Date().toJSON()}]`, ...messages);
+  console.log(new Date().toJSON(), ...messages);
 
 /*
  * Log to console with name and timestamp

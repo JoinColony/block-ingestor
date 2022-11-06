@@ -15,7 +15,7 @@ const app = express();
 const port = process.env.STATS_PORT;
 
 app.get('/', (req: Request, res: Response) => {
-  res.type('text/plain').send('TX Ingestor');
+  res.type('text/plain').send(process.env.NODE_ENV !== 'production' ? 'TX Ingestor' : '');
 });
 
 /*
@@ -33,7 +33,7 @@ app.get('/stats', (req, res) => {
 });
 
 const startStatsServer = async (): Promise<Server> => app.listen(port, () => {
-  output('Transactions Ingestor is Running');
+  output('TX Ingestor is Running');
   output(`Stats available at http://localhost:${port}/stats`);
   output(`Liveness check available at http://localhost:${port}/liveness`);
 });
