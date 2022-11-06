@@ -39,7 +39,7 @@ const startStatsServer = async (): Promise<Server> => app.listen(port, () => {
   output(`Liveness check available at http://localhost:${port}/liveness`);
 });
 
-const startIngestort = async (): Promise<void> => {
+const startIngestor = async (): Promise<void> => {
   /*
   * Get all colonies currently deployed
   */
@@ -55,7 +55,7 @@ const start = async (): Promise<void> => {
   if (port) {
     await startStatsServer();
   }
-  startIngestort();
+  startIngestor();
 };
 
 start();
