@@ -43,7 +43,8 @@ export default async (event: ContractEvent): Promise<void> => {
     }
 
     /*
-     * New ERC-20 (but not Native Chain Token -- 0x0000...0000) transfers
+     * New ERC-20 transfers
+     * (but not Native Chain Token -- 0x0000...0000)
      */
     case ContractEventsSignatures.Transfer: {
       const { contractAddress, transactionHash, logIndex, blockNumber } = event ?? {};

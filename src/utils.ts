@@ -78,7 +78,7 @@ export const writeJsonStats = async (
 /*
  * Sort an array by a list (object) of priorities
  * List (object) key is customizable, and priorties are positive integers
- * Negative integers relegate the items at the back of the array
+ * Negative integers relegate the items to the back of the array
  *
  * See: `contractEventsPriorityMap` from `./types` for an example
  */
@@ -104,6 +104,9 @@ export const sortByPriority = (
     : maxPriority + 1;
 
   /*
+   * @TODO Properly test with descending sort, it think there needs to be
+   * a bitwise flip in here as well
+   *
    * Negative sort priority moves it to the back of the list
    */
   if (first < 0 || second < 0) {
@@ -116,7 +119,23 @@ export const sortByPriority = (
   } else if (first > second) {
     result = 1;
   }
-  return (order === SortOrder.Desc) ? ~result : result;
+
+  if (order === SortOrder.Desc) {
+    /*
+     * @NOTE Bitwise Not Operator -- Basically flips the bits
+     *
+     * This works because -1, 0, and 1 with the bits flipped are more-or-less
+     * their exact opposite (bitwise) meaning it's perfect when sorting in the
+     * other direction
+     *
+     * Eg:
+     * 1 (Integer) = 00000000000000000000000000000001 (32-bit signed series of bits)
+     * ~1 (Integer) = 11111111111111111111111111111110 (32-bit signed series of bits)
+     * 11111111111111111111111111111110 (32-bit signed series of bits) = -2 (Integer)
+     */
+    return ~result;
+  }
+  return result;
 };
 
 /*
