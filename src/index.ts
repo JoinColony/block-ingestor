@@ -29,7 +29,6 @@ app.get('/liveness', (req, res) => res.sendStatus(200));
 app.get('/stats', (req, res) => {
   readJsonStats().then(
     stats => res.type('json').send(stats),
-    () => {},
   );
 });
 
