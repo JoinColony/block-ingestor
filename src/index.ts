@@ -6,6 +6,7 @@ import { utils } from 'ethers';
 import blockListener from './blockListener';
 import trackColonies from './trackColonies';
 import eventListener from './eventListener';
+import amplifyClientSetup from './amplifyClient';
 import { output, readJsonStats } from './utils';
 
 dotenv.config();
@@ -55,6 +56,7 @@ const start = async (): Promise<void> => {
     await startStatsServer();
   }
   startIngestor();
+  amplifyClientSetup();
 };
 
 start();
