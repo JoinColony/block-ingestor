@@ -7,7 +7,7 @@ import { AnyColonyClient, ClientType, ColonyNetworkClient, getTokenClient, Token
 
 import networkClient from './networkClient';
 import { addEvent } from './eventQueue';
-import { ContractEventsSignatures, SortOrder } from './types';
+import { ContractEventsSignatures } from './types';
 
 dotenv.config();
 
@@ -90,7 +90,7 @@ export const setToJS = (
  */
 export const eventListenerGenerator = async (
   eventSignature: ContractEventsSignatures,
-  contractAddress?: string,
+  contractAddress: string,
   clientType: ClientType = ClientType.NetworkClient,
 ): Promise<void> => {
   const { provider } = networkClient;
@@ -99,10 +99,17 @@ export const eventListenerGenerator = async (
     client = await networkClient.getColonyClient(contractAddress);
   }
 
-  const filter: { topics: string[], address?: string } = {
+  const filter: { topics: Array<string | null>, address?: string } = {
     topics: [utils.id(eventSignature)],
   };
-  if (contractAddress) {
+
+  if (clientType === ClientType.TokenClient) {
+    filter.topics = [
+      ...filter.topics,
+      null,
+      utils.hexZeroPad(contractAddress, 32),
+    ];
+  } else {
     filter.address = contractAddress;
   }
 
@@ -159,8 +166,9 @@ export const addColonyEventListener = async (
  */
 export const addTokenEventListener = async (
   eventSignature: ContractEventsSignatures,
+  contractAddress: string,
 ): Promise<void> => await eventListenerGenerator(
   eventSignature,
-  undefined,
+  contractAddress,
   ClientType.TokenClient,
 );

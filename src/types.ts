@@ -32,14 +32,6 @@ export enum ContractEventsSignatures {
 }
 
 /*
- * Sort directions... obviously
- */
-export enum SortOrder {
-  Asc = 'ascending',
-  Desc = 'descending',
-}
-
-/*
  * The internal Ethers event names for which we can set listeners
  * (Which for some reason Ethers doesn't export the types for)
  */
