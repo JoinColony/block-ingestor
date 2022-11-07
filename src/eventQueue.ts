@@ -39,15 +39,16 @@ eventQueue.on(QueueEvents.ProcessEvents, function (this: EventQueue) {
 });
 
 /*
- * Sort the current queue
+ * Do updates to the queue before processing it
+ *
+ * This originally sorted the the queue list based on priorities, but that is
+ * no longer relevant, so we're processing them in the order we're receiving them.
+ *
+ * In the future we might do "ensure proper order", sort, by getting all events in the
+ * queue and sort them based on their log index, so as to ensure they didn't added
+ * to the list out of order
  */
 eventQueue.on(QueueEvents.QueueUpdated, function (this: EventQueue) {
-  if (this.queue.length) {
-    this.queue = this.queue.sort(sortByPriority(
-      'signature',
-      contractEventsPriorityMap,
-    ));
-  }
   verbose('Event queue updated');
   this.emit(QueueEvents.ProcessEvents);
 });

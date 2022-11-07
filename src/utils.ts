@@ -76,69 +76,6 @@ export const writeJsonStats = async (
 };
 
 /*
- * Sort an array by a list (object) of priorities
- * List (object) key is customizable, and priorties are positive integers
- * Negative integers relegate the items to the back of the array
- *
- * See: `contractEventsPriorityMap` from `./types` for an example
- */
-export const sortByPriority = (
-  key: string,
-  priorities: Record<string, number>,
-  order = SortOrder.Asc,
-): ((firstEntry: any, secondEntry: any) => number) => (firstEntry, secondEntry) => {
-  if (
-    !Object.prototype.hasOwnProperty.call(firstEntry, key) ||
-    !Object.prototype.hasOwnProperty.call(secondEntry, key)
-  ) {
-    return 0;
-  }
-
-  const [maxPriority] = Object.values(priorities).sort().reverse();
-
-  const first = (firstEntry[key] in priorities)
-    ? priorities[firstEntry[key] as keyof typeof priorities]
-    : maxPriority + 1;
-  const second = (secondEntry[key] in priorities)
-    ? priorities[secondEntry[key] as keyof typeof priorities]
-    : maxPriority + 1;
-
-  /*
-   * @TODO Properly test with descending sort, it think there needs to be
-   * a bitwise flip in here as well
-   *
-   * Negative sort priority moves it to the back of the list
-   */
-  if (first < 0 || second < 0) {
-    return -1;
-  }
-
-  let result = 0;
-  if (first < second) {
-    result = -1;
-  } else if (first > second) {
-    result = 1;
-  }
-
-  if (order === SortOrder.Desc) {
-    /*
-     * @NOTE Bitwise Not Operator -- Basically flips the bits
-     *
-     * This works because -1, 0, and 1 with the bits flipped are more-or-less
-     * their exact opposite (bitwise) meaning it's perfect when sorting in the
-     * other direction
-     *
-     * Eg:
-     * 1 (Integer) = 00000000000000000000000000000001 (32-bit signed series of bits)
-     * ~1 (Integer) = 11111111111111111111111111111110 (32-bit signed series of bits)
-     * 11111111111111111111111111111110 (32-bit signed series of bits) = -2 (Integer)
-     */
-    return ~result;
-  }
-  return result;
-};
-
-/*
  * Convert a Set that contains a JSON string, back into JS form
  */
 export const setToJS = (
