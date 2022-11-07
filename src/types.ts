@@ -47,15 +47,4 @@ export enum EthersObserverEvents {
   Block = 'block',
 }
 
-/*
- * Sort priority for events
- *
- * If negative priority, it will be relegated to the back of the array
- * If not listed it will be sorted after the ones with priority set, and
- * before the ones with negative priority
- */
-export const contractEventsPriorityMap = {
-  [ContractEventsSignatures.Transfer]: 1,
-  [ContractEventsSignatures.ColonyFundsClaimed]: 2,
-  [ContractEventsSignatures.UknownEvent]: -1,
-};
+export type ChainID = number;

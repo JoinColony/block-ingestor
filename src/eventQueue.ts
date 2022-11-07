@@ -1,8 +1,8 @@
 import { EventEmitter } from 'events';
 import dotenv from 'dotenv';
 
-import { verbose, sortByPriority } from './utils';
-import { ContractEvent, QueueEvents, ContractEventsSignatures, contractEventsPriorityMap } from './types';
+import { verbose } from './utils';
+import { ContractEvent, QueueEvents, ContractEventsSignatures } from './types';
 import eventProcessor from './eventProcessor';
 
 dotenv.config();

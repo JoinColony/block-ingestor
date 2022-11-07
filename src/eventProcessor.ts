@@ -2,6 +2,7 @@ import { output, writeJsonStats, setToJS, verbose } from './utils';
 import { coloniesSet } from './trackColonies';
 import networkClient from './networkClient';
 import { colonySpecificEventsListener } from './eventListener';
+import { getChainId } from './provider';
 import { ContractEventsSignatures, ContractEvent } from './types';
 
 /*
@@ -48,6 +49,7 @@ export default async (event: ContractEvent): Promise<void> => {
      */
     case ContractEventsSignatures.Transfer: {
       const { contractAddress, transactionHash, logIndex, blockNumber } = event ?? {};
+      const chainId = getChainId();
       /*
        * @NOTE Take the values from the "array" rather than from the named properties
        * This is because our native tokens differ in abi from ERC20 or SAI tokens
@@ -84,7 +86,7 @@ export default async (event: ContractEvent): Promise<void> => {
          * @TODO Wire up GraphQL mutation once available
          */
         verbose({
-          id: `${transactionHash}_${logIndex}`,
+          id: `${chainId}_${transactionHash}_${logIndex}`,
           colonyId: dst,
           tokenId: contractAddress,
           createdAtBlock: blockNumber,
