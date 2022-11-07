@@ -1,8 +1,9 @@
-import { output, writeJsonStats, setToJS, verbose } from './utils';
+import { output, writeJsonStats, verbose } from './utils';
 import { coloniesSet } from './trackColonies';
 import networkClient from './networkClient';
 import { colonySpecificEventsListener } from './eventListener';
 import { getChainId } from './provider';
+import { query, mutate } from './amplifyClient';
 import { ContractEventsSignatures, ContractEvent } from './types';
 
 /*
@@ -75,29 +76,42 @@ export default async (event: ContractEvent): Promise<void> => {
        * If that's the case, we need to filter it out.
        */
       const isMiningCycleTransfer = source === networkClient.address && wad.isZero();
-      const destinationIsTrackedColony = setToJS(coloniesSet).find(
-        ({ colonyAddress }) => colonyAddress === dst,
-      );
+      /*
+       * @TODO Improve event listener to only track transfers into colonies addresses
+       */
+      // const destinationIsTrackedColony = setToJS(coloniesSet).find(
+      //   ({ colonyAddress }) => colonyAddress === dst,
+      // );
 
-      if (destinationIsTrackedColony && !isMiningCycleTransfer) {
+      if (!isMiningCycleTransfer) {
         const amount = wad.toString();
-        output('Found new Transfer of:', amount, 'into Colony:', dst);
-        /*
-         * @TODO Wire up GraphQL mutation once available
-         */
-        verbose({
-          id: `${chainId}_${transactionHash}_${logIndex}`,
-          colonyId: dst,
-          tokenId: contractAddress,
-          createdAtBlock: blockNumber,
-          args: {
-            source,
-            amount,
-          },
-          status: {
-            claimed: false,
-          },
-        });
+        const transactionId = `${chainId}_${transactionHash}_${logIndex}`;
+
+        const {
+          id: existentTransaction,
+        } = await query('getTransactionById', { transactionId });
+
+        output(
+          'Found new Transfer of:', amount, 'into Colony:', dst,
+          existentTransaction
+            ? 'but not acting upon it since it already exists in the database'
+            : '',
+        );
+
+        if (!existentTransaction) {
+          await mutate('createColonyTransaction', {
+            input: {
+              id: transactionId,
+              colonyTransactionsId: dst,
+              colonyTransactionTokenId: contractAddress,
+              createdAtBlock: blockNumber,
+              args: {
+                source,
+                amount,
+              },
+            },
+          });
+        }
       }
       return;
     }

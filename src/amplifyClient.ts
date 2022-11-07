@@ -1,4 +1,4 @@
-import { Amplify } from 'aws-amplify';
+import { Amplify, API, graphqlOperation } from 'aws-amplify';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -39,26 +39,48 @@ export const queries = {
   }`,
 };
 
-// const httpLink = new HttpLink({
-//   uri: `${process.env.AWS_APPSYNC_ENDPOINT}/graphql`,
-//   headers: {
-//     'x-api-key': process.env.AWS_APPSYNC_KEY,
-//   },
-// });
-
-// export default new ApolloClient({
-//   ssrMode: true,
-//   link: httpLink,
-//   cache: new InMemoryCache(),
-//   // @ts-ignore
-//   something: { hello: true },
-// });
-
 export default (): void => {
   Amplify.configure({
     aws_appsync_graphqlEndpoint: `${process.env.AWS_APPSYNC_ENDPOINT}/graphql`,
-    // aws_appsync_region: 'eu-central-1',
     aws_appsync_authenticationType: 'API_KEY',
     aws_appsync_apiKey: process.env.AWS_APPSYNC_KEY,
   });
+};
+
+export const query = async (
+  queryName: keyof typeof queries,
+  /*
+   * @TODO Would be nice if at some point we could actually set these
+   * types properly
+   */
+  variables?: Record<string, unknown>,
+): Promise<any> => {
+  try {
+    const result = await API.graphql(
+      graphqlOperation(queries[queryName], variables),
+    );
+    const [internalQueryName] = Object.keys(result?.data ?? []);
+    return result?.data[internalQueryName] ?? {};
+  } catch (error) {
+    console.error(`Could not fetch query "${queryName}"`, error);
+    return undefined;
+  }
+};
+
+export const mutate = async (
+  mutationName: keyof typeof mutations,
+  /*
+   * @TODO Would be nice if at some point we could actually set these
+   * types properly
+   */
+  variables?: { input: Record<string, unknown> },
+): Promise<void> => {
+  try {
+    await API.graphql(
+      graphqlOperation(mutations[mutationName], variables),
+    );
+  } catch (error) {
+    console.error(`Could not execute mutation "${mutationName}"`, error);
+    return undefined;
+  }
 };
