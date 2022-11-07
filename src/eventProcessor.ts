@@ -1,4 +1,4 @@
-import { output, writeJsonStats, verbose } from './utils';
+import { output, writeJsonStats } from './utils';
 import { coloniesSet } from './trackColonies';
 import networkClient from './networkClient';
 import { colonySpecificEventsListener } from './eventListener';
@@ -87,6 +87,13 @@ export default async (event: ContractEvent): Promise<void> => {
         const amount = wad.toString();
         const transactionId = `${chainId}_${transactionHash}_${logIndex}`;
 
+        /*
+         * @NOTE That this check is mainly required for local development where
+         * the chain does not mine a new block automatically, so you'll most likely
+         * run parsing / events listener on the same block over and over
+         * So as to not mess up your data / database, only create the event
+         * if it does not exist
+         */
         const {
           id: existentTransaction,
         } = await query('getTransactionById', { transactionId });
@@ -120,23 +127,51 @@ export default async (event: ContractEvent): Promise<void> => {
      * New Colony transfer claims
      */
     case ContractEventsSignatures.ColonyFundsClaimed: {
-      const { contractAddress } = event ?? {};
+      const { contractAddress: colonyAddress, blockNumber } = event ?? {};
       const { token: tokenAddress } = event?.args ?? {};
 
-      output('Found new Transfer Claim for Token:', tokenAddress, 'by Colony:', contractAddress);
-      /*
-       * @TODO Wire up GraphQL mutation once available
-       *
-       * This needs to find all transfer entries that are unclaimed in the database,
-       * which were created before this claim
-       */
-      verbose({
-        colonyId: contractAddress,
-        tokenId: tokenAddress,
-        status: {
-          claimed: true,
+      const { items: unclaimedTransactions } = await query(
+        'getColonyUnclaimedTransactions', {
+          colonyAddress,
+          tokenAddress,
+          upToBlock: blockNumber,
         },
-      });
+      );
+
+      /*
+       * This check is actually required since anybody can make payout claims
+       * for any colony, any time, even if there's nothing left to claim
+       * (basically do claims for 0)
+       */
+      const colonyHasTransactionsUnclaimed = unclaimedTransactions?.length;
+
+      output(
+        'Found new Transfer Claim for Token:', tokenAddress, 'by Colony:', colonyAddress,
+        !colonyHasTransactionsUnclaimed
+          ? 'but not acting upon it since all existing non-zero transactions were claimed for this token'
+          : '',
+      );
+
+      /*
+       * Colony needs to exist (this should not happen, but a safety check nontheless)
+       * and to have unclaimed transactions for this token
+       */
+      if (colonyHasTransactionsUnclaimed) {
+        await Promise.all(
+          unclaimedTransactions.map(
+            async ({ id }: { id: string }) => await mutate(
+              'updateColonyTransaction', {
+                input: {
+                  id,
+                  colonyTransactionsId: colonyAddress,
+                  colonyTransactionTokenId: tokenAddress,
+                  claimed: String(true),
+                },
+              }),
+          ),
+        );
+      }
+
       return;
     }
 

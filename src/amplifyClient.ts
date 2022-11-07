@@ -20,17 +20,21 @@ export const mutations = {
   }`,
 };
 
+/*
+ * @NOTE These queries are custom
+ */
 export const queries = {
   getColonyUnclaimedTransactions: /* GraphQL */ `
-  query GetColonyUnclaimedTransactions($colonyAddress: ID!, $startingBlock: Int = 1) {
-    getColonyByAddress(id: $colonyAddress) {
-      items {
-        id
-        type
-        transactions(filter: { claimed: { ne: "true" }, createdAtBlock: { gt: $startingBlock } }) {
-          items { id }
-        }
+  query GetColonyUnclaimedTransactions($colonyAddress: ID!, $tokenAddress: ID!, $upToBlock: Int = 1) {
+    listColonyTransactions(
+      filter: {
+        colonyTransactionsId: { eq: $colonyAddress }
+        colonyTransactionTokenId: { eq: $tokenAddress },
+        claimed: { ne: "true" },
+        createdAtBlock: { le: $upToBlock }
       }
+    ) {
+      items { id }
     }
   }`,
   getTransactionById: /* GraphQL */ `
