@@ -10,37 +10,35 @@ dotenv.config();
  */
 
 export const mutations = {
-  createColonyTransaction: /* GraphQL */ `
-  mutation CreateColonyTransaction($input: CreateColonyTransactionInput!, $condition: ModelColonyTransactionConditionInput) {
-    createColonyTransaction(input: $input, condition: $condition) { id }
-  }`,
-  updateColonyTransaction: /* GraphQL */ `
-  mutation UpdateColonyTransaction($input: UpdateColonyTransactionInput!, $condition: ModelColonyTransactionConditionInput) {
-    updateColonyTransaction(input: $input, condition: $condition) { id }
-  }`,
+  createColonyFundsClaim: /* GraphQL */ `
+    mutation CreateColonyFundsClaim($input: CreateColonyFundsClaimInput!, $condition: ModelColonyFundsClaimConditionInput) {
+      createColonyFundsClaim(input: $input, condition: $condition) { id }
+    }`,
+  deleteColonyFundsClaim: /* GraphQL */ `
+    mutation DeleteColonyFundsClaim($input: DeleteColonyFundsClaimInput!, $condition: ModelColonyFundsClaimConditionInput) {
+      deleteColonyFundsClaim(input: $input, condition: $condition) { id }
+    }`,
 };
 
 /*
  * @NOTE These queries are custom
  */
 export const queries = {
-  getColonyUnclaimedTransactions: /* GraphQL */ `
-  query GetColonyUnclaimedTransactions($colonyAddress: ID!, $tokenAddress: ID!, $upToBlock: Int = 1) {
-    listColonyTransactions(
-      filter: {
-        colonyTransactionsId: { eq: $colonyAddress }
-        colonyTransactionTokenId: { eq: $tokenAddress },
-        claimed: { ne: "true" },
-        createdAtBlock: { le: $upToBlock }
+  getColonyUnclaimedFunds: /* GraphQL */ `
+    query GetColonyUnclaimedFunds($colonyAddress: ID!, $upToBlock: Int = 1) {
+      listColonyFundsClaims(
+        filter: {
+          colonyFundsClaimsId: {eq: $colonyAddress },
+          createdAtBlock: { le: $upToBlock }
+        }
+      ) {
+        items { id }
       }
-    ) {
-      items { id }
-    }
-  }`,
-  getTransactionById: /* GraphQL */ `
-  query GetTransactionById($transactionId: ID!) {
-    getColonyTransaction(id: $transactionId) { id }
-  }`,
+    }`,
+  getColonyUnclaimedFund: /* GraphQL */ `
+    query GetColonyUnclaimedFund($clamId: ID!) {
+      getColonyFundsClaim(id: $clamId) { id }
+    }`,
 };
 
 export default (): void => {

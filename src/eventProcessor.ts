@@ -1,3 +1,5 @@
+import dotenv from 'dotenv';
+
 import { output, writeJsonStats } from './utils';
 import { coloniesSet } from './trackColonies';
 import networkClient from './networkClient';
@@ -5,6 +7,8 @@ import { colonySpecificEventsListener } from './eventListener';
 import { getChainId } from './provider';
 import { query, mutate } from './amplifyClient';
 import { ContractEventsSignatures, ContractEvent } from './types';
+
+dotenv.config();
 
 /*
  * Here's where you'll be handling all your custom logic for the various events
@@ -76,46 +80,40 @@ export default async (event: ContractEvent): Promise<void> => {
        * If that's the case, we need to filter it out.
        */
       const isMiningCycleTransfer = source === networkClient.address && wad.isZero();
-      /*
-       * @TODO Improve event listener to only track transfers into colonies addresses
-       */
-      // const destinationIsTrackedColony = setToJS(coloniesSet).find(
-      //   ({ colonyAddress }) => colonyAddress === dst,
-      // );
 
       if (!isMiningCycleTransfer) {
+        let existingClaim;
         const amount = wad.toString();
-        const transactionId = `${chainId}_${transactionHash}_${logIndex}`;
-
+        const clamId = `${chainId}_${transactionHash}_${logIndex}`;
         /*
-         * @NOTE That this check is mainly required for local development where
+         * @NOTE That this check is only required for local development where
          * the chain does not mine a new block automatically, so you'll most likely
          * run parsing / events listener on the same block over and over
          * So as to not mess up your data / database, only create the event
          * if it does not exist
          */
-        const {
-          id: existentTransaction,
-        } = await query('getTransactionById', { transactionId });
+
+        if (process.env.NODE_ENV !== 'production') {
+          const { id: existingClaimId } = await query('getColonyUnclaimedFund', { clamId });
+          existingClaim = existingClaimId;
+        }
 
         output(
           'Found new Transfer of:', amount, 'into Colony:', dst,
-          existentTransaction
-            ? 'but not acting upon it since it already exists in the database'
+          existingClaim || amount === '0'
+            ? `but not acting upon it since ${existingClaim ? 'it already exists in the database' : ''}${amount === '0' ? 'it\'s value is zero' : ''}`
             : '',
         );
 
-        if (!existentTransaction) {
-          await mutate('createColonyTransaction', {
+        // Don't add zero transfer claims in the database
+        if (!existingClaim && amount !== '0') {
+          await mutate('createColonyFundsClaim', {
             input: {
-              id: transactionId,
-              colonyTransactionsId: dst,
-              colonyTransactionTokenId: contractAddress,
+              id: clamId,
+              colonyFundsClaimsId: dst,
+              colonyFundsClaimTokenId: contractAddress,
               createdAtBlock: blockNumber,
-              args: {
-                source,
-                amount,
-              },
+              amount,
             },
           });
         }
@@ -130,10 +128,9 @@ export default async (event: ContractEvent): Promise<void> => {
       const { contractAddress: colonyAddress, blockNumber } = event ?? {};
       const { token: tokenAddress } = event?.args ?? {};
 
-      const { items: unclaimedTransactions } = await query(
-        'getColonyUnclaimedTransactions', {
+      const { items: unclaimedFunds } = await query(
+        'getColonyUnclaimedFunds', {
           colonyAddress,
-          tokenAddress,
           upToBlock: blockNumber,
         },
       );
@@ -143,11 +140,11 @@ export default async (event: ContractEvent): Promise<void> => {
        * for any colony, any time, even if there's nothing left to claim
        * (basically do claims for 0)
        */
-      const colonyHasTransactionsUnclaimed = unclaimedTransactions?.length;
+      const colonyHasUnclaimedFunds = unclaimedFunds?.length;
 
       output(
         'Found new Transfer Claim for Token:', tokenAddress, 'by Colony:', colonyAddress,
-        !colonyHasTransactionsUnclaimed
+        !colonyHasUnclaimedFunds
           ? 'but not acting upon it since all existing non-zero transactions were claimed for this token'
           : '',
       );
@@ -156,18 +153,12 @@ export default async (event: ContractEvent): Promise<void> => {
        * Colony needs to exist (this should not happen, but a safety check nontheless)
        * and to have unclaimed transactions for this token
        */
-      if (colonyHasTransactionsUnclaimed) {
+      if (colonyHasUnclaimedFunds) {
         await Promise.all(
-          unclaimedTransactions.map(
+          unclaimedFunds.map(
             async ({ id }: { id: string }) => await mutate(
-              'updateColonyTransaction', {
-                input: {
-                  id,
-                  colonyTransactionsId: colonyAddress,
-                  colonyTransactionTokenId: tokenAddress,
-                  claimed: String(true),
-                },
-              }),
+              'deleteColonyFundsClaim', { input: { id } },
+            ),
           ),
         );
       }
