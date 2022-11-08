@@ -1,4 +1,5 @@
 import dotenv from 'dotenv';
+import { constants } from 'ethers';
 
 import { output, writeJsonStats } from './utils';
 import { coloniesSet } from './trackColonies';
@@ -128,41 +129,52 @@ export default async (event: ContractEvent): Promise<void> => {
       const { contractAddress: colonyAddress, blockNumber } = event ?? {};
       const { token: tokenAddress } = event?.args ?? {};
 
-      const { items: unclaimedFunds } = await query(
-        'getColonyUnclaimedFunds', {
-          colonyAddress,
-          upToBlock: blockNumber,
-        },
-      );
-
       /*
-       * This check is actually required since anybody can make payout claims
-       * for any colony, any time, even if there's nothing left to claim
-       * (basically do claims for 0)
+       * We're not handling native chain token claims from here, so no point
+       * in running through the whole logic just to end up with the same result
        */
-      const colonyHasUnclaimedFunds = unclaimedFunds?.length;
+      if (tokenAddress !== constants.AddressZero) {
+        const { items: unclaimedFunds } = await query(
+          'getColonyUnclaimedFunds', {
+            colonyAddress,
+            tokenAddress,
+            upToBlock: blockNumber,
+          },
+        );
 
-      output(
-        'Found new Transfer Claim for Token:', tokenAddress, 'by Colony:', colonyAddress,
-        !colonyHasUnclaimedFunds
-          ? 'but not acting upon it since all existing non-zero transactions were claimed for this token'
-          : '',
-      );
+        /*
+        * This check is actually required since anybody can make payout claims
+        * for any colony, any time, even if there's nothing left to claim
+        * (basically do claims for 0)
+        */
+        const colonyHasUnclaimedFunds = unclaimedFunds?.length;
 
-      /*
-       * Colony needs to exist (this should not happen, but a safety check nontheless)
-       * and to have unclaimed transactions for this token
-       */
-      if (colonyHasUnclaimedFunds) {
-        await Promise.all(
-          unclaimedFunds.map(
-            async ({ id }: { id: string }) => await mutate(
-              'deleteColonyFundsClaim', { input: { id } },
+        output(
+          'Found new Transfer Claim for Token:', tokenAddress, 'by Colony:', colonyAddress,
+          !colonyHasUnclaimedFunds
+            ? 'but not acting upon it since all existing non-zero transactions were claimed for this token'
+            : '',
+        );
+
+        /*
+        * Colony needs to exist (this should not happen, but a safety check nontheless)
+        * and to have unclaimed transactions for this token
+        */
+        if (colonyHasUnclaimedFunds) {
+          await Promise.all(
+            unclaimedFunds.map(
+              async ({ id }: { id: string }) => await mutate(
+                'deleteColonyFundsClaim', { input: { id } },
+              ),
             ),
-          ),
+          );
+        }
+      } else {
+        output(
+          'Found new Transfer Claim for Token:', tokenAddress, 'by Colony:', colonyAddress,
+          'but not acting upon it since it\'s a chain native token claim, and we\'re not handling these from here',
         );
       }
-
       return;
     }
 

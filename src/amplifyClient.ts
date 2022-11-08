@@ -25,10 +25,11 @@ export const mutations = {
  */
 export const queries = {
   getColonyUnclaimedFunds: /* GraphQL */ `
-    query GetColonyUnclaimedFunds($colonyAddress: ID!, $upToBlock: Int = 1) {
+    query GetColonyUnclaimedFunds($colonyAddress: ID!, $tokenAddress: ID!, $upToBlock: Int = 1) {
       listColonyFundsClaims(
         filter: {
-          colonyFundsClaimsId: {eq: $colonyAddress },
+          colonyFundsClaimsId: { eq: $colonyAddress },
+          colonyFundsClaimTokenId: { eq: $tokenAddress },
           createdAtBlock: { le: $upToBlock }
         }
       ) {
