@@ -1,5 +1,5 @@
 {
-  "name": "tx-ingestor",
+  "name": "block-ingestor",
   "version": "1.0.0",
   "description": "Microservice that ingests ERC20 transactions for Colony Network Contracts",
   "main": "index.ts",
