@@ -7,6 +7,7 @@ import blockListener from './blockListener';
 import trackColonies from './trackColonies';
 import eventListener from './eventListener';
 import amplifyClientSetup from './amplifyClient';
+import provider, { getChainId } from './provider';
 import { output, readJsonStats } from './utils';
 
 dotenv.config();
@@ -33,8 +34,14 @@ app.get('/stats', (req, res) => {
   );
 });
 
-const startStatsServer = async (): Promise<Server> => app.listen(port, () => {
-  output('Block Ingestor is Running');
+const startStatsServer = async (): Promise<Server> => app.listen(port, async () => {
+  /*
+   * Need to run this first, otherwise it won't set the chain internally
+   * Maybe a good idea would be to refactor this store the network inside the provider
+   * so that way we'll fetch it on provider initialization
+   */
+  await provider.getNetwork();
+  output('Block Ingestor started on chain', getChainId());
   output(`Stats available at http://localhost:${port}/stats`);
   output(`Liveness check available at http://localhost:${port}/liveness`);
 });
