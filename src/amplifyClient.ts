@@ -18,6 +18,10 @@ export const mutations = {
     mutation DeleteColonyFundsClaim($input: DeleteColonyFundsClaimInput!, $condition: ModelColonyFundsClaimConditionInput) {
       deleteColonyFundsClaim(input: $input, condition: $condition) { id }
     }`,
+  createContractEvent: /* GraphQL */ `
+    mutation CreateContractEvent($input: CreateContractEventInput!, $condition: ModelContractEventConditionInput) {
+      createContractEvent(input: $input, condition: $condition) { id }
+    }`,
 };
 
 /*
@@ -39,6 +43,10 @@ export const queries = {
   getColonyUnclaimedFund: /* GraphQL */ `
     query GetColonyUnclaimedFund($clamId: ID!) {
       getColonyFundsClaim(id: $clamId) { id }
+    }`,
+  getContractEvent: /* GraphQL */ `
+    query GetContractEvent($id: ID!) {
+      getContractEvent(id: $id) { id }
     }`,
 };
 

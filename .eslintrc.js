@@ -23,5 +23,6 @@ module.exports = {
     '@typescript-eslint/no-floating-promises': 'off',
     '@typescript-eslint/require-array-sort-compare': 'off',
     'no-lone-blocks': 'off',
+    'no-useless-return': 'off',
   },
 };

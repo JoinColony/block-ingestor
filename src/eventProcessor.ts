@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
-import { constants } from 'ethers';
+import { constants, BigNumber } from 'ethers';
 
-import { output, writeJsonStats } from './utils';
+import { output, verbose, writeJsonStats } from './utils';
 import { coloniesSet } from './trackColonies';
 import networkClient from './networkClient';
 import { colonySpecificEventsListener } from './eventListener';
@@ -46,6 +46,7 @@ export default async (event: ContractEvent): Promise<void> => {
        * Setup all Colony specific listeners for it
        */
       await colonySpecificEventsListener(colonyAddress);
+
       return;
     }
 
@@ -127,7 +128,7 @@ export default async (event: ContractEvent): Promise<void> => {
      */
     case ContractEventsSignatures.ColonyFundsClaimed: {
       const { contractAddress: colonyAddress, blockNumber } = event ?? {};
-      const { token: tokenAddress } = event?.args ?? {};
+      const { token: tokenAddress, payoutRemainder } = event?.args ?? {};
 
       /*
        * We're not handling native chain token claims from here, so no point
@@ -175,11 +176,105 @@ export default async (event: ContractEvent): Promise<void> => {
           'but not acting upon it since it\'s a chain native token claim, and we\'re not handling these from here',
         );
       }
+
+      /*
+       * Save the event to the database, but only if the claim was greater than zero
+       * No point in filling the database with useless data
+       */
+      if (!payoutRemainder.isZero()) {
+        await saveEvent(event);
+      }
+
       return;
     }
 
     default: {
       return;
     };
+  }
+};
+
+export const saveEvent = async (event: ContractEvent): Promise<void> => {
+  if (!event.signature) {
+    throw new Error('Event does not have a signature. Possibly bad event data. Refusing the save to database!');
+  }
+  const chainId = getChainId();
+
+  const {
+    name,
+    signature,
+    logIndex,
+    transactionHash,
+    blockNumber,
+    args = {},
+    contractAddress,
+  } = event;
+
+  /*
+  * Parse Args
+  */
+  const keys = Object.keys(args);
+  const parsedArgs: Record<string, string> = {};
+  keys.slice(keys.length / 2).map((key) => {
+    if (BigNumber.isBigNumber(args[key as keyof typeof args])) {
+      parsedArgs[key] = (args[key as keyof typeof args] as BigNumber).toString();
+    }
+    parsedArgs[key] = String(args[key as keyof typeof args]);
+    return undefined;
+  });
+
+  const contractEvent: {
+    id: string
+    agent: string
+    meta: Record<string, string | number>
+    name: string
+    signature: string
+    target: string
+    encodedArguments?: string
+    contractEventTokenId?: string
+    contractEventUserId?: string
+    contractEventDomainId?: string
+    contractEventColonyId?: string
+  } = {
+    id: `${chainId}_${transactionHash}_${logIndex}`,
+    agent: parsedArgs?.agent || contractAddress,
+    meta: {
+      chainId,
+      transactionHash,
+      logIndex,
+      blockNumber,
+    },
+    name,
+    signature,
+    target: parsedArgs?.dst || contractAddress,
+    encodedArguments: JSON.stringify(parsedArgs),
+  };
+
+  switch (signature) {
+    case ContractEventsSignatures.ColonyFundsClaimed: {
+      /*
+       * Link to colony and token
+       */
+      contractEvent.contractEventTokenId = parsedArgs.token;
+      contractEvent.contractEventColonyId = contractAddress;
+      break;
+    }
+
+    default: {
+      break;
+    }
+  }
+
+  /*
+   * @NOTE That this check is only required for local development where
+   * the chain does not mine a new block automatically, so you'll most likely
+   *  run parsing / events listener on the same block over and over
+   * So as to not mess up your data / database, only create the event
+   * if it does not exist
+   */
+  const { id: existingContractEvent } = await query('getContractEvent', { id: contractEvent.id });
+  if (!existingContractEvent) {
+    await mutate('createContractEvent', { input: contractEvent });
+    verbose(`Saving event ${contractEvent.signature} to the database for ${contractAddress}`);
   }
 };
