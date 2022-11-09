@@ -93,6 +93,11 @@ export default async (event: ContractEvent): Promise<void> => {
          * run parsing / events listener on the same block over and over
          * So as to not mess up your data / database, only create the event
          * if it does not exist
+         *
+         * @TODO an idea of how to reduce queries is to wrap this in a try catch block
+         * and just send out the mutation
+         * If it succeeds, great, the event is created, if it fails, assume the event
+         * already existed in the database
          */
 
         if (process.env.NODE_ENV !== 'production') {
@@ -271,8 +276,17 @@ export const saveEvent = async (event: ContractEvent): Promise<void> => {
    *  run parsing / events listener on the same block over and over
    * So as to not mess up your data / database, only create the event
    * if it does not exist
+   *
+   * @TODO an idea of how to reduce queries is to wrap this in a try catch block
+   * and just send out the mutation
+   * If it succeeds, great, the event is created, if it fails, assume the event
+   * already existed in the database
    */
-  const { id: existingContractEvent } = await query('getContractEvent', { id: contractEvent.id });
+  let existingContractEvent;
+  if (process.env.NODE_ENV !== 'production') {
+    const { id: existingContractEventId } = await query('getContractEvent', { id: contractEvent.id });
+    existingContractEvent = existingContractEventId;
+  }
   if (!existingContractEvent) {
     await mutate('createContractEvent', { input: contractEvent });
     verbose(`Saving event ${contractEvent.signature} to the database for ${contractAddress}`);
