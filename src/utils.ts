@@ -59,6 +59,16 @@ export const writeJsonStats = async (
   objectOrFunction: Record<string, unknown> | ((jsonFile: Record<string, unknown>) => Record<string, unknown>),
   filePath = `${path.resolve(__dirname, '..')}/run/stats.json`,
 ): Promise<void> => {
+  const port = process.env.STATS_PORT;
+  if (port) {
+    verbose('Stats are DISABLED, no point in writing to the stats file');
+    /*
+     * If the port isn't set, it means the stats are disabled, so there's no point
+     * in keep writing the stats file, so we exit early
+     */
+    return;
+  }
+
   let newJsonContents = {};
   const curentJsonContents = await readJsonStats(filePath);
 
