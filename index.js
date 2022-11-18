@@ -1,15 +1,20 @@
 const ethers = require('ethers');
 const coinMachineFactory = require('./abi/coinMachineFactoryABI.json');
 const whitelist = require('./abi/whitelistABI.json');
+const coinMachine = require('./abi/coinMachineABI.json');
 const { handleWhitelistInitialised, handleAgreementSigned, handleUserApproved } = require('./handlers/whitelist.js');
+const { handleCoinMachineInitialised } = require('./handlers/coinMachine.js');
 
 const { output, poorMansGraphQL } = require('./utils');
-
 
 const WhitelistEvents = {
   'UserApproved': handleUserApproved,
   'AgreementSigned': handleAgreementSigned,
   'WhitelistInitialised': handleWhitelistInitialised
+}
+
+const CoinMachineEvents = {
+  'CoinMachineInitialised': handleCoinMachineInitialised,
 }
 
 const fetchExistingWhitelists = async () => {
@@ -29,6 +34,7 @@ const fetchExistingWhitelists = async () => {
   try {
     const { body } = await poorMansGraphQL(query);
     const result = JSON.parse(body);
+    console.log(result, 'result');
     return result.data.listWhitelists.items;
   } catch (error) {
     console.log(error);
@@ -58,6 +64,28 @@ const subsribeToWhitelist = async (whitelistAddress, provider) => {
   }
 }
 
+const subsribeToCoinMachine = async (coinMachineAddress, provider) => {
+  try {
+    const contract = await new ethers.Contract(coinMachineAddress, coinMachine.abi, provider);
+    contract.on('*', async(event) => {
+      const parsed = contract.interface.parseLog(event);
+      const handler =  CoinMachineEvents[event.event];
+      if (!handler) return;
+      const query = await handler(parsed.args, coinMachineAddress);
+      try {
+        await poorMansGraphQL(query);
+        output(`Database updated after event: ${event.event}`);
+      } catch (error) {
+        console.log(error);
+        // silent error
+      }
+    });
+
+  } catch (error) {
+    console.error(error);
+  }
+}
+
 (async () => {
   const provider = new ethers.providers.JsonRpcProvider();
   const whitelistContracts = []; // Fetch from db and subsribe
@@ -71,26 +99,48 @@ const subsribeToWhitelist = async (whitelistAddress, provider) => {
     }));
     contract.on('*', async(event) => {
       const parsed = contract.interface.parseLog(event);
-      const { whitelist, owner } = parsed.args;
-      await subsribeToWhitelist(whitelist, provider);
-
-      const query = {
-        operationName: "CreateWhitelist",
-        query: `
-            mutation CreateWhitelist {
-              createWhitelist(
-              input: { id: "${whitelist}", walletAddress: "${owner}" }
-              condition: {}
-            ) {
-              id
+      let query;
+      if (parsed.name === "WhitelistDeployed") {
+        const { whitelist, owner } = parsed.args;
+        await subsribeToWhitelist(whitelist, provider);
+  
+        query = {
+          operationName: "CreateWhitelist",
+          query: `
+              mutation CreateWhitelist {
+                createWhitelist(
+                input: { id: "${whitelist}", walletAddress: "${owner}" }
+                condition: {}
+              ) {
+                id
+              }
             }
-          }
-        `,
-        variables: null,
-      };
+          `,
+          variables: null,
+        };
+      }
+      if (parsed.name === "CoinMachineDeployed") {
+        const { coinMachine, owner, agreementHash } = parsed.args;
+        await subsribeToCoinMachine(coinMachine, provider);
+        query = {
+          operationName: "CreateCompanyAgreement",
+          query: `
+              mutation CreateCompanyAgreement {
+                createCompanyAgreement(
+                input: { coinMachineAddress: "${coinMachine}", userCompanyAgreementsId: "${owner}", agreementHash: "${agreementHash}" }
+                condition: {}
+              ) {
+                coinMachineAddress
+              }
+            }
+          `,
+          variables: null,
+        };
+      }
+      if (!query) return;
       try {
         await poorMansGraphQL(query);
-        output('Saving whitelist to database');
+        output(`Database updated after event ${parsed.name}`);
       } catch (error) {
         console.log(error);
         // silent error
