@@ -11,17 +11,42 @@ dotenv.config();
 
 export const mutations = {
   createColonyFundsClaim: /* GraphQL */ `
-    mutation CreateColonyFundsClaim($input: CreateColonyFundsClaimInput!, $condition: ModelColonyFundsClaimConditionInput) {
-      createColonyFundsClaim(input: $input, condition: $condition) { id }
-    }`,
+    mutation CreateColonyFundsClaim(
+      $input: CreateColonyFundsClaimInput!
+      $condition: ModelColonyFundsClaimConditionInput
+    ) {
+      createColonyFundsClaim(input: $input, condition: $condition) {
+        id
+      }
+    }
+  `,
   deleteColonyFundsClaim: /* GraphQL */ `
-    mutation DeleteColonyFundsClaim($input: DeleteColonyFundsClaimInput!, $condition: ModelColonyFundsClaimConditionInput) {
-      deleteColonyFundsClaim(input: $input, condition: $condition) { id }
-    }`,
+    mutation DeleteColonyFundsClaim(
+      $input: DeleteColonyFundsClaimInput!
+      $condition: ModelColonyFundsClaimConditionInput
+    ) {
+      deleteColonyFundsClaim(input: $input, condition: $condition) {
+        id
+      }
+    }
+  `,
   createContractEvent: /* GraphQL */ `
-    mutation CreateContractEvent($input: CreateContractEventInput!, $condition: ModelContractEventConditionInput) {
-      createContractEvent(input: $input, condition: $condition) { id }
-    }`,
+    mutation CreateContractEvent(
+      $input: CreateContractEventInput!
+      $condition: ModelContractEventConditionInput
+    ) {
+      createContractEvent(input: $input, condition: $condition) {
+        id
+      }
+    }
+  `,
+  createColonyExtension: /* GraphQL */ `
+    mutation CreateColonyExtension($input: CreateColonyExtensionInput!) {
+      createColonyExtension(input: $input) {
+        id
+      }
+    }
+  `,
 };
 
 /*
@@ -29,25 +54,38 @@ export const mutations = {
  */
 export const queries = {
   getColonyUnclaimedFunds: /* GraphQL */ `
-    query GetColonyUnclaimedFunds($colonyAddress: ID!, $tokenAddress: ID!, $upToBlock: Int = 1) {
+    query GetColonyUnclaimedFunds(
+      $colonyAddress: ID!
+      $tokenAddress: ID!
+      $upToBlock: Int = 1
+    ) {
       listColonyFundsClaims(
         filter: {
-          colonyFundsClaimsId: { eq: $colonyAddress },
-          colonyFundsClaimTokenId: { eq: $tokenAddress },
+          colonyFundsClaimsId: { eq: $colonyAddress }
+          colonyFundsClaimTokenId: { eq: $tokenAddress }
           createdAtBlock: { le: $upToBlock }
         }
       ) {
-        items { id }
+        items {
+          id
+        }
       }
-    }`,
+    }
+  `,
   getColonyUnclaimedFund: /* GraphQL */ `
-    query GetColonyUnclaimedFund($clamId: ID!) {
-      getColonyFundsClaim(id: $clamId) { id }
-    }`,
+    query GetColonyUnclaimedFund($claimId: ID!) {
+      getColonyFundsClaim(id: $claimId) {
+        id
+      }
+    }
+  `,
   getContractEvent: /* GraphQL */ `
     query GetContractEvent($id: ID!) {
-      getContractEvent(id: $id) { id }
-    }`,
+      getContractEvent(id: $id) {
+        id
+      }
+    }
+  `,
 };
 
 export default (): void => {
@@ -87,9 +125,7 @@ export const mutate = async (
   variables?: { input: Record<string, unknown> },
 ): Promise<void> => {
   try {
-    await API.graphql(
-      graphqlOperation(mutations[mutationName], variables),
-    );
+    await API.graphql(graphqlOperation(mutations[mutationName], variables));
   } catch (error) {
     console.error(`Could not execute mutation "${mutationName}"`, error);
     return undefined;

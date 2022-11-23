@@ -17,13 +17,13 @@ export const colonySpecificEventsListener = async (
     colonyAddress,
   );
   await addTokenEventListener(ContractEventsSignatures.Transfer, colonyAddress);
-  await addNetworkEventListener(ContractEventsSignatures.ExtensionInstalled);
 };
 
+/*
+ * No general, global level (basically network) events to listen to currently
+ */
 const eventListener = async (): Promise<void> => {
-  /*
-   * No general, global level (basically network) events to listen to currently
-   */
+  await addNetworkEventListener(ContractEventsSignatures.ExtensionInstalled);
 };
 
 export default eventListener;

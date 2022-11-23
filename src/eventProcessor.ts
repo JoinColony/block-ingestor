@@ -95,7 +95,7 @@ export default async (event: ContractEvent): Promise<void> => {
       if (!isMiningCycleTransfer) {
         let existingClaim;
         const amount = wad.toString();
-        const clamId = `${chainId}_${transactionHash}_${logIndex}`;
+        const claimId = `${chainId}_${transactionHash}_${logIndex}`;
         /*
          * @NOTE That this check is only required for local development where
          * the chain does not mine a new block automatically, so you'll most likely
@@ -112,7 +112,7 @@ export default async (event: ContractEvent): Promise<void> => {
         if (process.env.NODE_ENV !== 'production') {
           const { id: existingClaimId } = await query(
             'getColonyUnclaimedFund',
-            { clamId },
+            { claimId },
           );
           existingClaim = existingClaimId;
         }
@@ -133,7 +133,7 @@ export default async (event: ContractEvent): Promise<void> => {
         if (!existingClaim && amount !== '0') {
           await mutate('createColonyFundsClaim', {
             input: {
-              id: clamId,
+              id: claimId,
               colonyFundsClaimsId: dst,
               colonyFundsClaimTokenId: contractAddress,
               createdAtBlock: blockNumber,
@@ -214,7 +214,20 @@ export default async (event: ContractEvent): Promise<void> => {
     }
 
     case ContractEventsSignatures.ExtensionInstalled: {
-      console.log('Extension installed event!');
+      const { extensionId, colony } = event.args;
+      const extensionAddress = await networkClient.getExtensionInstallation(
+        extensionId,
+        colony,
+      );
+
+      await mutate('createColonyExtension', {
+        input: {
+          id: extensionAddress,
+          colonyId: colony,
+          hash: extensionId,
+        },
+      });
+
       return;
     }
 

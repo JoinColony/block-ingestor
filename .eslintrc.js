@@ -4,8 +4,7 @@ module.exports = {
     es2021: true,
   },
   extends: 'standard-with-typescript',
-  overrides: [
-  ],
+  overrides: [],
   parserOptions: {
     ecmaVersion: 'latest',
     sourceType: 'module',
@@ -24,5 +23,6 @@ module.exports = {
     '@typescript-eslint/require-array-sort-compare': 'off',
     'no-lone-blocks': 'off',
     'no-useless-return': 'off',
+    '@typescript-eslint/member-delimiter-style': 'off',
   },
 };
