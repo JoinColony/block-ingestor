@@ -4,10 +4,10 @@ import { LogDescription } from '@ethersproject/abi';
  * Custom contract event, since we need some log values as well
  */
 export interface ContractEvent extends LogDescription {
-  transactionHash: string
-  logIndex: number
-  contractAddress: string
-  blockNumber: number
+  transactionHash: string;
+  logIndex: number;
+  contractAddress: string;
+  blockNumber: number;
 }
 
 /*
@@ -19,7 +19,7 @@ export enum QueueEvents {
   ProcessEvents = 'ProcessEvents', // start processing events in queue
   ProcessEvent = 'ProcessEvent', // process a individual event
   EventProcessed = 'EventProcessed',
-};
+}
 
 /*
  * All contract events signatures we deal with
@@ -29,6 +29,7 @@ export enum ContractEventsSignatures {
   ColonyAdded = 'ColonyAdded(uint256,address,address)',
   Transfer = 'Transfer(address,address,uint256)',
   ColonyFundsClaimed = 'ColonyFundsClaimed(address,address,uint256,uint256)',
+  ExtensionInstalled = 'ExtensionInstalled(bytes32,address,uint256)',
 }
 
 /*
