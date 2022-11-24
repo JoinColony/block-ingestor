@@ -7,6 +7,8 @@ const { handleCoinMachineInitialised } = require('./handlers/coinMachine.js');
 
 const { output, poorMansGraphQL } = require('./utils');
 
+const customGraphQLEndpoint = process.env.GraphQLAPIEndpointOutput;
+
 const WhitelistEvents = {
   'UserApproved': handleUserApproved,
   'AgreementSigned': handleAgreementSigned,
@@ -32,7 +34,7 @@ const fetchExistingWhitelists = async () => {
     variables: null,
   };
   try {
-    const { body } = await poorMansGraphQL(query);
+    const { body } = await poorMansGraphQL(query, customGraphQLEndpoint);
     const result = JSON.parse(body);
     console.log(result, 'result');
     return result.data.listWhitelists.items;
@@ -51,7 +53,7 @@ const subsribeToWhitelist = async (whitelistAddress, provider) => {
       if (!handler) return;
       const query = await handler(parsed.args, whitelistAddress);
       try {
-        await poorMansGraphQL(query);
+        await poorMansGraphQL(query, customGraphQLEndpoint);
         output(`Database updated after event: ${event.event}`);
       } catch (error) {
         console.log(error);
