@@ -4,7 +4,8 @@ module.exports = {
   output: (...messages) => console.log('[BlockIngestor]', ...messages),
   poorMansGraphQL: async (
     query,
-    endpoint = 'http://192.168.0.220:20002/graphql',
+    endpoint = process.env.GraphQLAPIEndpointOutput ||
+      "http://192.168.0.220:20002/graphql",
     /*
      * @NOTE This is Hardcoded in Amplify
      * It will always be da2-fakeApiId123456
