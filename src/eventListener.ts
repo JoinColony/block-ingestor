@@ -25,6 +25,7 @@ export const colonySpecificEventsListener = async (
 const eventListener = async (): Promise<void> => {
   await addNetworkEventListener(ContractEventsSignatures.ExtensionInstalled);
   await addNetworkEventListener(ContractEventsSignatures.ExtensionUninstalled);
+  await addNetworkEventListener(ContractEventsSignatures.ExtensionDeprecated);
 };
 
 export default eventListener;

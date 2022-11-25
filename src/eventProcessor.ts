@@ -246,6 +246,25 @@ export default async (event: ContractEvent): Promise<void> => {
       return;
     }
 
+    case ContractEventsSignatures.ExtensionDeprecated: {
+      const { extensionId, colony, deprecated } = event.args;
+
+      if (!deprecated) {
+        /** @TODO: Figure out what to do in case deprecated is false */
+        return;
+      }
+
+      await mutate('updateColonyExtension', {
+        input: {
+          colonyId: colony,
+          hash: extensionId,
+          status: 'DEPRECATED',
+        },
+      });
+
+      return;
+    }
+
     default: {
       return;
     }

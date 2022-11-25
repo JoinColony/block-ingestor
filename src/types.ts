@@ -31,6 +31,7 @@ export enum ContractEventsSignatures {
   ColonyFundsClaimed = 'ColonyFundsClaimed(address,address,uint256,uint256)',
   ExtensionInstalled = 'ExtensionInstalled(bytes32,address,uint256)',
   ExtensionUninstalled = 'ExtensionUninstalled(bytes32,address)',
+  ExtensionDeprecated = 'ExtensionDeprecated(bytes32,address,bool)',
 }
 
 /*
