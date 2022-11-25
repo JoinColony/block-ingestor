@@ -47,6 +47,15 @@ export const mutations = {
       }
     }
   `,
+  updateColonyExtension: /* GraphQL */ `
+    mutation UpdateColonyExtension(
+      $input: UpdateExtensionByColonyAndHashInput!
+    ) {
+      updateExtensionByColonyAndHash(input: $input) {
+        id
+      }
+    }
+  `,
 };
 
 /*

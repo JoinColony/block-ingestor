@@ -225,6 +225,21 @@ export default async (event: ContractEvent): Promise<void> => {
           id: extensionAddress,
           colonyId: colony,
           hash: extensionId,
+          status: 'INSTALLED',
+        },
+      });
+
+      return;
+    }
+
+    case ContractEventsSignatures.ExtensionUninstalled: {
+      const { extensionId, colony } = event.args;
+
+      await mutate('updateColonyExtension', {
+        input: {
+          colonyId: colony,
+          hash: extensionId,
+          status: 'DELETED',
         },
       });
 
