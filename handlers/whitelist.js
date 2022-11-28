@@ -1,8 +1,8 @@
 const { poorMansGraphQL } = require('../utils');
 
 function handleUserStatusCreate(user, whitelistAddress, status = null, agreement = null) {
-  const input = status ? `{ walletAddress: "${user}", approved: ${Boolean(status)}, whitelistID: "${whitelistAddress}" }` :
-  `{ walletAddress: "${user}", agreementSigned: true, whitelistID: "${whitelistAddress}" }`
+  const input = status ? `{ walletAddress: "${user}", approved: ${Boolean(status)}, whitelistId: "${whitelistAddress}" }` :
+  `{ walletAddress: "${user}", agreementSigned: true, whitelistId: "${whitelistAddress}" }`
   const query = {
     operationName: "CreateUserStatusMutation",
     query: `
@@ -47,7 +47,7 @@ async function handleUserApproved(args, whitelistAddress) {
     query: `
         query UserStatusByWhitelistAndWalletAddress {
           userStatusByWhitelistAndWalletAddress(
-          whitelistID: "${whitelistAddress}",
+          whitelistId: "${whitelistAddress}",
           walletAddress: {eq: "${_user}"}
         ) {
           items {
@@ -81,7 +81,7 @@ async function handleAgreementSigned(args, whitelistAddress) {
     query: `
         query UserStatusByWhitelistAndWalletAddress {
           userStatusByWhitelistAndWalletAddress(
-          whitelistID: "${whitelistAddress}",
+          whitelistId: "${whitelistAddress}",
           walletAddress: {eq: "${_user}"}
         ) {
           items {
