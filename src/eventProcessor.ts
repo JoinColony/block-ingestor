@@ -214,7 +214,8 @@ export default async (event: ContractEvent): Promise<void> => {
     }
 
     case ContractEventsSignatures.ExtensionInstalled: {
-      const { extensionId, colony } = event.args;
+      const { extensionId, colony, version } = event.args;
+
       const extensionAddress = await networkClient.getExtensionInstallation(
         extensionId,
         colony,
@@ -226,6 +227,7 @@ export default async (event: ContractEvent): Promise<void> => {
           colonyId: colony,
           hash: extensionId,
           status: 'INSTALLED',
+          version: BigNumber.from(version).toNumber(),
         },
       });
 
