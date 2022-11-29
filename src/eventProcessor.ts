@@ -262,6 +262,20 @@ export default async (event: ContractEvent): Promise<void> => {
       return;
     }
 
+    case ContractEventsSignatures.ExtensionUpgraded: {
+      const { extensionId, colony, version } = event.args;
+
+      await mutate('updateColonyExtension', {
+        input: {
+          colonyId: colony,
+          hash: extensionId,
+          version: BigNumber.from(version).toNumber(),
+        },
+      });
+
+      return;
+    }
+
     default: {
       return;
     }
