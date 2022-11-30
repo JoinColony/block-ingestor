@@ -23,6 +23,9 @@ export const colonySpecificEventsListener = async (
  * No general, global level (basically network) events to listen to currently
  */
 const eventListener = async (): Promise<void> => {
+  await addNetworkEventListener(
+    ContractEventsSignatures.ExtensionAddedToNetwork,
+  );
   await addNetworkEventListener(ContractEventsSignatures.ExtensionInstalled);
   await addNetworkEventListener(ContractEventsSignatures.ExtensionUninstalled);
   await addNetworkEventListener(ContractEventsSignatures.ExtensionDeprecated);

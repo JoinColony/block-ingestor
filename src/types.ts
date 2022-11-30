@@ -29,6 +29,7 @@ export enum ContractEventsSignatures {
   ColonyAdded = 'ColonyAdded(uint256,address,address)',
   Transfer = 'Transfer(address,address,uint256)',
   ColonyFundsClaimed = 'ColonyFundsClaimed(address,address,uint256,uint256)',
+  ExtensionAddedToNetwork = 'ExtensionAddedToNetwork(bytes32,uint256)',
   ExtensionInstalled = 'ExtensionInstalled(bytes32,address,uint256)',
   ExtensionUninstalled = 'ExtensionUninstalled(bytes32,address)',
   ExtensionDeprecated = 'ExtensionDeprecated(bytes32,address,bool)',

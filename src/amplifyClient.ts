@@ -40,6 +40,11 @@ export const mutations = {
       }
     }
   `,
+  setCurrentVersion: /* GraphQL */ `
+    mutation SetCurrentVersion($input: SetCurrentVersionInput!) {
+      setCurrentVersion(input: $input)
+    }
+  `,
   createColonyExtension: /* GraphQL */ `
     mutation CreateColonyExtension($input: CreateColonyExtensionInput!) {
       createColonyExtension(input: $input) {

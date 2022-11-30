@@ -213,6 +213,19 @@ export default async (event: ContractEvent): Promise<void> => {
       return;
     }
 
+    case ContractEventsSignatures.ExtensionAddedToNetwork: {
+      const { extensionId, version } = event.args;
+
+      await mutate('setCurrentVersion', {
+        input: {
+          item: extensionId,
+          version: BigNumber.from(version).toNumber(),
+        },
+      });
+
+      return;
+    }
+
     case ContractEventsSignatures.ExtensionInstalled: {
       const { extensionId, colony, version } = event.args;
 
