@@ -2,7 +2,7 @@ const ethers = require('ethers');
 const coinMachineFactory = require('./abi/coinMachineFactoryABI.json');
 const whitelist = require('./abi/whitelistABI.json');
 const coinMachine = require('./abi/coinMachineABI.json');
-const { handleWhitelistInitialised, handleAgreementSigned, handleUserApproved } = require('./handlers/whitelist.js');
+const { handleAgreementSigned, handleUserApproved } = require('./handlers/whitelist.js');
 const { handleCoinMachineInitialised } = require('./handlers/coinMachine.js');
 
 const { output, poorMansGraphQL } = require('./utils');
@@ -10,7 +10,6 @@ const { output, poorMansGraphQL } = require('./utils');
 const WhitelistEvents = {
   'UserApproved': handleUserApproved,
   'AgreementSigned': handleAgreementSigned,
-  'WhitelistInitialised': handleWhitelistInitialised
 }
 
 const CoinMachineEvents = {
@@ -101,15 +100,17 @@ const subsribeToCoinMachine = async (coinMachineAddress, provider) => {
       const parsed = contract.interface.parseLog(event);
       let query;
       if (parsed.name === "WhitelistDeployed") {
-        const { whitelist, owner } = parsed.args;
+        const { whitelist: whitelistAddress, owner } = parsed.args;
         await subsribeToWhitelist(whitelist, provider);
-  
+        const whitelistContract = await new ethers.Contract(whitelistAddress, whitelist.abi, provider);
+        const agreementHash = await whitelistContract.agreementHash();
+        const approvals = await whitelistContract.useApprovals();;
         query = {
           operationName: "CreateWhitelist",
           query: `
               mutation CreateWhitelist {
                 createWhitelist(
-                input: { id: "${whitelist}", walletAddress: "${owner}" }
+                input: { id: "${whitelistAddress}", walletAddress: "${owner}", agreementHash: "${agreementHash}", useApprovals: ${Boolean(approvals)} }
                 condition: {}
               ) {
                 id
