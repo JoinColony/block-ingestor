@@ -101,7 +101,7 @@ const subsribeToCoinMachine = async (coinMachineAddress, provider) => {
       let query;
       if (parsed.name === "WhitelistDeployed") {
         const { whitelist: whitelistAddress, owner } = parsed.args;
-        await subsribeToWhitelist(whitelist, provider);
+        await subsribeToWhitelist(whitelistAddress, provider);
         const whitelistContract = await new ethers.Contract(whitelistAddress, whitelist.abi, provider);
         const agreementHash = await whitelistContract.agreementHash();
         const approvals = await whitelistContract.useApprovals();;
