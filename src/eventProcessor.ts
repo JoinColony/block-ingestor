@@ -227,6 +227,7 @@ export default async (event: ContractEvent): Promise<void> => {
     }
 
     case ContractEventsSignatures.ExtensionInstalled: {
+      const { transactionHash } = event;
       const { extensionId, colony, version } = event.args;
 
       const extensionAddress = await networkClient.getExtensionInstallation(
@@ -234,12 +235,22 @@ export default async (event: ContractEvent): Promise<void> => {
         colony,
       );
 
+      const receipt = await networkClient.provider.getTransactionReceipt(
+        transactionHash,
+      );
+      const installedBy = receipt.from || constants.AddressZero;
+
+      // @TODO: Get actual transaction timestamp
+      const installedAt = Math.floor(Date.now() / 1000);
+
       await mutate('createColonyExtension', {
         input: {
           id: extensionAddress,
           colonyId: colony,
           hash: extensionId,
           version: BigNumber.from(version).toNumber(),
+          installedBy,
+          installedAt,
         },
       });
 
