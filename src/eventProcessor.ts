@@ -239,7 +239,6 @@ export default async (event: ContractEvent): Promise<void> => {
           id: extensionAddress,
           colonyId: colony,
           hash: extensionId,
-          status: 'INSTALLED',
           version: BigNumber.from(version).toNumber(),
         },
       });
@@ -254,7 +253,7 @@ export default async (event: ContractEvent): Promise<void> => {
         input: {
           colonyId: colony,
           hash: extensionId,
-          status: 'DELETED',
+          isDeleted: true,
         },
       });
 
