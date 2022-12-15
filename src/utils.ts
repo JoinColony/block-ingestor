@@ -3,7 +3,13 @@ import { ensureFile, readJson, writeJson } from 'fs-extra';
 import path from 'path';
 import { utils } from 'ethers';
 import { Log } from '@ethersproject/providers';
-import { AnyColonyClient, ClientType, ColonyNetworkClient, getTokenClient, TokenClient } from '@colony/colony-js';
+import {
+  AnyColonyClient,
+  ClientType,
+  ColonyNetworkClient,
+  getTokenClient,
+  TokenClient,
+} from '@colony/colony-js';
 
 import networkClient from './networkClient';
 import { addEvent } from './eventQueue';
@@ -49,6 +55,10 @@ export const readJsonStats = async (
   }
 };
 
+type ObjectOrFunction =
+  | Record<string, unknown>
+  | ((jsonFile: Record<string, unknown>) => Record<string, unknown>);
+
 /*
  * Write a json file at a specified path.
  * It accepts either a object fragment (or full object) that will get appended to the existing file,
@@ -56,7 +66,7 @@ export const readJsonStats = async (
  * that will be written back
  */
 export const writeJsonStats = async (
-  objectOrFunction: Record<string, unknown> | ((jsonFile: Record<string, unknown>) => Record<string, unknown>),
+  objectOrFunction: ObjectOrFunction,
   filePath = `${path.resolve(__dirname, '..')}/run/stats.json`,
 ): Promise<void> => {
   const port = process.env.STATS_PORT;
@@ -91,9 +101,8 @@ export const writeJsonStats = async (
 /*
  * Convert a Set that contains a JSON string, back into JS form
  */
-export const setToJS = (
-  set: Set<string>,
-): Array<Record<string, string>> => Array.from(set).map(entry => JSON.parse(entry));
+export const setToJS = (set: Set<string>): Array<Record<string, string>> =>
+  Array.from(set).map((entry) => JSON.parse(entry));
 
 /*
  * Generator method for events listeners
@@ -107,12 +116,13 @@ export const eventListenerGenerator = async (
   clientType: ClientType = ClientType.NetworkClient,
 ): Promise<void> => {
   const { provider } = networkClient;
-  let client: ColonyNetworkClient | TokenClient | AnyColonyClient = networkClient;
+  let client: ColonyNetworkClient | TokenClient | AnyColonyClient =
+    networkClient;
   if (clientType === ClientType.ColonyClient && contractAddress) {
     client = await networkClient.getColonyClient(contractAddress);
   }
 
-  const filter: { topics: Array<string | null>, address?: string } = {
+  const filter: { topics: Array<string | null>; address?: string } = {
     topics: [utils.id(eventSignature)],
   };
 
@@ -133,16 +143,24 @@ export const eventListenerGenerator = async (
   );
 
   provider.on(filter, async (log: Log) => {
-    const { transactionHash, logIndex, blockNumber, address: eventContractAddress } = log;
+    const {
+      transactionHash,
+      logIndex,
+      blockNumber,
+      address: eventContractAddress,
+    } = log;
     if (clientType === ClientType.TokenClient) {
       client = await getTokenClient(eventContractAddress, provider);
     }
+    const { hash: blockHash, timestamp } = await provider.getBlock(blockNumber);
     addEvent({
       ...client.interface.parseLog(log),
       blockNumber,
       transactionHash,
       logIndex,
       contractAddress: eventContractAddress,
+      blockHash,
+      timestamp,
     });
   });
 };
@@ -154,11 +172,12 @@ export const eventListenerGenerator = async (
 export const addNetworkEventListener = async (
   eventSignature: ContractEventsSignatures,
   contractAddress: string = networkClient.address,
-): Promise<void> => await eventListenerGenerator(
-  eventSignature,
-  contractAddress,
-  ClientType.NetworkClient,
-);
+): Promise<void> =>
+  await eventListenerGenerator(
+    eventSignature,
+    contractAddress,
+    ClientType.NetworkClient,
+  );
 
 /*
  * Colony Client specific event listener,
@@ -167,11 +186,12 @@ export const addNetworkEventListener = async (
 export const addColonyEventListener = async (
   eventSignature: ContractEventsSignatures,
   contractAddress: string,
-): Promise<void> => await eventListenerGenerator(
-  eventSignature,
-  contractAddress,
-  ClientType.ColonyClient,
-);
+): Promise<void> =>
+  await eventListenerGenerator(
+    eventSignature,
+    contractAddress,
+    ClientType.ColonyClient,
+  );
 
 /*
  * Token Client specific event listener,
@@ -180,8 +200,9 @@ export const addColonyEventListener = async (
 export const addTokenEventListener = async (
   eventSignature: ContractEventsSignatures,
   contractAddress: string,
-): Promise<void> => await eventListenerGenerator(
-  eventSignature,
-  contractAddress,
-  ClientType.TokenClient,
-);
+): Promise<void> =>
+  await eventListenerGenerator(
+    eventSignature,
+    contractAddress,
+    ClientType.TokenClient,
+  );

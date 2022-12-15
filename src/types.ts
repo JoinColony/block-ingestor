@@ -8,6 +8,8 @@ export interface ContractEvent extends LogDescription {
   logIndex: number;
   contractAddress: string;
   blockNumber: number;
+  blockHash: string;
+  timestamp: number;
 }
 
 /*
