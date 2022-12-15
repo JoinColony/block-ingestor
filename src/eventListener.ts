@@ -19,9 +19,6 @@ export const colonySpecificEventsListener = async (
   await addTokenEventListener(ContractEventsSignatures.Transfer, colonyAddress);
 };
 
-/*
- * No general, global level (basically network) events to listen to currently
- */
 const eventListener = async (): Promise<void> => {
   await addNetworkEventListener(
     ContractEventsSignatures.ExtensionAddedToNetwork,
