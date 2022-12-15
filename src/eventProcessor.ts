@@ -240,6 +240,14 @@ export default async (event: ContractEvent): Promise<void> => {
       );
       const installedBy = receipt.from || constants.AddressZero;
 
+      verbose(
+        'Extension:',
+        extensionId,
+        `(version ${version})`,
+        'installed in Colony:',
+        colony,
+      );
+
       await mutate('createColonyExtension', {
         input: {
           id: extensionAddress,
@@ -257,6 +265,8 @@ export default async (event: ContractEvent): Promise<void> => {
     case ContractEventsSignatures.ExtensionUninstalled: {
       const { extensionId, colony } = event.args;
 
+      verbose('Extension:', extensionId, 'uninstalled in Colony:', colony);
+
       await mutate('updateColonyExtension', {
         input: {
           colonyId: colony,
@@ -271,6 +281,14 @@ export default async (event: ContractEvent): Promise<void> => {
     case ContractEventsSignatures.ExtensionDeprecated: {
       const { extensionId, colony, deprecated } = event.args;
 
+      verbose(
+        'Extension:',
+        extensionId,
+        deprecated ? 'deprecated' : 're-enabled',
+        'in Colony:',
+        colony,
+      );
+
       await mutate('updateColonyExtension', {
         input: {
           colonyId: colony,
@@ -284,6 +302,15 @@ export default async (event: ContractEvent): Promise<void> => {
 
     case ContractEventsSignatures.ExtensionUpgraded: {
       const { extensionId, colony, version } = event.args;
+
+      verbose(
+        'Extension:',
+        extensionId,
+        'upgraded to version',
+        version,
+        'in Colony:',
+        colony,
+      );
 
       await mutate('updateColonyExtension', {
         input: {
