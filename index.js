@@ -3,7 +3,7 @@ const coinMachineFactory = require('./abi/coinMachineFactoryABI.json');
 const whitelist = require('./abi/whitelistABI.json');
 const coinMachine = require('./abi/coinMachineABI.json');
 const { handleAgreementSigned, handleUserApproved } = require('./handlers/whitelist.js');
-const { handleCoinMachineInitialised } = require('./handlers/coinMachine.js');
+const { handleCoinMachineInitialised, handleCoinMachineStateSet } = require('./handlers/coinMachine.js');
 
 const { output, poorMansGraphQL } = require('./utils');
 
@@ -14,6 +14,7 @@ const WhitelistEvents = {
 
 const CoinMachineEvents = {
   'CoinMachineInitialised': handleCoinMachineInitialised,
+  'CoinMachineStateSet': handleCoinMachineStateSet,
 }
 
 const fetchExistingWhitelists = async () => {
@@ -35,6 +36,30 @@ const fetchExistingWhitelists = async () => {
     const result = JSON.parse(body);
     console.log(result, 'result');
     return result.data.listWhitelists.items;
+  } catch (error) {
+    console.log(error);
+    // silent error
+  }
+}
+
+const fetchExistingCoinMachines = async () => {
+  const query = {
+    operationName: "ListSalesQuery",
+    query: `
+        query ListSalesQuery {
+          listSales {
+          items {
+            coinMachineAddress
+          }
+        }
+      }
+    `,
+    variables: null,
+  };
+  try {
+    const { body } = await poorMansGraphQL(query);
+    const result = JSON.parse(body);
+    return result.data.listSales.items;
   } catch (error) {
     console.log(error);
     // silent error
@@ -96,6 +121,14 @@ const subsribeToCoinMachine = async (coinMachineAddress, provider) => {
     await Promise.all((existingWhitelists || []).map(async (w) => {
       await subsribeToWhitelist(w.id, provider);
     }));
+
+    const existingCoinMachines = await fetchExistingCoinMachines();
+    await Promise.all((existingCoinMachines || []).map(async (w) => {
+      if (w.coinMachineAddress) {
+        await subsribeToCoinMachine(w.coinMachineAddress, provider);
+      }
+    }));
+
     contract.on('*', async(event) => {
       const parsed = contract.interface.parseLog(event);
       let query;
