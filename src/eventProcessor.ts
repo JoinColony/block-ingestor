@@ -256,6 +256,9 @@ export default async (event: ContractEvent): Promise<void> => {
           version: BigNumber.from(version).toNumber(),
           installedBy,
           installedAt: timestamp,
+          isDeprecated: false,
+          isDeleted: false,
+          isInitialized: false,
         },
       });
 
