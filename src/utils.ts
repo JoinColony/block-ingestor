@@ -206,3 +206,46 @@ export const addTokenEventListener = async (
     contractAddress,
     ClientType.TokenClient,
   );
+
+/**
+ * Extension specific event listener
+ * It creates a new interface with ABI data describing
+ * possible event signature
+ */
+export const addExtensionEventListener = async (
+  eventSignature: ContractEventsSignatures,
+  extensionAddress: string,
+): Promise<void> => {
+  const { provider } = networkClient;
+  const iface = new utils.Interface([`event ${eventSignature}`]);
+  const filter = {
+    topics: [utils.id(eventSignature)],
+    address: extensionAddress,
+  };
+
+  verbose(
+    'Added listener for Event:',
+    eventSignature,
+    extensionAddress ? `filtering Address: ${extensionAddress}` : '',
+  );
+
+  provider.on(filter, async (log: Log) => {
+    const {
+      transactionHash,
+      logIndex,
+      blockNumber,
+      address: eventContractAddress,
+    } = log;
+
+    const { hash: blockHash, timestamp } = await provider.getBlock(blockNumber);
+    addEvent({
+      ...iface.parseLog(log),
+      blockNumber,
+      transactionHash,
+      logIndex,
+      contractAddress: eventContractAddress,
+      blockHash,
+      timestamp,
+    });
+  });
+};
