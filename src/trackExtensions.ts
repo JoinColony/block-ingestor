@@ -24,7 +24,7 @@ export default async (): Promise<void> => {
      * and the number of extension installations we encounter, minus uninstallations
      */
     const installedInColonyCount: { [address: string]: number } = {};
-    extensionInstalledLogs.forEach(async (log) => {
+    extensionInstalledLogs.forEach((log) => {
       const parsedLog = networkClient.interface.parseLog(log);
       const { colony } = parsedLog.args;
 
