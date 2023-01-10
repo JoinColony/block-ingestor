@@ -221,7 +221,7 @@ export default async (event: ContractEvent): Promise<void> => {
 
       await mutate('setCurrentVersion', {
         input: {
-          item: 'COLONY',
+          item: 'colony',
           version: BigNumber.from(version).toNumber(),
         },
       });
