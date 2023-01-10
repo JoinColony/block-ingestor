@@ -17,6 +17,10 @@ export const colonySpecificEventsListener = async (
     ContractEventsSignatures.ColonyFundsClaimed,
     colonyAddress,
   );
+  await addColonyEventListener(
+    ContractEventsSignatures.ColonyUpgraded,
+    colonyAddress,
+  );
   await addTokenEventListener(ContractEventsSignatures.Transfer, colonyAddress);
 };
 
