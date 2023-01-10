@@ -37,6 +37,8 @@ const eventListener = async (): Promise<void> => {
   await addNetworkEventListener(ContractEventsSignatures.ExtensionUninstalled);
   await addNetworkEventListener(ContractEventsSignatures.ExtensionDeprecated);
   await addNetworkEventListener(ContractEventsSignatures.ExtensionUpgraded);
+
+  await addNetworkEventListener(ContractEventsSignatures.ColonyVersionAdded);
 };
 
 export default eventListener;
