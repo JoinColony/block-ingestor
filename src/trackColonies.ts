@@ -75,7 +75,7 @@ const writeCurrentNetworkColonyVersion = async (): Promise<void> => {
 
   await mutate('setCurrentVersion', {
     input: {
-      item: 'colony',
+      key: 'colony',
       version: BigNumber.from(version).toNumber(),
     },
   });
