@@ -219,6 +219,8 @@ export default async (event: ContractEvent): Promise<void> => {
     case ContractEventsSignatures.ColonyVersionAdded: {
       const { version } = event.args;
 
+      verbose('New colony version:', version, 'added to network');
+
       await mutate('setCurrentVersion', {
         input: {
           key: 'colony',
@@ -230,7 +232,10 @@ export default async (event: ContractEvent): Promise<void> => {
     }
 
     case ContractEventsSignatures.ColonyUpgraded: {
+      const { contractAddress } = event;
       const { newVersion } = event.args;
+
+      verbose('Colony:', contractAddress, `upgraded to version ${newVersion}`);
 
       await mutate('updateColony', {
         input: {
@@ -244,6 +249,13 @@ export default async (event: ContractEvent): Promise<void> => {
 
     case ContractEventsSignatures.ExtensionAddedToNetwork: {
       const { extensionId, version } = event.args;
+
+      verbose(
+        'Extension:',
+        extensionId,
+        `(version ${version})`,
+        'added to network',
+      );
 
       await mutate('setCurrentVersion', {
         input: {
