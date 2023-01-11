@@ -218,13 +218,14 @@ export default async (event: ContractEvent): Promise<void> => {
 
     case ContractEventsSignatures.ColonyVersionAdded: {
       const { version } = event.args;
+      const convertedVersion = BigNumber.from(version).toNumber();
 
-      verbose('New colony version:', version, 'added to network');
+      verbose('New colony version:', convertedVersion, 'added to network');
 
       await mutate('setCurrentVersion', {
         input: {
           key: 'colony',
-          version: BigNumber.from(version).toNumber(),
+          version: convertedVersion,
         },
       });
 
@@ -234,13 +235,18 @@ export default async (event: ContractEvent): Promise<void> => {
     case ContractEventsSignatures.ColonyUpgraded: {
       const { contractAddress } = event;
       const { newVersion } = event.args;
+      const convertedVersion = BigNumber.from(newVersion).toNumber();
 
-      verbose('Colony:', contractAddress, `upgraded to version ${newVersion}`);
+      verbose(
+        'Colony:',
+        contractAddress,
+        `upgraded to version ${convertedVersion}`,
+      );
 
       await mutate('updateColony', {
         input: {
           id: event.contractAddress,
-          version: BigNumber.from(newVersion).toNumber(),
+          version: convertedVersion,
         },
       });
 
@@ -249,18 +255,19 @@ export default async (event: ContractEvent): Promise<void> => {
 
     case ContractEventsSignatures.ExtensionAddedToNetwork: {
       const { extensionId, version } = event.args;
+      const convertedVersion = BigNumber.from(version).toNumber();
 
       verbose(
         'Extension:',
         extensionId,
-        `(version ${version})`,
+        `(version ${convertedVersion})`,
         'added to network',
       );
 
       await mutate('setCurrentVersion', {
         input: {
           key: extensionId,
-          version: BigNumber.from(version).toNumber(),
+          version: convertedVersion,
         },
       });
 
@@ -270,6 +277,7 @@ export default async (event: ContractEvent): Promise<void> => {
     case ContractEventsSignatures.ExtensionInstalled: {
       const { transactionHash, timestamp } = event;
       const { extensionId, colony, version } = event.args;
+      const convertedVersion = BigNumber.from(version).toNumber();
 
       const extensionAddress = await networkClient.getExtensionInstallation(
         extensionId,
@@ -284,7 +292,7 @@ export default async (event: ContractEvent): Promise<void> => {
       verbose(
         'Extension:',
         extensionId,
-        `(version ${version})`,
+        `(version ${convertedVersion})`,
         'installed in Colony:',
         colony,
       );
@@ -294,7 +302,7 @@ export default async (event: ContractEvent): Promise<void> => {
           id: extensionAddress,
           colonyId: colony,
           hash: extensionId,
-          version: BigNumber.from(version).toNumber(),
+          version: convertedVersion,
           installedBy,
           installedAt: timestamp,
           isDeprecated: false,
@@ -348,12 +356,13 @@ export default async (event: ContractEvent): Promise<void> => {
 
     case ContractEventsSignatures.ExtensionUpgraded: {
       const { extensionId, colony, version } = event.args;
+      const convertedVersion = BigNumber.from(version).toNumber();
 
       verbose(
         'Extension:',
         extensionId,
         'upgraded to version',
-        version,
+        convertedVersion,
         'in Colony:',
         colony,
       );
@@ -362,7 +371,7 @@ export default async (event: ContractEvent): Promise<void> => {
         input: {
           colonyId: colony,
           hash: extensionId,
-          version: BigNumber.from(version).toNumber(),
+          version: convertedVersion,
         },
       });
 
