@@ -24,5 +24,6 @@ module.exports = {
     'no-lone-blocks': 'off',
     'no-useless-return': 'off',
     '@typescript-eslint/member-delimiter-style': 'off',
+    '@typescript-eslint/indent': 'off',
   },
 };

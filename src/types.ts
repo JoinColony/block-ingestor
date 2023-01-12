@@ -36,6 +36,7 @@ export enum ContractEventsSignatures {
   ExtensionUninstalled = 'ExtensionUninstalled(bytes32,address)',
   ExtensionDeprecated = 'ExtensionDeprecated(bytes32,address,bool)',
   ExtensionUpgraded = 'ExtensionUpgraded(indexed bytes32,indexed address,uint256)',
+  ExtensionInitialised = 'ExtensionInitialised()',
 }
 
 /*

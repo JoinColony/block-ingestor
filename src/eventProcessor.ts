@@ -4,7 +4,10 @@ import { constants, BigNumber } from 'ethers';
 import { output, verbose, writeJsonStats } from './utils';
 import { coloniesSet } from './trackColonies';
 import networkClient from './networkClient';
-import { colonySpecificEventsListener } from './eventListener';
+import {
+  extensionSpecificEventsListener,
+  colonySpecificEventsListener,
+} from './eventListener';
 import { getChainId } from './provider';
 import { query, mutate } from './amplifyClient';
 import { ContractEventsSignatures, ContractEvent } from './types';
@@ -262,6 +265,8 @@ export default async (event: ContractEvent): Promise<void> => {
         },
       });
 
+      await extensionSpecificEventsListener(extensionAddress);
+
       return;
     }
 
@@ -270,7 +275,7 @@ export default async (event: ContractEvent): Promise<void> => {
 
       verbose('Extension:', extensionId, 'uninstalled in Colony:', colony);
 
-      await mutate('updateColonyExtension', {
+      await mutate('updateColonyExtensionByColonyAndHash', {
         input: {
           colonyId: colony,
           hash: extensionId,
@@ -292,7 +297,7 @@ export default async (event: ContractEvent): Promise<void> => {
         colony,
       );
 
-      await mutate('updateColonyExtension', {
+      await mutate('updateColonyExtensionByColonyAndHash', {
         input: {
           colonyId: colony,
           hash: extensionId,
@@ -315,11 +320,26 @@ export default async (event: ContractEvent): Promise<void> => {
         colony,
       );
 
-      await mutate('updateColonyExtension', {
+      await mutate('updateColonyExtensionByColonyAndHash', {
         input: {
           colonyId: colony,
           hash: extensionId,
           version: BigNumber.from(version).toNumber(),
+        },
+      });
+
+      return;
+    }
+
+    case ContractEventsSignatures.ExtensionInitialised: {
+      const { contractAddress: extensionAddress } = event;
+
+      verbose('Extension with address:', extensionAddress, 'was enabled');
+
+      await mutate('updateColonyExtensionByAddress', {
+        input: {
+          id: extensionAddress,
+          isInitialized: true,
         },
       });
 

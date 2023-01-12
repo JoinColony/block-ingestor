@@ -1,5 +1,6 @@
 import {
   addColonyEventListener,
+  addExtensionEventListener,
   addNetworkEventListener,
   addTokenEventListener,
 } from './utils';
@@ -17,6 +18,15 @@ export const colonySpecificEventsListener = async (
     colonyAddress,
   );
   await addTokenEventListener(ContractEventsSignatures.Transfer, colonyAddress);
+};
+
+export const extensionSpecificEventsListener = async (
+  extensionAddress: string,
+): Promise<void> => {
+  await addExtensionEventListener(
+    ContractEventsSignatures.ExtensionInitialised,
+    extensionAddress,
+  );
 };
 
 const eventListener = async (): Promise<void> => {
