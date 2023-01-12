@@ -1,6 +1,9 @@
 import { Extension, getExtensionHash, getLogs } from '@colony/colony-js';
-import { extensionSpecificEventsListener } from './eventListener';
+import { BigNumber, constants } from 'ethers';
+import { Log } from '@ethersproject/providers';
 
+import { mutate } from './amplifyClient';
+import { extensionSpecificEventsListener } from './eventListener';
 import networkClient from './networkClient';
 import { verbose } from './utils';
 
@@ -24,6 +27,8 @@ export default async (): Promise<void> => {
       networkClient,
       networkClient.filters.ExtensionUninstalled(extensionId),
     );
+    // Store the most recent extension installed parsed log (needed below)
+    let lastInstalledLog: Log | undefined;
 
     /**
      * Looping through the logs to create a mapping between colonies
@@ -31,6 +36,7 @@ export default async (): Promise<void> => {
      */
     const installedInColonyCount: { [address: string]: number } = {};
     extensionInstalledLogs.forEach((log) => {
+      lastInstalledLog = log;
       const parsedLog = networkClient.interface.parseLog(log);
       const { colony } = parsedLog.args;
 
@@ -62,6 +68,34 @@ export default async (): Promise<void> => {
         );
 
         await extensionSpecificEventsListener(extensionAddress);
+
+        if (lastInstalledLog) {
+          const parsedLog = networkClient.interface.parseLog(lastInstalledLog);
+          const { transactionHash } = lastInstalledLog;
+          const { version } = parsedLog.args;
+          const convertedVersion = BigNumber.from(version).toNumber();
+
+          const receipt = await networkClient.provider.getTransactionReceipt(
+            transactionHash,
+          );
+          const installedBy = receipt.from || constants.AddressZero;
+
+          const timestamp = Math.floor(new Date().getTime() / 1000);
+
+          mutate('createColonyExtension', {
+            input: {
+              id: extensionAddress,
+              colonyId: colony,
+              hash: extensionId,
+              version: convertedVersion,
+              installedBy,
+              installedAt: timestamp,
+              isDeprecated: false,
+              isDeleted: false,
+              isInitialized: false,
+            },
+          });
+        }
       }
     }
   });
