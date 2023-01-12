@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 import { ensureFile, readJson, writeJson } from 'fs-extra';
 import path from 'path';
-import { utils } from 'ethers';
+import { Contract, utils } from 'ethers';
 import { Log } from '@ethersproject/providers';
 import {
   AnyColonyClient,
@@ -152,16 +152,22 @@ export const eventListenerGenerator = async (
     if (clientType === ClientType.TokenClient) {
       client = await getTokenClient(eventContractAddress, provider);
     }
-    const { hash: blockHash, timestamp } = await provider.getBlock(blockNumber);
-    addEvent({
-      ...client.interface.parseLog(log),
-      blockNumber,
-      transactionHash,
-      logIndex,
-      contractAddress: eventContractAddress,
-      blockHash,
-      timestamp,
-    });
+    try {
+      const { hash: blockHash, timestamp } = await provider.getBlock(
+        blockNumber,
+      );
+      addEvent({
+        ...client.interface.parseLog(log),
+        blockNumber,
+        transactionHash,
+        logIndex,
+        contractAddress: eventContractAddress,
+        blockHash,
+        timestamp,
+      });
+    } catch (error) {
+      verbose('Failed to process the event: ', error);
+    }
   });
 };
 
@@ -217,7 +223,9 @@ export const addExtensionEventListener = async (
   extensionAddress: string,
 ): Promise<void> => {
   const { provider } = networkClient;
-  const iface = new utils.Interface([`event ${eventSignature}`]);
+  const extensionContract = new Contract(extensionAddress, [
+    `event ${eventSignature}`,
+  ]);
   const filter = {
     topics: [utils.id(eventSignature)],
     address: extensionAddress,
@@ -237,15 +245,21 @@ export const addExtensionEventListener = async (
       address: eventContractAddress,
     } = log;
 
-    const { hash: blockHash, timestamp } = await provider.getBlock(blockNumber);
-    addEvent({
-      ...iface.parseLog(log),
-      blockNumber,
-      transactionHash,
-      logIndex,
-      contractAddress: eventContractAddress,
-      blockHash,
-      timestamp,
-    });
+    try {
+      const { hash: blockHash, timestamp } = await provider.getBlock(
+        blockNumber,
+      );
+      addEvent({
+        ...extensionContract.interface.parseLog(log),
+        blockNumber,
+        transactionHash,
+        logIndex,
+        contractAddress: eventContractAddress,
+        blockHash,
+        timestamp,
+      });
+    } catch (error) {
+      verbose('Failed to process the event: ', error);
+    }
   });
 };
