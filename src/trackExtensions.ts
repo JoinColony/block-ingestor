@@ -4,6 +4,12 @@ import { extensionSpecificEventsListener } from './eventListener';
 import networkClient from './networkClient';
 import { verbose } from './utils';
 
+/**
+ * Defines extensions for which we want to track ExtensionInitialised events
+ * Note: If an extension config in CDapp doesn't specify initialization params,
+ * it is considered enabled straight after installation and we don't need
+ * to track ExtensionInitialised events for it (e.g. OneTxPayment)
+ */
 const supportedExtensionIds = [getExtensionHash(Extension.VotingReputation)];
 
 export default async (): Promise<void> => {
