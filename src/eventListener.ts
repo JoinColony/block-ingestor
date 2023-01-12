@@ -17,6 +17,10 @@ export const colonySpecificEventsListener = async (
     ContractEventsSignatures.ColonyFundsClaimed,
     colonyAddress,
   );
+  await addColonyEventListener(
+    ContractEventsSignatures.ColonyUpgraded,
+    colonyAddress,
+  );
   await addTokenEventListener(ContractEventsSignatures.Transfer, colonyAddress);
 };
 
@@ -37,6 +41,8 @@ const eventListener = async (): Promise<void> => {
   await addNetworkEventListener(ContractEventsSignatures.ExtensionUninstalled);
   await addNetworkEventListener(ContractEventsSignatures.ExtensionDeprecated);
   await addNetworkEventListener(ContractEventsSignatures.ExtensionUpgraded);
+
+  await addNetworkEventListener(ContractEventsSignatures.ColonyVersionAdded);
 };
 
 export default eventListener;

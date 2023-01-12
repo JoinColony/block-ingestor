@@ -70,6 +70,13 @@ export const mutations = {
       }
     }
   `,
+  updateColony: /* GraphQL */ `
+    mutation UpdateColony($input: UpdateColonyInput!) {
+      updateColony(input: $input) {
+        id
+      }
+    }
+  `,
 };
 
 /*
