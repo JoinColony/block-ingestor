@@ -1,7 +1,12 @@
 import dotenv from 'dotenv';
 import { constants, BigNumber } from 'ethers';
 
-import { output, verbose, writeJsonStats } from './utils';
+import {
+  output,
+  verbose,
+  writeExtensionFromEvent,
+  writeJsonStats,
+} from './utils';
 import { coloniesSet } from './trackColonies';
 import networkClient from './networkClient';
 import {
@@ -276,7 +281,6 @@ export default async (event: ContractEvent): Promise<void> => {
     }
 
     case ContractEventsSignatures.ExtensionInstalled: {
-      const { transactionHash, timestamp } = event;
       const { extensionId, colony, version } = event.args;
       const convertedVersion = BigNumber.from(version).toNumber();
 
@@ -284,11 +288,6 @@ export default async (event: ContractEvent): Promise<void> => {
         extensionId,
         colony,
       );
-
-      const receipt = await networkClient.provider.getTransactionReceipt(
-        transactionHash,
-      );
-      const installedBy = receipt.from || constants.AddressZero;
 
       verbose(
         'Extension:',
@@ -298,20 +297,7 @@ export default async (event: ContractEvent): Promise<void> => {
         colony,
       );
 
-      await mutate('createColonyExtension', {
-        input: {
-          id: extensionAddress,
-          colonyId: colony,
-          hash: extensionId,
-          version: convertedVersion,
-          installedBy,
-          installedAt: timestamp,
-          isDeprecated: false,
-          isDeleted: false,
-          isInitialized: false,
-        },
-      });
-
+      await writeExtensionFromEvent(event, extensionAddress);
       await extensionSpecificEventsListener(extensionAddress);
 
       return;
