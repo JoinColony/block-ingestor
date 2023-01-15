@@ -1,6 +1,3 @@
-import dotenv from 'dotenv';
-import { ensureFile, readJson, writeJson } from 'fs-extra';
-import path from 'path';
 import { Contract, utils } from 'ethers';
 import { Log } from '@ethersproject/providers';
 import {
@@ -11,92 +8,10 @@ import {
   TokenClient,
 } from '@colony/colony-js';
 
-import networkClient from './networkClient';
-import { addEvent } from './eventQueue';
-import { ContractEventsSignatures } from './types';
-
-dotenv.config();
-
-/*
- * Log to console with name and timestamp
- * Used for basic stuff, which will always be logged
- */
-export const output = (...messages: any[]): void =>
-  console.log(new Date().toJSON(), ...messages);
-
-/*
- * Log to console with name and timestamp
- * This should be added to internals, which you don't always want to show in production
- * This is controlled by the `VERBOSE_OUTPUT` env variable
- */
-export const verbose = (...messages: any[]): void => {
-  const verboseOutput = process.env.VERBOSE_OUTPUT === 'true';
-  if (verboseOutput) {
-    output(...messages);
-  }
-};
-
-/*
- * Read a json file at a specified path.
- * If the file (including the path) doesn't exist, it will be created and seeded
- * with an empty object
- */
-export const readJsonStats = async (
-  filePath = `${path.resolve(__dirname, '..')}/run/stats.json`,
-): Promise<Record<string, unknown>> => {
-  await ensureFile(filePath);
-  let jsonContents;
-  try {
-    jsonContents = await readJson(filePath);
-    return jsonContents;
-  } catch (error) {
-    await writeJson(filePath, {});
-    return {};
-  }
-};
-
-type ObjectOrFunction =
-  | Record<string, unknown>
-  | ((jsonFile: Record<string, unknown>) => Record<string, unknown>);
-
-/*
- * Write a json file at a specified path.
- * It accepts either a object fragment (or full object) that will get appended to the existing file,
- * or a callback (which receives the current version of the file) and needs to return the new object
- * that will be written back
- */
-export const writeJsonStats = async (
-  objectOrFunction: ObjectOrFunction,
-  filePath = `${path.resolve(__dirname, '..')}/run/stats.json`,
-): Promise<void> => {
-  const port = process.env.STATS_PORT;
-  if (!port) {
-    verbose('Stats are DISABLED, no point in writing to the stats file');
-    /*
-     * If the port isn't set, it means the stats are disabled, so there's no point
-     * in keep writing the stats file, so we exit early
-     */
-    return;
-  }
-
-  let newJsonContents = {};
-  const curentJsonContents = await readJsonStats(filePath);
-
-  if (typeof objectOrFunction === 'function') {
-    newJsonContents = {
-      ...curentJsonContents,
-      ...objectOrFunction(curentJsonContents),
-    };
-  } else {
-    newJsonContents = {
-      ...curentJsonContents,
-      ...objectOrFunction,
-    };
-  }
-
-  await writeJson(filePath, newJsonContents);
-  verbose('Stats file updated');
-};
+import { verbose } from './logger';
+import networkClient from '../networkClient';
+import { ContractEvent, ContractEventsSignatures } from '../types';
+import { addEvent } from '../eventQueue';
 
 /*
  * Convert a Set that contains a JSON string, back into JS form
@@ -238,28 +153,34 @@ export const addExtensionEventListener = async (
   );
 
   provider.on(filter, async (log: Log) => {
-    const {
-      transactionHash,
-      logIndex,
-      blockNumber,
-      address: eventContractAddress,
-    } = log;
+    const event = await mapLogToContractEvent(log, extensionContract.interface);
 
-    try {
-      const { hash: blockHash, timestamp } = await provider.getBlock(
-        blockNumber,
-      );
-      addEvent({
-        ...extensionContract.interface.parseLog(log),
-        blockNumber,
-        transactionHash,
-        logIndex,
-        contractAddress: eventContractAddress,
-        blockHash,
-        timestamp,
-      });
-    } catch (error) {
-      verbose('Failed to process the event: ', error);
+    if (event) {
+      addEvent(event);
     }
   });
+};
+
+export const mapLogToContractEvent = async (
+  log: Log,
+  iface: utils.Interface,
+): Promise<ContractEvent | null> => {
+  const { provider } = networkClient;
+  const {
+    transactionHash,
+    logIndex,
+    blockNumber,
+    address: eventContractAddress,
+  } = log;
+  const { hash: blockHash, timestamp } = await provider.getBlock(blockNumber);
+
+  return {
+    ...iface.parseLog(log),
+    blockNumber,
+    transactionHash,
+    logIndex,
+    contractAddress: eventContractAddress,
+    blockHash,
+    timestamp,
+  };
 };
