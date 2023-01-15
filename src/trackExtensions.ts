@@ -1,11 +1,13 @@
 import { Extension, getExtensionHash, getLogs } from '@colony/colony-js';
-import { BigNumber, constants } from 'ethers';
 import { Log } from '@ethersproject/providers';
 
-import { mutate } from './amplifyClient';
 import { extensionSpecificEventsListener } from './eventListener';
 import networkClient from './networkClient';
-import { verbose } from './utils';
+import {
+  mapLogToContractEvent,
+  verbose,
+  writeExtensionFromEvent,
+} from './utils';
 
 /**
  * Defines extensions for which we want to track ExtensionInitialised events
@@ -69,32 +71,16 @@ export default async (): Promise<void> => {
 
         await extensionSpecificEventsListener(extensionAddress);
 
+        // Store the most recent installation in the db
         if (lastInstalledLog) {
-          const parsedLog = networkClient.interface.parseLog(lastInstalledLog);
-          const { transactionHash } = lastInstalledLog;
-          const { version } = parsedLog.args;
-          const convertedVersion = BigNumber.from(version).toNumber();
-
-          const receipt = await networkClient.provider.getTransactionReceipt(
-            transactionHash,
+          const event = await mapLogToContractEvent(
+            lastInstalledLog,
+            networkClient.interface,
           );
-          const installedBy = receipt.from || constants.AddressZero;
 
-          const timestamp = Math.floor(new Date().getTime() / 1000);
-
-          mutate('createColonyExtension', {
-            input: {
-              id: extensionAddress,
-              colonyId: colony,
-              hash: extensionId,
-              version: convertedVersion,
-              installedBy,
-              installedAt: timestamp,
-              isDeprecated: false,
-              isDeleted: false,
-              isInitialized: false,
-            },
-          });
+          if (event) {
+            await writeExtensionFromEvent(event, extensionAddress);
+          }
         }
       }
     }
