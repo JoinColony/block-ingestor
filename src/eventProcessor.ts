@@ -18,6 +18,7 @@ import {
 import { getChainId } from './provider';
 import { query, mutate } from './amplifyClient';
 import { ContractEventsSignatures, ContractEvent } from './types';
+import { writeColonyFromEvent } from './utils/colonies';
 
 dotenv.config();
 
@@ -63,6 +64,8 @@ export default async (event: ContractEvent): Promise<void> => {
        * Setup all Colony specific listeners for it
        */
       await colonySpecificEventsListener(colonyAddress);
+
+      await writeColonyFromEvent(event);
 
       return;
     }
