@@ -31,7 +31,7 @@ export default async (): Promise<void> => {
     networkClient.filters.ColonyAdded(),
   );
 
-  colonyAddedLogs.map((log) => {
+  colonyAddedLogs.forEach((log) => {
     const {
       args: { colonyAddress, token: tokenAddress },
     } = networkClient.interface.parseLog(log) || {};
@@ -41,7 +41,6 @@ export default async (): Promise<void> => {
      * - We're using a JSON string since we need to store two values, colony address and token
      */
     colonies.add(JSON.stringify({ colonyAddress, tokenAddress }));
-    return null;
   });
 
   await writeJsonStats({ trackedColonies: colonies.size });
