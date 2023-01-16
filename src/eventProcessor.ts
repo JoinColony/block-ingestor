@@ -259,19 +259,19 @@ export default async (event: ContractEvent): Promise<void> => {
     }
 
     case ContractEventsSignatures.ExtensionAddedToNetwork: {
-      const { extensionId, version } = event.args;
+      const { extensionId: extensionHash, version } = event.args;
       const convertedVersion = BigNumber.from(version).toNumber();
 
       verbose(
         'Extension:',
-        extensionId,
+        extensionHash,
         `(version ${convertedVersion})`,
         'added to network',
       );
 
       await mutate('setCurrentVersion', {
         input: {
-          key: extensionId,
+          key: extensionHash,
           version: convertedVersion,
         },
       });
@@ -280,37 +280,37 @@ export default async (event: ContractEvent): Promise<void> => {
     }
 
     case ContractEventsSignatures.ExtensionInstalled: {
-      const { extensionId, colony, version } = event.args;
+      const { extensionId: extensionHash, colony, version } = event.args;
       const convertedVersion = BigNumber.from(version).toNumber();
 
       const extensionAddress = await networkClient.getExtensionInstallation(
-        extensionId,
+        extensionHash,
         colony,
       );
 
       verbose(
         'Extension:',
-        extensionId,
+        extensionHash,
         `(version ${convertedVersion})`,
         'installed in Colony:',
         colony,
       );
 
       await writeExtensionFromEvent(event, extensionAddress);
-      await extensionSpecificEventsListener(extensionAddress);
+      await extensionSpecificEventsListener(extensionAddress, extensionHash);
 
       return;
     }
 
     case ContractEventsSignatures.ExtensionUninstalled: {
-      const { extensionId, colony } = event.args;
+      const { extensionId: extensionHash, colony } = event.args;
 
-      verbose('Extension:', extensionId, 'uninstalled in Colony:', colony);
+      verbose('Extension:', extensionHash, 'uninstalled in Colony:', colony);
 
       await mutate('updateColonyExtensionByColonyAndHash', {
         input: {
           colonyId: colony,
-          hash: extensionId,
+          hash: extensionHash,
           isDeleted: true,
         },
       });
@@ -319,11 +319,11 @@ export default async (event: ContractEvent): Promise<void> => {
     }
 
     case ContractEventsSignatures.ExtensionDeprecated: {
-      const { extensionId, colony, deprecated } = event.args;
+      const { extensionId: extensionHash, colony, deprecated } = event.args;
 
       verbose(
         'Extension:',
-        extensionId,
+        extensionHash,
         deprecated ? 'deprecated' : 're-enabled',
         'in Colony:',
         colony,
@@ -332,7 +332,7 @@ export default async (event: ContractEvent): Promise<void> => {
       await mutate('updateColonyExtensionByColonyAndHash', {
         input: {
           colonyId: colony,
-          hash: extensionId,
+          hash: extensionHash,
           isDeprecated: deprecated,
         },
       });
@@ -341,12 +341,12 @@ export default async (event: ContractEvent): Promise<void> => {
     }
 
     case ContractEventsSignatures.ExtensionUpgraded: {
-      const { extensionId, colony, version } = event.args;
+      const { extensionId: extensionHash, colony, version } = event.args;
       const convertedVersion = BigNumber.from(version).toNumber();
 
       verbose(
         'Extension:',
-        extensionId,
+        extensionHash,
         'upgraded to version',
         convertedVersion,
         'in Colony:',
@@ -356,7 +356,7 @@ export default async (event: ContractEvent): Promise<void> => {
       await mutate('updateColonyExtensionByColonyAndHash', {
         input: {
           colonyId: colony,
-          hash: extensionId,
+          hash: extensionHash,
           version: convertedVersion,
         },
       });

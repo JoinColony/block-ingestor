@@ -1,3 +1,5 @@
+import { getExtensionHash } from '@colony/colony-js';
+
 import {
   addColonyEventListener,
   addExtensionEventListener,
@@ -5,6 +7,7 @@ import {
   addTokenEventListener,
 } from './utils';
 import { ContractEventsSignatures } from './types';
+import { INITIALISABLE_EXTENSION_IDS } from './constants';
 
 /*
  * All events that need to be tracked on a single colony go in here
@@ -26,11 +29,17 @@ export const colonySpecificEventsListener = async (
 
 export const extensionSpecificEventsListener = async (
   extensionAddress: string,
+  extensionHash: string,
 ): Promise<void> => {
-  await addExtensionEventListener(
-    ContractEventsSignatures.ExtensionInitialised,
-    extensionAddress,
+  const isInitialisable = INITIALISABLE_EXTENSION_IDS.some(
+    (extensionId) => getExtensionHash(extensionId) === extensionHash,
   );
+  if (isInitialisable) {
+    await addExtensionEventListener(
+      ContractEventsSignatures.ExtensionInitialised,
+      extensionAddress,
+    );
+  }
 };
 
 const eventListener = async (): Promise<void> => {
