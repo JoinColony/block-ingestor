@@ -1,4 +1,4 @@
-import { BigNumber, constants, Contract } from 'ethers';
+import { constants, Contract } from 'ethers';
 import { Log } from '@ethersproject/providers';
 import { getLogs } from '@colony/colony-js';
 
@@ -6,6 +6,7 @@ import networkClient from '../networkClient';
 import { mutate } from '../amplifyClient';
 import { ContractEvent, ContractEventsSignatures } from '../types';
 import { verbose } from './logger';
+import { toNumber } from './numbers';
 
 /**
  * Function writing the extension version to the db based on the ExtensionAddedToNetwork event payload
@@ -14,7 +15,7 @@ export const writeExtensionVersionFromEvent = async (
   event: ContractEvent,
 ): Promise<void> => {
   const { version, extensionId: extensionHash } = event.args;
-  const convertedVersion = BigNumber.from(version).toNumber();
+  const convertedVersion = toNumber(version);
 
   verbose(
     'Extension:',
@@ -44,7 +45,7 @@ export const writeExtensionFromEvent = async (
 ): Promise<void> => {
   const { transactionHash, timestamp } = event;
   const { extensionId: extensionHash, colony, version } = event.args;
-  const convertedVersion = BigNumber.from(version).toNumber();
+  const convertedVersion = toNumber(version);
 
   const receipt = await networkClient.provider.getTransactionReceipt(
     transactionHash,

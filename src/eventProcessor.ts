@@ -3,6 +3,7 @@ import { constants, BigNumber } from 'ethers';
 
 import {
   output,
+  toNumber,
   verbose,
   writeExtensionFromEvent,
   writeExtensionVersionFromEvent,
@@ -225,7 +226,7 @@ export default async (event: ContractEvent): Promise<void> => {
 
     case ContractEventsSignatures.ColonyVersionAdded: {
       const { version } = event.args;
-      const convertedVersion = BigNumber.from(version).toNumber();
+      const convertedVersion = toNumber(version);
 
       verbose('New colony version:', convertedVersion, 'added to network');
 
@@ -242,7 +243,7 @@ export default async (event: ContractEvent): Promise<void> => {
     case ContractEventsSignatures.ColonyUpgraded: {
       const { contractAddress } = event;
       const { newVersion } = event.args;
-      const convertedVersion = BigNumber.from(newVersion).toNumber();
+      const convertedVersion = toNumber(newVersion);
 
       verbose(
         'Colony:',
@@ -317,7 +318,7 @@ export default async (event: ContractEvent): Promise<void> => {
 
     case ContractEventsSignatures.ExtensionUpgraded: {
       const { extensionId: extensionHash, colony, version } = event.args;
-      const convertedVersion = BigNumber.from(version).toNumber();
+      const convertedVersion = toNumber(version);
 
       verbose(
         'Extension:',
