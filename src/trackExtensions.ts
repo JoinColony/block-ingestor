@@ -8,6 +8,7 @@ import {
   mapLogToContractEvent,
   verbose,
   writeExtensionFromEvent,
+  writeExtensionVersionFromEvent,
 } from './utils';
 import { SUPPORTED_EXTENSION_IDS } from './constants';
 
@@ -15,8 +16,36 @@ export default async (): Promise<void> => {
   verbose('Fetching existing extensions');
 
   SUPPORTED_EXTENSION_IDS.forEach(async (extensionId) => {
-    trackExtensionInstallations(extensionId);
+    await trackExtensionInstallations(extensionId);
+    await trackExtensionAddedToNetwork(extensionId);
   });
+};
+
+const trackExtensionAddedToNetwork = async (
+  extensionId: string,
+): Promise<void> => {
+  const extensionHash = getExtensionHash(extensionId);
+  const extensionAddedToNetworkLogs = await getLogs(
+    networkClient,
+    networkClient.filters.ExtensionAddedToNetwork(extensionHash),
+  );
+
+  // Only interested in the most recent one which contains the newest version
+  const mostRecentLog =
+    extensionAddedToNetworkLogs[extensionAddedToNetworkLogs.length - 1];
+  if (!mostRecentLog) {
+    return;
+  }
+
+  const event = await mapLogToContractEvent(
+    mostRecentLog,
+    networkClient.interface,
+  );
+  if (!event) {
+    return;
+  }
+
+  writeExtensionVersionFromEvent(event);
 };
 
 const trackExtensionInstallations = async (
@@ -75,10 +104,10 @@ const trackExtensionInstallations = async (
     await extensionSpecificEventsListener(extensionAddress, extensionHash);
 
     // Store the most recent installation in the db
-    const lastInstalledLog =
+    const mostRecentInstalledLog =
       extensionInstalledLogs[extensionInstalledLogs.length - 1];
     const event = await mapLogToContractEvent(
-      lastInstalledLog,
+      mostRecentInstalledLog,
       networkClient.interface,
     );
 
@@ -97,7 +126,7 @@ const trackExtensionInstallations = async (
       const isDeprecated = await isExtensionDeprecated(
         extensionHash,
         colony,
-        lastInstalledLog,
+        mostRecentInstalledLog,
       );
 
       await writeExtensionFromEvent(
