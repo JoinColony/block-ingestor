@@ -5,6 +5,31 @@ import { getLogs } from '@colony/colony-js';
 import networkClient from '../networkClient';
 import { mutate } from '../amplifyClient';
 import { ContractEvent } from '../types';
+import { verbose } from './logger';
+
+/**
+ * Function writing the extension version to the db based on the ExtensionAddedToNetwork event payload
+ */
+export const writeExtensionVersionFromEvent = async (
+  event: ContractEvent,
+): Promise<void> => {
+  const { version, extensionId: extensionHash } = event.args;
+  const convertedVersion = BigNumber.from(version).toNumber();
+
+  verbose(
+    'Extension:',
+    extensionHash,
+    `(version ${convertedVersion})`,
+    'added to network',
+  );
+
+  await mutate('setCurrentVersion', {
+    input: {
+      key: extensionHash,
+      version: convertedVersion,
+    },
+  });
+};
 
 /**
  * Function extracting installed extension details from the event and writing it to the database
@@ -17,7 +42,7 @@ export const writeExtensionFromEvent = async (
   isDeprecated?: boolean,
 ): Promise<void> => {
   const { transactionHash, timestamp } = event;
-  const { extensionId, colony, version } = event.args;
+  const { extensionId: extensionHash, colony, version } = event.args;
   const convertedVersion = BigNumber.from(version).toNumber();
 
   const receipt = await networkClient.provider.getTransactionReceipt(
@@ -25,11 +50,19 @@ export const writeExtensionFromEvent = async (
   );
   const installedBy = receipt.from || constants.AddressZero;
 
+  verbose(
+    'Extension:',
+    extensionHash,
+    `(version ${convertedVersion})`,
+    'installed in Colony:',
+    colony,
+  );
+
   await mutate('createColonyExtension', {
     input: {
       id: extensionAddress,
       colonyId: colony,
-      hash: extensionId,
+      hash: extensionHash,
       version: overrideVersion ?? convertedVersion,
       installedBy,
       installedAt: timestamp,

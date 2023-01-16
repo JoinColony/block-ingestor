@@ -5,6 +5,7 @@ import {
   output,
   verbose,
   writeExtensionFromEvent,
+  writeExtensionVersionFromEvent,
   writeJsonStats,
 } from './utils';
 import { coloniesSet } from './trackColonies';
@@ -260,46 +261,19 @@ export default async (event: ContractEvent): Promise<void> => {
     }
 
     case ContractEventsSignatures.ExtensionAddedToNetwork: {
-      const { extensionId: extensionHash, version } = event.args;
-      const convertedVersion = BigNumber.from(version).toNumber();
-
-      verbose(
-        'Extension:',
-        extensionHash,
-        `(version ${convertedVersion})`,
-        'added to network',
-      );
-
-      await mutate('setCurrentVersion', {
-        input: {
-          key: extensionHash,
-          version: convertedVersion,
-        },
-      });
-
+      await writeExtensionVersionFromEvent(event);
       return;
     }
 
     case ContractEventsSignatures.ExtensionInstalled: {
-      const { extensionId: extensionHash, colony, version } = event.args;
-      const convertedVersion = BigNumber.from(version).toNumber();
-
+      const { extensionId: extensionHash, colony } = event.args;
       const extensionAddress = await networkClient.getExtensionInstallation(
         extensionHash,
         colony,
       );
 
-      verbose(
-        'Extension:',
-        extensionHash,
-        `(version ${convertedVersion})`,
-        'installed in Colony:',
-        colony,
-      );
-
       await writeExtensionFromEvent(event, extensionAddress);
       await extensionSpecificEventsListener(extensionAddress, extensionHash);
-
       return;
     }
 
