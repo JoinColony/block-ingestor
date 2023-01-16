@@ -1,5 +1,4 @@
 import { Extension, getExtensionHash, getLogs } from '@colony/colony-js';
-import { BigNumber } from 'ethers';
 
 import { extensionSpecificEventsListener } from './eventListener';
 import networkClient from './networkClient';
@@ -7,6 +6,7 @@ import {
   isExtensionDeprecated,
   isExtensionInitialised,
   mapLogToContractEvent,
+  toNumber,
   verbose,
   writeExtensionFromEvent,
   writeExtensionVersionFromEvent,
@@ -123,7 +123,7 @@ const trackExtensionInstallations = async (
           await networkClient.getColonyClient(colony)
         ).getExtensionClient(extensionId)
       ).version();
-      const convertedVersion = BigNumber.from(version).toNumber();
+      const convertedVersion = toNumber(version);
 
       const isDeprecated = await isExtensionDeprecated(
         extensionHash,

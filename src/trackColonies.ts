@@ -1,6 +1,5 @@
 import dotenv from 'dotenv';
 import { getLogs } from '@colony/colony-js';
-import { BigNumber } from 'ethers';
 
 import networkClient from './networkClient';
 import {
@@ -9,6 +8,7 @@ import {
   verbose,
   addNetworkEventListener,
   setToJS,
+  toNumber,
 } from './utils';
 import { colonySpecificEventsListener } from './eventListener';
 import { ContractEventsSignatures } from './types';
@@ -75,7 +75,7 @@ const writeCurrentNetworkColonyVersion = async (): Promise<void> => {
   await mutate('setCurrentVersion', {
     input: {
       key: 'colony',
-      version: BigNumber.from(version).toNumber(),
+      version: toNumber(version),
     },
   });
 };
