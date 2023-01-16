@@ -1,10 +1,10 @@
-import { BigNumber, constants } from 'ethers';
+import { BigNumber, constants, Contract } from 'ethers';
 import { Log } from '@ethersproject/providers';
 import { getLogs } from '@colony/colony-js';
 
 import networkClient from '../networkClient';
 import { mutate } from '../amplifyClient';
-import { ContractEvent } from '../types';
+import { ContractEvent, ContractEventsSignatures } from '../types';
 import { verbose } from './logger';
 
 /**
@@ -40,6 +40,7 @@ export const writeExtensionFromEvent = async (
   extensionAddress: string,
   overrideVersion?: number,
   isDeprecated?: boolean,
+  isInitialised?: boolean,
 ): Promise<void> => {
   const { transactionHash, timestamp } = event;
   const { extensionId: extensionHash, colony, version } = event.args;
@@ -68,7 +69,7 @@ export const writeExtensionFromEvent = async (
       installedAt: timestamp,
       isDeprecated: !!isDeprecated,
       isDeleted: false,
-      isInitialized: false,
+      isInitialized: !!isInitialised,
     },
   });
 };
@@ -86,18 +87,41 @@ export const isExtensionDeprecated = async (
     networkClient,
     networkClient.filters.ExtensionDeprecated(extensionHash, colonyAddress),
   );
-  const lastDeprecatedLog =
+  const mostRecentDeprecatedLog =
     extensionDeprecatedLogs[extensionDeprecatedLogs.length - 1];
 
   // Short-circuit if there's no log or it happened before the installation
   if (
-    !lastDeprecatedLog ||
-    lastDeprecatedLog.blockNumber < installedLog.blockNumber
+    !mostRecentDeprecatedLog ||
+    mostRecentDeprecatedLog.blockNumber < installedLog.blockNumber
   ) {
     return false;
   }
 
-  const parsedLog = await networkClient.interface.parseLog(lastDeprecatedLog);
+  const parsedLog = await networkClient.interface.parseLog(
+    mostRecentDeprecatedLog,
+  );
 
   return !!parsedLog.args.deprecated;
+};
+
+export const isExtensionInitialised = async (
+  extensionAddress: string,
+  installedLog: Log,
+): Promise<boolean> => {
+  const extensionContract = new Contract(extensionAddress, [
+    `event ${ContractEventsSignatures.ExtensionInitialised}`,
+  ]);
+
+  const extensionInitialisedLogs = await getLogs(networkClient, {
+    topics: extensionContract.filters.ExtensionInitialised().topics,
+    address: extensionAddress,
+  });
+  const mostRecentInitialisedLog =
+    extensionInitialisedLogs[extensionInitialisedLogs.length - 1];
+
+  return !!(
+    mostRecentInitialisedLog &&
+    mostRecentInitialisedLog.blockNumber >= installedLog.blockNumber
+  );
 };

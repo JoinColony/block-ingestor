@@ -5,6 +5,7 @@ import { extensionSpecificEventsListener } from './eventListener';
 import networkClient from './networkClient';
 import {
   isExtensionDeprecated,
+  isExtensionInitialised,
   mapLogToContractEvent,
   verbose,
   writeExtensionFromEvent,
@@ -13,11 +14,12 @@ import {
 import { SUPPORTED_EXTENSION_IDS } from './constants';
 
 export default async (): Promise<void> => {
-  verbose('Fetching existing extensions');
-
   SUPPORTED_EXTENSION_IDS.forEach(async (extensionId) => {
-    await trackExtensionInstallations(extensionId);
+    verbose(`Fetching current version of extension: ${extensionId}`);
     await trackExtensionAddedToNetwork(extensionId);
+
+    verbose(`Fetching existing installations of extension: ${extensionId}`);
+    await trackExtensionInstallations(extensionId);
   });
 };
 
@@ -129,11 +131,17 @@ const trackExtensionInstallations = async (
         mostRecentInstalledLog,
       );
 
+      const isInitialised = await isExtensionInitialised(
+        extensionAddress,
+        mostRecentInstalledLog,
+      );
+
       await writeExtensionFromEvent(
         event,
         extensionAddress,
         convertedVersion,
         isDeprecated,
+        isInitialised,
       );
     }
   }
