@@ -13,6 +13,7 @@ import {
 import { colonySpecificEventsListener } from './eventListener';
 import { ContractEventsSignatures } from './types';
 import { mutate } from './amplifyClient';
+import { COLONY_CURRENT_VERSION_KEY } from './constants';
 
 dotenv.config();
 
@@ -75,7 +76,7 @@ const writeCurrentNetworkColonyVersion = async (): Promise<void> => {
 
   await mutate('setCurrentVersion', {
     input: {
-      key: 'colony',
+      key: COLONY_CURRENT_VERSION_KEY,
       version: BigNumber.from(version).toNumber(),
     },
   });

@@ -11,6 +11,7 @@ import {
 import { getChainId } from './provider';
 import { query, mutate } from './amplifyClient';
 import { ContractEventsSignatures, ContractEvent } from './types';
+import { COLONY_CURRENT_VERSION_KEY } from './constants';
 
 dotenv.config();
 
@@ -224,7 +225,7 @@ export default async (event: ContractEvent): Promise<void> => {
 
       await mutate('setCurrentVersion', {
         input: {
-          key: 'colony',
+          key: COLONY_CURRENT_VERSION_KEY,
           version: convertedVersion,
         },
       });
