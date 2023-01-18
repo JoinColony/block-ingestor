@@ -87,6 +87,9 @@ export const isExtensionDeprecated = async (
   const extensionDeprecatedLogs = await getLogs(
     networkClient,
     networkClient.filters.ExtensionDeprecated(extensionHash, colonyAddress),
+    {
+      fromBlock: installedLog.blockNumber,
+    },
   );
   const mostRecentDeprecatedLog =
     extensionDeprecatedLogs[extensionDeprecatedLogs.length - 1];
@@ -114,10 +117,16 @@ export const isExtensionInitialised = async (
     `event ${ContractEventsSignatures.ExtensionInitialised}`,
   ]);
 
-  const extensionInitialisedLogs = await getLogs(networkClient, {
-    topics: extensionContract.filters.ExtensionInitialised().topics,
-    address: extensionAddress,
-  });
+  const extensionInitialisedLogs = await getLogs(
+    networkClient,
+    {
+      topics: extensionContract.filters.ExtensionInitialised().topics,
+      address: extensionAddress,
+    },
+    {
+      fromBlock: installedLog.blockNumber,
+    },
+  );
   const mostRecentInitialisedLog =
     extensionInitialisedLogs[extensionInitialisedLogs.length - 1];
 
