@@ -75,6 +75,22 @@ export const writeExtensionFromEvent = async (
   });
 };
 
+export const deleteExtensionFromEvent = async (
+  event: ContractEvent,
+): Promise<void> => {
+  const { extensionId: extensionHash, colony } = event.args;
+
+  verbose('Extension:', extensionHash, 'uninstalled in Colony:', colony);
+
+  await mutate('updateColonyExtensionByColonyAndHash', {
+    input: {
+      colonyId: colony,
+      hash: extensionHash,
+      isDeleted: true,
+    },
+  });
+};
+
 /**
  * Function determining whether an extension has been deprecated in colony
  * since its installation, based on the ExtensionInstalled event log

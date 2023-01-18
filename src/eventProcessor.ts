@@ -2,6 +2,7 @@ import dotenv from 'dotenv';
 import { constants, BigNumber } from 'ethers';
 
 import {
+  deleteExtensionFromEvent,
   output,
   toNumber,
   verbose,
@@ -279,18 +280,7 @@ export default async (event: ContractEvent): Promise<void> => {
     }
 
     case ContractEventsSignatures.ExtensionUninstalled: {
-      const { extensionId: extensionHash, colony } = event.args;
-
-      verbose('Extension:', extensionHash, 'uninstalled in Colony:', colony);
-
-      await mutate('updateColonyExtensionByColonyAndHash', {
-        input: {
-          colonyId: colony,
-          hash: extensionHash,
-          isDeleted: true,
-        },
-      });
-
+      await deleteExtensionFromEvent(event);
       return;
     }
 

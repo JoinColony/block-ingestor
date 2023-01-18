@@ -3,6 +3,7 @@ import { Extension, getExtensionHash, getLogs } from '@colony/colony-js';
 import { extensionSpecificEventsListener } from './eventListener';
 import networkClient from './networkClient';
 import {
+  deleteExtensionFromEvent,
   isExtensionDeprecated,
   isExtensionInitialised,
   mapLogToContractEvent,
@@ -91,29 +92,45 @@ const trackExtensionInstallations = async (
     installedInColonyCount,
   )) {
     /**
-     * Only the colonies with installation count > 0 have this extension currently installed
+     * If installation count is 0, that means the extension has been deleted
      */
-    if (installationsCount === 0) {
-      continue;
-    }
+    if (installationsCount <= 0) {
+      const mostRecentUninstalledLog =
+        extensionUninstalledLogs[extensionUninstalledLogs.length - 1];
+      if (!mostRecentUninstalledLog) {
+        return;
+      }
 
-    const extensionAddress = await networkClient.getExtensionInstallation(
-      extensionHash,
-      colony,
-    );
+      const event = await mapLogToContractEvent(
+        mostRecentUninstalledLog,
+        networkClient.interface,
+      );
+      if (!event) {
+        return;
+      }
 
-    // Listen to extension specific events (e.g. ExtensionInitialised)
-    await extensionSpecificEventsListener(extensionAddress, extensionHash);
+      await deleteExtensionFromEvent(event);
+    } else {
+      const extensionAddress = await networkClient.getExtensionInstallation(
+        extensionHash,
+        colony,
+      );
 
-    // Store the most recent installation in the db
-    const mostRecentInstalledLog =
-      extensionInstalledLogs[extensionInstalledLogs.length - 1];
-    const event = await mapLogToContractEvent(
-      mostRecentInstalledLog,
-      networkClient.interface,
-    );
+      // Listen to extension specific events (e.g. ExtensionInitialised)
+      await extensionSpecificEventsListener(extensionAddress, extensionHash);
 
-    if (event) {
+      // Store the most recent installation in the db
+      const mostRecentInstalledLog =
+        extensionInstalledLogs[extensionInstalledLogs.length - 1];
+      const event = await mapLogToContractEvent(
+        mostRecentInstalledLog,
+        networkClient.interface,
+      );
+
+      if (!event) {
+        return;
+      }
+
       /**
        * Get the currently installed version of extension
        * (so we don't have to worry about ExtensionUpgraded events)
