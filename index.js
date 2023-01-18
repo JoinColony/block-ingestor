@@ -3,7 +3,7 @@ const coinMachineFactory = require('./abi/coinMachineFactoryABI.json');
 const whitelist = require('./abi/whitelistABI.json');
 const coinMachine = require('./abi/coinMachineABI.json');
 const { handleAgreementSigned, handleUserApproved } = require('./handlers/whitelist.js');
-const { handleCoinMachineInitialised, handleCoinMachineStateSet } = require('./handlers/coinMachine.js');
+const { handleCoinMachineInitialised, handleCoinMachineStateSet, handleTokensBought } = require('./handlers/coinMachine.js');
 
 const { output, poorMansGraphQL } = require('./utils');
 
@@ -15,6 +15,7 @@ const WhitelistEvents = {
 const CoinMachineEvents = {
   'CoinMachineInitialised': handleCoinMachineInitialised,
   'CoinMachineStateSet': handleCoinMachineStateSet,
+  'TokensBought': handleTokensBought,
 }
 
 const fetchExistingWhitelists = async () => {

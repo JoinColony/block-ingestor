@@ -1,4 +1,5 @@
 const { poorMansGraphQL } = require('../utils');
+const ethers = require('ethers');
 
 async function handleCoinMachineInitialised(args, coinMachineAddress) {
   const querySaleByCoinMachineAddress = {
@@ -91,7 +92,29 @@ async function handleCoinMachineStateSet(args, coinMachineAddress) {
     }
 }
 
+
+async function handleTokensBought(args, coinMachineAddress) {
+  const { buyer, numTokens, totalCost } = args;
+  const marketPrice = ethers.BigNumber.from(totalCost).div(ethers.BigNumber.from(numTokens));
+  const query = {
+    operationName: "CreateOrdersHistory",
+    query: `
+        mutation CreateOrdersHistory {
+          createOrdersHistory(
+          input: { coinMachineAddress: "${coinMachineAddress}", walletAddress: "${buyer}", volume: "${numTokens}", marketPrice: "${marketPrice}" }
+          condition: {}
+        ) {
+          id
+        }
+      }
+    `,
+    variables: null,
+  };
+  return query;
+}
+
 module.exports = {
   handleCoinMachineInitialised,
-  handleCoinMachineStateSet
+  handleCoinMachineStateSet,
+  handleTokensBought,
 }
