@@ -1,5 +1,6 @@
 const { poorMansGraphQL } = require('../utils');
 const ethers = require('ethers');
+const purchaseTokens = require('../purchaseTokens.json');
 
 async function handleCoinMachineInitialised(args, coinMachineAddress) {
   const querySaleByCoinMachineAddress = {
@@ -94,23 +95,55 @@ async function handleCoinMachineStateSet(args, coinMachineAddress) {
 
 
 async function handleTokensBought(args, coinMachineAddress) {
-  const { buyer, numTokens, totalCost } = args;
-  const marketPrice = ethers.BigNumber.from(totalCost).div(ethers.BigNumber.from(numTokens));
-  const query = {
-    operationName: "CreateOrdersHistory",
+  const querySaleByCoinMachineAddress = {
+    operationName: "GetSalebyCoinMachineAddress",
     query: `
-        mutation CreateOrdersHistory {
-          createOrdersHistory(
-          input: { coinMachineAddress: "${coinMachineAddress}", walletAddress: "${buyer}", volume: "${numTokens}", marketPrice: "${marketPrice}" }
-          condition: {}
+        query GetSalebyCoinMachineAddress {
+          getSalebyCoinMachineAddress(
+          coinMachineAddress: "${coinMachineAddress}"
         ) {
-          id
+          items {
+            tokenDecimals
+            tokenAddress
+            purchaseToken
+          }
         }
       }
     `,
     variables: null,
   };
-  return query;
+
+  try {
+    const { body } = await poorMansGraphQL(querySaleByCoinMachineAddress);
+    const result = JSON.parse(body);
+    const sale = result.data.getSalebyCoinMachineAddress.items[0];
+    if (!sale) return;
+    const { tokenDecimals, purchaseToken } = sale;
+    const purchaseTokenDecimals = purchaseTokens.find(
+      (token) => token.tokenAddress === purchaseToken,
+    )?.decimals;
+    const { buyer, numTokens, totalCost } = args;
+    const tokens = ethers.utils.formatUnits(numTokens, tokenDecimals);
+    const cost = ethers.utils.formatUnits(totalCost, purchaseTokenDecimals);
+    const query = {
+      operationName: "CreateOrdersHistory",
+      query: `
+          mutation CreateOrdersHistory {
+            createOrdersHistory(
+            input: { coinMachineAddress: "${coinMachineAddress}", walletAddress: "${buyer}", volume: "${tokens}", marketPrice: "${parseFloat(cost/tokens)}" }
+            condition: {}
+          ) {
+            id
+          }
+        }
+      `,
+      variables: null,
+    };
+    return query;
+  } catch (error) {
+    console.log(error);
+    // silent error
+  }
 }
 
 module.exports = {
