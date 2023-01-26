@@ -35,6 +35,8 @@ export const writeExtensionVersionFromEvent = async (
 /**
  * Function extracting installed extension details from the event and writing it to the database
  * @param overrideVersion If set, it will be used instead of the version in the event arguments
+ * @param shouldUpsert If true, the function will call updateExtensionByColonyAndHash mutation
+ * instead of createColonyExtension
  */
 export const writeExtensionFromEvent = async (
   event: ContractEvent,
@@ -76,8 +78,7 @@ export const writeExtensionFromEvent = async (
     await mutate('updateColonyExtensionByColonyAndHash', {
       input,
     });
-  }
-  {
+  } else {
     await mutate('createColonyExtension', {
       input: {
         id: extensionAddress,

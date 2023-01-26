@@ -25,10 +25,8 @@ export default async (): Promise<void> => {
     );
     await trackExtensionAddedToNetwork(extensionId, latestBlock);
 
-    verbose(
-      `Fetching events for extension: ${extensionId} starting from block: ${latestBlock}`,
-    );
-    await trackExtensionEvents(extensionId, latestBlock);
+    verbose(`Fetching events for extension: ${extensionId}`);
+    await trackExtensionEvents(extensionId);
   });
 };
 
@@ -61,10 +59,7 @@ const trackExtensionAddedToNetwork = async (
   writeExtensionVersionFromEvent(event);
 };
 
-const trackExtensionEvents = async (
-  extensionId: Extension,
-  latestBlock: number,
-): Promise<void> => {
+const trackExtensionEvents = async (extensionId: Extension): Promise<void> => {
   const extensionHash = getExtensionHash(extensionId);
   const extensionInstalledLogs = await getLogs(
     networkClient,
@@ -103,9 +98,7 @@ const trackExtensionEvents = async (
     installedInColonyCount,
   )) {
     /**
-     * If installation count is 0, that means the extension has been deleted,
-     * or never installed (but we'll try to delete it from the db anyway,
-     * to save a get query)
+     * If installation count is 0, that means the extension has been uninstalled
      */
     if (installationsCount <= 0) {
       const mostRecentUninstalledLog =
