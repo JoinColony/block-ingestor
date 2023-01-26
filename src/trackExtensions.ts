@@ -1,6 +1,5 @@
 import { Extension, getExtensionHash, getLogs } from '@colony/colony-js';
 
-// import { extensionSpecificEventsListener } from './eventListener';
 import networkClient from './networkClient';
 import {
   deleteExtensionFromEvent,
@@ -26,7 +25,7 @@ export default async (): Promise<void> => {
     await trackExtensionAddedToNetwork(extensionId, latestBlock);
 
     verbose(`Fetching events for extension: ${extensionId}`);
-    await trackExtensionEvents(extensionId);
+    await trackExtensionEvents(extensionId, latestBlock);
   });
 };
 
@@ -59,7 +58,10 @@ const trackExtensionAddedToNetwork = async (
   writeExtensionVersionFromEvent(event);
 };
 
-const trackExtensionEvents = async (extensionId: Extension): Promise<void> => {
+const trackExtensionEvents = async (
+  extensionId: Extension,
+  latestBlock: number,
+): Promise<void> => {
   const extensionHash = getExtensionHash(extensionId);
   const extensionInstalledLogs = await getLogs(
     networkClient,
@@ -103,7 +105,14 @@ const trackExtensionEvents = async (extensionId: Extension): Promise<void> => {
     if (installationsCount <= 0) {
       const mostRecentUninstalledLog =
         extensionUninstalledLogs[extensionUninstalledLogs.length - 1];
-      if (!mostRecentUninstalledLog) {
+      /**
+       * Short circuit if there's no log or it happened before the latest processed block
+       * (meaning it's already reflected in the db)
+       */
+      if (
+        !mostRecentUninstalledLog ||
+        mostRecentUninstalledLog.blockNumber < latestBlock
+      ) {
         return;
       }
 
