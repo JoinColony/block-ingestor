@@ -42,6 +42,7 @@ export const writeExtensionFromEvent = async (
   overrideVersion?: number,
   isDeprecated?: boolean,
   isInitialised?: boolean,
+  shouldUpsert?: boolean,
 ): Promise<void> => {
   const { transactionHash, timestamp } = event;
   const { extensionId: extensionHash, colony, version } = event.args;
@@ -60,19 +61,30 @@ export const writeExtensionFromEvent = async (
     colony,
   );
 
-  await mutate('createColonyExtension', {
-    input: {
-      id: extensionAddress,
-      colonyId: colony,
-      hash: extensionHash,
-      version: overrideVersion ?? convertedVersion,
-      installedBy,
-      installedAt: timestamp,
-      isDeprecated: !!isDeprecated,
-      isDeleted: false,
-      isInitialized: !!isInitialised,
-    },
-  });
+  const input = {
+    colonyId: colony,
+    hash: extensionHash,
+    version: overrideVersion ?? convertedVersion,
+    installedBy,
+    installedAt: timestamp,
+    isDeprecated: !!isDeprecated,
+    isDeleted: false,
+    isInitialized: !!isInitialised,
+  };
+
+  if (shouldUpsert) {
+    await mutate('updateColonyExtensionByColonyAndHash', {
+      input,
+    });
+  }
+  {
+    await mutate('createColonyExtension', {
+      input: {
+        id: extensionAddress,
+        ...input,
+      },
+    });
+  }
 };
 
 export const deleteExtensionFromEvent = async (
