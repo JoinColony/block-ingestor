@@ -16,7 +16,7 @@ import stats from '../run/stats.json';
 import { extensionSpecificEventsListener } from './eventListener';
 
 export default async (): Promise<void> => {
-  const latestBlock = stats.latestBlock ?? 0;
+  const latestBlock = stats.latestBlock ?? 1;
 
   SUPPORTED_EXTENSION_IDS.forEach(async (extensionId) => {
     verbose(
@@ -82,7 +82,7 @@ const trackExtensionEvents = async (
     const { colony } = parsedLog.args;
 
     if (colony in installedInColonyCount) {
-      installedInColonyCount[colony]++;
+      installedInColonyCount[colony] += 1;
     } else {
       installedInColonyCount[colony] = 1;
     }
@@ -92,7 +92,7 @@ const trackExtensionEvents = async (
     const { colony } = parsedLog.args;
 
     if (colony in installedInColonyCount) {
-      installedInColonyCount[colony]--;
+      installedInColonyCount[colony] -= 1;
     }
   });
 
