@@ -18,7 +18,11 @@ import {
 } from './eventListener';
 import { getChainId } from './provider';
 import { query, mutate } from './amplifyClient';
-import { ContractEventsSignatures, ContractEvent } from './types';
+import {
+  ContractEventsSignatures,
+  ContractEvent,
+  ColonyActionType,
+} from './types';
 import { COLONY_CURRENT_VERSION_KEY } from './constants';
 
 dotenv.config();
@@ -339,6 +343,24 @@ export default async (event: ContractEvent): Promise<void> => {
         input: {
           id: extensionAddress,
           isInitialized: true,
+        },
+      });
+
+      return;
+    }
+
+    case ContractEventsSignatures.TokensMinted: {
+      const { transactionHash, blockNumber } = event;
+      const { agent: initiator, who: recipient, amount } = event.args;
+
+      await mutate('createColonyAction', {
+        input: {
+          type: ColonyActionType.MintTokens,
+          initiator,
+          recipient,
+          amount: amount.toString(),
+          transactionHash,
+          blockNumber,
         },
       });
 

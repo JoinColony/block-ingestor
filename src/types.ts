@@ -33,12 +33,17 @@ export enum ContractEventsSignatures {
   ColonyFundsClaimed = 'ColonyFundsClaimed(address,address,uint256,uint256)',
   ColonyVersionAdded = 'ColonyVersionAdded(uint256,address)',
   ColonyUpgraded = 'ColonyUpgraded(address,uint256,uint256)',
+
+  // Extensions
   ExtensionAddedToNetwork = 'ExtensionAddedToNetwork(bytes32,uint256)',
   ExtensionInstalled = 'ExtensionInstalled(bytes32,address,uint256)',
   ExtensionUninstalled = 'ExtensionUninstalled(bytes32,address)',
   ExtensionDeprecated = 'ExtensionDeprecated(bytes32,address,bool)',
   ExtensionUpgraded = 'ExtensionUpgraded(indexed bytes32,indexed address,uint256)',
   ExtensionInitialised = 'ExtensionInitialised()',
+
+  // Actions
+  TokensMinted = 'TokensMinted(address,address,uint256)',
 }
 
 /*
@@ -50,3 +55,10 @@ export enum EthersObserverEvents {
 }
 
 export type ChainID = number;
+
+/*
+ * GraphQL ColonyActionType enum
+ */
+export enum ColonyActionType {
+  MintTokens = 'MINT_TOKENS',
+}

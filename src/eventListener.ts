@@ -25,6 +25,10 @@ export const colonySpecificEventsListener = async (
     colonyAddress,
   );
   await addTokenEventListener(ContractEventsSignatures.Transfer, colonyAddress);
+  await addColonyEventListener(
+    ContractEventsSignatures.TokensMinted,
+    colonyAddress,
+  );
 };
 
 export const extensionSpecificEventsListener = async (
