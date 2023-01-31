@@ -2,9 +2,18 @@ import dotenv from 'dotenv';
 import { getLogs } from '@colony/colony-js';
 
 import networkClient from './networkClient';
-import { output, writeJsonStats, verbose, addNetworkEventListener, setToJS } from './utils';
+import {
+  output,
+  writeJsonStats,
+  verbose,
+  addNetworkEventListener,
+  setToJS,
+  toNumber,
+} from './utils';
 import { colonySpecificEventsListener } from './eventListener';
 import { ContractEventsSignatures } from './types';
+import { mutate } from './amplifyClient';
+import { COLONY_CURRENT_VERSION_KEY } from './constants';
 
 dotenv.config();
 
@@ -23,15 +32,16 @@ export default async (): Promise<void> => {
     networkClient.filters.ColonyAdded(),
   );
 
-  colonyAddedLogs.map(log => {
-    const { args: { colonyAddress, token: tokenAddress } } = networkClient.interface.parseLog(log) || {};
+  colonyAddedLogs.forEach((log) => {
+    const {
+      args: { colonyAddress, token: tokenAddress },
+    } = networkClient.interface.parseLog(log) || {};
     /*
      * Add found colonies to a Set
      * - We're using a Set to ensure uniquess
      * - We're using a JSON string since we need to store two values, colony address and token
      */
     colonies.add(JSON.stringify({ colonyAddress, tokenAddress }));
-    return null;
   });
 
   await writeJsonStats({ trackedColonies: colonies.size });
@@ -43,7 +53,8 @@ export default async (): Promise<void> => {
    */
   await Promise.all(
     setToJS(coloniesSet).map(
-      async ({ colonyAddress }) => await colonySpecificEventsListener(colonyAddress),
+      async ({ colonyAddress }) =>
+        await colonySpecificEventsListener(colonyAddress),
     ),
   );
 
@@ -51,4 +62,21 @@ export default async (): Promise<void> => {
    * Set a Network level listener to track new colonies that will get created on chain
    */
   await addNetworkEventListener(ContractEventsSignatures.ColonyAdded);
+
+  await writeCurrentNetworkColonyVersion();
+};
+
+/*
+ * Function writing the highest colony version currently available in the network to the database
+ * Subsequent changes to available version are handled in eventProcessor
+ */
+const writeCurrentNetworkColonyVersion = async (): Promise<void> => {
+  const version = await networkClient.getCurrentColonyVersion();
+
+  await mutate('setCurrentVersion', {
+    input: {
+      key: COLONY_CURRENT_VERSION_KEY,
+      version: toNumber(version),
+    },
+  });
 };
