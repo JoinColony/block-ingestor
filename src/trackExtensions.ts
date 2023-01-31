@@ -12,11 +12,11 @@ import {
   writeExtensionVersionFromEvent,
 } from './utils';
 import { SUPPORTED_EXTENSION_IDS } from './constants';
-import stats from '../run/stats.json';
 import { extensionSpecificEventsListener } from './eventListener';
 
 export default async (): Promise<void> => {
-  const latestBlock = stats.latestBlock ?? 1;
+  // @TODO: Set to the latest block processed by block-ingestor
+  const latestBlock = 1;
 
   SUPPORTED_EXTENSION_IDS.forEach(async (extensionId) => {
     verbose(
