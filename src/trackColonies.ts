@@ -1,6 +1,5 @@
 import dotenv from 'dotenv';
 import { getLogs } from '@colony/colony-js';
-import { BigNumber } from 'ethers';
 
 import networkClient from './networkClient';
 import {
@@ -9,6 +8,7 @@ import {
   verbose,
   addNetworkEventListener,
   setToJS,
+  toNumber,
 } from './utils';
 import { colonySpecificEventsListener } from './eventListener';
 import { ContractEventsSignatures } from './types';
@@ -32,7 +32,7 @@ export default async (): Promise<void> => {
     networkClient.filters.ColonyAdded(),
   );
 
-  colonyAddedLogs.map((log) => {
+  colonyAddedLogs.forEach((log) => {
     const {
       args: { colonyAddress, token: tokenAddress },
     } = networkClient.interface.parseLog(log) || {};
@@ -42,7 +42,6 @@ export default async (): Promise<void> => {
      * - We're using a JSON string since we need to store two values, colony address and token
      */
     colonies.add(JSON.stringify({ colonyAddress, tokenAddress }));
-    return null;
   });
 
   await writeJsonStats({ trackedColonies: colonies.size });
@@ -77,7 +76,7 @@ const writeCurrentNetworkColonyVersion = async (): Promise<void> => {
   await mutate('setCurrentVersion', {
     input: {
       key: COLONY_CURRENT_VERSION_KEY,
-      version: BigNumber.from(version).toNumber(),
+      version: toNumber(version),
     },
   });
 };
