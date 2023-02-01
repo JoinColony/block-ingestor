@@ -126,10 +126,8 @@ export default async (event: ContractEvent): Promise<void> => {
          */
 
         if (process.env.NODE_ENV !== 'production') {
-          const { id: existingClaimId } = await query(
-            'getColonyUnclaimedFund',
-            { claimId },
-          );
+          const { id: existingClaimId } =
+            (await query('getColonyUnclaimedFund', { claimId })) || {};
           existingClaim = existingClaimId;
         }
 
@@ -173,14 +171,12 @@ export default async (event: ContractEvent): Promise<void> => {
        * in running through the whole logic just to end up with the same result
        */
       if (tokenAddress !== constants.AddressZero) {
-        const { items: unclaimedFunds } = await query(
-          'getColonyUnclaimedFunds',
-          {
+        const { items: unclaimedFunds } =
+          (await query('getColonyUnclaimedFunds', {
             colonyAddress,
             tokenAddress,
             upToBlock: blockNumber,
-          },
-        );
+          })) || {};
         /*
          * This check is actually required since anybody can make payout claims
          * for any colony, any time, even if there's nothing left to claim
@@ -471,9 +467,10 @@ export const saveEvent = async (event: ContractEvent): Promise<void> => {
    */
   let existingContractEvent;
   if (process.env.NODE_ENV !== 'production') {
-    const { id: existingContractEventId } = await query('getContractEvent', {
-      id: contractEvent.id,
-    });
+    const { id: existingContractEventId } =
+      (await query('getContractEvent', {
+        id: contractEvent.id,
+      })) || {};
     existingContractEvent = existingContractEventId;
   }
   if (!existingContractEvent) {
