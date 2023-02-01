@@ -355,14 +355,18 @@ export default async (event: ContractEvent): Promise<void> => {
         blockNumber,
         contractAddress: colonyAddress,
       } = event;
-      const { agent: initiator, who: recipient, amount } = event.args;
+      const {
+        agent: initiatorAddress,
+        who: recipientAddress,
+        amount,
+      } = event.args;
 
       await mutate('createColonyAction', {
         input: {
           colonyId: colonyAddress,
           type: ColonyActionType.MintTokens,
-          initiator,
-          recipient,
+          initiatorAddress,
+          recipientAddress,
           amount: amount.toString(),
           transactionHash,
           blockNumber,
