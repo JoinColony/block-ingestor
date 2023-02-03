@@ -1,5 +1,5 @@
 import dotenv from 'dotenv';
-import { constants, BigNumber } from 'ethers';
+import { constants, BigNumber, Contract } from 'ethers';
 
 import {
   deleteExtensionFromEvent,
@@ -24,6 +24,7 @@ import {
   ColonyActionType,
 } from './types';
 import { COLONY_CURRENT_VERSION_KEY } from './constants';
+import baseTokenAbi from './external/baseTokenAbi.json';
 
 dotenv.config();
 
@@ -357,6 +358,21 @@ export default async (event: ContractEvent): Promise<void> => {
         amount,
       } = event.args;
 
+      const colonyClient = await networkClient.getColonyClient(colonyAddress);
+      const tokenAddress = await colonyClient.getToken();
+      const contract = new Contract(
+        tokenAddress,
+        baseTokenAbi,
+        networkClient.provider,
+      );
+
+      let tokenSymbol;
+      try {
+        tokenSymbol = (await contract.functions.symbol())[0];
+      } catch {
+        output('Could not get symbol of token:', tokenAddress);
+      }
+
       await mutate('createColonyAction', {
         input: {
           colonyId: colonyAddress,
@@ -366,6 +382,7 @@ export default async (event: ContractEvent): Promise<void> => {
           amount: amount.toString(),
           transactionHash,
           blockNumber,
+          tokenSymbol,
         },
       });
 
