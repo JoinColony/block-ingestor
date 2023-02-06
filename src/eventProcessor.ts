@@ -362,12 +362,12 @@ export default async (event: ContractEvent): Promise<void> => {
 
       await mutate('createColonyAction', {
         input: {
+          id: transactionHash,
           colonyId: colonyAddress,
           type: ColonyActionType.MintTokens,
           initiatorAddress,
           recipientAddress,
           amount: amount.toString(),
-          transactionHash,
           blockNumber,
           tokenSymbol,
         },
