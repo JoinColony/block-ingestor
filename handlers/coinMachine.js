@@ -125,12 +125,19 @@ async function handleTokensBought(args, coinMachineAddress) {
     const { buyer, numTokens, totalCost } = args;
     const tokens = ethers.utils.formatUnits(numTokens, tokenDecimals);
     const cost = ethers.utils.formatUnits(totalCost, purchaseTokenDecimals);
+    const currentPeriod = await contract.getCurrentPeriod();
     const query = {
       operationName: "CreateOrdersHistory",
       query: `
           mutation CreateOrdersHistory {
             createOrdersHistory(
-            input: { coinMachineAddress: "${coinMachineAddress}", walletAddress: "${buyer}", volume: "${tokens}", marketPrice: "${parseFloat(cost/tokens)}" }
+            input: {
+              coinMachineAddress: "${coinMachineAddress}",
+              walletAddress: "${buyer}",
+              volume: "${tokens}",
+              marketPrice: "${parseFloat(cost / tokens)}",
+              period: ${currentPeriod.toNumber()}
+            }
             condition: {}
           ) {
             id
