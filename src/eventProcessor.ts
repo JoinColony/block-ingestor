@@ -24,7 +24,7 @@ import {
   ColonyActionType,
 } from './types';
 import { COLONY_CURRENT_VERSION_KEY } from './constants';
-import { getColonyNativeTokenSymbol } from './utils/tokens';
+import { getColonyTokenAddress, getTokenSymbol } from './utils/tokens';
 
 dotenv.config();
 
@@ -358,7 +358,8 @@ export default async (event: ContractEvent): Promise<void> => {
         amount,
       } = event.args;
 
-      const tokenSymbol = await getColonyNativeTokenSymbol(colonyAddress);
+      const tokenAddress = await getColonyTokenAddress(colonyAddress);
+      const tokenSymbol = await getTokenSymbol(tokenAddress);
 
       verbose(
         amount.toString(),
@@ -377,6 +378,7 @@ export default async (event: ContractEvent): Promise<void> => {
           amount: amount.toString(),
           blockNumber,
           tokenSymbol,
+          tokenAddress,
         },
       });
 

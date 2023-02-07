@@ -20,11 +20,10 @@ export const getTokenSymbol = async (
   }
 };
 
-export const getColonyNativeTokenSymbol = async (
+export const getColonyTokenAddress = async (
   colonyAddress: string,
-): Promise<string | null> => {
+): Promise<string> => {
   const colonyClient = await networkClient.getColonyClient(colonyAddress);
   const tokenAddress = await colonyClient.getToken();
-
-  return await getTokenSymbol(tokenAddress);
+  return tokenAddress;
 };
