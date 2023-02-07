@@ -360,6 +360,13 @@ export default async (event: ContractEvent): Promise<void> => {
 
       const tokenSymbol = await getColonyNativeTokenSymbol(colonyAddress);
 
+      verbose(
+        amount.toString(),
+        tokenSymbol,
+        'was minted in colony:',
+        colonyAddress,
+      );
+
       await mutate('createColonyAction', {
         input: {
           id: transactionHash,
