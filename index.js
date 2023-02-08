@@ -96,7 +96,7 @@ const subsribeToCoinMachine = async (coinMachineAddress, provider) => {
       const parsed = contract.interface.parseLog(event);
       const handler =  CoinMachineEvents[event.event];
       if (!handler) return;
-      const query = await handler(parsed.args, coinMachineAddress);
+      const query = await handler(parsed.args, coinMachineAddress, contract);
       try {
         await poorMansGraphQL(query);
         output(`Database updated after event: ${event.event}`);

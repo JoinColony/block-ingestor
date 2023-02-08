@@ -94,7 +94,7 @@ async function handleCoinMachineStateSet(args, coinMachineAddress) {
 }
 
 
-async function handleTokensBought(args, coinMachineAddress) {
+async function handleTokensBought(args, coinMachineAddress, contract) {
   const querySaleByCoinMachineAddress = {
     operationName: "GetSalebyCoinMachineAddress",
     query: `
