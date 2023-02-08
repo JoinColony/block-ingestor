@@ -1,4 +1,4 @@
-import { getExtensionHash } from '@colony/colony-js';
+import { getExtensionHash, Extension } from '@colony/colony-js';
 
 import {
   addColonyEventListener,
@@ -41,6 +41,13 @@ export const extensionSpecificEventsListener = async (
   if (isInitialisable) {
     await addExtensionEventListener(
       ContractEventsSignatures.ExtensionInitialised,
+      extensionAddress,
+    );
+  }
+
+  if (extensionHash === getExtensionHash(Extension.OneTxPayment)) {
+    await addExtensionEventListener(
+      ContractEventsSignatures.OneTxPaymentMade,
       extensionAddress,
     );
   }
