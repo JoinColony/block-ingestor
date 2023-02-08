@@ -29,6 +29,10 @@ export const colonySpecificEventsListener = async (
     ContractEventsSignatures.TokensMinted,
     colonyAddress,
   );
+  await addColonyEventListener(
+    ContractEventsSignatures.PaymentAdded,
+    colonyAddress,
+  );
 };
 
 export const extensionSpecificEventsListener = async (

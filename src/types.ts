@@ -27,7 +27,7 @@ export enum QueueEvents {
  * All contract events signatures we deal with
  */
 export enum ContractEventsSignatures {
-  UknownEvent = 'UknownEvent()',
+  UnknownEvent = 'UnknownEvent()',
   ColonyAdded = 'ColonyAdded(uint256,address,address)',
   Transfer = 'Transfer(address,address,uint256)',
   ColonyFundsClaimed = 'ColonyFundsClaimed(address,address,uint256,uint256)',
@@ -45,6 +45,7 @@ export enum ContractEventsSignatures {
 
   // Actions
   TokensMinted = 'TokensMinted(address,address,uint256)',
+  PaymentAdded = 'PaymentAdded(address,uint256)',
 }
 
 /*
