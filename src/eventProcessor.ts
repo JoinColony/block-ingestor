@@ -9,6 +9,8 @@ import {
   writeExtensionFromEvent,
   writeExtensionVersionFromEvent,
   writeJsonStats,
+  getColonyTokenAddress,
+  writeActionFromEvent,
 } from './utils';
 import { coloniesSet } from './trackColonies';
 import networkClient from './networkClient';
@@ -24,7 +26,6 @@ import {
   ColonyActionType,
 } from './types';
 import { COLONY_CURRENT_VERSION_KEY } from './constants';
-import { getColonyTokenAddress } from './utils/tokens';
 
 dotenv.config();
 
@@ -357,41 +358,26 @@ export default async (event: ContractEvent): Promise<void> => {
 
       const tokenAddress = await getColonyTokenAddress(colonyAddress);
 
-      verbose(
-        amount.toString(),
-        'tokens were minted in colony:',
-        colonyAddress,
-      );
-
-      await mutate('createColonyAction', {
-        input: {
-          id: transactionHash,
-          colonyId: colonyAddress,
-          type: ColonyActionType.MintTokens,
-          initiatorAddress,
-          recipientAddress,
-          amount: amount.toString(),
-          blockNumber,
-          tokenAddress,
-        },
+      await writeActionFromEvent(event, {
+        type: ColonyActionType.MintTokens,
+        initiatorAddress,
+        recipientAddress,
+        amount: amount.toString(),
+        tokenAddress,
       });
 
       return;
     }
 
     case ContractEventsSignatures.OneTxPaymentMade: {
-      const { contractAddress: colonyAddress } = event;
       const [initiatorAddress, fundamentalChainId] = event.args;
 
-      await mutate('createColonyAction', {
-        input: {
-          id: transactionHash,
-          colonyId: colonyAddress,
-          type: ColonyActionType.Payment,
-          initiatorAddress,
-          fundamentalChainId,
-        },
+      await writeActionFromEvent(event, {
+        type: ColonyActionType.Payment,
+        initiatorAddress,
+        fundamentalChainId: toNumber(fundamentalChainId),
       });
+
       return;
     }
 
