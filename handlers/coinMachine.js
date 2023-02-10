@@ -22,7 +22,7 @@ async function handleCoinMachineInitialised(args, coinMachineAddress) {
       const { body } = await poorMansGraphQL(querySaleByCoinMachineAddress);
       const result = JSON.parse(body);
       const sale = result.data.getSalebyCoinMachineAddress.items[0];
-      if (!sale) return;
+      if (!sale) return [];
       const query = {
         operationName: "UpdateSaleMutation",
         query: `
@@ -37,7 +37,7 @@ async function handleCoinMachineInitialised(args, coinMachineAddress) {
         `,
         variables: null,
       };
-      return query;
+      return [ query ];
     } catch (error) {
       console.log(error);
       // silent error
@@ -70,7 +70,7 @@ async function handleCoinMachineStateSet(args, coinMachineAddress) {
       const { body } = await poorMansGraphQL(querySaleByCoinMachineAddress);
       const result = JSON.parse(body);
       const sale = result.data.getSalebyCoinMachineAddress.items[0];
-      if (!sale) return;
+      if (!sale) return [];
       const { state } = args;
       const query = {
         operationName: "UpdateSaleMutation",
@@ -86,7 +86,7 @@ async function handleCoinMachineStateSet(args, coinMachineAddress) {
         `,
         variables: null,
       };
-      return query;
+      return [ query ];
     } catch (error) {
       console.log(error);
       // silent error
@@ -106,6 +106,8 @@ async function handleTokensBought(args, coinMachineAddress, contract) {
             tokenDecimals
             tokenAddress
             purchaseToken
+            id
+            endDate
           }
         }
       }
@@ -117,8 +119,8 @@ async function handleTokensBought(args, coinMachineAddress, contract) {
     const { body } = await poorMansGraphQL(querySaleByCoinMachineAddress);
     const result = JSON.parse(body);
     const sale = result.data.getSalebyCoinMachineAddress.items[0];
-    if (!sale) return;
-    const { tokenDecimals, purchaseToken } = sale;
+    if (!sale) return [];
+    const { tokenDecimals, purchaseToken, id, endDate } = sale;
     const purchaseTokenDecimals = purchaseTokens.find(
       (token) => token.tokenAddress === purchaseToken,
     )?.decimals;
@@ -146,7 +148,37 @@ async function handleTokensBought(args, coinMachineAddress, contract) {
       `,
       variables: null,
     };
-    return query;
+    const [totalSold, totalIntake, tokenBalance, intakeCap] = await Promise.all([
+      contract.getSoldTotal(),
+      contract.getTotalIntake(),
+      contract.getTokenBalance(),
+      contract.intakeCap(),
+    ])
+    const formattedSold = ethers.utils.formatUnits(totalSold, tokenDecimals);
+    const formattedIntake = ethers.utils.formatUnits(totalIntake, purchaseTokenDecimals);
+    const saleEnded = totalSold.gte(tokenBalance) || totalIntake.gte(intakeCap);
+    const updatedEndDate = saleEnded ? `"${new Date().toISOString()}"` : endDate;
+    const saleUpdateQuery = {
+      operationName: "UpdateSaleMutation",
+      query: `
+        mutation UpdateSaleMutation {
+          updateSale(
+          input: {
+            id: "${id}",
+            totalSold: "${formattedSold}",
+            totalIntake: "${formattedIntake}",
+            endDate: ${updatedEndDate}
+          }
+          condition: {}
+        ) {
+          id
+        }
+      }
+      `,
+      variables: null,
+    }
+
+    return [query, saleUpdateQuery];
   } catch (error) {
     console.log(error);
     // silent error
