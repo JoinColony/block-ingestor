@@ -46,6 +46,8 @@ export default async (event: ContractEvent): Promise<void> => {
     );
   }
 
+  const { transactionHash, blockNumber } = event;
+
   switch (event.signature) {
     /*
      * New Colony Added
@@ -79,8 +81,7 @@ export default async (event: ContractEvent): Promise<void> => {
      * (but not Native Chain Token -- 0x0000...0000)
      */
     case ContractEventsSignatures.Transfer: {
-      const { contractAddress, transactionHash, logIndex, blockNumber } =
-        event ?? {};
+      const { contractAddress, logIndex } = event ?? {};
       const chainId = getChainId();
       /*
        * @NOTE Take the values from the "array" rather than from the named properties
@@ -164,7 +165,7 @@ export default async (event: ContractEvent): Promise<void> => {
      * New Colony transfer claims
      */
     case ContractEventsSignatures.ColonyFundsClaimed: {
-      const { contractAddress: colonyAddress, blockNumber } = event ?? {};
+      const { contractAddress: colonyAddress } = event ?? {};
       const { token: tokenAddress, payoutRemainder } = event?.args ?? {};
 
       /*
@@ -347,11 +348,7 @@ export default async (event: ContractEvent): Promise<void> => {
     }
 
     case ContractEventsSignatures.TokensMinted: {
-      const {
-        transactionHash,
-        blockNumber,
-        contractAddress: colonyAddress,
-      } = event;
+      const { contractAddress: colonyAddress } = event;
       const {
         agent: initiatorAddress,
         who: recipientAddress,
@@ -379,6 +376,22 @@ export default async (event: ContractEvent): Promise<void> => {
         },
       });
 
+      return;
+    }
+
+    case ContractEventsSignatures.OneTxPaymentMade: {
+      const { contractAddress: colonyAddress } = event;
+      const [initiatorAddress, fundamentalChainId] = event.args;
+
+      await mutate('createColonyAction', {
+        input: {
+          id: transactionHash,
+          colonyId: colonyAddress,
+          type: ColonyActionType.Payment,
+          initiatorAddress,
+          fundamentalChainId,
+        },
+      });
       return;
     }
 
