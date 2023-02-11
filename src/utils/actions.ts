@@ -4,14 +4,10 @@ import { verbose } from './logger';
 
 export const writeActionFromEvent = async (
   event: ContractEvent,
+  colonyAddress: string,
   actionFields: Record<string, any>,
 ): Promise<void> => {
-  const {
-    transactionHash,
-    contractAddress: colonyAddress,
-    blockNumber,
-    timestamp,
-  } = event;
+  const { transactionHash, blockNumber, timestamp } = event;
 
   const actionType = actionFields.type ?? 'UNKNOWN';
   verbose('Action', actionType, 'took place in Colony:', colonyAddress);

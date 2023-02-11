@@ -358,7 +358,7 @@ export default async (event: ContractEvent): Promise<void> => {
 
       const tokenAddress = await getColonyTokenAddress(colonyAddress);
 
-      await writeActionFromEvent(event, {
+      await writeActionFromEvent(event, colonyAddress, {
         type: ColonyActionType.MintTokens,
         initiatorAddress,
         recipientAddress,
@@ -374,12 +374,29 @@ export default async (event: ContractEvent): Promise<void> => {
       const [recipientAddress, fundamentalChainId] = event.args;
 
       // @TODO: Get colony address
-
-      await writeActionFromEvent(event, {
+      await writeActionFromEvent(event, '0x0', {
         type: ColonyActionType.Payment,
         initiatorAddress: extensionAddress,
         recipientAddress,
         fundamentalChainId: toNumber(fundamentalChainId),
+      });
+
+      return;
+    }
+
+    case ContractEventsSignatures.PaymentAdded: {
+      const { contractAddress: colonyAddress } = event;
+      const { paymentId } = event.args;
+
+      const colonyClient = await networkClient.getColonyClient(colonyAddress);
+      const paymentInfo = await colonyClient.getPayment(paymentId);
+      const { domainId } = paymentInfo;
+
+      await mutate('updateColonyAction', {
+        input: {
+          id: transactionHash,
+          fromDomain: domainId.toString(),
+        },
       });
 
       return;
