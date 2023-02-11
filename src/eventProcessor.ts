@@ -370,11 +370,15 @@ export default async (event: ContractEvent): Promise<void> => {
     }
 
     case ContractEventsSignatures.OneTxPaymentMade: {
-      const [initiatorAddress, fundamentalChainId] = event.args;
+      const { contractAddress: extensionAddress } = event;
+      const [recipientAddress, fundamentalChainId] = event.args;
+
+      // @TODO: Get colony address
 
       await writeActionFromEvent(event, {
         type: ColonyActionType.Payment,
-        initiatorAddress,
+        initiatorAddress: extensionAddress,
+        recipientAddress,
         fundamentalChainId: toNumber(fundamentalChainId),
       });
 
