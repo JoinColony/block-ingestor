@@ -6,11 +6,11 @@ export const writeActionFromEvent = async (
   event: ContractEvent,
   actionFields: Record<string, any>,
 ): Promise<void> => {
-  // @TODO: Pass timestamp as createdAt field
   const {
     transactionHash,
     contractAddress: colonyAddress,
     blockNumber,
+    timestamp,
   } = event;
 
   const actionType = actionFields.type ?? 'UNKNOWN';
@@ -21,6 +21,7 @@ export const writeActionFromEvent = async (
       id: transactionHash,
       colonyId: colonyAddress,
       blockNumber,
+      createdAt: new Date(timestamp * 1000).toISOString(),
       ...actionFields,
     },
   });
