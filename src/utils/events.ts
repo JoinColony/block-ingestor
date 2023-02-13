@@ -1,20 +1,8 @@
 import { BigNumber, utils } from 'ethers';
 import { Log } from '@ethersproject/providers';
-import {
-  AnyVotingReputationClient,
-  ClientType,
-  Extension,
-  getTokenClient,
-} from '@colony/colony-js';
 
 import networkClient from '~networkClient';
-import {
-  ContractEvent,
-  ContractEventsSignatures,
-  Filter,
-  NetworkClients,
-} from '~types';
-import { addEvent } from '~eventQueue';
+import { ContractEvent, ContractEventsSignatures } from '~types';
 import { mutate, query } from '~amplifyClient';
 import { getChainId } from '~provider';
 import {
@@ -27,189 +15,13 @@ import {
   ChainMetadataInput,
 } from '~graphql';
 
-import { getExtensionContract } from './extensions';
 import { verbose } from './logger';
-import { getCachedColonyClient } from './colonyClient';
 
 /**
  * Convert a Set that contains a JSON string, back into JS form
  */
 export const setToJS = (set: Set<string>): Array<Record<string, string>> =>
   Array.from(set).map((entry) => JSON.parse(entry));
-
-/**
- * Generator method for events listeners
- *
- * It basically does away with all the boilerplate of setting up topics, setting
- * the event listener, parsing the received event
- */
-export const eventListenerGenerator = async (
-  eventSignature: ContractEventsSignatures,
-  contractAddress: string,
-  clientType: ClientType = ClientType.NetworkClient,
-): Promise<void> => {
-  let { provider } = networkClient;
-  let client: NetworkClients = networkClient;
-  if (clientType === ClientType.ColonyClient && contractAddress) {
-    client = await getCachedColonyClient(contractAddress);
-  } else if (clientType === ClientType.VotingReputationClient) {
-    const colonyClient = await networkClient.getColonyClient(contractAddress);
-    client = await colonyClient.getExtensionClient(Extension.VotingReputation);
-    (client as AnyVotingReputationClient).getColony();
-    provider = client.provider;
-  }
-  const filter: Filter = {
-    topics: [utils.id(eventSignature)],
-  };
-  if (clientType === ClientType.TokenClient) {
-    filter.topics = [
-      ...(filter.topics ?? []),
-      null,
-      utils.hexZeroPad(contractAddress, 32),
-    ];
-  } else if (clientType !== ClientType.VotingReputationClient) {
-    filter.address = contractAddress;
-  }
-  verbose(
-    'Added listener for Event:',
-    eventSignature,
-    contractAddress ? `filtering Address: ${contractAddress}` : '',
-  );
-
-  provider.on(filter, async (log: Log) => {
-    const {
-      address: eventContractAddress,
-      blockNumber,
-      transactionHash,
-      logIndex,
-    } = log;
-    if (clientType === ClientType.TokenClient) {
-      client = await getTokenClient(eventContractAddress, provider);
-    }
-    try {
-      const { hash: blockHash, timestamp } = await provider.getBlock(
-        blockNumber,
-      );
-
-      if (clientType === ClientType.VotingReputationClient) {
-        /*
-         * In the case of Voting Rep, only add the event to the queue if the colony address
-         * associated with the event is the same as the colony address the listener is associated with.
-         */
-        const { colonyId } = await query(GetColonyExtensionDocument, {
-          id: eventContractAddress,
-        });
-
-        if (colonyId === contractAddress) {
-          addEvent({
-            ...client.interface.parseLog(log),
-            blockNumber,
-            transactionHash,
-            logIndex,
-            contractAddress,
-            blockHash,
-            timestamp,
-          });
-        }
-      } else {
-        addEvent({
-          ...client.interface.parseLog(log),
-          blockNumber,
-          transactionHash,
-          logIndex,
-          contractAddress: eventContractAddress,
-          blockHash,
-          timestamp,
-        });
-      }
-    } catch (error) {
-      verbose('Failed to process the event: ', error);
-    }
-  });
-};
-
-/**
- * Network Client specific event listener,
- * which uses `eventListenerGenerator` under the hood
- */
-export const addNetworkEventListener = async (
-  eventSignature: ContractEventsSignatures,
-  contractAddress: string = networkClient.address,
-): Promise<void> =>
-  await eventListenerGenerator(
-    eventSignature,
-    contractAddress,
-    ClientType.NetworkClient,
-  );
-
-/**
- * Colony Client specific event listener,
- * which uses `eventListenerGenerator` under the hood
- */
-export const addColonyEventListener = async (
-  eventSignature: ContractEventsSignatures,
-  contractAddress: string,
-): Promise<void> =>
-  await eventListenerGenerator(
-    eventSignature,
-    contractAddress,
-    ClientType.ColonyClient,
-  );
-
-/**
- * Token Client specific event listener,
- * which uses `eventListenerGenerator` under the hood
- */
-export const addTokenEventListener = async (
-  eventSignature: ContractEventsSignatures,
-  contractAddress: string,
-): Promise<void> =>
-  await eventListenerGenerator(
-    eventSignature,
-    contractAddress,
-    ClientType.TokenClient,
-  );
-
-export const addMotionEventListener = async (
-  eventSignature: ContractEventsSignatures,
-  colonyAddress: string,
-): Promise<void> =>
-  await eventListenerGenerator(
-    eventSignature,
-    colonyAddress,
-    ClientType.VotingReputationClient,
-  );
-
-/**
- * Extension specific event listener
- * It creates a new interface with ABI data describing
- * possible event signature
- */
-export const addExtensionEventListener = async (
-  eventSignature: ContractEventsSignatures,
-  extensionAddress: string,
-): Promise<void> => {
-  const { provider } = networkClient;
-  const extensionContract = getExtensionContract(extensionAddress);
-  const filter = {
-    topics: [utils.id(eventSignature)],
-    address: extensionAddress,
-  };
-
-  verbose(
-    'Added listener for Event:',
-    eventSignature,
-    extensionAddress ? `filtering Address: ${extensionAddress}` : '',
-  );
-
-  provider.on(filter, async (log: Log) => {
-    const event = await mapLogToContractEvent(log, extensionContract.interface);
-
-    if (event) {
-      addEvent(event);
-    }
-  });
-};
 
 export const mapLogToContractEvent = async (
   log: Log,
