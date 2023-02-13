@@ -1,12 +1,13 @@
 import { Id } from '@colony/colony-js';
 
+import { ColonyActionType } from '~graphql';
 import { ContractEvent } from '~types';
 import {
   writeActionFromEvent,
   getColonyTokenAddress,
   getDomainDatabaseId,
+  verbose,
 } from '~utils';
-import { ColonyActionType } from '~graphql';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { contractAddress: colonyAddress } = event;
@@ -14,12 +15,20 @@ export default async (event: ContractEvent): Promise<void> => {
 
   const tokenAddress = await getColonyTokenAddress(colonyAddress);
 
-  await writeActionFromEvent(event, colonyAddress, {
-    type: ColonyActionType.MintTokens,
-    initiatorAddress,
-    recipientAddress,
-    amount: amount.toString(),
-    tokenAddress,
-    fromDomainId: getDomainDatabaseId(colonyAddress, Id.RootDomain),
-  });
+  if (amount && amount.toString() !== '0') {
+    await writeActionFromEvent(event, colonyAddress, {
+      type: ColonyActionType.MintTokens,
+      initiatorAddress,
+      recipientAddress,
+      amount: amount.toString(),
+      tokenAddress,
+      fromDomainId: getDomainDatabaseId(colonyAddress, Id.RootDomain),
+    });
+  } else {
+    verbose(
+      `Detected Mint Tokens event but its amount was ${
+        amount ? amount.toString() : amount
+      }`,
+    );
+  }
 };
