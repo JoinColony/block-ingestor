@@ -1,5 +1,5 @@
 import { ColonyActionType, ContractEvent } from '~types';
-import { writeActionFromEvent, getColonyTokenAddress } from '~utils';
+import { writeActionFromEvent, getColonyTokenAddress, verbose } from '~utils';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { contractAddress: colonyAddress } = event;
@@ -7,11 +7,19 @@ export default async (event: ContractEvent): Promise<void> => {
 
   const tokenAddress = await getColonyTokenAddress(colonyAddress);
 
-  await writeActionFromEvent(event, colonyAddress, {
-    type: ColonyActionType.MintTokens,
-    initiatorAddress,
-    recipientAddress,
-    amount: amount.toString(),
-    tokenAddress,
-  });
+  if (amount && amount.toString() !== '0') {
+    await writeActionFromEvent(event, colonyAddress, {
+      type: ColonyActionType.MintTokens,
+      initiatorAddress,
+      recipientAddress,
+      amount: amount.toString(),
+      tokenAddress,
+    });
+  } else {
+    verbose(
+      `Detected Mint Tokens event but its amount was ${
+        amount ? amount.toString() : amount
+      }`,
+    );
+  }
 };

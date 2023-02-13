@@ -2,6 +2,7 @@ import { Extension, getExtensionHash, getLogs } from '@colony/colony-js';
 
 import networkClient from '~networkClient';
 import {
+  addMotionEventListener,
   deleteExtensionFromEvent,
   getCachedColonyClient,
   isExtensionDeprecated,
@@ -11,9 +12,10 @@ import {
   verbose,
   writeExtensionFromEvent,
   writeExtensionVersionFromEvent,
-} from '~utils';
-import { SUPPORTED_EXTENSION_IDS } from '~constants';
-import { extensionSpecificEventsListener } from '~eventListener';
+} from './utils';
+import { SUPPORTED_EXTENSION_IDS } from './constants';
+import { extensionSpecificEventsListener } from './eventListener';
+import { ContractEventsSignatures } from './types';
 
 export default async (): Promise<void> => {
   // @TODO: Set to the latest block processed by block-ingestor
@@ -88,6 +90,7 @@ const trackExtensionEvents = async (
       installedInColonyCount[colony] = 1;
     }
   });
+
   extensionUninstalledLogs.forEach((log) => {
     const parsedLog = networkClient.interface.parseLog(log);
     const { colony } = parsedLog.args;
@@ -173,6 +176,11 @@ const trackExtensionEvents = async (
       mostRecentInstalledLog,
     );
 
+    // Listen for motions if Voting Reputation is initialised.
+    if (Extension.VotingReputation === extensionId && isInitialised) {
+      addMotionEventListener(ContractEventsSignatures.MotionCreated, colony);
+    }
+
     await writeExtensionFromEvent(
       event,
       extensionAddress,
@@ -183,5 +191,3 @@ const trackExtensionEvents = async (
     );
   }
 };
-
-// motion...

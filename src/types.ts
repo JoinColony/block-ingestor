@@ -1,4 +1,10 @@
-import { getLogs } from '@colony/colony-js';
+import {
+  AnyColonyClient,
+  AnyVotingReputationClient,
+  ColonyNetworkClient,
+  TokenClient,
+  getLogs,
+} from '@colony/colony-js';
 import { LogDescription } from '@ethersproject/abi';
 
 /*
@@ -55,6 +61,9 @@ export enum ContractEventsSignatures {
   ColonyFundsMovedBetweenFundingPots = 'ColonyFundsMovedBetweenFundingPots(address,uint256,uint256,uint256,address)',
   ColonyMetadata = 'ColonyMetadata(address,string)',
   ArbitraryReputationUpdate = 'ArbitraryReputationUpdate(address,address,uint256,int256)',
+
+  // Motions
+  MotionCreated = 'MotionCreated(uint256,address,uint256)',
 }
 
 /*
@@ -81,9 +90,37 @@ export enum ColonyActionType {
   VersionUpgrade = 'VERSION_UPGRADE',
   EmitDomainReputationPenalty = 'EMIT_DOMAIN_REPUTATION_PENALTY',
   EmitDomainReputationReward = 'EMIT_DOMAIN_REPUTATION_REWARD',
+  MintTokensMotion = 'MINT_TOKENS_MOTION',
 }
 
 export type ColonyActionHandler = (event: ContractEvent) => Promise<void>;
 
 // The Filter type doesn't seem to be exported from colony-js
 export type Filter = Parameters<typeof getLogs>[1];
+
+/*
+ * Contract calls
+ */
+export enum ColonyOperations {
+  MintTokens = 'mintTokens',
+}
+
+export const motionNameMapping: { [key: string]: ColonyActionType } = {
+  [ColonyOperations.MintTokens]: ColonyActionType.MintTokensMotion,
+  // makePaymentFundedFromDomain: ColonyMotions.PaymentMotion,
+  // unlockToken: ColonyMotions.UnlockTokenMotion,
+  // addDomain: ColonyMotions.CreateDomainMotion,
+  // editDomain: ColonyMotions.EditDomainMotion,
+  // editColony: ColonyMotions.ColonyEditMotion,
+  // setUserRoles: ColonyMotions.SetUserRolesMotion,
+  // moveFundsBetweenPots: ColonyMotions.MoveFundsMotion,
+  // upgrade: ColonyMotions.VersionUpgradeMotion,
+  // emitDomainReputationPenalty: ColonyMotions.EmitDomainReputationPenaltyMotion,
+  // emitDomainReputationReward: ColonyMotions.EmitDomainReputationRewardMotion,
+};
+
+export type NetworkClients =
+  | ColonyNetworkClient
+  | TokenClient
+  | AnyColonyClient
+  | AnyVotingReputationClient;
