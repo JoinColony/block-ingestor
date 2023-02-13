@@ -387,6 +387,20 @@ export default async (event: ContractEvent): Promise<void> => {
       return;
     }
 
+    case ContractEventsSignatures.PayoutClaimed: {
+      const { token: tokenAddress, amount } = event.args;
+
+      await mutate('updateColonyAction', {
+        input: {
+          id: transactionHash,
+          tokenAddress,
+          amount: amount.toString(),
+        },
+      });
+
+      return;
+    }
+
     case ContractEventsSignatures.PaymentAdded: {
       const { contractAddress: colonyAddress } = event;
       const { paymentId } = event.args;

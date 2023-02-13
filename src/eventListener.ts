@@ -30,6 +30,10 @@ export const colonySpecificEventsListener = async (
     colonyAddress,
   );
   await addColonyEventListener(
+    ContractEventsSignatures.PayoutClaimed,
+    colonyAddress,
+  );
+  await addColonyEventListener(
     ContractEventsSignatures.PaymentAdded,
     colonyAddress,
   );
