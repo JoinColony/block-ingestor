@@ -2,11 +2,11 @@ import { constants, Contract } from 'ethers';
 import { Log } from '@ethersproject/providers';
 import { getLogs } from '@colony/colony-js';
 
-import networkClient from '../networkClient';
-import { mutate } from '../amplifyClient';
-import { ContractEvent, ContractEventsSignatures } from '../types';
-import { verbose } from './logger';
-import { toNumber } from './numbers';
+import networkClient from '../../networkClient';
+import { mutate } from '../../amplifyClient';
+import { ContractEvent, ContractEventsSignatures } from '../../types';
+import { verbose } from '../logger';
+import { toNumber } from '../numbers';
 
 /**
  * Function writing the extension version to the db based on the ExtensionAddedToNetwork event payload

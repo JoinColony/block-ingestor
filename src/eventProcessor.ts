@@ -11,6 +11,7 @@ import {
   writeJsonStats,
   getColonyTokenAddress,
   writeActionFromEvent,
+  getColonyByExtensionAddress,
 } from './utils';
 import { coloniesSet } from './trackColonies';
 import networkClient from './networkClient';
@@ -372,14 +373,16 @@ export default async (event: ContractEvent): Promise<void> => {
     case ContractEventsSignatures.OneTxPaymentMade: {
       const { contractAddress: extensionAddress } = event;
       const [recipientAddress, fundamentalChainId] = event.args;
+      const colonyAddress = await getColonyByExtensionAddress(extensionAddress);
 
-      // @TODO: Get colony address
-      await writeActionFromEvent(event, '0x0', {
-        type: ColonyActionType.Payment,
-        initiatorAddress: extensionAddress,
-        recipientAddress,
-        fundamentalChainId: toNumber(fundamentalChainId),
-      });
+      if (colonyAddress) {
+        await writeActionFromEvent(event, colonyAddress, {
+          type: ColonyActionType.Payment,
+          initiatorAddress: extensionAddress,
+          recipientAddress,
+          fundamentalChainId: toNumber(fundamentalChainId),
+        });
+      }
 
       return;
     }
