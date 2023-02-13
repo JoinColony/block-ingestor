@@ -20,6 +20,7 @@ import {
   handleEditDomainAction,
   handleEditColonyAction,
   handleVersionUpgradeAction,
+  handleMotionCreated,
 } from './handlers';
 
 dotenv.config();
@@ -103,6 +104,12 @@ export default async (event: ContractEvent): Promise<void> => {
 
     case ContractEventsSignatures.ExtensionInitialised: {
       await handleExtensionInitialised(event);
+      return;
+    }
+
+    /* Entry point for a newly created motion. */
+    case ContractEventsSignatures.MotionCreated: {
+      await handleMotionCreated(event);
       return;
     }
 

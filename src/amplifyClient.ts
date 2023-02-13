@@ -66,7 +66,8 @@ export const mutations = {
       $input: UpdateColonyExtensionInput!
     ) {
       updateColonyExtension(input: $input) {
-        id
+        extensionHash: hash
+        colonyAddress: colonyId
       }
     }
   `,
@@ -137,6 +138,13 @@ export const queries = {
       }
     }
   `,
+  getColonyExtension: /* GraphQL */ `
+    query GetColonyExtension($id: ID!) {
+      getColonyExtension(id: $id) {
+        colonyId
+      }
+    }
+  `,
 };
 
 export default (): void => {
@@ -174,9 +182,12 @@ export const mutate = async (
    * types properly
    */
   variables?: { input: Record<string, unknown> },
-): Promise<void> => {
+): Promise<any> => {
   try {
-    await API.graphql(graphqlOperation(mutations[mutationName], variables));
+    const result = await API.graphql(
+      graphqlOperation(mutations[mutationName], variables),
+    );
+    return result;
   } catch (error) {
     console.error(`Could not execute mutation "${mutationName}"`, error);
     return undefined;
