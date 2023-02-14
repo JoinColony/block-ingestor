@@ -1,4 +1,4 @@
-import { Contract, utils } from 'ethers';
+import { utils } from 'ethers';
 import { Log } from '@ethersproject/providers';
 import {
   AnyColonyClient,
@@ -12,6 +12,7 @@ import { verbose } from './logger';
 import networkClient from '../networkClient';
 import { ContractEvent, ContractEventsSignatures } from '../types';
 import { addEvent } from '../eventQueue';
+import { getExtensionContract } from './extensions';
 
 /*
  * Convert a Set that contains a JSON string, back into JS form
@@ -138,9 +139,7 @@ export const addExtensionEventListener = async (
   extensionAddress: string,
 ): Promise<void> => {
   const { provider } = networkClient;
-  const extensionContract = new Contract(extensionAddress, [
-    `event ${eventSignature}`,
-  ]);
+  const extensionContract = getExtensionContract(extensionAddress);
   const filter = {
     topics: [utils.id(eventSignature)],
     address: extensionAddress,
@@ -186,7 +185,8 @@ export const mapLogToContractEvent = async (
       blockHash,
       timestamp,
     };
-  } catch {
+  } catch (error) {
+    console.error(error);
     return null;
   }
 };
