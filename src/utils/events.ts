@@ -172,15 +172,21 @@ export const mapLogToContractEvent = async (
     blockNumber,
     address: eventContractAddress,
   } = log;
-  const { hash: blockHash, timestamp } = await provider.getBlock(blockNumber);
 
-  return {
-    ...iface.parseLog(log),
-    blockNumber,
-    transactionHash,
-    logIndex,
-    contractAddress: eventContractAddress,
-    blockHash,
-    timestamp,
-  };
+  try {
+    const { hash: blockHash, timestamp } = await provider.getBlock(blockNumber);
+    const parsedLog = iface.parseLog(log);
+
+    return {
+      ...parsedLog,
+      blockNumber,
+      transactionHash,
+      logIndex,
+      contractAddress: eventContractAddress,
+      blockHash,
+      timestamp,
+    };
+  } catch {
+    return null;
+  }
 };
