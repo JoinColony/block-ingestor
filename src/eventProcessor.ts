@@ -9,9 +9,7 @@ import {
   writeExtensionFromEvent,
   writeExtensionVersionFromEvent,
   writeJsonStats,
-  getColonyTokenAddress,
-  writeActionFromEvent,
-  getColonyByExtensionAddress,
+  handleMintTokensAction,
 } from './utils';
 import { coloniesSet } from './trackColonies';
 import networkClient from './networkClient';
@@ -21,11 +19,7 @@ import {
 } from './eventListener';
 import { getChainId } from './provider';
 import { query, mutate } from './amplifyClient';
-import {
-  ContractEventsSignatures,
-  ContractEvent,
-  ColonyActionType,
-} from './types';
+import { ContractEventsSignatures, ContractEvent } from './types';
 import { COLONY_CURRENT_VERSION_KEY } from './constants';
 
 dotenv.config();
@@ -350,74 +344,15 @@ export default async (event: ContractEvent): Promise<void> => {
     }
 
     case ContractEventsSignatures.TokensMinted: {
-      const { contractAddress: colonyAddress } = event;
-      const {
-        agent: initiatorAddress,
-        who: recipientAddress,
-        amount,
-      } = event.args;
-
-      const tokenAddress = await getColonyTokenAddress(colonyAddress);
-
-      await writeActionFromEvent(event, colonyAddress, {
-        type: ColonyActionType.MintTokens,
-        initiatorAddress,
-        recipientAddress,
-        amount: amount.toString(),
-        tokenAddress,
-      });
-
+      await handleMintTokensAction(event);
       return;
     }
 
-    case ContractEventsSignatures.OneTxPaymentMade: {
-      const { contractAddress: extensionAddress } = event;
-      const [recipientAddress, fundamentalChainId] = event.args;
-      const colonyAddress = await getColonyByExtensionAddress(extensionAddress);
+    // case ContractEventsSignatures.PaymentAdded: {
+    //   await handlePaymentAction(event);
 
-      if (colonyAddress) {
-        await writeActionFromEvent(event, colonyAddress, {
-          type: ColonyActionType.Payment,
-          initiatorAddress: extensionAddress,
-          recipientAddress,
-          fundamentalChainId: toNumber(fundamentalChainId),
-        });
-      }
-
-      return;
-    }
-
-    case ContractEventsSignatures.PayoutClaimed: {
-      const { token: tokenAddress, amount } = event.args;
-
-      await mutate('updateColonyAction', {
-        input: {
-          id: transactionHash,
-          tokenAddress,
-          amount: amount.toString(),
-        },
-      });
-
-      return;
-    }
-
-    case ContractEventsSignatures.PaymentAdded: {
-      const { contractAddress: colonyAddress } = event;
-      const { paymentId } = event.args;
-
-      const colonyClient = await networkClient.getColonyClient(colonyAddress);
-      const paymentInfo = await colonyClient.getPayment(paymentId);
-      const { domainId } = paymentInfo;
-
-      await mutate('updateColonyAction', {
-        input: {
-          id: transactionHash,
-          fromDomain: domainId.toString(),
-        },
-      });
-
-      return;
-    }
+    //   return;
+    // }
 
     default: {
       return;
