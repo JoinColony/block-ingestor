@@ -1,6 +1,5 @@
-import { ColonyActionType, ContractEvent } from '../../../types';
-import { getColonyTokenAddress } from '../../tokens';
-import { writeActionFromEvent } from '../writeAction';
+import { ColonyActionType, ContractEvent } from '~/types';
+import { writeActionFromEvent, getColonyTokenAddress } from '~/utils';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { contractAddress: colonyAddress } = event;
