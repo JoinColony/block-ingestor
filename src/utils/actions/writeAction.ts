@@ -1,6 +1,6 @@
-import { mutate } from '../../amplifyClient';
-import { ContractEvent } from '../../types';
-import { verbose } from '../logger';
+import { mutate } from '~/amplifyClient';
+import { ContractEvent } from '~/types';
+import { verbose } from '~/utils';
 
 export const writeActionFromEvent = async (
   event: ContractEvent,
