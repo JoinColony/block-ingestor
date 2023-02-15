@@ -1,15 +1,5 @@
 import dotenv from 'dotenv';
 
-import {
-  deleteExtensionFromEvent,
-  toNumber,
-  verbose,
-  writeExtensionFromEvent,
-  writeExtensionVersionFromEvent,
-} from './utils';
-import networkClient from './networkClient';
-import { extensionSpecificEventsListener } from './eventListener';
-import { mutate } from './amplifyClient';
 import { ContractEventsSignatures, ContractEvent } from './types';
 import {
   handleColonyAdded,
@@ -19,6 +9,12 @@ import {
   handleTransfer,
   handleMintTokensAction,
   handlePaymentAction,
+  handleExtensionInstalled,
+  handleExtensionAddedToNetwork,
+  handleExtensionUninstalled,
+  handleExtensionDeprecated,
+  handleExtensionUpgraded,
+  handleExtensionInitialised,
 } from './handlers';
 
 dotenv.config();
@@ -81,85 +77,32 @@ export default async (event: ContractEvent): Promise<void> => {
     }
 
     case ContractEventsSignatures.ExtensionAddedToNetwork: {
-      await writeExtensionVersionFromEvent(event);
+      await handleExtensionAddedToNetwork(event);
       return;
     }
 
     case ContractEventsSignatures.ExtensionInstalled: {
-      const { extensionId: extensionHash, colony } = event.args;
-      const extensionAddress = await networkClient.getExtensionInstallation(
-        extensionHash,
-        colony,
-      );
-
-      await writeExtensionFromEvent(event, extensionAddress);
-      await extensionSpecificEventsListener(extensionAddress, extensionHash);
+      await handleExtensionInstalled(event);
       return;
     }
 
     case ContractEventsSignatures.ExtensionUninstalled: {
-      await deleteExtensionFromEvent(event);
+      await handleExtensionUninstalled(event);
       return;
     }
 
     case ContractEventsSignatures.ExtensionDeprecated: {
-      const { extensionId: extensionHash, colony, deprecated } = event.args;
-
-      verbose(
-        'Extension:',
-        extensionHash,
-        deprecated ? 'deprecated' : 're-enabled',
-        'in Colony:',
-        colony,
-      );
-
-      await mutate('updateColonyExtensionByColonyAndHash', {
-        input: {
-          colonyId: colony,
-          hash: extensionHash,
-          isDeprecated: deprecated,
-        },
-      });
-
+      await handleExtensionDeprecated(event);
       return;
     }
 
     case ContractEventsSignatures.ExtensionUpgraded: {
-      const { extensionId: extensionHash, colony, version } = event.args;
-      const convertedVersion = toNumber(version);
-
-      verbose(
-        'Extension:',
-        extensionHash,
-        'upgraded to version',
-        convertedVersion,
-        'in Colony:',
-        colony,
-      );
-
-      await mutate('updateColonyExtensionByColonyAndHash', {
-        input: {
-          colonyId: colony,
-          hash: extensionHash,
-          version: convertedVersion,
-        },
-      });
-
+      await handleExtensionUpgraded(event);
       return;
     }
 
     case ContractEventsSignatures.ExtensionInitialised: {
-      const { contractAddress: extensionAddress } = event;
-
-      verbose('Extension with address:', extensionAddress, 'was enabled');
-
-      await mutate('updateColonyExtensionByAddress', {
-        input: {
-          id: extensionAddress,
-          isInitialized: true,
-        },
-      });
-
+      await handleExtensionInitialised(event);
       return;
     }
 
