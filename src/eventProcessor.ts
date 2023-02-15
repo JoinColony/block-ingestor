@@ -10,6 +10,7 @@ import {
   writeExtensionVersionFromEvent,
   writeJsonStats,
   handleMintTokensAction,
+  handlePaymentAction,
 } from './utils';
 import { coloniesSet } from './trackColonies';
 import networkClient from './networkClient';
@@ -348,11 +349,11 @@ export default async (event: ContractEvent): Promise<void> => {
       return;
     }
 
-    // case ContractEventsSignatures.PaymentAdded: {
-    //   await handlePaymentAction(event);
+    case ContractEventsSignatures.PaymentAdded: {
+      await handlePaymentAction(event);
 
-    //   return;
-    // }
+      return;
+    }
 
     default: {
       return;
