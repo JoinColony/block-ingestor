@@ -4,7 +4,7 @@ import {
   ColonyNetworkClient,
   TokenClient,
 } from '@colony/colony-js';
-import { LogDescription } from '@ethersproject/abi';
+import { LogDescription, TransactionDescription } from '@ethersproject/abi';
 
 /*
  * Custom contract event, since we need some log values as well
@@ -87,6 +87,7 @@ export enum ColonyActionType {
   VersionUpgrade = 'VERSION_UPGRADE',
   MintTokensMotion = 'MINT_TOKENS_MOTION',
 }
+
 /*
  * Contract calls
  */
@@ -108,8 +109,31 @@ export const motionNameMapping: { [key: string]: ColonyActionType } = {
   // emitDomainReputationReward: ColonyMotions.EmitDomainReputationRewardMotion,
 };
 
+export interface MotionData {
+  parsedAction: TransactionDescription;
+  motionData: {
+    motionState: number;
+  };
+}
+
 export type NetworkClients =
   | ColonyNetworkClient
   | TokenClient
   | AnyColonyClient
   | AnyVotingReputationClient;
+
+interface VotingReputationParams {
+  requiredStake: string;
+  minimumStake: string;
+}
+export interface CreateExtensionInput extends Record<string, any> {
+  colonyId: string;
+  hash: string;
+  version: number;
+  installedBy: string;
+  installedAt: number;
+  isDeprecated: boolean;
+  isDeleted: boolean;
+  isInitialized: boolean;
+  extensionConfig: VotingReputationParams | null;
+}

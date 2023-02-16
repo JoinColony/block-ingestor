@@ -66,6 +66,7 @@ export const mutations = {
       $input: UpdateColonyExtensionInput!
     ) {
       updateColonyExtension(input: $input) {
+        id
         extensionHash: hash
         colonyAddress: colonyId
       }

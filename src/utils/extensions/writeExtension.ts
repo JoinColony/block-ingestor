@@ -1,10 +1,10 @@
 import { constants } from 'ethers';
 import { Log } from '@ethersproject/providers';
-import { getLogs } from '@colony/colony-js';
+import { Extension, getExtensionHash, getLogs } from '@colony/colony-js';
 
 import networkClient from '~networkClient';
 import { mutate } from '~amplifyClient';
-import { ContractEvent } from '~types';
+import { ContractEvent, CreateExtensionInput } from '~types';
 import { verbose, toNumber } from '~utils';
 
 import { getExtensionContract } from './contracts';
@@ -64,7 +64,7 @@ export const writeExtensionFromEvent = async (
     colony,
   );
 
-  const input = {
+  const input: CreateExtensionInput = {
     colonyId: colony,
     hash: extensionHash,
     version: overrideVersion ?? convertedVersion,
@@ -73,7 +73,19 @@ export const writeExtensionFromEvent = async (
     isDeprecated: !!isDeprecated,
     isDeleted: false,
     isInitialized: !!isInitialised,
+    extensionConfig: null,
   };
+
+  /** If Voting Reputation is initialised, add its config to the db. */
+  if (
+    extensionHash === getExtensionHash(Extension.VotingReputation) &&
+    isInitialised
+  ) {
+    input.extensionConfig = await getExtensionConfig(
+      Extension.VotingReputation,
+      colony,
+    );
+  }
 
   if (shouldUpsert) {
     await mutate('updateColonyExtensionByColonyAndHash', {
@@ -162,4 +174,47 @@ export const isExtensionInitialised = async (
     mostRecentInitialisedLog &&
     mostRecentInitialisedLog.blockNumber >= installedLog.blockNumber
   );
+};
+
+const getExtensionConfig = async (
+  extensionId: Extension,
+  colonyAddress: string,
+) => {
+  switch (extensionId) {
+    case Extension.VotingReputation: {
+      const colonyClient = await networkClient.getColonyClient(colonyAddress);
+      const votingReputationClient = await colonyClient.getExtensionClient(
+        Extension.VotingReputation,
+      );
+
+      const userMinStakeFraction =
+        await votingReputationClient.getUserMinStakeFraction();
+      const totalStakeFraction =
+        await votingReputationClient.getTotalStakeFraction();
+
+      return {
+        minimumStake: userMinStakeFraction.toString(),
+        requiredStake: totalStakeFraction.toString(),
+      };
+    }
+
+    default: {
+      return null;
+    }
+  }
+};
+export const writeVotingReputationInitParamsToDB = async (
+  extensionAddress: string,
+  colonyAddress: string,
+) => {
+  const extensionConfig = await getExtensionConfig(
+    Extension.VotingReputation,
+    colonyAddress,
+  );
+  await mutate('updateColonyExtensionByAddress', {
+    input: {
+      id: extensionAddress,
+      extensionConfig,
+    },
+  });
 };

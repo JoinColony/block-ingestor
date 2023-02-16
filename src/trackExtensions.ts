@@ -11,6 +11,7 @@ import {
   verbose,
   writeExtensionFromEvent,
   writeExtensionVersionFromEvent,
+  writeVotingReputationInitParamsToDB,
 } from './utils';
 import { SUPPORTED_EXTENSION_IDS } from './constants';
 import { extensionSpecificEventsListener } from './eventListener';

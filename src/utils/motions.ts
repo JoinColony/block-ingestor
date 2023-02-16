@@ -1,30 +1,47 @@
 import { AnyColonyClient, Extension } from '@colony/colony-js';
-import { TransactionDescription } from 'ethers/lib/utils';
+import { BigNumber } from 'ethers';
 
-import { mutate } from '../amplifyClient';
-import { ContractEvent, motionNameMapping } from '../types';
+import { mutate } from '~amplifyClient';
+import { ContractEvent, MotionData, motionNameMapping } from '~types';
 import { getDomainDatabaseId } from './domains';
-import { verbose } from './logger';
+
 import { getColonyTokenAddress } from './tokens';
 
-export const getParsedActionFromMotion = async (
-  motionId: string,
+export const extractDataFromMotion = async (
+  motionId: BigNumber,
   colonyClient: AnyColonyClient,
 ) => {
   const votingClient = await colonyClient.getExtensionClient(
     Extension.VotingReputation,
   );
 
-  const motion = await votingClient.getMotion(motionId);
+  const {
+    action,
+    stakes: [nay, yay],
+    rootHash,
+    domainId: motionDomainId,
+    skillRep,
+  } = await votingClient.getMotion(motionId);
 
-  try {
-    return colonyClient.interface.parseTransaction({
-      data: motion.action,
-    });
-  } catch {
-    verbose(`Unable to parse ${motion.action}`);
-    return undefined;
-  }
+  const motionState = await votingClient.getMotionState(motionId);
+  const parsedAction = colonyClient.interface.parseTransaction({
+    data: action,
+  });
+
+  return {
+    parsedAction,
+    motionData: {
+      motionId: motionId.toString(),
+      motionStakes: { nay: nay.toString(), yay: yay.toString() },
+      motionState,
+      rootHash,
+      motionDomainId: getDomainDatabaseId(
+        colonyClient.address,
+        motionDomainId.toString(),
+      ),
+      skillRep: skillRep.toString(),
+    },
+  };
 };
 
 export const writeMintTokensMotionToDB = async (
@@ -34,7 +51,7 @@ export const writeMintTokensMotionToDB = async (
     blockNumber,
     args: { creator, domainId },
   }: ContractEvent,
-  parsedAction: TransactionDescription,
+  { parsedAction, motionData }: MotionData,
 ) => {
   const { name, args: actionArgs } = parsedAction;
   const amount = actionArgs[0].toString();
@@ -50,6 +67,7 @@ export const writeMintTokensMotionToDB = async (
       initiatorAddress: creator,
       amount,
       blockNumber,
+      motionData,
     },
   });
 };

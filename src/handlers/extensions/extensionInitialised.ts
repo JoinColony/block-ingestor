@@ -2,7 +2,11 @@ import { Extension, getExtensionHash } from '@colony/colony-js';
 
 import { mutate } from '~amplifyClient';
 import { ContractEvent, ContractEventsSignatures } from '~types';
-import { addMotionEventListener, verbose } from '~utils';
+import {
+  addMotionEventListener,
+  verbose,
+  writeVotingReputationInitParamsToDB,
+} from '~utils';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { contractAddress: extensionAddress } = event;
@@ -11,7 +15,7 @@ export default async (event: ContractEvent): Promise<void> => {
 
   const {
     data: {
-      updateColonyExtension: { extensionHash, colonyAddress },
+      updateColonyExtension: { id, extensionHash, colonyAddress },
     },
   } = await mutate('updateColonyExtensionByAddress', {
     input: {
@@ -26,5 +30,8 @@ export default async (event: ContractEvent): Promise<void> => {
       ContractEventsSignatures.MotionCreated,
       colonyAddress,
     );
+
+    /* Add Voting Extension Initialisation Params to DB for access by motions */
+    await writeVotingReputationInitParamsToDB(id, colonyAddress);
   }
 };
