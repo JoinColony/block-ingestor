@@ -55,7 +55,7 @@ export default async (paymentAddedEvent: ContractEvent): Promise<void> => {
 
   await writeActionFromEvent(paymentAddedEvent, colonyAddress, {
     type: ColonyActionType.Payment,
-    fromDomain: domainId.toString(),
+    fromDomain: toNumber(domainId),
     tokenAddress,
     amount: amount.toString(),
     initiatorAddress: extensionAddress,
