@@ -15,6 +15,7 @@ import {
   handleExtensionDeprecated,
   handleExtensionUpgraded,
   handleExtensionInitialised,
+  handleDomainCreatedAction,
 } from './handlers';
 
 dotenv.config();
@@ -113,6 +114,11 @@ export default async (event: ContractEvent): Promise<void> => {
 
     case ContractEventsSignatures.PaymentAdded: {
       await handlePaymentAction(event);
+      return;
+    }
+
+    case ContractEventsSignatures.DomainAdded: {
+      await handleDomainCreatedAction(event);
       return;
     }
 

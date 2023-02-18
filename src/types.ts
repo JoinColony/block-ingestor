@@ -41,12 +41,13 @@ export enum ContractEventsSignatures {
   ExtensionDeprecated = 'ExtensionDeprecated(bytes32,address,bool)',
   ExtensionUpgraded = 'ExtensionUpgraded(indexed bytes32,indexed address,uint256)',
   ExtensionInitialised = 'ExtensionInitialised()',
-  OneTxPaymentMade = 'OneTxPaymentMade(address,uint256,uint256)',
 
   // Actions
   TokensMinted = 'TokensMinted(address,address,uint256)',
-  PayoutClaimed = 'PayoutClaimed(address,uint256,address,uint256)',
   PaymentAdded = 'PaymentAdded(address,uint256)',
+  PayoutClaimed = 'PayoutClaimed(address,uint256,address,uint256)',
+  OneTxPaymentMade = 'OneTxPaymentMade(address,uint256,uint256)',
+  DomainAdded = 'DomainAdded(address,uint256)',
 }
 
 /*

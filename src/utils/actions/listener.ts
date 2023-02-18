@@ -12,4 +12,8 @@ export const addActionEventListeners = async (
     ContractEventsSignatures.PaymentAdded,
     colonyAddress,
   );
+  await addColonyEventListener(
+    ContractEventsSignatures.DomainAdded,
+    colonyAddress,
+  );
 };
