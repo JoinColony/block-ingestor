@@ -66,4 +66,5 @@ export type ChainID = number;
 export enum ColonyActionType {
   MintTokens = 'MINT_TOKENS',
   Payment = 'PAYMENT',
+  CreateDomain = 'CREATE_DOMAIN',
 }
