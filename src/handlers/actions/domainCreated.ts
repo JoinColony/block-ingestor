@@ -4,11 +4,12 @@ import { getDatabaseDomainId } from '~/utils/domains';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { contractAddress: colonyAddress } = event;
-  const { domainId } = event.args;
+  const { domainId, agent: initiatorAddress } = event.args;
   const nativeDomainId = toNumber(domainId);
 
   writeActionFromEvent(event, colonyAddress, {
     type: ColonyActionType.CreateDomain,
     fromDomainId: getDatabaseDomainId(colonyAddress, nativeDomainId),
+    initiatorAddress,
   });
 };
