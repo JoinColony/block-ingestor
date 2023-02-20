@@ -16,4 +16,8 @@ export const addActionEventListeners = async (
     ContractEventsSignatures.DomainAdded,
     colonyAddress,
   );
+  await addColonyEventListener(
+    ContractEventsSignatures.TokenUnlocked,
+    colonyAddress,
+  );
 };
