@@ -16,6 +16,7 @@ export default async (event: ContractEvent): Promise<void> => {
   await mutate('createDomain', {
     input: {
       id: databaseDomainId,
+      colonyId: colonyAddress,
       nativeId: nativeDomainId,
       isRoot: false,
       nativeFundingPotId: toNumber(fundingPotId),
