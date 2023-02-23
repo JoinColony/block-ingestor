@@ -48,7 +48,7 @@ export enum ContractEventsSignatures {
   PayoutClaimed = 'PayoutClaimed(address,uint256,address,uint256)',
   OneTxPaymentMade = 'OneTxPaymentMade(address,uint256,uint256)',
   DomainAdded = 'DomainAdded(address,uint256)',
-  TokenUnlocked = 'TokenUnlocked()',
+  TokenUnlocked = 'TokenUnlocked(address)',
 }
 
 /*
