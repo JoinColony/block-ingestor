@@ -17,6 +17,7 @@ import {
   handleExtensionInitialised,
   handleCreateDomainAction,
   handleTokenUnlockedAction,
+  handleMoveFundsAction,
 } from './handlers';
 
 dotenv.config();
@@ -125,6 +126,11 @@ export default async (event: ContractEvent): Promise<void> => {
 
     case ContractEventsSignatures.TokenUnlocked: {
       await handleTokenUnlockedAction(event);
+      return;
+    }
+
+    case ContractEventsSignatures.ColonyFundsMovedBetweenFundingPots: {
+      await handleMoveFundsAction(event);
       return;
     }
 
