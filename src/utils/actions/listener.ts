@@ -17,6 +17,10 @@ export const addActionEventListeners = async (
     colonyAddress,
   );
   await addColonyEventListener(
+    ContractEventsSignatures.DomainMetadata,
+    colonyAddress,
+  );
+  await addColonyEventListener(
     ContractEventsSignatures.TokenUnlocked,
     colonyAddress,
   );

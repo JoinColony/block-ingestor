@@ -18,6 +18,7 @@ import {
   handleCreateDomainAction,
   handleTokenUnlockedAction,
   handleMoveFundsAction,
+  handleEditDomainAction,
 } from './handlers';
 
 dotenv.config();
@@ -121,6 +122,11 @@ export default async (event: ContractEvent): Promise<void> => {
 
     case ContractEventsSignatures.DomainAdded: {
       await handleCreateDomainAction(event);
+      return;
+    }
+
+    case ContractEventsSignatures.DomainMetadata: {
+      await handleEditDomainAction(event);
       return;
     }
 
