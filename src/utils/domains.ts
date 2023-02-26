@@ -1,4 +1,4 @@
-export const getDatabaseDomainId = (
+export const getDomainDatabaseId = (
   colonyAddress: string,
   nativeId: number,
 ): string => `${colonyAddress}_${nativeId}`;

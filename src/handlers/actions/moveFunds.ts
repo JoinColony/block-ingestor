@@ -9,7 +9,7 @@ import { BigNumber } from 'ethers';
 import networkClient from '~/networkClient';
 import { ColonyActionType, ContractEvent } from '~/types';
 import { toNumber, writeActionFromEvent } from '~/utils';
-import { getDatabaseDomainId } from '~/utils/domains';
+import { getDomainDatabaseId } from '~/utils/domains';
 
 /**
  * The handler makes use of colonyClient getDomainFromFundingPot method which is only
@@ -49,10 +49,10 @@ export default async (event: ContractEvent): Promise<void> => {
     tokenAddress,
     amount: amount.toString(),
     fromDomainId: fromDomainId
-      ? getDatabaseDomainId(colonyAddress, toNumber(fromDomainId))
+      ? getDomainDatabaseId(colonyAddress, toNumber(fromDomainId))
       : undefined,
     toDomainId: toDomainId
-      ? getDatabaseDomainId(colonyAddress, toNumber(toDomainId))
+      ? getDomainDatabaseId(colonyAddress, toNumber(toDomainId))
       : undefined,
   });
 };
