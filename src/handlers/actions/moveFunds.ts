@@ -8,8 +8,7 @@ import {
 import { BigNumber } from 'ethers';
 import networkClient from '~/networkClient';
 import { ColonyActionType, ContractEvent } from '~/types';
-import { toNumber, writeActionFromEvent } from '~/utils';
-import { getDomainDatabaseId } from '~/utils/domains';
+import { toNumber, writeActionFromEvent, getDomainDatabaseId } from '~/utils';
 
 /**
  * The handler makes use of colonyClient getDomainFromFundingPot method which is only
