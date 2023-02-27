@@ -110,6 +110,7 @@ async function handleTokensBought(args, coinMachineAddress, contract) {
             purchaseToken
             id
             endDate
+            userCount
             users(filter: {userID: {eq: "${buyer}"}}) {
               items {
                 userID
@@ -129,7 +130,7 @@ async function handleTokensBought(args, coinMachineAddress, contract) {
     if (!sale) return [];
 
     // Create Order History Entry
-    const { tokenDecimals, purchaseToken, id, endDate } = sale;
+    const { tokenDecimals, purchaseToken, id, endDate, userCount } = sale;
     const purchaseTokenDecimals = purchaseTokens.find(
       (token) => token.tokenAddress === purchaseToken
     )?.decimals;
@@ -158,6 +159,8 @@ async function handleTokensBought(args, coinMachineAddress, contract) {
     };
 
     // Update Sale Information
+    const firstTimeBuy = sale.users.items.length === 0;
+
     const [totalSold, totalIntake, tokenBalance, intakeCap] = await Promise.all(
       [
         contract.getSoldTotal(),
@@ -185,6 +188,7 @@ async function handleTokensBought(args, coinMachineAddress, contract) {
             totalSold: "${formattedSold}",
             totalIntake: "${formattedIntake}",
             endDate: ${updatedEndDate}
+            userCount: ${firstTimeBuy ? userCount + 1 : userCount}
           }
           condition: {}
         ) {
@@ -196,8 +200,6 @@ async function handleTokensBought(args, coinMachineAddress, contract) {
     };
 
     const queries = [query, saleUpdateQuery];
-
-    const firstTimeBuy = sale.users.items.length === 0;
 
     if (firstTimeBuy) {
       // Create User Sale Connection
