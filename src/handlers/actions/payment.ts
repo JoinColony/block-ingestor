@@ -49,16 +49,17 @@ export default async (paymentAddedEvent: ContractEvent): Promise<void> => {
   }
 
   const { paymentId } = paymentAddedEvent.args;
-  const { domainId } = await colonyClient.getPayment(paymentId);
+  const { recipient: recipientAddress, domainId } =
+    await colonyClient.getPayment(paymentId);
   const { token: tokenAddress, amount } = payoutClaimedEvent.args;
-  const [recipientAddress, fundamentalChainId] = oneTxPaymentMadeEvent.args;
+  const [initiatorAddress, fundamentalChainId] = oneTxPaymentMadeEvent.args;
 
   await writeActionFromEvent(paymentAddedEvent, colonyAddress, {
     type: ColonyActionType.Payment,
     fromDomain: toNumber(domainId),
     tokenAddress,
     amount: amount.toString(),
-    initiatorAddress: extensionAddress,
+    initiatorAddress,
     recipientAddress,
     fundamentalChainId: toNumber(fundamentalChainId),
   });
