@@ -5,6 +5,7 @@ import {
   addExtensionEventListener,
   addNetworkEventListener,
   addTokenEventListener,
+  addActionEventListeners,
 } from './utils';
 import { ContractEventsSignatures } from './types';
 import { INITIALISABLE_EXTENSION_IDS } from './constants';
@@ -25,10 +26,7 @@ export const colonySpecificEventsListener = async (
     colonyAddress,
   );
   await addTokenEventListener(ContractEventsSignatures.Transfer, colonyAddress);
-  await addColonyEventListener(
-    ContractEventsSignatures.TokensMinted,
-    colonyAddress,
-  );
+  await addActionEventListeners(colonyAddress);
 };
 
 export const extensionSpecificEventsListener = async (

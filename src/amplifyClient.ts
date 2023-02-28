@@ -84,6 +84,13 @@ export const mutations = {
       }
     }
   `,
+  updateColonyAction: /* GraphQL */ `
+    mutation UpdateColonyAction($input: UpdateColonyActionInput!) {
+      updateColonyAction(input: $input) {
+        id
+      }
+    }
+  `,
 };
 
 /*

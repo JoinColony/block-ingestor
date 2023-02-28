@@ -27,7 +27,7 @@ export enum QueueEvents {
  * All contract events signatures we deal with
  */
 export enum ContractEventsSignatures {
-  UknownEvent = 'UknownEvent()',
+  UnknownEvent = 'UnknownEvent()',
   ColonyAdded = 'ColonyAdded(uint256,address,address)',
   Transfer = 'Transfer(address,address,uint256)',
   ColonyFundsClaimed = 'ColonyFundsClaimed(address,address,uint256,uint256)',
@@ -41,9 +41,12 @@ export enum ContractEventsSignatures {
   ExtensionDeprecated = 'ExtensionDeprecated(bytes32,address,bool)',
   ExtensionUpgraded = 'ExtensionUpgraded(indexed bytes32,indexed address,uint256)',
   ExtensionInitialised = 'ExtensionInitialised()',
+  OneTxPaymentMade = 'OneTxPaymentMade(address,uint256,uint256)',
 
   // Actions
   TokensMinted = 'TokensMinted(address,address,uint256)',
+  PayoutClaimed = 'PayoutClaimed(address,uint256,address,uint256)',
+  PaymentAdded = 'PaymentAdded(address,uint256)',
 }
 
 /*
@@ -61,4 +64,5 @@ export type ChainID = number;
  */
 export enum ColonyActionType {
   MintTokens = 'MINT_TOKENS',
+  Payment = 'PAYMENT',
 }

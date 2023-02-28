@@ -1,4 +1,4 @@
-import networkClient from '../networkClient';
+import networkClient from '~networkClient';
 
 export const getColonyTokenAddress = async (
   colonyAddress: string,
