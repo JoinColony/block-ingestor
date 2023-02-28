@@ -1,10 +1,11 @@
-import { getExtensionHash, Extension } from '@colony/colony-js';
+import { getExtensionHash } from '@colony/colony-js';
 
 import {
   addColonyEventListener,
   addExtensionEventListener,
   addNetworkEventListener,
   addTokenEventListener,
+  addActionEventListeners,
 } from './utils';
 import { ContractEventsSignatures } from './types';
 import { INITIALISABLE_EXTENSION_IDS } from './constants';
@@ -25,18 +26,7 @@ export const colonySpecificEventsListener = async (
     colonyAddress,
   );
   await addTokenEventListener(ContractEventsSignatures.Transfer, colonyAddress);
-  await addColonyEventListener(
-    ContractEventsSignatures.TokensMinted,
-    colonyAddress,
-  );
-  await addColonyEventListener(
-    ContractEventsSignatures.PayoutClaimed,
-    colonyAddress,
-  );
-  await addColonyEventListener(
-    ContractEventsSignatures.PaymentAdded,
-    colonyAddress,
-  );
+  await addActionEventListeners(colonyAddress);
 };
 
 export const extensionSpecificEventsListener = async (
@@ -49,13 +39,6 @@ export const extensionSpecificEventsListener = async (
   if (isInitialisable) {
     await addExtensionEventListener(
       ContractEventsSignatures.ExtensionInitialised,
-      extensionAddress,
-    );
-  }
-
-  if (extensionHash === getExtensionHash(Extension.OneTxPayment)) {
-    await addExtensionEventListener(
-      ContractEventsSignatures.OneTxPaymentMade,
       extensionAddress,
     );
   }

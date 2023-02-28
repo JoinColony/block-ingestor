@@ -1,12 +1,13 @@
-import { constants, Contract } from 'ethers';
+import { constants } from 'ethers';
 import { Log } from '@ethersproject/providers';
 import { getLogs } from '@colony/colony-js';
 
-import networkClient from '../../networkClient';
-import { mutate } from '../../amplifyClient';
-import { ContractEvent, ContractEventsSignatures } from '../../types';
-import { verbose } from '../logger';
-import { toNumber } from '../numbers';
+import networkClient from '~networkClient';
+import { mutate } from '~amplifyClient';
+import { ContractEvent } from '~types';
+import { verbose, toNumber } from '~utils';
+
+import { getExtensionContract } from './contracts';
 
 /**
  * Function writing the extension version to the db based on the ExtensionAddedToNetwork event payload
@@ -142,9 +143,7 @@ export const isExtensionInitialised = async (
   extensionAddress: string,
   installedLog: Log,
 ): Promise<boolean> => {
-  const extensionContract = new Contract(extensionAddress, [
-    `event ${ContractEventsSignatures.ExtensionInitialised}`,
-  ]);
+  const extensionContract = getExtensionContract(extensionAddress);
 
   const extensionInitialisedLogs = await getLogs(
     networkClient,
