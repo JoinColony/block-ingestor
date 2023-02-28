@@ -1,7 +1,7 @@
-import { extensionSpecificEventsListener } from '~/eventListener';
-import networkClient from '~/networkClient';
-import { ContractEvent } from '~/types';
-import { writeExtensionFromEvent } from '~/utils';
+import { extensionSpecificEventsListener } from '~eventListener';
+import networkClient from '~networkClient';
+import { ContractEvent } from '~types';
+import { writeExtensionFromEvent } from '~utils';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { extensionId: extensionHash, colony } = event.args;

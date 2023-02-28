@@ -1,7 +1,7 @@
-import { mutate } from '~/amplifyClient';
-import { COLONY_CURRENT_VERSION_KEY } from '~/constants';
-import { ContractEvent } from '~/types';
-import { toNumber, verbose } from '~/utils';
+import { mutate } from '~amplifyClient';
+import { COLONY_CURRENT_VERSION_KEY } from '~constants';
+import { ContractEvent } from '~types';
+import { toNumber, verbose } from '~utils';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { version } = event.args;

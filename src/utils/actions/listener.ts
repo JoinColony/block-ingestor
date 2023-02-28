@@ -1,4 +1,5 @@
-import { ContractEventsSignatures } from '../../types';
+import { ContractEventsSignatures } from '~/types';
+
 import { addColonyEventListener } from '../events';
 
 export const addActionEventListeners = async (

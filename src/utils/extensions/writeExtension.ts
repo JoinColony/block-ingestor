@@ -2,11 +2,11 @@ import { constants } from 'ethers';
 import { Log } from '@ethersproject/providers';
 import { getLogs } from '@colony/colony-js';
 
-import networkClient from '../../networkClient';
-import { mutate } from '../../amplifyClient';
-import { ContractEvent } from '../../types';
-import { verbose } from '../logger';
-import { toNumber } from '../numbers';
+import networkClient from '~networkClient';
+import { mutate } from '~amplifyClient';
+import { ContractEvent } from '~types';
+import { verbose, toNumber } from '~utils';
+
 import { getExtensionContract } from './contracts';
 
 /**

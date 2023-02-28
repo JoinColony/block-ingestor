@@ -1,18 +1,18 @@
 import { utils } from 'ethers';
 
-import networkClient from '~/networkClient';
-import provider from '~/provider';
+import networkClient from '~networkClient';
+import provider from '~provider';
 import {
   ColonyActionType,
   ContractEvent,
   ContractEventsSignatures,
-} from '~/types';
+} from '~types';
 import {
   writeActionFromEvent,
   getOneTxPaymentContract,
   toNumber,
   mapLogToContractEvent,
-} from '~/utils';
+} from '~utils';
 
 const events = [
   ContractEventsSignatures.PaymentAdded,

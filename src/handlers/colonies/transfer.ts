@@ -1,8 +1,8 @@
-import { mutate, query } from '~/amplifyClient';
-import networkClient from '~/networkClient';
-import { getChainId } from '~/provider';
-import { ContractEvent } from '~/types';
-import { output } from '~/utils';
+import { mutate, query } from '~amplifyClient';
+import networkClient from '~networkClient';
+import { getChainId } from '~provider';
+import { ContractEvent } from '~types';
+import { output } from '~utils';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { contractAddress, logIndex, blockNumber, transactionHash } = event;

@@ -1,6 +1,6 @@
-import { mutate } from '~/amplifyClient';
-import { ContractEvent } from '~/types';
-import { toNumber, verbose } from '~/utils';
+import { mutate } from '~amplifyClient';
+import { ContractEvent } from '~types';
+import { toNumber, verbose } from '~utils';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { extensionId: extensionHash, colony, version } = event.args;

@@ -1,5 +1,6 @@
 import { Contract } from 'ethers';
-import { ContractEventsSignatures } from '~/types';
+
+import { ContractEventsSignatures } from '~types';
 
 /**
  * Function returning a generic extension contract

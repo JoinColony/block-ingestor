@@ -1,6 +1,6 @@
 import { Contract } from 'ethers';
 
-import provider from '../../provider';
+import provider from '~provider';
 
 const ABI = [
   {

@@ -1,8 +1,8 @@
 import { constants } from 'ethers';
-import { mutate, query } from '~/amplifyClient';
 
-import { ContractEvent } from '~/types';
-import { output, saveEvent } from '~/utils';
+import { mutate, query } from '~amplifyClient';
+import { ContractEvent } from '~types';
+import { output, saveEvent } from '~utils';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { contractAddress: colonyAddress, blockNumber } = event;

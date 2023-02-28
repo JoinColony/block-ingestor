@@ -8,11 +8,11 @@ import {
   TokenClient,
 } from '@colony/colony-js';
 
-import networkClient from '~/networkClient';
-import { ContractEvent, ContractEventsSignatures } from '~/types';
-import { addEvent } from '~/eventQueue';
-import { mutate, query } from '~/amplifyClient';
-import { getChainId } from '~/provider';
+import networkClient from '~networkClient';
+import { ContractEvent, ContractEventsSignatures } from '~types';
+import { addEvent } from '~eventQueue';
+import { mutate, query } from '~amplifyClient';
+import { getChainId } from '~provider';
 
 import { getExtensionContract } from './extensions';
 import { verbose } from './logger';
