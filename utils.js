@@ -11,7 +11,7 @@ module.exports = {
      * It will always be da2-fakeApiId123456
      * https://github.com/aws-amplify/amplify-cli/blob/da712b858873ba90090f7407211ec97ca4991f29/packages/amplify-util-mock/src/CFNParser/resource-processors/appsync.ts#L139
      */
-    apiKey = 'da2-fakeApiId123456',
+    apiKey = process.env.GraphQLAPIKey || 'da2-fakeApiId123456',
   ) => {
     const options = {
       method: 'POST',
