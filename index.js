@@ -112,7 +112,8 @@ const subsribeToCoinMachine = async (coinMachineAddress, provider) => {
 }
 
 (async () => {
-  const provider = new ethers.providers.JsonRpcProvider();
+  const jsonRpcUrl = process.env.RPC_URL || "http://localhost:8545";
+  const provider = new ethers.providers.JsonRpcProvider(jsonRpcUrl);
   const whitelistContracts = []; // Fetch from db and subsribe
 
   const coinmachineFactoryAddress = process.argv[2];
