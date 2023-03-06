@@ -91,6 +91,13 @@ export const mutations = {
       }
     }
   `,
+  createDomain: /* GraphQL */ `
+    mutation CreateDomain($input: CreateDomainInput!) {
+      createDomain(input: $input) {
+        id
+      }
+    }
+  `,
 };
 
 /*
