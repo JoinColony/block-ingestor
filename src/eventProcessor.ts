@@ -19,6 +19,7 @@ import {
   handleTokenUnlockedAction,
   handleMoveFundsAction,
   handleEditDomainAction,
+  handleEditColonyAction,
 } from './handlers';
 
 dotenv.config();
@@ -137,6 +138,11 @@ export default async (event: ContractEvent): Promise<void> => {
 
     case ContractEventsSignatures.ColonyFundsMovedBetweenFundingPots: {
       await handleMoveFundsAction(event);
+      return;
+    }
+
+    case ContractEventsSignatures.ColonyMetadata: {
+      await handleEditColonyAction(event);
       return;
     }
 
