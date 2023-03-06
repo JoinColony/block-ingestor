@@ -21,4 +21,8 @@ export const addActionEventListeners = async (
     ContractEventsSignatures.TokenUnlocked,
     colonyAddress,
   );
+  await addColonyEventListener(
+    ContractEventsSignatures.ColonyFundsMovedBetweenFundingPots,
+    colonyAddress,
+  );
 };

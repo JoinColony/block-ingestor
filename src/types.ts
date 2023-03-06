@@ -49,6 +49,7 @@ export enum ContractEventsSignatures {
   OneTxPaymentMade = 'OneTxPaymentMade(address,uint256,uint256)',
   DomainAdded = 'DomainAdded(address,uint256)',
   TokenUnlocked = 'TokenUnlocked(address)',
+  ColonyFundsMovedBetweenFundingPots = 'ColonyFundsMovedBetweenFundingPots(address,uint256,uint256,uint256,address)',
 }
 
 /*
@@ -69,4 +70,5 @@ export enum ColonyActionType {
   Payment = 'PAYMENT',
   CreateDomain = 'CREATE_DOMAIN',
   UnlockToken = 'UNLOCK_TOKEN',
+  MoveFunds = 'MOVE_FUNDS',
 }
