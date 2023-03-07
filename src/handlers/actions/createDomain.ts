@@ -1,14 +1,13 @@
 import { mutate } from '~/amplifyClient';
 import networkClient from '~/networkClient';
 import { ColonyActionType, ContractEvent } from '~/types';
-import { toNumber, writeActionFromEvent } from '~/utils';
-import { getDatabaseDomainId } from '~/utils/domains';
+import { toNumber, writeActionFromEvent, getDomainDatabaseId } from '~/utils';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { contractAddress: colonyAddress } = event;
   const { domainId, agent: initiatorAddress } = event.args;
   const nativeDomainId = toNumber(domainId);
-  const databaseDomainId = getDatabaseDomainId(colonyAddress, nativeDomainId);
+  const databaseDomainId = getDomainDatabaseId(colonyAddress, nativeDomainId);
 
   const colonyClient = await networkClient.getColonyClient(colonyAddress);
   const [skillId, fundingPotId] = await colonyClient.getDomain(nativeDomainId);
