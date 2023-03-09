@@ -4,7 +4,7 @@ import { toNumber, verbose, writeActionFromEvent } from '~utils';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { contractAddress: colonyAddress } = event;
-  const { newVersion } = event.args;
+  const { newVersion, agent: initiatorAddress } = event.args;
   const convertedVersion = toNumber(newVersion);
 
   verbose('Colony:', colonyAddress, `upgraded to version ${convertedVersion}`);
@@ -19,6 +19,7 @@ export default async (event: ContractEvent): Promise<void> => {
 
   writeActionFromEvent(event, colonyAddress, {
     type: ColonyActionType.VersionUpgrade,
+    initiatorAddress,
     newColonyVersion: convertedVersion,
   });
 };
