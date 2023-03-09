@@ -19,5 +19,6 @@ export default async (event: ContractEvent): Promise<void> => {
 
   writeActionFromEvent(event, colonyAddress, {
     type: ColonyActionType.VersionUpgrade,
+    newColonyVersion: convertedVersion,
   });
 };
