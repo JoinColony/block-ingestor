@@ -230,7 +230,7 @@ export const saveEvent = async (event: ContractEvent): Promise<void> => {
   const contractEvent: {
     id: string;
     agent: string;
-    meta: Record<string, string | number>;
+    chainMetadata: Record<string, string | number>;
     name: string;
     signature: string;
     target: string;
@@ -242,7 +242,7 @@ export const saveEvent = async (event: ContractEvent): Promise<void> => {
   } = {
     id: `${chainId}_${transactionHash}_${logIndex}`,
     agent: parsedArgs?.agent || contractAddress,
-    meta: {
+    chainMetadata: {
       chainId,
       transactionHash,
       logIndex,
