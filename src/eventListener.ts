@@ -6,10 +6,21 @@ import {
   addNetworkEventListener,
   addTokenEventListener,
   addActionEventListeners,
+  addMotionEventListener,
 } from './utils';
 import { ContractEventsSignatures } from './types';
 import { INITIALISABLE_EXTENSION_IDS } from './constants';
 
+export const motionSpecificEventsListener = async (colonyAddress: string) => {
+  await addMotionEventListener(
+    ContractEventsSignatures.MotionCreated,
+    colonyAddress,
+  );
+  await addMotionEventListener(
+    ContractEventsSignatures.MotionStaked,
+    colonyAddress,
+  );
+};
 /*
  * All events that need to be tracked on a single colony go in here
  * as this will get linked in all the relevant places

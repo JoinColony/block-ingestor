@@ -203,6 +203,7 @@ const getExtensionConfig = async (
     }
   }
 };
+
 export const writeVotingReputationInitParamsToDB = async (
   extensionAddress: string,
   colonyAddress: string,

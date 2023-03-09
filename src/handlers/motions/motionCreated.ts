@@ -1,3 +1,4 @@
+import { motionSpecificEventsListener } from '~eventListener';
 import networkClient from '~networkClient';
 import { ColonyOperations, ContractEvent } from '~types';
 import {
@@ -14,7 +15,11 @@ export default async (event: ContractEvent) => {
 
   try {
     const colonyClient = await networkClient.getColonyClient(colonyAddress);
-    const motionData = await extractDataFromMotion(motionId, colonyClient);
+    const motionData = await extractDataFromMotion(
+      motionId,
+      colonyClient,
+      colonyAddress,
+    );
 
     const contractOperation = motionData.parsedAction.name;
 
@@ -29,6 +34,8 @@ export default async (event: ContractEvent) => {
       }
     }
     verbose(`${contractOperation} Motion Created`);
+
+    await motionSpecificEventsListener(colonyAddress);
   } catch {
     verbose('Unable to create Motion.');
   }

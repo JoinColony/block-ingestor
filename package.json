@@ -25,6 +25,7 @@
   "dependencies": {
     "@colony/colony-js": "^6.1.0",
     "aws-amplify": "^4.3.43",
+    "decimal.js": "^10.4.3",
     "dotenv": "^16.0.3",
     "ethers": "^5.7.2",
     "express": "^4.18.2",

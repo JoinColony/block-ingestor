@@ -146,6 +146,44 @@ export const queries = {
       }
     }
   `,
+  getColonyMotions: /* GraphQL */ `
+    query GetActionsByColony($colonyAddress: ID!) {
+      getActionsByColony(
+        colonyId: $colonyAddress
+        filter: { isMotion: { eq: true } }
+      ) {
+        items {
+          id
+          motionData {
+            rootHash
+            motionStakes {
+              raw {
+                yay
+                nay
+              }
+              percentage {
+                yay
+                nay
+              }
+            }
+            usersStakes {
+              address
+              stakes {
+                raw {
+                  yay
+                  nay
+                }
+              }
+            }
+            motionState
+            motionDomainId
+            skillRep
+            motionId
+          }
+        }
+      }
+    }
+  `,
 };
 
 export default (): void => {

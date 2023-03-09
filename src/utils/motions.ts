@@ -1,15 +1,45 @@
 import { AnyColonyClient, Extension } from '@colony/colony-js';
 import { BigNumber } from 'ethers';
+import Decimal from 'decimal.js';
 
 import { mutate } from '~amplifyClient';
-import { ContractEvent, MotionData, motionNameMapping } from '~types';
-import { getDomainDatabaseId } from './domains';
+import { ContractEvent, AugmentedMotionData, motionNameMapping } from '~types';
 
 import { getColonyTokenAddress } from './tokens';
+import { getVotingClient } from './clients';
+import { getDomainDatabaseId } from './domains';
+
+export const convertStakeToPercentage = (
+  stake: string | Decimal,
+  requiredStake: Decimal,
+) => new Decimal(stake).div(requiredStake).mul(100).toDP(2).toString();
+
+export const getMotionStakePercentages = (
+  yay: BigNumber,
+  nay: BigNumber,
+  requiredStake: Decimal,
+) => ({
+  yay: convertStakeToPercentage(yay.toString(), requiredStake),
+  nay: convertStakeToPercentage(nay.toString(), requiredStake),
+});
+
+export const getRequiredStake = async (
+  colonyAddress: string,
+  skillRep: string,
+) => {
+  const votingReputationClient = await getVotingClient(colonyAddress);
+  const totalStakeFraction =
+    await votingReputationClient.getTotalStakeFraction();
+  const totalStakeFractionPercentage = new Decimal(
+    totalStakeFraction.toString(),
+  ).div(new Decimal(10).pow(18).toString());
+  return new Decimal(skillRep).mul(totalStakeFractionPercentage).round();
+};
 
 export const extractDataFromMotion = async (
   motionId: BigNumber,
   colonyClient: AnyColonyClient,
+  colonyAddress: string,
 ) => {
   const votingClient = await colonyClient.getExtensionClient(
     Extension.VotingReputation,
@@ -23,6 +53,10 @@ export const extractDataFromMotion = async (
     skillRep,
   } = await votingClient.getMotion(motionId);
 
+  const requiredStake = await getRequiredStake(
+    colonyAddress,
+    skillRep.toString(),
+  );
   const motionState = await votingClient.getMotionState(motionId);
   const parsedAction = colonyClient.interface.parseTransaction({
     data: action,
@@ -32,7 +66,14 @@ export const extractDataFromMotion = async (
     parsedAction,
     motionData: {
       motionId: motionId.toString(),
-      motionStakes: { nay: nay.toString(), yay: yay.toString() },
+      motionStakes: {
+        raw: {
+          yay: yay.toString(),
+          nay: nay.toString(),
+        },
+        percentage: getMotionStakePercentages(yay, nay, requiredStake),
+      },
+      usersStakes: [],
       motionState,
       rootHash,
       motionDomainId: getDomainDatabaseId(
@@ -51,7 +92,7 @@ export const writeMintTokensMotionToDB = async (
     blockNumber,
     args: { creator, domainId },
   }: ContractEvent,
-  { parsedAction, motionData }: MotionData,
+  { parsedAction, motionData }: AugmentedMotionData,
 ) => {
   const { name, args: actionArgs } = parsedAction;
   const amount = actionArgs[0].toString();

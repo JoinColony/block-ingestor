@@ -4,7 +4,7 @@ import {
   ColonyNetworkClient,
   TokenClient,
 } from '@colony/colony-js';
-import { LogDescription, TransactionDescription } from '@ethersproject/abi';
+import { LogDescription } from '@ethersproject/abi';
 
 /*
  * Custom contract event, since we need some log values as well
@@ -61,6 +61,7 @@ export enum ContractEventsSignatures {
 
   // Motions
   MotionCreated = 'MotionCreated(uint256,address,uint256)',
+  MotionStaked = 'MotionStaked(uint256,address,uint256,uint256)',
 }
 
 /*
@@ -88,52 +89,11 @@ export enum ColonyActionType {
   MintTokensMotion = 'MINT_TOKENS_MOTION',
 }
 
-/*
- * Contract calls
- */
-export enum ColonyOperations {
-  MintTokens = 'mintTokens',
-}
-
-export const motionNameMapping: { [key: string]: ColonyActionType } = {
-  [ColonyOperations.MintTokens]: ColonyActionType.MintTokensMotion,
-  // makePaymentFundedFromDomain: ColonyMotions.PaymentMotion,
-  // unlockToken: ColonyMotions.UnlockTokenMotion,
-  // addDomain: ColonyMotions.CreateDomainMotion,
-  // editDomain: ColonyMotions.EditDomainMotion,
-  // editColony: ColonyMotions.ColonyEditMotion,
-  // setUserRoles: ColonyMotions.SetUserRolesMotion,
-  // moveFundsBetweenPots: ColonyMotions.MoveFundsMotion,
-  // upgrade: ColonyMotions.VersionUpgradeMotion,
-  // emitDomainReputationPenalty: ColonyMotions.EmitDomainReputationPenaltyMotion,
-  // emitDomainReputationReward: ColonyMotions.EmitDomainReputationRewardMotion,
-};
-
-export interface MotionData {
-  parsedAction: TransactionDescription;
-  motionData: {
-    motionState: number;
-  };
-}
-
 export type NetworkClients =
   | ColonyNetworkClient
   | TokenClient
   | AnyColonyClient
   | AnyVotingReputationClient;
 
-interface VotingReputationParams {
-  requiredStake: string;
-  minimumStake: string;
-}
-export interface CreateExtensionInput extends Record<string, any> {
-  colonyId: string;
-  hash: string;
-  version: number;
-  installedBy: string;
-  installedAt: number;
-  isDeprecated: boolean;
-  isDeleted: boolean;
-  isInitialized: boolean;
-  extensionConfig: VotingReputationParams | null;
-}
+export * from './motions';
+export * from './extensions';
