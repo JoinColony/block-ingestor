@@ -4,7 +4,6 @@ import { ContractEventsSignatures, ContractEvent } from './types';
 import {
   handleColonyAdded,
   handleColonyFundsClaimed,
-  handleColonyUpgraded,
   handleColonyVersionAdded,
   handleTransfer,
   handleMintTokensAction,
@@ -20,6 +19,7 @@ import {
   handleMoveFundsAction,
   handleEditDomainAction,
   handleEditColonyAction,
+  handleVersionUpgradeAction,
 } from './handlers';
 
 dotenv.config();
@@ -73,11 +73,6 @@ export default async (event: ContractEvent): Promise<void> => {
      */
     case ContractEventsSignatures.ColonyVersionAdded: {
       await handleColonyVersionAdded(event);
-      return;
-    }
-
-    case ContractEventsSignatures.ColonyUpgraded: {
-      await handleColonyUpgraded(event);
       return;
     }
 
@@ -143,6 +138,11 @@ export default async (event: ContractEvent): Promise<void> => {
 
     case ContractEventsSignatures.ColonyMetadata: {
       await handleEditColonyAction(event);
+      return;
+    }
+
+    case ContractEventsSignatures.ColonyUpgraded: {
+      await handleVersionUpgradeAction(event);
       return;
     }
 
