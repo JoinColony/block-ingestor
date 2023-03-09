@@ -51,6 +51,7 @@ export enum ContractEventsSignatures {
   DomainMetadata = 'DomainMetadata(address,uint256,string)',
   TokenUnlocked = 'TokenUnlocked(address)',
   ColonyFundsMovedBetweenFundingPots = 'ColonyFundsMovedBetweenFundingPots(address,uint256,uint256,uint256,address)',
+  ColonyMetadata = 'ColonyMetadata(address,string)',
 }
 
 /*
@@ -73,4 +74,5 @@ export enum ColonyActionType {
   EditDomain = 'EDIT_DOMAIN',
   UnlockToken = 'UNLOCK_TOKEN',
   MoveFunds = 'MOVE_FUNDS',
+  ColonyEdit = 'COLONY_EDIT',
 }
