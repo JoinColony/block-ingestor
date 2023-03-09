@@ -12,6 +12,7 @@ import {
   getOneTxPaymentContract,
   toNumber,
   mapLogToContractEvent,
+  getDomainDatabaseId,
 } from '~utils';
 
 const events = [
@@ -56,7 +57,7 @@ export default async (paymentAddedEvent: ContractEvent): Promise<void> => {
 
   await writeActionFromEvent(paymentAddedEvent, colonyAddress, {
     type: ColonyActionType.Payment,
-    fromDomainId: toNumber(domainId),
+    fromDomainId: getDomainDatabaseId(colonyAddress, toNumber(domainId)),
     tokenAddress,
     amount: amount.toString(),
     initiatorAddress,
