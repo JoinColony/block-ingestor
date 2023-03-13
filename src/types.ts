@@ -75,4 +75,5 @@ export enum ColonyActionType {
   UnlockToken = 'UNLOCK_TOKEN',
   MoveFunds = 'MOVE_FUNDS',
   ColonyEdit = 'COLONY_EDIT',
+  VersionUpgrade = 'VERSION_UPGRADE',
 }
