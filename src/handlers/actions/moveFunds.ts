@@ -40,7 +40,6 @@ export default async (event: ContractEvent): Promise<void> => {
   const hasPaymentAddedEvent = receipt.logs.some((log) =>
     log.topics.includes(utils.id(ContractEventsSignatures.PaymentAdded)),
   );
-  console.log('has payment added: ', hasPaymentAddedEvent);
 
   if (hasPaymentAddedEvent) {
     verbose(
