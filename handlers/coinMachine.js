@@ -28,7 +28,11 @@ async function handleCoinMachineInitialised(args, coinMachineAddress) {
         query: `
             mutation UpdateSaleMutation {
               updateSale(
-              input: { id: "${sale.id}", status: INITIALISED }
+              input: {
+                id: "${sale.id}",
+                status: INITIALISED,
+                soldOut: false
+              }
               condition: {}
             ) {
               id
@@ -130,7 +134,7 @@ async function handleTokensBought(args, coinMachineAddress, contract) {
     if (!sale) return [];
 
     // Create Order History Entry
-    const { tokenDecimals, purchaseToken, id, endDate, userCount } = sale;
+    const { tokenDecimals, purchaseToken, id, userCount } = sale;
     const purchaseTokenDecimals = purchaseTokens.find(
       (token) => token.tokenAddress === purchaseToken
     )?.decimals;
@@ -174,10 +178,7 @@ async function handleTokensBought(args, coinMachineAddress, contract) {
       totalIntake,
       purchaseTokenDecimals
     );
-    const saleEnded = totalSold.gte(tokenBalance) || totalIntake.gte(intakeCap);
-    const updatedEndDate = saleEnded
-      ? `"${new Date().toISOString()}"`
-      : endDate;
+    const soldOut = totalSold.gte(tokenBalance) || totalIntake.gte(intakeCap);
     const saleUpdateQuery = {
       operationName: "UpdateSaleMutation",
       query: `
@@ -187,7 +188,7 @@ async function handleTokensBought(args, coinMachineAddress, contract) {
             id: "${id}",
             totalSold: "${formattedSold}",
             totalIntake: "${formattedIntake}",
-            endDate: ${updatedEndDate}
+            soldOut: ${soldOut}
             userCount: ${firstTimeBuy ? userCount + 1 : userCount}
           }
           condition: {}
