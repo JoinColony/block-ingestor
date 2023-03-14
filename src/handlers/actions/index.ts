@@ -6,3 +6,4 @@ export { default as handleTokenUnlockedAction } from './unlockToken';
 export { default as handleMoveFundsAction } from './moveFunds';
 export { default as handleEditColonyAction } from './editColony';
 export { default as handleVersionUpgradeAction } from './versionUpgrade';
+export { default as handleManageReputationAction } from './manageReputation';
