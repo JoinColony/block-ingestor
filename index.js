@@ -94,11 +94,11 @@ const subsribeToCoinMachine = async (coinMachineAddress, provider) => {
     const contract = await new ethers.Contract(coinMachineAddress, coinMachine.abi, provider);
     contract.on('*', async(event) => {
       const parsed = contract.interface.parseLog(event);
-      const handler =  CoinMachineEvents[event.event];
+      const handler = CoinMachineEvents[event.event];
       if (!handler) return;
-      const query = await handler(parsed.args, coinMachineAddress, contract);
+      const queries = await handler(parsed.args, coinMachineAddress, contract);
       try {
-        await poorMansGraphQL(query);
+        Promise.all(queries.map((query) => poorMansGraphQL(query)));
         output(`Database updated after event: ${event.event}`);
       } catch (error) {
         console.log(error);

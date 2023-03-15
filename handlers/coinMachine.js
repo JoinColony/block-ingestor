@@ -22,13 +22,17 @@ async function handleCoinMachineInitialised(args, coinMachineAddress) {
       const { body } = await poorMansGraphQL(querySaleByCoinMachineAddress);
       const result = JSON.parse(body);
       const sale = result.data.getSalebyCoinMachineAddress.items[0];
-      if (!sale) return;
+      if (!sale) return [];
       const query = {
         operationName: "UpdateSaleMutation",
         query: `
             mutation UpdateSaleMutation {
               updateSale(
-              input: { id: "${sale.id}", status: INITIALISED }
+              input: {
+                id: "${sale.id}",
+                status: INITIALISED,
+                soldOut: false
+              }
               condition: {}
             ) {
               id
@@ -37,7 +41,7 @@ async function handleCoinMachineInitialised(args, coinMachineAddress) {
         `,
         variables: null,
       };
-      return query;
+      return [ query ];
     } catch (error) {
       console.log(error);
       // silent error
@@ -70,7 +74,7 @@ async function handleCoinMachineStateSet(args, coinMachineAddress) {
       const { body } = await poorMansGraphQL(querySaleByCoinMachineAddress);
       const result = JSON.parse(body);
       const sale = result.data.getSalebyCoinMachineAddress.items[0];
-      if (!sale) return;
+      if (!sale) return [];
       const { state } = args;
       const query = {
         operationName: "UpdateSaleMutation",
@@ -86,7 +90,7 @@ async function handleCoinMachineStateSet(args, coinMachineAddress) {
         `,
         variables: null,
       };
-      return query;
+      return [ query ];
     } catch (error) {
       console.log(error);
       // silent error
@@ -95,6 +99,8 @@ async function handleCoinMachineStateSet(args, coinMachineAddress) {
 
 
 async function handleTokensBought(args, coinMachineAddress, contract) {
+  const { buyer, numTokens, totalCost } = args;
+
   const querySaleByCoinMachineAddress = {
     operationName: "GetSalebyCoinMachineAddress",
     query: `
@@ -106,6 +112,14 @@ async function handleTokensBought(args, coinMachineAddress, contract) {
             tokenDecimals
             tokenAddress
             purchaseToken
+            id
+            endDate
+            userCount
+            users(filter: {userID: {eq: "${buyer}"}}) {
+              items {
+                userID
+              }
+            }
           }
         }
       }
@@ -117,12 +131,13 @@ async function handleTokensBought(args, coinMachineAddress, contract) {
     const { body } = await poorMansGraphQL(querySaleByCoinMachineAddress);
     const result = JSON.parse(body);
     const sale = result.data.getSalebyCoinMachineAddress.items[0];
-    if (!sale) return;
-    const { tokenDecimals, purchaseToken } = sale;
+    if (!sale) return [];
+
+    // Create Order History Entry
+    const { tokenDecimals, purchaseToken, id, userCount } = sale;
     const purchaseTokenDecimals = purchaseTokens.find(
-      (token) => token.tokenAddress === purchaseToken,
+      (token) => token.tokenAddress === purchaseToken
     )?.decimals;
-    const { buyer, numTokens, totalCost } = args;
     const tokens = ethers.utils.formatUnits(numTokens, tokenDecimals);
     const cost = ethers.utils.formatUnits(totalCost, purchaseTokenDecimals);
     const currentPeriod = await contract.getCurrentPeriod();
@@ -146,7 +161,72 @@ async function handleTokensBought(args, coinMachineAddress, contract) {
       `,
       variables: null,
     };
-    return query;
+
+    // Update Sale Information
+    const firstTimeBuy = sale.users.items.length === 0;
+
+    const [totalSold, totalIntake, tokenBalance, intakeCap] = await Promise.all(
+      [
+        contract.getSoldTotal(),
+        contract.getTotalIntake(),
+        contract.getTokenBalance(),
+        contract.intakeCap(),
+      ]
+    );
+    const formattedSold = ethers.utils.formatUnits(totalSold, tokenDecimals);
+    const formattedIntake = ethers.utils.formatUnits(
+      totalIntake,
+      purchaseTokenDecimals
+    );
+    const soldOut = totalSold.gte(tokenBalance) || totalIntake.gte(intakeCap);
+    const saleUpdateQuery = {
+      operationName: "UpdateSaleMutation",
+      query: `
+        mutation UpdateSaleMutation {
+          updateSale(
+          input: {
+            id: "${id}",
+            totalSold: "${formattedSold}",
+            totalIntake: "${formattedIntake}",
+            soldOut: ${soldOut}
+            userCount: ${firstTimeBuy ? userCount + 1 : userCount}
+          }
+          condition: {}
+        ) {
+          id
+        }
+      }
+      `,
+      variables: null,
+    };
+
+    const queries = [query, saleUpdateQuery];
+
+    if (firstTimeBuy) {
+      // Create User Sale Connection
+      const createUserSaleConnection = {
+        operationName: "CreateUserSales",
+        query: `
+          mutation CreateUserSales {
+            createUserSales(
+            input: {
+              userID: "${buyer}",
+              saleID: "${id}"
+            }
+            condition: {}
+          ) {
+            id
+          }
+        }
+      `,
+        variables: null,
+      };
+
+      return [...queries, createUserSaleConnection];
+    }
+
+    return queries;
+
   } catch (error) {
     console.log(error);
     // silent error
