@@ -77,5 +77,6 @@ export enum ColonyActionType {
   MoveFunds = 'MOVE_FUNDS',
   ColonyEdit = 'COLONY_EDIT',
   VersionUpgrade = 'VERSION_UPGRADE',
-  ManageReputation = 'MANAGE_REPUTATION',
+  EmitDomainReputationPenalty = 'EMIT_DOMAIN_REPUTATION_PENALTY',
+  EmitDomainReputationReward = 'EMIT_DOMAIN_REPUTATION_REWARD',
 }

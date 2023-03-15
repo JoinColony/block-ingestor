@@ -20,7 +20,7 @@ import {
   handleEditDomainAction,
   handleEditColonyAction,
   handleVersionUpgradeAction,
-  handleManageReputationAction,
+  handleEmitDomainReputationAction,
 } from './handlers';
 
 dotenv.config();
@@ -148,7 +148,7 @@ export default async (event: ContractEvent): Promise<void> => {
     }
 
     case ContractEventsSignatures.ArbitraryReputationUpdate: {
-      await handleManageReputationAction(event);
+      await handleEmitDomainReputationAction(event);
       return;
     }
 
