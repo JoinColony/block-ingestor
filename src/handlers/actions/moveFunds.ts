@@ -5,10 +5,21 @@ import {
   ColonyClientV3,
   ColonyClientV4,
 } from '@colony/colony-js';
-import { BigNumber } from 'ethers';
-import networkClient from '~/networkClient';
-import { ColonyActionType, ContractEvent } from '~/types';
-import { toNumber, writeActionFromEvent, getDomainDatabaseId } from '~/utils';
+import { BigNumber, utils } from 'ethers';
+
+import networkClient from '~networkClient';
+import {
+  ColonyActionType,
+  ContractEvent,
+  ContractEventsSignatures,
+} from '~types';
+import {
+  toNumber,
+  writeActionFromEvent,
+  getDomainDatabaseId,
+  verbose,
+} from '~utils';
+import provider from '~provider';
 
 /**
  * The handler makes use of colonyClient getDomainFromFundingPot method which is only
@@ -25,6 +36,18 @@ const isSupportedColonyClient = (
   (colonyClient as SupportedColonyClient).getDomainFromFundingPot !== undefined;
 
 export default async (event: ContractEvent): Promise<void> => {
+  const receipt = await provider.getTransactionReceipt(event.transactionHash);
+  const hasPaymentAddedEvent = receipt.logs.some((log) =>
+    log.topics.includes(utils.id(ContractEventsSignatures.PaymentAdded)),
+  );
+
+  if (hasPaymentAddedEvent) {
+    verbose(
+      'Not acting upon the ColonyFundsMovedBetweenFundingPots event as a PaymentAdded event was present in the same transaction',
+    );
+    return;
+  }
+
   const { contractAddress: colonyAddress } = event;
   const {
     agent: initiatorAddress,
