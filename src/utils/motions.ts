@@ -3,7 +3,12 @@ import { BigNumber } from 'ethers';
 import Decimal from 'decimal.js';
 
 import { mutate } from '~amplifyClient';
-import { ContractEvent, AugmentedMotionData, motionNameMapping } from '~types';
+import {
+  ContractEvent,
+  AugmentedMotionData,
+  motionNameMapping,
+  MotionStakeFragment,
+} from '~types';
 
 import { getColonyTokenAddress } from './tokens';
 import { getVotingClient } from './clients';
@@ -12,13 +17,13 @@ import { getDomainDatabaseId } from './domains';
 export const convertStakeToPercentage = (
   stake: string | Decimal,
   requiredStake: Decimal,
-) => new Decimal(stake).div(requiredStake).mul(100).toDP(2).toString();
+): string => new Decimal(stake).div(requiredStake).mul(100).toDP(2).toString();
 
 export const getMotionStakePercentages = (
   yay: BigNumber,
   nay: BigNumber,
   requiredStake: Decimal,
-) => ({
+): MotionStakeFragment => ({
   yay: convertStakeToPercentage(yay.toString(), requiredStake),
   nay: convertStakeToPercentage(nay.toString(), requiredStake),
 });
@@ -26,7 +31,7 @@ export const getMotionStakePercentages = (
 export const getRequiredStake = async (
   colonyAddress: string,
   skillRep: string,
-) => {
+): Promise<Decimal> => {
   const votingReputationClient = await getVotingClient(colonyAddress);
   const totalStakeFraction =
     await votingReputationClient.getTotalStakeFraction();
@@ -40,7 +45,7 @@ export const extractDataFromMotion = async (
   motionId: BigNumber,
   colonyClient: AnyColonyClient,
   colonyAddress: string,
-) => {
+): Promise<AugmentedMotionData> => {
   const votingClient = await colonyClient.getExtensionClient(
     Extension.VotingReputation,
   );
@@ -93,7 +98,7 @@ export const writeMintTokensMotionToDB = async (
     args: { creator, domainId },
   }: ContractEvent,
   { parsedAction, motionData }: AugmentedMotionData,
-) => {
+): Promise<void> => {
   const { name, args: actionArgs } = parsedAction;
   const amount = actionArgs[0].toString();
   const tokenAddress = await getColonyTokenAddress(colonyAddress);

@@ -1,16 +1,4 @@
-interface VotingReputationParams {
-  requiredStake: string;
+export interface VotingReputationConfig {
   minimumStake: string;
-}
-
-export interface CreateExtensionInput extends Record<string, any> {
-  colonyId: string;
-  hash: string;
-  version: number;
-  installedBy: string;
-  installedAt: number;
-  isDeprecated: boolean;
-  isDeleted: boolean;
-  isInitialized: boolean;
-  extensionConfig: VotingReputationParams | null;
+  requiredStake: string;
 }

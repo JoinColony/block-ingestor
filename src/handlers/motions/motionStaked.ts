@@ -3,7 +3,7 @@ import { ContractEvent, MotionQuery } from '~types';
 import { verbose, getRequiredStake } from '~utils';
 import { getMotionSide, updateMotionStakeInDB } from './helpers';
 
-export default async (event: ContractEvent) => {
+export default async (event: ContractEvent): Promise<void> => {
   const {
     contractAddress: colonyAddress,
     args: { vote, amount, staker, motionId: rawMotionId },

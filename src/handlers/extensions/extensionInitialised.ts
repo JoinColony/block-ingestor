@@ -21,7 +21,7 @@ export default async (event: ContractEvent): Promise<void> => {
     },
   });
 
-  /* Listen for motions once Voting Reputation is enabled.*/
+  /* Listen for motions once Voting Reputation is enabled. */
   if (getExtensionHash(Extension.VotingReputation) === extensionHash) {
     await motionSpecificEventsListener(colonyAddress);
 

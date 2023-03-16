@@ -27,22 +27,22 @@ export const motionNameMapping: { [key: string]: ColonyActionType } = {
   // emitDomainReputationReward: ColonyMotions.EmitDomainReputationRewardMotion,
 };
 
-export type MotionQuery = {
+export interface MotionQuery {
   id: string;
   motionData: MotionData;
-};
+}
 
 export enum MotionSide {
   YAY = 'yay',
   NAY = 'nay',
 }
 
-interface MotionStakeFragment {
+export interface MotionStakeFragment {
   [MotionSide.YAY]: string;
   [MotionSide.NAY]: string;
 }
 
-interface MotionStakes {
+export interface MotionStakes {
   raw: MotionStakeFragment;
   percentage: MotionStakeFragment;
 }

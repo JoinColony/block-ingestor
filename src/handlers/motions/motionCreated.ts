@@ -1,4 +1,3 @@
-import { motionSpecificEventsListener } from '~eventListener';
 import networkClient from '~networkClient';
 import { ColonyOperations, ContractEvent } from '~types';
 import {
@@ -7,7 +6,7 @@ import {
   writeMintTokensMotionToDB,
 } from '~utils';
 
-export default async (event: ContractEvent) => {
+export default async (event: ContractEvent): Promise<void> => {
   const {
     contractAddress: colonyAddress,
     args: { motionId },
@@ -23,7 +22,7 @@ export default async (event: ContractEvent) => {
 
     const contractOperation = motionData.parsedAction.name;
 
-    /* Handle the action type-specific mutation here*/
+    /* Handle the action type-specific mutation here */
     switch (contractOperation) {
       case ColonyOperations.MintTokens: {
         await writeMintTokensMotionToDB(event, motionData);
@@ -34,8 +33,6 @@ export default async (event: ContractEvent) => {
       }
     }
     verbose(`${contractOperation} Motion Created`);
-
-    await motionSpecificEventsListener(colonyAddress);
   } catch {
     verbose('Unable to create Motion.');
   }

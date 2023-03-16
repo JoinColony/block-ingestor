@@ -11,7 +11,9 @@ import {
 import { ContractEventsSignatures } from './types';
 import { INITIALISABLE_EXTENSION_IDS } from './constants';
 
-export const motionSpecificEventsListener = async (colonyAddress: string) => {
+export const motionSpecificEventsListener = async (
+  colonyAddress: string,
+): Promise<void> => {
   await addMotionEventListener(
     ContractEventsSignatures.MotionCreated,
     colonyAddress,

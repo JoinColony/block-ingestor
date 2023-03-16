@@ -4,7 +4,7 @@ import { Extension, getExtensionHash, getLogs } from '@colony/colony-js';
 
 import networkClient from '~networkClient';
 import { mutate } from '~amplifyClient';
-import { ContractEvent, CreateExtensionInput } from '~types';
+import { ContractEvent, VotingReputationConfig } from '~types';
 import { verbose, toNumber } from '~utils';
 
 import { getExtensionContract } from './contracts';
@@ -64,7 +64,7 @@ export const writeExtensionFromEvent = async (
     colony,
   );
 
-  const input: CreateExtensionInput = {
+  const input: Record<string, any> = {
     colonyId: colony,
     hash: extensionHash,
     version: overrideVersion ?? convertedVersion,
@@ -179,7 +179,7 @@ export const isExtensionInitialised = async (
 const getExtensionConfig = async (
   extensionId: Extension,
   colonyAddress: string,
-) => {
+): Promise<VotingReputationConfig | null> => {
   switch (extensionId) {
     case Extension.VotingReputation: {
       const colonyClient = await networkClient.getColonyClient(colonyAddress);
@@ -207,7 +207,7 @@ const getExtensionConfig = async (
 export const writeVotingReputationInitParamsToDB = async (
   extensionAddress: string,
   colonyAddress: string,
-) => {
+): Promise<void> => {
   const extensionConfig = await getExtensionConfig(
     Extension.VotingReputation,
     colonyAddress,
