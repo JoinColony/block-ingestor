@@ -2,13 +2,11 @@ import { ClientType } from '@colony/colony-js';
 import { Log } from '@ethersproject/abstract-provider';
 import { utils } from 'ethers';
 
-import { mapLogToContractEvent } from '~utils/events';
+import { mapLogToContractEvent, getExtensionContract, verbose } from '~utils';
 import { addEvent } from '~eventQueue';
 import networkClient from '~networkClient';
 import { ContractEventsSignatures } from '~types';
 
-import { getExtensionContract } from '../extensions';
-import { verbose } from '../logger';
 import { eventListenerGenerator } from './eventListenerGenerator';
 /**
  * Network Client specific event listener,

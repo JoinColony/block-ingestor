@@ -15,7 +15,7 @@ import {
   ChainMetadataInput,
 } from '~graphql';
 
-import { verbose } from './logger';
+import { verbose } from '../logger';
 
 /**
  * Convert a Set that contains a JSON string, back into JS form
