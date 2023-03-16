@@ -6,7 +6,7 @@ import { ContractEvent, ContractEventsSignatures } from '~types';
 import { mutate, query } from '~amplifyClient';
 import { getChainId } from '~provider';
 
-import { verbose } from './logger';
+import { verbose } from '../logger';
 
 /**
  * Convert a Set that contains a JSON string, back into JS form

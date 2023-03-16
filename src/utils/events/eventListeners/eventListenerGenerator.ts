@@ -6,7 +6,7 @@ import { query } from '~amplifyClient';
 import { addEvent } from '~eventQueue';
 import networkClient from '~networkClient';
 import { ContractEventsSignatures, NetworkClients } from '~types';
-import { verbose } from '~utils/logger';
+import { verbose } from '~utils';
 
 /**
  * Generator method for events listeners
