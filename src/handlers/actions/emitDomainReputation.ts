@@ -3,7 +3,7 @@ import { BigNumber } from 'ethers';
 import { Id, getEvents } from '@colony/colony-js';
 import networkClient from '~networkClient';
 import { ColonyActionType, ContractEvent } from '~types';
-import { toNumber, writeActionFromEvent, getDomainDatabaseId } from '~utils';
+import { toNumber, writeActionFromEvent, getDomainDatabaseId, findAsyncSequential } from '~utils';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { contractAddress: colonyAddress } = event;
@@ -17,20 +17,13 @@ export default async (event: ContractEvent): Promise<void> => {
   const domainAddedFilter = colonyClient.filters.DomainAdded(null, null);
   const domainAddedEvents = await getEvents(colonyClient, domainAddedFilter);
 
-  const colonyDomains = await Promise.all(
-    domainAddedEvents.map(async (domain) => {
-      const domainId = domain.args.domainId.toString();
-      const { skillId } = await colonyClient.getDomain(domainId);
-      return {
-        skillId,
-        domainId,
-      };
-    }),
-  );
+  const changeDomain = await findAsyncSequential(domainAddedEvents, async (domain) => {
+    const domainId = domain.args.domainId.toString();
+    const { skillId: domainSkillId } = await colonyClient.getDomain(domainId);
+    return domainSkillId.eq(skillId);
+  });
 
-  const changeDomain = colonyDomains.find((domain) =>
-    domain.skillId.eq(skillId),
-  );
+  const changeDomainId = changeDomain ? changeDomain?.args.domainId.toString() : Id.RootDomain;
 
   await writeActionFromEvent(event, colonyAddress, {
     type: actionType,
@@ -38,6 +31,6 @@ export default async (event: ContractEvent): Promise<void> => {
     recipientAddress: userAddress,
     skillId: toNumber(skillId),
     amount: amount.toString(),
-    fromDomainId: getDomainDatabaseId(colonyAddress, changeDomain?.domainId ?? Id.RootDomain),
+    fromDomainId: getDomainDatabaseId(colonyAddress, changeDomainId),
   });
 };
