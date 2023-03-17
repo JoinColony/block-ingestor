@@ -61,7 +61,7 @@ const startIngestor = async (): Promise<void> => {
   /*
    * Setup all listeners we care about
    */
-  await blockListener();
+  blockListener();
   await eventListener();
 };
 

@@ -1,3 +1,9 @@
+import {
+  AnyColonyClient,
+  AnyVotingReputationClient,
+  ColonyNetworkClient,
+  TokenClient,
+} from '@colony/colony-js';
 import { LogDescription } from '@ethersproject/abi';
 
 /*
@@ -52,6 +58,9 @@ export enum ContractEventsSignatures {
   TokenUnlocked = 'TokenUnlocked(address)',
   ColonyFundsMovedBetweenFundingPots = 'ColonyFundsMovedBetweenFundingPots(address,uint256,uint256,uint256,address)',
   ColonyMetadata = 'ColonyMetadata(address,string)',
+
+  // Motions
+  MotionCreated = 'MotionCreated(uint256,address,uint256)',
 }
 
 /*
@@ -76,4 +85,31 @@ export enum ColonyActionType {
   MoveFunds = 'MOVE_FUNDS',
   ColonyEdit = 'COLONY_EDIT',
   VersionUpgrade = 'VERSION_UPGRADE',
+  MintTokensMotion = 'MINT_TOKENS_MOTION',
 }
+/*
+ * Contract calls
+ */
+export enum ColonyOperations {
+  MintTokens = 'mintTokens',
+}
+
+export const motionNameMapping: { [key: string]: ColonyActionType } = {
+  [ColonyOperations.MintTokens]: ColonyActionType.MintTokensMotion,
+  // makePaymentFundedFromDomain: ColonyMotions.PaymentMotion,
+  // unlockToken: ColonyMotions.UnlockTokenMotion,
+  // addDomain: ColonyMotions.CreateDomainMotion,
+  // editDomain: ColonyMotions.EditDomainMotion,
+  // editColony: ColonyMotions.ColonyEditMotion,
+  // setUserRoles: ColonyMotions.SetUserRolesMotion,
+  // moveFundsBetweenPots: ColonyMotions.MoveFundsMotion,
+  // upgrade: ColonyMotions.VersionUpgradeMotion,
+  // emitDomainReputationPenalty: ColonyMotions.EmitDomainReputationPenaltyMotion,
+  // emitDomainReputationReward: ColonyMotions.EmitDomainReputationRewardMotion,
+};
+
+export type NetworkClients =
+  | ColonyNetworkClient
+  | TokenClient
+  | AnyColonyClient
+  | AnyVotingReputationClient;
