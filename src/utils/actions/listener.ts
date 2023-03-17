@@ -1,4 +1,4 @@
-import { ContractEventsSignatures } from '~/types';
+import { ContractEventsSignatures } from '~types';
 
 import { addColonyEventListener } from '../events';
 

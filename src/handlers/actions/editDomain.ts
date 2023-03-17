@@ -1,16 +1,16 @@
 import { utils } from 'ethers';
-import provider from '~/provider';
+import provider from '~provider';
 import {
   ColonyActionType,
   ContractEvent,
   ContractEventsSignatures,
-} from '~/types';
+} from '~types';
 import {
   toNumber,
   verbose,
   writeActionFromEvent,
   getDomainDatabaseId,
-} from '~/utils';
+} from '~utils';
 
 export default async (event: ContractEvent): Promise<void> => {
   const receipt = await provider.getTransactionReceipt(event.transactionHash);
