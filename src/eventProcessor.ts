@@ -23,7 +23,7 @@ import {
   handleMotionCreated,
   handleMotionStaked,
 } from './handlers';
-
+import { RemoveListener } from './utils';
 dotenv.config();
 
 /*
@@ -37,6 +37,17 @@ dotenv.config();
  *   return;
  * }
  */
+
+export interface EventProcessorContext {
+  removeListeners: {
+    [address: string]: {
+      [handler: string]: RemoveListener[];
+    };
+  };
+}
+
+const context: EventProcessorContext = { removeListeners: {} };
+
 export default async (event: ContractEvent): Promise<void> => {
   if (!event.signature) {
     throw new Error(
@@ -89,7 +100,7 @@ export default async (event: ContractEvent): Promise<void> => {
     }
 
     case ContractEventsSignatures.ExtensionUninstalled: {
-      await handleExtensionUninstalled(event);
+      await handleExtensionUninstalled(event, context);
       return;
     }
 
@@ -104,7 +115,7 @@ export default async (event: ContractEvent): Promise<void> => {
     }
 
     case ContractEventsSignatures.ExtensionInitialised: {
-      await handleExtensionInitialised(event);
+      await handleExtensionInitialised(event, context);
       return;
     }
 

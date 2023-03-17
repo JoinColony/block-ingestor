@@ -7,21 +7,26 @@ import {
   addTokenEventListener,
   addActionEventListeners,
   addMotionEventListener,
+  RemoveListener,
 } from './utils';
 import { ContractEventsSignatures } from './types';
 import { INITIALISABLE_EXTENSION_IDS } from './constants';
 
 export const motionSpecificEventsListener = async (
   colonyAddress: string,
-): Promise<void> => {
-  await addMotionEventListener(
-    ContractEventsSignatures.MotionCreated,
-    colonyAddress,
-  );
-  await addMotionEventListener(
-    ContractEventsSignatures.MotionStaked,
-    colonyAddress,
-  );
+): Promise<RemoveListener[]> => {
+  const removeListeners: RemoveListener[] = [
+    await addMotionEventListener(
+      ContractEventsSignatures.MotionCreated,
+      colonyAddress,
+    ),
+    await addMotionEventListener(
+      ContractEventsSignatures.MotionStaked,
+      colonyAddress,
+    ),
+  ];
+
+  return removeListeners;
 };
 /*
  * All events that need to be tracked on a single colony go in here
