@@ -1,9 +1,9 @@
 import { BigNumber } from 'ethers';
 
-import { Id, getEvents } from '@colony/colony-js';
+import { getEvents } from '@colony/colony-js';
 import networkClient from '~networkClient';
 import { ColonyActionType, ContractEvent } from '~types';
-import { toNumber, writeActionFromEvent, getDomainDatabaseId, findAsyncSequential } from '~utils';
+import { writeActionFromEvent, getDomainDatabaseId, findAsyncSequential, verbose } from '~utils';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { contractAddress: colonyAddress } = event;
@@ -23,14 +23,18 @@ export default async (event: ContractEvent): Promise<void> => {
     return domainSkillId.eq(skillId);
   });
 
-  const changeDomainId = changeDomain ? changeDomain?.args.domainId.toString() : Id.RootDomain;
+  if (!changeDomain) {
+    verbose(
+      'Not acting upon the emitDomainReputation event as a domain matching the skillId was not found',
+    );
+    return;
+  }
 
   await writeActionFromEvent(event, colonyAddress, {
     type: actionType,
     initiatorAddress,
     recipientAddress: userAddress,
-    skillId: toNumber(skillId),
     amount: amount.toString(),
-    fromDomainId: getDomainDatabaseId(colonyAddress, changeDomainId),
+    fromDomainId: getDomainDatabaseId(colonyAddress, changeDomain?.args.domainId.toString()),
   });
 };
