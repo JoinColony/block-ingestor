@@ -76,7 +76,7 @@ const getEventFilter = (
   eventSignature: string,
   contractAddress: string,
   clientType: ClientType,
-) => {
+): { topics: Array<string | null>; address?: string } => {
   const filter: { topics: Array<string | null>; address?: string } = {
     topics: [utils.id(eventSignature)],
   };
@@ -113,7 +113,7 @@ const addEventToQueue = async (
   contractAddress: string,
   log: Log,
   provider: Provider,
-) => {
+): Promise<void> => {
   const {
     transactionHash,
     logIndex,
@@ -123,7 +123,7 @@ const addEventToQueue = async (
   try {
     const { hash: blockHash, timestamp } = await provider.getBlock(blockNumber);
 
-    let event = {
+    const event = {
       blockNumber,
       transactionHash,
       logIndex,
