@@ -1,12 +1,12 @@
 import networkClient from '~networkClient';
 import { ColonyOperations, ContractEvent } from '~types';
 import {
-  verbose,
   getParsedActionFromMotion,
+  verbose,
   writeMintTokensMotionToDB,
 } from '~utils';
 
-export default async (event: ContractEvent) => {
+export default async (event: ContractEvent): Promise<void> => {
   const {
     contractAddress: colonyAddress,
     args: { motionId },
@@ -18,7 +18,7 @@ export default async (event: ContractEvent) => {
   if (parsedAction) {
     const contractOperation = parsedAction.name;
 
-    /* Handle the action type-specific mutation here*/
+    /* Handle the action type-specific mutation here */
     switch (contractOperation) {
       case ColonyOperations.MintTokens: {
         await writeMintTokensMotionToDB(event, parsedAction);

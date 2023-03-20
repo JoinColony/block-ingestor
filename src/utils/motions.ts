@@ -10,7 +10,7 @@ import { getColonyTokenAddress } from './tokens';
 export const getParsedActionFromMotion = async (
   motionId: string,
   colonyClient: AnyColonyClient,
-) => {
+): Promise<TransactionDescription | undefined> => {
   const votingClient = await colonyClient.getExtensionClient(
     Extension.VotingReputation,
   );
@@ -35,7 +35,7 @@ export const writeMintTokensMotionToDB = async (
     args: { creator, domainId },
   }: ContractEvent,
   parsedAction: TransactionDescription,
-) => {
+): Promise<void> => {
   const { name, args: actionArgs } = parsedAction;
   const amount = actionArgs[0].toString();
   const tokenAddress = await getColonyTokenAddress(colonyAddress);
