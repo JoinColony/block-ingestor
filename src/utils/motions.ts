@@ -32,7 +32,7 @@ export const writeMintTokensMotionToDB = async (
     transactionHash,
     contractAddress: colonyAddress,
     blockNumber,
-    args: { creator, domainId },
+    args: { motionId, creator, domainId },
   }: ContractEvent,
   parsedAction: TransactionDescription,
 ): Promise<void> => {
@@ -45,6 +45,9 @@ export const writeMintTokensMotionToDB = async (
       colonyId: colonyAddress,
       type: motionNameMapping[name],
       isMotion: true,
+      motionData: {
+        motionId: motionId.toString(),
+      },
       tokenAddress,
       fromDomainId: getDomainDatabaseId(colonyAddress, domainId),
       initiatorAddress: creator,
