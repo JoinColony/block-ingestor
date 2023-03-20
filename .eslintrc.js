@@ -25,5 +25,13 @@ module.exports = {
     'no-useless-return': 'off',
     '@typescript-eslint/member-delimiter-style': 'off',
     '@typescript-eslint/indent': 'off',
+    '@typescript-eslint/space-before-function-paren': [
+      'error',
+      {
+        anonymous: 'always',
+        named: 'never',
+        asyncArrow: 'always',
+      },
+    ],
   },
 };

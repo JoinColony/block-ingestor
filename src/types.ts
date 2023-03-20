@@ -27,18 +27,31 @@ export enum QueueEvents {
  * All contract events signatures we deal with
  */
 export enum ContractEventsSignatures {
-  UknownEvent = 'UknownEvent()',
+  UnknownEvent = 'UnknownEvent()',
   ColonyAdded = 'ColonyAdded(uint256,address,address)',
   Transfer = 'Transfer(address,address,uint256)',
   ColonyFundsClaimed = 'ColonyFundsClaimed(address,address,uint256,uint256)',
   ColonyVersionAdded = 'ColonyVersionAdded(uint256,address)',
   ColonyUpgraded = 'ColonyUpgraded(address,uint256,uint256)',
+
+  // Extensions
   ExtensionAddedToNetwork = 'ExtensionAddedToNetwork(bytes32,uint256)',
   ExtensionInstalled = 'ExtensionInstalled(bytes32,address,uint256)',
   ExtensionUninstalled = 'ExtensionUninstalled(bytes32,address)',
   ExtensionDeprecated = 'ExtensionDeprecated(bytes32,address,bool)',
   ExtensionUpgraded = 'ExtensionUpgraded(indexed bytes32,indexed address,uint256)',
   ExtensionInitialised = 'ExtensionInitialised()',
+
+  // Actions
+  TokensMinted = 'TokensMinted(address,address,uint256)',
+  PaymentAdded = 'PaymentAdded(address,uint256)',
+  PayoutClaimed = 'PayoutClaimed(address,uint256,address,uint256)',
+  OneTxPaymentMade = 'OneTxPaymentMade(address,uint256,uint256)',
+  DomainAdded = 'DomainAdded(address,uint256)',
+  DomainMetadata = 'DomainMetadata(address,uint256,string)',
+  TokenUnlocked = 'TokenUnlocked(address)',
+  ColonyFundsMovedBetweenFundingPots = 'ColonyFundsMovedBetweenFundingPots(address,uint256,uint256,uint256,address)',
+  ColonyMetadata = 'ColonyMetadata(address,string)',
 }
 
 /*
@@ -50,3 +63,17 @@ export enum EthersObserverEvents {
 }
 
 export type ChainID = number;
+
+/*
+ * GraphQL ColonyActionType enum
+ */
+export enum ColonyActionType {
+  MintTokens = 'MINT_TOKENS',
+  Payment = 'PAYMENT',
+  CreateDomain = 'CREATE_DOMAIN',
+  EditDomain = 'EDIT_DOMAIN',
+  UnlockToken = 'UNLOCK_TOKEN',
+  MoveFunds = 'MOVE_FUNDS',
+  ColonyEdit = 'COLONY_EDIT',
+  VersionUpgrade = 'VERSION_UPGRADE',
+}

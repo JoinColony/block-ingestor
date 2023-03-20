@@ -5,8 +5,8 @@
   "main": "index.ts",
   "scripts": {
     "build": "rm -rf dist/* run/* && npx tsc",
-    "start": "node dist/index.js",
-    "dev": "ts-node-dev src/index.ts",
+    "start": "node -r ts-node/register/transpile-only -r tsconfig-paths/register dist/index.js",
+    "dev": "ts-node-dev -r tsconfig-paths/register src/index.ts",
     "prod": "npm run build && NODE_ENV=production npm run start",
     "typecheck": "tsc --noEmit",
     "lint": "eslint src/ --ext .ts",
@@ -41,6 +41,7 @@
     "eslint-plugin-n": "^15.4.0",
     "eslint-plugin-promise": "^6.1.1",
     "ts-node-dev": "^2.0.0",
+    "tsconfig-paths": "^4.1.2",
     "typescript": "^4.8.4"
   }
 }

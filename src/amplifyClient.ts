@@ -77,6 +77,27 @@ export const mutations = {
       }
     }
   `,
+  createColonyAction: /* GraphQL */ `
+    mutation CreateColonyAction($input: CreateColonyActionInput!) {
+      createColonyAction(input: $input) {
+        id
+      }
+    }
+  `,
+  updateColonyAction: /* GraphQL */ `
+    mutation UpdateColonyAction($input: UpdateColonyActionInput!) {
+      updateColonyAction(input: $input) {
+        id
+      }
+    }
+  `,
+  createDomain: /* GraphQL */ `
+    mutation CreateDomain($input: CreateDomainInput!) {
+      createDomain(input: $input) {
+        id
+      }
+    }
+  `,
 };
 
 /*
