@@ -67,6 +67,7 @@ export enum ContractEventsSignatures {
 
   // Motions
   MotionCreated = 'MotionCreated(uint256,address,uint256)',
+  MotionStaked = 'MotionStaked(uint256,address,uint256,uint256)',
 }
 
 /*
@@ -100,26 +101,8 @@ export enum ColonyActionType {
 // The Filter type doesn't seem to be exported from colony-js
 export type Filter = Parameters<typeof getLogs>[1];
 
-/*
- * Contract calls
- */
-export enum ColonyOperations {
-  MintTokens = 'mintTokens',
-}
-
-export const motionNameMapping: { [key: string]: ColonyActionType } = {
-  [ColonyOperations.MintTokens]: ColonyActionType.MintTokensMotion,
-  // makePaymentFundedFromDomain: ColonyMotions.PaymentMotion,
-  // unlockToken: ColonyMotions.UnlockTokenMotion,
-  // addDomain: ColonyMotions.CreateDomainMotion,
-  // editDomain: ColonyMotions.EditDomainMotion,
-  // editColony: ColonyMotions.ColonyEditMotion,
-  // setUserRoles: ColonyMotions.SetUserRolesMotion,
-  // moveFundsBetweenPots: ColonyMotions.MoveFundsMotion,
-  // upgrade: ColonyMotions.VersionUpgradeMotion,
-  // emitDomainReputationPenalty: ColonyMotions.EmitDomainReputationPenaltyMotion,
-  // emitDomainReputationReward: ColonyMotions.EmitDomainReputationRewardMotion,
-};
+// Export here to avoid circular dependency with ColonyActionType
+export * from './motions';
 
 export type NetworkClients =
   | ColonyNetworkClient
