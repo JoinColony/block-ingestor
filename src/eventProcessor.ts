@@ -23,6 +23,7 @@ import {
   handleEmitDomainReputationAction,
   handleNetworkFeeInverseSet,
   handleMotionCreated,
+  handleMotionStaked,
 } from './handlers';
 
 dotenv.config();
@@ -117,6 +118,11 @@ export default async (event: ContractEvent): Promise<void> => {
     /* Entry point for a newly created motion. */
     case ContractEventsSignatures.MotionCreated: {
       await handleMotionCreated(event);
+      return;
+    }
+
+    case ContractEventsSignatures.MotionStaked: {
+      await handleMotionStaked(event);
       return;
     }
 
