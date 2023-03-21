@@ -32,3 +32,12 @@ export const getMotionStakes = (
 
   return motionStakes;
 };
+
+export const getRemainingStakes = (
+  requiredStake: BigNumber,
+  [totalNayStakesRaw, totalYayStakesRaw]: [BigNumber, BigNumber],
+): [string, string] => {
+  const remainingYayStake = requiredStake.sub(totalYayStakesRaw).toString();
+  const remainingNayStake = requiredStake.sub(totalNayStakesRaw).toString();
+  return [remainingNayStake, remainingYayStake];
+};
