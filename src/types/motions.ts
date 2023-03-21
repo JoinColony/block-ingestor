@@ -36,7 +36,7 @@ export interface MotionStakes {
   percentage: MotionStakeFragment;
 }
 
-interface MotionData {
+export interface MotionData {
   motionId: string;
   usersStakes: UserStakes[];
 }
