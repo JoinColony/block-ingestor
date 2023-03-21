@@ -6,6 +6,7 @@ import {
   addNetworkEventListener,
   addTokenEventListener,
   addActionEventListeners,
+  addMotionEventListener,
 } from './utils';
 import { ContractEventsSignatures } from '~types';
 import { INITIALISABLE_EXTENSION_IDS } from './constants';
@@ -27,6 +28,19 @@ export const colonySpecificEventsListener = async (
   );
   await addTokenEventListener(ContractEventsSignatures.Transfer, colonyAddress);
   await addActionEventListeners(colonyAddress);
+};
+
+export const motionSpecificEventsListener = async (
+  colonyAddress: string,
+): Promise<void> => {
+  await addMotionEventListener(
+    ContractEventsSignatures.MotionCreated,
+    colonyAddress,
+  );
+  await addMotionEventListener(
+    ContractEventsSignatures.MotionStaked,
+    colonyAddress,
+  );
 };
 
 export const extensionSpecificEventsListener = async (
