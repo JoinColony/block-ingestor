@@ -1,13 +1,13 @@
 import { query } from '~amplifyClient';
 import { ContractEvent, MotionQuery } from '~types';
-import { verbose } from '~utils';
-import { getVotingClient } from '~utils/clients';
+import { verbose, getVotingClient } from '~utils';
 import {
   getMotionSide,
   getMotionStakes,
   getRemainingStakes,
   getRequiredStake,
   getUpdatedUsersStakes,
+  updateMotionInDB,
 } from '../helpers';
 
 export default async (event: ContractEvent): Promise<void> => {
@@ -22,10 +22,7 @@ export default async (event: ContractEvent): Promise<void> => {
 
   const requiredStake = getRequiredStake(skillRep, totalStakeFraction);
   const motionStakes = getMotionStakes(requiredStake, stakes);
-  const [remainingNayStake, remainingYayStake] = getRemainingStakes(
-    requiredStake,
-    stakes,
-  );
+  const remainingStakes = getRemainingStakes(requiredStake, stakes);
 
   const { items: motions }: { items: MotionQuery[] } = await query(
     'getColonyMotions',
@@ -40,7 +37,9 @@ export default async (event: ContractEvent): Promise<void> => {
 
   if (stakedMotion) {
     const {
+      id,
       motionData: { usersStakes },
+      motionData,
     } = stakedMotion;
 
     const updatedUserStakes = getUpdatedUsersStakes(
@@ -51,8 +50,15 @@ export default async (event: ContractEvent): Promise<void> => {
       requiredStake,
     );
 
+    await updateMotionInDB(id, {
+      ...motionData,
+      usersStakes: updatedUserStakes,
+      motionStakes,
+      remainingStakes,
+    });
+
     verbose(
-      `User: ${staker} staked motion ${motionId} by ${amount.toString()} on side ${getMotionSide(
+      `User: ${staker} staked motion ${motionId.toString()} by ${amount.toString()} on side ${getMotionSide(
         vote,
       )}`,
     );
