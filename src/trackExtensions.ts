@@ -3,7 +3,6 @@ import { Extension, getExtensionHash, getLogs } from '@colony/colony-js';
 
 import networkClient from '~networkClient';
 import {
-  addMotionEventListener,
   deleteExtensionFromEvent,
   getCachedColonyClient,
   getLatestBlock,
@@ -16,8 +15,10 @@ import {
   writeExtensionVersionFromEvent,
 } from '~utils';
 import { SUPPORTED_EXTENSION_IDS } from '~constants';
-import { extensionSpecificEventsListener } from '~eventListener';
-import { ContractEventsSignatures } from './types';
+import {
+  extensionSpecificEventsListener,
+  motionSpecificEventsListener,
+} from '~eventListener';
 
 export default async (): Promise<void> => {
   const latestBlock = await getLatestBlock();
@@ -183,7 +184,7 @@ const trackExtensionEvents = async (
 
     // Listen for motions if Voting Reputation is initialised.
     if (Extension.VotingReputation === extensionId && isInitialised) {
-      addMotionEventListener(ContractEventsSignatures.MotionCreated, colony);
+      await motionSpecificEventsListener(colony);
     }
 
     await writeExtensionFromEvent(
