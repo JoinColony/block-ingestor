@@ -6,6 +6,7 @@ import {
   getMotionStakes,
   getRemainingStakes,
   getRequiredStake,
+  getStakedMotion,
   getUpdatedUsersStakes,
   updateMotionInDB,
 } from '../helpers';
@@ -31,9 +32,7 @@ export default async (event: ContractEvent): Promise<void> => {
     },
   );
 
-  const stakedMotion = motions.find(
-    ({ motionData: { motionId: id } }) => id === motionId.toString(),
-  );
+  const stakedMotion = getStakedMotion(motions, motionId);
 
   if (stakedMotion) {
     const {

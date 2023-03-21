@@ -184,6 +184,7 @@ export const queries = {
             rootHash
             motionDomainId
           }
+          createdAt
         }
       }
     }
