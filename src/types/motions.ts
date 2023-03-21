@@ -35,3 +35,18 @@ export interface MotionStakes {
   raw: MotionStakeFragment;
   percentage: MotionStakeFragment;
 }
+
+interface MotionData {
+  motionId: string;
+  usersStakes: UserStakes[];
+}
+
+export interface UserStakes {
+  address: string;
+  stakes: MotionStakes;
+}
+
+export interface MotionQuery {
+  id: string;
+  motionData: MotionData;
+}

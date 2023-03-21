@@ -1,4 +1,5 @@
-import { ContractEvent } from '~types';
+import { query } from '~amplifyClient';
+import { ContractEvent, MotionQuery } from '~types';
 import { verbose } from '~utils';
 import { getVotingClient } from '~utils/clients';
 import {
@@ -23,6 +24,13 @@ export default async (event: ContractEvent): Promise<void> => {
   const [remainingNayStake, remainingYayStake] = getRemainingStakes(
     requiredStake,
     stakes,
+  );
+
+  const { items: motions }: { items: MotionQuery[] } = await query(
+    'getColonyMotions',
+    {
+      colonyAddress,
+    },
   );
 
   verbose(
