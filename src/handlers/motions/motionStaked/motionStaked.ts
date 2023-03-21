@@ -1,8 +1,7 @@
-import { BigNumber } from 'ethers';
 import { ContractEvent } from '~types';
 import { verbose } from '~utils';
 import { getVotingClient } from '~utils/clients';
-import { getMotionSide, getRequiredStake } from '../helpers';
+import { getMotionSide, getMotionStakes, getRequiredStake } from '../helpers';
 
 export default async (event: ContractEvent): Promise<void> => {
   const {
@@ -12,20 +11,10 @@ export default async (event: ContractEvent): Promise<void> => {
 
   const votingClient = await getVotingClient(colonyAddress);
   const totalStakeFraction = await votingClient.getTotalStakeFraction();
-  const {
-    skillRep,
-    stakes: [totalNayStakesRaw, totalYayStakesRaw],
-  } = await votingClient.getMotion(motionId);
+  const { skillRep, stakes } = await votingClient.getMotion(motionId);
 
   const requiredStake = getRequiredStake(skillRep, totalStakeFraction);
-
-  const totalYayStakesPercentage = BigNumber.from(totalYayStakesRaw)
-    .div(requiredStake)
-    .mul(100);
-
-  const totalNayStakesPercentage = BigNumber.from(totalNayStakesRaw)
-    .div(requiredStake)
-    .mul(100);
+  const motionStakes = getMotionStakes(requiredStake, stakes);
 
   verbose(
     `User: ${staker} staked motion ${motionId} by ${amount.toString()} on side ${getMotionSide(

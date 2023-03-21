@@ -25,3 +25,13 @@ export const motionNameMapping: { [key: string]: ColonyActionType } = {
   // emitDomainReputationPenalty: ColonyMotions.EmitDomainReputationPenaltyMotion,
   // emitDomainReputationReward: ColonyMotions.EmitDomainReputationRewardMotion,
 };
+
+interface MotionStakeFragment {
+  [MotionSide.NAY]: string;
+  [MotionSide.YAY]: string;
+}
+
+export interface MotionStakes {
+  raw: MotionStakeFragment;
+  percentage: MotionStakeFragment;
+}
