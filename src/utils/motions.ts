@@ -1,5 +1,7 @@
 import { AnyColonyClient, Extension } from '@colony/colony-js';
 import { TransactionDescription } from 'ethers/lib/utils';
+import { motionSpecificEventsListener } from '~eventListener';
+import { getEventProcessorContext, RemoveListenerKeys } from '~eventProcessor';
 
 import { mutate } from '../amplifyClient';
 import { ContractEvent, motionNameMapping } from '../types';
@@ -55,4 +57,18 @@ export const writeMintTokensMotionToDB = async (
       blockNumber,
     },
   });
+};
+
+export const applyMotionListeners = async (
+  colonyAddress: string,
+): Promise<void> => {
+  const removeMotionListeners = await motionSpecificEventsListener(
+    colonyAddress,
+  );
+
+  const eventProcessContext = getEventProcessorContext();
+  /* Store remove listener functions in context, to be called when extension is uninstalled */
+  eventProcessContext.removeListeners[colonyAddress] = {
+    [RemoveListenerKeys.EXTENSION_INITIALISED]: removeMotionListeners,
+  };
 };
