@@ -12,13 +12,15 @@ export const getMotionStakes = (
   requiredStake: BigNumber,
   [totalNayStakesRaw, totalYayStakesRaw]: [BigNumber, BigNumber],
 ): MotionStakes => {
-  const totalYayStakesPercentage = BigNumber.from(totalYayStakesRaw)
-    .div(requiredStake)
-    .mul(100);
+  const totalYayStakesPercentage = getStakePercentage(
+    totalYayStakesRaw,
+    requiredStake,
+  );
 
-  const totalNayStakesPercentage = BigNumber.from(totalNayStakesRaw)
-    .div(requiredStake)
-    .mul(100);
+  const totalNayStakesPercentage = getStakePercentage(
+    totalNayStakesRaw,
+    requiredStake,
+  );
 
   const motionStakes: MotionStakes = {
     raw: {
@@ -43,10 +45,10 @@ export const getRemainingStakes = (
   return [remainingNayStake, remainingYayStake];
 };
 
-const getStakePercentage = (
+export const getStakePercentage = (
   stake: BigNumber,
   requiredStake: BigNumber,
-): BigNumber => stake.div(requiredStake).mul(100);
+): BigNumber => stake.mul(100).div(requiredStake);
 
 /**
  * Given staking data, format and return new UserStakes object
@@ -94,11 +96,11 @@ const getUpdatedUserStakes = (
     stakes: {
       raw: {
         ...existingUserStakes.stakes.raw,
-        [stakedSide]: updatedRawStake,
+        [stakedSide]: updatedRawStake.toString(),
       },
       percentage: {
         ...existingUserStakes.stakes.percentage,
-        [stakedSide]: updatedPercentage,
+        [stakedSide]: updatedPercentage.toString(),
       },
     },
   };
