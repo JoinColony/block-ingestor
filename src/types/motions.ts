@@ -56,4 +56,5 @@ export interface UserStakes {
 export interface MotionQuery {
   id: string;
   motionData: MotionData;
+  createdAt: string;
 }
