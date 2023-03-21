@@ -9,3 +9,4 @@ export * from './domains';
 export * from './colonyClient';
 export * from './motions';
 export * from './events';
+export * from './clients';
