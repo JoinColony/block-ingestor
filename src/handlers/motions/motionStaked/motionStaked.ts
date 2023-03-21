@@ -7,6 +7,7 @@ import {
   getMotionStakes,
   getRemainingStakes,
   getRequiredStake,
+  getUpdatedUsersStakes,
 } from '../helpers';
 
 export default async (event: ContractEvent): Promise<void> => {
@@ -33,9 +34,27 @@ export default async (event: ContractEvent): Promise<void> => {
     },
   );
 
-  verbose(
-    `User: ${staker} staked motion ${motionId} by ${amount.toString()} on side ${getMotionSide(
-      vote,
-    )}`,
+  const stakedMotion = motions.find(
+    ({ motionData: { motionId: id } }) => id === motionId.toString(),
   );
+
+  if (stakedMotion) {
+    const {
+      motionData: { usersStakes },
+    } = stakedMotion;
+
+    const updatedUserStakes = getUpdatedUsersStakes(
+      usersStakes,
+      staker,
+      vote,
+      amount,
+      requiredStake,
+    );
+
+    verbose(
+      `User: ${staker} staked motion ${motionId} by ${amount.toString()} on side ${getMotionSide(
+        vote,
+      )}`,
+    );
+  }
 };
