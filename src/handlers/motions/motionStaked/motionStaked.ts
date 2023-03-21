@@ -1,6 +1,6 @@
 import { ContractEvent } from '~types';
 import { verbose } from '~utils';
-import { getMotionSide } from './helpers';
+import { getMotionSide } from '../helpers';
 
 export default async (event: ContractEvent): Promise<void> => {
   const {
