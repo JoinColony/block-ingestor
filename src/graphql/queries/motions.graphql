@@ -36,6 +36,7 @@ query GetColonyMotions($colonyAddress: ID!) {
         rootHash
         motionDomainId
       }
+      createdAt
     }
   }
 }
