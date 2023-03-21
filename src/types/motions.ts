@@ -39,6 +39,13 @@ export interface MotionStakes {
 export interface MotionData {
   motionId: string;
   usersStakes: UserStakes[];
+  motionStakes: MotionStakes;
+  remainingStakes: [string, string];
+  userMinStake: string;
+  requiredStake: string;
+  // For calculating user's max stake in client
+  rootHash: string;
+  motionDomainId: string;
 }
 
 export interface UserStakes {
