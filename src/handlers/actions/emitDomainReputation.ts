@@ -1,9 +1,21 @@
 import { BigNumber } from 'ethers';
+import { AnyColonyClient, getEvents } from '@colony/colony-js';
 
-import { getEvents } from '@colony/colony-js';
 import networkClient from '~networkClient';
 import { ColonyActionType, ContractEvent } from '~types';
-import { writeActionFromEvent, getDomainDatabaseId, findAsyncSequential, verbose } from '~utils';
+import { writeActionFromEvent, getDomainDatabaseId, verbose } from '~utils';
+import { LogDescription } from 'ethers/lib/utils';
+
+const getChangeDomainId = async (domainAddedEvents: LogDescription[], colonyClient: AnyColonyClient, skillId: number): Promise<number | null> => {
+  for (const event of domainAddedEvents) {
+    const domainId = event.args.domainId.toString();
+    const { skillId: domainSkillId } = await colonyClient.getDomain(domainId);
+    if (domainSkillId.eq(skillId)) {
+      return domainId;
+    }
+  }
+  return null;
+};
 
 export default async (event: ContractEvent): Promise<void> => {
   const { contractAddress: colonyAddress } = event;
@@ -16,16 +28,11 @@ export default async (event: ContractEvent): Promise<void> => {
   const colonyClient = await networkClient.getColonyClient(colonyAddress);
   const domainAddedFilter = colonyClient.filters.DomainAdded(null, null);
   const domainAddedEvents = await getEvents(colonyClient, domainAddedFilter);
+  const changeDomainId = await getChangeDomainId(domainAddedEvents, colonyClient, skillId);
 
-  const changeDomain = await findAsyncSequential(domainAddedEvents, async (domain) => {
-    const domainId = domain.args.domainId.toString();
-    const { skillId: domainSkillId } = await colonyClient.getDomain(domainId);
-    return domainSkillId.eq(skillId);
-  });
-
-  if (!changeDomain) {
+  if (!changeDomainId) {
     verbose(
-      'Not acting upon the emitDomainReputation event as a domain matching the skillId was not found',
+      'Not acting upon the ArbitraryReputationUpdate event as a domain matching the skillId was not found',
     );
     return;
   }
@@ -35,6 +42,6 @@ export default async (event: ContractEvent): Promise<void> => {
     initiatorAddress,
     recipientAddress: userAddress,
     amount: amount.toString(),
-    fromDomainId: getDomainDatabaseId(colonyAddress, changeDomain?.args.domainId.toString()),
+    fromDomainId: getDomainDatabaseId(colonyAddress, changeDomainId),
   });
 };
