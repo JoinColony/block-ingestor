@@ -52,6 +52,7 @@ export enum ContractEventsSignatures {
   TokenUnlocked = 'TokenUnlocked(address)',
   ColonyFundsMovedBetweenFundingPots = 'ColonyFundsMovedBetweenFundingPots(address,uint256,uint256,uint256,address)',
   ColonyMetadata = 'ColonyMetadata(address,string)',
+  ArbitraryReputationUpdate = 'ArbitraryReputationUpdate(address,address,uint256,int256)',
 }
 
 /*
@@ -76,4 +77,6 @@ export enum ColonyActionType {
   MoveFunds = 'MOVE_FUNDS',
   ColonyEdit = 'COLONY_EDIT',
   VersionUpgrade = 'VERSION_UPGRADE',
+  EmitDomainReputationPenalty = 'EMIT_DOMAIN_REPUTATION_PENALTY',
+  EmitDomainReputationReward = 'EMIT_DOMAIN_REPUTATION_REWARD',
 }

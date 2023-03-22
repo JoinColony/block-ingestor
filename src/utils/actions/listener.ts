@@ -1,4 +1,4 @@
-import { ContractEventsSignatures } from '~/types';
+import { ContractEventsSignatures } from '~types';
 
 import { addColonyEventListener } from '../events';
 
@@ -31,6 +31,10 @@ export const addActionEventListeners = async (
   );
   await addColonyEventListener(
     ContractEventsSignatures.ColonyMetadata,
+    colonyAddress,
+  );
+  await addColonyEventListener(
+    ContractEventsSignatures.ArbitraryReputationUpdate,
     colonyAddress,
   );
 };
