@@ -9,6 +9,7 @@ import {
   handleMoveFundsAction,
   handlePaymentAction,
   handleTokenUnlockedAction,
+  handleVersionUpgradeAction,
 } from '~handlers';
 import networkClient from '~networkClient';
 import { ColonyActionHandler, ContractEventsSignatures } from '~types';
@@ -79,5 +80,10 @@ export default async (colonyAddress: string): Promise<void> => {
     ContractEventsSignatures.ColonyMetadata,
     colonyAddress,
     handleEditColonyAction,
+  );
+  await trackActionsByEvent(
+    ContractEventsSignatures.ColonyUpgraded,
+    colonyAddress,
+    handleVersionUpgradeAction,
   );
 };
