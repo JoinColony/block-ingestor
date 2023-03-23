@@ -16,6 +16,7 @@ import { getChainId } from '~provider';
 
 import { getExtensionContract } from './extensions';
 import { verbose } from './logger';
+import { getCachedColonyClient } from './colonyClient';
 
 /*
  * Convert a Set that contains a JSON string, back into JS form
@@ -38,7 +39,7 @@ export const eventListenerGenerator = async (
   let client: ColonyNetworkClient | TokenClient | AnyColonyClient =
     networkClient;
   if (clientType === ClientType.ColonyClient && contractAddress) {
-    client = await networkClient.getColonyClient(contractAddress);
+    client = await getCachedColonyClient(contractAddress);
   }
 
   const filter: { topics: Array<string | null>; address?: string } = {
