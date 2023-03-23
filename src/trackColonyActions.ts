@@ -4,7 +4,7 @@ import { utils } from 'ethers';
 import { handleMintTokensAction, handlePaymentAction } from '~handlers';
 import networkClient from '~networkClient';
 import { ContractEventsSignatures } from '~types';
-import { mapLogToContractEvent, verbose } from '~utils';
+import { getCachedColonyClient, mapLogToContractEvent, verbose } from '~utils';
 
 // The Filter type doesn't seem to be exported from colony-js
 type Filter = Parameters<typeof getLogs>[1];
@@ -57,7 +57,7 @@ const trackCreatePaymentActions = async (
 
 export default async (colonyAddress: string): Promise<void> => {
   verbose('Fetching past actions for colony:', colonyAddress);
-  const colonyClient = await networkClient.getColonyClient(colonyAddress);
+  const colonyClient = await getCachedColonyClient(colonyAddress);
   await trackMintTokensActions(colonyAddress, colonyClient);
   await trackCreatePaymentActions(colonyAddress, colonyClient);
 };
