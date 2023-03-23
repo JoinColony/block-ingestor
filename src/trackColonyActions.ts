@@ -3,6 +3,7 @@ import { utils } from 'ethers';
 
 import {
   handleCreateDomainAction,
+  handleEditColonyAction,
   handleEditDomainAction,
   handleMintTokensAction,
   handleMoveFundsAction,
@@ -73,5 +74,10 @@ export default async (colonyAddress: string): Promise<void> => {
     ContractEventsSignatures.ColonyFundsMovedBetweenFundingPots,
     colonyAddress,
     handleMoveFundsAction,
+  );
+  await trackActionsByEvent(
+    ContractEventsSignatures.ColonyMetadata,
+    colonyAddress,
+    handleEditColonyAction,
   );
 };
