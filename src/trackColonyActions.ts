@@ -2,6 +2,8 @@ import { getLogs } from '@colony/colony-js';
 import { utils } from 'ethers';
 
 import {
+  handleCreateDomainAction,
+  handleEditDomainAction,
   handleMintTokensAction,
   handleMoveFundsAction,
   handlePaymentAction,
@@ -31,7 +33,6 @@ const trackActionsByEvent = async (
   const filter = getFilter(eventSignature, colonyAddress);
   const logs = await getLogs(networkClient, filter);
   logs.forEach(async (log) => {
-    console.log(log);
     const event = await mapLogToContractEvent(log, colonyClient.interface);
     if (!event) {
       return;
@@ -57,6 +58,16 @@ export default async (colonyAddress: string): Promise<void> => {
     ContractEventsSignatures.TokenUnlocked,
     colonyAddress,
     handleTokenUnlockedAction,
+  );
+  await trackActionsByEvent(
+    ContractEventsSignatures.DomainAdded,
+    colonyAddress,
+    handleCreateDomainAction,
+  );
+  await trackActionsByEvent(
+    ContractEventsSignatures.DomainMetadata,
+    colonyAddress,
+    handleEditDomainAction,
   );
   await trackActionsByEvent(
     ContractEventsSignatures.ColonyFundsMovedBetweenFundingPots,
