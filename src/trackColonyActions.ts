@@ -1,7 +1,11 @@
 import { AnyColonyClient, getLogs } from '@colony/colony-js';
 import { utils } from 'ethers';
 
-import { handleMintTokensAction, handlePaymentAction } from '~handlers';
+import {
+  handleMintTokensAction,
+  handlePaymentAction,
+  handleTokenUnlockedAction,
+} from '~handlers';
 import networkClient from '~networkClient';
 import { ContractEventsSignatures } from '~types';
 import { getCachedColonyClient, mapLogToContractEvent, verbose } from '~utils';
@@ -55,9 +59,29 @@ const trackCreatePaymentActions = async (
   });
 };
 
+const trackUnlockTokenActions = async (
+  colonyAddress: string,
+  colonyClient: AnyColonyClient,
+): Promise<void> => {
+  const tokenUnlockedFilter = getFilter(
+    ContractEventsSignatures.TokenUnlocked,
+    colonyAddress,
+  );
+  const tokenUnlockedLogs = await getLogs(networkClient, tokenUnlockedFilter);
+  tokenUnlockedLogs.forEach(async (log) => {
+    const event = await mapLogToContractEvent(log, colonyClient.interface);
+    if (!event) {
+      return;
+    }
+
+    await handleTokenUnlockedAction(event);
+  });
+};
+
 export default async (colonyAddress: string): Promise<void> => {
   verbose('Fetching past actions for colony:', colonyAddress);
   const colonyClient = await getCachedColonyClient(colonyAddress);
   await trackMintTokensActions(colonyAddress, colonyClient);
   await trackCreatePaymentActions(colonyAddress, colonyClient);
+  await trackUnlockTokenActions(colonyAddress, colonyClient);
 };
