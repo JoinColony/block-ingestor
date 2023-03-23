@@ -48,6 +48,37 @@ const getStakePercentage = (
   requiredStake: BigNumber,
 ): BigNumber => stake.div(requiredStake).mul(100);
 
+/**
+ * Given staking data, format and return new UserStakes object
+ */
+const getNewUserStakes = (
+  staker: string,
+  vote: BigNumber,
+  amount: BigNumber,
+  requiredStake: BigNumber,
+): UserStakes => {
+  const invertedVote = BigNumber.from(1).sub(vote);
+  const stakedSide = getMotionSide(vote);
+  const unstakedSide = getMotionSide(invertedVote);
+  return {
+    address: staker,
+    stakes: {
+      raw: {
+        [stakedSide]: amount.toString(),
+        [unstakedSide]: '0',
+      },
+
+      percentage: {
+        [stakedSide]: getStakePercentage(amount, requiredStake).toString(),
+        [unstakedSide]: '0',
+      },
+    }, // TS doesn't like the computed keys, but we know they're correct
+  } as unknown as UserStakes;
+};
+
+/**
+ * Given staking data, add stakes to existing stakes and return new, updated UserStakes object
+ */
 const getUpdatedUserStakes = (
   existingUserStakes: UserStakes,
   amount: BigNumber,
@@ -94,6 +125,9 @@ const getUserStakesMapFn =
     return userStakes;
   };
 
+/**
+ * Takes existing usersStakes and updates the entry with the latest stake data
+ */
 export const getUpdatedUsersStakes = (
   usersStakes: UserStakes[],
   staker: string,
@@ -116,23 +150,7 @@ export const getUpdatedUsersStakes = (
     return usersStakes.map(updateUserStakes);
   }
 
-  const invertedVote = BigNumber.from(1).sub(vote);
-  const stakedSide = getMotionSide(vote);
-  const unstakedSide = getMotionSide(invertedVote);
-  const newUserStake = {
-    address: staker,
-    stakes: {
-      raw: {
-        [stakedSide]: amount.toString(),
-        [unstakedSide]: '0',
-      },
+  const newUserStakes = getNewUserStakes(staker, vote, amount, requiredStake);
 
-      percentage: {
-        [stakedSide]: getStakePercentage(amount, requiredStake),
-        [unstakedSide]: '0',
-      },
-    }, // TS doesn't like the computed keys, but we know they're correct
-  } as unknown as UserStakes;
-
-  return [...usersStakes, newUserStake];
+  return [...usersStakes, newUserStakes];
 };
