@@ -156,3 +156,20 @@ export const getUpdatedUsersStakes = (
 
   return [...usersStakes, newUserStakes];
 };
+
+const getUserMinStake = (
+  totalStakeFraction: BigNumber,
+  userMinStakeFraction: BigNumber,
+  skillRep: BigNumber,
+): string => {
+  /*
+   * Both totalStakeFraction and userMinStakeFraction both divide by 10 to the power of 18.
+   * Since we've multiplied by both, we need to divide by 10 to the power of 18, twice.
+   */
+
+  return skillRep
+    .mul(totalStakeFraction)
+    .mul(userMinStakeFraction)
+    .div(BigNumber.from(10).pow(36))
+    .toString();
+};
