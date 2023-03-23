@@ -3,6 +3,7 @@ import { utils } from 'ethers';
 
 import {
   handleMintTokensAction,
+  handleMoveFundsAction,
   handlePaymentAction,
   handleTokenUnlockedAction,
 } from '~handlers';
@@ -56,5 +57,10 @@ export default async (colonyAddress: string): Promise<void> => {
     ContractEventsSignatures.TokenUnlocked,
     colonyAddress,
     handleTokenUnlockedAction,
+  );
+  await trackActionsByEvent(
+    ContractEventsSignatures.ColonyFundsMovedBetweenFundingPots,
+    colonyAddress,
+    handleMoveFundsAction,
   );
 };
