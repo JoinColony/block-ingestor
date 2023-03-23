@@ -5,6 +5,7 @@ import {
   handleCreateDomainAction,
   handleEditColonyAction,
   handleEditDomainAction,
+  handleEmitDomainReputationAction,
   handleMintTokensAction,
   handleMoveFundsAction,
   handlePaymentAction,
@@ -85,5 +86,10 @@ export default async (colonyAddress: string): Promise<void> => {
     ContractEventsSignatures.ColonyUpgraded,
     colonyAddress,
     handleVersionUpgradeAction,
+  );
+  await trackActionsByEvent(
+    ContractEventsSignatures.ArbitraryReputationUpdate,
+    colonyAddress,
+    handleEmitDomainReputationAction,
   );
 };
