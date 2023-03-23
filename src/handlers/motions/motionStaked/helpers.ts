@@ -157,7 +157,7 @@ export const getUpdatedUsersStakes = (
   return [...usersStakes, newUserStakes];
 };
 
-const getUserMinStake = (
+export const getUserMinStake = (
   totalStakeFraction: BigNumber,
   userMinStakeFraction: BigNumber,
   skillRep: BigNumber,

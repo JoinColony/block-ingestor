@@ -1,8 +1,12 @@
 import { AnyColonyClient, Extension } from '@colony/colony-js';
 import { TransactionDescription } from 'ethers/lib/utils';
+import { BigNumber } from 'ethers';
 
 import { mutate } from '../amplifyClient';
-import { ContractEvent, motionNameMapping } from '../types';
+import { ContractEvent, motionNameMapping, MotionData } from '../types';
+import { getRequiredStake, getUserMinStake } from '~handlers/motions/helpers';
+
+import { getVotingClient } from './clients';
 import { getDomainDatabaseId } from './domains';
 import { verbose } from './logger';
 import { getColonyTokenAddress } from './tokens';
@@ -27,6 +31,47 @@ export const getParsedActionFromMotion = async (
   }
 };
 
+const getMotionData = async (
+  colonyAddress: string,
+  motionId: BigNumber,
+  domainId: BigNumber,
+): Promise<MotionData> => {
+  const votingClient = await getVotingClient(colonyAddress);
+  const { skillRep, rootHash } = await votingClient.getMotion(motionId);
+  const totalStakeFraction = await votingClient.getTotalStakeFraction();
+  const userMinStakeFraction = await votingClient.getUserMinStakeFraction();
+  const requiredStake: string = getRequiredStake(
+    skillRep,
+    totalStakeFraction,
+  ).toString();
+
+  const userMinStake = getUserMinStake(
+    totalStakeFraction,
+    userMinStakeFraction,
+    skillRep,
+  );
+
+  return {
+    motionId: motionId.toString(),
+    motionStakes: {
+      raw: {
+        nay: '0',
+        yay: '0',
+      },
+      percentage: {
+        nay: '0',
+        yay: '0',
+      },
+    },
+    requiredStake,
+    remainingStakes: [requiredStake, requiredStake], // [nayRemaining, yayRemaining]
+    usersStakes: [],
+    userMinStake,
+    rootHash,
+    motionDomainId: domainId.toString(),
+  };
+};
+
 export const writeMintTokensMotionToDB = async (
   {
     transactionHash,
@@ -39,15 +84,14 @@ export const writeMintTokensMotionToDB = async (
   const { name, args: actionArgs } = parsedAction;
   const amount = actionArgs[0].toString();
   const tokenAddress = await getColonyTokenAddress(colonyAddress);
+  const motionData = await getMotionData(colonyAddress, motionId, domainId);
   await mutate('createColonyAction', {
     input: {
       id: transactionHash,
       colonyId: colonyAddress,
       type: motionNameMapping[name],
       isMotion: true,
-      motionData: {
-        motionId: motionId.toString(),
-      },
+      motionData,
       tokenAddress,
       fromDomainId: getDomainDatabaseId(colonyAddress, domainId),
       initiatorAddress: creator,
