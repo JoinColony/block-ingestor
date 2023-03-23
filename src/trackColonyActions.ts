@@ -1,4 +1,4 @@
-import { AnyColonyClient, getLogs } from '@colony/colony-js';
+import { getLogs } from '@colony/colony-js';
 import { utils } from 'ethers';
 
 import {
@@ -7,7 +7,7 @@ import {
   handleTokenUnlockedAction,
 } from '~handlers';
 import networkClient from '~networkClient';
-import { ContractEventsSignatures } from '~types';
+import { ColonyActionHandler, ContractEventsSignatures } from '~types';
 import { getCachedColonyClient, mapLogToContractEvent, verbose } from '~utils';
 
 // The Filter type doesn't seem to be exported from colony-js
@@ -21,67 +21,40 @@ const getFilter = (
   address: colonyAddress,
 });
 
-const trackMintTokensActions = async (
+const trackActionsByEvent = async (
+  eventSignature: ContractEventsSignatures,
   colonyAddress: string,
-  colonyClient: AnyColonyClient,
+  handler: ColonyActionHandler,
 ): Promise<void> => {
-  const tokensMintedFilter = getFilter(
-    ContractEventsSignatures.TokensMinted,
-    colonyAddress,
-  );
-  const tokensMintedLogs = await getLogs(networkClient, tokensMintedFilter);
-  tokensMintedLogs.forEach(async (log) => {
+  const colonyClient = await getCachedColonyClient(colonyAddress);
+  const filter = getFilter(eventSignature, colonyAddress);
+  const logs = await getLogs(networkClient, filter);
+  logs.forEach(async (log) => {
+    console.log(log);
     const event = await mapLogToContractEvent(log, colonyClient.interface);
     if (!event) {
       return;
     }
 
-    await handleMintTokensAction(event);
-  });
-};
-
-const trackCreatePaymentActions = async (
-  colonyAddress: string,
-  colonyClient: AnyColonyClient,
-): Promise<void> => {
-  const paymentAddedFilter = getFilter(
-    ContractEventsSignatures.PaymentAdded,
-    colonyAddress,
-  );
-  const paymentAddedLogs = await getLogs(networkClient, paymentAddedFilter);
-  paymentAddedLogs.forEach(async (log) => {
-    const event = await mapLogToContractEvent(log, colonyClient.interface);
-    if (!event) {
-      return;
-    }
-
-    await handlePaymentAction(event);
-  });
-};
-
-const trackUnlockTokenActions = async (
-  colonyAddress: string,
-  colonyClient: AnyColonyClient,
-): Promise<void> => {
-  const tokenUnlockedFilter = getFilter(
-    ContractEventsSignatures.TokenUnlocked,
-    colonyAddress,
-  );
-  const tokenUnlockedLogs = await getLogs(networkClient, tokenUnlockedFilter);
-  tokenUnlockedLogs.forEach(async (log) => {
-    const event = await mapLogToContractEvent(log, colonyClient.interface);
-    if (!event) {
-      return;
-    }
-
-    await handleTokenUnlockedAction(event);
+    handler(event);
   });
 };
 
 export default async (colonyAddress: string): Promise<void> => {
   verbose('Fetching past actions for colony:', colonyAddress);
-  const colonyClient = await getCachedColonyClient(colonyAddress);
-  await trackMintTokensActions(colonyAddress, colonyClient);
-  await trackCreatePaymentActions(colonyAddress, colonyClient);
-  await trackUnlockTokenActions(colonyAddress, colonyClient);
+  await trackActionsByEvent(
+    ContractEventsSignatures.TokensMinted,
+    colonyAddress,
+    handleMintTokensAction,
+  );
+  await trackActionsByEvent(
+    ContractEventsSignatures.PaymentAdded,
+    colonyAddress,
+    handlePaymentAction,
+  );
+  await trackActionsByEvent(
+    ContractEventsSignatures.TokenUnlocked,
+    colonyAddress,
+    handleTokenUnlockedAction,
+  );
 };

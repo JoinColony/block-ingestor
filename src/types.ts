@@ -80,3 +80,5 @@ export enum ColonyActionType {
   EmitDomainReputationPenalty = 'EMIT_DOMAIN_REPUTATION_PENALTY',
   EmitDomainReputationReward = 'EMIT_DOMAIN_REPUTATION_REWARD',
 }
+
+export type ColonyActionHandler = (event: ContractEvent) => Promise<void>;
