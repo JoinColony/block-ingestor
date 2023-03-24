@@ -13,11 +13,8 @@ import {
   handleVersionUpgradeAction,
 } from '~handlers';
 import networkClient from '~networkClient';
-import { ColonyActionHandler, ContractEventsSignatures } from '~types';
+import { ColonyActionHandler, ContractEventsSignatures, Filter } from '~types';
 import { getCachedColonyClient, mapLogToContractEvent, verbose } from '~utils';
-
-// The Filter type doesn't seem to be exported from colony-js
-type Filter = Parameters<typeof getLogs>[1];
 
 const getFilter = (
   eventSignature: ContractEventsSignatures,

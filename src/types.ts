@@ -1,3 +1,4 @@
+import { getLogs } from '@colony/colony-js';
 import { LogDescription } from '@ethersproject/abi';
 
 /*
@@ -82,3 +83,6 @@ export enum ColonyActionType {
 }
 
 export type ColonyActionHandler = (event: ContractEvent) => Promise<void>;
+
+// The Filter type doesn't seem to be exported from colony-js
+export type Filter = Parameters<typeof getLogs>[1];

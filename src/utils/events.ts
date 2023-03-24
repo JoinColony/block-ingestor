@@ -9,7 +9,7 @@ import {
 } from '@colony/colony-js';
 
 import networkClient from '~networkClient';
-import { ContractEvent, ContractEventsSignatures } from '~types';
+import { ContractEvent, ContractEventsSignatures, Filter } from '~types';
 import { addEvent } from '~eventQueue';
 import { mutate, query } from '~amplifyClient';
 import { getChainId } from '~provider';
@@ -42,13 +42,13 @@ export const eventListenerGenerator = async (
     client = await getCachedColonyClient(contractAddress);
   }
 
-  const filter: { topics: Array<string | null>; address?: string } = {
+  const filter: Filter = {
     topics: [utils.id(eventSignature)],
   };
 
   if (clientType === ClientType.TokenClient) {
     filter.topics = [
-      ...filter.topics,
+      ...(filter.topics ?? []),
       null,
       utils.hexZeroPad(contractAddress, 32),
     ];
