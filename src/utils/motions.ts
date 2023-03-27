@@ -1,11 +1,15 @@
-import { AnyColonyClient, Extension } from '@colony/colony-js';
+import { AnyColonyClient, ClientType, Extension } from '@colony/colony-js';
 import { TransactionDescription } from 'ethers/lib/utils';
-import { motionSpecificEventsListener } from '~eventListener';
-import { getEventProcessorContext, RemoveListenerKeys } from '~eventProcessor';
+import ctx, { ListenerRemover } from '~context';
 
 import { mutate } from '../amplifyClient';
-import { ContractEvent, motionNameMapping } from '../types';
+import {
+  ContractEvent,
+  ContractEventsSignatures,
+  motionNameMapping,
+} from '../types';
 import { getDomainDatabaseId } from './domains';
+import { generateListenerRemoverKey } from './events';
 import { verbose } from './logger';
 import { getColonyTokenAddress } from './tokens';
 
@@ -59,16 +63,33 @@ export const writeMintTokensMotionToDB = async (
   });
 };
 
-export const applyMotionListeners = async (
+const getMotionListenerRemovers = (
   colonyAddress: string,
-): Promise<void> => {
-  const removeMotionListeners = await motionSpecificEventsListener(
-    colonyAddress,
+): ListenerRemover[] => {
+  const listenerRemovers: ListenerRemover[] = [];
+
+  const motionSignatures = Object.values(ContractEventsSignatures).filter(
+    (sig) => sig.includes('Motion'),
   );
 
-  const eventProcessContext = getEventProcessorContext();
-  /* Store remove listener functions in context, to be called when extension is uninstalled */
-  eventProcessContext.removeListeners[colonyAddress] = {
-    [RemoveListenerKeys.EXTENSION_INITIALISED]: removeMotionListeners,
-  };
+  motionSignatures.forEach((signature) => {
+    const key = generateListenerRemoverKey(
+      colonyAddress,
+      ClientType.VotingReputationClient,
+      signature,
+    );
+    const motionListenerRemover = ctx.listenerRemovers[key];
+    if (motionListenerRemover) {
+      listenerRemovers.push(motionListenerRemover);
+    }
+  });
+
+  return listenerRemovers;
+};
+
+export const removeMotionListeners = (colonyAddress: string): void => {
+  const listenerRemovers = getMotionListenerRemovers(colonyAddress);
+  listenerRemovers.forEach((listenerRemover) => {
+    listenerRemover();
+  });
 };
