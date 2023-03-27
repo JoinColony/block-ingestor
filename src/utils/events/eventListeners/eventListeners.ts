@@ -58,6 +58,7 @@ export const addMotionEventListener = async (
     eventSignature,
     colonyAddress,
     ClientType.VotingReputationClient,
+    true,
   );
 
 /**
