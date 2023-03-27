@@ -58,7 +58,7 @@ export const addTokenEventListener = async (
 export const addMotionEventListener = async (
   eventSignature: ContractEventsSignatures,
   colonyAddress: string,
-) =>
+): Promise<void> =>
   await eventListenerGenerator(
     eventSignature,
     colonyAddress,
