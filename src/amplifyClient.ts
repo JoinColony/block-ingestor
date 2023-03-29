@@ -211,6 +211,14 @@ export const queries = {
             userMinStake
             rootHash
             motionDomainId
+            stakerRewards {
+              address
+              rewards {
+                yay
+                nay
+              }
+            }
+            isFinalized
           }
           createdAt
         }
