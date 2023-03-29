@@ -24,6 +24,7 @@ import {
   handleNetworkFeeInverseSet,
   handleMotionCreated,
   handleMotionStaked,
+  handleMotionFinalized,
 } from './handlers';
 
 dotenv.config();
@@ -123,6 +124,11 @@ export default async (event: ContractEvent): Promise<void> => {
 
     case ContractEventsSignatures.MotionStaked: {
       await handleMotionStaked(event);
+      return;
+    }
+
+    case ContractEventsSignatures.MotionFinalized: {
+      await handleMotionFinalized(event);
       return;
     }
 

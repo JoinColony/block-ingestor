@@ -46,11 +46,18 @@ export interface MotionData {
   // For calculating user's max stake in client
   rootHash: string;
   motionDomainId: string;
+  stakerRewards: StakerReward[];
+  isFinalized: boolean;
 }
 
 export interface UserStakes {
   address: string;
   stakes: MotionStakes;
+}
+
+export interface StakerReward {
+  address: string;
+  rewards: MotionStakeFragment;
 }
 
 export interface MotionQuery {
