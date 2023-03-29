@@ -69,6 +69,8 @@ const getMotionData = async (
     userMinStake,
     rootHash,
     motionDomainId: domainId.toString(),
+    stakerRewards: [],
+    isFinalized: false,
   };
 };
 
