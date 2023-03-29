@@ -63,6 +63,7 @@ export interface UserStakes {
 export interface StakerReward {
   address: string;
   rewards: MotionStakeFragment;
+  isClaimed: boolean;
 }
 
 export interface MotionQuery {
