@@ -1,12 +1,11 @@
-import { query } from '~amplifyClient';
-import { ContractEvent, MotionQuery } from '~types';
+import { ContractEvent } from '~types';
 import { verbose, getVotingClient } from '~utils';
 import {
+  getMotionFromDB,
   getMotionSide,
   getMotionStakes,
   getRemainingStakes,
   getRequiredStake,
-  getStakedMotion,
   getUpdatedUsersStakes,
   updateMotionInDB,
 } from '../helpers';
@@ -25,14 +24,7 @@ export default async (event: ContractEvent): Promise<void> => {
   const motionStakes = getMotionStakes(requiredStake, stakes);
   const remainingStakes = getRemainingStakes(requiredStake, stakes);
 
-  const { items: motions }: { items: MotionQuery[] } = await query(
-    'getColonyMotions',
-    {
-      colonyAddress,
-    },
-  );
-
-  const stakedMotion = getStakedMotion(motions, motionId);
+  const stakedMotion = await getMotionFromDB(colonyAddress, motionId);
 
   if (stakedMotion) {
     const {
