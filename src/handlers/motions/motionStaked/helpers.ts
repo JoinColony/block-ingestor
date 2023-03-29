@@ -174,36 +174,3 @@ export const getUserMinStake = (
     .div(BigNumber.from(10).pow(36))
     .toString();
 };
-
-/*
- * Motion ids are not unique between voting reputation installations. If you had a motion with id of 1
- * in a previous voting reputation installation, you will get another one after uninstalling and reinstalling
- * the voting reputation client. So, we only want the one created most recently, since that's the one created
- * by the currently installed version of the voting reputation extension.
- */
-
-export const getStakedMotion = (
-  motions: MotionQuery[],
-  motionId: BigNumber,
-): MotionQuery | undefined => {
-  const motionsWithCorrectId = motions.filter(
-    ({ motionData: { motionId: id } }) => id === motionId.toString(),
-  );
-
-  if (motionsWithCorrectId.length > 1) {
-    motionsWithCorrectId.sort(
-      (a, b) =>
-        new Date(a.createdAt).valueOf() - new Date(b.createdAt).valueOf(),
-    );
-  }
-
-  const stakedMotion = motionsWithCorrectId.pop();
-
-  if (!stakedMotion) {
-    verbose(
-      'Could not find the staked motion in the db. This is a bug and needs investigating.',
-    );
-  }
-
-  return stakedMotion;
-};
