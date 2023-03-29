@@ -7,3 +7,5 @@ export const SUPPORTED_EXTENSION_IDS = [
   Extension.VotingReputation,
 ];
 export const INITIALISABLE_EXTENSION_IDS = [Extension.VotingReputation];
+
+export const NETWORK_INVERSE_FEE_KEY = 'networkInverseFee';
