@@ -66,6 +66,7 @@ export enum ContractEventsSignatures {
   MotionCreated = 'MotionCreated(uint256,address,uint256)',
   MotionStaked = 'MotionStaked(uint256,address,uint256,uint256)',
   MotionFinalized = 'MotionFinalized(uint256,bytes,bool)',
+  MotionRewardClaimed = 'MotionRewardClaimed(uint256,address,uint256,uint256)',
 }
 
 /*
