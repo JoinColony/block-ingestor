@@ -46,5 +46,6 @@ export const getStakerReward = async (
       nay: stakingRewardNay.toString(),
       yay: stakingRewardYay.toString(),
     },
+    isClaimed: false,
   };
 };
