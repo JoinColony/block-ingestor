@@ -35,6 +35,14 @@ query GetColonyMotions($colonyAddress: ID!) {
         userMinStake
         rootHash
         motionDomainId
+        stakerRewards {
+          address
+          rewards {
+            yay
+            nay
+          }
+        }
+        isFinalized
       }
       createdAt
     }
