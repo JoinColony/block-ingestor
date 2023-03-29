@@ -41,6 +41,10 @@ export const motionSpecificEventsListener = async (
     ContractEventsSignatures.MotionStaked,
     colonyAddress,
   );
+  await addMotionEventListener(
+    ContractEventsSignatures.MotionFinalized,
+    colonyAddress,
+  );
 };
 
 export const extensionSpecificEventsListener = async (
