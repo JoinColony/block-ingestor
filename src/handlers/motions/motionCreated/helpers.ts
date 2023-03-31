@@ -12,7 +12,6 @@ import {
 } from '~utils';
 
 import { getRequiredStake, getUserMinStake } from '../helpers';
-
 export const getParsedActionFromMotion = async (
   motionId: string,
   colonyClient: AnyColonyClient,
@@ -32,6 +31,12 @@ export const getParsedActionFromMotion = async (
     return undefined;
   }
 };
+
+export const getMotionDatabaseId = (
+  chainId: number,
+  votingRepExtnAddress: string,
+  nativeMotionId: BigNumber,
+): string => `${chainId}-${votingRepExtnAddress}_${nativeMotionId}`;
 
 const getMotionData = async (
   colonyAddress: string,
@@ -53,8 +58,12 @@ const getMotionData = async (
     skillRep,
   );
 
+  const { chainId } = await votingClient.provider.getNetwork();
+
   return {
-    motionId: motionId.toString(),
+    createdBy: votingClient.address,
+    motionId: getMotionDatabaseId(chainId, votingClient.address, motionId),
+    nativeMotionId: motionId.toString(),
     motionStakes: {
       raw: {
         nay: '0',
