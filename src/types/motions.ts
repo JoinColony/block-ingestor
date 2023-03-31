@@ -43,6 +43,7 @@ export interface MotionStakes {
 
 export interface MotionData {
   motionId: string;
+  nativeMotionId: string;
   usersStakes: UserStakes[];
   motionStakes: MotionStakes;
   remainingStakes: [string, string];
@@ -53,6 +54,7 @@ export interface MotionData {
   motionDomainId: string;
   stakerRewards: StakerReward[];
   isFinalized: boolean;
+  createdBy: string;
 }
 
 export interface UserStakes {
