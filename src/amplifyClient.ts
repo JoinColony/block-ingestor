@@ -155,6 +155,7 @@ export const queries = {
           id
           motionData {
             motionId
+            nativeMotionId
             motionStakes {
               raw {
                 nay
@@ -189,10 +190,11 @@ export const queries = {
                 yay
                 nay
               }
+              isClaimed
             }
             isFinalized
+            createdBy
           }
-          createdAt
         }
       }
     }
