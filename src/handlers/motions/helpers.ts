@@ -29,7 +29,7 @@ export const updateMotionInDB = async (
 
 export const getMotionFromDB = async (
   colonyAddress: string,
-  motionId: BigNumber,
+  databaseMotionId: string,
 ): Promise<MotionQuery | undefined> => {
   const { items: motions } =
     (await query<{ items: MotionQuery[] }>('getColonyMotions', {
@@ -44,18 +44,9 @@ export const getMotionFromDB = async (
     return undefined;
   }
 
-  const motionsWithCorrectId = motions.filter(
-    ({ motionData: { motionId: id } }) => id === motionId.toString(),
+  const motion = motions.find(
+    ({ motionData: { motionId } }) => motionId === databaseMotionId,
   );
-
-  if (motionsWithCorrectId.length > 1) {
-    motionsWithCorrectId.sort(
-      (a, b) =>
-        new Date(a.createdAt).valueOf() - new Date(b.createdAt).valueOf(),
-    );
-  }
-
-  const motion = motionsWithCorrectId.pop();
 
   if (!motion) {
     verbose(
