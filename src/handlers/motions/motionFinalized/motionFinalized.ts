@@ -1,4 +1,5 @@
 import { ContractEvent } from '~types';
+import { getMotionDatabaseId, getVotingClient } from '~utils';
 import { getMotionFromDB, updateMotionInDB } from '../helpers';
 import { getStakerReward } from './helpers';
 
@@ -8,7 +9,17 @@ export default async (event: ContractEvent): Promise<void> => {
     args: { motionId },
   } = event;
 
-  const finalizedMotion = await getMotionFromDB(colonyAddress, motionId);
+  const votingClient = await getVotingClient(colonyAddress);
+  const { chainId } = await votingClient.provider.getNetwork();
+  const motionDatabaseId = getMotionDatabaseId(
+    chainId,
+    votingClient.address,
+    motionId,
+  );
+  const finalizedMotion = await getMotionFromDB(
+    colonyAddress,
+    motionDatabaseId,
+  );
   if (finalizedMotion) {
     const {
       motionData: { usersStakes },
