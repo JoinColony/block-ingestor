@@ -7,6 +7,7 @@ query GetColonyMotions($colonyAddress: ID!) {
       id
       motionData {
         motionId
+        nativeMotionId
         motionStakes {
           raw {
             nay
@@ -41,10 +42,11 @@ query GetColonyMotions($colonyAddress: ID!) {
             yay
             nay
           }
+          isClaimed
         }
         isFinalized
+        createdBy
       }
-      createdAt
     }
   }
 }
