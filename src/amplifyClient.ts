@@ -46,7 +46,7 @@ export const mutations = {
     }
   `,
   setCurrentNetworkInverseFee: /* GraphQL */ `
-    mutation setCurrentNetworkInverseFee($input: setCurrentNetworkInverseFeeInput!) {
+    mutation setCurrentNetworkInverseFee($input: SetCurrentNetworkInverseFeeInput!) {
       setCurrentNetworkInverseFee(input: $input)
     }
   `,
