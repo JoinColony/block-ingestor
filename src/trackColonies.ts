@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 import { getLogs } from '@colony/colony-js';
 
-import networkClient from './networkClient';
+import networkClient from '~networkClient';
 import {
   output,
   writeJsonStats,
@@ -9,11 +9,12 @@ import {
   addNetworkEventListener,
   setToJS,
   toNumber,
-} from './utils';
-import { colonySpecificEventsListener } from './eventListener';
-import { ContractEventsSignatures } from './types';
-import { mutate } from './amplifyClient';
-import { COLONY_CURRENT_VERSION_KEY } from './constants';
+} from '~utils';
+import { colonySpecificEventsListener } from '~eventListener';
+import { ContractEventsSignatures } from '~types';
+import { mutate } from '~amplifyClient';
+import { COLONY_CURRENT_VERSION_KEY } from '~constants';
+import trackColonyActions from '~trackColonyActions';
 
 dotenv.config();
 
@@ -52,10 +53,11 @@ export default async (): Promise<void> => {
    * Once we found all current colonies, setup all Colony related listeners we care about
    */
   await Promise.all(
-    setToJS(coloniesSet).map(
-      async ({ colonyAddress }) =>
-        await colonySpecificEventsListener(colonyAddress),
-    ),
+    setToJS(coloniesSet).map(async ({ colonyAddress }) => {
+      await trackColonyActions(colonyAddress);
+
+      await colonySpecificEventsListener(colonyAddress);
+    }),
   );
 
   /*
