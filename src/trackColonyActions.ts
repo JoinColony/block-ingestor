@@ -24,6 +24,13 @@ const getFilter = (
   address: colonyAddress,
 });
 
+/**
+ * This function get logs for a particular event, parses them and call a relevant action handler to act upon it
+ *
+ * @NOTE This can only work with an archive node, as well as one that can display more than 10000 events.
+ * Most commercial solutions out there limit to around 10k events in the past, plus that not everyone will give up an archive node.
+ * So this can only work with our custom, nethermind based node.
+ */
 const trackActionsByEvent = async (
   eventSignature: ContractEventsSignatures,
   colonyAddress: string,
