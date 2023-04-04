@@ -1,6 +1,5 @@
 import { utils } from 'ethers';
 
-import networkClient from '~networkClient';
 import provider from '~provider';
 import {
   ColonyActionType,
@@ -13,6 +12,7 @@ import {
   toNumber,
   mapLogToContractEvent,
   getDomainDatabaseId,
+  getCachedColonyClient,
 } from '~utils';
 
 const events = [
@@ -26,7 +26,7 @@ const hashedSignatures = events.map((signature) => utils.id(signature));
 export default async (paymentAddedEvent: ContractEvent): Promise<void> => {
   const { contractAddress: colonyAddress, transactionHash } = paymentAddedEvent;
 
-  const colonyClient = await networkClient.getColonyClient(colonyAddress);
+  const colonyClient = await getCachedColonyClient(colonyAddress);
 
   const receipt = await provider.getTransactionReceipt(transactionHash);
   const [, payoutClaimedLog, oneTxPaymentMadeLog] = receipt.logs.filter((log) =>

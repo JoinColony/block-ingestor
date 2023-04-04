@@ -1,13 +1,16 @@
 import { Id } from '@colony/colony-js';
-import networkClient from '~networkClient';
 import { ColonyActionType, ContractEvent } from '~types';
-import { writeActionFromEvent, getDomainDatabaseId } from '~utils';
+import {
+  writeActionFromEvent,
+  getDomainDatabaseId,
+  getCachedColonyClient,
+} from '~utils';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { contractAddress: colonyAddress } = event;
   const { agent: initiatorAddress } = event.args;
 
-  const colonyClient = await networkClient.getColonyClient(colonyAddress);
+  const colonyClient = await getCachedColonyClient(colonyAddress);
   const tokenAddress = await colonyClient.getToken();
 
   await writeActionFromEvent(event, colonyAddress, {

@@ -9,13 +9,14 @@ import {
 } from '@colony/colony-js';
 
 import networkClient from '~networkClient';
-import { ContractEvent, ContractEventsSignatures } from '~types';
+import { ContractEvent, ContractEventsSignatures, Filter } from '~types';
 import { addEvent } from '~eventQueue';
 import { mutate, query } from '~amplifyClient';
 import { getChainId } from '~provider';
 
 import { getExtensionContract } from './extensions';
 import { verbose } from './logger';
+import { getCachedColonyClient } from './colonyClient';
 
 /*
  * Convert a Set that contains a JSON string, back into JS form
@@ -38,16 +39,16 @@ export const eventListenerGenerator = async (
   let client: ColonyNetworkClient | TokenClient | AnyColonyClient =
     networkClient;
   if (clientType === ClientType.ColonyClient && contractAddress) {
-    client = await networkClient.getColonyClient(contractAddress);
+    client = await getCachedColonyClient(contractAddress);
   }
 
-  const filter: { topics: Array<string | null>; address?: string } = {
+  const filter: Filter = {
     topics: [utils.id(eventSignature)],
   };
 
   if (clientType === ClientType.TokenClient) {
     filter.topics = [
-      ...filter.topics,
+      ...(filter.topics ?? []),
       null,
       utils.hexZeroPad(contractAddress, 32),
     ];

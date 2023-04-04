@@ -1,8 +1,9 @@
 import { Extension, getExtensionHash, getLogs } from '@colony/colony-js';
 
-import networkClient from './networkClient';
+import networkClient from '~networkClient';
 import {
   deleteExtensionFromEvent,
+  getCachedColonyClient,
   isExtensionDeprecated,
   isExtensionInitialised,
   mapLogToContractEvent,
@@ -10,9 +11,9 @@ import {
   verbose,
   writeExtensionFromEvent,
   writeExtensionVersionFromEvent,
-} from './utils';
-import { SUPPORTED_EXTENSION_IDS } from './constants';
-import { extensionSpecificEventsListener } from './eventListener';
+} from '~utils';
+import { SUPPORTED_EXTENSION_IDS } from '~constants';
+import { extensionSpecificEventsListener } from '~eventListener';
 
 export default async (): Promise<void> => {
   // @TODO: Set to the latest block processed by block-ingestor
@@ -156,7 +157,7 @@ const trackExtensionEvents = async (
      */
     const version = await (
       await (
-        await networkClient.getColonyClient(colony)
+        await getCachedColonyClient(colony)
       ).getExtensionClient(extensionId)
     ).version();
     const convertedVersion = toNumber(version);

@@ -7,7 +7,6 @@ import {
 } from '@colony/colony-js';
 import { BigNumber, utils } from 'ethers';
 
-import networkClient from '~networkClient';
 import {
   ColonyActionType,
   ContractEvent,
@@ -18,6 +17,7 @@ import {
   writeActionFromEvent,
   getDomainDatabaseId,
   verbose,
+  getCachedColonyClient,
 } from '~utils';
 import provider from '~provider';
 
@@ -57,7 +57,7 @@ export default async (event: ContractEvent): Promise<void> => {
     toPot,
   } = event.args;
 
-  const colonyClient = await networkClient.getColonyClient(colonyAddress);
+  const colonyClient = await getCachedColonyClient(colonyAddress);
   let fromDomainId: BigNumber | undefined;
   let toDomainId: BigNumber | undefined;
   if (isSupportedColonyClient(colonyClient)) {
