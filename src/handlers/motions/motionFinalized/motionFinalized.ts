@@ -1,6 +1,10 @@
 import { ContractEvent } from '~types';
-import { getMotionDatabaseId, getVotingClient } from '~utils';
-import { getMotionFromDB, updateMotionInDB } from '../helpers';
+import { getVotingClient } from '~utils';
+import {
+  getMotionDatabaseId,
+  getMotionFromDB,
+  updateMotionInDB,
+} from '../helpers';
 import { getStakerReward } from './helpers';
 
 export default async (event: ContractEvent): Promise<void> => {
