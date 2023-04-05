@@ -1,6 +1,10 @@
 import { ContractEvent, MotionData } from '~types';
-import { getMotionDatabaseId, getVotingClient } from '~utils';
-import { getMotionFromDB, updateMotionInDB } from './helpers';
+import { getVotingClient } from '~utils';
+import {
+  getMotionDatabaseId,
+  getMotionFromDB,
+  updateMotionInDB,
+} from './helpers';
 
 export default async (event: ContractEvent): Promise<void> => {
   const {

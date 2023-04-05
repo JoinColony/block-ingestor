@@ -11,7 +11,11 @@ import {
   verbose,
 } from '~utils';
 
-import { getRequiredStake, getUserMinStake } from '../helpers';
+import {
+  getMotionDatabaseId,
+  getRequiredStake,
+  getUserMinStake,
+} from '../helpers';
 export const getParsedActionFromMotion = async (
   motionId: string,
   colonyClient: AnyColonyClient,
@@ -31,12 +35,6 @@ export const getParsedActionFromMotion = async (
     return undefined;
   }
 };
-
-export const getMotionDatabaseId = (
-  chainId: number,
-  votingRepExtnAddress: string,
-  nativeMotionId: BigNumber,
-): string => `${chainId}-${votingRepExtnAddress}_${nativeMotionId}`;
 
 const getMotionData = async (
   colonyAddress: string,
