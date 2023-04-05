@@ -1,15 +1,17 @@
 import { AnyColonyClient, Extension } from '@colony/colony-js';
-import { TransactionDescription } from 'ethers/lib/utils';
 import { BigNumber } from 'ethers';
+import { TransactionDescription } from 'ethers/lib/utils';
 
-import { mutate } from '../amplifyClient';
-import { ContractEvent, motionNameMapping, MotionData } from '../types';
-import { getRequiredStake, getUserMinStake } from '~handlers/motions/helpers';
+import { mutate } from '~amplifyClient';
+import { MotionData, ContractEvent, motionNameMapping } from '~types';
+import {
+  getColonyTokenAddress,
+  getDomainDatabaseId,
+  getVotingClient,
+  verbose,
+} from '~utils';
 
-import { getVotingClient } from './clients';
-import { getDomainDatabaseId } from './domains';
-import { verbose } from './logger';
-import { getColonyTokenAddress } from './tokens';
+import { getRequiredStake, getUserMinStake } from '../helpers';
 
 export const getParsedActionFromMotion = async (
   motionId: string,
