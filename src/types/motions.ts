@@ -80,6 +80,7 @@ export interface MotionData {
   revealedVotes: MotionVotes;
   repSubmitted: string;
   skillRep: string;
+  events: Event[];
 }
 
 export interface UserStakes {
@@ -97,4 +98,13 @@ export interface MotionQuery {
   id: string;
   motionData: MotionData;
   createdAt: string;
+}
+
+export interface Event {
+  name: string;
+  // type: string;
+  // values: string;
+  // createdAt: number;
+  // emmitedBy: string;
+  // transactionHash: string;
 }
