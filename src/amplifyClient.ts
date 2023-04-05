@@ -45,9 +45,18 @@ export const mutations = {
       setCurrentVersion(input: $input)
     }
   `,
-  setCurrentNetworkInverseFee: /* GraphQL */ `
-    mutation setCurrentNetworkInverseFee($input: SetCurrentNetworkInverseFeeInput!) {
-      setCurrentNetworkInverseFee(input: $input)
+  createCurrentNetworkInverseFee: /* GraphQL */ `
+    mutation CreateCurrentNetworkInverseFee($input: CreateCurrentNetworkInverseFeeInput!) {
+      createCurrentNetworkInverseFee(input: $input) {
+        id
+      }
+    }
+  `,
+  updateCurrentNetworkInverseFee: /* GraphQL */ `
+    mutation UpdateCurrentNetworkInverseFee($input: UpdateCurrentNetworkInverseFeeInput!) {
+      updateCurrentNetworkInverseFee(input: $input) {
+        id
+      }
     }
   `,
   createColonyExtension: /* GraphQL */ `
@@ -139,6 +148,16 @@ export const queries = {
     query GetContractEvent($id: ID!) {
       getContractEvent(id: $id) {
         id
+      }
+    }
+  `,
+  getCurrentNetworkInverseFee: /* GraphQL */ `
+    query GetCurrentNetworkInverseFee {
+      listCurrentNetworkInverseFees(limit: 1) {
+        items {
+          id
+          inverseFee
+        }
       }
     }
   `,

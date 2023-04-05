@@ -17,16 +17,11 @@ export default async (): Promise<void> => {
   const networkInverseFee = await networkClient.getFeeInverse();
   const convertedFee = networkInverseFee.toString();
 
-  await mutate('setCurrentNetworkInverseFee', {
+  await mutate('createCurrentNetworkInverseFee', {
     input: {
       inverseFee: convertedFee,
     },
   });
 
   output('Current network inverse fee is: ', convertedFee);
-
-  /*
-   * Set a Network level listener to track new inverse fees
-   */
-  await addNetworkEventListener(ContractEventsSignatures.NetworkFeeInverseSet);
 };

@@ -54,6 +54,8 @@ const eventListener = async (): Promise<void> => {
   await addNetworkEventListener(ContractEventsSignatures.ExtensionUpgraded);
 
   await addNetworkEventListener(ContractEventsSignatures.ColonyVersionAdded);
+
+  await addNetworkEventListener(ContractEventsSignatures.NetworkFeeInverseSet);
 };
 
 export default eventListener;
