@@ -1,12 +1,12 @@
 import { BigNumber } from 'ethers';
 import { mutate, query } from '~amplifyClient';
-import { MotionData, MotionQuery, MotionSide } from '~types';
+import { MotionData, MotionQuery, MotionSide, MotionVote } from '~types';
 import { verbose } from '~utils';
 
 export * from './motionStaked/helpers';
 
 export const getMotionSide = (vote: BigNumber): MotionSide =>
-  vote.eq(1) ? MotionSide.YAY : MotionSide.NAY;
+  vote.eq(MotionVote.YAY) ? MotionSide.YAY : MotionSide.NAY;
 
 export const updateMotionInDB = async (
   id: string,
@@ -31,12 +31,18 @@ export const getMotionFromDB = async (
   colonyAddress: string,
   motionId: BigNumber,
 ): Promise<MotionQuery | undefined> => {
-  const { items: motions }: { items: MotionQuery[] } = await query(
-    'getColonyMotions',
-    {
+  const { items: motions } =
+    (await query<{ items: MotionQuery[] }>('getColonyMotions', {
       colonyAddress,
-    },
-  );
+    })) ?? {};
+
+  if (!motions) {
+    verbose(
+      'Could not query motions in the db. This is a bug and needs investigating.',
+    );
+
+    return undefined;
+  }
 
   const motionsWithCorrectId = motions.filter(
     ({ motionData: { motionId: id } }) => id === motionId.toString(),
