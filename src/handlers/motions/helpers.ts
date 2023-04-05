@@ -20,12 +20,11 @@ export const updateMotionInDB = async (
   });
 };
 
-/*
- * Motion ids are not unique between voting reputation installations. If you had a motion with id of 1
- * in a previous voting reputation installation, you will get another one after uninstalling and reinstalling
- * the voting reputation client. So, we only want the one created most recently, since that's the one created
- * by the currently installed version of the voting reputation extension.
- */
+export const getMotionDatabaseId = (
+  chainId: number,
+  votingRepExtnAddress: string,
+  nativeMotionId: BigNumber,
+): string => `${chainId}-${votingRepExtnAddress}_${nativeMotionId}`;
 
 export const getMotionFromDB = async (
   colonyAddress: string,

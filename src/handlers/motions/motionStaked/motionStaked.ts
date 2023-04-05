@@ -1,6 +1,7 @@
 import { ContractEvent } from '~types';
-import { verbose, getVotingClient, getMotionDatabaseId } from '~utils';
+import { verbose, getVotingClient } from '~utils';
 import {
+  getMotionDatabaseId,
   getMotionFromDB,
   getMotionSide,
   getMotionStakes,
