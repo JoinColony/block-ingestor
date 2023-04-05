@@ -1,6 +1,6 @@
 import { BigNumber } from 'ethers';
 
-import { StakerReward } from '~types';
+import { MotionVote, StakerReward } from '~types';
 import { getVotingClient } from '~utils';
 
 export const getStakerReward = async (
@@ -25,7 +25,7 @@ export const getStakerReward = async (
     [stakingRewardYay] = await votingReputationClient.getStakerReward(
       motionId,
       userAddress,
-      1,
+      MotionVote.YAY,
     );
   } catch (error) {
     // We don't care to catch the error since we fallback to it's initial value
@@ -34,7 +34,7 @@ export const getStakerReward = async (
     [stakingRewardNay] = await votingReputationClient.getStakerReward(
       motionId,
       userAddress,
-      0,
+      MotionVote.NAY,
     );
   } catch (error) {
     // silent error
