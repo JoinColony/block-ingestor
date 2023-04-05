@@ -235,20 +235,20 @@ export default (): void => {
   });
 };
 
-export const query = async (
+export const query = async <T = any>(
   queryName: keyof typeof queries,
   /*
    * @TODO Would be nice if at some point we could actually set these
    * types properly
    */
   variables?: Record<string, unknown>,
-): Promise<any> => {
+): Promise<T | undefined> => {
   try {
     const result = await API.graphql(
       graphqlOperation(queries[queryName], variables),
     );
     const [internalQueryName] = Object.keys(result?.data ?? []);
-    return result?.data[internalQueryName] ?? {};
+    return result?.data[internalQueryName];
   } catch (error) {
     console.error(`Could not fetch query "${queryName}"`, error);
     return undefined;
