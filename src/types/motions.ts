@@ -5,6 +5,11 @@ export enum MotionSide {
   NAY = 'nay',
 }
 
+export enum MotionVote {
+  NAY,
+  YAY,
+}
+
 /*
  * Contract calls
  */
