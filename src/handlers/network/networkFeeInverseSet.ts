@@ -18,7 +18,7 @@ export default async (event: ContractEvent): Promise<void> => {
       {
         input: {
           id: networkInverseFees[0].id,
-          convertedFee,
+          inverseFee: convertedFee,
         },
       },
     );
@@ -27,7 +27,7 @@ export default async (event: ContractEvent): Promise<void> => {
       'createCurrentNetworkInverseFee',
       {
         input: {
-          convertedFee,
+          inverseFee: convertedFee,
         },
       },
     );    
