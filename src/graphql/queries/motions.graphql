@@ -46,6 +46,10 @@ query GetColonyMotions($colonyAddress: ID!) {
         }
         isFinalized
         createdBy
+        voterRecord {
+          address
+          voteCount
+        }
       }
     }
   }
