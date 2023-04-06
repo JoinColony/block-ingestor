@@ -41,6 +41,11 @@ export interface MotionStakes {
   percentage: MotionStakeFragment;
 }
 
+export interface VoterRecord {
+  address: string;
+  voteCount: string;
+}
+
 export interface MotionData {
   motionId: string;
   nativeMotionId: string;
@@ -49,12 +54,12 @@ export interface MotionData {
   remainingStakes: [string, string];
   userMinStake: string;
   requiredStake: string;
-  // For calculating user's max stake in client
-  rootHash: string;
+  rootHash: string; // For calculating user's max stake in client
   motionDomainId: string;
   stakerRewards: StakerReward[];
   isFinalized: boolean;
   createdBy: string;
+  voterRecord: VoterRecord[];
 }
 
 export interface UserStakes {

@@ -26,6 +26,7 @@ import {
   handleMotionStaked,
   handleMotionFinalized,
   handleMotionRewardClaimed,
+  handleMotionVoteSubmitted,
 } from './handlers';
 
 dotenv.config();
@@ -135,6 +136,11 @@ export default async (event: ContractEvent): Promise<void> => {
 
     case ContractEventsSignatures.MotionRewardClaimed: {
       await handleMotionRewardClaimed(event);
+      return;
+    }
+
+    case ContractEventsSignatures.MotionVoteSubmitted: {
+      await handleMotionVoteSubmitted(event);
       return;
     }
 
