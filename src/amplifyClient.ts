@@ -239,6 +239,12 @@ export const queries = {
             }
             repSubmitted
             skillRep
+            events {
+              name
+              initiatorAddress
+              vote
+              amount
+            }
           }
         }
       }

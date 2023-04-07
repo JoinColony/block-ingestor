@@ -1,5 +1,6 @@
 import { ContractEvent } from '~types';
 import { verbose, getVotingClient } from '~utils';
+import { BigNumber } from 'ethers';
 import {
   getMotionDatabaseId,
   getMotionFromDB,
@@ -41,6 +42,7 @@ export default async (event: ContractEvent): Promise<void> => {
       motionData: { usersStakes },
       motionData,
     } = stakedMotion;
+    motionData.events.push({ name: 'MotionStaked', initiatorAddress: staker, vote: BigNumber.from(vote).toString(), amount: BigNumber.from(amount).toString() });
 
     const updatedUserStakes = getUpdatedUsersStakes(
       usersStakes,
