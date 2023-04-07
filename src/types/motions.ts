@@ -41,6 +41,8 @@ export interface MotionStakes {
   percentage: MotionStakeFragment;
 }
 
+type MotionVotes = MotionStakes;
+
 export interface VoterRecord {
   address: string;
   voteCount: string;
@@ -61,6 +63,7 @@ export interface MotionData {
   isFinalized: boolean;
   createdBy: string;
   voterRecord: VoterRecord[];
+  revealedVotes: MotionVotes;
 }
 
 export interface UserStakes {
