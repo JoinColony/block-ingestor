@@ -63,6 +63,12 @@ query GetColonyMotions($colonyAddress: ID!) {
         }
         repSubmitted
         skillRep
+        events {
+          name
+          initiatorAddress
+          vote
+          amount
+        }
       }
     }
   }
