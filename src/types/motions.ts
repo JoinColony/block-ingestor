@@ -44,6 +44,7 @@ export interface MotionStakes {
 export interface VoterRecord {
   address: string;
   voteCount: string;
+  vote: number | null;
 }
 
 export interface MotionData {
