@@ -10,6 +10,8 @@ import { ContractEvent } from '~types';
 import { verbose } from '~utils';
 import { motionSpecificEventsListener } from '~eventListener';
 
+import { addVotingReputationParamsToDB } from './helpers';
+
 export default async (event: ContractEvent): Promise<void> => {
   const { contractAddress: extensionAddress } = event;
 
@@ -33,5 +35,6 @@ export default async (event: ContractEvent): Promise<void> => {
   /* Listen for motions once Voting Reputation is enabled. */
   if (getExtensionHash(Extension.VotingReputation) === extensionHash) {
     await motionSpecificEventsListener(colonyAddress);
+    await addVotingReputationParamsToDB(extensionAddress, colonyAddress);
   }
 };
