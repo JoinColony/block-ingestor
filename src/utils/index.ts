@@ -6,6 +6,5 @@ export * from './numbers';
 export * from './tokens';
 export * from './actions';
 export * from './domains';
-export * from './motions';
 export * from './events';
 export * from './clients';
