@@ -117,7 +117,9 @@ interface VotingReputationParams {
 
 export interface Event {
   name: string;
+  transactionHash: string;
+  logIndex: number;
   initiatorAddress: string;
-  vote: string;
-  amount: string;
+  vote?: string;
+  amount?: string;
 }

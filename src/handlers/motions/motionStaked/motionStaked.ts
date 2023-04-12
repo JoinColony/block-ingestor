@@ -1,6 +1,5 @@
 import { ContractEvent } from '~types';
 import { verbose, getVotingClient } from '~utils';
-import { BigNumber } from 'ethers';
 import {
   getMotionDatabaseId,
   getMotionFromDB,
@@ -15,6 +14,8 @@ import {
 export default async (event: ContractEvent): Promise<void> => {
   const {
     contractAddress: colonyAddress,
+    logIndex,
+    transactionHash,
     args: { vote, amount, staker, motionId },
   } = event;
 
@@ -39,10 +40,21 @@ export default async (event: ContractEvent): Promise<void> => {
   if (stakedMotion) {
     const {
       id,
-      motionData: { usersStakes },
+      motionData: { usersStakes, events },
       motionData,
     } = stakedMotion;
-    motionData.events.push({ name: 'MotionStaked', initiatorAddress: staker, vote: BigNumber.from(vote).toString(), amount: BigNumber.from(amount).toString() });
+
+    const updatedEvents = [
+      ...events,
+      {
+        name: 'MotionStaked',
+        transactionHash,
+        logIndex,
+        initiatorAddress: staker,
+        vote: vote.toString(),
+        amount: amount.toString(),
+      },
+    ];
 
     const updatedUserStakes = getUpdatedUsersStakes(
       usersStakes,
@@ -59,6 +71,7 @@ export default async (event: ContractEvent): Promise<void> => {
         usersStakes: updatedUserStakes,
         motionStakes,
         remainingStakes,
+        events: updatedEvents,
       },
       showInActionsList,
     );
