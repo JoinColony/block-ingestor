@@ -9,6 +9,5 @@ export * from './domains';
 export * from './colonyClient';
 export * from './arrays';
 export * from './permissions';
-export * from './motions';
 export * from './events';
 export * from './clients';
