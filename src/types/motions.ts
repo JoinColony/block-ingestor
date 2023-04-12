@@ -64,6 +64,8 @@ export interface MotionData {
   createdBy: string;
   voterRecord: VoterRecord[];
   revealedVotes: MotionVotes;
+  repSubmitted: string;
+  skillRep: string;
 }
 
 export interface UserStakes {
