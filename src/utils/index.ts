@@ -7,6 +7,5 @@ export * from './tokens';
 export * from './actions';
 export * from './domains';
 export * from './colonyClient';
-export * from './motions';
 export * from './events';
 export * from './clients';

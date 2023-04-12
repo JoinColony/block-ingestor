@@ -16,6 +16,7 @@ import {
   getRequiredStake,
   getUserMinStake,
 } from '../helpers';
+
 export const getParsedActionFromMotion = async (
   motionId: string,
   colonyClient: AnyColonyClient,
