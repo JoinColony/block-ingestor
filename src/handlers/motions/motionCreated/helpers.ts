@@ -137,7 +137,7 @@ export const writeManageDomainMotionToDB = async (
 ): Promise<void> => {
   const { name } = parsedAction;
   const databaseDomainId = getMotionDomainDatabaseId(colonyAddress, transactionHash);
-
+  verbose('This is the type of this motion: ', name)
   await mutate('createColonyAction', {
     input: {
       id: transactionHash,
