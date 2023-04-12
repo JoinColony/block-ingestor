@@ -3,6 +3,7 @@ import { ColonyOperations, ContractEvent } from '~types';
 import { verbose } from '~utils';
 import {
   getParsedActionFromMotion,
+  writeManageDomainMotionToDB,
   writeMintTokensMotionToDB,
 } from './helpers';
 
@@ -22,6 +23,11 @@ export default async (event: ContractEvent): Promise<void> => {
     switch (contractOperation) {
       case ColonyOperations.MintTokens: {
         await writeMintTokensMotionToDB(event, parsedAction);
+        break;
+      }
+      case ColonyOperations.CreateDomain:
+      case ColonyOperations.EditDomain: {
+        await writeManageDomainMotionToDB(event, parsedAction);
         break;
       }
       default: {
