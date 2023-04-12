@@ -1,8 +1,9 @@
 import { Extension, getExtensionHash } from '@colony/colony-js';
 
 import { mutate } from '~amplifyClient';
-import { ContractEvent, ContractEventsSignatures } from '~types';
-import { addMotionEventListener, verbose } from '~utils';
+import { motionSpecificEventsListener } from '~eventListener';
+import { ContractEvent } from '~types';
+import { verbose } from '~utils';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { contractAddress: extensionAddress } = event;
@@ -22,9 +23,6 @@ export default async (event: ContractEvent): Promise<void> => {
 
   /* Listen for motions once Voting Reputation is enabled. */
   if (getExtensionHash(Extension.VotingReputation) === extensionHash) {
-    await addMotionEventListener(
-      ContractEventsSignatures.MotionCreated,
-      colonyAddress,
-    );
+    await motionSpecificEventsListener(colonyAddress);
   }
 };

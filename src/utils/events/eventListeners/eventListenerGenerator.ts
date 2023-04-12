@@ -8,6 +8,8 @@ import networkClient from '~networkClient';
 import { ContractEventsSignatures, NetworkClients } from '~types';
 import { verbose } from '~utils';
 
+import { saveRemover } from './listenerRemover';
+
 /**
  * Generator method for events listeners
  *
@@ -18,6 +20,7 @@ export const eventListenerGenerator = async (
   eventSignature: ContractEventsSignatures,
   contractAddress: string,
   clientType: ClientType = ClientType.NetworkClient,
+  isRemovable: boolean = false,
 ): Promise<void> => {
   const { client, provider } = await getClientAndProvider(
     clientType,
@@ -32,9 +35,24 @@ export const eventListenerGenerator = async (
     contractAddress ? `filtering Address: ${contractAddress}` : '',
   );
 
-  provider.on(filter, async (log: Log) => {
+  const handleEvent = async (log: Log): Promise<void> => {
     await addEventToQueue(client, clientType, contractAddress, log, provider);
-  });
+  };
+
+  provider.on(filter, handleEvent);
+
+  if (isRemovable) {
+    const listenerRemover = (): void => {
+      verbose(
+        'Removed listener for Event:',
+        eventSignature,
+        contractAddress ? `filtering Address: ${contractAddress}` : '',
+      );
+      provider.off(filter, handleEvent);
+    };
+
+    saveRemover(contractAddress, clientType, eventSignature, listenerRemover);
+  }
 };
 
 /**
