@@ -1,10 +1,10 @@
 import networkClient from '~networkClient';
 import { ColonyOperations, ContractEvent } from '~types';
+import { verbose } from '~utils';
 import {
   getParsedActionFromMotion,
-  verbose,
   writeMintTokensMotionToDB,
-} from '~utils';
+} from './helpers';
 
 export default async (event: ContractEvent): Promise<void> => {
   const {
