@@ -7,7 +7,8 @@ import { addEvent } from '~eventQueue';
 import networkClient from '~networkClient';
 import { ContractEventsSignatures, NetworkClients } from '~types';
 import { verbose } from '~utils';
-import ctx from '~context';
+
+import { saveRemover } from './listenerRemover';
 
 /**
  * Generator method for events listeners
@@ -19,7 +20,7 @@ export const eventListenerGenerator = async (
   eventSignature: ContractEventsSignatures,
   contractAddress: string,
   clientType: ClientType = ClientType.NetworkClient,
-  saveRemoverInContext: boolean = false,
+  isRemovable: boolean = false,
 ): Promise<void> => {
   const { client, provider } = await getClientAndProvider(
     clientType,
@@ -40,32 +41,20 @@ export const eventListenerGenerator = async (
 
   provider.on(filter, handleEvent);
 
-  const listenerRemover = (): void => {
-    verbose(
-      'Removed listener for Event:',
-      eventSignature,
-      contractAddress ? `filtering Address: ${contractAddress}` : '',
-    );
-    provider.off(filter, handleEvent);
-  };
+  if (isRemovable) {
+    const listenerRemover = (): void => {
+      verbose(
+        'Removed listener for Event:',
+        eventSignature,
+        contractAddress ? `filtering Address: ${contractAddress}` : '',
+      );
+      provider.off(filter, handleEvent);
+    };
 
-  if (saveRemoverInContext) {
-    const listenerRemoverKey = generateListenerRemoverKey(
-      contractAddress,
-      clientType,
-      eventSignature,
-    );
-    ctx.listenerRemovers[listenerRemoverKey] = listenerRemover;
+    saveRemover(contractAddress, clientType, eventSignature, listenerRemover);
   }
 };
 
-/* Generate a unique key for the listenerRemover. */
-
-export const generateListenerRemoverKey = (
-  contractAddress: string,
-  clientType: ClientType,
-  eventSignature: ContractEventsSignatures,
-): string => `${contractAddress}-${clientType}-${eventSignature}`;
 /**
  * Handle the event listener generator-specific client and provider logic
  */
