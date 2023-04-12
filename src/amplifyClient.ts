@@ -241,6 +241,8 @@ export const queries = {
             skillRep
             events {
               name
+              transactionHash
+              logIndex
               initiatorAddress
               vote
               amount
