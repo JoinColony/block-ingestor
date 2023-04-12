@@ -237,6 +237,8 @@ export const queries = {
                 nay
               }
             }
+            repSubmitted
+            skillRep
           }
         }
       }
