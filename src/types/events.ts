@@ -100,6 +100,8 @@ export enum ColonyActionType {
   EmitDomainReputationReward = 'EMIT_DOMAIN_REPUTATION_REWARD',
   SetUserRoles = 'SET_USER_ROLES',
   MintTokensMotion = 'MINT_TOKENS_MOTION',
+  CreateDomainMotion = 'CREATE_DOMAIN_MOTION',
+  EditDomainMotion = 'EDIT_DOMAIN_MOTION',
 }
 
 // The Filter type doesn't seem to be exported from colony-js
