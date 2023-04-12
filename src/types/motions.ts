@@ -64,6 +64,8 @@ export interface MotionData {
   createdBy: string;
   voterRecord: VoterRecord[];
   revealedVotes: MotionVotes;
+  repSubmitted: string;
+  skillRep: string;
 }
 
 export interface UserStakes {
@@ -81,4 +83,19 @@ export interface MotionQuery {
   id: string;
   motionData: MotionData;
   createdAt: string;
+}
+
+export interface ExtensionParams {
+  votingReputation?: VotingReputationParams;
+}
+
+interface VotingReputationParams {
+  totalStakeFraction: string;
+  voterRewardFraction: string;
+  userMinStakeFraction: string;
+  maxVoteFraction: string;
+  stakePeriod: string;
+  submitPeriod: string;
+  revealPeriod: string;
+  escalationPeriod: string;
 }

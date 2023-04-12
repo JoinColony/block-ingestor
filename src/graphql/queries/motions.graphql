@@ -61,6 +61,8 @@ query GetColonyMotions($colonyAddress: ID!) {
             nay
           }
         }
+        repSubmitted
+        skillRep
       }
     }
   }
