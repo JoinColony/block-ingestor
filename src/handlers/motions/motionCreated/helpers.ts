@@ -43,7 +43,9 @@ const getMotionData = async (
   domainId: BigNumber,
 ): Promise<MotionData> => {
   const votingClient = await getVotingClient(colonyAddress);
-  const { skillRep, rootHash } = await votingClient.getMotion(motionId);
+  const { skillRep, rootHash, repSubmitted } = await votingClient.getMotion(
+    motionId,
+  );
   const totalStakeFraction = await votingClient.getTotalStakeFraction();
   const userMinStakeFraction = await votingClient.getUserMinStakeFraction();
   const requiredStake: string = getRequiredStake(
@@ -92,6 +94,8 @@ const getMotionData = async (
         yay: '0',
       },
     },
+    repSubmitted: repSubmitted.toString(),
+    skillRep: skillRep.toString(),
   };
 };
 
