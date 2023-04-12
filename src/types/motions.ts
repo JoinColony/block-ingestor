@@ -15,14 +15,16 @@ export enum MotionVote {
  */
 export enum ColonyOperations {
   MintTokens = 'mintTokens',
+  CreateDomain = 'createDomain',
+  EditDomain = 'editDomain',
 }
 
 export const motionNameMapping: { [key: string]: ColonyActionType } = {
   [ColonyOperations.MintTokens]: ColonyActionType.MintTokensMotion,
   // makePaymentFundedFromDomain: ColonyMotions.PaymentMotion,
   // unlockToken: ColonyMotions.UnlockTokenMotion,
-  // addDomain: ColonyMotions.CreateDomainMotion,
-  // editDomain: ColonyMotions.EditDomainMotion,
+  [ColonyOperations.CreateDomain]: ColonyActionType.CreateDomainMotion,
+  [ColonyOperations.EditDomain]: ColonyActionType.EditDomainMotion,
   // editColony: ColonyMotions.ColonyEditMotion,
   // setUserRoles: ColonyMotions.SetUserRolesMotion,
   // moveFundsBetweenPots: ColonyMotions.MoveFundsMotion,
