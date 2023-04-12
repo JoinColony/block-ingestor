@@ -29,6 +29,7 @@ import {
   handleMotionVoteSubmitted,
   handleMotionVoteRevealed,
 } from './handlers';
+import { verbose } from '~utils';
 
 dotenv.config();
 
@@ -49,7 +50,7 @@ export default async (event: ContractEvent): Promise<void> => {
       'Event does not have a signature. Possibly bad event data. Refusing the process!',
     );
   }
-
+  verbose('This is the event signature: ', event.signature);
   switch (event.signature) {
     /*
      * New Colony Added
