@@ -1,4 +1,5 @@
 import { ContractEvent } from '~types';
+import { BigNumber } from 'ethers';
 import { verbose, getVotingClient } from '~utils';
 import {
   getMotionDatabaseId,
@@ -40,12 +41,22 @@ export default async (event: ContractEvent): Promise<void> => {
   if (stakedMotion) {
     const {
       id,
-      motionData: { usersStakes, events },
+      motionData: { usersStakes, events: updatedEvents },
       motionData,
     } = stakedMotion;
 
-    const updatedEvents = [
-      ...events,
+    if (vote.eq(0) && !updatedEvents.find(({ name }) => name === 'ObjectionRaised')) {
+      updatedEvents.push(
+        {
+          name: 'ObjectionRaised',
+          transactionHash,
+          logIndex,
+          initiatorAddress: staker,
+        },
+      );
+    }
+
+    updatedEvents.push(
       {
         name: 'MotionStaked',
         transactionHash,
@@ -54,7 +65,29 @@ export default async (event: ContractEvent): Promise<void> => {
         vote: vote.toString(),
         amount: amount.toString(),
       },
-    ];
+    );
+
+    if (requiredStake.eq(BigNumber.from(motionStakes.raw.yay))) {
+      const eventName = !updatedEvents.find(({ name }) => name === 'ObjectionRaised') ? 'MotionFullyStaked' : 'MotionFullyStakedAfterObjection';
+      updatedEvents.push(
+        {
+          name: eventName,
+          transactionHash,
+          logIndex,
+          initiatorAddress: staker,
+        },
+      );
+    }
+    if (requiredStake.eq(BigNumber.from(motionStakes.raw.nay))) {
+      updatedEvents.push(
+        {
+          name: 'ObjectionFullyStaked',
+          transactionHash,
+          logIndex,
+          initiatorAddress: staker,
+        },
+      );
+    }
 
     const updatedUserStakes = getUpdatedUsersStakes(
       usersStakes,
