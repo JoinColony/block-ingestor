@@ -1,6 +1,5 @@
 import { BigNumber } from 'ethers';
-import { MotionQuery, MotionStakes, UserStakes } from '~types';
-import { verbose } from '~utils';
+import { MotionStakes, UserStakes } from '~types';
 import { getMotionSide } from '../helpers';
 
 export const getRequiredStake = (
@@ -49,7 +48,16 @@ export const getRemainingStakes = (
 export const getStakePercentage = (
   stake: BigNumber,
   requiredStake: BigNumber,
-): BigNumber => stake.mul(100).div(requiredStake);
+): BigNumber => {
+  const percentage = stake.mul(100).div(requiredStake);
+
+  // May be zero due to rounding. Since a user cannot stake 0%, we round up to 1.
+  if (percentage.isZero()) {
+    return percentage.add(1);
+  }
+
+  return percentage;
+};
 
 /**
  * Given staking data, format and return new UserStakes object
