@@ -24,7 +24,9 @@ export default async (event: ContractEvent): Promise<void> => {
   const requiredStake = getRequiredStake(skillRep, totalStakeFraction);
   const motionStakes = getMotionStakes(requiredStake, stakes);
   const remainingStakes = getRemainingStakes(requiredStake, stakes);
-
+  const showInActionsList =
+    Number(motionStakes.percentage.yay) + Number(motionStakes.percentage.nay) >=
+    10;
   const { chainId } = await votingClient.provider.getNetwork();
   const motionDatabaseId = getMotionDatabaseId(
     chainId,
@@ -48,12 +50,16 @@ export default async (event: ContractEvent): Promise<void> => {
       requiredStake,
     );
 
-    await updateMotionInDB(id, {
-      ...motionData,
-      usersStakes: updatedUserStakes,
-      motionStakes,
-      remainingStakes,
-    });
+    await updateMotionInDB(
+      id,
+      {
+        ...motionData,
+        usersStakes: updatedUserStakes,
+        motionStakes,
+        remainingStakes,
+      },
+      showInActionsList,
+    );
 
     verbose(
       `User: ${staker} staked motion ${motionId.toString()} by ${amount.toString()} on side ${getMotionSide(
