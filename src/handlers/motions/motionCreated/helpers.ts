@@ -2,7 +2,6 @@ import { AnyColonyClient, Extension } from '@colony/colony-js';
 import { BigNumber } from 'ethers';
 import { TransactionDescription } from 'ethers/lib/utils';
 
-import { mutate } from '~amplifyClient';
 import { MotionData, ContractEvent, motionNameMapping } from '~types';
 import {
   getColonyTokenAddress,
@@ -12,6 +11,7 @@ import {
 } from '~utils';
 
 import {
+  createMotionInDB,
   getMotionDatabaseId,
   getRequiredStake,
   getUserMinStake,
@@ -112,18 +112,15 @@ export const writeMintTokensMotionToDB = async (
   const amount = actionArgs[0].toString();
   const tokenAddress = await getColonyTokenAddress(colonyAddress);
   const motionData = await getMotionData(colonyAddress, motionId, domainId);
-  await mutate('createColonyAction', {
-    input: {
-      id: transactionHash,
-      colonyId: colonyAddress,
-      type: motionNameMapping[name],
-      isMotion: true,
-      motionData,
-      tokenAddress,
-      fromDomainId: getDomainDatabaseId(colonyAddress, domainId),
-      initiatorAddress: creator,
-      amount,
-      blockNumber,
-    },
+  await createMotionInDB({
+    id: transactionHash,
+    colonyId: colonyAddress,
+    type: motionNameMapping[name],
+    motionData,
+    tokenAddress,
+    fromDomainId: getDomainDatabaseId(colonyAddress, domainId),
+    initiatorAddress: creator,
+    amount,
+    blockNumber,
   });
 };
