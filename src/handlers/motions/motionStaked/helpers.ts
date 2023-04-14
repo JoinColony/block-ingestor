@@ -1,5 +1,5 @@
 import { BigNumber } from 'ethers';
-import { MotionStakes, UserStakes } from '~types';
+import { MotionStakes, UserStakes, Message } from '~types';
 import { getMotionSide } from '../helpers';
 
 export const getRequiredStake = (
@@ -181,4 +181,62 @@ export const getUserMinStake = (
     .mul(userMinStakeFraction)
     .div(BigNumber.from(10).pow(36))
     .toString();
+};
+
+export const getUpdatedMessages = (
+  updatedMessages: Message[],
+  requiredStake: BigNumber,
+  motionStakes: MotionStakes,
+  transactionHash: string,
+  logIndex: number,
+  vote: BigNumber,
+  staker: string,
+  amount: BigNumber,
+): Message[] => {
+    const isFirstObjection = vote.eq(0) && !updatedMessages.find(({ name }) => name === 'ObjectionRaised');
+    if (isFirstObjection) {
+      updatedMessages.push(
+        {
+          name: 'ObjectionRaised',
+          transactionHash,
+          logIndex,
+          initiatorAddress: staker,
+        },
+      );
+    }
+
+    updatedMessages.push(
+      {
+        name: 'MotionStaked',
+        transactionHash,
+        logIndex,
+        initiatorAddress: staker,
+        vote: vote.toString(),
+        amount: amount.toString(),
+      },
+    );
+
+    if (requiredStake.eq(motionStakes.raw.yay)) {
+      const messageName = !updatedMessages.find(({ name }) => name === 'ObjectionRaised') ? 'MotionFullyStaked' : 'MotionFullyStakedAfterObjection';
+      updatedMessages.push(
+        {
+          name: messageName,
+          transactionHash,
+          logIndex,
+          initiatorAddress: staker,
+        },
+      );
+    }
+    if (requiredStake.eq(motionStakes.raw.nay)) {
+      updatedMessages.push(
+        {
+          name: 'ObjectionFullyStaked',
+          transactionHash,
+          logIndex,
+          initiatorAddress: staker,
+        },
+      );
+    }
+
+    return updatedMessages;
 };

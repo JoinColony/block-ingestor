@@ -211,7 +211,7 @@ export const queries = {
             }
             repSubmitted
             skillRep
-            events {
+            messages {
               name
               transactionHash
               logIndex
