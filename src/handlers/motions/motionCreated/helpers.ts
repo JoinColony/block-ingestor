@@ -98,7 +98,7 @@ export const getMotionData = async (
     },
     repSubmitted: repSubmitted.toString(),
     skillRep: skillRep.toString(),
-    messages: [{ name: 'MotionCreated', transactionHash, logIndex, initiatorAddress: creator }],
+    messages: [{ name: 'MotionCreated', messageKey: `${transactionHash}${logIndex}`, initiatorAddress: creator }],
   };
 };
 
