@@ -29,6 +29,7 @@ export const writeActionFromEvent = async (
         colonyId: colonyAddress,
         blockNumber,
         createdAt: new Date(timestamp * 1000).toISOString(),
+        showInActionsList: true,
         ...actionFields,
       },
     },
