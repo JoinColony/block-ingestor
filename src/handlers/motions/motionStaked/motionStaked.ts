@@ -1,5 +1,4 @@
 import { ContractEvent } from '~types';
-import { BigNumber } from 'ethers';
 import { verbose, getVotingClient } from '~utils';
 import {
   getMotionDatabaseId,
@@ -9,6 +8,7 @@ import {
   getRemainingStakes,
   getRequiredStake,
   getUpdatedUsersStakes,
+  getUpdatedMessages,
   updateMotionInDB,
 } from '../helpers';
 
@@ -41,53 +41,9 @@ export default async (event: ContractEvent): Promise<void> => {
   if (stakedMotion) {
     const {
       id,
-      motionData: { usersStakes, events: updatedEvents },
+      motionData: { usersStakes, messages },
       motionData,
     } = stakedMotion;
-
-    if (vote.eq(0) && !updatedEvents.find(({ name }) => name === 'ObjectionRaised')) {
-      updatedEvents.push(
-        {
-          name: 'ObjectionRaised',
-          transactionHash,
-          logIndex,
-          initiatorAddress: staker,
-        },
-      );
-    }
-
-    updatedEvents.push(
-      {
-        name: 'MotionStaked',
-        transactionHash,
-        logIndex,
-        initiatorAddress: staker,
-        vote: vote.toString(),
-        amount: amount.toString(),
-      },
-    );
-
-    if (requiredStake.eq(BigNumber.from(motionStakes.raw.yay))) {
-      const eventName = !updatedEvents.find(({ name }) => name === 'ObjectionRaised') ? 'MotionFullyStaked' : 'MotionFullyStakedAfterObjection';
-      updatedEvents.push(
-        {
-          name: eventName,
-          transactionHash,
-          logIndex,
-          initiatorAddress: staker,
-        },
-      );
-    }
-    if (requiredStake.eq(BigNumber.from(motionStakes.raw.nay))) {
-      updatedEvents.push(
-        {
-          name: 'ObjectionFullyStaked',
-          transactionHash,
-          logIndex,
-          initiatorAddress: staker,
-        },
-      );
-    }
 
     const updatedUserStakes = getUpdatedUsersStakes(
       usersStakes,
@@ -97,6 +53,8 @@ export default async (event: ContractEvent): Promise<void> => {
       requiredStake,
     );
 
+    const updatedMessages = getUpdatedMessages(messages, requiredStake, motionStakes, transactionHash, logIndex, vote, staker, amount);
+
     await updateMotionInDB(
       id,
       {
@@ -104,7 +62,7 @@ export default async (event: ContractEvent): Promise<void> => {
         usersStakes: updatedUserStakes,
         motionStakes,
         remainingStakes,
-        events: updatedEvents,
+        messages: updatedMessages,
       },
       showInActionsList,
     );
