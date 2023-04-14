@@ -80,7 +80,7 @@ export interface MotionData {
   revealedVotes: MotionVotes;
   repSubmitted: string;
   skillRep: string;
-  events: Event[];
+  messages: Message[];
 }
 
 export interface UserStakes {
@@ -115,7 +115,7 @@ interface VotingReputationParams {
   escalationPeriod: string;
 }
 
-export interface Event {
+export interface Message {
   name: string;
   transactionHash: string;
   logIndex: number;
