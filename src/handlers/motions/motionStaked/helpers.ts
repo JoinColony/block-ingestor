@@ -193,13 +193,14 @@ export const getUpdatedMessages = (
   staker: string,
   amount: BigNumber,
 ): Message[] => {
+    const messageKey = `${transactionHash}${logIndex}`;
+
     const isFirstObjection = vote.eq(0) && !updatedMessages.find(({ name }) => name === 'ObjectionRaised');
     if (isFirstObjection) {
       updatedMessages.push(
         {
           name: 'ObjectionRaised',
-          transactionHash,
-          logIndex,
+          messageKey: `${messageKey}_ObjectionRaised`,
           initiatorAddress: staker,
         },
       );
@@ -208,8 +209,7 @@ export const getUpdatedMessages = (
     updatedMessages.push(
       {
         name: 'MotionStaked',
-        transactionHash,
-        logIndex,
+        messageKey,
         initiatorAddress: staker,
         vote: vote.toString(),
         amount: amount.toString(),
@@ -221,8 +221,7 @@ export const getUpdatedMessages = (
       updatedMessages.push(
         {
           name: messageName,
-          transactionHash,
-          logIndex,
+          messageKey: `${messageKey}_${messageName}`,
           initiatorAddress: staker,
         },
       );
@@ -231,8 +230,7 @@ export const getUpdatedMessages = (
       updatedMessages.push(
         {
           name: 'ObjectionFullyStaked',
-          transactionHash,
-          logIndex,
+          messageKey: `${messageKey}_ObjectionFullyStaked`,
           initiatorAddress: staker,
         },
       );
