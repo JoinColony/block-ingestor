@@ -25,7 +25,7 @@ export default async (event: ContractEvent): Promise<void> => {
         await writeMintTokensMotionToDB(event, parsedAction);
         break;
       }
-      case ColonyOperations.CreateDomain:
+      case ColonyOperations.AddDomain:
       case ColonyOperations.EditDomain: {
         await writeManageDomainMotionToDB(event, parsedAction);
         break;

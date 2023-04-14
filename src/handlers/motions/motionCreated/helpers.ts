@@ -8,7 +8,7 @@ import {
   getDomainDatabaseId,
   getVotingClient,
   verbose,
-  getMotionDomainDatabaseId,
+  getPendingMotionDomainDatabaseId,
 } from '~utils';
 
 import {
@@ -136,17 +136,17 @@ export const writeManageDomainMotionToDB = async (
   parsedAction: TransactionDescription,
 ): Promise<void> => {
   const { name } = parsedAction;
-  const databaseDomainId = getMotionDomainDatabaseId(colonyAddress, transactionHash);
-  verbose('This is the type of this motion: ', name)
+  const pendingDomainMetadataId = getPendingMotionDomainDatabaseId(colonyAddress, transactionHash);
+
   await mutate('createColonyAction', {
     input: {
       id: transactionHash,
       colonyId: colonyAddress,
       type: motionNameMapping[name],
       isMotion: true,
-      fromDomainId: databaseDomainId,
       initiatorAddress: creator,
       blockNumber,
+      pendingDomainMetadataId
     },
   });
 };
