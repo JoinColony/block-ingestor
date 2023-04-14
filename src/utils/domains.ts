@@ -3,7 +3,7 @@ export const getDomainDatabaseId = (
   nativeId: number,
 ): string => `${colonyAddress}_${nativeId}`;
 
-export const getMotionDomainDatabaseId = (
+export const getPendingMotionDomainDatabaseId = (
   colonyAddress: string,
   transactionHash: string,
 ) => `${colonyAddress}_motion-${transactionHash}`;
