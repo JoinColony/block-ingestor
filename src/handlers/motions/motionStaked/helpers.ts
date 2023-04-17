@@ -216,7 +216,7 @@ export const getUpdatedMessages = (
       },
     );
 
-    if (requiredStake.eq(motionStakes.raw.yay)) {
+    if (vote.eq(1) && requiredStake.eq(motionStakes.raw.yay)) {
       const messageName = !updatedMessages.find(({ name }) => name === 'ObjectionRaised') ? 'MotionFullyStaked' : 'MotionFullyStakedAfterObjection';
       updatedMessages.push(
         {
@@ -226,7 +226,7 @@ export const getUpdatedMessages = (
         },
       );
     }
-    if (requiredStake.eq(motionStakes.raw.nay)) {
+    if (vote.eq(0) && requiredStake.eq(motionStakes.raw.nay)) {
       updatedMessages.push(
         {
           name: 'ObjectionFullyStaked',
