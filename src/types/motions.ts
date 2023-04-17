@@ -22,7 +22,7 @@ export enum ColonyOperations {
 export const motionNameMapping: { [key: string]: ColonyActionType } = {
   [ColonyOperations.MintTokens]: ColonyActionType.MintTokensMotion,
   // makePaymentFundedFromDomain: ColonyMotions.PaymentMotion,
-  // unlockToken: ColonyMotions.UnlockTokenMotion,
+  [ColonyOperations.UnlockToken]: ColonyActionType.UnlockTokenMotion,
   // addDomain: ColonyMotions.CreateDomainMotion,
   // editDomain: ColonyMotions.EditDomainMotion,
   // editColony: ColonyMotions.ColonyEditMotion,
