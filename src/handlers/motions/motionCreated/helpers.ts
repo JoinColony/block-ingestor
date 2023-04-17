@@ -131,7 +131,7 @@ export const writeManageDomainMotionToDB = async (
     transactionHash,
     contractAddress: colonyAddress,
     blockNumber,
-    args: { creator },
+    args: { creator, domainId },
   }: ContractEvent,
   parsedAction: TransactionDescription,
 ): Promise<void> => {
@@ -146,7 +146,8 @@ export const writeManageDomainMotionToDB = async (
       isMotion: true,
       initiatorAddress: creator,
       blockNumber,
-      pendingDomainMetadataId
+      pendingDomainMetadataId,
+      motionDomainId: domainId,
     },
   });
 };
