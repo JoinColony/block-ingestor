@@ -9,6 +9,7 @@ import {
   getVotingClient,
   verbose,
   getPendingMotionDomainDatabaseId,
+  toNumber,
 } from '~utils';
 
 import {
@@ -147,7 +148,7 @@ export const writeManageDomainMotionToDB = async (
       initiatorAddress: creator,
       blockNumber,
       pendingDomainMetadataId,
-      motionDomainId: domainId,
+      motionDomainId: toNumber(domainId),
     },
   });
 };
