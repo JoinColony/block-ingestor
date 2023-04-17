@@ -65,8 +65,7 @@ query GetColonyMotions($colonyAddress: ID!) {
         skillRep
         messages {
           name
-          transactionHash
-          logIndex
+          messageKey
           initiatorAddress
           vote
           amount
