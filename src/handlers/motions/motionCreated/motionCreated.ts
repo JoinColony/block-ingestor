@@ -6,6 +6,7 @@ import {
   handleManageDomainMotion,
   handleMintTokensMotion,
   handleNetworkUpgradeMotion,
+  handleUnlockTokenMotion,
 } from './handlers';
 
 export default async (event: ContractEvent): Promise<void> => {
@@ -33,6 +34,11 @@ export default async (event: ContractEvent): Promise<void> => {
 
       case ColonyOperations.Upgrade: {
         await handleNetworkUpgradeMotion(event, parsedAction);
+        break;
+      }
+
+      case ColonyOperations.UnlockToken: {
+        await handleUnlockTokenMotion(event, parsedAction);
         break;
       }
 
