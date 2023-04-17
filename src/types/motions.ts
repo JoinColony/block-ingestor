@@ -16,6 +16,7 @@ export enum MotionVote {
 export enum ColonyOperations {
   MintTokens = 'mintTokens',
   Upgrade = 'upgrade',
+  UnlockToken = 'unlockToken',
 }
 
 export const motionNameMapping: { [key: string]: ColonyActionType } = {

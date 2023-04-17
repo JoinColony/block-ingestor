@@ -2,7 +2,11 @@ import networkClient from '~networkClient';
 import { ColonyOperations, ContractEvent } from '~types';
 import { verbose } from '~utils';
 import { getParsedActionFromMotion } from './helpers';
-import { handleMintTokensMotion, handleNetworkUpgradeMotion } from './handlers';
+import {
+  handleNetworkUpgradeMotion,
+  handleMintTokensMotion,
+  handleUnlockTokenMotion,
+} from './handlers';
 
 export default async (event: ContractEvent): Promise<void> => {
   const {
@@ -24,6 +28,11 @@ export default async (event: ContractEvent): Promise<void> => {
 
       case ColonyOperations.Upgrade: {
         await handleNetworkUpgradeMotion(event, parsedAction);
+        break;
+      }
+
+      case ColonyOperations.UnlockToken: {
+        await handleUnlockTokenMotion(event, parsedAction);
         break;
       }
 
