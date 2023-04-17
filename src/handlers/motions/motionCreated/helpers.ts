@@ -2,16 +2,11 @@ import { AnyColonyClient, Extension } from '@colony/colony-js';
 import { BigNumber } from 'ethers';
 import { TransactionDescription } from 'ethers/lib/utils';
 
-import { MotionData, ContractEvent, motionNameMapping } from '~types';
-import {
-  getColonyTokenAddress,
-  getDomainDatabaseId,
-  getVotingClient,
-  verbose,
-} from '~utils';
+import { ContractEvent, MotionData } from '~types';
+import { getVotingClient, verbose } from '~utils';
+import { mutate } from '~amplifyClient';
 
 import {
-  createMotionInDB,
   getMotionDatabaseId,
   getRequiredStake,
   getUserMinStake,
@@ -37,7 +32,7 @@ export const getParsedActionFromMotion = async (
   }
 };
 
-const getMotionData = async (
+export const getMotionData = async (
   colonyAddress: string,
   motionId: BigNumber,
   domainId: BigNumber,
@@ -99,28 +94,27 @@ const getMotionData = async (
   };
 };
 
-export const writeMintTokensMotionToDB = async (
+export const createMotionInDB = async (
   {
     transactionHash,
-    contractAddress: colonyAddress,
     blockNumber,
+    contractAddress: colonyAddress,
     args: { motionId, creator, domainId },
   }: ContractEvent,
-  parsedAction: TransactionDescription,
+  input: Record<string, any>,
 ): Promise<void> => {
-  const { name, args: actionArgs } = parsedAction;
-  const amount = actionArgs[0].toString();
-  const tokenAddress = await getColonyTokenAddress(colonyAddress);
   const motionData = await getMotionData(colonyAddress, motionId, domainId);
-  await createMotionInDB({
-    id: transactionHash,
-    colonyId: colonyAddress,
-    type: motionNameMapping[name],
-    motionData,
-    tokenAddress,
-    fromDomainId: getDomainDatabaseId(colonyAddress, domainId),
-    initiatorAddress: creator,
-    amount,
-    blockNumber,
+
+  await mutate('createColonyAction', {
+    input: {
+      id: transactionHash,
+      colonyId: colonyAddress,
+      isMotion: true,
+      showInActionsList: false,
+      motionData,
+      initiatorAddress: creator,
+      blockNumber,
+      ...input,
+    },
   });
 };
