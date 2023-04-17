@@ -187,14 +187,11 @@ export const getUpdatedMessages = (
   updatedMessages: Message[],
   requiredStake: BigNumber,
   motionStakes: MotionStakes,
-  transactionHash: string,
-  logIndex: number,
+  messageKey: string,
   vote: BigNumber,
   staker: string,
   amount: BigNumber,
 ): Message[] => {
-    const messageKey = `${transactionHash}${logIndex}`;
-
     const isFirstObjection = vote.eq(0) && !updatedMessages.find(({ name }) => name === 'ObjectionRaised');
     if (isFirstObjection) {
       updatedMessages.push(
