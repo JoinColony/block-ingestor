@@ -17,6 +17,7 @@ export enum ColonyOperations {
   MintTokens = 'mintTokens',
   AddDomain = 'addDomain',
   EditDomain = 'editDomain',
+  Upgrade = 'upgrade',
 }
 
 export const motionNameMapping: { [key: string]: ColonyActionType } = {
@@ -28,7 +29,7 @@ export const motionNameMapping: { [key: string]: ColonyActionType } = {
   // editColony: ColonyMotions.ColonyEditMotion,
   // setUserRoles: ColonyMotions.SetUserRolesMotion,
   // moveFundsBetweenPots: ColonyMotions.MoveFundsMotion,
-  // upgrade: ColonyMotions.VersionUpgradeMotion,
+  [ColonyOperations.Upgrade]: ColonyActionType.VersionUpgradeMotion,
   // emitDomainReputationPenalty: ColonyMotions.EmitDomainReputationPenaltyMotion,
   // emitDomainReputationReward: ColonyMotions.EmitDomainReputationRewardMotion,
 };

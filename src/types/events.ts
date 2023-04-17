@@ -102,6 +102,7 @@ export enum ColonyActionType {
   MintTokensMotion = 'MINT_TOKENS_MOTION',
   CreateDomainMotion = 'CREATE_DOMAIN_MOTION',
   EditDomainMotion = 'EDIT_DOMAIN_MOTION',
+  VersionUpgradeMotion = 'VERSION_UPGRADE_MOTION',
 }
 
 // The Filter type doesn't seem to be exported from colony-js
