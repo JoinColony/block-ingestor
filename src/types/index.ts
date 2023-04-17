@@ -93,6 +93,7 @@ export enum ColonyActionType {
   MintTokensMotion = 'MINT_TOKENS_MOTION',
   CreateDomainMotion = 'CREATE_DOMAIN_MOTION',
   EditDomainMotion = 'EDIT_DOMAIN_MOTION',
+  VersionUpgradeMotion = 'VERSION_UPGRADE_MOTION',
 }
 
 // Export here to avoid circular dependency with ColonyActionType
