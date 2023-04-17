@@ -213,8 +213,7 @@ export const queries = {
             skillRep
             messages {
               name
-              transactionHash
-              logIndex
+              messageKey
               initiatorAddress
               vote
               amount
