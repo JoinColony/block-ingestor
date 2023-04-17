@@ -15,7 +15,6 @@ export default async (event: ContractEvent): Promise<void> => {
 
   if (parsedAction) {
     const contractOperation = parsedAction.name;
-
     /* Handle the action type-specific mutation here */
     switch (contractOperation) {
       case ColonyOperations.MintTokens: {
