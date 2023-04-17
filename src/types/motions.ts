@@ -18,6 +18,7 @@ export enum ColonyOperations {
   AddDomain = 'addDomain',
   EditDomain = 'editDomain',
   Upgrade = 'upgrade',
+  UnlockToken = 'unlockToken',
 }
 
 export const motionNameMapping: { [key: string]: ColonyActionType } = {
