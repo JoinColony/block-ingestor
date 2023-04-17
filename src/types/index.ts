@@ -94,6 +94,7 @@ export enum ColonyActionType {
   CreateDomainMotion = 'CREATE_DOMAIN_MOTION',
   EditDomainMotion = 'EDIT_DOMAIN_MOTION',
   VersionUpgradeMotion = 'VERSION_UPGRADE_MOTION',
+  UnlockTokenMotion = 'UNLOCK_TOKEN_MOTION',
 }
 
 // Export here to avoid circular dependency with ColonyActionType
