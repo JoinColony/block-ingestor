@@ -52,8 +52,8 @@ export default async (event: ContractEvent): Promise<void> => {
       amount,
       requiredStake,
     );
-
-    const updatedMessages = getUpdatedMessages(messages, requiredStake, motionStakes, transactionHash, logIndex, vote, staker, amount);
+    const messageKey = `${transactionHash}${logIndex}`;
+    const updatedMessages = getUpdatedMessages(messages, requiredStake, motionStakes, messageKey, vote, staker, amount);
 
     await updateMotionInDB(
       id,
