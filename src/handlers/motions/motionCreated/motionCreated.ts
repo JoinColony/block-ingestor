@@ -1,3 +1,5 @@
+import { Extension } from '@colony/colony-js';
+
 import networkClient from '~networkClient';
 import { ColonyOperations, ContractEvent } from '~types';
 import { verbose } from '~utils';
@@ -7,6 +9,7 @@ import {
   handleMintTokensMotion,
   handleNetworkUpgradeMotion,
   handleUnlockTokenMotion,
+  handlePaymentMotion,
 } from './handlers';
 
 export default async (event: ContractEvent): Promise<void> => {
@@ -16,7 +19,14 @@ export default async (event: ContractEvent): Promise<void> => {
   } = event;
 
   const colonyClient = await networkClient.getColonyClient(colonyAddress);
-  const parsedAction = await getParsedActionFromMotion(motionId, colonyClient);
+  const oneTxPaymentClient = await colonyClient.getExtensionClient(
+    Extension.OneTxPayment,
+  );
+  const parsedAction = await getParsedActionFromMotion(
+    motionId,
+    colonyAddress,
+    [colonyClient, oneTxPaymentClient],
+  );
 
   if (parsedAction) {
     const contractOperation = parsedAction.name;
@@ -39,6 +49,11 @@ export default async (event: ContractEvent): Promise<void> => {
 
       case ColonyOperations.UnlockToken: {
         await handleUnlockTokenMotion(event, parsedAction);
+        break;
+      }
+
+      case ColonyOperations.MakePaymentFundedFromDomain: {
+        await handlePaymentMotion(event, parsedAction);
         break;
       }
 
