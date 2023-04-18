@@ -80,6 +80,7 @@ const getMotionData = async (
     rootHash,
     motionDomainId: domainId.toString(),
     stakerRewards: [],
+    voterRecord: [],
     isFinalized: false,
   };
 };

@@ -194,6 +194,10 @@ export const queries = {
             }
             isFinalized
             createdBy
+            voterRecord {
+              address
+              voteCount
+            }
           }
         }
       }
