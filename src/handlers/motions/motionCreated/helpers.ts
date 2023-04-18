@@ -36,14 +36,23 @@ export const getParsedActionFromMotion = async (
   return undefined;
 };
 
-export const getMotionData = async (
+interface Props {
   colonyAddress: string,
   transactionHash: string,
   logIndex: number,
   motionId: BigNumber,
   domainId: BigNumber,
   creatorAddress: string,
-): Promise<MotionData> => {
+}
+
+const getMotionData = async ({
+  colonyAddress,
+  transactionHash,
+  logIndex,
+  motionId,
+  domainId,
+  creatorAddress,
+}: Props): Promise<MotionData> => {
   const votingClient = await getVotingClient(colonyAddress);
   const { skillRep, rootHash, repSubmitted } = await votingClient.getMotion(
     motionId,
@@ -98,6 +107,7 @@ export const getMotionData = async (
     },
     repSubmitted: repSubmitted.toString(),
     skillRep: skillRep.toString(),
+    hasObjection: false,
     messages: [{ name: 'MotionCreated', messageKey: `${transactionHash}${logIndex}`, initiatorAddress: creatorAddress }],
   };
 };
@@ -112,7 +122,7 @@ export const createMotionInDB = async (
   }: ContractEvent,
   input: Record<string, any>,
 ): Promise<void> => {
-  const motionData = await getMotionData(colonyAddress, transactionHash, logIndex, motionId, domainId, creatorAddress);
+  const motionData = await getMotionData({ colonyAddress, transactionHash, logIndex, motionId, domainId, creatorAddress });
 
   await mutate('createColonyAction', {
     input: {

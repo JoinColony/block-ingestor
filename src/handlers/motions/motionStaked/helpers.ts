@@ -1,5 +1,5 @@
 import { BigNumber } from 'ethers';
-import { MotionStakes, UserStakes, MotionMessage } from '~types';
+import { MotionStakes, UserStakes, MotionMessage, MotionData, MotionVote } from '~types';
 import { getMotionSide } from '../helpers';
 
 export const getRequiredStake = (
@@ -183,18 +183,31 @@ export const getUserMinStake = (
     .toString();
 };
 
-export const getUpdatedMessages = (
-  messages: MotionMessage[],
-  requiredStake: BigNumber,
+interface Props {
+  motionData: MotionData,
+  messages: MotionMessage[];
+  requiredStake: BigNumber;
   motionStakes: MotionStakes,
   messageKey: string,
   vote: BigNumber,
   staker: string,
   amount: BigNumber,
-): MotionMessage[] => {
+}
+
+export const getUpdatedMessages = ({
+  motionData: { hasObjection },
+  messages,
+  requiredStake,
+  motionStakes,
+  messageKey,
+  vote,
+  staker,
+  amount,
+}: Props): MotionMessage[] => {
   const updatedMessages = [...messages];
-  const isFirstObjection = vote.eq(0) && !updatedMessages.find(({ name }) => name === 'ObjectionRaised');
+  const isFirstObjection = vote.eq(MotionVote.NAY) && !hasObjection;
   if (isFirstObjection) {
+    hasObjection = true;
     updatedMessages.push(
       {
         name: 'ObjectionRaised',
@@ -214,8 +227,8 @@ export const getUpdatedMessages = (
     },
   );
 
-  if (vote.eq(1) && requiredStake.eq(motionStakes.raw.yay)) {
-    const messageName = !updatedMessages.find(({ name }) => name === 'ObjectionRaised') ? 'MotionFullyStaked' : 'MotionFullyStakedAfterObjection';
+  if (vote.eq(MotionVote.YAY) && requiredStake.eq(motionStakes.raw.yay)) {
+    const messageName = hasObjection ? 'MotionFullyStakedAfterObjection' : 'MotionFullyStaked';
     updatedMessages.push(
       {
         name: messageName,
@@ -224,7 +237,7 @@ export const getUpdatedMessages = (
       },
     );
   }
-  if (vote.eq(0) && requiredStake.eq(motionStakes.raw.nay)) {
+  if (vote.eq(MotionVote.NAY) && requiredStake.eq(motionStakes.raw.nay)) {
     updatedMessages.push(
       {
         name: 'ObjectionFullyStaked',

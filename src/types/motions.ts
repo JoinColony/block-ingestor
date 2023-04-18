@@ -80,6 +80,7 @@ export interface MotionData {
   revealedVotes: MotionVotes;
   repSubmitted: string;
   skillRep: string;
+  hasObjection: boolean;
   messages: MotionMessage[];
 }
 

@@ -239,6 +239,7 @@ export const queries = {
             }
             repSubmitted
             skillRep
+            hasObjection
             motionMessages {
               name
               messageKey
