@@ -15,6 +15,7 @@ export const getUpdatedVoterRecord = (
       {
         address: voterAddress,
         voteCount: '1',
+        vote: null,
       },
     ];
   }
@@ -26,6 +27,7 @@ export const getUpdatedVoterRecord = (
       const updatedRecord: VoterRecord = {
         ...currentVoterRecord,
         voteCount: BigNumber.from(voteCount).add(1).toString(),
+        vote: null,
       };
       return updatedRecord;
     }
