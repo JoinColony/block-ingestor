@@ -42,7 +42,7 @@ export const getMotionData = async (
   logIndex: number,
   motionId: BigNumber,
   domainId: BigNumber,
-  creator: string,
+  creatorAddress: string,
 ): Promise<MotionData> => {
   const votingClient = await getVotingClient(colonyAddress);
   const { skillRep, rootHash, repSubmitted } = await votingClient.getMotion(
@@ -98,7 +98,7 @@ export const getMotionData = async (
     },
     repSubmitted: repSubmitted.toString(),
     skillRep: skillRep.toString(),
-    messages: [{ name: 'MotionCreated', messageKey: `${transactionHash}${logIndex}`, initiatorAddress: creator }],
+    messages: [{ name: 'MotionCreated', messageKey: `${transactionHash}${logIndex}`, initiatorAddress: creatorAddress }],
   };
 };
 
