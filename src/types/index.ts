@@ -102,6 +102,7 @@ export enum ColonyActionType {
   VersionUpgradeMotion = 'VERSION_UPGRADE_MOTION',
   UnlockTokenMotion = 'UNLOCK_TOKEN_MOTION',
   PaymentMotion = 'PAYMENT_MOTION',
+  MoveFundsMotion = 'MOVE_FUNDS_MOTION',
 }
 
 export type ColonyActionHandler = (event: ContractEvent) => Promise<void>;
