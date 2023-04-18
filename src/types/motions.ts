@@ -20,6 +20,7 @@ export enum ColonyOperations {
   Upgrade = 'upgrade',
   UnlockToken = 'unlockToken',
   MakePaymentFundedFromDomain = 'makePaymentFundedFromDomain',
+  MoveFundsBetweenPots = 'moveFundsBetweenPots',
 }
 
 export const motionNameMapping: { [key: string]: ColonyActionType } = {
@@ -35,7 +36,7 @@ export const motionNameMapping: { [key: string]: ColonyActionType } = {
   // editDomain: ColonyMotions.EditDomainMotion,
   // editColony: ColonyMotions.ColonyEditMotion,
   // setUserRoles: ColonyMotions.SetUserRolesMotion,
-  // moveFundsBetweenPots: ColonyMotions.MoveFundsMotion,
+  [ColonyOperations.MoveFundsBetweenPots]: ColonyActionType.MoveFundsMotion,
   [ColonyOperations.Upgrade]: ColonyActionType.VersionUpgradeMotion,
   // emitDomainReputationPenalty: ColonyMotions.EmitDomainReputationPenaltyMotion,
   // emitDomainReputationReward: ColonyMotions.EmitDomainReputationRewardMotion,
