@@ -14,6 +14,7 @@ export default async (event: ContractEvent): Promise<void> => {
   } = event;
 
   const votingClient = await getVotingClient(colonyAddress);
+  const { repSubmitted } = await votingClient.getMotion(motionId);
   const { chainId } = await votingClient.provider.getNetwork();
   const motionDatabaseId = getMotionDatabaseId(
     chainId,
@@ -33,6 +34,7 @@ export default async (event: ContractEvent): Promise<void> => {
     await updateMotionInDB(id, {
       ...motionData,
       voterRecord: updatedVoterRecord,
+      repSubmitted: repSubmitted.toString(),
     });
 
     verbose(`User: ${voter} voted on motion ${motionId.toString()}`);

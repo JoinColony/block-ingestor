@@ -2,6 +2,7 @@ import { Extension, getExtensionHash, getLogs } from '@colony/colony-js';
 
 import networkClient from './networkClient';
 import {
+  addVotingReputationParamsToDB,
   deleteExtensionFromEvent,
   isExtensionDeprecated,
   isExtensionInitialised,
@@ -179,6 +180,7 @@ const trackExtensionEvents = async (
     // Listen for motions if Voting Reputation is initialised.
     if (Extension.VotingReputation === extensionId && isInitialised) {
       await motionSpecificEventsListener(colony);
+      await addVotingReputationParamsToDB(extensionAddress, colony);
     }
 
     await writeExtensionFromEvent(
