@@ -1,4 +1,5 @@
 import { mutate } from '~amplifyClient';
+import { UpdateColonyExtensionByAddressDocument } from '~graphql';
 import { ExtensionParams } from '~types';
 import { getVotingClient } from '~utils';
 
@@ -41,10 +42,11 @@ export const addVotingReputationParamsToDB = async (
   extensionAddress: string,
   colonyAddress: string,
 ): Promise<void> => {
-  await mutate('updateColonyExtensionByAddress', {
+  const params = await getVotingReputationParams(colonyAddress);
+  await mutate(UpdateColonyExtensionByAddressDocument, {
     input: {
       id: extensionAddress,
-      params: await getVotingReputationParams(colonyAddress),
+      params,
     },
   });
 };
