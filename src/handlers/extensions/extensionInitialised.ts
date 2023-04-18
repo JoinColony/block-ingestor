@@ -3,9 +3,7 @@ import { Extension, getExtensionHash } from '@colony/colony-js';
 import { mutate } from '~amplifyClient';
 import { motionSpecificEventsListener } from '~eventListener';
 import { ContractEvent } from '~types';
-import { verbose } from '~utils';
-
-import { addVotingReputationParamsToDB } from './helpers';
+import { verbose, addVotingReputationParamsToDB } from '~utils';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { contractAddress: extensionAddress } = event;

@@ -41,10 +41,11 @@ export const addVotingReputationParamsToDB = async (
   extensionAddress: string,
   colonyAddress: string,
 ): Promise<void> => {
+  const params = await getVotingReputationParams(colonyAddress);
   await mutate('updateColonyExtensionByAddress', {
     input: {
       id: extensionAddress,
-      params: await getVotingReputationParams(colonyAddress),
+      params,
     },
   });
 };
