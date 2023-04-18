@@ -197,6 +197,17 @@ export const queries = {
             voterRecord {
               address
               voteCount
+              vote
+            }
+            revealedVotes {
+              raw {
+                yay
+                nay
+              }
+              percentage {
+                yay
+                nay
+              }
             }
           }
         }

@@ -82,6 +82,16 @@ const getMotionData = async (
     stakerRewards: [],
     voterRecord: [],
     isFinalized: false,
+    revealedVotes: {
+      raw: {
+        nay: '0',
+        yay: '0',
+      },
+      percentage: {
+        nay: '0',
+        yay: '0',
+      },
+    },
   };
 };
 

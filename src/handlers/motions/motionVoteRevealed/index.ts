@@ -1,4 +1,4 @@
-import { ContractEvent, VoterRecord } from '~types';
+import { ContractEvent, VoterRecord, MotionSide } from '~types';
 import { getVotingClient, verbose } from '~utils';
 import {
   getMotionDatabaseId,
@@ -13,6 +13,9 @@ export default async (event: ContractEvent): Promise<void> => {
   } = event;
 
   const votingClient = await getVotingClient(colonyAddress);
+  const {
+    votes: [nayVotes, yayVotes],
+  } = await votingClient.getMotion(motionId);
   const { chainId } = await votingClient.provider.getNetwork();
   const motionDatabaseId = getMotionDatabaseId(
     chainId,
@@ -27,7 +30,6 @@ export default async (event: ContractEvent): Promise<void> => {
       motionData: { voterRecord },
       motionData,
     } = revealedMotion;
-
     const updatedVoterRecord = voterRecord.map((record) => {
       const { address } = record;
       if (address !== voter) {
@@ -42,9 +44,22 @@ export default async (event: ContractEvent): Promise<void> => {
       return updatedRecord;
     });
 
+    const totalVotes = nayVotes.add(yayVotes);
+    const yayVotePercentage = yayVotes.mul(100).div(totalVotes);
+    const nayVotePercentage = nayVotes.mul(100).div(totalVotes);
     await updateMotionInDB(id, {
       ...motionData,
       voterRecord: updatedVoterRecord,
+      revealedVotes: {
+        raw: {
+          [MotionSide.NAY]: nayVotes.toString(),
+          [MotionSide.YAY]: yayVotes.toString(),
+        },
+        percentage: {
+          [MotionSide.NAY]: nayVotePercentage.toString(),
+          [MotionSide.YAY]: yayVotePercentage.toString(),
+        },
+      },
     });
 
     verbose(
