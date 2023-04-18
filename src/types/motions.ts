@@ -19,6 +19,7 @@ export enum ColonyOperations {
   EditDomain = 'editDomain',
   Upgrade = 'upgrade',
   UnlockToken = 'unlockToken',
+  MakePaymentFundedFromDomain = 'makePaymentFundedFromDomain',
 }
 
 export const motionNameMapping: { [key: string]: ColonyActionType } = {
@@ -27,6 +28,8 @@ export const motionNameMapping: { [key: string]: ColonyActionType } = {
   // unlockToken: ColonyMotions.UnlockTokenMotion,
   [ColonyOperations.AddDomain]: ColonyActionType.CreateDomainMotion,
   [ColonyOperations.EditDomain]: ColonyActionType.EditDomainMotion,
+  [ColonyOperations.MakePaymentFundedFromDomain]:
+    ColonyActionType.PaymentMotion,
   [ColonyOperations.UnlockToken]: ColonyActionType.UnlockTokenMotion,
   // addDomain: ColonyMotions.CreateDomainMotion,
   // editDomain: ColonyMotions.EditDomainMotion,
