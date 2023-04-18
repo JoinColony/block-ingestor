@@ -1,9 +1,8 @@
 import { Extension, getExtensionHash, getLogs } from '@colony/colony-js';
 
-import { addVotingReputationParamsToDB } from '~handlers/extensions';
-
 import networkClient from './networkClient';
 import {
+  addVotingReputationParamsToDB,
   deleteExtensionFromEvent,
   isExtensionDeprecated,
   isExtensionInitialised,
