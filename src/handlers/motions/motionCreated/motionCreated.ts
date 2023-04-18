@@ -10,6 +10,7 @@ import {
   handleNetworkUpgradeMotion,
   handleUnlockTokenMotion,
   handlePaymentMotion,
+  handleMoveFundsMotion,
 } from './handlers';
 
 export default async (event: ContractEvent): Promise<void> => {
@@ -54,6 +55,11 @@ export default async (event: ContractEvent): Promise<void> => {
 
       case ColonyOperations.MakePaymentFundedFromDomain: {
         await handlePaymentMotion(event, parsedAction);
+        break;
+      }
+
+      case ColonyOperations.MoveFundsBetweenPots: {
+        await handleMoveFundsMotion(event, parsedAction);
         break;
       }
 
