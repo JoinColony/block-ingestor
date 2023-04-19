@@ -98,6 +98,8 @@ export enum ColonyActionType {
   UnlockTokenMotion = 'UNLOCK_TOKEN_MOTION',
   PaymentMotion = 'PAYMENT_MOTION',
   MoveFundsMotion = 'MOVE_FUNDS_MOTION',
+  EmitDomainReputationPenaltyMotion = 'EMIT_DOMAIN_REPUTATION_PENALTY_MOTION',
+  EmitDomainReputationRewardMotion = 'EMIT_DOMAIN_REPUTATION_REWARD_MOTION',
 }
 
 // Export here to avoid circular dependency with ColonyActionType
