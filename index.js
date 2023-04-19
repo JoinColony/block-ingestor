@@ -1,11 +1,18 @@
-const ethers = require('ethers');
-const coinMachineFactory = require('./abi/coinMachineFactoryABI.json');
-const whitelist = require('./abi/whitelistABI.json');
-const coinMachine = require('./abi/coinMachineABI.json');
-const { handleAgreementSigned, handleUserApproved } = require('./handlers/whitelist.js');
-const { handleCoinMachineInitialised, handleCoinMachineStateSet, handleTokensBought } = require('./handlers/coinMachine.js');
+const ethers = require("ethers");
+const coinMachineFactory = require("./abi/coinMachineFactoryABI.json");
+const whitelist = require("./abi/whitelistABI.json");
+const coinMachine = require("./abi/coinMachineABI.json");
+const {
+  handleAgreementSigned,
+  handleUserApproved,
+} = require("./handlers/whitelist.js");
+const {
+  handleCoinMachineInitialised,
+  handleCoinMachineStateSet,
+  handleTokensBought,
+} = require("./handlers/coinMachine.js");
 
-const { output, poorMansGraphQL } = require('./utils');
+const { output, poorMansGraphQL } = require("./utils");
 
 const WhitelistEvents = {
   'UserApproved': handleUserApproved,
@@ -30,7 +37,6 @@ const fetchExistingWhitelists = async () => {
         }
       }
     `,
-    variables: null,
   };
   try {
     const { body } = await poorMansGraphQL(query);
@@ -55,7 +61,6 @@ const fetchExistingCoinMachines = async () => {
         }
       }
     `,
-    variables: null,
   };
   try {
     const { body } = await poorMansGraphQL(query);
@@ -145,14 +150,14 @@ const subsribeToCoinMachine = async (coinMachineAddress, provider) => {
           query: `
               mutation CreateWhitelist {
                 createWhitelist(
-                input: { id: "${whitelistAddress}", walletAddress: "${owner}", agreementHash: "${agreementHash}", useApprovals: ${Boolean(approvals)} }
-                condition: {}
+                input: { id: "${whitelistAddress}", owner: "${owner}", agreementHash: "${agreementHash}", useApprovals: ${Boolean(
+            approvals
+          )} }
               ) {
                 id
               }
             }
           `,
-          variables: null,
         };
       }
       if (parsed.name === "CoinMachineDeployed") {
@@ -164,13 +169,11 @@ const subsribeToCoinMachine = async (coinMachineAddress, provider) => {
               mutation CreateCompanyAgreement {
                 createCompanyAgreement(
                 input: { coinMachineAddress: "${coinMachine}", userCompanyAgreementsId: "${owner}", agreementHash: "${agreementHash}" }
-                condition: {}
               ) {
                 coinMachineAddress
               }
             }
           `,
-          variables: null,
         };
       }
       if (!query) return;
