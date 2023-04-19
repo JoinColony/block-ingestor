@@ -21,6 +21,8 @@ export enum ColonyOperations {
   UnlockToken = 'unlockToken',
   MakePaymentFundedFromDomain = 'makePaymentFundedFromDomain',
   MoveFundsBetweenPots = 'moveFundsBetweenPots',
+  EmitDomainReputationPenalty = 'emitDomainReputationPenalty',
+  EmitDomainReputationReward = 'emitDomainReputationReward',
 }
 
 export const motionNameMapping: { [key: string]: ColonyActionType } = {
@@ -38,8 +40,9 @@ export const motionNameMapping: { [key: string]: ColonyActionType } = {
   // setUserRoles: ColonyMotions.SetUserRolesMotion,
   [ColonyOperations.MoveFundsBetweenPots]: ColonyActionType.MoveFundsMotion,
   [ColonyOperations.Upgrade]: ColonyActionType.VersionUpgradeMotion,
-  // emitDomainReputationPenalty: ColonyMotions.EmitDomainReputationPenaltyMotion,
-  // emitDomainReputationReward: ColonyMotions.EmitDomainReputationRewardMotion,
+  emitDomainReputationPenalty:
+    ColonyActionType.EmitDomainReputationPenaltyMotion,
+  emitDomainReputationReward: ColonyActionType.EmitDomainReputationRewardMotion,
 };
 
 interface MotionStakeFragment {

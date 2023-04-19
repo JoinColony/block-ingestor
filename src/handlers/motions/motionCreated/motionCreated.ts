@@ -11,6 +11,7 @@ import {
   handleUnlockTokenMotion,
   handlePaymentMotion,
   handleMoveFundsMotion,
+  handleDomainEditReputationMotion,
 } from './handlers';
 
 export default async (event: ContractEvent): Promise<void> => {
@@ -60,6 +61,12 @@ export default async (event: ContractEvent): Promise<void> => {
 
       case ColonyOperations.MoveFundsBetweenPots: {
         await handleMoveFundsMotion(event, parsedAction);
+        break;
+      }
+
+      case ColonyOperations.EmitDomainReputationReward:
+      case ColonyOperations.EmitDomainReputationPenalty: {
+        await handleDomainEditReputationMotion(event, parsedAction);
         break;
       }
 
