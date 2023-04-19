@@ -2,9 +2,12 @@ const { fetch, Request } = require("cross-fetch");
 const AmazonCognitoIdentity = require("amazon-cognito-identity-js");
 
 const USER_NAME = "blockingestor";
-const PASSWORD = "test1234";
-const USER_POOL_ID = "eu-west-2_jeQWnWA5z";
-const CLIENT_ID = "10is5acnrpvf0a73thu0dpk8df";
+// This is found in the User pool overview of the cognito tab for the project
+const USER_POOL_ID = process.env.UserPoolId || "eu-west-2_jeQWnWA5z";
+// This is found at the bottom of the App integration tab of the cognito tab
+// in the section called `App clients and analytics` it is the `app_client`
+// not the `app_clientWeb`
+const CLIENT_ID = process.env.ClientId || "10is5acnrpvf0a73thu0dpk8df";
 
 function authUser() {
   // authenticates with cognito to receive the access tokens.
@@ -48,6 +51,7 @@ module.exports = {
     query,
     endpoint = process.env.GraphQLAPIEndpointOutput ||
       "http://192.168.0.220:20002/graphql",
+    password = process.env.BlockIngestorPassword || "test1234"
   ) => {
     /* preferably cache the token somewhere and reuse in the future until it
        expires, then re-auth */
