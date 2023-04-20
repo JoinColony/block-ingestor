@@ -118,6 +118,20 @@ export const mutations = {
       }
     }
   `,
+  createColonyRole: /* GraphQL */ `
+    mutation createColonyRole($input: CreateColonyRoleInput!) {
+      createColonyRole(input: $input) {
+        id
+      }
+    }
+  `,
+  updateColonyRole: /* GraphQL */ `
+    mutation updateColonyRole($input: UpdateColonyRoleInput!) {
+      updateColonyRole(input: $input) {
+        id
+      }
+    }
+  `,
 };
 
 /*
@@ -164,6 +178,13 @@ export const queries = {
           id
           inverseFee
         }
+      }
+    }
+  `,
+  getColonyRole: /* GraphQL */ `
+    query GetColonyRole($id: ID!) {
+      getColonyRole(id: $id) {
+        id
       }
     }
   `,
