@@ -12,7 +12,7 @@ The following script sets up this user and group:
 ``` shell
 aws cognito-idp admin-create-user \
     --user-pool-id $userPool \
-    --username $userName
+    --username blockingestor
 
 aws cognito-idp admin-set-user-password \
     --user-pool-id $userPool \
@@ -22,12 +22,12 @@ aws cognito-idp admin-set-user-password \
 
 aws cognito-idp create-group \
     --user-pool-id $userPool \
-    --group-name blockingestor
+    --group-name admin
 
 aws cognito-idp admin-add-user-to-group \
     --user-pool-id $userPool \
     --username blockingestor \
-    --group-name blockingestor
+    --group-name admin
 ```
 
 NOTE: The default password for local development is `test1234`
