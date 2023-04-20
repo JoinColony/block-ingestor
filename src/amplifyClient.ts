@@ -212,7 +212,7 @@ export const queries = {
             repSubmitted
             skillRep
             hasObjection
-            motionMessages {
+            messages {
               name
               messageKey
               initiatorAddress
