@@ -1,4 +1,4 @@
-# Block Ingestor
+# Coinmachine Block Ingestor
 
 Ingest blocks and parse events
 
@@ -6,9 +6,13 @@ Ingest blocks and parse events
 
 ## Authentication
 
-The authentication for this process is done by creating a `blockingestor` user in the projects cognito user pool and creating and adding this user to the `blockingestor` group
+The Coinmachine application that utilises this block ingestor is set up using AWS infrastructure and thus it is necessary to install the [aws cli](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) in order to setup the authentication flow.
 
-The following script sets up this user and group:
+The first step is to clone and setup the coinmachine application using the steps found in that repo's README.
+
+Specifically the authentication for this process is done by creating a `blockingestor` user in the projects cognito user pool and then creating and adding this user to a `admin` group.
+
+The following script sets up this user and group using the aws cli:
 ``` shell
 aws cognito-idp admin-create-user \
     --user-pool-id $userPool \
@@ -32,7 +36,7 @@ aws cognito-idp admin-add-user-to-group \
 
 NOTE: The default password for local development is `test1234`
 
-The following env vars need to be set in the process environment for authentication to function correctly
+The following env vars need to be set in the process environment for authentication to function correctly, there is also a note of these in the `frontend/.env.example` file in the coinmachine repo
 
 ``` shell
 // This is found in the User pool overview of the cognito tab for the project
