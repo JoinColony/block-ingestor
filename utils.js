@@ -8,6 +8,9 @@ const USER_POOL_ID = process.env.USER_POOL_ID;
 // in the section called `App clients and analytics` it is the `app_client`
 // not the `app_clientWeb`
 const CLIENT_ID = process.env.CLIENT_ID;
+const PASSWORD = process.env.BLOCK_INGESTOR_PASSWORD || "test1234";
+const ENDPOINT =
+  process.env.GRAPHQL_API_ENDPOINT || "http://192.168.0.220:20002/graphql";
 
 if (!CLIENT_ID || !USER_POOL_ID) {
   throw new Error(
@@ -53,12 +56,7 @@ function authUser() {
 
 module.exports = {
   output: (...messages) => console.log("[BlockIngestor]", ...messages),
-  poorMansGraphQL: async (
-    query,
-    endpoint = process.env.GraphQLAPIEndpointOutput ||
-      "http://192.168.0.220:20002/graphql",
-    password = process.env.BlockIngestorPassword || "test1234"
-  ) => {
+  poorMansGraphQL: async (query) => {
     /* preferably cache the token somewhere and reuse in the future until it
        expires, then re-auth */
     const token = await authUser();
@@ -72,7 +70,7 @@ module.exports = {
       body: JSON.stringify(query),
     };
 
-    const request = new Request(endpoint, options);
+    const request = new Request(ENDPOINT, options);
     let statusCode = 200;
     let body;
     let response;
