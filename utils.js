@@ -3,11 +3,17 @@ const AmazonCognitoIdentity = require("amazon-cognito-identity-js");
 
 const USER_NAME = "blockingestor";
 // This is found in the User pool overview of the cognito tab for the project
-const USER_POOL_ID = process.env.UserPoolId || "eu-west-2_jeQWnWA5z";
+const USER_POOL_ID = process.env.UserPoolId;
 // This is found at the bottom of the App integration tab of the cognito tab
 // in the section called `App clients and analytics` it is the `app_client`
 // not the `app_clientWeb`
-const CLIENT_ID = process.env.ClientId || "10is5acnrpvf0a73thu0dpk8df";
+const CLIENT_ID = process.env.ClientId;
+
+if (!CLIENT_ID || !USER_POOL_ID) {
+  throw new Error(
+    `User pool id ${USER_POOL_ID} or Client id ${CLIENT_ID} not set`
+  );
+}
 
 function authUser() {
   // authenticates with cognito to receive the access tokens.
@@ -46,7 +52,7 @@ function authUser() {
 }
 
 module.exports = {
-  output: (...messages) => console.log('[BlockIngestor]', ...messages),
+  output: (...messages) => console.log("[BlockIngestor]", ...messages),
   poorMansGraphQL: async (
     query,
     endpoint = process.env.GraphQLAPIEndpointOutput ||
@@ -80,12 +86,12 @@ module.exports = {
     }
 
     if (statusCode === 400) {
-      throw new Error(`Query not successful: ${query.operationName}`)
+      throw new Error(`Query not successful: ${query.operationName}`);
     }
 
     return {
       statusCode,
-      body: JSON.stringify(body)
+      body: JSON.stringify(body),
     };
   },
 };
