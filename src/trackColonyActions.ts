@@ -11,6 +11,7 @@ import {
   handlePaymentAction,
   handleTokenUnlockedAction,
   handleVersionUpgradeAction,
+  handleManagePermissionsAction,
 } from '~handlers';
 import networkClient from '~networkClient';
 import { ColonyActionHandler, ContractEventsSignatures, Filter } from '~types';
@@ -102,5 +103,10 @@ export default async (colonyAddress: string): Promise<void> => {
     ContractEventsSignatures.ArbitraryReputationUpdate,
     colonyAddress,
     handleEmitDomainReputationAction,
+  );
+  await trackActionsByEvent(
+    ContractEventsSignatures.ColonyRoleSet,
+    colonyAddress,
+    handleManagePermissionsAction,
   );
 };

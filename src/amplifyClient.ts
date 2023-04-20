@@ -185,6 +185,7 @@ export const queries = {
     query GetColonyRole($id: ID!) {
       getColonyRole(id: $id) {
         id
+        latestBlock
       }
     }
   `,
