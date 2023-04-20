@@ -221,11 +221,9 @@ export const queries = {
       $votingRepHash: String!
       $colonyAddress: ID!
     ) {
-      listColonyExtensions(
-        filter: {
-          hash: { eq: $votingRepHash }
-          colonyId: { eq: $colonyAddress }
-        }
+      getExtensionByColonyAndHash(
+        colonyId: $colonyAddress
+        hash: { eq: $votingRepHash }
       ) {
         items {
           id
