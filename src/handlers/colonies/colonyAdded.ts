@@ -19,6 +19,8 @@ export default async (event: ContractEvent): Promise<void> => {
     coloniesSet.size,
   );
 
+  await createColonyFounderInitialRoleEntry(event);
+
   /*
    * Setup all Colony specific listeners for it
    */
