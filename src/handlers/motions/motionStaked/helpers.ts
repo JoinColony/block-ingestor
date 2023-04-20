@@ -195,7 +195,7 @@ interface Props {
 }
 
 export const getUpdatedMessages = ({
-  motionData: { hasObjection },
+  motionData,
   messages,
   requiredStake,
   motionStakes,
@@ -205,9 +205,9 @@ export const getUpdatedMessages = ({
   amount,
 }: Props): MotionMessage[] => {
   const updatedMessages = [...messages];
-  const isFirstObjection = vote.eq(MotionVote.NAY) && !hasObjection;
+  const isFirstObjection = vote.eq(MotionVote.NAY) && !motionData.hasObjection;
   if (isFirstObjection) {
-    hasObjection = true;
+    motionData.hasObjection = true;
     updatedMessages.push(
       {
         name: 'ObjectionRaised',
@@ -228,7 +228,7 @@ export const getUpdatedMessages = ({
   );
 
   if (vote.eq(MotionVote.YAY) && requiredStake.eq(motionStakes.raw.yay)) {
-    const messageName = hasObjection ? 'MotionFullyStakedAfterObjection' : 'MotionFullyStaked';
+    const messageName = motionData.hasObjection ? 'MotionFullyStakedAfterObjection' : 'MotionFullyStaked';
     updatedMessages.push(
       {
         name: messageName,
