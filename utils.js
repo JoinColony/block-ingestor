@@ -3,11 +3,11 @@ const AmazonCognitoIdentity = require("amazon-cognito-identity-js");
 
 const USER_NAME = "blockingestor";
 // This is found in the User pool overview of the cognito tab for the project
-const USER_POOL_ID = process.env.UserPoolId;
+const USER_POOL_ID = process.env.USER_POOL_ID;
 // This is found at the bottom of the App integration tab of the cognito tab
 // in the section called `App clients and analytics` it is the `app_client`
 // not the `app_clientWeb`
-const CLIENT_ID = process.env.ClientId;
+const CLIENT_ID = process.env.CLIENT_ID;
 
 if (!CLIENT_ID || !USER_POOL_ID) {
   throw new Error(
