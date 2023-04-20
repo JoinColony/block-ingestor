@@ -10,6 +10,7 @@ import amplifyClientSetup from './amplifyClient';
 import provider, { getChainId } from './provider';
 import { output, readJsonStats } from './utils';
 import trackExtensions from './trackExtensions';
+import trackNetworkInverseFee from './trackNetworkInverseFee';
 
 dotenv.config();
 utils.Logger.setLogLevel(utils.Logger.levels.ERROR);
@@ -57,6 +58,11 @@ const startIngestor = async (): Promise<void> => {
    * Get all supported extensions currently installed in colonies
    */
   await trackExtensions();
+
+  /*
+   * Get initial network inverse fee and setup listener for future ones
+   */
+  await trackNetworkInverseFee();
 
   /*
    * Setup all listeners we care about

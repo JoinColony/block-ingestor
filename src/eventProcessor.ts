@@ -21,6 +21,7 @@ import {
   handleEditColonyAction,
   handleVersionUpgradeAction,
   handleEmitDomainReputationAction,
+  handleNetworkFeeInverseSet,
 } from './handlers';
 
 dotenv.config();
@@ -74,6 +75,11 @@ export default async (event: ContractEvent): Promise<void> => {
      */
     case ContractEventsSignatures.ColonyVersionAdded: {
       await handleColonyVersionAdded(event);
+      return;
+    }
+
+    case ContractEventsSignatures.NetworkFeeInverseSet: {
+      await handleNetworkFeeInverseSet(event);
       return;
     }
 
