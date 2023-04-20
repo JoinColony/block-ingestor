@@ -55,6 +55,9 @@ export enum ContractEventsSignatures {
   ColonyFundsMovedBetweenFundingPots = 'ColonyFundsMovedBetweenFundingPots(address,uint256,uint256,uint256,address)',
   ColonyMetadata = 'ColonyMetadata(address,string)',
   ArbitraryReputationUpdate = 'ArbitraryReputationUpdate(address,address,uint256,int256)',
+  ColonyRoleSet = 'ColonyRoleSet(address,address,uint256,uint8,bool)',
+  ColonyRoleSet_OLD = 'ColonyRoleSet(address,uint256,uint8,bool)',
+  // RecoveryRoleSet = 'RecoveryRoleSet(address,bool)',
 }
 
 /*
@@ -66,6 +69,25 @@ export enum EthersObserverEvents {
 }
 
 export type ChainID = number;
+
+/*
+ * GraphQL ColonyActionType enum
+ */
+export enum ColonyActionType {
+  MintTokens = 'MINT_TOKENS',
+  Payment = 'PAYMENT',
+  CreateDomain = 'CREATE_DOMAIN',
+  EditDomain = 'EDIT_DOMAIN',
+  UnlockToken = 'UNLOCK_TOKEN',
+  MoveFunds = 'MOVE_FUNDS',
+  ColonyEdit = 'COLONY_EDIT',
+  VersionUpgrade = 'VERSION_UPGRADE',
+  EmitDomainReputationPenalty = 'EMIT_DOMAIN_REPUTATION_PENALTY',
+  EmitDomainReputationReward = 'EMIT_DOMAIN_REPUTATION_REWARD',
+  ManagePermissions = 'MANAGE_PERMISSIONS',
+}
+
+export type ColonyActionHandler = (event: ContractEvent) => Promise<void>;
 
 // The Filter type doesn't seem to be exported from colony-js
 export type Filter = Parameters<typeof getLogs>[1];
