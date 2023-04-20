@@ -64,7 +64,7 @@ query GetColonyMotions($colonyAddress: ID!) {
         repSubmitted
         skillRep
         hasObjection
-        motionMessages {
+        messages {
           name
           messageKey
           initiatorAddress
