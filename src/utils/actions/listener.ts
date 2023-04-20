@@ -37,4 +37,12 @@ export const addActionEventListeners = async (
     ContractEventsSignatures.ArbitraryReputationUpdate,
     colonyAddress,
   );
+  await addColonyEventListener(
+    ContractEventsSignatures.ColonyRoleSet,
+    colonyAddress,
+  );
+  await addColonyEventListener(
+    ContractEventsSignatures.ColonyRoleSet_OLD,
+    colonyAddress,
+  );
 };
