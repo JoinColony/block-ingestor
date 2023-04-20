@@ -8,6 +8,7 @@ import {
 } from './utils';
 import { ContractEventsSignatures } from './types';
 import { mutate } from './amplifyClient';
+import { NETWORK_INVERSE_FEE_DATABASE_ID } from '~constants';
 
 dotenv.config();
 
@@ -19,6 +20,7 @@ export default async (): Promise<void> => {
 
   await mutate('createCurrentNetworkInverseFee', {
     input: {
+      id: NETWORK_INVERSE_FEE_DATABASE_ID,
       inverseFee: convertedFee,
     },
   });
