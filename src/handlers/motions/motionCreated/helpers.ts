@@ -139,16 +139,13 @@ export const writeManageDomainMotionToDB = async (
   const pendingDomainMetadataId = getPendingMotionDomainDatabaseId(colonyAddress, transactionHash);
   const motionData = await getMotionData(colonyAddress, motionId, domainId);
 
-  await mutate('createColonyAction', {
-    input: {
-      id: transactionHash,
-      colonyId: colonyAddress,
-      type: motionNameMapping[name],
-      isMotion: true,
-      motionData,
-      initiatorAddress: creator,
-      blockNumber,
-      pendingDomainMetadataId,
-    },
+  await createMotionInDB({
+    id: transactionHash,
+    colonyId: colonyAddress,
+    type: motionNameMapping[name],
+    motionData,
+    initiatorAddress: creator,
+    blockNumber,
+    pendingDomainMetadataId,
   });
 };
