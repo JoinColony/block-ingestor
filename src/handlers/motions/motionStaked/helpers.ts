@@ -237,7 +237,8 @@ export const getUpdatedMessages = ({
       },
     );
   }
-  if (vote.eq(MotionVote.NAY) && requiredStake.eq(motionStakes.raw.nay)) {
+
+  if (vote.eq(MotionVote.NAY) && requiredStake.eq(motionStakes.raw.nay) && BigNumber.from(motionStakes.raw.nay).gt(motionStakes.raw.yay)) {
     updatedMessages.push(
       {
         name: 'ObjectionFullyStaked',
