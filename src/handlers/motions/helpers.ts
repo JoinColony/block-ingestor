@@ -11,11 +11,25 @@ export const getMotionSide = (vote: BigNumber): MotionSide =>
 export const updateMotionInDB = async (
   id: string,
   motionData: MotionData,
+  showInActionsList?: boolean,
 ): Promise<void> => {
   await mutate('updateColonyAction', {
     input: {
       id,
       motionData,
+      ...(showInActionsList === undefined ? {} : { showInActionsList }),
+    },
+  });
+};
+
+export const createMotionInDB = async (
+  input: Record<string, any>,
+): Promise<void> => {
+  await mutate('createColonyAction', {
+    input: {
+      isMotion: true,
+      showInActionsList: false,
+      ...input,
     },
   });
 };

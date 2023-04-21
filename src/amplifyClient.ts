@@ -216,6 +216,21 @@ export const queries = {
       }
     }
   `,
+  getVotingRepInstallations: /* GraphQL */ `
+    query GetVotingRepInstallations(
+      $votingRepHash: String!
+      $colonyAddress: ID!
+    ) {
+      getExtensionByColonyAndHash(
+        colonyId: $colonyAddress
+        hash: { eq: $votingRepHash }
+      ) {
+        items {
+          id
+        }
+      }
+    }
+  `,
 };
 
 export default (): void => {
