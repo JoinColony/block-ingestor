@@ -3,6 +3,7 @@ import { ContractEvent, ContractEventsSignatures } from '~types';
 import {
   getColonyRolesDatabaseId,
   createInitialColonyRolesDatabaseEntry,
+  createColonyHistoricRoleDatabaseEntry,
   verbose,
 } from '~utils';
 
@@ -30,6 +31,7 @@ export default async (event: ContractEvent): Promise<void> => {
   const {
     id: existingColonyRoleId,
     latestBlock: existingColonyRoleLatestBlock,
+    ...existingRoles
   } = (await query('getColonyRole', { id })) || {};
 
   /*
@@ -48,8 +50,23 @@ export default async (event: ContractEvent): Promise<void> => {
           ...roleValue,
         },
       });
+
       verbose(
-        `Update the roles entry for user ${user} in colony ${contractAddress}, under domain ${domainId.toNumber()}`,
+        `Update the Roles entry for user ${user} in colony ${contractAddress}, under domain ${domainId.toNumber()}`,
+      );
+
+      /*
+       * Create the historic role entry
+       */
+      await createColonyHistoricRoleDatabaseEntry(
+        contractAddress,
+        domainId.toNumber(),
+        user,
+        blockNumber,
+        {
+          ...existingRoles,
+          ...roleValue,
+        },
       );
     }
   /*

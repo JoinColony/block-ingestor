@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/naming-convention */
+
 import { ColonyRole, Id } from '@colony/colony-js';
 
 import { mutate } from '~amplifyClient';
@@ -14,6 +16,13 @@ export const getColonyRolesDatabaseId = (
   nativeDomainId: number,
   userAddress: string,
 ): string => `${colonyAddress}_${nativeDomainId}_${userAddress}_roles`;
+
+export const getColonyHistoricRolesDatabaseId = (
+  colonyAddress: string,
+  nativeDomainId: number,
+  userAddress: string,
+  blockNumber: number,
+): string => `${colonyAddress}_${nativeDomainId}_${userAddress}_${blockNumber}_roles`;
 
 export const createInitialColonyRolesDatabaseEntry = async (
   colonyAddress: string,
@@ -32,6 +41,13 @@ export const createInitialColonyRolesDatabaseEntry = async (
   const architectureRole = await colonyClient.hasUserRole(userAddress, nativeDomainId, ColonyRole.Architecture);
   const fundingRole = await colonyClient.hasUserRole(userAddress, nativeDomainId, ColonyRole.Funding);
   const administrationRole = await colonyClient.hasUserRole(userAddress, nativeDomainId, ColonyRole.Administration);
+
+  const role_0 = recoveryRole || null;
+  const role_1 = rootRole || null;
+  const role_2 = arbitrationRole || null;
+  const role_3 = architectureRole || null;
+  const role_5 = fundingRole || null;
+  const role_6 = administrationRole || null;
 
   let blockNumber = latestBlockNumber;
   if (!blockNumber) {
@@ -63,17 +79,35 @@ export const createInitialColonyRolesDatabaseEntry = async (
       // Link the Colony Model
       colonyRolesId: colonyAddress,
       // Set the permissions
-      role_0: recoveryRole || null,
-      role_1: rootRole || null,
-      role_2: arbitrationRole || null,
-      role_3: architectureRole || null,
-      role_5: fundingRole || null,
-      role_6: administrationRole || null,
+      role_0,
+      role_1,
+      role_2,
+      role_3,
+      role_5,
+      role_6,
     },
   });
 
   verbose(
-    `Create new roles entry for user ${userAddress} in colony ${colonyAddress}, under domain ${nativeDomainId}`,
+    `Create new Roles entry for user ${userAddress} in colony ${colonyAddress}, under domain ${nativeDomainId}`,
+  );
+
+  /*
+   * Create the historic role entry
+   */
+  await createColonyHistoricRoleDatabaseEntry(
+    colonyAddress,
+    nativeDomainId,
+    userAddress,
+    blockNumber,
+    {
+      role_0,
+      role_1,
+      role_2,
+      role_3,
+      role_5,
+      role_6,
+    },
   );
 };
 
@@ -111,5 +145,64 @@ export const createColonyFounderInitialRoleEntry = async (event: ContractEvent):
     Id.RootDomain,
     colonyFounderAddress,
     transactionReceipt.blockNumber,
+  );
+};
+
+/*
+ * @NOTE Create historic colony role entry to be used in historic contexts (eg: recovery mode)
+ *
+ * While similar to `createInitialColonyRolesDatabaseEntry`, it is quite different in the arguments
+ * it receives and mutation it calls
+ */
+export const createColonyHistoricRoleDatabaseEntry = async (
+  colonyAddress: string,
+  nativeDomainId: number,
+  userAddress: string,
+  blockNumber: number,
+  roles: {
+    role_0: boolean | null,
+    role_1: boolean | null,
+    role_2: boolean | null,
+    role_3: boolean | null,
+    role_5: boolean | null,
+    role_6: boolean | null,
+  },
+): Promise<void> => {
+  const id = getColonyHistoricRolesDatabaseId(colonyAddress, nativeDomainId, userAddress, blockNumber);
+  const domainDatabaseId = getDomainDatabaseId(colonyAddress, nativeDomainId);
+
+  await mutate('createColonyHistoricRole', {
+    input: {
+      id,
+      // Look in schema.grapql (in the CDapp) about why this is needed
+      type: 'SortedHistoricRole',
+      blockNumber,
+      // Link the Domain Model
+      colonyHistoricRoleDomainId: domainDatabaseId,
+      /*
+       * @NOTE Link the user Model
+       *
+       * Note that this handler will fire even for events where the target
+       * is something or someone not in the database (a user without an account,
+       * a random addresss -- contract, extension, token, etc)
+       *
+       * This means that on the other side, if you will want to fetch the "rich"
+       * value for the "User" object, it will crash, as that model link will not
+       * exist.
+       *
+       * Make sure to account for that when fetching the query (you can still fetch
+       * the "colonyRoleUserId" value manually, and linking it yourself to the
+       * appropriate entity)
+       */
+      colonyHistoricRoleUserId: userAddress,
+      // Link the Colony Model
+      colonyHistoricRoleColonyId: colonyAddress,
+      // Set the permissions
+      ...roles,
+    },
+  });
+
+  verbose(
+    `Create new Historic Roles entry for user ${userAddress} in colony ${colonyAddress}, under domain ${nativeDomainId} at block ${blockNumber}`,
   );
 };

@@ -119,15 +119,22 @@ export const mutations = {
     }
   `,
   createColonyRole: /* GraphQL */ `
-    mutation createColonyRole($input: CreateColonyRoleInput!) {
+    mutation CreateColonyRole($input: CreateColonyRoleInput!) {
       createColonyRole(input: $input) {
         id
       }
     }
   `,
   updateColonyRole: /* GraphQL */ `
-    mutation updateColonyRole($input: UpdateColonyRoleInput!) {
+    mutation UpdateColonyRole($input: UpdateColonyRoleInput!) {
       updateColonyRole(input: $input) {
+        id
+      }
+    }
+  `,
+  createColonyHistoricRole: /* GraphQL */ `
+    mutation CreateColonyHistoricRole($input: CreateColonyHistoricRoleInput!) {
+      createColonyHistoricRole(input: $input) {
         id
       }
     }
@@ -186,6 +193,12 @@ export const queries = {
       getColonyRole(id: $id) {
         id
         latestBlock
+        role_0
+        role_1
+        role_2
+        role_3
+        role_5
+        role_6
       }
     }
   `,
