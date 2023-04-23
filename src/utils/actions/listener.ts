@@ -41,8 +41,12 @@ export const addActionEventListeners = async (
     ContractEventsSignatures.ColonyRoleSet,
     colonyAddress,
   );
-  // await addColonyEventListener(
-  //   ContractEventsSignatures.ColonyRoleSet_OLD,
-  //   colonyAddress,
-  // );
+  await addColonyEventListener(
+    ContractEventsSignatures.ColonyRoleSet_OLD,
+    colonyAddress,
+  );
+  await addColonyEventListener(
+    ContractEventsSignatures.RecoveryRoleSet,
+    colonyAddress,
+  );
 };

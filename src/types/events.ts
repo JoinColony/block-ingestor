@@ -57,7 +57,7 @@ export enum ContractEventsSignatures {
   ArbitraryReputationUpdate = 'ArbitraryReputationUpdate(address,address,uint256,int256)',
   ColonyRoleSet = 'ColonyRoleSet(address,address,uint256,uint8,bool)',
   ColonyRoleSet_OLD = 'ColonyRoleSet(address,uint256,uint8,bool)',
-  // RecoveryRoleSet = 'RecoveryRoleSet(address,bool)',
+  RecoveryRoleSet = 'RecoveryRoleSet(address,bool)',
 }
 
 /*

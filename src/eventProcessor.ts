@@ -169,6 +169,11 @@ export default async (event: ContractEvent): Promise<void> => {
       return;
     }
 
+    case ContractEventsSignatures.RecoveryRoleSet: {
+      await handleManagePermissionsAction(event);
+      return;
+    }
+
     default: {
       return;
     }

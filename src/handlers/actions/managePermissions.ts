@@ -1,24 +1,22 @@
 import { mutate, query } from '~amplifyClient';
-import { ContractEvent } from '~types';
-
+import { ContractEvent, ContractEventsSignatures } from '~types';
 import {
   getColonyRolesDatabaseId,
   createInitialColonyRolesDatabaseEntry,
 } from '~utils';
 
 export default async (event: ContractEvent): Promise<void> => {
-  const { args, contractAddress, blockNumber } = event;
+  const { args, contractAddress, blockNumber, signature } = event;
   const { agent, user, domainId, role, setTo } = args;
 
   const id = getColonyRolesDatabaseId(contractAddress, domainId.toString(), user);
   const roleValue = {
     /* set it back to null rather than false, for consistency */
-    [`role_${role}`]: setTo || null,
+    [`role_${signature === ContractEventsSignatures.RecoveryRoleSet ? 0 : role}`]: setTo || null,
   };
 
   /*
    * @TODO
-   * - capture initial colony permissions (colony creator permissions)
    * - create action list entry
    * - handle individual recovery role being set
    */
@@ -71,8 +69,15 @@ export default async (event: ContractEvent): Promise<void> => {
   /*
    * If the agent is the actual network contract, DON'T expose the action
    * This will only happed the first time colony is created
+   *
+   * @NOTE That for the old version of the event:
+   * ColonyRoleSet(indexed address,indexed uint256,indexed uint8,bool)
+   * We won't have a agent value (that's just how it was created originally) meaning
+   * we can't know who created the call (easily, anyways), in which case `agent` will
+   * be set to undefined, so this check will pass, and the actions entry to set
+   * permissions will be created
    */
-  if (agent === process.env.CHAIN_NETWORK_CONTRACT) {
+  if (agent !== process.env.CHAIN_NETWORK_CONTRACT) {
     // console.log('Role was set by the network contract');
     // await writeActionFromEvent(event, colonyAddress, {
     //   type: ColonyActionType.CreateDomain,
