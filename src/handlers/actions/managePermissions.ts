@@ -3,6 +3,7 @@ import { ContractEvent, ContractEventsSignatures } from '~types';
 import {
   getColonyRolesDatabaseId,
   createInitialColonyRolesDatabaseEntry,
+  verbose,
 } from '~utils';
 
 export default async (event: ContractEvent): Promise<void> => {
@@ -11,14 +12,19 @@ export default async (event: ContractEvent): Promise<void> => {
 
   const id = getColonyRolesDatabaseId(contractAddress, domainId.toString(), user);
   const roleValue = {
-    /* set it back to null rather than false, for consistency */
+    /*
+     * Set it back to null rather than false, for consistency
+     *
+     * @NOTE This is the only place where there's actually any logic to handle `RecoveryRoleSet`
+     * This is since the `roleValue` const is only used when updating, as when creating
+     * a entry from scratch we bypass events and test each role individually
+     */
     [`role_${signature === ContractEventsSignatures.RecoveryRoleSet ? 0 : role}`]: setTo || null,
   };
 
   /*
    * @TODO
    * - create action list entry
-   * - handle individual recovery role being set
    */
 
   const {
@@ -35,7 +41,6 @@ export default async (event: ContractEvent): Promise<void> => {
      * permissions we stored in the database
      */
     if (blockNumber > parseInt(existingColonyRoleLatestBlock, 10)) {
-      console.log('update entry for', contractAddress, user, domainId.toString(), 'role', role, setTo);
       await mutate('updateColonyRole', {
         input: {
           id,
@@ -43,13 +48,14 @@ export default async (event: ContractEvent): Promise<void> => {
           ...roleValue,
         },
       });
+      verbose(
+        `Update the roles entry for user ${user} in colony ${contractAddress}, under domain ${domainId.toNumber()}`,
+      );
     }
   /*
    * create a new entry
    */
   } else {
-    console.log('create new entry for', contractAddress, user, domainId.toString(), 'role', role, setTo);
-
     /*
      * @NOTE We might not start at the correct initial permissions state just going by events
      * (ie: first event captured by the ingestor is actually not the first for this user)
