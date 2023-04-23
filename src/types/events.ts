@@ -84,7 +84,7 @@ export enum ColonyActionType {
   VersionUpgrade = 'VERSION_UPGRADE',
   EmitDomainReputationPenalty = 'EMIT_DOMAIN_REPUTATION_PENALTY',
   EmitDomainReputationReward = 'EMIT_DOMAIN_REPUTATION_REWARD',
-  ManagePermissions = 'MANAGE_PERMISSIONS',
+  SetUserRoles = 'SET_USER_ROLES',
 }
 
 export type ColonyActionHandler = (event: ContractEvent) => Promise<void>;

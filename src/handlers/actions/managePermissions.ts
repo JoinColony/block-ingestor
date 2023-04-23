@@ -1,19 +1,22 @@
 import { mutate, query } from '~amplifyClient';
-import { ContractEvent } from '~types';
+import { ContractEvent, ColonyActionType } from '~types';
 import {
   getColonyRolesDatabaseId,
+  getDomainDatabaseId,
   createInitialColonyRolesDatabaseEntry,
   createColonyHistoricRoleDatabaseEntry,
   getAllRoleEventsFromTransaction,
   getRolesMapFromEvents,
   verbose,
+  writeActionFromEvent,
 } from '~utils';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { args, contractAddress, blockNumber, transactionHash } = event;
-  const { user, domainId } = args;
+  const { agent, user: targetAddress, domainId } = args;
 
-  const id = getColonyRolesDatabaseId(contractAddress, domainId.toString(), user);
+  const id = getColonyRolesDatabaseId(contractAddress, domainId.toString(), targetAddress);
+  const domainDatabaseId = getDomainDatabaseId(contractAddress, domainId.toString());
 
   /*
    * @TODO
@@ -41,7 +44,6 @@ export default async (event: ContractEvent): Promise<void> => {
      * but it just adds more travel time which is wasted)
      */
     if (blockNumber > parseInt(existingColonyRoleLatestBlock, 10)) {
-      console.log(blockNumber, parseInt(existingColonyRoleLatestBlock, 10))
       const allRoleEventsUpdates = await getAllRoleEventsFromTransaction(transactionHash, contractAddress);
       const rolesFromAllUpdateEvents = getRolesMapFromEvents(allRoleEventsUpdates);
 
@@ -54,7 +56,7 @@ export default async (event: ContractEvent): Promise<void> => {
       });
 
       verbose(
-        `Update the Roles entry for user ${user} in colony ${contractAddress}, under domain ${domainId.toNumber()}`,
+        `Update the Roles entry for ${targetAddress} in colony ${contractAddress}, under domain ${domainId.toNumber()}`,
       );
 
       /*
@@ -63,13 +65,26 @@ export default async (event: ContractEvent): Promise<void> => {
       await createColonyHistoricRoleDatabaseEntry(
         contractAddress,
         domainId.toNumber(),
-        user,
+        targetAddress,
         blockNumber,
         {
           ...existingRoles,
           ...rolesFromAllUpdateEvents,
         },
       );
+
+      /*
+       * Create the action
+       */
+      // await writeActionFromEvent(event, contractAddress, {
+      //   type: ColonyActionType.SetUserRoles,
+      //   fromDomainId: domainDatabaseId,
+      //   initiatorAddress: agent,
+      //   roles: {
+      //     ...existingRoles,
+      //     ...rolesFromAllUpdateEvents,
+      //   },
+      // });
     }
   /*
    * create a new entry
@@ -81,22 +96,23 @@ export default async (event: ContractEvent): Promise<void> => {
      *
      * For that, if we have to create the entry from scratch we ensure we have the correct
      * state by fetching it from the chain
+     *
+     * This encapsulates:
+     * - creating a new role entry
+     * - creating a new historic role entry (log)
+     * - creating the action entry
      */
 
     await createInitialColonyRolesDatabaseEntry(
       contractAddress,
       domainId.toNumber(),
-      user,
+      targetAddress,
       blockNumber,
     );
   }
 
   // Create the action entry
   //
-  // await writeActionFromEvent(event, colonyAddress, {
-  //   type: ColonyActionType.CreateDomain,
-  //   fromDomainId: databaseDomainId,
-  //   initiatorAddress,
-  // });
-  console.log(transactionHash)
+
+  console.log(transactionHash);
 };

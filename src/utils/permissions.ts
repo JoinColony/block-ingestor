@@ -86,20 +86,20 @@ export const getRolesMapFromEvents = (roleEvents: ContractEvent[]): Record<strin
 export const createInitialColonyRolesDatabaseEntry = async (
   colonyAddress: string,
   nativeDomainId: number,
-  userAddress: string,
+  targetAddress: string,
   latestBlockNumber?: number,
 ): Promise<void> => {
-  const rolesDatabaseId = getColonyRolesDatabaseId(colonyAddress, nativeDomainId, userAddress);
+  const rolesDatabaseId = getColonyRolesDatabaseId(colonyAddress, nativeDomainId, targetAddress);
   const domainDatabaseId = getDomainDatabaseId(colonyAddress, nativeDomainId);
 
   const colonyClient = await getCachedColonyClient(colonyAddress);
 
-  const recoveryRole = await colonyClient.hasUserRole(userAddress, nativeDomainId, ColonyRole.Recovery);
-  const rootRole = await colonyClient.hasUserRole(userAddress, nativeDomainId, ColonyRole.Root);
-  const arbitrationRole = await colonyClient.hasUserRole(userAddress, nativeDomainId, ColonyRole.Arbitration);
-  const architectureRole = await colonyClient.hasUserRole(userAddress, nativeDomainId, ColonyRole.Architecture);
-  const fundingRole = await colonyClient.hasUserRole(userAddress, nativeDomainId, ColonyRole.Funding);
-  const administrationRole = await colonyClient.hasUserRole(userAddress, nativeDomainId, ColonyRole.Administration);
+  const recoveryRole = await colonyClient.hasUserRole(targetAddress, nativeDomainId, ColonyRole.Recovery);
+  const rootRole = await colonyClient.hasUserRole(targetAddress, nativeDomainId, ColonyRole.Root);
+  const arbitrationRole = await colonyClient.hasUserRole(targetAddress, nativeDomainId, ColonyRole.Arbitration);
+  const architectureRole = await colonyClient.hasUserRole(targetAddress, nativeDomainId, ColonyRole.Architecture);
+  const fundingRole = await colonyClient.hasUserRole(targetAddress, nativeDomainId, ColonyRole.Funding);
+  const administrationRole = await colonyClient.hasUserRole(targetAddress, nativeDomainId, ColonyRole.Administration);
 
   const role_0 = recoveryRole || null;
   const role_1 = rootRole || null;
@@ -119,24 +119,24 @@ export const createInitialColonyRolesDatabaseEntry = async (
       latestBlock: blockNumber,
       // Link the Domain Model
       colonyRoleDomainId: domainDatabaseId,
-      /*
-       * @NOTE Link the user Model
-       *
-       * Note that this handler will fire even for events where the target
-       * is something or someone not in the database (a user without an account,
-       * a random addresss -- contract, extension, token, etc)
-       *
-       * This means that on the other side, if you will want to fetch the "rich"
-       * value for the "User" object, it will crash, as that model link will not
-       * exist.
-       *
-       * Make sure to account for that when fetching the query (you can still fetch
-       * the "colonyRoleUserId" value manually, and linking it yourself to the
-       * appropriate entity)
-       */
-      colonyRoleUserId: userAddress,
       // Link the Colony Model
       colonyRolesId: colonyAddress,
+      /*
+       * @NOTE Link the target
+       *
+       * Note that this handler will fire even for events where the target
+       * is something or someone not in the database.
+       *
+       * We try to account for this, by linking address to either a user, colony, or
+       * extension via the target address, but it can happen regardless as the
+       * address can be totally random
+       *
+       * Make sure to be aware of that when fetching the query (you can still fetch
+       * the "targetAddress" value manually, and linking it yourself to the
+       * appropriate entity)
+       */
+      targetAddress,
+
       // Set the permissions
       ...BASE_ROLES_MAP,
       role_0,
@@ -149,7 +149,7 @@ export const createInitialColonyRolesDatabaseEntry = async (
   });
 
   verbose(
-    `Create new Roles entry for user ${userAddress} in colony ${colonyAddress}, under domain ${nativeDomainId}`,
+    `Create new Roles entry for ${targetAddress} in colony ${colonyAddress}, under domain ${nativeDomainId}`,
   );
 
   /*
@@ -158,7 +158,7 @@ export const createInitialColonyRolesDatabaseEntry = async (
   await createColonyHistoricRoleDatabaseEntry(
     colonyAddress,
     nativeDomainId,
-    userAddress,
+    targetAddress,
     blockNumber,
     {
       role_0,
@@ -209,11 +209,11 @@ export const createColonyFounderInitialRoleEntry = async (event: ContractEvent):
 export const createColonyHistoricRoleDatabaseEntry = async (
   colonyAddress: string,
   nativeDomainId: number,
-  userAddress: string,
+  targetAddress: string,
   blockNumber: number,
   roles: Record<string, boolean | null> = BASE_ROLES_MAP,
 ): Promise<void> => {
-  const id = getColonyHistoricRolesDatabaseId(colonyAddress, nativeDomainId, userAddress, blockNumber);
+  const id = getColonyHistoricRolesDatabaseId(colonyAddress, nativeDomainId, targetAddress, blockNumber);
   const domainDatabaseId = getDomainDatabaseId(colonyAddress, nativeDomainId);
 
   const {
@@ -229,31 +229,31 @@ export const createColonyHistoricRoleDatabaseEntry = async (
         blockNumber,
         // Link the Domain Model
         colonyHistoricRoleDomainId: domainDatabaseId,
-        /*
-         * @NOTE Link the user Model
-         *
-         * Note that this handler will fire even for events where the target
-         * is something or someone not in the database (a user without an account,
-         * a random addresss -- contract, extension, token, etc)
-         *
-         * This means that on the other side, if you will want to fetch the "rich"
-         * value for the "User" object, it will crash, as that model link will not
-         * exist.
-         *
-         * Make sure to account for that when fetching the query (you can still fetch
-         * the "colonyRoleUserId" value manually, and linking it yourself to the
-         * appropriate entity)
-         */
-        colonyHistoricRoleUserId: userAddress,
         // Link the Colony Model
         colonyHistoricRoleColonyId: colonyAddress,
+        /*
+         * @NOTE Link the target
+         *
+         * Note that this handler will fire even for events where the target
+         * is something or someone not in the database.
+         *
+         * We try to account for this, by linking address to either a user, colony, or
+         * extension via the target address, but it can happen regardless as the
+         * address can be totally random
+         *
+         * Make sure to be aware of that when fetching the query (you can still fetch
+         * the "targetAddress" value manually, and linking it yourself to the
+         * appropriate entity)
+         */
+        targetAddress,
+
         // Set the permissions
         ...roles,
       },
     });
 
     verbose(
-      `Create new Historic Roles entry for user ${userAddress} in colony ${colonyAddress}, under domain ${nativeDomainId} at block ${blockNumber}`,
+      `Create new Historic Roles entry for ${targetAddress} in colony ${colonyAddress}, under domain ${nativeDomainId} at block ${blockNumber}`,
     );
   }
 };
