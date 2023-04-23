@@ -71,28 +71,15 @@ export const eventListenerGenerator = async (
   );
 
   provider.on(filter, async (log: Log) => {
-    const {
-      transactionHash,
-      logIndex,
-      blockNumber,
-      address: eventContractAddress,
-    } = log;
+    const { address: eventContractAddress } = log;
     if (clientType === ClientType.TokenClient) {
       client = await getTokenClient(eventContractAddress, provider);
     }
     try {
-      const { hash: blockHash, timestamp } = await provider.getBlock(
-        blockNumber,
-      );
-      addEvent({
-        ...client.interface.parseLog(log),
-        blockNumber,
-        transactionHash,
-        logIndex,
-        contractAddress: eventContractAddress,
-        blockHash,
-        timestamp,
-      });
+      const event = await mapLogToContractEvent(log, client.interface);
+      if (event) {
+        addEvent(event);
+      }
     } catch (error) {
       verbose('Failed to process the event: ', error);
     }
