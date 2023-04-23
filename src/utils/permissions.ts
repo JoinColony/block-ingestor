@@ -9,6 +9,7 @@ import {
   verbose,
   getCachedColonyClient,
   getDomainDatabaseId,
+  mapLogToContractEvent,
 } from '~utils';
 
 export const getColonyRolesDatabaseId = (
@@ -23,6 +24,37 @@ export const getColonyHistoricRolesDatabaseId = (
   userAddress: string,
   blockNumber: number,
 ): string => `${colonyAddress}_${nativeDomainId}_${userAddress}_${blockNumber}_roles`;
+
+export const getAllRoleEventsFromTransaction = async (
+  transactionHash: string,
+  colonyAddress: string,
+): Promise<ContractEvent[]> => {
+  const colonyRoleSetEventName = ContractEventsSignatures.ColonyRoleSet.slice(0, ContractEventsSignatures.ColonyRoleSet.indexOf('('));
+  const colonyRecoveryRoleSetName = ContractEventsSignatures.RecoveryRoleSet.slice(0, ContractEventsSignatures.RecoveryRoleSet.indexOf('('));
+
+  const colonyClient = await getCachedColonyClient(colonyAddress);
+  const transactionReceipt = await colonyClient.provider.getTransactionReceipt(transactionHash);
+
+  const events = await Promise.all(
+    transactionReceipt.logs.map(log => mapLogToContractEvent(log, colonyClient.interface)),
+  );
+
+  const filteredEvents = events.filter(event => {
+    if (
+      !event ||
+      !(event.name === colonyRoleSetEventName || event.name === colonyRecoveryRoleSetName)
+    ) {
+      return false;
+    }
+    return true;
+  });
+
+  /*
+   * Typecasting since apparently TS doesn't realize we are actually filtering
+   * to ensure that the Array only contains proper events
+   */
+  return filteredEvents as ContractEvent[];
+};
 
 export const createInitialColonyRolesDatabaseEntry = async (
   colonyAddress: string,
@@ -129,16 +161,8 @@ export const createColonyFounderInitialRoleEntry = async (event: ContractEvent):
   const colonyClient = await getCachedColonyClient(colonyAddress);
   const transactionReceipt = await colonyClient.provider.getTransactionReceipt(transactionHash);
 
-  const { args: { user: colonyFounderAddress } } = transactionReceipt.logs
-    .map(log => {
-      try {
-        return colonyClient.interface.parseLog(log);
-      } catch (error) {
-        return undefined;
-      }
-    })
-    .filter(event => !!event)
-    .find(event => event?.name === ColonyRoleSetEventName) ?? { args: { user: '' } };
+  const events = await getAllRoleEventsFromTransaction(transactionHash, colonyAddress);
+  const { args: { user: colonyFounderAddress } } = events.find(event => event?.name === ColonyRoleSetEventName) ?? { args: { user: '' } };
 
   await createInitialColonyRolesDatabaseEntry(
     colonyAddress,

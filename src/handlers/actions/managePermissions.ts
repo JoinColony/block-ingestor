@@ -8,8 +8,8 @@ import {
 } from '~utils';
 
 export default async (event: ContractEvent): Promise<void> => {
-  const { args, contractAddress, blockNumber, signature } = event;
-  const { agent, user, domainId, role, setTo } = args;
+  const { args, contractAddress, blockNumber, signature, transactionHash } = event;
+  const { user, domainId, role, setTo } = args;
 
   const id = getColonyRolesDatabaseId(contractAddress, domainId.toString(), user);
   const roleValue = {
@@ -89,23 +89,12 @@ export default async (event: ContractEvent): Promise<void> => {
     );
   }
 
-  /*
-   * If the agent is the actual network contract, DON'T expose the action
-   * This will only happed the first time colony is created
-   *
-   * @NOTE That for the old version of the event:
-   * ColonyRoleSet(indexed address,indexed uint256,indexed uint8,bool)
-   * We won't have a agent value (that's just how it was created originally) meaning
-   * we can't know who created the call (easily, anyways), in which case `agent` will
-   * be set to undefined, so this check will pass, and the actions entry to set
-   * permissions will be created
-   */
-  if (agent !== process.env.CHAIN_NETWORK_CONTRACT) {
-    // console.log('Role was set by the network contract');
-    // await writeActionFromEvent(event, colonyAddress, {
-    //   type: ColonyActionType.CreateDomain,
-    //   fromDomainId: databaseDomainId,
-    //   initiatorAddress,
-    // });
-  }
+  // Create the action entry
+  //
+  // await writeActionFromEvent(event, colonyAddress, {
+  //   type: ColonyActionType.CreateDomain,
+  //   fromDomainId: databaseDomainId,
+  //   initiatorAddress,
+  // });
+  console.log(transactionHash)
 };
