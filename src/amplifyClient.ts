@@ -202,6 +202,13 @@ export const queries = {
       }
     }
   `,
+  getColonyHistoricRole: /* GraphQL */ `
+    query GetColonyHistoricRole($id: ID!) {
+      getColonyHistoricRole(id: $id) {
+        id
+      }
+    }
+  `,
 };
 
 export default (): void => {

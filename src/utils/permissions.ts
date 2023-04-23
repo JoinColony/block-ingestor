@@ -2,7 +2,7 @@
 
 import { ColonyRole, Id } from '@colony/colony-js';
 
-import { mutate } from '~amplifyClient';
+import { mutate, query } from '~amplifyClient';
 import { ContractEvent, ContractEventsSignatures } from '~types';
 
 import {
@@ -11,6 +11,15 @@ import {
   getDomainDatabaseId,
   mapLogToContractEvent,
 } from '~utils';
+
+const BASE_ROLES_MAP = {
+  [`role_${ColonyRole.Recovery}`]: null,
+  [`role_${ColonyRole.Root}`]: null,
+  [`role_${ColonyRole.Arbitration}`]: null,
+  [`role_${ColonyRole.Architecture}`]: null,
+  [`role_${ColonyRole.Funding}`]: null,
+  [`role_${ColonyRole.Administration}`]: null,
+};
 
 export const getColonyRolesDatabaseId = (
   colonyAddress: string,
@@ -54,6 +63,24 @@ export const getAllRoleEventsFromTransaction = async (
    * to ensure that the Array only contains proper events
    */
   return filteredEvents as ContractEvent[];
+};
+
+export const getRolesMapFromEvents = (roleEvents: ContractEvent[]): Record<string, boolean | null> => {
+  let roleMap = {};
+
+  roleEvents.map(({
+    signature,
+    args: { role, setTo },
+  }) => {
+    const roleValue = { [`role_${signature === ContractEventsSignatures.RecoveryRoleSet ? 0 : role}`]: setTo || null };
+    roleMap = {
+      ...roleMap,
+      ...roleValue,
+    };
+    return undefined;
+  });
+
+  return roleMap;
 };
 
 export const createInitialColonyRolesDatabaseEntry = async (
@@ -111,6 +138,7 @@ export const createInitialColonyRolesDatabaseEntry = async (
       // Link the Colony Model
       colonyRolesId: colonyAddress,
       // Set the permissions
+      ...BASE_ROLES_MAP,
       role_0,
       role_1,
       role_2,
@@ -183,50 +211,49 @@ export const createColonyHistoricRoleDatabaseEntry = async (
   nativeDomainId: number,
   userAddress: string,
   blockNumber: number,
-  roles: {
-    role_0: boolean | null,
-    role_1: boolean | null,
-    role_2: boolean | null,
-    role_3: boolean | null,
-    role_5: boolean | null,
-    role_6: boolean | null,
-  },
+  roles: Record<string, boolean | null> = BASE_ROLES_MAP,
 ): Promise<void> => {
   const id = getColonyHistoricRolesDatabaseId(colonyAddress, nativeDomainId, userAddress, blockNumber);
   const domainDatabaseId = getDomainDatabaseId(colonyAddress, nativeDomainId);
 
-  await mutate('createColonyHistoricRole', {
-    input: {
-      id,
-      // Look in schema.grapql (in the CDapp) about why this is needed
-      type: 'SortedHistoricRole',
-      blockNumber,
-      // Link the Domain Model
-      colonyHistoricRoleDomainId: domainDatabaseId,
-      /*
-       * @NOTE Link the user Model
-       *
-       * Note that this handler will fire even for events where the target
-       * is something or someone not in the database (a user without an account,
-       * a random addresss -- contract, extension, token, etc)
-       *
-       * This means that on the other side, if you will want to fetch the "rich"
-       * value for the "User" object, it will crash, as that model link will not
-       * exist.
-       *
-       * Make sure to account for that when fetching the query (you can still fetch
-       * the "colonyRoleUserId" value manually, and linking it yourself to the
-       * appropriate entity)
-       */
-      colonyHistoricRoleUserId: userAddress,
-      // Link the Colony Model
-      colonyHistoricRoleColonyId: colonyAddress,
-      // Set the permissions
-      ...roles,
-    },
-  });
+  const {
+    id: existingColonyRoleId,
+  } = (await query('getColonyHistoricRole', { id })) || {};
 
-  verbose(
-    `Create new Historic Roles entry for user ${userAddress} in colony ${colonyAddress}, under domain ${nativeDomainId} at block ${blockNumber}`,
-  );
+  if (!existingColonyRoleId) {
+    await mutate('createColonyHistoricRole', {
+      input: {
+        id,
+        // Look in schema.grapql (in the CDapp) about why this is needed
+        type: 'SortedHistoricRole',
+        blockNumber,
+        // Link the Domain Model
+        colonyHistoricRoleDomainId: domainDatabaseId,
+        /*
+         * @NOTE Link the user Model
+         *
+         * Note that this handler will fire even for events where the target
+         * is something or someone not in the database (a user without an account,
+         * a random addresss -- contract, extension, token, etc)
+         *
+         * This means that on the other side, if you will want to fetch the "rich"
+         * value for the "User" object, it will crash, as that model link will not
+         * exist.
+         *
+         * Make sure to account for that when fetching the query (you can still fetch
+         * the "colonyRoleUserId" value manually, and linking it yourself to the
+         * appropriate entity)
+         */
+        colonyHistoricRoleUserId: userAddress,
+        // Link the Colony Model
+        colonyHistoricRoleColonyId: colonyAddress,
+        // Set the permissions
+        ...roles,
+      },
+    });
+
+    verbose(
+      `Create new Historic Roles entry for user ${userAddress} in colony ${colonyAddress}, under domain ${nativeDomainId} at block ${blockNumber}`,
+    );
+  }
 };

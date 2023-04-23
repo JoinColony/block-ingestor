@@ -1,27 +1,19 @@
 import { mutate, query } from '~amplifyClient';
-import { ContractEvent, ContractEventsSignatures } from '~types';
+import { ContractEvent } from '~types';
 import {
   getColonyRolesDatabaseId,
   createInitialColonyRolesDatabaseEntry,
   createColonyHistoricRoleDatabaseEntry,
+  getAllRoleEventsFromTransaction,
+  getRolesMapFromEvents,
   verbose,
 } from '~utils';
 
 export default async (event: ContractEvent): Promise<void> => {
-  const { args, contractAddress, blockNumber, signature, transactionHash } = event;
-  const { user, domainId, role, setTo } = args;
+  const { args, contractAddress, blockNumber, transactionHash } = event;
+  const { user, domainId } = args;
 
   const id = getColonyRolesDatabaseId(contractAddress, domainId.toString(), user);
-  const roleValue = {
-    /*
-     * Set it back to null rather than false, for consistency
-     *
-     * @NOTE This is the only place where there's actually any logic to handle `RecoveryRoleSet`
-     * This is since the `roleValue` const is only used when updating, as when creating
-     * a entry from scratch we bypass events and test each role individually
-     */
-    [`role_${signature === ContractEventsSignatures.RecoveryRoleSet ? 0 : role}`]: setTo || null,
-  };
 
   /*
    * @TODO
@@ -41,13 +33,23 @@ export default async (event: ContractEvent): Promise<void> => {
     /*
      * Only update the entry if the event we're processing is older than the latest
      * permissions we stored in the database
+     *
+     * Would be ideal if we could tell if the previous mutation executed, because as it stands,
+     * until it finishes, this logic check can't really tell and will try to execute it again
+     *
+     * (it doesn't break anything, as the GraphQL server will just discard it with an error,
+     * but it just adds more travel time which is wasted)
      */
     if (blockNumber > parseInt(existingColonyRoleLatestBlock, 10)) {
+      console.log(blockNumber, parseInt(existingColonyRoleLatestBlock, 10))
+      const allRoleEventsUpdates = await getAllRoleEventsFromTransaction(transactionHash, contractAddress);
+      const rolesFromAllUpdateEvents = getRolesMapFromEvents(allRoleEventsUpdates);
+
       await mutate('updateColonyRole', {
         input: {
           id,
           latestBlock: blockNumber,
-          ...roleValue,
+          ...rolesFromAllUpdateEvents,
         },
       });
 
@@ -65,7 +67,7 @@ export default async (event: ContractEvent): Promise<void> => {
         blockNumber,
         {
           ...existingRoles,
-          ...roleValue,
+          ...rolesFromAllUpdateEvents,
         },
       );
     }
