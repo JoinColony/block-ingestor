@@ -1,4 +1,4 @@
-import { ContractEvent, MotionData } from '~types';
+import { ContractEvent, MotionData, MotionEvents } from '~types';
 import { getVotingClient } from '~utils';
 import {
   getMotionDatabaseId,
@@ -10,6 +10,8 @@ export default async (event: ContractEvent): Promise<void> => {
   const {
     contractAddress: colonyAddress,
     args: { motionId, staker },
+    transactionHash,
+    logIndex,
   } = event;
 
   const votingClient = await getVotingClient(colonyAddress);
@@ -23,7 +25,7 @@ export default async (event: ContractEvent): Promise<void> => {
 
   if (claimedMotion) {
     const {
-      motionData: { stakerRewards },
+      motionData: { stakerRewards, messages },
     } = claimedMotion;
 
     const updatedStakerRewards = stakerRewards.map((stakerReward) => {
@@ -48,6 +50,14 @@ export default async (event: ContractEvent): Promise<void> => {
     const updatedMotionData: MotionData = {
       ...claimedMotion.motionData,
       stakerRewards: updatedStakerRewards,
+      messages: [
+        ...messages,
+        {
+          name: MotionEvents.MotionRewardClaimed,
+          messageKey: `${transactionHash}${logIndex}`,
+          initiatorAddress: staker,
+        },
+      ],
     };
 
     await updateMotionInDB(claimedMotion.id, updatedMotionData);
