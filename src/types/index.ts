@@ -1,5 +1,6 @@
 import {
   AnyColonyClient,
+  AnyOneTxPaymentClient,
   AnyVotingReputationClient,
   ColonyNetworkClient,
   TokenClient,
@@ -95,6 +96,7 @@ export enum ColonyActionType {
   EditDomainMotion = 'EDIT_DOMAIN_MOTION',
   VersionUpgradeMotion = 'VERSION_UPGRADE_MOTION',
   UnlockTokenMotion = 'UNLOCK_TOKEN_MOTION',
+  PaymentMotion = 'PAYMENT_MOTION',
 }
 
 // Export here to avoid circular dependency with ColonyActionType
@@ -104,7 +106,8 @@ export type NetworkClients =
   | ColonyNetworkClient
   | TokenClient
   | AnyColonyClient
-  | AnyVotingReputationClient;
+  | AnyVotingReputationClient
+  | AnyOneTxPaymentClient;
 
 export interface ExtensionParams {
   votingReputation?: VotingReputationParams;

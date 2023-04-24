@@ -1,8 +1,7 @@
-import { AnyColonyClient, Extension } from '@colony/colony-js';
 import { BigNumber } from 'ethers';
 import { TransactionDescription } from 'ethers/lib/utils';
 
-import { MotionData, ContractEvent } from '~types';
+import { ContractEvent, MotionData } from '~types';
 import { getVotingClient, verbose } from '~utils';
 
 import { mutate } from '~amplifyClient';
@@ -12,25 +11,29 @@ import {
   getRequiredStake,
   getUserMinStake,
 } from '../helpers';
+import { AnyColonyClient, AnyOneTxPaymentClient } from '@colony/colony-js/*';
 
 export const getParsedActionFromMotion = async (
   motionId: string,
-  colonyClient: AnyColonyClient,
+  colonyAddress: string,
+  clients: [AnyColonyClient, AnyOneTxPaymentClient],
 ): Promise<TransactionDescription | undefined> => {
-  const votingClient = await colonyClient.getExtensionClient(
-    Extension.VotingReputation,
-  );
-
+  const votingClient = await getVotingClient(colonyAddress);
   const motion = await votingClient.getMotion(motionId);
 
-  try {
-    return colonyClient.interface.parseTransaction({
-      data: motion.action,
-    });
-  } catch {
-    verbose(`Unable to parse ${motion.action}`);
-    return undefined;
+  for (const client of clients) {
+    // Return the first time a client can successfully parse the motion
+    try {
+      return client.interface.parseTransaction({
+        data: motion.action,
+      });
+    } catch {
+      continue;
+    }
   }
+
+  verbose(`Unable to parse ${motion.action}`);
+  return undefined;
 };
 
 export const getMotionData = async (
