@@ -1,12 +1,10 @@
 import { BigNumber } from 'ethers';
 import { TransactionDescription } from 'ethers/lib/utils';
 
-import { mutate } from '~amplifyClient';
 import { MotionData, ContractEvent, MotionEvents } from '~types';
-import {
-  getVotingClient,
-  verbose,
-} from '~utils';
+import { getVotingClient, verbose } from '~utils';
+
+import { mutate } from '~amplifyClient';
 
 import {
   getMotionDatabaseId,
@@ -123,9 +121,9 @@ const getMotionData = async ({
 export const createMotionInDB = async (
   {
     transactionHash,
+    blockNumber,
     logIndex,
     contractAddress: colonyAddress,
-    blockNumber,
     args: { motionId, creator: creatorAddress, domainId },
   }: ContractEvent,
   input: Record<string, any>,
