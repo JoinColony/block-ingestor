@@ -17,9 +17,9 @@ export const getVotingClient = async (
 };
 
 /**
- * The handler makes use of colonyClient getDomainFromFundingPot method which is only
+ * A utility to check for the presence of the `getDomainFromFundingPot` method, which is only
  * available on ColonyClientV5 and above. The following type predicate allows to check
- * we're dealing with a client that supports this method
+ * we're dealing with a client that supports this method.
  */
 type SupportedColonyClient = Exclude<
   AnyColonyClient,
