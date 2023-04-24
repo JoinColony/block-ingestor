@@ -104,7 +104,7 @@ export interface MotionQuery {
 export interface MotionMessage {
   name: string;
   messageKey: string;
-  initiatorAddress: string;
+  initiatorAddress?: string;
   vote?: string;
   amount?: string;
 }
