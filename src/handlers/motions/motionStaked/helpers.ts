@@ -238,6 +238,7 @@ export const getUpdatedMessages = ({
     );
   }
 
+  // Only send am ObjectionFullyStaked message if the motion has not already been fully staked for the YAY side
   if (vote.eq(MotionVote.NAY) && requiredStake.eq(motionStakes.raw.nay) && BigNumber.from(motionStakes.raw.nay).gt(motionStakes.raw.yay)) {
     updatedMessages.push(
       {
