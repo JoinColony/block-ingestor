@@ -5,6 +5,7 @@ import {
   MotionMessage,
   MotionData,
   MotionVote,
+  MotionEvents,
 } from '~types';
 import { getMotionSide } from '../helpers';
 
@@ -215,14 +216,14 @@ export const getUpdatedMessages = ({
   if (isFirstObjection) {
     motionData.hasObjection = true;
     updatedMessages.push({
-      name: 'ObjectionRaised',
-      messageKey: `${messageKey}_ObjectionRaised`,
+      name: MotionEvents.ObjectionRaised,
+      messageKey: `${messageKey}_${MotionEvents.ObjectionRaised}}`,
       initiatorAddress: staker,
     });
   }
 
   updatedMessages.push({
-    name: 'MotionStaked',
+    name: MotionEvents.MotionStaked,
     messageKey,
     initiatorAddress: staker,
     vote: vote.toString(),
@@ -231,8 +232,8 @@ export const getUpdatedMessages = ({
 
   if (vote.eq(MotionVote.YAY) && requiredStake.eq(motionStakes.raw.yay)) {
     const messageName = motionData.hasObjection
-      ? 'MotionFullyStakedAfterObjection'
-      : 'MotionFullyStaked';
+      ? MotionEvents.MotionFullyStakedAfterObjection
+      : MotionEvents.MotionFullyStaked;
     updatedMessages.push({
       name: messageName,
       messageKey: `${messageKey}_${messageName}`,
@@ -247,8 +248,8 @@ export const getUpdatedMessages = ({
     BigNumber.from(motionStakes.raw.nay).gt(motionStakes.raw.yay)
   ) {
     updatedMessages.push({
-      name: 'ObjectionFullyStaked',
-      messageKey: `${messageKey}_ObjectionFullyStaked`,
+      name: MotionEvents.ObjectionFullyStaked,
+      messageKey: `${messageKey}_${MotionEvents.ObjectionFullyStaked}`,
       initiatorAddress: staker,
     });
   }
