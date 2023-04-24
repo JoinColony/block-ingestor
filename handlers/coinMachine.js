@@ -1,6 +1,6 @@
-const { poorMansGraphQL } = require('../utils');
-const ethers = require('ethers');
-const purchaseTokens = require('../purchaseTokens.json');
+const { poorMansGraphQL } = require("../utils");
+const ethers = require("ethers");
+const purchaseTokens = require("../purchaseTokens.json");
 
 async function handleCoinMachineInitialised(args, coinMachineAddress) {
   const querySaleByCoinMachineAddress = {
@@ -16,16 +16,15 @@ async function handleCoinMachineInitialised(args, coinMachineAddress) {
         }
       }
     `,
-    variables: null,
   };
-   try {
-      const { body } = await poorMansGraphQL(querySaleByCoinMachineAddress);
-      const result = JSON.parse(body);
-      const sale = result.data.getSalebyCoinMachineAddress.items[0];
-      if (!sale) return [];
-      const query = {
-        operationName: "UpdateSaleMutation",
-        query: `
+  try {
+    const { body } = await poorMansGraphQL(querySaleByCoinMachineAddress);
+    const result = JSON.parse(body);
+    const sale = result.data.getSalebyCoinMachineAddress.items[0];
+    if (!sale) return [];
+    const query = {
+      operationName: "UpdateSaleMutation",
+      query: `
             mutation UpdateSaleMutation {
               updateSale(
               input: {
@@ -33,26 +32,24 @@ async function handleCoinMachineInitialised(args, coinMachineAddress) {
                 status: INITIALISED,
                 soldOut: false
               }
-              condition: {}
             ) {
               id
             }
           }
         `,
-        variables: null,
-      };
-      return [ query ];
-    } catch (error) {
-      console.log(error);
-      // silent error
-    }
+    };
+    return [query];
+  } catch (error) {
+    console.log(error);
+    // silent error
+  }
 }
 
 const CoinMachineStatus = {
   0: "ACTIVE",
   1: "PAUSED",
-  2: "STOPPED"
-}
+  2: "STOPPED",
+};
 
 async function handleCoinMachineStateSet(args, coinMachineAddress) {
   const querySaleByCoinMachineAddress = {
@@ -68,35 +65,31 @@ async function handleCoinMachineStateSet(args, coinMachineAddress) {
         }
       }
     `,
-    variables: null,
   };
-   try {
-      const { body } = await poorMansGraphQL(querySaleByCoinMachineAddress);
-      const result = JSON.parse(body);
-      const sale = result.data.getSalebyCoinMachineAddress.items[0];
-      if (!sale) return [];
-      const { state } = args;
-      const query = {
-        operationName: "UpdateSaleMutation",
-        query: `
+  try {
+    const { body } = await poorMansGraphQL(querySaleByCoinMachineAddress);
+    const result = JSON.parse(body);
+    const sale = result.data.getSalebyCoinMachineAddress.items[0];
+    if (!sale) return [];
+    const { state } = args;
+    const query = {
+      operationName: "UpdateSaleMutation",
+      query: `
             mutation UpdateSaleMutation {
               updateSale(
               input: { id: "${sale.id}", coinMachineStatus: ${CoinMachineStatus[state]} }
-              condition: {}
             ) {
               id
             }
           }
         `,
-        variables: null,
-      };
-      return [ query ];
-    } catch (error) {
-      console.log(error);
-      // silent error
-    }
+    };
+    return [query];
+  } catch (error) {
+    console.log(error);
+    // silent error
+  }
 }
-
 
 async function handleTokensBought(args, coinMachineAddress, contract) {
   const { buyer, numTokens, totalCost } = args;
@@ -124,7 +117,6 @@ async function handleTokensBought(args, coinMachineAddress, contract) {
         }
       }
     `,
-    variables: null,
   };
 
   try {
@@ -153,13 +145,11 @@ async function handleTokensBought(args, coinMachineAddress, contract) {
               marketPrice: "${parseFloat(cost / tokens)}",
               period: ${currentPeriod.toNumber()}
             }
-            condition: {}
           ) {
             id
           }
         }
       `,
-      variables: null,
     };
 
     // Update Sale Information
@@ -191,13 +181,11 @@ async function handleTokensBought(args, coinMachineAddress, contract) {
             soldOut: ${soldOut}
             userCount: ${firstTimeBuy ? userCount + 1 : userCount}
           }
-          condition: {}
         ) {
           id
         }
       }
       `,
-      variables: null,
     };
 
     const queries = [query, saleUpdateQuery];
@@ -213,20 +201,17 @@ async function handleTokensBought(args, coinMachineAddress, contract) {
               userID: "${buyer}",
               saleID: "${id}"
             }
-            condition: {}
           ) {
             id
           }
         }
       `,
-        variables: null,
       };
 
       return [...queries, createUserSaleConnection];
     }
 
     return queries;
-
   } catch (error) {
     console.log(error);
     // silent error
@@ -237,4 +222,4 @@ module.exports = {
   handleCoinMachineInitialised,
   handleCoinMachineStateSet,
   handleTokensBought,
-}
+};
