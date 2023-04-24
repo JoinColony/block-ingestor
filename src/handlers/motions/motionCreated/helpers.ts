@@ -1,10 +1,12 @@
 import { BigNumber } from 'ethers';
 import { TransactionDescription } from 'ethers/lib/utils';
 
-import { ContractEvent, MotionData } from '~types';
-import { getVotingClient, verbose } from '~utils';
-
 import { mutate } from '~amplifyClient';
+import { MotionData, ContractEvent, MotionEvents } from '~types';
+import {
+  getVotingClient,
+  verbose,
+} from '~utils';
 
 import {
   getMotionDatabaseId,
@@ -110,7 +112,7 @@ const getMotionData = async ({
     hasObjection: false,
     messages: [
       {
-        name: 'MotionCreated',
+        name: MotionEvents.MotionCreated,
         messageKey: `${transactionHash}${logIndex}`,
         initiatorAddress: creatorAddress,
       },

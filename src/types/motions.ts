@@ -25,6 +25,16 @@ export enum ColonyOperations {
   EmitDomainReputationReward = 'emitDomainReputationReward',
 }
 
+export enum MotionEvents {
+  MotionCreated = 'MotionCreated',
+  MotionStaked = 'MotionStaked',
+  MotionFinalized = 'MotionFinalized',
+  ObjectionRaised = 'ObjectionRaised',
+  ObjectionFullyStaked = 'ObjectionFullyStaked',
+  MotionFullyStaked = 'MotionFullyStaked',
+  MotionFullyStakedAfterObjection = 'MotionFullyStakedAfterObjection',
+}
+
 export const motionNameMapping: { [key: string]: ColonyActionType } = {
   [ColonyOperations.MintTokens]: ColonyActionType.MintTokensMotion,
   // makePaymentFundedFromDomain: ColonyMotions.PaymentMotion,
