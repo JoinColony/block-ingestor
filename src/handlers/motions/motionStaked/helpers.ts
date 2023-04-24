@@ -213,6 +213,14 @@ export const getUpdatedMessages = ({
 }: Props): MotionMessage[] => {
   const updatedMessages = [...messages];
   const isFirstObjection = vote.eq(MotionVote.NAY) && !motionData.hasObjection;
+  const isFullyYayStaked =
+    vote.eq(MotionVote.YAY) && requiredStake.eq(motionStakes.raw.yay);
+  const isFullyNayStaked =
+    vote.eq(MotionVote.NAY) && requiredStake.eq(motionStakes.raw.nay);
+  const bothSidesFullyStaked =
+    requiredStake.eq(motionStakes.raw.yay) &&
+    requiredStake.eq(motionStakes.raw.nay);
+
   if (isFirstObjection) {
     motionData.hasObjection = true;
     updatedMessages.push({
@@ -230,7 +238,7 @@ export const getUpdatedMessages = ({
     amount: amount.toString(),
   });
 
-  if (vote.eq(MotionVote.YAY) && requiredStake.eq(motionStakes.raw.yay)) {
+  if (isFullyYayStaked) {
     const messageName = motionData.hasObjection
       ? MotionEvents.MotionFullyStakedAfterObjection
       : MotionEvents.MotionFullyStaked;
@@ -241,16 +249,22 @@ export const getUpdatedMessages = ({
     });
   }
 
-  // Only send am ObjectionFullyStaked message if the motion has not already been fully staked for the YAY side
+  // Only send an ObjectionFullyStaked message if the motion has not already been fully staked for the YAY side
   if (
-    vote.eq(MotionVote.NAY) &&
-    requiredStake.eq(motionStakes.raw.nay) &&
+    isFullyNayStaked &&
     BigNumber.from(motionStakes.raw.nay).gt(motionStakes.raw.yay)
   ) {
     updatedMessages.push({
       name: MotionEvents.ObjectionFullyStaked,
       messageKey: `${messageKey}_${MotionEvents.ObjectionFullyStaked}`,
       initiatorAddress: staker,
+    });
+  }
+
+  if (bothSidesFullyStaked) {
+    updatedMessages.push({
+      name: MotionEvents.MotionVotingPhase,
+      messageKey: `${messageKey}_${MotionEvents.MotionVotingPhase}`,
     });
   }
 
