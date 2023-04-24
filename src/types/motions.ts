@@ -17,6 +17,8 @@ export enum ColonyOperations {
   MintTokens = 'mintTokens',
   AddDomain = 'addDomain',
   EditDomain = 'editDomain',
+  Upgrade = 'upgrade',
+  UnlockToken = 'unlockToken',
 }
 
 export const motionNameMapping: { [key: string]: ColonyActionType } = {
@@ -25,10 +27,13 @@ export const motionNameMapping: { [key: string]: ColonyActionType } = {
   // unlockToken: ColonyMotions.UnlockTokenMotion,
   [ColonyOperations.AddDomain]: ColonyActionType.CreateDomainMotion,
   [ColonyOperations.EditDomain]: ColonyActionType.EditDomainMotion,
+  [ColonyOperations.UnlockToken]: ColonyActionType.UnlockTokenMotion,
+  // addDomain: ColonyMotions.CreateDomainMotion,
+  // editDomain: ColonyMotions.EditDomainMotion,
   // editColony: ColonyMotions.ColonyEditMotion,
   // setUserRoles: ColonyMotions.SetUserRolesMotion,
   // moveFundsBetweenPots: ColonyMotions.MoveFundsMotion,
-  // upgrade: ColonyMotions.VersionUpgradeMotion,
+  [ColonyOperations.Upgrade]: ColonyActionType.VersionUpgradeMotion,
   // emitDomainReputationPenalty: ColonyMotions.EmitDomainReputationPenaltyMotion,
   // emitDomainReputationReward: ColonyMotions.EmitDomainReputationRewardMotion,
 };

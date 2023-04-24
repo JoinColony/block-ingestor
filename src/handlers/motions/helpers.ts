@@ -22,18 +22,6 @@ export const updateMotionInDB = async (
   });
 };
 
-export const createMotionInDB = async (
-  input: Record<string, any>,
-): Promise<void> => {
-  await mutate('createColonyAction', {
-    input: {
-      isMotion: true,
-      showInActionsList: false,
-      ...input,
-    },
-  });
-};
-
 export const getMotionDatabaseId = (
   chainId: number,
   votingRepExtnAddress: string,
