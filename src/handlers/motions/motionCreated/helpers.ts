@@ -1,7 +1,7 @@
 import { BigNumber } from 'ethers';
 import { TransactionDescription } from 'ethers/lib/utils';
 
-import { ContractEvent, MotionData, NetworkClients } from '~types';
+import { ContractEvent, MotionData } from '~types';
 import { getVotingClient, verbose } from '~utils';
 
 import { mutate } from '~amplifyClient';
@@ -11,11 +11,12 @@ import {
   getRequiredStake,
   getUserMinStake,
 } from '../helpers';
+import { AnyColonyClient, AnyOneTxPaymentClient } from '@colony/colony-js/*';
 
 export const getParsedActionFromMotion = async (
   motionId: string,
   colonyAddress: string,
-  clients: NetworkClients[],
+  clients: [AnyColonyClient, AnyOneTxPaymentClient],
 ): Promise<TransactionDescription | undefined> => {
   const votingClient = await getVotingClient(colonyAddress);
   const motion = await votingClient.getMotion(motionId);
