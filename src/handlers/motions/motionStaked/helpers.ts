@@ -1,5 +1,11 @@
 import { BigNumber } from 'ethers';
-import { MotionStakes, UserStakes, MotionMessage, MotionData, MotionVote } from '~types';
+import {
+  MotionStakes,
+  UserStakes,
+  MotionMessage,
+  MotionData,
+  MotionVote,
+} from '~types';
 import { getMotionSide } from '../helpers';
 
 export const getRequiredStake = (
@@ -184,14 +190,14 @@ export const getUserMinStake = (
 };
 
 interface Props {
-  motionData: MotionData,
+  motionData: MotionData;
   messages: MotionMessage[];
   requiredStake: BigNumber;
-  motionStakes: MotionStakes,
-  messageKey: string,
-  vote: BigNumber,
-  staker: string,
-  amount: BigNumber,
+  motionStakes: MotionStakes;
+  messageKey: string;
+  vote: BigNumber;
+  staker: string;
+  amount: BigNumber;
 }
 
 export const getUpdatedMessages = ({
@@ -208,45 +214,43 @@ export const getUpdatedMessages = ({
   const isFirstObjection = vote.eq(MotionVote.NAY) && !motionData.hasObjection;
   if (isFirstObjection) {
     motionData.hasObjection = true;
-    updatedMessages.push(
-      {
-        name: 'ObjectionRaised',
-        messageKey: `${messageKey}_ObjectionRaised`,
-        initiatorAddress: staker,
-      },
-    );
+    updatedMessages.push({
+      name: 'ObjectionRaised',
+      messageKey: `${messageKey}_ObjectionRaised`,
+      initiatorAddress: staker,
+    });
   }
 
-  updatedMessages.push(
-    {
-      name: 'MotionStaked',
-      messageKey,
-      initiatorAddress: staker,
-      vote: vote.toString(),
-      amount: amount.toString(),
-    },
-  );
+  updatedMessages.push({
+    name: 'MotionStaked',
+    messageKey,
+    initiatorAddress: staker,
+    vote: vote.toString(),
+    amount: amount.toString(),
+  });
 
   if (vote.eq(MotionVote.YAY) && requiredStake.eq(motionStakes.raw.yay)) {
-    const messageName = motionData.hasObjection ? 'MotionFullyStakedAfterObjection' : 'MotionFullyStaked';
-    updatedMessages.push(
-      {
-        name: messageName,
-        messageKey: `${messageKey}_${messageName}`,
-        initiatorAddress: staker,
-      },
-    );
+    const messageName = motionData.hasObjection
+      ? 'MotionFullyStakedAfterObjection'
+      : 'MotionFullyStaked';
+    updatedMessages.push({
+      name: messageName,
+      messageKey: `${messageKey}_${messageName}`,
+      initiatorAddress: staker,
+    });
   }
 
   // Only send am ObjectionFullyStaked message if the motion has not already been fully staked for the YAY side
-  if (vote.eq(MotionVote.NAY) && requiredStake.eq(motionStakes.raw.nay) && BigNumber.from(motionStakes.raw.nay).gt(motionStakes.raw.yay)) {
-    updatedMessages.push(
-      {
-        name: 'ObjectionFullyStaked',
-        messageKey: `${messageKey}_ObjectionFullyStaked`,
-        initiatorAddress: staker,
-      },
-    );
+  if (
+    vote.eq(MotionVote.NAY) &&
+    requiredStake.eq(motionStakes.raw.nay) &&
+    BigNumber.from(motionStakes.raw.nay).gt(motionStakes.raw.yay)
+  ) {
+    updatedMessages.push({
+      name: 'ObjectionFullyStaked',
+      messageKey: `${messageKey}_ObjectionFullyStaked`,
+      initiatorAddress: staker,
+    });
   }
 
   return updatedMessages;
