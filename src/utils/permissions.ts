@@ -3,13 +3,14 @@
 import { ColonyRole, Id } from '@colony/colony-js';
 
 import { mutate, query } from '~amplifyClient';
-import { ContractEvent, ContractEventsSignatures } from '~types';
+import { ContractEvent, ContractEventsSignatures, ColonyActionType } from '~types';
 
 import {
   verbose,
   getCachedColonyClient,
   getDomainDatabaseId,
   mapLogToContractEvent,
+  writeActionFromEvent,
 } from '~utils';
 
 const BASE_ROLES_MAP = {
@@ -65,14 +66,28 @@ export const getAllRoleEventsFromTransaction = async (
   return filteredEvents as ContractEvent[];
 };
 
-export const getRolesMapFromEvents = (roleEvents: ContractEvent[]): Record<string, boolean | null> => {
+export const getRolesMapFromEvents = (roleEvents: ContractEvent[], setToNull: boolean = true): Record<string, boolean | null> => {
   let roleMap = {};
 
   roleEvents.map(({
     signature,
     args: { role, setTo },
   }) => {
-    const roleValue = { [`role_${signature === ContractEventsSignatures.RecoveryRoleSet ? 0 : role}`]: setTo || null };
+    /*
+     * @NOTE This logic is begining to get kinda complicated so I'm going to attempt to explain it
+     *
+     * It's role is to format the object key/value pairs for roles (eg: `{ role_1: true }`).
+     *
+     * Since we have a separate event for `RecoveryRoleSet` which has a different format than the rest, check for it, and convert the
+     * role to `0` if we find it.
+     *
+     * Second part (after the || operator check) deals with how we display the "off" side of the role. To keep database consistency, for operational
+     * roles (ie: the ones we use to check against), we check the `false` value (which signifies the permission was taken away) to `null` as that is
+     * the default state of the GraphQL entry. For Actions however, we need to set it to `false` as to distiguish itself, and for us to know what
+     * to display in the Action's text. For this we use `setToNull`, which, when set (on by default), changes the "off" state to null, and when it's
+     * not being set, changes the "off" state to false
+     */
+    const roleValue = { [`role_${signature === ContractEventsSignatures.RecoveryRoleSet ? 0 : role}`]: setTo || (setToNull ? null : setTo) };
     roleMap = {
       ...roleMap,
       ...roleValue,
@@ -87,7 +102,7 @@ export const createInitialColonyRolesDatabaseEntry = async (
   colonyAddress: string,
   nativeDomainId: number,
   targetAddress: string,
-  latestBlockNumber?: number,
+  transactionHash: string,
 ): Promise<void> => {
   const rolesDatabaseId = getColonyRolesDatabaseId(colonyAddress, nativeDomainId, targetAddress);
   const domainDatabaseId = getDomainDatabaseId(colonyAddress, nativeDomainId);
@@ -108,10 +123,11 @@ export const createInitialColonyRolesDatabaseEntry = async (
   const role_5 = fundingRole || null;
   const role_6 = administrationRole || null;
 
-  let blockNumber = latestBlockNumber;
-  if (!blockNumber) {
-    blockNumber = await colonyClient.provider.getBlockNumber();
-  }
+  const colonyRoleSetEventName = ContractEventsSignatures.ColonyRoleSet.slice(0, ContractEventsSignatures.ColonyRoleSet.indexOf('('));
+  const events = await getAllRoleEventsFromTransaction(transactionHash, colonyAddress);
+  const firstRoleSetEvent = events.find(({ signature }) => signature === ContractEventsSignatures.ColonyRoleSet);
+  const recoveryRoleSetEvent = events.find(({ signature }) => signature === ContractEventsSignatures.RecoveryRoleSet);
+  const blockNumber = firstRoleSetEvent?.blockNumber ?? 0;
 
   await mutate('createColonyRole', {
     input: {
@@ -161,6 +177,7 @@ export const createInitialColonyRolesDatabaseEntry = async (
     targetAddress,
     blockNumber,
     {
+      ...BASE_ROLES_MAP,
       role_0,
       role_1,
       role_2,
@@ -169,6 +186,54 @@ export const createInitialColonyRolesDatabaseEntry = async (
       role_6,
     },
   );
+
+  if (firstRoleSetEvent?.signature === ContractEventsSignatures.ColonyRoleSet) {
+    /*
+    * Create the action
+    */
+    await writeActionFromEvent(firstRoleSetEvent, colonyAddress, {
+      type: ColonyActionType.SetUserRoles,
+      fromDomainId: domainDatabaseId,
+      initiatorAddress: firstRoleSetEvent?.args.agent,
+      recipientAddress: targetAddress,
+      roles: {
+        ...BASE_ROLES_MAP,
+        role_0,
+        role_1,
+        role_2,
+        role_3,
+        role_5,
+        role_6,
+      },
+      individualEvents: JSON.stringify(
+        [
+          ...events
+            .filter(({ signature }) => signature !== ContractEventsSignatures.RecoveryRoleSet)
+            .map(({
+              name,
+              args: { role, setTo },
+              transactionHash,
+              logIndex,
+            }) => ({
+              id: `${transactionHash}_${logIndex}`,
+              type: name,
+              role,
+              setTo,
+            })),
+          /*
+           * THis is disabled b/c eslint's style cleanup breaks the layout somehow...
+           */
+          // eslint-disable-next-line multiline-ternary
+          ...(recoveryRoleSetEvent ? [{
+            id: `${recoveryRoleSetEvent.transactionHash}_${recoveryRoleSetEvent.logIndex}`,
+            type: colonyRoleSetEventName,
+            role: 0,
+            setTo: recoveryRoleSetEvent.args.setTo,
+          }] : []),
+        ],
+      ),
+    });
+  }
 };
 
 /*
@@ -186,9 +251,6 @@ export const createColonyFounderInitialRoleEntry = async (event: ContractEvent):
     throw new Error('The event passed in is not the "ColonyAdded" event. We can\'t determine the colony\'s founder otherwise');
   }
 
-  const colonyClient = await getCachedColonyClient(colonyAddress);
-  const transactionReceipt = await colonyClient.provider.getTransactionReceipt(transactionHash);
-
   const events = await getAllRoleEventsFromTransaction(transactionHash, colonyAddress);
   const { args: { user: colonyFounderAddress } } = events.find(event => event?.name === ColonyRoleSetEventName) ?? { args: { user: '' } };
 
@@ -196,7 +258,7 @@ export const createColonyFounderInitialRoleEntry = async (event: ContractEvent):
     colonyAddress,
     Id.RootDomain,
     colonyFounderAddress,
-    transactionReceipt.blockNumber,
+    transactionHash,
   );
 };
 

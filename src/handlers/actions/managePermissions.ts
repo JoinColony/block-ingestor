@@ -46,6 +46,7 @@ export default async (event: ContractEvent): Promise<void> => {
     if (blockNumber > parseInt(existingColonyRoleLatestBlock, 10)) {
       const allRoleEventsUpdates = await getAllRoleEventsFromTransaction(transactionHash, contractAddress);
       const rolesFromAllUpdateEvents = getRolesMapFromEvents(allRoleEventsUpdates);
+      const rolesFromAllUpdateEventsForAction = getRolesMapFromEvents(allRoleEventsUpdates, false);
 
       await mutate('updateColonyRole', {
         input: {
@@ -76,15 +77,28 @@ export default async (event: ContractEvent): Promise<void> => {
       /*
        * Create the action
        */
-      // await writeActionFromEvent(event, contractAddress, {
-      //   type: ColonyActionType.SetUserRoles,
-      //   fromDomainId: domainDatabaseId,
-      //   initiatorAddress: agent,
-      //   roles: {
-      //     ...existingRoles,
-      //     ...rolesFromAllUpdateEvents,
-      //   },
-      // });
+      await writeActionFromEvent(event, contractAddress, {
+        type: ColonyActionType.SetUserRoles,
+        fromDomainId: domainDatabaseId,
+        initiatorAddress: agent,
+        recipientAddress: targetAddress,
+        roles: {
+          ...rolesFromAllUpdateEventsForAction,
+        },
+        individualEvents: JSON.stringify(
+          allRoleEventsUpdates.map(({
+            name,
+            args: { role, setTo },
+            transactionHash,
+            logIndex,
+          }) => ({
+            id: `${transactionHash}_${logIndex}`,
+            type: name,
+            role,
+            setTo,
+          })),
+        ),
+      });
     }
   /*
    * create a new entry
@@ -107,12 +121,7 @@ export default async (event: ContractEvent): Promise<void> => {
       contractAddress,
       domainId.toNumber(),
       targetAddress,
-      blockNumber,
+      transactionHash,
     );
   }
-
-  // Create the action entry
-  //
-
-  console.log(transactionHash);
 };
