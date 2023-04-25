@@ -1,5 +1,12 @@
 import { BigNumber } from 'ethers';
-import { MotionStakes, UserStakes } from '~types';
+import {
+  MotionStakes,
+  UserStakes,
+  MotionMessage,
+  MotionData,
+  MotionVote,
+  MotionEvents,
+} from '~types';
 import { getMotionSide } from '../helpers';
 
 export const getRequiredStake = (
@@ -181,4 +188,71 @@ export const getUserMinStake = (
     .mul(userMinStakeFraction)
     .div(BigNumber.from(10).pow(36))
     .toString();
+};
+
+interface Props {
+  motionData: MotionData;
+  messages: MotionMessage[];
+  requiredStake: BigNumber;
+  motionStakes: MotionStakes;
+  messageKey: string;
+  vote: BigNumber;
+  staker: string;
+  amount: BigNumber;
+}
+
+export const getUpdatedMessages = ({
+  motionData,
+  messages,
+  requiredStake,
+  motionStakes,
+  messageKey,
+  vote,
+  staker,
+  amount,
+}: Props): MotionMessage[] => {
+  const updatedMessages = [...messages];
+  const isFirstObjection = vote.eq(MotionVote.NAY) && !motionData.hasObjection;
+  if (isFirstObjection) {
+    motionData.hasObjection = true;
+    updatedMessages.push({
+      name: MotionEvents.ObjectionRaised,
+      messageKey: `${messageKey}_${MotionEvents.ObjectionRaised}}`,
+      initiatorAddress: staker,
+    });
+  }
+
+  updatedMessages.push({
+    name: MotionEvents.MotionStaked,
+    messageKey,
+    initiatorAddress: staker,
+    vote: vote.toString(),
+    amount: amount.toString(),
+  });
+
+  if (vote.eq(MotionVote.YAY) && requiredStake.eq(motionStakes.raw.yay)) {
+    const messageName = motionData.hasObjection
+      ? MotionEvents.MotionFullyStakedAfterObjection
+      : MotionEvents.MotionFullyStaked;
+    updatedMessages.push({
+      name: messageName,
+      messageKey: `${messageKey}_${messageName}`,
+      initiatorAddress: staker,
+    });
+  }
+
+  // Only send am ObjectionFullyStaked message if the motion has not already been fully staked for the YAY side
+  if (
+    vote.eq(MotionVote.NAY) &&
+    requiredStake.eq(motionStakes.raw.nay) &&
+    BigNumber.from(motionStakes.raw.nay).gt(motionStakes.raw.yay)
+  ) {
+    updatedMessages.push({
+      name: MotionEvents.ObjectionFullyStaked,
+      messageKey: `${messageKey}_${MotionEvents.ObjectionFullyStaked}`,
+      initiatorAddress: staker,
+    });
+  }
+
+  return updatedMessages;
 };

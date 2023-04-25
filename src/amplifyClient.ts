@@ -211,6 +211,14 @@ export const queries = {
             }
             repSubmitted
             skillRep
+            hasObjection
+            messages {
+              name
+              messageKey
+              initiatorAddress
+              vote
+              amount
+            }
           }
         }
       }

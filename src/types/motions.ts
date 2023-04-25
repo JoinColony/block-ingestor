@@ -25,6 +25,16 @@ export enum ColonyOperations {
   EmitDomainReputationReward = 'emitDomainReputationReward',
 }
 
+export enum MotionEvents {
+  MotionCreated = 'MotionCreated',
+  MotionStaked = 'MotionStaked',
+  MotionFinalized = 'MotionFinalized',
+  ObjectionRaised = 'ObjectionRaised',
+  ObjectionFullyStaked = 'ObjectionFullyStaked',
+  MotionFullyStaked = 'MotionFullyStaked',
+  MotionFullyStakedAfterObjection = 'MotionFullyStakedAfterObjection',
+}
+
 export const motionNameMapping: { [key: string]: ColonyActionType } = {
   [ColonyOperations.MintTokens]: ColonyActionType.MintTokensMotion,
   // makePaymentFundedFromDomain: ColonyMotions.PaymentMotion,
@@ -80,6 +90,8 @@ export interface MotionData {
   revealedVotes: MotionVotes;
   repSubmitted: string;
   skillRep: string;
+  hasObjection: boolean;
+  messages: MotionMessage[];
 }
 
 export interface UserStakes {
@@ -97,4 +109,12 @@ export interface MotionQuery {
   id: string;
   motionData: MotionData;
   createdAt: string;
+}
+
+export interface MotionMessage {
+  name: string;
+  messageKey: string;
+  initiatorAddress?: string;
+  vote?: string;
+  amount?: string;
 }

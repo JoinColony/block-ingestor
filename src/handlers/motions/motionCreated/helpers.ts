@@ -1,7 +1,7 @@
 import { BigNumber } from 'ethers';
 import { TransactionDescription } from 'ethers/lib/utils';
 
-import { ContractEvent, MotionData } from '~types';
+import { MotionData, ContractEvent, MotionEvents } from '~types';
 import { getVotingClient, verbose } from '~utils';
 
 import { mutate } from '~amplifyClient';
@@ -36,11 +36,23 @@ export const getParsedActionFromMotion = async (
   return undefined;
 };
 
-export const getMotionData = async (
-  colonyAddress: string,
-  motionId: BigNumber,
-  domainId: BigNumber,
-): Promise<MotionData> => {
+interface Props {
+  colonyAddress: string;
+  transactionHash: string;
+  logIndex: number;
+  motionId: BigNumber;
+  domainId: BigNumber;
+  creatorAddress: string;
+}
+
+const getMotionData = async ({
+  colonyAddress,
+  transactionHash,
+  logIndex,
+  motionId,
+  domainId,
+  creatorAddress,
+}: Props): Promise<MotionData> => {
   const votingClient = await getVotingClient(colonyAddress);
   const { skillRep, rootHash, repSubmitted } = await votingClient.getMotion(
     motionId,
@@ -95,6 +107,14 @@ export const getMotionData = async (
     },
     repSubmitted: repSubmitted.toString(),
     skillRep: skillRep.toString(),
+    hasObjection: false,
+    messages: [
+      {
+        name: MotionEvents.MotionCreated,
+        messageKey: `${transactionHash}${logIndex}`,
+        initiatorAddress: creatorAddress,
+      },
+    ],
   };
 };
 
@@ -102,12 +122,20 @@ export const createMotionInDB = async (
   {
     transactionHash,
     blockNumber,
+    logIndex,
     contractAddress: colonyAddress,
-    args: { motionId, creator, domainId },
+    args: { motionId, creator: creatorAddress, domainId },
   }: ContractEvent,
   input: Record<string, any>,
 ): Promise<void> => {
-  const motionData = await getMotionData(colonyAddress, motionId, domainId);
+  const motionData = await getMotionData({
+    colonyAddress,
+    transactionHash,
+    logIndex,
+    motionId,
+    domainId,
+    creatorAddress,
+  });
 
   await mutate('createColonyAction', {
     input: {
@@ -116,7 +144,7 @@ export const createMotionInDB = async (
       isMotion: true,
       showInActionsList: false,
       motionData,
-      initiatorAddress: creator,
+      initiatorAddress: creatorAddress,
       blockNumber,
       ...input,
     },

@@ -8,12 +8,15 @@ import {
   getRemainingStakes,
   getRequiredStake,
   getUpdatedUsersStakes,
+  getUpdatedMessages,
   updateMotionInDB,
 } from '../helpers';
 
 export default async (event: ContractEvent): Promise<void> => {
   const {
     contractAddress: colonyAddress,
+    logIndex,
+    transactionHash,
     args: { vote, amount, staker, motionId },
   } = event;
 
@@ -38,7 +41,7 @@ export default async (event: ContractEvent): Promise<void> => {
   if (stakedMotion) {
     const {
       id,
-      motionData: { usersStakes },
+      motionData: { usersStakes, messages },
       motionData,
     } = stakedMotion;
 
@@ -49,6 +52,16 @@ export default async (event: ContractEvent): Promise<void> => {
       amount,
       requiredStake,
     );
+    const updatedMessages = getUpdatedMessages({
+      motionData,
+      messages,
+      requiredStake,
+      motionStakes,
+      messageKey: `${transactionHash}${logIndex}`,
+      vote,
+      staker,
+      amount,
+    });
 
     await updateMotionInDB(
       id,
@@ -57,6 +70,7 @@ export default async (event: ContractEvent): Promise<void> => {
         usersStakes: updatedUserStakes,
         motionStakes,
         remainingStakes,
+        messages: updatedMessages,
       },
       showInActionsList,
     );
