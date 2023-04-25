@@ -12,7 +12,9 @@ The first step is to clone and setup the coinmachine application using the steps
 
 Specifically the authentication for this process is done by creating a `blockingestor` user in the projects cognito user pool and then creating and adding this user to a `admin` group.
 
-The following script sets up this user and group using the aws cli:
+The setup script automates this process for you just call `npm run setup` to configure the block ingestor user.
+
+This script is a wrapper to provide a good user experience around the following commands:
 ``` shell
 aws cognito-idp admin-create-user \
     --user-pool-id $userPool \

@@ -4,7 +4,8 @@
   "description": "Ingest blocks and parse events",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "setup": "./setup.sh"
   },
   "author": "",
   "license": "ISC",
