@@ -1,9 +1,10 @@
 import { BigNumber } from 'ethers';
 import { TransactionDescription } from 'ethers/lib/utils';
 
-import { MotionVote, StakerReward } from '~types';
-import { getVotingClient, verbose } from '~utils';
+import { ColonyOperations, MotionQuery, MotionVote, StakerReward } from '~types';
+import { getDomainDatabaseId, getVotingClient, verbose } from '~utils';
 import networkClient from '~networkClient';
+import { mutate } from '~amplifyClient';
 
 export const getStakerReward = async (
   motionId: string,
@@ -66,5 +67,33 @@ export const getParsedActionFromMotion = async (
   } catch {
     verbose(`Unable to parse ${motionAction} using colony client`);
     return undefined;
+  }
+};
+
+export const linkPendingDomainMetadataWithDomain = async (action: string, colonyAddress: string, finalizedMotion: MotionQuery) => {
+  const parsedDomainAction = await getParsedActionFromMotion(action, colonyAddress);
+  if (parsedDomainAction?.name === ColonyOperations.AddDomain) {
+    const colonyClient = await networkClient.getColonyClient(colonyAddress);
+    const domainCount = await colonyClient.getDomainCount();
+    // The new domain should be created by now, so we just get the total of existing domains
+    // and use that as an id to link the pending metadata.
+    const nativeDomainId = domainCount.toNumber();
+
+    await mutate('createDomainMetadata', {
+      input: {
+        ...finalizedMotion.pendingDomainMetadata,
+        id: getDomainDatabaseId(colonyAddress, nativeDomainId),
+        
+      },
+    });        
+  } else if (parsedDomainAction?.name === ColonyOperations.EditDomain) {
+    const nativeDomainId = parsedDomainAction.args[2].toNumber(); // domainId arg from editDomain action
+
+    await mutate('updateDomainMetadata', {
+      input: {
+        ...finalizedMotion.pendingDomainMetadata,
+        id: getDomainDatabaseId(colonyAddress, nativeDomainId),
+      },
+    }); 
   }
 };
