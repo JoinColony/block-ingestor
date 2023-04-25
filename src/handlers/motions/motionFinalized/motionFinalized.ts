@@ -37,9 +37,12 @@ export default async (event: ContractEvent): Promise<void> => {
     const {
       revealedVotes: {
         raw: { yay: yayVotes, nay: nayVotes },
-      }
+      },
+      motionStakes: {
+        percentage: { yay: yayPercentage, nay: nayPercentage },
+      },
     } = motionData;
-    const yayWon = BigNumber.from(yayVotes).gt(nayVotes);
+    const yayWon = BigNumber.from(yayVotes).gt(nayVotes) || (Number(yayPercentage) > Number(nayPercentage));
 
     if (finalizedMotion.pendingDomainMetadata && yayWon) {
       await linkPendingDomainMetadataWithDomain(action, colonyAddress, finalizedMotion);
