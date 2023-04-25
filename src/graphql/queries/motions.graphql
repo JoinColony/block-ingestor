@@ -72,6 +72,20 @@ query GetColonyMotions($colonyAddress: ID!) {
           amount
         }
       }
+      pendingDomainMetadata {
+        name
+        color
+        description
+        changelog {
+          transactionHash
+          oldName
+          newName
+          oldColor
+          newColor
+          oldDescription
+          newDescription
+        }
+      }
     }
   }
 }
