@@ -1,7 +1,9 @@
 import { BigNumber } from 'ethers';
+import { TransactionDescription } from 'ethers/lib/utils';
 
 import { MotionVote, StakerReward } from '~types';
-import { getVotingClient } from '~utils';
+import { getVotingClient, verbose } from '~utils';
+import networkClient from '~networkClient';
 
 export const getStakerReward = async (
   motionId: string,
@@ -48,4 +50,21 @@ export const getStakerReward = async (
     },
     isClaimed: false,
   };
+};
+
+export const getParsedActionFromMotion = async (
+  motionAction: string,
+  colonyAddress: string,
+): Promise<TransactionDescription | undefined> => {
+  const colonyClient = await networkClient.getColonyClient(colonyAddress);
+
+  // We are only parsing this action in order to know if it's a add/edit domain motion. Therefore, we shouldn't need to try with any other client.
+  try {
+    return colonyClient.interface.parseTransaction({
+      data: motionAction,
+    });    
+  } catch {
+    verbose(`Unable to parse ${motionAction} using colony client`);
+    return undefined;
+  }
 };
