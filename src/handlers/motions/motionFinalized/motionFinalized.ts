@@ -39,7 +39,7 @@ export default async (event: ContractEvent): Promise<void> => {
       if (parsedDomainAction?.name === ColonyOperations.AddDomain) {
         const colonyClient = await networkClient.getColonyClient(colonyAddress);
         const domainCount = await colonyClient.getDomainCount();
-        const nativeDomainId = domainCount.add(1).toNumber();
+        const nativeDomainId = domainCount.toNumber(); // The new domain should be created by now, so we just get the total of existing domains and use that as an id
 
         await mutate('createDomainMetadata', {
           input: {
