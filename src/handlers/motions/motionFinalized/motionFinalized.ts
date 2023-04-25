@@ -1,7 +1,7 @@
-import { ColonyOperations, ContractEvent } from '~types';
-import { getDomainDatabaseId, getVotingClient } from '~utils';
-import { mutate } from '~amplifyClient';
-import networkClient from '~networkClient';
+import { BigNumber } from 'ethers';
+
+import { ContractEvent } from '~types';
+import { getVotingClient } from '~utils';
 
 import {
   getMotionDatabaseId,
@@ -9,7 +9,7 @@ import {
   updateMotionInDB,
 } from '../helpers';
 
-import { getParsedActionFromMotion, getStakerReward } from './helpers';
+import { getStakerReward, linkPendingDomainMetadataWithDomain } from './helpers';
 
 export default async (event: ContractEvent): Promise<void> => {
   const {
@@ -34,30 +34,15 @@ export default async (event: ContractEvent): Promise<void> => {
       motionData,
     } = finalizedMotion;
 
-    if (finalizedMotion.pendingDomainMetadata) {
-      const parsedDomainAction = await getParsedActionFromMotion(action, colonyAddress);
-      if (parsedDomainAction?.name === ColonyOperations.AddDomain) {
-        const colonyClient = await networkClient.getColonyClient(colonyAddress);
-        const domainCount = await colonyClient.getDomainCount();
-        const nativeDomainId = domainCount.toNumber(); // The new domain should be created by now, so we just get the total of existing domains and use that as an id
-
-        await mutate('createDomainMetadata', {
-          input: {
-            ...finalizedMotion.pendingDomainMetadata,
-            id: getDomainDatabaseId(colonyAddress, nativeDomainId),
-            
-          },
-        });        
-      } else if (parsedDomainAction?.name === ColonyOperations.EditDomain) {
-        const nativeDomainId = parsedDomainAction.args[2].toNumber();
-
-        await mutate('updateDomainMetadata', {
-          input: {
-            ...finalizedMotion.pendingDomainMetadata,
-            id: getDomainDatabaseId(colonyAddress, nativeDomainId),
-          },
-        }); 
+    const {
+      revealedVotes: {
+        raw: { yay: yayVotes, nay: nayVotes },
       }
+    } = motionData;
+    const yayWon = BigNumber.from(yayVotes).gt(nayVotes);
+
+    if (finalizedMotion.pendingDomainMetadata && yayWon) {
+      await linkPendingDomainMetadataWithDomain(action, colonyAddress, finalizedMotion);
     }
 
     const updatedStakerRewards = await Promise.all(
