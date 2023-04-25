@@ -105,10 +105,48 @@ export interface StakerReward {
   isClaimed: boolean;
 }
 
+enum DomainColor {
+  LIGHT_PINK,
+  PINK,
+  BLACK,
+  EMERALD_GREEN,
+  BLUE,
+  YELLOW,
+  RED,
+  GREEN,
+  PERIWINKLE,
+  GOLD,
+  AQUA,
+  BLUE_GREY,
+  PURPLE,
+  ORANGE,
+  MAGENTA,
+  PURPLE_GREY,
+}
+
+interface DomainMetadataChangelog {
+  transactionHash: string;
+  oldName: string;
+  newName: string;
+  oldColor: DomainColor;
+  newColor: DomainColor;
+  oldDescription: string;
+  newDescription: string;
+}
+
+interface DomainMetadata {
+  id: string;
+  name: string;
+  description: string;
+  color: string;
+  changelog: [DomainMetadataChangelog];
+}
+
 export interface MotionQuery {
   id: string;
   motionData: MotionData;
   createdAt: string;
+  pendingDomainMetadata: DomainMetadata;
 }
 
 export interface MotionMessage {
