@@ -99,6 +99,20 @@ export const mutations = {
       }
     }
   `,
+  createDomainMetadata: /* GraphQL */ `
+    mutation CreateDomainMetadata($input: CreateDomainMetadataInput!) {
+      createDomainMetadata(input: $input) {
+        id
+      }
+    }
+  `,
+  updateDomainMetadata: /* GraphQL */ `
+    mutation UpdateDomainMetadata($input: UpdateDomainMetadataInput!) {
+      updateDomainMetadata(input: $input) {
+        id
+      }
+    }
+  `,
 };
 
 /*
@@ -218,6 +232,20 @@ export const queries = {
               initiatorAddress
               vote
               amount
+            }
+          }
+          pendingDomainMetadata {
+            name
+            color
+            description
+            changelog {
+              transactionHash
+              oldName
+              newName
+              oldColor
+              newColor
+              oldDescription
+              newDescription
             }
           }
         }
