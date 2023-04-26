@@ -11,13 +11,12 @@ export const handlePaymentMotion = async (
 ): Promise<void> => {
   const {
     contractAddress: colonyAddress,
-    args: { domainId },
   } = event;
   const { name, args: actionArgs } = parsedAction;
-  const [, , , , recipients, tokenAddresses, amounts] = actionArgs;
+  const [, , , , recipients, tokenAddresses, amounts, fromDomainId] = actionArgs;
   await createMotionInDB(event, {
     type: motionNameMapping[name],
-    fromDomainId: getDomainDatabaseId(colonyAddress, toNumber(domainId)),
+    fromDomainId: getDomainDatabaseId(colonyAddress, toNumber(fromDomainId)),
     tokenAddress: tokenAddresses[0],
     amount: amounts[0].toString(),
     recipientAddress: recipients[0],
