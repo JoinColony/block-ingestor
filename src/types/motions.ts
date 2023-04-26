@@ -35,6 +35,9 @@ export enum MotionEvents {
   MotionFullyStakedAfterObjection = 'MotionFullyStakedAfterObjection',
   MotionVotingPhase = 'MotionVotingPhase',
   MotionRewardClaimed = 'MotionRewardClaimed',
+  MotionRevealResultObjectionWon = 'MotionRevealResultObjectionWon',
+  MotionHasFailedFinalizable = 'MotionHasFailedFinalizable',
+  MotionRevealResultMotionWon = 'MotionRevealResultMotionWon',
 }
 
 export const motionNameMapping: { [key: string]: ColonyActionType } = {
