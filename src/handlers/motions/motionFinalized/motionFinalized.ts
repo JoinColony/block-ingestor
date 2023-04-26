@@ -13,6 +13,8 @@ import { getStakerReward, linkPendingDomainMetadataWithDomain } from './helpers'
 export default async (event: ContractEvent): Promise<void> => {
   const {
     contractAddress: colonyAddress,
+    logIndex,
+    transactionHash,
     args: { motionId, action },
   } = event;
 
@@ -60,10 +62,19 @@ export default async (event: ContractEvent): Promise<void> => {
       ),
     );
 
+    const updatedMessages = [
+      ...messages,
+      {
+        name: 'MotionFinalized',
+        messageKey: `${transactionHash}${logIndex}`,
+      },
+    ];
+
     const updatedMotionData = {
       ...motionData,
       stakerRewards: updatedStakerRewards,
       isFinalized: true,
+      messages: updatedMessages,
     };
 
     await updateMotionInDB(finalizedMotion.id, updatedMotionData);
