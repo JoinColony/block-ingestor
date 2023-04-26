@@ -5,10 +5,13 @@ import {
   getMotionFromDB,
   updateMotionInDB,
 } from '../helpers';
+import { getUpdatedMessages } from './helpers';
 
 export default async (event: ContractEvent): Promise<void> => {
   const {
     contractAddress: colonyAddress,
+    logIndex,
+    transactionHash,
     args: { motionId, voter, vote },
   } = event;
 
@@ -27,7 +30,7 @@ export default async (event: ContractEvent): Promise<void> => {
   if (revealedMotion) {
     const {
       id,
-      motionData: { voterRecord },
+      motionData: { voterRecord, messages },
       motionData,
     } = revealedMotion;
     const updatedVoterRecord = voterRecord.map((record) => {
@@ -42,6 +45,13 @@ export default async (event: ContractEvent): Promise<void> => {
       };
 
       return updatedRecord;
+    });
+
+    const updatedMessages = getUpdatedMessages({
+      messages,
+      messageKey: `${transactionHash}${logIndex}`,
+      voter,
+      votes: [nayVotes, yayVotes],
     });
 
     const totalVotes = nayVotes.add(yayVotes);
@@ -60,6 +70,7 @@ export default async (event: ContractEvent): Promise<void> => {
           [MotionSide.YAY]: yayVotePercentage.toString(),
         },
       },
+      messages: updatedMessages,
     });
 
     verbose(
