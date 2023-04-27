@@ -53,8 +53,8 @@ export const getStakerReward = async (
   };
 };
 
-export const getParsedActionFromMotion = async (
-  motionAction: string,
+const getParsedActionFromDomainMotion = async (
+  domainAction: string,
   colonyAddress: string,
 ): Promise<TransactionDescription | undefined> => {
   const colonyClient = await networkClient.getColonyClient(colonyAddress);
@@ -62,16 +62,16 @@ export const getParsedActionFromMotion = async (
   // We are only parsing this action in order to know if it's a add/edit domain motion. Therefore, we shouldn't need to try with any other client.
   try {
     return colonyClient.interface.parseTransaction({
-      data: motionAction,
-    });    
+      data: domainAction,
+    });
   } catch {
-    verbose(`Unable to parse ${motionAction} using colony client`);
+    verbose(`Unable to parse ${domainAction} using colony client`);
     return undefined;
   }
 };
 
-export const linkPendingDomainMetadataWithDomain = async (action: string, colonyAddress: string, finalizedMotion: MotionQuery) => {
-  const parsedDomainAction = await getParsedActionFromMotion(action, colonyAddress);
+export const linkPendingDomainMetadataWithDomain = async (action: string, colonyAddress: string, finalizedMotion: MotionQuery): Promise<void> => {
+  const parsedDomainAction = await getParsedActionFromDomainMotion(action, colonyAddress);
   if (parsedDomainAction?.name === ColonyOperations.AddDomain) {
     const colonyClient = await networkClient.getColonyClient(colonyAddress);
     const domainCount = await colonyClient.getDomainCount();
@@ -83,9 +83,8 @@ export const linkPendingDomainMetadataWithDomain = async (action: string, colony
       input: {
         ...finalizedMotion.pendingDomainMetadata,
         id: getDomainDatabaseId(colonyAddress, nativeDomainId),
-        
       },
-    });        
+    });
   } else if (parsedDomainAction?.name === ColonyOperations.EditDomain) {
     const nativeDomainId = parsedDomainAction.args[2].toNumber(); // domainId arg from editDomain action
 
@@ -94,6 +93,6 @@ export const linkPendingDomainMetadataWithDomain = async (action: string, colony
         ...finalizedMotion.pendingDomainMetadata,
         id: getDomainDatabaseId(colonyAddress, nativeDomainId),
       },
-    }); 
+    });
   }
 };
