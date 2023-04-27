@@ -39,6 +39,7 @@ export default async (event: ContractEvent): Promise<void> => {
         motionStakes: {
           percentage: { yay: yayPercentage, nay: nayPercentage },
         },
+        messages,
       },
       motionData,
     } = finalizedMotion;
