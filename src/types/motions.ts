@@ -96,6 +96,9 @@ export interface MotionData {
   repSubmitted: string;
   skillRep: string;
   hasObjection: boolean;
+  hasPassed: boolean;
+  inRevealPhase: boolean;
+  hasFailedNotFinalizable: boolean;
   messages: MotionMessage[];
 }
 

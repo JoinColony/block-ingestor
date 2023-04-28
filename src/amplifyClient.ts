@@ -254,6 +254,9 @@ export const queries = {
             repSubmitted
             skillRep
             hasObjection
+            hasPassed
+            inRevealPhase
+            hasFailedNotFinalizable
             messages {
               name
               messageKey
