@@ -34,4 +34,5 @@ module.exports = {
       },
     ],
   },
+  ignorePatterns: ['codegen.ts', 'src/types/generated.ts'],
 };
