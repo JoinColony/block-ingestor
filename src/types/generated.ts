@@ -2718,6 +2718,91 @@ export type Watcher = {
   user?: Maybe<User>;
 };
 
+export type CreateColonyActionMutationVariables = Exact<{
+  input: CreateColonyActionInput;
+}>;
+
+export type CreateColonyActionMutation = {
+  __typename?: 'Mutation';
+  createColonyAction?: { __typename?: 'ColonyAction'; id: string } | null;
+};
+
+export type UpdateColonyActionMutationVariables = Exact<{
+  input: UpdateColonyActionInput;
+}>;
+
+export type UpdateColonyActionMutation = {
+  __typename?: 'Mutation';
+  updateColonyAction?: { __typename?: 'ColonyAction'; id: string } | null;
+};
+
+export type UpdateColonyMutationVariables = Exact<{
+  input: UpdateColonyInput;
+}>;
+
+export type UpdateColonyMutation = {
+  __typename?: 'Mutation';
+  updateColony?: { __typename?: 'Colony'; id: string } | null;
+};
+
+export type SetCurrentVersionMutationVariables = Exact<{
+  input: SetCurrentVersionInput;
+}>;
+
+export type SetCurrentVersionMutation = {
+  __typename?: 'Mutation';
+  setCurrentVersion?: boolean | null;
+};
+
+export type CreateDomainMutationVariables = Exact<{
+  input: CreateDomainInput;
+}>;
+
+export type CreateDomainMutation = {
+  __typename?: 'Mutation';
+  createDomain?: { __typename?: 'Domain'; id: string } | null;
+};
+
+export type CreateContractEventMutationVariables = Exact<{
+  input: CreateContractEventInput;
+  condition?: InputMaybe<ModelContractEventConditionInput>;
+}>;
+
+export type CreateContractEventMutation = {
+  __typename?: 'Mutation';
+  createContractEvent?: { __typename?: 'ContractEvent'; id: string } | null;
+};
+
+export type CreateColonyExtensionMutationVariables = Exact<{
+  input: CreateColonyExtensionInput;
+}>;
+
+export type CreateColonyExtensionMutation = {
+  __typename?: 'Mutation';
+  createColonyExtension?: { __typename?: 'ColonyExtension'; id: string } | null;
+};
+
+export type UpdateColonyExtensionByColonyAndHashMutationVariables = Exact<{
+  input: UpdateExtensionByColonyAndHashInput;
+}>;
+
+export type UpdateColonyExtensionByColonyAndHashMutation = {
+  __typename?: 'Mutation';
+  updateExtensionByColonyAndHash?: {
+    __typename?: 'ColonyExtension';
+    id: string;
+  } | null;
+};
+
+export type UpdateColonyExtensionByAddressMutationVariables = Exact<{
+  input: UpdateColonyExtensionInput;
+}>;
+
+export type UpdateColonyExtensionByAddressMutation = {
+  __typename?: 'Mutation';
+  updateColonyExtension?: { __typename?: 'ColonyExtension'; id: string } | null;
+};
+
 export type CreateColonyFundsClaimMutationVariables = Exact<{
   input: CreateColonyFundsClaimInput;
   condition?: InputMaybe<ModelColonyFundsClaimConditionInput>;
@@ -2727,6 +2812,43 @@ export type CreateColonyFundsClaimMutation = {
   __typename?: 'Mutation';
   createColonyFundsClaim?: {
     __typename?: 'ColonyFundsClaim';
+    id: string;
+  } | null;
+};
+
+export type DeleteColonyFundsClaimMutationVariables = Exact<{
+  input: DeleteColonyFundsClaimInput;
+  condition?: InputMaybe<ModelColonyFundsClaimConditionInput>;
+}>;
+
+export type DeleteColonyFundsClaimMutation = {
+  __typename?: 'Mutation';
+  deleteColonyFundsClaim?: {
+    __typename?: 'ColonyFundsClaim';
+    id: string;
+  } | null;
+};
+
+export type CreateCurrentNetworkInverseFeeMutationVariables = Exact<{
+  input: CreateCurrentNetworkInverseFeeInput;
+}>;
+
+export type CreateCurrentNetworkInverseFeeMutation = {
+  __typename?: 'Mutation';
+  createCurrentNetworkInverseFee?: {
+    __typename?: 'CurrentNetworkInverseFee';
+    id: string;
+  } | null;
+};
+
+export type UpdateCurrentNetworkInverseFeeMutationVariables = Exact<{
+  input: UpdateCurrentNetworkInverseFeeInput;
+}>;
+
+export type UpdateCurrentNetworkInverseFeeMutation = {
+  __typename?: 'Mutation';
+  updateCurrentNetworkInverseFee?: {
+    __typename?: 'CurrentNetworkInverseFee';
     id: string;
   } | null;
 };

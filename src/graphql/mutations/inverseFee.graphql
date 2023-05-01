@@ -1,0 +1,15 @@
+mutation CreateCurrentNetworkInverseFee(
+  $input: CreateCurrentNetworkInverseFeeInput!
+) {
+  createCurrentNetworkInverseFee(input: $input) {
+    id
+  }
+}
+
+mutation UpdateCurrentNetworkInverseFee(
+  $input: UpdateCurrentNetworkInverseFeeInput!
+) {
+  updateCurrentNetworkInverseFee(input: $input) {
+    id
+  }
+}

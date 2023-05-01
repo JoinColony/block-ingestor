@@ -1,0 +1,19 @@
+mutation CreateColonyExtension($input: CreateColonyExtensionInput!) {
+  createColonyExtension(input: $input) {
+    id
+  }
+}
+
+mutation UpdateColonyExtensionByColonyAndHash(
+  $input: UpdateExtensionByColonyAndHashInput!
+) {
+  updateExtensionByColonyAndHash(input: $input) {
+    id
+  }
+}
+
+mutation UpdateColonyExtensionByAddress($input: UpdateColonyExtensionInput!) {
+  updateColonyExtension(input: $input) {
+    id
+  }
+}

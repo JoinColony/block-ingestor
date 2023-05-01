@@ -1,0 +1,8 @@
+mutation CreateContractEvent(
+  $input: CreateContractEventInput!
+  $condition: ModelContractEventConditionInput
+) {
+  createContractEvent(input: $input, condition: $condition) {
+    id
+  }
+}
