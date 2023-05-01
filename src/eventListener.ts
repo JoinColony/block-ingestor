@@ -7,7 +7,7 @@ import {
   addTokenEventListener,
   addActionEventListeners,
 } from './utils';
-import { ContractEventsSignatures } from './types';
+import { ContractEventsSignatures } from '~types';
 import { INITIALISABLE_EXTENSION_IDS } from './constants';
 
 /*

@@ -1,5 +1,5 @@
 import { getLogs } from '@colony/colony-js';
-import { LogDescription } from '@ethersproject/abi';
+import { LogDescription } from 'ethers/lib/utils';
 
 /*
  * Custom contract event, since we need some log values as well
@@ -66,24 +66,6 @@ export enum EthersObserverEvents {
 }
 
 export type ChainID = number;
-
-/*
- * GraphQL ColonyActionType enum
- */
-export enum ColonyActionType {
-  MintTokens = 'MINT_TOKENS',
-  Payment = 'PAYMENT',
-  CreateDomain = 'CREATE_DOMAIN',
-  EditDomain = 'EDIT_DOMAIN',
-  UnlockToken = 'UNLOCK_TOKEN',
-  MoveFunds = 'MOVE_FUNDS',
-  ColonyEdit = 'COLONY_EDIT',
-  VersionUpgrade = 'VERSION_UPGRADE',
-  EmitDomainReputationPenalty = 'EMIT_DOMAIN_REPUTATION_PENALTY',
-  EmitDomainReputationReward = 'EMIT_DOMAIN_REPUTATION_REWARD',
-}
-
-export type ColonyActionHandler = (event: ContractEvent) => Promise<void>;
 
 // The Filter type doesn't seem to be exported from colony-js
 export type Filter = Parameters<typeof getLogs>[1];
