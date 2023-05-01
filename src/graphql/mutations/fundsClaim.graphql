@@ -1,0 +1,8 @@
+mutation CreateColonyFundsClaim(
+  $input: CreateColonyFundsClaimInput!
+  $condition: ModelColonyFundsClaimConditionInput
+) {
+  createColonyFundsClaim(input: $input, condition: $condition) {
+    id
+  }
+}
