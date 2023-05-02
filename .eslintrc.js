@@ -34,5 +34,5 @@ module.exports = {
       },
     ],
   },
-  ignorePatterns: ['codegen.ts', 'src/types/generated.ts'],
+  ignorePatterns: ['codegen.ts', 'src/graphql/generated.ts'],
 };
