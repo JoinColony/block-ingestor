@@ -25,7 +25,7 @@ export default async (event: ContractEvent): Promise<void> => {
   const { skillRep, stakes } = await votingClient.getMotion(motionId);
 
   const requiredStake = getRequiredStake(skillRep, totalStakeFraction);
-  const motionStakes = getMotionStakes(requiredStake, stakes);
+  const motionStakes = getMotionStakes(requiredStake, stakes, vote);
   const remainingStakes = getRemainingStakes(requiredStake, stakes);
   const showInActionsList =
     Number(motionStakes.percentage.yay) + Number(motionStakes.percentage.nay) >=
