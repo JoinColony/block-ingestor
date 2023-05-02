@@ -17,6 +17,9 @@ const config: CodegenConfig = {
       plugins: ['typescript', 'typescript-operations'],
     },
   },
+  hooks: {
+    afterOneFileWrite: ['prettier --write --ignore-unknown'],
+  },
 };
 
 export default config;
