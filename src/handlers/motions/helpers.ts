@@ -57,3 +57,10 @@ export const getMotionFromDB = async (
 
   return motion;
 };
+
+export const getMessageKey = (
+  transactionHash: string,
+  logIndex: number,
+): string => {
+  return `${transactionHash}${logIndex}`;
+};

@@ -255,8 +255,9 @@ export const queries = {
             skillRep
             hasObjection
             hasPassed
-            inRevealPhase
+            hasFailed
             hasFailedNotFinalizable
+            inRevealPhase
             messages {
               name
               messageKey

@@ -10,6 +10,7 @@ import {
   getMotionDatabaseId,
   getRequiredStake,
   getUserMinStake,
+  getMessageKey,
 } from '../helpers';
 import { AnyColonyClient, AnyOneTxPaymentClient } from '@colony/colony-js/*';
 
@@ -109,12 +110,13 @@ const getMotionData = async ({
     skillRep: skillRep.toString(),
     hasObjection: false,
     hasPassed: false,
-    inRevealPhase: false,
+    hasFailed: false,
     hasFailedNotFinalizable: false,
+    inRevealPhase: false,
     messages: [
       {
         name: MotionEvents.MotionCreated,
-        messageKey: `${transactionHash}${logIndex}`,
+        messageKey: getMessageKey(transactionHash, logIndex),
         initiatorAddress: creatorAddress,
       },
     ],
