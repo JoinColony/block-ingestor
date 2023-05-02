@@ -10,6 +10,7 @@ import {
   getUpdatedUsersStakes,
   getUpdatedMessages,
   updateMotionInDB,
+  getMessageKey,
 } from '../helpers';
 
 export default async (event: ContractEvent): Promise<void> => {
@@ -57,7 +58,7 @@ export default async (event: ContractEvent): Promise<void> => {
       messages,
       requiredStake,
       motionStakes,
-      messageKey: `${transactionHash}${logIndex}`,
+      messageKey: getMessageKey(transactionHash, logIndex),
       vote,
       staker,
       amount,

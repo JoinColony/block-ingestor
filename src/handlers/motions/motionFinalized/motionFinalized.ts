@@ -7,6 +7,7 @@ import {
   getMotionDatabaseId,
   getMotionFromDB,
   updateMotionInDB,
+  getMessageKey,
 } from '../helpers';
 import { getStakerReward, linkPendingDomainMetadataWithDomain } from './helpers';
 
@@ -67,7 +68,7 @@ export default async (event: ContractEvent): Promise<void> => {
       ...messages,
       {
         name: MotionEvents.MotionFinalized,
-        messageKey: `${transactionHash}${logIndex}`,
+        messageKey: getMessageKey(transactionHash, logIndex),
       },
     ];
 

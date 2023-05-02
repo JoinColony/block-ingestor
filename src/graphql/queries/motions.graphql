@@ -65,8 +65,9 @@ query GetColonyMotions($colonyAddress: ID!) {
         skillRep
         hasObjection
         hasPassed
-        inRevealPhase
+        hasFailed
         hasFailedNotFinalizable
+        inRevealPhase
         messages {
           name
           messageKey
