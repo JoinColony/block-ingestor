@@ -235,13 +235,16 @@ export type ColonyMetadata = {
   createdAt: Scalars['AWSDateTime'];
   displayName: Scalars['String'];
   id: Scalars['ID'];
+  isWhitelistActivated?: Maybe<Scalars['Boolean']>;
   thumbnail?: Maybe<Scalars['String']>;
   updatedAt: Scalars['AWSDateTime'];
+  whitelistedAddresses?: Maybe<Array<Scalars['String']>>;
 };
 
 export type ColonyMetadataChangelog = {
   __typename?: 'ColonyMetadataChangelog';
   hasAvatarChanged: Scalars['Boolean'];
+  hasWhitelistChanged: Scalars['Boolean'];
   newDisplayName: Scalars['String'];
   oldDisplayName: Scalars['String'];
   transactionHash: Scalars['String'];
@@ -249,6 +252,7 @@ export type ColonyMetadataChangelog = {
 
 export type ColonyMetadataChangelogInput = {
   hasAvatarChanged: Scalars['Boolean'];
+  hasWhitelistChanged: Scalars['Boolean'];
   newDisplayName: Scalars['String'];
   oldDisplayName: Scalars['String'];
   transactionHash: Scalars['String'];
@@ -364,7 +368,9 @@ export type CreateColonyMetadataInput = {
   changelog?: InputMaybe<Array<ColonyMetadataChangelogInput>>;
   displayName: Scalars['String'];
   id?: InputMaybe<Scalars['ID']>;
+  isWhitelistActivated?: InputMaybe<Scalars['Boolean']>;
   thumbnail?: InputMaybe<Scalars['String']>;
+  whitelistedAddresses?: InputMaybe<Array<Scalars['String']>>;
 };
 
 export type CreateColonyTokensInput = {
@@ -838,9 +844,11 @@ export type ModelColonyMetadataConditionInput = {
   and?: InputMaybe<Array<InputMaybe<ModelColonyMetadataConditionInput>>>;
   avatar?: InputMaybe<ModelStringInput>;
   displayName?: InputMaybe<ModelStringInput>;
+  isWhitelistActivated?: InputMaybe<ModelBooleanInput>;
   not?: InputMaybe<ModelColonyMetadataConditionInput>;
   or?: InputMaybe<Array<InputMaybe<ModelColonyMetadataConditionInput>>>;
   thumbnail?: InputMaybe<ModelStringInput>;
+  whitelistedAddresses?: InputMaybe<ModelStringInput>;
 };
 
 export type ModelColonyMetadataConnection = {
@@ -854,9 +862,11 @@ export type ModelColonyMetadataFilterInput = {
   avatar?: InputMaybe<ModelStringInput>;
   displayName?: InputMaybe<ModelStringInput>;
   id?: InputMaybe<ModelIdInput>;
+  isWhitelistActivated?: InputMaybe<ModelBooleanInput>;
   not?: InputMaybe<ModelColonyMetadataFilterInput>;
   or?: InputMaybe<Array<InputMaybe<ModelColonyMetadataFilterInput>>>;
   thumbnail?: InputMaybe<ModelStringInput>;
+  whitelistedAddresses?: InputMaybe<ModelStringInput>;
 };
 
 export type ModelColonyTokensConditionInput = {
@@ -1215,10 +1225,12 @@ export type ModelSubscriptionColonyMetadataFilterInput = {
   avatar?: InputMaybe<ModelSubscriptionStringInput>;
   displayName?: InputMaybe<ModelSubscriptionStringInput>;
   id?: InputMaybe<ModelSubscriptionIdInput>;
+  isWhitelistActivated?: InputMaybe<ModelSubscriptionBooleanInput>;
   or?: InputMaybe<
     Array<InputMaybe<ModelSubscriptionColonyMetadataFilterInput>>
   >;
   thumbnail?: InputMaybe<ModelSubscriptionStringInput>;
+  whitelistedAddresses?: InputMaybe<ModelSubscriptionStringInput>;
 };
 
 export type ModelSubscriptionColonyTokensFilterInput = {
@@ -2555,7 +2567,9 @@ export type UpdateColonyMetadataInput = {
   changelog?: InputMaybe<Array<ColonyMetadataChangelogInput>>;
   displayName?: InputMaybe<Scalars['String']>;
   id: Scalars['ID'];
+  isWhitelistActivated?: InputMaybe<Scalars['Boolean']>;
   thumbnail?: InputMaybe<Scalars['String']>;
+  whitelistedAddresses?: InputMaybe<Array<Scalars['String']>>;
 };
 
 export type UpdateColonyTokensInput = {
@@ -2850,5 +2864,53 @@ export type UpdateCurrentNetworkInverseFeeMutation = {
   updateCurrentNetworkInverseFee?: {
     __typename?: 'CurrentNetworkInverseFee';
     id: string;
+  } | null;
+};
+
+export type GetContractEventQueryVariables = Exact<{
+  id: Scalars['ID'];
+}>;
+
+export type GetContractEventQuery = {
+  __typename?: 'Query';
+  getContractEvent?: { __typename?: 'ContractEvent'; id: string } | null;
+};
+
+export type GetColonyUnclaimedFundsQueryVariables = Exact<{
+  colonyAddress: Scalars['ID'];
+  tokenAddress: Scalars['ID'];
+  upToBlock?: InputMaybe<Scalars['Int']>;
+}>;
+
+export type GetColonyUnclaimedFundsQuery = {
+  __typename?: 'Query';
+  listColonyFundsClaims?: {
+    __typename?: 'ModelColonyFundsClaimConnection';
+    items: Array<{ __typename?: 'ColonyFundsClaim'; id: string } | null>;
+  } | null;
+};
+
+export type GetColonyUnclaimedFundQueryVariables = Exact<{
+  claimId: Scalars['ID'];
+}>;
+
+export type GetColonyUnclaimedFundQuery = {
+  __typename?: 'Query';
+  getColonyFundsClaim?: { __typename?: 'ColonyFundsClaim'; id: string } | null;
+};
+
+export type GetCurrentNetworkInverseFeeQueryVariables = Exact<{
+  [key: string]: never;
+}>;
+
+export type GetCurrentNetworkInverseFeeQuery = {
+  __typename?: 'Query';
+  listCurrentNetworkInverseFees?: {
+    __typename?: 'ModelCurrentNetworkInverseFeeConnection';
+    items: Array<{
+      __typename?: 'CurrentNetworkInverseFee';
+      id: string;
+      inverseFee: string;
+    } | null>;
   } | null;
 };
