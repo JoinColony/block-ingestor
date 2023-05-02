@@ -14,7 +14,14 @@ const config: CodegenConfig = {
   documents: ['src/**/*.graphql'],
   generates: {
     'src/types/generated.ts': {
-      plugins: ['typescript', 'typescript-operations'],
+      plugins: [
+        'typescript',
+        'typescript-operations',
+        'typescript-document-nodes',
+      ],
+      config: {
+        nameSuffix: 'Document',
+      },
     },
   },
   hooks: {

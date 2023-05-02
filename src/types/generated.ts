@@ -1,3 +1,4 @@
+import gql from 'graphql-tag';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = {
@@ -2914,3 +2915,151 @@ export type GetCurrentNetworkInverseFeeQuery = {
     } | null>;
   } | null;
 };
+
+export const CreateColonyActionDocument = gql`
+  mutation CreateColonyAction($input: CreateColonyActionInput!) {
+    createColonyAction(input: $input) {
+      id
+    }
+  }
+`;
+export const UpdateColonyActionDocument = gql`
+  mutation UpdateColonyAction($input: UpdateColonyActionInput!) {
+    updateColonyAction(input: $input) {
+      id
+    }
+  }
+`;
+export const UpdateColonyDocument = gql`
+  mutation UpdateColony($input: UpdateColonyInput!) {
+    updateColony(input: $input) {
+      id
+    }
+  }
+`;
+export const SetCurrentVersionDocument = gql`
+  mutation SetCurrentVersion($input: SetCurrentVersionInput!) {
+    setCurrentVersion(input: $input)
+  }
+`;
+export const CreateDomainDocument = gql`
+  mutation CreateDomain($input: CreateDomainInput!) {
+    createDomain(input: $input) {
+      id
+    }
+  }
+`;
+export const CreateContractEventDocument = gql`
+  mutation CreateContractEvent(
+    $input: CreateContractEventInput!
+    $condition: ModelContractEventConditionInput
+  ) {
+    createContractEvent(input: $input, condition: $condition) {
+      id
+    }
+  }
+`;
+export const CreateColonyExtensionDocument = gql`
+  mutation CreateColonyExtension($input: CreateColonyExtensionInput!) {
+    createColonyExtension(input: $input) {
+      id
+    }
+  }
+`;
+export const UpdateColonyExtensionByColonyAndHashDocument = gql`
+  mutation UpdateColonyExtensionByColonyAndHash(
+    $input: UpdateExtensionByColonyAndHashInput!
+  ) {
+    updateExtensionByColonyAndHash(input: $input) {
+      id
+    }
+  }
+`;
+export const UpdateColonyExtensionByAddressDocument = gql`
+  mutation UpdateColonyExtensionByAddress($input: UpdateColonyExtensionInput!) {
+    updateColonyExtension(input: $input) {
+      id
+    }
+  }
+`;
+export const CreateColonyFundsClaimDocument = gql`
+  mutation CreateColonyFundsClaim(
+    $input: CreateColonyFundsClaimInput!
+    $condition: ModelColonyFundsClaimConditionInput
+  ) {
+    createColonyFundsClaim(input: $input, condition: $condition) {
+      id
+    }
+  }
+`;
+export const DeleteColonyFundsClaimDocument = gql`
+  mutation DeleteColonyFundsClaim(
+    $input: DeleteColonyFundsClaimInput!
+    $condition: ModelColonyFundsClaimConditionInput
+  ) {
+    deleteColonyFundsClaim(input: $input, condition: $condition) {
+      id
+    }
+  }
+`;
+export const CreateCurrentNetworkInverseFeeDocument = gql`
+  mutation CreateCurrentNetworkInverseFee(
+    $input: CreateCurrentNetworkInverseFeeInput!
+  ) {
+    createCurrentNetworkInverseFee(input: $input) {
+      id
+    }
+  }
+`;
+export const UpdateCurrentNetworkInverseFeeDocument = gql`
+  mutation UpdateCurrentNetworkInverseFee(
+    $input: UpdateCurrentNetworkInverseFeeInput!
+  ) {
+    updateCurrentNetworkInverseFee(input: $input) {
+      id
+    }
+  }
+`;
+export const GetContractEventDocument = gql`
+  query GetContractEvent($id: ID!) {
+    getContractEvent(id: $id) {
+      id
+    }
+  }
+`;
+export const GetColonyUnclaimedFundsDocument = gql`
+  query GetColonyUnclaimedFunds(
+    $colonyAddress: ID!
+    $tokenAddress: ID!
+    $upToBlock: Int = 1
+  ) {
+    listColonyFundsClaims(
+      filter: {
+        colonyFundsClaimsId: { eq: $colonyAddress }
+        colonyFundsClaimTokenId: { eq: $tokenAddress }
+        createdAtBlock: { le: $upToBlock }
+      }
+    ) {
+      items {
+        id
+      }
+    }
+  }
+`;
+export const GetColonyUnclaimedFundDocument = gql`
+  query GetColonyUnclaimedFund($claimId: ID!) {
+    getColonyFundsClaim(id: $claimId) {
+      id
+    }
+  }
+`;
+export const GetCurrentNetworkInverseFeeDocument = gql`
+  query GetCurrentNetworkInverseFee {
+    listCurrentNetworkInverseFees(limit: 1) {
+      items {
+        id
+        inverseFee
+      }
+    }
+  }
+`;
