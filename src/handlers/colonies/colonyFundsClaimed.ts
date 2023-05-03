@@ -2,7 +2,12 @@ import { constants } from 'ethers';
 
 import { mutate, query } from '~amplifyClient';
 import { ContractEvent } from '~types';
-import { output, saveEvent } from '~utils';
+import { output, saveEvent, notNull } from '~utils';
+import {
+  GetColonyUnclaimedFundsDocument,
+  GetColonyUnclaimedFundsQuery,
+  GetColonyUnclaimedFundsQueryVariables,
+} from '~graphql';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { contractAddress: colonyAddress, blockNumber } = event;
@@ -14,11 +19,16 @@ export default async (event: ContractEvent): Promise<void> => {
    */
   if (tokenAddress !== constants.AddressZero) {
     const { items: unclaimedFunds } =
-      (await query('getColonyUnclaimedFunds', {
-        colonyAddress,
-        tokenAddress,
-        upToBlock: blockNumber,
-      })) || {};
+      (
+        await query<
+          GetColonyUnclaimedFundsQuery,
+          GetColonyUnclaimedFundsQueryVariables
+        >(GetColonyUnclaimedFundsDocument, {
+          colonyAddress,
+          tokenAddress,
+          upToBlock: blockNumber,
+        })
+      )?.data?.listColonyFundsClaims ?? {};
     /*
      * This check is actually required since anybody can make payout claims
      * for any colony, any time, even if there's nothing left to claim
@@ -40,9 +50,9 @@ export default async (event: ContractEvent): Promise<void> => {
      */
     if (colonyHasUnclaimedFunds) {
       await Promise.all(
-        unclaimedFunds.map(({ id }: { id: string }) =>
-          mutate('deleteColonyFundsClaim', { input: { id } }),
-        ),
+        unclaimedFunds
+          .filter(notNull)
+          .map(({ id }) => mutate('deleteColonyFundsClaim', { input: { id } })),
       );
     }
   } else {

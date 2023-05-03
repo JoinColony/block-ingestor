@@ -13,6 +13,11 @@ import { ContractEvent, ContractEventsSignatures, Filter } from '~types';
 import { addEvent } from '~eventQueue';
 import { mutate, query } from '~amplifyClient';
 import { getChainId } from '~provider';
+import {
+  GetContractEventDocument,
+  GetContractEventQuery,
+  GetContractEventQueryVariables,
+} from '~graphql';
 
 import { getExtensionContract } from './extensions';
 import { verbose } from './logger';
@@ -285,9 +290,14 @@ export const saveEvent = async (event: ContractEvent): Promise<void> => {
   let existingContractEvent;
   if (process.env.NODE_ENV !== 'production') {
     const { id: existingContractEventId } =
-      (await query('getContractEvent', {
-        id: contractEvent.id,
-      })) || {};
+      (
+        await query<GetContractEventQuery, GetContractEventQueryVariables>(
+          GetContractEventDocument,
+          {
+            id: contractEvent.id,
+          },
+        )
+      )?.data?.getContractEvent ?? {};
     existingContractEvent = existingContractEventId;
   }
   if (!existingContractEvent) {

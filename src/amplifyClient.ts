@@ -1,5 +1,7 @@
 import { Amplify, API, graphqlOperation } from 'aws-amplify';
+import { GraphQLQuery } from '@aws-amplify/api';
 import dotenv from 'dotenv';
+import { DocumentNode, isExecutableDefinitionNode } from 'graphql';
 
 dotenv.config();
 
@@ -46,14 +48,18 @@ export const mutations = {
     }
   `,
   createCurrentNetworkInverseFee: /* GraphQL */ `
-    mutation CreateCurrentNetworkInverseFee($input: CreateCurrentNetworkInverseFeeInput!) {
+    mutation CreateCurrentNetworkInverseFee(
+      $input: CreateCurrentNetworkInverseFeeInput!
+    ) {
       createCurrentNetworkInverseFee(input: $input) {
         id
       }
     }
   `,
   updateCurrentNetworkInverseFee: /* GraphQL */ `
-    mutation UpdateCurrentNetworkInverseFee($input: UpdateCurrentNetworkInverseFeeInput!) {
+    mutation UpdateCurrentNetworkInverseFee(
+      $input: UpdateCurrentNetworkInverseFeeInput!
+    ) {
       updateCurrentNetworkInverseFee(input: $input) {
         id
       }
@@ -171,22 +177,26 @@ export default (): void => {
   });
 };
 
-export const query = async (
-  queryName: keyof typeof queries,
-  /*
-   * @TODO Would be nice if at some point we could actually set these
-   * types properly
-   */
-  variables?: Record<string, unknown>,
-): Promise<any> => {
+type QueryFnReturn<T> = Promise<
+  ReturnType<typeof API.graphql<GraphQLQuery<T>>> | undefined
+>;
+
+export const query = async <T, TVariables extends Record<string, unknown> = {}>(
+  queryDocument: DocumentNode,
+  variables: TVariables,
+): QueryFnReturn<T> => {
   try {
-    const result = await API.graphql(
-      graphqlOperation(queries[queryName], variables),
+    const result = await API.graphql<GraphQLQuery<T>>(
+      graphqlOperation(queryDocument, variables),
     );
-    const [internalQueryName] = Object.keys(result?.data ?? []);
-    return result?.data[internalQueryName] ?? {};
+
+    return result;
   } catch (error) {
-    console.error(`Could not fetch query "${queryName}"`, error);
+    const definitionNode = queryDocument.definitions[0];
+    const queryName = isExecutableDefinitionNode(definitionNode)
+      ? definitionNode.name
+      : 'Unknown';
+    console.error(`Could not fetch query ${queryName}`, error);
     return undefined;
   }
 };
