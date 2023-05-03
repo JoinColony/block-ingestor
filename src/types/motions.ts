@@ -78,6 +78,14 @@ export interface VoterRecord {
   vote: number | null;
 }
 
+export interface MotionStateHistory {
+  hasVoted: boolean;
+  hasPassed: boolean;
+  hasFailed: boolean;
+  hasFailedNotFinalizable: boolean;
+  inRevealPhase: boolean
+}
+
 export interface MotionData {
   motionId: string;
   nativeMotionId: string;
@@ -96,10 +104,7 @@ export interface MotionData {
   repSubmitted: string;
   skillRep: string;
   hasObjection: boolean;
-  hasPassed: boolean;
-  hasFailed: boolean;
-  hasFailedNotFinalizable: boolean;
-  inRevealPhase: boolean;
+  motionStateHistory: MotionStateHistory;
   messages: MotionMessage[];
 }
 

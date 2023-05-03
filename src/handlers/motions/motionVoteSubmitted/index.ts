@@ -35,6 +35,10 @@ export default async (event: ContractEvent): Promise<void> => {
       ...motionData,
       voterRecord: updatedVoterRecord,
       repSubmitted: repSubmitted.toString(),
+      motionStateHistory: {
+        ...motionData.motionStateHistory,
+        hasVoted: true,
+      },
     });
 
     verbose(`User: ${voter} voted on motion ${motionId.toString()}`);

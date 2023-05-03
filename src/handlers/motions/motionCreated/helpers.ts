@@ -109,10 +109,13 @@ const getMotionData = async ({
     repSubmitted: repSubmitted.toString(),
     skillRep: skillRep.toString(),
     hasObjection: false,
-    hasPassed: false,
-    hasFailed: false,
-    hasFailedNotFinalizable: false,
-    inRevealPhase: false,
+    motionStateHistory: {
+      hasVoted: false,
+      hasPassed: false,
+      hasFailed: false,
+      hasFailedNotFinalizable: false,
+      inRevealPhase: false,
+    },
     messages: [
       {
         name: MotionEvents.MotionCreated,
