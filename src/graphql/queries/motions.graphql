@@ -29,7 +29,7 @@ query GetColonyMotion($id: ID!) {
     }
     userMinStake
     rootHash
-    motionDomainId
+    nativeMotionDomainId
     stakerRewards {
       address
       rewards {

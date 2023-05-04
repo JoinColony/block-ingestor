@@ -96,7 +96,7 @@ export interface ColonyMotion {
   userMinStake: string;
   requiredStake: string;
   rootHash: string; // For calculating user's max stake in client
-  motionNativeDomainId: string;
+  nativeMotionDomainId: string;
   stakerRewards: StakerReward[];
   isFinalized: boolean;
   createdBy: string;
