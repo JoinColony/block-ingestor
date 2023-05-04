@@ -1,19 +1,20 @@
 import { mutate } from '~amplifyClient';
 import {
-  ColonyActionType,
   CreateColonyActionDocument,
+  CreateColonyActionInput,
   CreateColonyActionMutation,
   CreateColonyActionMutationVariables,
 } from '~graphql';
 import { ContractEvent } from '~types';
 import { verbose } from '~utils';
 
-type ActionFields = Record<string, unknown> & { type: ColonyActionType };
-
 export const writeActionFromEvent = async (
   event: ContractEvent,
   colonyAddress: string,
-  actionFields: ActionFields,
+  actionFields: Omit<
+    CreateColonyActionInput,
+    'blockNumber' | 'colonyId' | 'colonyActionsId'
+  >,
 ): Promise<void> => {
   const { transactionHash, blockNumber, timestamp } = event;
 
