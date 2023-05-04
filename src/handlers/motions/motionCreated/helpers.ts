@@ -94,7 +94,7 @@ const getMotionData = async ({
     usersStakes: [],
     userMinStake,
     rootHash,
-    motionNativeDomainId: domainId.toString(),
+    nativeMotionDomainId: domainId.toString(),
     stakerRewards: [],
     voterRecord: [],
     isFinalized: false,

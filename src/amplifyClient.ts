@@ -254,7 +254,7 @@ export const queries = {
         }
         userMinStake
         rootHash
-        motionDomainId
+        nativeMotionDomainId
         stakerRewards {
           address
           rewards {
