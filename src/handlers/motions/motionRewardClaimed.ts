@@ -1,4 +1,4 @@
-import { ContractEvent, MotionData, MotionEvents } from '~types';
+import { ContractEvent, ColonyMotion, MotionEvents } from '~types';
 import { getVotingClient } from '~utils';
 import {
   getMotionDatabaseId,
@@ -22,11 +22,12 @@ export default async (event: ContractEvent): Promise<void> => {
     votingClient.address,
     motionId,
   );
-  const claimedMotion = await getMotionFromDB(colonyAddress, motionDatabaseId);
+  const claimedMotion = await getMotionFromDB(motionDatabaseId);
 
   if (claimedMotion) {
     const {
-      motionData: { stakerRewards, messages },
+      stakerRewards,
+      messages,
     } = claimedMotion;
 
     const updatedStakerRewards = stakerRewards.map((stakerReward) => {
@@ -48,8 +49,8 @@ export default async (event: ContractEvent): Promise<void> => {
       };
     });
 
-    const updatedMotionData: MotionData = {
-      ...claimedMotion.motionData,
+    const updatedMotionData: ColonyMotion = {
+      ...claimedMotion,
       stakerRewards: updatedStakerRewards,
       messages: [
         ...messages,
@@ -61,6 +62,6 @@ export default async (event: ContractEvent): Promise<void> => {
       ],
     };
 
-    await updateMotionInDB(claimedMotion.id, updatedMotionData);
+    await updateMotionInDB(updatedMotionData);
   }
 };

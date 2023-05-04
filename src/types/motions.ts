@@ -87,8 +87,8 @@ export interface MotionStateHistory {
   inRevealPhase: boolean;
 }
 
-export interface MotionData {
-  motionId: string;
+export interface ColonyMotion {
+  id: string;
   nativeMotionId: string;
   usersStakes: UserStakes[];
   motionStakes: MotionStakes;
@@ -96,7 +96,7 @@ export interface MotionData {
   userMinStake: string;
   requiredStake: string;
   rootHash: string; // For calculating user's max stake in client
-  motionDomainId: string;
+  motionNativeDomainId: string;
   stakerRewards: StakerReward[];
   isFinalized: boolean;
   createdBy: string;
@@ -107,6 +107,8 @@ export interface MotionData {
   hasObjection: boolean;
   motionStateHistory: MotionStateHistory;
   messages: MotionMessage[];
+  pendingDomainMetadataId: string | null;
+  pendingDomainMetadata?: DomainMetadata;
 }
 
 export interface UserStakes {
@@ -184,7 +186,7 @@ export interface ColonyMetadata {
 
 export interface MotionQuery {
   id: string;
-  motionData: MotionData;
+  motionData: ColonyMotion;
   createdAt: string;
   pendingDomainMetadata: DomainMetadata;
   pendingColonyMetadata: ColonyMetadata;

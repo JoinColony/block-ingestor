@@ -21,18 +21,16 @@ export default async (event: ContractEvent): Promise<void> => {
     votingClient.address,
     motionId,
   );
-  const votedMotion = await getMotionFromDB(colonyAddress, motionDatabaseId);
+  const votedMotion = await getMotionFromDB(motionDatabaseId);
 
   if (votedMotion) {
     const {
-      id,
-      motionData: { voterRecord },
-      motionData,
+      voterRecord,
     } = votedMotion;
 
     const updatedVoterRecord = getUpdatedVoterRecord(voterRecord, voter);
-    await updateMotionInDB(id, {
-      ...motionData,
+    await updateMotionInDB({
+      ...votedMotion,
       voterRecord: updatedVoterRecord,
       repSubmitted: repSubmitted.toString(),
       motionStateHistory: {

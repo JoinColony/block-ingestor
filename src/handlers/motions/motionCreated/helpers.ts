@@ -1,7 +1,7 @@
 import { BigNumber } from 'ethers';
 import { TransactionDescription } from 'ethers/lib/utils';
 
-import { MotionData, ContractEvent, MotionEvents } from '~types';
+import { ColonyMotion, ContractEvent, MotionEvents } from '~types';
 import { getVotingClient, verbose } from '~utils';
 
 import { mutate } from '~amplifyClient';
@@ -44,6 +44,7 @@ interface Props {
   motionId: BigNumber;
   domainId: BigNumber;
   creatorAddress: string;
+  pendingDomainMetadataId: string | null;
 }
 
 const getMotionData = async ({
@@ -53,7 +54,8 @@ const getMotionData = async ({
   motionId,
   domainId,
   creatorAddress,
-}: Props): Promise<MotionData> => {
+  pendingDomainMetadataId,
+}: Props): Promise<ColonyMotion> => {
   const votingClient = await getVotingClient(colonyAddress);
   const { skillRep, rootHash, repSubmitted } = await votingClient.getMotion(
     motionId,
@@ -75,7 +77,7 @@ const getMotionData = async ({
 
   return {
     createdBy: votingClient.address,
-    motionId: getMotionDatabaseId(chainId, votingClient.address, motionId),
+    id: getMotionDatabaseId(chainId, votingClient.address, motionId),
     nativeMotionId: motionId.toString(),
     motionStakes: {
       raw: {
@@ -92,7 +94,7 @@ const getMotionData = async ({
     usersStakes: [],
     userMinStake,
     rootHash,
-    motionDomainId: domainId.toString(),
+    motionNativeDomainId: domainId.toString(),
     stakerRewards: [],
     voterRecord: [],
     isFinalized: false,
@@ -123,6 +125,7 @@ const getMotionData = async ({
         initiatorAddress: creatorAddress,
       },
     ],
+    pendingDomainMetadataId,
   };
 };
 
@@ -134,7 +137,10 @@ export const createMotionInDB = async (
     contractAddress: colonyAddress,
     args: { motionId, creator: creatorAddress, domainId },
   }: ContractEvent,
-  input: Record<string, any>,
+  {
+    pendingDomainMetadataId,
+    ...inputRest
+  }: Record<string, any>,
 ): Promise<void> => {
   const motionData = await getMotionData({
     colonyAddress,
@@ -143,6 +149,13 @@ export const createMotionInDB = async (
     motionId,
     domainId,
     creatorAddress,
+    pendingDomainMetadataId,
+  });
+
+  await mutate('createColonyMotion', {
+    input: {
+      ...motionData,
+    },
   });
 
   await mutate('createColonyAction', {
@@ -151,10 +164,10 @@ export const createMotionInDB = async (
       colonyId: colonyAddress,
       isMotion: true,
       showInActionsList: false,
-      motionData,
+      motionDataId: motionData.id,
       initiatorAddress: creatorAddress,
       blockNumber,
-      ...input,
+      ...inputRest,
     },
   });
 };
