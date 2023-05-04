@@ -3,7 +3,7 @@ import {
   MotionStakes,
   UserStakes,
   MotionMessage,
-  MotionData,
+  ColonyMotion,
   MotionVote,
   MotionEvents,
 } from '~types';
@@ -190,7 +190,7 @@ export const getUserMinStake = (
 };
 
 interface Props {
-  motionData: MotionData;
+  motionData: ColonyMotion;
   messages: MotionMessage[];
   requiredStake: BigNumber;
   motionStakes: MotionStakes;

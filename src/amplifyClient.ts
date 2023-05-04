@@ -152,6 +152,20 @@ export const mutations = {
       }
     }
   `,
+  createColonyMotion: /* GraphQL */ `
+    mutation CreateColonyMotion($input: CreateColonyMotionInput!) {
+      createColonyMotion(input: $input) {
+        id
+      }
+    }
+  `,
+  updateColonyMotion: /* GraphQL */ `
+    mutation UpdateColonyMotion($input: UpdateColonyMotionInput!) {
+      updateColonyMotion(input: $input) {
+        id
+      }
+    }
+  `,
 };
 
 /*
@@ -208,101 +222,94 @@ export const queries = {
       }
     }
   `,
-  getColonyMotions: /* GraphQL */ `
-    query GetActionsByColony($colonyAddress: ID!) {
-      getActionsByColony(
-        colonyId: $colonyAddress
-        filter: { isMotion: { eq: true } }
-      ) {
-        items {
-          id
-          motionData {
-            motionId
-            nativeMotionId
-            motionStakes {
-              raw {
-                nay
-                yay
-              }
-              percentage {
-                nay
-                yay
-              }
+  getColonyMotion: /* GraphQL */ `
+    query GetColonyMotion($id: ID!) {
+      getColonyMotion(id: $id) {
+        id
+        nativeMotionId
+        motionStakes {
+          raw {
+            nay
+            yay
+          }
+          percentage {
+            nay
+            yay
+          }
+        }
+        requiredStake
+        remainingStakes
+        usersStakes {
+          address
+          stakes {
+            raw {
+              yay
+              nay
             }
-            requiredStake
-            remainingStakes
-            usersStakes {
-              address
-              stakes {
-                raw {
-                  yay
-                  nay
-                }
-                percentage {
-                  yay
-                  nay
-                }
-              }
-            }
-            userMinStake
-            rootHash
-            motionDomainId
-            stakerRewards {
-              address
-              rewards {
-                yay
-                nay
-              }
-              isClaimed
-            }
-            isFinalized
-            createdBy
-            voterRecord {
-              address
-              voteCount
-              vote
-            }
-            revealedVotes {
-              raw {
-                yay
-                nay
-              }
-              percentage {
-                yay
-                nay
-              }
-            }
-            repSubmitted
-            skillRep
-            hasObjection
-            motionStateHistory {
-              hasVoted
-              hasPassed
-              hasFailed
-              hasFailedNotFinalizable
-              inRevealPhase
-            }
-            messages {
-              name
-              messageKey
-              initiatorAddress
-              vote
-              amount
+            percentage {
+              yay
+              nay
             }
           }
-          pendingDomainMetadata {
-            name
-            color
-            description
-            changelog {
-              transactionHash
-              oldName
-              newName
-              oldColor
-              newColor
-              oldDescription
-              newDescription
-            }
+        }
+        userMinStake
+        rootHash
+        motionDomainId
+        stakerRewards {
+          address
+          rewards {
+            yay
+            nay
+          }
+          isClaimed
+        }
+        isFinalized
+        createdBy
+        voterRecord {
+          address
+          voteCount
+          vote
+        }
+        revealedVotes {
+          raw {
+            yay
+            nay
+          }
+          percentage {
+            yay
+            nay
+          }
+        }
+        repSubmitted
+        skillRep
+        hasObjection
+        motionNativeDomainId
+        motionStateHistory {
+          hasVoted
+          hasPassed
+          hasFailed
+          hasFailedNotFinalizable
+          inRevealPhase
+        }
+        messages {
+          name
+          messageKey
+          initiatorAddress
+          vote
+          amount
+        }
+        pendingDomainMetadata {
+          name
+          color
+          description
+          changelog {
+            transactionHash
+            oldName
+            newName
+            oldColor
+            newColor
+            oldDescription
+            newDescription
           }
           pendingColonyMetadata {
             id

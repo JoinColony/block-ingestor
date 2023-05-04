@@ -1,6 +1,6 @@
 import { BigNumber } from 'ethers';
 import { mutate, query } from '~amplifyClient';
-import { MotionData, MotionQuery, MotionSide, MotionVote } from '~types';
+import { ColonyMotion, MotionSide, MotionVote } from '~types';
 import { verbose } from '~utils';
 
 export * from './motionStaked/helpers';
@@ -9,14 +9,12 @@ export const getMotionSide = (vote: BigNumber): MotionSide =>
   vote.eq(MotionVote.YAY) ? MotionSide.YAY : MotionSide.NAY;
 
 export const updateMotionInDB = async (
-  id: string,
-  motionData: MotionData,
+  motionData: ColonyMotion,
   showInActionsList?: boolean,
 ): Promise<void> => {
-  await mutate('updateColonyAction', {
+  await mutate('updateColonyMotion', {
     input: {
-      id,
-      motionData,
+      ...motionData,
       ...(showInActionsList === undefined ? {} : { showInActionsList }),
     },
   });
@@ -29,25 +27,12 @@ export const getMotionDatabaseId = (
 ): string => `${chainId}-${votingRepExtnAddress}_${nativeMotionId}`;
 
 export const getMotionFromDB = async (
-  colonyAddress: string,
   databaseMotionId: string,
-): Promise<MotionQuery | undefined> => {
-  const { items: motions } =
-    (await query<{ items: MotionQuery[] }>('getColonyMotions', {
-      colonyAddress,
-    })) ?? {};
-
-  if (!motions) {
-    verbose(
-      'Could not query motions in the db. This is a bug and needs investigating.',
-    );
-
-    return undefined;
-  }
-
-  const motion = motions.find(
-    ({ motionData: { motionId } }) => motionId === databaseMotionId,
-  );
+): Promise<ColonyMotion | undefined> => {
+  const motion =
+    await query<ColonyMotion>('getColonyMotion', {
+      databaseMotionId,
+    });
 
   if (!motion) {
     verbose(

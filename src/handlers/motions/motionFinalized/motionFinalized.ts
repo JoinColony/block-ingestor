@@ -31,23 +31,17 @@ export default async (event: ContractEvent): Promise<void> => {
     votingClient.address,
     motionId,
   );
-  const finalizedMotion = await getMotionFromDB(
-    colonyAddress,
-    motionDatabaseId,
-  );
+  const finalizedMotion = await getMotionFromDB(motionDatabaseId);
   if (finalizedMotion) {
     const {
-      motionData: {
-        usersStakes,
-        revealedVotes: {
-          raw: { yay: yayVotes, nay: nayVotes },
-        },
-        motionStakes: {
-          percentage: { yay: yayPercentage, nay: nayPercentage },
-        },
-        messages,
+      usersStakes,
+      revealedVotes: {
+        raw: { yay: yayVotes, nay: nayVotes },
       },
-      motionData,
+      motionStakes: {
+        percentage: { yay: yayPercentage, nay: nayPercentage },
+      },
+      messages,
     } = finalizedMotion;
 
     const yayWon =
@@ -92,12 +86,12 @@ export default async (event: ContractEvent): Promise<void> => {
     ];
 
     const updatedMotionData = {
-      ...motionData,
+      ...finalizedMotion,
       stakerRewards: updatedStakerRewards,
       isFinalized: true,
       messages: updatedMessages,
     };
 
-    await updateMotionInDB(finalizedMotion.id, updatedMotionData);
+    await updateMotionInDB(updatedMotionData);
   }
 };
