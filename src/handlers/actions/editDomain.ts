@@ -1,10 +1,7 @@
 import { utils } from 'ethers';
+import { ColonyActionType } from '~graphql';
 import provider from '~provider';
-import {
-  ColonyActionType,
-  ContractEvent,
-  ContractEventsSignatures,
-} from '~types';
+import { ContractEvent, ContractEventsSignatures } from '~types';
 import {
   toNumber,
   verbose,

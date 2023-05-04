@@ -1,10 +1,11 @@
 import { mutate } from '~amplifyClient';
 import {
+  ColonyActionType,
   CreateDomainDocument,
   CreateDomainMutation,
   CreateDomainMutationVariables,
 } from '~graphql';
-import { ColonyActionType, ContractEvent } from '~types';
+import { ContractEvent } from '~types';
 import {
   toNumber,
   writeActionFromEvent,

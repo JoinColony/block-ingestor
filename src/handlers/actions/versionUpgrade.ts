@@ -1,10 +1,11 @@
 import { mutate } from '~amplifyClient';
 import {
+  ColonyActionType,
   UpdateColonyDocument,
   UpdateColonyMutation,
   UpdateColonyMutationVariables,
 } from '~graphql';
-import { ColonyActionType, ContractEvent } from '~types';
+import { ContractEvent } from '~types';
 import { toNumber, verbose, writeActionFromEvent } from '~utils';
 
 export default async (event: ContractEvent): Promise<void> => {

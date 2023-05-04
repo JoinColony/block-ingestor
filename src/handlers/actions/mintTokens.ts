@@ -1,4 +1,5 @@
-import { ColonyActionType, ContractEvent } from '~types';
+import { ColonyActionType } from '~graphql';
+import { ContractEvent } from '~types';
 import { writeActionFromEvent, getColonyTokenAddress } from '~utils';
 
 export default async (event: ContractEvent): Promise<void> => {
