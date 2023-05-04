@@ -1,7 +1,7 @@
 import { colonySpecificEventsListener } from '~eventListener';
 import { coloniesSet } from '~trackColonies';
 import { ContractEvent } from '~types';
-import { output, writeJsonStats } from '~utils';
+import { output, updateStats } from '~utils';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { colonyAddress, token: tokenAddress } = event.args ?? {};
@@ -10,7 +10,7 @@ export default async (event: ContractEvent): Promise<void> => {
    * Add it to the Set
    */
   coloniesSet.add(JSON.stringify({ colonyAddress, tokenAddress }));
-  await writeJsonStats({ trackedColonies: coloniesSet.size });
+  await updateStats({ trackedColonies: coloniesSet.size });
 
   output(
     'Found new Colony:',

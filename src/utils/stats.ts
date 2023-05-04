@@ -1,40 +1,19 @@
-import { ensureFile, readJson, writeJson } from 'fs-extra';
-import path from 'path';
+import storage from 'node-persist';
 
 import { verbose } from './logger';
-
-/*
- * Read a json file at a specified path.
- * If the file (including the path) doesn't exist, it will be created and seeded
- * with an empty object
- */
-export const readJsonStats = async (
-  filePath = `${path.resolve(__dirname, '..')}/run/stats.json`,
-): Promise<Record<string, unknown>> => {
-  await ensureFile(filePath);
-  let jsonContents;
-  try {
-    jsonContents = await readJson(filePath);
-    return jsonContents;
-  } catch (error) {
-    await writeJson(filePath, {});
-    return {};
-  }
-};
 
 type ObjectOrFunction =
   | Record<string, unknown>
   | ((jsonFile: Record<string, unknown>) => Record<string, unknown>);
 
 /*
- * Write a json file at a specified path.
- * It accepts either a object fragment (or full object) that will get appended to the existing file,
- * or a callback (which receives the current version of the file) and needs to return the new object
+ * Update stats with a given argument
+ * It accepts either a object fragment (or full object) that will get appended to the stats,
+ * or a callback (which receives the current stats) and needs to return the new object
  * that will be written back
  */
-export const writeJsonStats = async (
+export const updateStats = async (
   objectOrFunction: ObjectOrFunction,
-  filePath = `${path.resolve(__dirname, '..')}/run/stats.json`,
 ): Promise<void> => {
   const port = process.env.STATS_PORT;
   if (!port) {
@@ -46,21 +25,31 @@ export const writeJsonStats = async (
     return;
   }
 
-  let newJsonContents = {};
-  const curentJsonContents = await readJsonStats(filePath);
+  let newStats = {};
+  const currentStats = (await storage.getItem('stats')) ?? {};
 
   if (typeof objectOrFunction === 'function') {
-    newJsonContents = {
-      ...curentJsonContents,
-      ...objectOrFunction(curentJsonContents),
+    newStats = {
+      ...currentStats,
+      ...objectOrFunction(currentStats),
     };
   } else {
-    newJsonContents = {
-      ...curentJsonContents,
+    newStats = {
+      ...currentStats,
       ...objectOrFunction,
     };
   }
 
-  await writeJson(filePath, newJsonContents);
+  await storage.setItem('stats', newStats);
   verbose('Stats file updated');
+};
+
+export const getStats = async (): Promise<Record<string, unknown>> => {
+  const stats = (await storage.getItem('stats')) ?? {};
+  return stats;
+};
+
+export const getLatestBlock = async (): Promise<number> => {
+  const stats = await getStats();
+  return Number(stats.latestBlock ?? 1);
 };

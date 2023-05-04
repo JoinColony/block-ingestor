@@ -1,14 +1,11 @@
 import networkClient from './networkClient';
-import { verbose, writeJsonStats } from './utils';
+import { updateStats, verbose } from './utils';
 import { EthersObserverEvents } from './types';
 
 const blockListener = (): typeof networkClient.provider =>
-  networkClient.provider.on(
-    EthersObserverEvents.Block,
-    async (blockNumber) => {
-      verbose('Processing block #', blockNumber);
-      await writeJsonStats({ latestBlock: blockNumber });
-    },
-  );
+  networkClient.provider.on(EthersObserverEvents.Block, async (blockNumber) => {
+    verbose('Processing block #', blockNumber);
+    await updateStats({ latestBlock: blockNumber });
+  });
 
 export default blockListener;
