@@ -31,7 +31,7 @@ export const getMotionFromDB = async (
 ): Promise<ColonyMotion | undefined> => {
   const motion =
     await query<ColonyMotion>('getColonyMotion', {
-      databaseMotionId,
+      id: databaseMotionId,
     });
 
   if (!motion) {
