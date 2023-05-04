@@ -213,7 +213,7 @@ export const queries = {
 
 export default (): void => {
   Amplify.configure({
-    aws_appsync_graphqlEndpoint: `${process.env.AWS_APPSYNC_ENDPOINT}/graphql`,
+    aws_appsync_graphqlEndpoint: `${process.env.AWS_APPSYNC_ENDPOINT}`,
     aws_appsync_authenticationType: 'API_KEY',
     aws_appsync_apiKey: process.env.AWS_APPSYNC_KEY,
   });
