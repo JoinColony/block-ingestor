@@ -3,11 +3,13 @@ import networkClient from '~networkClient';
 import { getChainId } from '~provider';
 import { ContractEvent } from '~types';
 import {
+  CreateColonyFundsClaimDocument,
+  CreateColonyFundsClaimMutation,
+  CreateColonyFundsClaimMutationVariables,
   GetColonyUnclaimedFundDocument,
   GetColonyUnclaimedFundQuery,
   GetColonyUnclaimedFundQueryVariables,
 } from '~graphql';
-
 import { output } from '~utils';
 
 export default async (event: ContractEvent): Promise<void> => {
@@ -82,7 +84,10 @@ export default async (event: ContractEvent): Promise<void> => {
 
     // Don't add zero transfer claims in the database
     if (!existingClaim && amount !== '0') {
-      await mutate('createColonyFundsClaim', {
+      await mutate<
+        CreateColonyFundsClaimMutation,
+        CreateColonyFundsClaimMutationVariables
+      >(CreateColonyFundsClaimDocument, {
         input: {
           id: claimId,
           colonyFundsClaimsId: dst,

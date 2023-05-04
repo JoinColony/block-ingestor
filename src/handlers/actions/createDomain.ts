@@ -1,4 +1,9 @@
 import { mutate } from '~amplifyClient';
+import {
+  CreateDomainDocument,
+  CreateDomainMutation,
+  CreateDomainMutationVariables,
+} from '~graphql';
 import { ColonyActionType, ContractEvent } from '~types';
 import {
   toNumber,
@@ -16,16 +21,19 @@ export default async (event: ContractEvent): Promise<void> => {
   const colonyClient = await getCachedColonyClient(colonyAddress);
   const [skillId, fundingPotId] = await colonyClient.getDomain(nativeDomainId);
 
-  await mutate('createDomain', {
-    input: {
-      id: databaseDomainId,
-      colonyId: colonyAddress,
-      nativeId: nativeDomainId,
-      isRoot: false,
-      nativeFundingPotId: toNumber(fundingPotId),
-      nativeSkillId: toNumber(skillId),
+  await mutate<CreateDomainMutation, CreateDomainMutationVariables>(
+    CreateDomainDocument,
+    {
+      input: {
+        id: databaseDomainId,
+        colonyId: colonyAddress,
+        nativeId: nativeDomainId,
+        isRoot: false,
+        nativeFundingPotId: toNumber(fundingPotId),
+        nativeSkillId: toNumber(skillId),
+      },
     },
-  });
+  );
 
   await writeActionFromEvent(event, colonyAddress, {
     type: ColonyActionType.CreateDomain,

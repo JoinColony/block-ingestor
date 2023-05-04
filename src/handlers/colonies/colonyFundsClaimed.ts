@@ -4,6 +4,9 @@ import { mutate, query } from '~amplifyClient';
 import { ContractEvent } from '~types';
 import { output, saveEvent, notNull } from '~utils';
 import {
+  DeleteColonyFundsClaimDocument,
+  DeleteColonyFundsClaimMutation,
+  DeleteColonyFundsClaimMutationVariables,
   GetColonyUnclaimedFundsDocument,
   GetColonyUnclaimedFundsQuery,
   GetColonyUnclaimedFundsQueryVariables,
@@ -52,7 +55,12 @@ export default async (event: ContractEvent): Promise<void> => {
       await Promise.all(
         unclaimedFunds
           .filter(notNull)
-          .map(({ id }) => mutate('deleteColonyFundsClaim', { input: { id } })),
+          .map(({ id }) =>
+            mutate<
+              DeleteColonyFundsClaimMutation,
+              DeleteColonyFundsClaimMutationVariables
+            >(DeleteColonyFundsClaimDocument, { input: { id } }),
+          ),
       );
     }
   } else {

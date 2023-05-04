@@ -177,14 +177,14 @@ export default (): void => {
   });
 };
 
-type QueryFnReturn<T> = Promise<
+type GraphQLFnReturn<T> = Promise<
   ReturnType<typeof API.graphql<GraphQLQuery<T>>> | undefined
 >;
 
 export const query = async <T, TVariables extends Record<string, unknown> = {}>(
   queryDocument: DocumentNode,
   variables: TVariables,
-): QueryFnReturn<T> => {
+): GraphQLFnReturn<T> => {
   try {
     const result = await API.graphql<GraphQLQuery<T>>(
       graphqlOperation(queryDocument, variables),
@@ -201,18 +201,25 @@ export const query = async <T, TVariables extends Record<string, unknown> = {}>(
   }
 };
 
-export const mutate = async (
-  mutationName: keyof typeof mutations,
-  /*
-   * @TODO Would be nice if at some point we could actually set these
-   * types properly
-   */
-  variables?: { input: Record<string, unknown> },
-): Promise<void> => {
+export const mutate = async <
+  T,
+  TVariables extends Record<string, unknown> = {},
+>(
+  mutationDocument: DocumentNode,
+  variables: TVariables,
+): GraphQLFnReturn<T> => {
   try {
-    await API.graphql(graphqlOperation(mutations[mutationName], variables));
+    const result = await API.graphql<GraphQLQuery<T>>(
+      graphqlOperation(mutationDocument, variables),
+    );
+
+    return result;
   } catch (error) {
-    console.error(`Could not execute mutation "${mutationName}"`, error);
+    const definitionNode = mutationDocument.definitions[0];
+    const mutationName = isExecutableDefinitionNode(definitionNode)
+      ? definitionNode.name
+      : 'Unknown';
+    console.error(`Could not execute mutation ${mutationName}`, error);
     return undefined;
   }
 };

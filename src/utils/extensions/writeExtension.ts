@@ -6,6 +6,17 @@ import networkClient from '~networkClient';
 import { mutate } from '~amplifyClient';
 import { ContractEvent } from '~types';
 import { verbose, toNumber } from '~utils';
+import {
+  CreateColonyExtensionDocument,
+  CreateColonyExtensionMutation,
+  CreateColonyExtensionMutationVariables,
+  SetCurrentVersionDocument,
+  SetCurrentVersionMutation,
+  SetCurrentVersionMutationVariables,
+  UpdateColonyExtensionByColonyAndHashDocument,
+  UpdateColonyExtensionByColonyAndHashMutation,
+  UpdateColonyExtensionByColonyAndHashMutationVariables,
+} from '~graphql';
 
 import { getExtensionContract } from './contracts';
 
@@ -25,12 +36,15 @@ export const writeExtensionVersionFromEvent = async (
     'added to network',
   );
 
-  await mutate('setCurrentVersion', {
-    input: {
-      key: extensionHash,
-      version: convertedVersion,
+  await mutate<SetCurrentVersionMutation, SetCurrentVersionMutationVariables>(
+    SetCurrentVersionDocument,
+    {
+      input: {
+        key: extensionHash,
+        version: convertedVersion,
+      },
     },
-  });
+  );
 };
 
 /**
@@ -76,11 +90,17 @@ export const writeExtensionFromEvent = async (
   };
 
   if (shouldUpsert) {
-    await mutate('updateColonyExtensionByColonyAndHash', {
+    await mutate<
+      UpdateColonyExtensionByColonyAndHashMutation,
+      UpdateColonyExtensionByColonyAndHashMutationVariables
+    >(UpdateColonyExtensionByColonyAndHashDocument, {
       input,
     });
   } else {
-    await mutate('createColonyExtension', {
+    await mutate<
+      CreateColonyExtensionMutation,
+      CreateColonyExtensionMutationVariables
+    >(CreateColonyExtensionDocument, {
       input: {
         id: extensionAddress,
         ...input,
@@ -96,7 +116,10 @@ export const deleteExtensionFromEvent = async (
 
   verbose('Extension:', extensionHash, 'uninstalled in Colony:', colony);
 
-  await mutate('updateColonyExtensionByColonyAndHash', {
+  await mutate<
+    UpdateColonyExtensionByColonyAndHashMutation,
+    UpdateColonyExtensionByColonyAndHashMutationVariables
+  >(UpdateColonyExtensionByColonyAndHashDocument, {
     input: {
       colonyId: colony,
       hash: extensionHash,

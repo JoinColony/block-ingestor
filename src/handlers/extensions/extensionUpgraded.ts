@@ -1,4 +1,9 @@
 import { mutate } from '~amplifyClient';
+import {
+  UpdateColonyExtensionByColonyAndHashDocument,
+  UpdateColonyExtensionByColonyAndHashMutation,
+  UpdateColonyExtensionByColonyAndHashMutationVariables,
+} from '~graphql';
 import { ContractEvent } from '~types';
 import { toNumber, verbose } from '~utils';
 
@@ -15,7 +20,10 @@ export default async (event: ContractEvent): Promise<void> => {
     colony,
   );
 
-  await mutate('updateColonyExtensionByColonyAndHash', {
+  await mutate<
+    UpdateColonyExtensionByColonyAndHashMutation,
+    UpdateColonyExtensionByColonyAndHashMutationVariables
+  >(UpdateColonyExtensionByColonyAndHashDocument, {
     input: {
       colonyId: colony,
       hash: extensionHash,

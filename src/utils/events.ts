@@ -14,6 +14,9 @@ import { addEvent } from '~eventQueue';
 import { mutate, query } from '~amplifyClient';
 import { getChainId } from '~provider';
 import {
+  CreateContractEventDocument,
+  CreateContractEventMutation,
+  CreateContractEventMutationVariables,
   GetContractEventDocument,
   GetContractEventQuery,
   GetContractEventQueryVariables,
@@ -301,7 +304,10 @@ export const saveEvent = async (event: ContractEvent): Promise<void> => {
     existingContractEvent = existingContractEventId;
   }
   if (!existingContractEvent) {
-    await mutate('createContractEvent', { input: contractEvent });
+    await mutate<
+      CreateContractEventMutation,
+      CreateContractEventMutationVariables
+    >(CreateContractEventDocument, { input: contractEvent });
     verbose(
       `Saving event ${contractEvent.signature} to the database for ${contractAddress}`,
     );
