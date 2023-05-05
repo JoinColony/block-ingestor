@@ -3,3 +3,9 @@ mutation UpdateColony($input: UpdateColonyInput!) {
     id
   }
 }
+
+mutation UpdateColonyMetadata($input: UpdateColonyMetadataInput!) {
+  updateColonyMetadata(input: $input) {
+    id
+  }
+}
