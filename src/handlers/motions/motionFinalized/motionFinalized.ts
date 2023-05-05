@@ -1,18 +1,21 @@
 import { BigNumber } from 'ethers';
 
-import { ContractEvent } from '~types';
+import { ContractEvent, MotionEvents } from '~types';
 import { getVotingClient } from '~utils';
 
 import {
   getMotionDatabaseId,
   getMotionFromDB,
   updateMotionInDB,
+  getMessageKey,
 } from '../helpers';
 import { getStakerReward, linkPendingDomainMetadataWithDomain } from './helpers';
 
 export default async (event: ContractEvent): Promise<void> => {
   const {
     contractAddress: colonyAddress,
+    logIndex,
+    transactionHash,
     args: { motionId, action },
   } = event;
 
@@ -37,6 +40,7 @@ export default async (event: ContractEvent): Promise<void> => {
         motionStakes: {
           percentage: { yay: yayPercentage, nay: nayPercentage },
         },
+        messages,
       },
       motionData,
     } = finalizedMotion;
@@ -60,10 +64,19 @@ export default async (event: ContractEvent): Promise<void> => {
       ),
     );
 
+    const updatedMessages = [
+      ...messages,
+      {
+        name: MotionEvents.MotionFinalized,
+        messageKey: getMessageKey(transactionHash, logIndex),
+      },
+    ];
+
     const updatedMotionData = {
       ...motionData,
       stakerRewards: updatedStakerRewards,
       isFinalized: true,
+      messages: updatedMessages,
     };
 
     await updateMotionInDB(finalizedMotion.id, updatedMotionData);

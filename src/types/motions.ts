@@ -35,6 +35,9 @@ export enum MotionEvents {
   MotionFullyStakedAfterObjection = 'MotionFullyStakedAfterObjection',
   MotionVotingPhase = 'MotionVotingPhase',
   MotionRewardClaimed = 'MotionRewardClaimed',
+  MotionRevealResultObjectionWon = 'MotionRevealResultObjectionWon',
+  MotionHasFailedFinalizable = 'MotionHasFailedFinalizable',
+  MotionRevealResultMotionWon = 'MotionRevealResultMotionWon',
 }
 
 export const motionNameMapping: { [key: string]: ColonyActionType } = {
@@ -75,6 +78,14 @@ export interface VoterRecord {
   vote: number | null;
 }
 
+export interface MotionStateHistory {
+  hasVoted: boolean;
+  hasPassed: boolean;
+  hasFailed: boolean;
+  hasFailedNotFinalizable: boolean;
+  inRevealPhase: boolean
+}
+
 export interface MotionData {
   motionId: string;
   nativeMotionId: string;
@@ -93,6 +104,7 @@ export interface MotionData {
   repSubmitted: string;
   skillRep: string;
   hasObjection: boolean;
+  motionStateHistory: MotionStateHistory;
   messages: MotionMessage[];
 }
 

@@ -254,6 +254,13 @@ export const queries = {
             repSubmitted
             skillRep
             hasObjection
+            motionStateHistory {
+              hasVoted
+              hasPassed
+              hasFailed
+              hasFailedNotFinalizable
+              inRevealPhase
+            }
             messages {
               name
               messageKey
