@@ -19,19 +19,19 @@ export const updateMotionInDB = async (
   });
 
   if (showInActionsList !== undefined) {
-    const colonyAction =
-      await query('getColonyActionByMotion', {
+    const { items: colonyAction } =
+      (await query<{ items: Array<{ id: string }> }>('getColonyActionByMotion', {
         motionDataId: motionData.id,
-      });
+      })) ?? {};
 
-    if (!colonyAction) {
+    if (!colonyAction?.length) {
       verbose(
         'Could not find the action in the db. This is a bug and needs investigating.',
       );
     } else {
       await mutate('updateColonyAction', {
         input: {
-          id: colonyAction.id,
+          id: colonyAction[0].id,
           showInActionsList,
         },
       });
