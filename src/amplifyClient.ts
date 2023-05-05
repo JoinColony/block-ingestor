@@ -222,6 +222,15 @@ export const queries = {
       }
     }
   `,
+  getColonyActionByMotion: /* GraphQL */ `
+    query GetColonyActionByMotion($motionDataId: ID!) {
+      getColonyActionByMotion(motionDataId: $motionDataId) {
+        items {
+          id
+        }
+      }
+    }
+  `,
   getColonyMotion: /* GraphQL */ `
     query GetColonyMotion($id: ID!) {
       getColonyMotion(id: $id) {
