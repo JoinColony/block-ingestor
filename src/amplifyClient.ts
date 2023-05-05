@@ -292,7 +292,7 @@ export const queries = {
         repSubmitted
         skillRep
         hasObjection
-        motionNativeDomainId
+        nativeMotionDomainId
         motionStateHistory {
           hasVoted
           hasPassed
