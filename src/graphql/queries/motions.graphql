@@ -58,7 +58,7 @@ query GetColonyMotion($id: ID!) {
     repSubmitted
     skillRep
     hasObjection
-    motionNativeDomainId
+    nativeMotionDomainId
     motionStateHistory {
       hasVoted
       hasPassed
