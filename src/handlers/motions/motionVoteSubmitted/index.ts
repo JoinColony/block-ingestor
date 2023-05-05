@@ -34,7 +34,7 @@ export default async (event: ContractEvent): Promise<void> => {
       voterRecord: updatedVoterRecord,
       repSubmitted: repSubmitted.toString(),
       motionStateHistory: {
-        ...motionData.motionStateHistory,
+        ...votedMotion.motionStateHistory,
         hasVoted: true,
       },
     });
