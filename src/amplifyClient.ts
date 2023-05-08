@@ -227,6 +227,7 @@ export const queries = {
       getColonyActionByMotion(motionDataId: $motionDataId) {
         items {
           id
+          pendingDomainMetadata
         }
       }
     }

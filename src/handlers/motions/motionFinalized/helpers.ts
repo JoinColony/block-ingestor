@@ -7,6 +7,7 @@ import {
   DomainMetadata,
   MotionVote,
   StakerReward,
+  ColonyMotion,
 } from '~types';
 import {
   getColonyFromDB,
@@ -86,81 +87,92 @@ const getParsedActionFromDomainMotion = async (
 export const linkPendingDomainMetadataWithDomain = async (
   action: string,
   colonyAddress: string,
-  pendingDomainMetadata: DomainMetadata,
+  finalizedMotion: ColonyMotion,
 ): Promise<void> => {
   const parsedDomainAction = await getParsedActionFromDomainMotion(
     action,
     colonyAddress,
   );
-  if (parsedDomainAction?.name === ColonyOperations.AddDomain) {
-    const colonyClient = await networkClient.getColonyClient(colonyAddress);
-    const domainCount = await colonyClient.getDomainCount();
-    // The new domain should be created by now, so we just get the total of existing domains
-    // and use that as an id to link the pending metadata.
-    const nativeDomainId = domainCount.toNumber();
+  const isMotionAddingADomain = parsedDomainAction?.name === ColonyOperations.AddDomain;
+  const isMotionEditingADomain = parsedDomainAction?.name === ColonyOperations.EditDomain;
 
-    await mutate('createDomainMetadata', {
-      input: {
-        ...pendingDomainMetadata,
-        id: getDomainDatabaseId(colonyAddress, nativeDomainId),
-      },
-    });
-  } else if (parsedDomainAction?.name === ColonyOperations.EditDomain) {
-    const nativeDomainId = parsedDomainAction.args[2].toNumber(); // domainId arg from editDomain action
-    const databaseDomainId = getDomainDatabaseId(colonyAddress, nativeDomainId);
+  if (isMotionAddingADomain || isMotionEditingADomain) {
+    const { items: colonyAction } =
+      (await query<{ items: Array<{ id: string, pendingDomainMetadata: DomainMetadata }> }>('getColonyActionByMotion', {
+        motionDataId: finalizedMotion.id,
+      })) ?? {};
+    const pendingDomainMetadata = colonyAction?.[0]?.pendingDomainMetadata;
 
-    const currentDomainMetadata = await query<DomainMetadata>(
-      'getDomainMetadata',
-      {
-        id: databaseDomainId,
-      },
-    );
+    if (isMotionAddingADomain) {
+      const colonyClient = await networkClient.getColonyClient(colonyAddress);
+      const domainCount = await colonyClient.getDomainCount();
+      // The new domain should be created by now, so we just get the total of existing domains
+      // and use that as an id to link the pending metadata.
+      const nativeDomainId = domainCount.toNumber();
 
-    const updatedMetadata = {
-      ...currentDomainMetadata,
-    };
+      await mutate('createDomainMetadata', {
+        input: {
+          ...pendingDomainMetadata,
+          id: getDomainDatabaseId(colonyAddress, nativeDomainId),
+        },
+      });
+    } else if (parsedDomainAction?.name === ColonyOperations.EditDomain) {
+      const nativeDomainId = parsedDomainAction.args[2].toNumber(); // domainId arg from editDomain action
+      const databaseDomainId = getDomainDatabaseId(colonyAddress, nativeDomainId);
 
-    const { changelog: pendingChangelog = [] } = pendingDomainMetadata;
-
-    if (!pendingChangelog.length) {
-      console.error(
-        `Pending changelog for domain with database id: ${databaseDomainId} could not be found.
-        This is a bug and should be investigated.`,
+      const currentDomainMetadata = await query<DomainMetadata>(
+        'getDomainMetadata',
+        {
+          id: databaseDomainId,
+        },
       );
-    }
 
-    const {
-      newColor,
-      newDescription,
-      newName,
-      oldColor,
-      oldDescription,
-      oldName,
-    } = pendingChangelog[pendingChangelog.length - 1] ?? {};
+      const updatedMetadata = {
+        ...currentDomainMetadata,
+      };
 
-    const hasColorChanged = newColor !== oldColor;
-    const hasDescriptionChanged = newDescription !== oldDescription;
-    const hasNameChanged = newName !== oldName;
+      const pendingChangelog = pendingDomainMetadata?.changelog ?? [];
 
-    if (hasColorChanged) {
-      updatedMetadata.color = newColor;
-    }
+      if (!pendingChangelog.length) {
+        console.error(
+          `Pending changelog for domain with database id: ${databaseDomainId} could not be found.
+          This is a bug and should be investigated.`,
+        );
+      }
 
-    if (hasDescriptionChanged) {
-      updatedMetadata.description = newDescription;
-    }
+      const {
+        newColor,
+        newDescription,
+        newName,
+        oldColor,
+        oldDescription,
+        oldName,
+      } = pendingChangelog[pendingChangelog.length - 1] ?? {};
 
-    if (hasNameChanged) {
-      updatedMetadata.name = newName;
-    }
+      const hasColorChanged = newColor !== oldColor;
+      const hasDescriptionChanged = newDescription !== oldDescription;
+      const hasNameChanged = newName !== oldName;
 
-    await mutate('updateDomainMetadata', {
-      input: {
-        ...updatedMetadata,
-        id: databaseDomainId,
-      },
-    });
-  }
+      if (hasColorChanged) {
+        updatedMetadata.color = newColor;
+      }
+
+      if (hasDescriptionChanged) {
+        updatedMetadata.description = newDescription;
+      }
+
+      if (hasNameChanged) {
+        updatedMetadata.name = newName;
+      }
+
+      await mutate('updateDomainMetadata', {
+        input: {
+          ...updatedMetadata,
+          id: databaseDomainId,
+        },
+      });
+    };
+  };
 };
 
 export const linkPendingColonyMetadataWithColony = async (

@@ -54,11 +54,11 @@ export default async (event: ContractEvent): Promise<void> => {
      * then we can assume that the motion's action is a domain action and we need to link this provisional DomainMetadata to the REAL Domain by creating
      * a new DomainMetadata with the corresponding Domain item id.
      */
-    if (finalizedMotion.pendingDomainMetadata && yayWon) {
+    if (yayWon) {
       await linkPendingDomainMetadataWithDomain(
         action,
         colonyAddress,
-        finalizedMotion.pendingDomainMetadata,
+        finalizedMotion,
       );
     }
 
