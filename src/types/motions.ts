@@ -107,8 +107,6 @@ export interface ColonyMotion {
   hasObjection: boolean;
   motionStateHistory: MotionStateHistory;
   messages: MotionMessage[];
-  pendingDomainMetadataId: string | null;
-  pendingDomainMetadata?: DomainMetadata;
 }
 
 export interface UserStakes {
