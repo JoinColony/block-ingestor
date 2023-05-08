@@ -227,7 +227,40 @@ export const queries = {
       getColonyActionByMotion(motionDataId: $motionDataId) {
         items {
           id
-          pendingDomainMetadata
+          pendingDomainMetadata {
+            name
+            color
+            description
+            changelog {
+              transactionHash
+              oldName
+              newName
+              oldColor
+              newColor
+              oldDescription
+              newDescription
+            }
+          }
+          pendingColonyMetadata {
+            id
+            displayName
+            avatar
+            thumbnail
+            changelog {
+              transactionHash
+              oldDisplayName
+              newDisplayName
+              hasAvatarChanged
+              hasWhitelistChanged
+              haveTokensChanged
+            }
+            isWhitelistActivated
+            whitelistedAddresses
+            modifiedTokenAddresses {
+              added
+              removed
+            }
+          }
         }
       }
     }
@@ -307,40 +340,6 @@ export const queries = {
           initiatorAddress
           vote
           amount
-        }
-        pendingDomainMetadata {
-          name
-          color
-          description
-          changelog {
-            transactionHash
-            oldName
-            newName
-            oldColor
-            newColor
-            oldDescription
-            newDescription
-          }
-          pendingColonyMetadata {
-            id
-            displayName
-            avatar
-            thumbnail
-            changelog {
-              transactionHash
-              oldDisplayName
-              newDisplayName
-              hasAvatarChanged
-              hasWhitelistChanged
-              haveTokensChanged
-            }
-            isWhitelistActivated
-            whitelistedAddresses
-            modifiedTokenAddresses {
-              added
-              removed
-            }
-          }
         }
       }
     }

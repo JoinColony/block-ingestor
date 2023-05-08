@@ -44,7 +44,6 @@ interface Props {
   motionId: BigNumber;
   domainId: BigNumber;
   creatorAddress: string;
-  pendingDomainMetadataId: string | null;
 }
 
 const getMotionData = async ({
@@ -54,7 +53,6 @@ const getMotionData = async ({
   motionId,
   domainId,
   creatorAddress,
-  pendingDomainMetadataId,
 }: Props): Promise<ColonyMotion> => {
   const votingClient = await getVotingClient(colonyAddress);
   const { skillRep, rootHash, repSubmitted } = await votingClient.getMotion(
@@ -125,7 +123,6 @@ const getMotionData = async ({
         initiatorAddress: creatorAddress,
       },
     ],
-    pendingDomainMetadataId,
   };
 };
 
@@ -137,10 +134,7 @@ export const createMotionInDB = async (
     contractAddress: colonyAddress,
     args: { motionId, creator: creatorAddress, domainId },
   }: ContractEvent,
-  {
-    pendingDomainMetadataId,
-    ...inputRest
-  }: Record<string, any>,
+  input: Record<string, any>,
 ): Promise<void> => {
   const motionData = await getMotionData({
     colonyAddress,
@@ -149,7 +143,6 @@ export const createMotionInDB = async (
     motionId,
     domainId,
     creatorAddress,
-    pendingDomainMetadataId,
   });
 
   await mutate('createColonyMotion', {
@@ -167,7 +160,7 @@ export const createMotionInDB = async (
       motionDataId: motionData.id,
       initiatorAddress: creatorAddress,
       blockNumber,
-      ...inputRest,
+      ...input,
     },
   });
 };
