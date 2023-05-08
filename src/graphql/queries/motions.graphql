@@ -1,3 +1,12 @@
+query GetColonyActionByMotion($motionDataId: ID!) {
+  getColonyActionByMotion(motionDataId: $motionDataId) {
+    items {
+      id
+      pendingDomainMetadata
+    }
+  }
+}
+
 query GetColonyMotion($id: ID!) {
   getColonyMotion(id: $id) {
     id
