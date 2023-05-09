@@ -223,8 +223,8 @@ export const queries = {
     }
   `,
   getColonyActionByMotion: /* GraphQL */ `
-    query GetColonyActionByMotion($motionDataId: ID!) {
-      getColonyActionByMotion(motionDataId: $motionDataId) {
+    query GetColonyActionByMotion($motionId: ID!) {
+      getColonyActionByMotion(motionId: $motionId) {
         items {
           id
           pendingDomainMetadata {
