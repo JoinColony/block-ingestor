@@ -1,4 +1,4 @@
-import { BigNumber } from 'ethers';
+import { BigNumber, constants } from 'ethers';
 import {
   MotionStakes,
   UserStakes,
@@ -265,6 +265,7 @@ export const getUpdatedMessages = ({
     updatedMessages.push({
       name: MotionEvents.MotionVotingPhase,
       messageKey: `${messageKey}_${MotionEvents.MotionVotingPhase}`,
+      initiatorAddress: constants.AddressZero,
     });
   }
 
