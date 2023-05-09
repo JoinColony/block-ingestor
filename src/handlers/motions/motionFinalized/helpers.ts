@@ -99,7 +99,7 @@ export const linkPendingDomainMetadataWithDomain = async (
   if (isMotionAddingADomain || isMotionEditingADomain) {
     const { items: colonyAction } =
       (await query<{ items: Array<{ id: string, pendingDomainMetadata: DomainMetadata }> }>('getColonyActionByMotion', {
-        motionDataId: finalizedMotion.id,
+        motionId: finalizedMotion.id,
       })) ?? {};
     const pendingDomainMetadata = colonyAction?.[0]?.pendingDomainMetadata;
 

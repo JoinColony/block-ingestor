@@ -157,7 +157,7 @@ export const createMotionInDB = async (
       colonyId: colonyAddress,
       isMotion: true,
       showInActionsList: false,
-      motionDataId: motionData.id,
+      motionId: motionData.id,
       initiatorAddress: creatorAddress,
       blockNumber,
       ...input,
