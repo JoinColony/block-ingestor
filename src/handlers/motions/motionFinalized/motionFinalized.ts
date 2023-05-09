@@ -1,4 +1,4 @@
-import { BigNumber } from 'ethers';
+import { BigNumber, constants } from 'ethers';
 
 import { ContractEvent, MotionEvents } from '~types';
 import { getVotingClient } from '~utils';
@@ -67,6 +67,7 @@ export default async (event: ContractEvent): Promise<void> => {
     const updatedMessages = [
       ...messages,
       {
+        initiatorAddress: constants.AddressZero,
         name: MotionEvents.MotionFinalized,
         messageKey: getMessageKey(transactionHash, logIndex),
       },
