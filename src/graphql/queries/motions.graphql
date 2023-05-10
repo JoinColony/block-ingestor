@@ -1,38 +1,40 @@
-query GetColonyActionByMotion($motionDataId: ID!) {
-  items {
-    id
-    pendingDomainMetadata {
-      name
-      color
-      description
-      changelog {
-        transactionHash
-        oldName
-        newName
-        oldColor
-        newColor
-        oldDescription
-        newDescription
-      }
-    }
-    pendingColonyMetadata {
+query GetColonyActionByMotionId($motionId: ID!) {
+  getColonyActionByMotionId(motionId: $motionId) {
+    items {
       id
-      displayName
-      avatar
-      thumbnail
-      changelog {
-        transactionHash
-        oldDisplayName
-        newDisplayName
-        hasAvatarChanged
-        hasWhitelistChanged
-        haveTokensChanged
+      pendingDomainMetadata {
+        name
+        color
+        description
+        changelog {
+          transactionHash
+          oldName
+          newName
+          oldColor
+          newColor
+          oldDescription
+          newDescription
+        }
       }
-      isWhitelistActivated
-      whitelistedAddresses
-      modifiedTokenAddresses {
-        added
-        removed
+      pendingColonyMetadata {
+        id
+        displayName
+        avatar
+        thumbnail
+        changelog {
+          transactionHash
+          oldDisplayName
+          newDisplayName
+          hasAvatarChanged
+          hasWhitelistChanged
+          haveTokensChanged
+        }
+        isWhitelistActivated
+        whitelistedAddresses
+        modifiedTokenAddresses {
+          added
+          removed
+        }
       }
     }
   }
