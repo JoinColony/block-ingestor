@@ -222,9 +222,9 @@ export const queries = {
       }
     }
   `,
-  getColonyActionByMotion: /* GraphQL */ `
-    query GetColonyActionByMotion($motionId: ID!) {
-      getColonyActionByMotion(motionId: $motionId) {
+  getColonyActionByMotionId: /* GraphQL */ `
+    query GetColonyActionByMotionId($motionId: ID!) {
+      getColonyActionByMotionId(motionId: $motionId) {
         items {
           id
           pendingDomainMetadata {

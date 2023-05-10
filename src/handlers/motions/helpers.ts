@@ -20,7 +20,7 @@ export const updateMotionInDB = async (
 
   if (showInActionsList !== undefined) {
     const { items: colonyAction } =
-      (await query<{ items: Array<{ id: string }> }>('getColonyActionByMotion', {
+      (await query<{ items: Array<{ id: string }> }>('getColonyActionByMotionId', {
         motionId: motionData.id,
       })) ?? {};
 
