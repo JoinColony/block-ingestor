@@ -1,12 +1,7 @@
 import dotenv from 'dotenv';
 
 import networkClient from './networkClient';
-import {
-  output,
-  verbose,
-  addNetworkEventListener,
-} from './utils';
-import { ContractEventsSignatures } from './types';
+import { output, verbose } from './utils';
 import { mutate } from './amplifyClient';
 import { NETWORK_INVERSE_FEE_DATABASE_ID } from '~constants';
 
