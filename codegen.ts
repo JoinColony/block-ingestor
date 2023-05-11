@@ -1,12 +1,17 @@
+import dotenv from 'dotenv';
 import { CodegenConfig } from '@graphql-codegen/cli';
+
+dotenv.config();
+
+const endpoint = `${process.env.AWS_APPSYNC_ENDPOINT}/graphql`;
 
 const config: CodegenConfig = {
   schema: [
     {
-      'http://localhost:20002/graphql': {
+      [endpoint]: {
         headers: {
           'Content-Type': 'application/json',
-          'x-api-key': 'da2-fakeApiId123456',
+          'x-api-key': process.env.AWS_APPSYNC_KEY ?? '',
         },
       },
     },
