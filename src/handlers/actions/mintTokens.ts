@@ -1,6 +1,12 @@
-import { ColonyActionType } from '~graphql';
+import { Id } from '@colony/colony-js';
+
 import { ContractEvent } from '~types';
-import { writeActionFromEvent, getColonyTokenAddress } from '~utils';
+import {
+  writeActionFromEvent,
+  getColonyTokenAddress,
+  getDomainDatabaseId,
+} from '~utils';
+import { ColonyActionType } from '~graphql';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { contractAddress: colonyAddress } = event;
@@ -14,5 +20,6 @@ export default async (event: ContractEvent): Promise<void> => {
     recipientAddress,
     amount: amount.toString(),
     tokenAddress,
+    fromDomainId: getDomainDatabaseId(colonyAddress, Id.RootDomain),
   });
 };
