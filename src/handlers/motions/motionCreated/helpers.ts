@@ -1,7 +1,8 @@
 import { BigNumber } from 'ethers';
 import { TransactionDescription } from 'ethers/lib/utils';
+import { AnyColonyClient, AnyOneTxPaymentClient } from '@colony/colony-js';
 
-import { ColonyMotion, ContractEvent, MotionEvents } from '~types';
+import { ColonyMotion, ContractEvent, MotionEvents, ColonyActionInput, ColonyAction } from '~types';
 import { getVotingClient, verbose } from '~utils';
 
 import { mutate } from '~amplifyClient';
@@ -12,7 +13,6 @@ import {
   getUserMinStake,
   getMessageKey,
 } from '../helpers';
-import { AnyColonyClient, AnyOneTxPaymentClient } from '@colony/colony-js/*';
 
 export const getParsedActionFromMotion = async (
   motionId: string,
@@ -126,6 +126,23 @@ const getMotionData = async ({
   };
 };
 
+const createActionWithMotion = async (
+  actionData: ColonyAction,
+  motionData: ColonyMotion,
+): Promise<void> => {
+  await mutate('createColonyMotion', {
+    input: {
+      ...motionData,
+    },
+  });
+
+  await mutate('createColonyAction', {
+    input: {
+      ...actionData,
+    },
+  });
+};
+
 export const createMotionInDB = async (
   {
     transactionHash,
@@ -134,7 +151,7 @@ export const createMotionInDB = async (
     contractAddress: colonyAddress,
     args: { motionId, creator: creatorAddress, domainId },
   }: ContractEvent,
-  input: Record<string, any>,
+  input: ColonyActionInput,
 ): Promise<void> => {
   const motionData = await getMotionData({
     colonyAddress,
@@ -145,22 +162,16 @@ export const createMotionInDB = async (
     creatorAddress,
   });
 
-  await mutate('createColonyMotion', {
-    input: {
-      ...motionData,
-    },
-  });
+  const actionData = {
+    id: transactionHash,
+    colonyId: colonyAddress,
+    isMotion: true,
+    showInActionsList: false,
+    motionId: motionData.id,
+    initiatorAddress: creatorAddress,
+    blockNumber,
+    ...input,
+  };
 
-  await mutate('createColonyAction', {
-    input: {
-      id: transactionHash,
-      colonyId: colonyAddress,
-      isMotion: true,
-      showInActionsList: false,
-      motionId: motionData.id,
-      initiatorAddress: creatorAddress,
-      blockNumber,
-      ...input,
-    },
-  });
+  createActionWithMotion(actionData, motionData);
 };
