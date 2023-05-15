@@ -116,6 +116,8 @@ export type Filter = Parameters<typeof getLogs>[1];
 // Export here to avoid circular dependency with ColonyActionType
 export * from './motions';
 
+export * from './actions';
+
 export type NetworkClients =
   | ColonyNetworkClient
   | TokenClient
