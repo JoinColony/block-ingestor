@@ -153,14 +153,14 @@ export const mutations = {
     }
   `,
   createColonyMotion: /* GraphQL */ `
-    mutation CreateColonyMotion($input: CreateColonyMotionInput!) {
+    mutation CreateColonyMotion($input: ColonyMotionInput!) {
       createColonyMotion(input: $input) {
         id
       }
     }
   `,
   updateColonyMotion: /* GraphQL */ `
-    mutation UpdateColonyMotion($input: UpdateColonyMotionInput!) {
+    mutation UpdateColonyMotion($input: ColonyMotionInput!) {
       updateColonyMotion(input: $input) {
         id
       }
