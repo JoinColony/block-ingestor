@@ -1,0 +1,8 @@
+query GetCurrentNetworkInverseFee {
+  listCurrentNetworkInverseFees(limit: 1) {
+    items {
+      id
+      inverseFee
+    }
+  }
+}

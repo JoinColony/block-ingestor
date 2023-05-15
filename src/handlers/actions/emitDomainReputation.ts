@@ -1,14 +1,15 @@
 import { BigNumber } from 'ethers';
 import { AnyColonyClient, getEvents } from '@colony/colony-js';
+import { LogDescription } from 'ethers/lib/utils';
 
-import { ColonyActionType, ContractEvent } from '~types';
+import { ContractEvent } from '~types';
 import {
   writeActionFromEvent,
   getDomainDatabaseId,
   verbose,
   getCachedColonyClient,
 } from '~utils';
-import { LogDescription } from 'ethers/lib/utils';
+import { ColonyActionType } from '~graphql';
 
 const getChangeDomainId = async (
   domainAddedEvents: LogDescription[],

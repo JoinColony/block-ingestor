@@ -1,0 +1,3 @@
+mutation SetCurrentVersion($input: SetCurrentVersionInput!) {
+  setCurrentVersion(input: $input)
+}

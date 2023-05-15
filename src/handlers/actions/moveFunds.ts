@@ -7,11 +7,7 @@ import {
 } from '@colony/colony-js';
 import { BigNumber, utils } from 'ethers';
 
-import {
-  ColonyActionType,
-  ContractEvent,
-  ContractEventsSignatures,
-} from '~types';
+import { ContractEvent, ContractEventsSignatures } from '~types';
 import {
   toNumber,
   writeActionFromEvent,
@@ -20,6 +16,7 @@ import {
   getCachedColonyClient,
 } from '~utils';
 import provider from '~provider';
+import { ColonyActionType } from '~graphql';
 
 /**
  * The handler makes use of colonyClient getDomainFromFundingPot method which is only

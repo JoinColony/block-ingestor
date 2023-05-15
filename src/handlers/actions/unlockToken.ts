@@ -1,5 +1,6 @@
 import { Id } from '@colony/colony-js';
-import { ColonyActionType, ContractEvent } from '~types';
+import { ColonyActionType } from '~graphql';
+import { ContractEvent } from '~types';
 import {
   writeActionFromEvent,
   getDomainDatabaseId,

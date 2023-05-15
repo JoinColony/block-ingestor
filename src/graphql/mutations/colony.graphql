@@ -1,0 +1,5 @@
+mutation UpdateColony($input: UpdateColonyInput!) {
+  updateColony(input: $input) {
+    id
+  }
+}

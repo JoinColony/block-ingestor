@@ -1,0 +1,11 @@
+mutation CreateColonyAction($input: CreateColonyActionInput!) {
+  createColonyAction(input: $input) {
+    id
+  }
+}
+
+mutation UpdateColonyAction($input: UpdateColonyActionInput!) {
+  updateColonyAction(input: $input) {
+    id
+  }
+}

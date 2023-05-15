@@ -1,0 +1,17 @@
+mutation CreateColonyFundsClaim(
+  $input: CreateColonyFundsClaimInput!
+  $condition: ModelColonyFundsClaimConditionInput
+) {
+  createColonyFundsClaim(input: $input, condition: $condition) {
+    id
+  }
+}
+
+mutation DeleteColonyFundsClaim(
+  $input: DeleteColonyFundsClaimInput!
+  $condition: ModelColonyFundsClaimConditionInput
+) {
+  deleteColonyFundsClaim(input: $input, condition: $condition) {
+    id
+  }
+}

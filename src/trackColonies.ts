@@ -15,6 +15,11 @@ import { ContractEventsSignatures } from '~types';
 import { mutate } from '~amplifyClient';
 import { COLONY_CURRENT_VERSION_KEY } from '~constants';
 import trackColonyActions from '~trackColonyActions';
+import {
+  SetCurrentVersionDocument,
+  SetCurrentVersionMutation,
+  SetCurrentVersionMutationVariables,
+} from '~graphql';
 
 dotenv.config();
 
@@ -75,10 +80,13 @@ export default async (): Promise<void> => {
 const writeCurrentNetworkColonyVersion = async (): Promise<void> => {
   const version = await networkClient.getCurrentColonyVersion();
 
-  await mutate('setCurrentVersion', {
-    input: {
-      key: COLONY_CURRENT_VERSION_KEY,
-      version: toNumber(version),
+  await mutate<SetCurrentVersionMutation, SetCurrentVersionMutationVariables>(
+    SetCurrentVersionDocument,
+    {
+      input: {
+        key: COLONY_CURRENT_VERSION_KEY,
+        version: toNumber(version),
+      },
     },
-  });
+  );
 };

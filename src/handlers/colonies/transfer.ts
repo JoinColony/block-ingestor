@@ -2,6 +2,14 @@ import { mutate, query } from '~amplifyClient';
 import networkClient from '~networkClient';
 import { getChainId } from '~provider';
 import { ContractEvent } from '~types';
+import {
+  CreateColonyFundsClaimDocument,
+  CreateColonyFundsClaimMutation,
+  CreateColonyFundsClaimMutationVariables,
+  GetColonyUnclaimedFundDocument,
+  GetColonyUnclaimedFundQuery,
+  GetColonyUnclaimedFundQueryVariables,
+} from '~graphql';
 import { output } from '~utils';
 
 export default async (event: ContractEvent): Promise<void> => {
@@ -53,7 +61,12 @@ export default async (event: ContractEvent): Promise<void> => {
 
     if (process.env.NODE_ENV !== 'production') {
       const { id: existingClaimId } =
-        (await query('getColonyUnclaimedFund', { claimId })) || {};
+        (
+          await query<
+            GetColonyUnclaimedFundQuery,
+            GetColonyUnclaimedFundQueryVariables
+          >(GetColonyUnclaimedFundDocument, { claimId })
+        )?.data?.getColonyFundsClaim ?? {};
       existingClaim = existingClaimId;
     }
 
@@ -62,7 +75,7 @@ export default async (event: ContractEvent): Promise<void> => {
       amount,
       'into Colony:',
       dst,
-      existingClaim || amount === '0'
+      !!existingClaim || amount === '0'
         ? `but not acting upon it since ${
             existingClaim ? 'it already exists in the database' : ''
           }${amount === '0' ? "it's value is zero" : ''}`
@@ -71,7 +84,10 @@ export default async (event: ContractEvent): Promise<void> => {
 
     // Don't add zero transfer claims in the database
     if (!existingClaim && amount !== '0') {
-      await mutate('createColonyFundsClaim', {
+      await mutate<
+        CreateColonyFundsClaimMutation,
+        CreateColonyFundsClaimMutationVariables
+      >(CreateColonyFundsClaimDocument, {
         input: {
           id: claimId,
           colonyFundsClaimsId: dst,
