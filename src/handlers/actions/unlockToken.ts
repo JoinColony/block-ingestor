@@ -2,9 +2,9 @@ import { Id } from '@colony/colony-js';
 
 import {
   ColonyActionType,
-  GetColonyStatusDocument,
-  GetColonyStatusQuery,
-  GetColonyStatusQueryVariables,
+  GetColonyByNativeTokenIdDocument,
+  GetColonyByNativeTokenIdQuery,
+  GetColonyByNativeTokenIdQueryVariables,
   UpdateColonyDocument,
   UpdateColonyMutation,
   UpdateColonyMutationVariables,
@@ -15,6 +15,7 @@ import {
   writeActionFromEvent,
   getDomainDatabaseId,
   getCachedColonyClient,
+  notNull,
 } from '~utils';
 
 export default async (event: ContractEvent): Promise<void> => {
@@ -30,30 +31,32 @@ export default async (event: ContractEvent): Promise<void> => {
   const tokenAddress = await colonyClient.getToken();
 
   const { data } =
-    (await query<GetColonyStatusQuery, GetColonyStatusQueryVariables>(
-      GetColonyStatusDocument,
-      {
-        id: colonyAddress,
-      },
-    )) ?? {};
+    (await query<
+      GetColonyByNativeTokenIdQuery,
+      GetColonyByNativeTokenIdQueryVariables
+    >(GetColonyByNativeTokenIdDocument, {
+      nativeTokenId: tokenAddress,
+    })) ?? {};
 
-  if (data?.getColony) {
+  const colonies = data?.listColonies?.items.filter(notNull) ?? [];
+
+  colonies.forEach(async (colony) => {
     await mutate<UpdateColonyMutation, UpdateColonyMutationVariables>(
       UpdateColonyDocument,
       {
         input: {
-          id: colonyAddress,
+          id: colony.id,
           status: {
-            ...data.getColony.status,
+            ...colony.status,
             nativeToken: {
-              ...data.getColony.status?.nativeToken,
+              ...colony.status?.nativeToken,
               unlocked: true,
             },
           },
         },
       },
     );
-  }
+  });
 
   await writeActionFromEvent(event, colonyAddress, {
     type: ColonyActionType.UnlockToken,

@@ -27,15 +27,18 @@ query GetColony($id: ID!) {
   }
 }
 
-query GetColonyStatus($id: ID!) {
-  getColony(id: $id) {
-    status {
-      nativeToken {
-        mintable
-        unlockable
-        unlocked
+query GetColonyByNativeTokenId($nativeTokenId: ID!) {
+  listColonies(filter: { colonyNativeTokenId: { eq: $nativeTokenId } }) {
+    items {
+      id
+      status {
+        nativeToken {
+          unlocked
+          unlockable
+          mintable
+        }
+        recovery
       }
-      recovery
     }
   }
 }
