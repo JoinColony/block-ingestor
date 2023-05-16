@@ -23,6 +23,7 @@ export enum ColonyOperations {
   MoveFundsBetweenPots = 'moveFundsBetweenPots',
   EmitDomainReputationPenalty = 'emitDomainReputationPenalty',
   EmitDomainReputationReward = 'emitDomainReputationReward',
+  EditColony = 'editColony',
 }
 
 export enum MotionEvents {
@@ -51,7 +52,7 @@ export const motionNameMapping: { [key: string]: ColonyActionType } = {
   [ColonyOperations.UnlockToken]: ColonyActionType.UnlockTokenMotion,
   // addDomain: ColonyMotions.CreateDomainMotion,
   // editDomain: ColonyMotions.EditDomainMotion,
-  // editColony: ColonyMotions.ColonyEditMotion,
+  [ColonyOperations.EditColony]: ColonyActionType.ColonyEditMotion,
   // setUserRoles: ColonyMotions.SetUserRolesMotion,
   [ColonyOperations.MoveFundsBetweenPots]: ColonyActionType.MoveFundsMotion,
   [ColonyOperations.Upgrade]: ColonyActionType.VersionUpgradeMotion,
@@ -83,7 +84,7 @@ export interface MotionStateHistory {
   hasPassed: boolean;
   hasFailed: boolean;
   hasFailedNotFinalizable: boolean;
-  inRevealPhase: boolean
+  inRevealPhase: boolean;
 }
 
 export interface MotionData {
@@ -156,11 +157,32 @@ interface DomainMetadata {
   changelog: [DomainMetadataChangelog];
 }
 
+interface ColonyMetadataChangelog {
+  transactionHash: string;
+  oldDisplayName: string;
+  newDisplayName: string;
+  hasAvatarChanged: boolean;
+  hasWhitelistChanged: boolean;
+  haveTokensChanged: boolean;
+}
+
+export interface ColonyMetadata {
+  id: string;
+  displayName: string;
+  avatar?: string;
+  thumbnail?: string;
+  changelog?: ColonyMetadataChangelog[];
+  isWhitelistActivated?: boolean;
+  whitelistedAddresses?: string[];
+  modifiedTokenAddresses?: string[];
+}
+
 export interface MotionQuery {
   id: string;
   motionData: MotionData;
   createdAt: string;
   pendingDomainMetadata: DomainMetadata;
+  pendingColonyMetadata: ColonyMetadata;
 }
 
 export interface MotionMessage {
