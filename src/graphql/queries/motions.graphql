@@ -93,6 +93,26 @@ query GetColonyMotions($colonyAddress: ID!) {
           newDescription
         }
       }
+      pendingColonyMetadata {
+        id
+        displayName
+        avatar
+        thumbnail
+        changelog {
+          transactionHash
+          oldDisplayName
+          newDisplayName
+          hasAvatarChanged
+          hasWhitelistChanged
+          haveTokensChanged
+        }
+        isWhitelistActivated
+        whitelistedAddresses
+        modifiedTokenAddresses {
+          added
+          removed
+        }
+      }
     }
   }
 }

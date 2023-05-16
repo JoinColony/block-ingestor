@@ -9,7 +9,12 @@ import {
   updateMotionInDB,
   getMessageKey,
 } from '../helpers';
-import { getStakerReward, linkPendingDomainMetadataWithDomain } from './helpers';
+
+import {
+  getStakerReward,
+  linkPendingColonyMetadataWithColony,
+  linkPendingDomainMetadataWithDomain,
+} from './helpers';
 
 export default async (event: ContractEvent): Promise<void> => {
   const {
@@ -45,7 +50,9 @@ export default async (event: ContractEvent): Promise<void> => {
       motionData,
     } = finalizedMotion;
 
-    const yayWon = BigNumber.from(yayVotes).gt(nayVotes) || (Number(yayPercentage) > Number(nayPercentage));
+    const yayWon =
+      BigNumber.from(yayVotes).gt(nayVotes) ||
+      Number(yayPercentage) > Number(nayPercentage);
 
     /*
      * pendingDomainMetadata is a motion data prop that we use to store the metadata of a Domain that COULD be created/edited
@@ -54,7 +61,18 @@ export default async (event: ContractEvent): Promise<void> => {
      * a new DomainMetadata with the corresponding Domain item id.
      */
     if (finalizedMotion.pendingDomainMetadata && yayWon) {
-      await linkPendingDomainMetadataWithDomain(action, colonyAddress, finalizedMotion);
+      await linkPendingDomainMetadataWithDomain(
+        action,
+        colonyAddress,
+        finalizedMotion,
+      );
+    }
+
+    if (finalizedMotion.pendingColonyMetadata && yayWon) {
+      await linkPendingColonyMetadataWithColony(
+        finalizedMotion.pendingColonyMetadata,
+        colonyAddress,
+      );
     }
 
     const updatedStakerRewards = await Promise.all(

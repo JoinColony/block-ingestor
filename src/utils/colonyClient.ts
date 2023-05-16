@@ -1,6 +1,8 @@
 import { AnyColonyClient } from '@colony/colony-js';
 
+import { query } from '~amplifyClient';
 import networkClient from '~networkClient';
+import { ColonyQuery } from '~types';
 
 const colonyClientsCache: Record<string, AnyColonyClient> = {};
 
@@ -24,4 +26,21 @@ export const getCachedColonyClient = async (
   }
   // @ts-ignore
   return {};
+};
+
+export const getColonyFromDB = async (
+  colonyAddress: string,
+): Promise<ColonyQuery | undefined> => {
+  const colony = await query<ColonyQuery>('getColony', {
+    id: colonyAddress,
+  });
+
+  if (!colony) {
+    console.error(
+      `Could not find colony: ${colonyAddress} in database. This is a bug and should be investigated.`,
+    );
+    return;
+  }
+
+  return colony;
 };

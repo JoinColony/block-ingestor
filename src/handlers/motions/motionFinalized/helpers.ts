@@ -1,10 +1,23 @@
 import { BigNumber } from 'ethers';
 import { TransactionDescription } from 'ethers/lib/utils';
 
-import { ColonyOperations, MotionQuery, MotionVote, StakerReward } from '~types';
-import { getDomainDatabaseId, getVotingClient, verbose } from '~utils';
+import {
+  ColonyMetadata,
+  ColonyOperations,
+  MotionQuery,
+  MotionVote,
+  StakerReward,
+} from '~types';
+import {
+  getColonyFromDB,
+  getDomainDatabaseId,
+  getExistingTokenAddresses,
+  getVotingClient,
+  updateColonyTokens,
+  verbose,
+} from '~utils';
 import networkClient from '~networkClient';
-import { mutate } from '~amplifyClient';
+import { query, mutate } from '~amplifyClient';
 
 export const getStakerReward = async (
   motionId: string,
@@ -70,8 +83,15 @@ const getParsedActionFromDomainMotion = async (
   }
 };
 
-export const linkPendingDomainMetadataWithDomain = async (action: string, colonyAddress: string, finalizedMotion: MotionQuery): Promise<void> => {
-  const parsedDomainAction = await getParsedActionFromDomainMotion(action, colonyAddress);
+export const linkPendingDomainMetadataWithDomain = async (
+  action: string,
+  colonyAddress: string,
+  finalizedMotion: MotionQuery,
+): Promise<void> => {
+  const parsedDomainAction = await getParsedActionFromDomainMotion(
+    action,
+    colonyAddress,
+  );
   if (parsedDomainAction?.name === ColonyOperations.AddDomain) {
     const colonyClient = await networkClient.getColonyClient(colonyAddress);
     const domainCount = await colonyClient.getDomainCount();
@@ -95,4 +115,85 @@ export const linkPendingDomainMetadataWithDomain = async (action: string, colony
       },
     });
   }
+};
+
+export const linkPendingColonyMetadataWithColony = async (
+  pendingColonyMetadata: ColonyMetadata,
+  colonyAddress: string,
+): Promise<void> => {
+  const currentColonyMetadata = await query<ColonyMetadata>(
+    'getColonyMetadata',
+    {
+      id: colonyAddress,
+    },
+  );
+
+  if (!currentColonyMetadata) {
+    console.error(
+      `Could not find the current metadata for the colony: ${colonyAddress}. This is a bug and should be investigated.`,
+    );
+    return;
+  }
+
+  const {
+    haveTokensChanged,
+    hasAvatarChanged,
+    hasWhitelistChanged,
+    newDisplayName,
+    oldDisplayName,
+  } = pendingColonyMetadata.changelog?.[0] ?? {};
+
+  const updatedMetadata = {
+    ...currentColonyMetadata,
+  };
+
+  /*
+   * Here, we update metadata as granularly as possible so that we don't overwrite state changes that occured
+   * after this motion was created.
+   */
+
+  if (hasAvatarChanged) {
+    // If avatar has changed, update avatar and thumbnail
+    updatedMetadata.avatar = pendingColonyMetadata.avatar;
+    updatedMetadata.thumbnail = pendingColonyMetadata.thumbnail;
+  }
+
+  if (hasWhitelistChanged) {
+    // If whitelist has changed, update whitelistedAddresses and isWhitelistActivated
+    updatedMetadata.isWhitelistActivated =
+      pendingColonyMetadata.isWhitelistActivated;
+
+    updatedMetadata.whitelistedAddresses =
+      pendingColonyMetadata.whitelistedAddresses;
+  }
+
+  if (newDisplayName !== oldDisplayName) {
+    // If displayName has changed, update displayName
+    updatedMetadata.displayName = pendingColonyMetadata.displayName;
+  }
+
+  if (haveTokensChanged && pendingColonyMetadata.modifiedTokenAddresses) {
+    // If tokens have changed, update colony tokens
+    const colony = await getColonyFromDB(colonyAddress);
+
+    if (colony) {
+      const existingTokenAddresses = getExistingTokenAddresses(colony);
+
+      await updateColonyTokens(
+        colony,
+        existingTokenAddresses,
+        pendingColonyMetadata.modifiedTokenAddresses,
+      );
+    }
+  }
+
+  await mutate('updateColonyMetadata', {
+    input: {
+      ...updatedMetadata,
+      changelog: [
+        ...(currentColonyMetadata.changelog ?? []),
+        pendingColonyMetadata.changelog?.[0],
+      ],
+    },
+  });
 };
