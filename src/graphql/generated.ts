@@ -3388,24 +3388,28 @@ export type UpdateStatsMutation = {
   updateIngestorStats?: { __typename?: 'IngestorStats'; id: string } | null;
 };
 
-export type GetColonyStatusQueryVariables = Exact<{
-  id: Scalars['ID'];
+export type GetColonyByNativeTokenIdQueryVariables = Exact<{
+  nativeTokenId: Scalars['ID'];
 }>;
 
-export type GetColonyStatusQuery = {
+export type GetColonyByNativeTokenIdQuery = {
   __typename?: 'Query';
-  getColony?: {
-    __typename?: 'Colony';
-    status?: {
-      __typename?: 'ColonyStatus';
-      recovery?: boolean | null;
-      nativeToken?: {
-        __typename?: 'NativeTokenStatus';
-        mintable?: boolean | null;
-        unlockable?: boolean | null;
-        unlocked?: boolean | null;
+  listColonies?: {
+    __typename?: 'ModelColonyConnection';
+    items: Array<{
+      __typename?: 'Colony';
+      id: string;
+      status?: {
+        __typename?: 'ColonyStatus';
+        recovery?: boolean | null;
+        nativeToken?: {
+          __typename?: 'NativeTokenStatus';
+          unlocked?: boolean | null;
+          unlockable?: boolean | null;
+          mintable?: boolean | null;
+        } | null;
       } | null;
-    } | null;
+    } | null>;
   } | null;
 };
 
@@ -3634,16 +3638,19 @@ export const UpdateStatsDocument = gql`
     }
   }
 `;
-export const GetColonyStatusDocument = gql`
-  query GetColonyStatus($id: ID!) {
-    getColony(id: $id) {
-      status {
-        nativeToken {
-          mintable
-          unlockable
-          unlocked
+export const GetColonyByNativeTokenIdDocument = gql`
+  query GetColonyByNativeTokenId($nativeTokenId: ID!) {
+    listColonies(filter: { colonyNativeTokenId: { eq: $nativeTokenId } }) {
+      items {
+        id
+        status {
+          nativeToken {
+            unlocked
+            unlockable
+            mintable
+          }
+          recovery
         }
-        recovery
       }
     }
   }
