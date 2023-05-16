@@ -31,7 +31,7 @@ export type Scalars = {
 export type ChainMetadata = {
   __typename?: 'ChainMetadata';
   blockNumber?: Maybe<Scalars['Int']>;
-  chainId: Scalars['Int'];
+  chainId?: Maybe<Scalars['Int']>;
   logIndex?: Maybe<Scalars['Int']>;
   network?: Maybe<Network>;
   transactionHash?: Maybe<Scalars['String']>;
@@ -39,7 +39,7 @@ export type ChainMetadata = {
 
 export type ChainMetadataInput = {
   blockNumber?: InputMaybe<Scalars['Int']>;
-  chainId: Scalars['Int'];
+  chainId?: InputMaybe<Scalars['Int']>;
   logIndex?: InputMaybe<Scalars['Int']>;
   network?: InputMaybe<Network>;
   transactionHash?: InputMaybe<Scalars['String']>;
@@ -50,7 +50,7 @@ export type Colony = {
   actions?: Maybe<ModelColonyActionConnection>;
   balances?: Maybe<ColonyBalances>;
   chainFundsClaim?: Maybe<ColonyChainFundsClaim>;
-  chainMetadata: ChainMetadata;
+  chainMetadata?: Maybe<ChainMetadata>;
   colonyNativeTokenId: Scalars['ID'];
   createdAt: Scalars['AWSDateTime'];
   domains?: Maybe<ModelDomainConnection>;
@@ -529,7 +529,7 @@ export type CreateColonyHistoricRoleInput = {
 export type CreateColonyInput = {
   balances?: InputMaybe<ColonyBalancesInput>;
   chainFundsClaim?: InputMaybe<ColonyChainFundsClaimInput>;
-  chainMetadata: ChainMetadataInput;
+  chainMetadata?: InputMaybe<ChainMetadataInput>;
   colonyNativeTokenId: Scalars['ID'];
   id?: InputMaybe<Scalars['ID']>;
   motionsWithUnclaimedStakes?: InputMaybe<Array<ColonyUnclaimedStakeInput>>;
@@ -663,7 +663,7 @@ export type CreateProfileInput = {
 
 export type CreateTokenInput = {
   avatar?: InputMaybe<Scalars['String']>;
-  chainMetadata: ChainMetadataInput;
+  chainMetadata?: InputMaybe<ChainMetadataInput>;
   createdAt?: InputMaybe<Scalars['AWSDateTime']>;
   decimals: Scalars['Int'];
   id?: InputMaybe<Scalars['ID']>;
@@ -674,7 +674,7 @@ export type CreateTokenInput = {
 };
 
 export type CreateUniqueColonyInput = {
-  chainMetadata: ChainMetadataInput;
+  chainMetadata?: InputMaybe<ChainMetadataInput>;
   colonyNativeTokenId: Scalars['ID'];
   id: Scalars['ID'];
   name: Scalars['String'];
@@ -691,7 +691,7 @@ export type CreateUniqueUserInput = {
 
 export type CreateUserInput = {
   id?: InputMaybe<Scalars['ID']>;
-  name?: InputMaybe<Scalars['String']>;
+  name: Scalars['String'];
   profileId?: InputMaybe<Scalars['ID']>;
 };
 
@@ -3395,7 +3395,7 @@ export type SubscriptionOnUpdateWatchedColoniesArgs = {
 export type Token = {
   __typename?: 'Token';
   avatar?: Maybe<Scalars['String']>;
-  chainMetadata: ChainMetadata;
+  chainMetadata?: Maybe<ChainMetadata>;
   colonies?: Maybe<ModelColonyTokensConnection>;
   createdAt: Scalars['AWSDateTime'];
   decimals: Scalars['Int'];
@@ -3684,7 +3684,7 @@ export type User = {
   __typename?: 'User';
   createdAt: Scalars['AWSDateTime'];
   id: Scalars['ID'];
-  name?: Maybe<Scalars['String']>;
+  name: Scalars['String'];
   profile?: Maybe<Profile>;
   profileId?: Maybe<Scalars['ID']>;
   tokens?: Maybe<ModelUserTokensConnection>;
@@ -4255,6 +4255,27 @@ export type GetColonyQuery = {
         rewards: { __typename?: 'MotionStakeValues'; yay: string; nay: string };
       }>;
     }> | null;
+  } | null;
+};
+
+export type GetColonyStatusQueryVariables = Exact<{
+  id: Scalars['ID'];
+}>;
+
+export type GetColonyStatusQuery = {
+  __typename?: 'Query';
+  getColony?: {
+    __typename?: 'Colony';
+    status?: {
+      __typename?: 'ColonyStatus';
+      recovery?: boolean | null;
+      nativeToken?: {
+        __typename?: 'NativeTokenStatus';
+        mintable?: boolean | null;
+        unlockable?: boolean | null;
+        unlocked?: boolean | null;
+      } | null;
+    } | null;
   } | null;
 };
 
@@ -4918,6 +4939,20 @@ export const GetColonyDocument = gql`
     }
   }
   ${Colony}
+`;
+export const GetColonyStatusDocument = gql`
+  query GetColonyStatus($id: ID!) {
+    getColony(id: $id) {
+      status {
+        nativeToken {
+          mintable
+          unlockable
+          unlocked
+        }
+        recovery
+      }
+    }
+  }
 `;
 export const GetDomainMetadataDocument = gql`
   query GetDomainMetadata($id: ID!) {

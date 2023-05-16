@@ -2,12 +2,15 @@ import { Id } from '@colony/colony-js';
 
 import {
   ColonyActionType,
+  GetColonyStatusDocument,
+  GetColonyStatusQuery,
+  GetColonyStatusQueryVariables,
   UpdateColonyDocument,
   UpdateColonyMutation,
   UpdateColonyMutationVariables,
 } from '~graphql';
 import { ContractEvent } from '~types';
-import { mutate } from '~amplifyClient';
+import { mutate, query } from '~amplifyClient';
 import {
   writeActionFromEvent,
   getDomainDatabaseId,
@@ -26,19 +29,31 @@ export default async (event: ContractEvent): Promise<void> => {
 
   const tokenAddress = await colonyClient.getToken();
 
-  await mutate<UpdateColonyMutation, UpdateColonyMutationVariables>(
-    UpdateColonyDocument,
-    {
-      input: {
+  const { data } =
+    (await query<GetColonyStatusQuery, GetColonyStatusQueryVariables>(
+      GetColonyStatusDocument,
+      {
         id: colonyAddress,
-        status: {
-          nativeToken: {
-            unlocked: true,
+      },
+    )) ?? {};
+
+  if (data?.getColony) {
+    await mutate<UpdateColonyMutation, UpdateColonyMutationVariables>(
+      UpdateColonyDocument,
+      {
+        input: {
+          id: colonyAddress,
+          status: {
+            ...data.getColony.status,
+            nativeToken: {
+              ...data.getColony.status?.nativeToken,
+              unlocked: true,
+            },
           },
         },
       },
-    },
-  );
+    );
+  }
 
   await writeActionFromEvent(event, colonyAddress, {
     type: ColonyActionType.UnlockToken,

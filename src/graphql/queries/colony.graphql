@@ -26,3 +26,16 @@ query GetColony($id: ID!) {
     ...Colony
   }
 }
+
+query GetColonyStatus($id: ID!) {
+  getColony(id: $id) {
+    status {
+      nativeToken {
+        mintable
+        unlockable
+        unlocked
+      }
+      recovery
+    }
+  }
+}
