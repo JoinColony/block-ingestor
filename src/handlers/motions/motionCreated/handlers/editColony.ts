@@ -3,19 +3,17 @@ import { ContractEvent, motionNameMapping } from '~types';
 import { getPendingMetadataDatabaseId } from '~utils';
 import { createMotionInDB } from '../helpers';
 
-export const handleManageDomainMotion = async (
+export const handleEditColonyMotion = async (
   event: ContractEvent,
-  parsedAction: TransactionDescription,
+  { name }: TransactionDescription,
 ): Promise<void> => {
   const { transactionHash, contractAddress: colonyAddress } = event;
-  const { name } = parsedAction;
-  const pendingDomainMetadataId = getPendingMetadataDatabaseId(
+  const pendingColonyMetadataId = getPendingMetadataDatabaseId(
     colonyAddress,
     transactionHash,
   );
-
   await createMotionInDB(event, {
     type: motionNameMapping[name],
-    pendingDomainMetadataId,
+    pendingColonyMetadataId,
   });
 };

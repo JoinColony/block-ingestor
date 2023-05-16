@@ -108,6 +108,7 @@ export enum ColonyActionType {
   MoveFundsMotion = 'MOVE_FUNDS_MOTION',
   EmitDomainReputationPenaltyMotion = 'EMIT_DOMAIN_REPUTATION_PENALTY_MOTION',
   EmitDomainReputationRewardMotion = 'EMIT_DOMAIN_REPUTATION_REWARD_MOTION',
+  ColonyEditMotion = 'COLONY_EDIT_MOTION',
 }
 
 // The Filter type doesn't seem to be exported from colony-js
