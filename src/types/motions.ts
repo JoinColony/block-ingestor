@@ -166,6 +166,11 @@ interface ColonyMetadataChangelog {
   haveTokensChanged: boolean;
 }
 
+export interface PendingModifiedTokenAddresses {
+  added: string[];
+  removed: string[];
+}
+
 export interface ColonyMetadata {
   id: string;
   displayName: string;
@@ -174,7 +179,7 @@ export interface ColonyMetadata {
   changelog?: ColonyMetadataChangelog[];
   isWhitelistActivated?: boolean;
   whitelistedAddresses?: string[];
-  modifiedTokenAddresses?: string[];
+  modifiedTokenAddresses?: PendingModifiedTokenAddresses;
 }
 
 export interface MotionQuery {

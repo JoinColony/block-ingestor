@@ -131,6 +131,27 @@ export const mutations = {
       }
     }
   `,
+  updateColonyMetadata: /* GraphQL */ `
+    mutation UpdateColonyMetadata($input: UpdateColonyMetadataInput!) {
+      updateColonyMetadata(input: $input) {
+        id
+      }
+    }
+  `,
+  createColonyTokens: /* GraphQL */ `
+    mutation CreateColonyTokens($input: CreateColonyTokensInput!) {
+      createColonyTokens(input: $input) {
+        id
+      }
+    }
+  `,
+  deleteColonyTokens: /* GraphQL */ `
+    mutation DeleteColonyTokens($input: DeleteColonyTokensInput!) {
+      deleteColonyTokens(input: $input) {
+        id
+      }
+    }
+  `,
 };
 
 /*
@@ -283,6 +304,26 @@ export const queries = {
               newDescription
             }
           }
+          pendingColonyMetadata {
+            id
+            displayName
+            avatar
+            thumbnail
+            changelog {
+              transactionHash
+              oldDisplayName
+              newDisplayName
+              hasAvatarChanged
+              hasWhitelistChanged
+              haveTokensChanged
+            }
+            isWhitelistActivated
+            whitelistedAddresses
+            modifiedTokenAddresses {
+              added
+              removed
+            }
+          }
         }
       }
     }
@@ -298,6 +339,52 @@ export const queries = {
       ) {
         items {
           id
+        }
+      }
+    }
+  `,
+  getColonyMetadata: /* GraphQL */ `
+    query GetColonyMetadata($id: ID!) {
+      getColonyMetadata(id: $id) {
+        id
+        displayName
+        avatar
+        thumbnail
+        changelog {
+          transactionHash
+          oldDisplayName
+          newDisplayName
+          hasAvatarChanged
+          hasWhitelistChanged
+          haveTokensChanged
+        }
+        isWhitelistActivated
+        whitelistedAddresses
+        modifiedTokenAddresses {
+          added
+          removed
+        }
+      }
+    }
+  `,
+  getTokenFromEverywhere: /* GraphQL */ `
+    query GetTokenFromEverywhere($input: TokenFromEverywhereArguments!) {
+      getTokenFromEverywhere(input: $input) {
+        items {
+          id
+        }
+      }
+    }
+  `,
+  getColony: /* GraphQL */ `
+    query GetColony($id: ID!) {
+      getColony(id: $id) {
+        colonyAddress: id
+        tokens {
+          items {
+            id
+            tokenAddress: tokenID
+          }
         }
       }
     }
