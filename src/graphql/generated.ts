@@ -3388,6 +3388,27 @@ export type UpdateStatsMutation = {
   updateIngestorStats?: { __typename?: 'IngestorStats'; id: string } | null;
 };
 
+export type GetColonyStatusQueryVariables = Exact<{
+  id: Scalars['ID'];
+}>;
+
+export type GetColonyStatusQuery = {
+  __typename?: 'Query';
+  getColony?: {
+    __typename?: 'Colony';
+    status?: {
+      __typename?: 'ColonyStatus';
+      recovery?: boolean | null;
+      nativeToken?: {
+        __typename?: 'NativeTokenStatus';
+        mintable?: boolean | null;
+        unlockable?: boolean | null;
+        unlocked?: boolean | null;
+      } | null;
+    } | null;
+  } | null;
+};
+
 export type GetContractEventQueryVariables = Exact<{
   id: Scalars['ID'];
 }>;
@@ -3610,6 +3631,20 @@ export const UpdateStatsDocument = gql`
   mutation UpdateStats($value: String!) {
     updateIngestorStats(input: { id: "STATS", value: $value }) {
       id
+    }
+  }
+`;
+export const GetColonyStatusDocument = gql`
+  query GetColonyStatus($id: ID!) {
+    getColony(id: $id) {
+      status {
+        nativeToken {
+          mintable
+          unlockable
+          unlocked
+        }
+        recovery
+      }
     }
   }
 `;
