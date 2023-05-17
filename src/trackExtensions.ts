@@ -4,6 +4,7 @@ import networkClient from '~networkClient';
 import {
   deleteExtensionFromEvent,
   getCachedColonyClient,
+  getLatestBlock,
   isExtensionDeprecated,
   isExtensionInitialised,
   mapLogToContractEvent,
@@ -16,8 +17,7 @@ import { SUPPORTED_EXTENSION_IDS } from '~constants';
 import { extensionSpecificEventsListener } from '~eventListener';
 
 export default async (): Promise<void> => {
-  // @TODO: Set to the latest block processed by block-ingestor
-  const latestBlock = 1;
+  const latestBlock = await getLatestBlock();
 
   SUPPORTED_EXTENSION_IDS.forEach(async (extensionId) => {
     verbose(

@@ -14,7 +14,12 @@ import {
 } from '~handlers';
 import networkClient from '~networkClient';
 import { ColonyActionHandler, ContractEventsSignatures, Filter } from '~types';
-import { getCachedColonyClient, mapLogToContractEvent, verbose } from '~utils';
+import {
+  getCachedColonyClient,
+  getLatestBlock,
+  mapLogToContractEvent,
+  verbose,
+} from '~utils';
 
 const getFilter = (
   eventSignature: ContractEventsSignatures,
@@ -38,7 +43,9 @@ const trackActionsByEvent = async (
 ): Promise<void> => {
   const colonyClient = await getCachedColonyClient(colonyAddress);
   const filter = getFilter(eventSignature, colonyAddress);
-  const logs = await getLogs(networkClient, filter);
+  const logs = await getLogs(networkClient, filter, {
+    fromBlock: await getLatestBlock(),
+  });
   logs.forEach(async (log) => {
     const event = await mapLogToContractEvent(log, colonyClient.interface);
     if (!event) {

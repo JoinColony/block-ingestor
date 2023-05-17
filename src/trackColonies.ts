@@ -4,11 +4,11 @@ import { getLogs } from '@colony/colony-js';
 import networkClient from '~networkClient';
 import {
   output,
-  writeJsonStats,
   verbose,
   addNetworkEventListener,
   setToJS,
   toNumber,
+  updateStats,
 } from '~utils';
 import { colonySpecificEventsListener } from '~eventListener';
 import { ContractEventsSignatures } from '~types';
@@ -50,7 +50,7 @@ export default async (): Promise<void> => {
     colonies.add(JSON.stringify({ colonyAddress, tokenAddress }));
   });
 
-  await writeJsonStats({ trackedColonies: colonies.size });
+  await updateStats({ trackedColonies: colonies.size });
 
   output('Tracking', colonies.size, 'currently deployed colonies');
 
