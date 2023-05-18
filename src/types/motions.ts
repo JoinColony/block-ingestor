@@ -149,12 +149,12 @@ interface DomainMetadataChangelog {
   newDescription: string;
 }
 
-interface DomainMetadata {
+export interface DomainMetadata {
   id: string;
   name: string;
   description: string;
-  color: string;
-  changelog: [DomainMetadataChangelog];
+  color: DomainColor;
+  changelog?: DomainMetadataChangelog[];
 }
 
 interface ColonyMetadataChangelog {

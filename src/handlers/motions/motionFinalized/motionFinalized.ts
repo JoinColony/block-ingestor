@@ -64,7 +64,7 @@ export default async (event: ContractEvent): Promise<void> => {
       await linkPendingDomainMetadataWithDomain(
         action,
         colonyAddress,
-        finalizedMotion,
+        finalizedMotion.pendingDomainMetadata,
       );
     }
 
