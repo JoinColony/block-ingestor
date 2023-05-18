@@ -389,6 +389,25 @@ export const queries = {
       }
     }
   `,
+  getDomainMetadata: /* GraphQL */ `
+    query GetDomainMetadata($id: ID!) {
+      getDomainMetadata(id: $id) {
+        color
+        description
+        id
+        name
+        changelog {
+          newColor
+          newDescription
+          newName
+          oldColor
+          oldDescription
+          oldName
+          transactionHash
+        }
+      }
+    }
+  `,
 };
 
 export default (): void => {

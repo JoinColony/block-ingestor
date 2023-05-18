@@ -4,7 +4,7 @@ import { TransactionDescription } from 'ethers/lib/utils';
 import {
   ColonyMetadata,
   ColonyOperations,
-  MotionQuery,
+  DomainMetadata,
   MotionVote,
   StakerReward,
 } from '~types';
@@ -86,7 +86,7 @@ const getParsedActionFromDomainMotion = async (
 export const linkPendingDomainMetadataWithDomain = async (
   action: string,
   colonyAddress: string,
-  finalizedMotion: MotionQuery,
+  pendingDomainMetadata: DomainMetadata,
 ): Promise<void> => {
   const parsedDomainAction = await getParsedActionFromDomainMotion(
     action,
@@ -101,17 +101,63 @@ export const linkPendingDomainMetadataWithDomain = async (
 
     await mutate('createDomainMetadata', {
       input: {
-        ...finalizedMotion.pendingDomainMetadata,
+        ...pendingDomainMetadata,
         id: getDomainDatabaseId(colonyAddress, nativeDomainId),
       },
     });
   } else if (parsedDomainAction?.name === ColonyOperations.EditDomain) {
     const nativeDomainId = parsedDomainAction.args[2].toNumber(); // domainId arg from editDomain action
+    const databaseDomainId = getDomainDatabaseId(colonyAddress, nativeDomainId);
+
+    const currentDomainMetadata = await query<DomainMetadata>(
+      'getDomainMetadata',
+      {
+        id: databaseDomainId,
+      },
+    );
+
+    const updatedMetadata = {
+      ...currentDomainMetadata,
+    };
+
+    const { changelog: pendingChangelog = [] } = pendingDomainMetadata;
+
+    if (!pendingChangelog.length) {
+      console.error(
+        `Pending changelog for domain with database id: ${databaseDomainId} could not be found.
+        This is a bug and should be investigated.`,
+      );
+    }
+
+    const {
+      newColor,
+      newDescription,
+      newName,
+      oldColor,
+      oldDescription,
+      oldName,
+    } = pendingChangelog[pendingChangelog.length - 1] ?? {};
+
+    const hasColorChanged = newColor !== oldColor;
+    const hasDescriptionChanged = newDescription !== oldDescription;
+    const hasNameChanged = newName !== oldName;
+
+    if (hasColorChanged) {
+      updatedMetadata.color = newColor;
+    }
+
+    if (hasDescriptionChanged) {
+      updatedMetadata.description = newDescription;
+    }
+
+    if (hasNameChanged) {
+      updatedMetadata.name = newName;
+    }
 
     await mutate('updateDomainMetadata', {
       input: {
-        ...finalizedMotion.pendingDomainMetadata,
-        id: getDomainDatabaseId(colonyAddress, nativeDomainId),
+        ...updatedMetadata,
+        id: databaseDomainId,
       },
     });
   }
