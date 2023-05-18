@@ -3390,12 +3390,15 @@ export type UpdateStatsMutation = {
 
 export type GetColonyByNativeTokenIdQueryVariables = Exact<{
   nativeTokenId: Scalars['ID'];
+  limit?: InputMaybe<Scalars['Int']>;
+  nextToken?: InputMaybe<Scalars['String']>;
 }>;
 
 export type GetColonyByNativeTokenIdQuery = {
   __typename?: 'Query';
   listColonies?: {
     __typename?: 'ModelColonyConnection';
+    nextToken?: string | null;
     items: Array<{
       __typename?: 'Colony';
       id: string;
@@ -3639,8 +3642,16 @@ export const UpdateStatsDocument = gql`
   }
 `;
 export const GetColonyByNativeTokenIdDocument = gql`
-  query GetColonyByNativeTokenId($nativeTokenId: ID!) {
-    listColonies(filter: { colonyNativeTokenId: { eq: $nativeTokenId } }) {
+  query GetColonyByNativeTokenId(
+    $nativeTokenId: ID!
+    $limit: Int
+    $nextToken: String
+  ) {
+    listColonies(
+      filter: { colonyNativeTokenId: { eq: $nativeTokenId } }
+      limit: $limit
+      nextToken: $nextToken
+    ) {
       items {
         id
         status {
@@ -3652,6 +3663,7 @@ export const GetColonyByNativeTokenIdDocument = gql`
           recovery
         }
       }
+      nextToken
     }
   }
 `;
