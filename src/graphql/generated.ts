@@ -4162,10 +4162,12 @@ export type GetColonyQuery = { __typename?: 'Query', getColony?: { __typename?: 
 
 export type GetColonyByNativeTokenIdQueryVariables = Exact<{
   nativeTokenId: Scalars['ID'];
+  limit?: InputMaybe<Scalars['Int']>;
+  nextToken?: InputMaybe<Scalars['String']>;
 }>;
 
 
-export type GetColonyByNativeTokenIdQuery = { __typename?: 'Query', listColonies?: { __typename?: 'ModelColonyConnection', items: Array<{ __typename?: 'Colony', id: string, status?: { __typename?: 'ColonyStatus', recovery?: boolean | null, nativeToken?: { __typename?: 'NativeTokenStatus', unlocked?: boolean | null, unlockable?: boolean | null, mintable?: boolean | null } | null } | null } | null> } | null };
+export type GetColonyByNativeTokenIdQuery = { __typename?: 'Query', listColonies?: { __typename?: 'ModelColonyConnection', nextToken?: string | null, items: Array<{ __typename?: 'Colony', id: string, status?: { __typename?: 'ColonyStatus', recovery?: boolean | null, nativeToken?: { __typename?: 'NativeTokenStatus', unlocked?: boolean | null, unlockable?: boolean | null, mintable?: boolean | null } | null } | null } | null> } | null };
 
 export type GetDomainMetadataQueryVariables = Exact<{
   id: Scalars['ID'];
@@ -4624,8 +4626,12 @@ export const GetColonyDocument = gql`
 }
     ${Colony}`;
 export const GetColonyByNativeTokenIdDocument = gql`
-    query GetColonyByNativeTokenId($nativeTokenId: ID!) {
-  listColonies(filter: {colonyNativeTokenId: {eq: $nativeTokenId}}) {
+    query GetColonyByNativeTokenId($nativeTokenId: ID!, $limit: Int, $nextToken: String) {
+  listColonies(
+    filter: {colonyNativeTokenId: {eq: $nativeTokenId}}
+    limit: $limit
+    nextToken: $nextToken
+  ) {
     items {
       id
       status {
@@ -4637,6 +4643,7 @@ export const GetColonyByNativeTokenIdDocument = gql`
         recovery
       }
     }
+    nextToken
   }
 }
     `;

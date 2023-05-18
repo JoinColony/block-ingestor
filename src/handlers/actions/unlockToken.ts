@@ -29,16 +29,31 @@ export default async (event: ContractEvent): Promise<void> => {
   }
 
   const tokenAddress = await colonyClient.getToken();
+  const queryVariables: GetColonyByNativeTokenIdQueryVariables = {
+    nativeTokenId: tokenAddress,
+    limit: 1000,
+  };
 
   const { data } =
     (await query<
       GetColonyByNativeTokenIdQuery,
       GetColonyByNativeTokenIdQueryVariables
-    >(GetColonyByNativeTokenIdDocument, {
-      nativeTokenId: tokenAddress,
-    })) ?? {};
+    >(GetColonyByNativeTokenIdDocument, queryVariables)) ?? {};
 
   const colonies = data?.listColonies?.items.filter(notNull) ?? [];
+  queryVariables.nextToken = data?.listColonies?.nextToken;
+
+  while (queryVariables.nextToken) {
+    const { data: nextData } =
+      (await query<
+        GetColonyByNativeTokenIdQuery,
+        GetColonyByNativeTokenIdQueryVariables
+      >(GetColonyByNativeTokenIdDocument, queryVariables)) ?? {};
+
+    colonies.push(...(nextData?.listColonies?.items.filter(notNull) ?? []));
+
+    queryVariables.nextToken = nextData?.listColonies?.nextToken;
+  }
 
   colonies.forEach(async (colony) => {
     await mutate<UpdateColonyMutation, UpdateColonyMutationVariables>(

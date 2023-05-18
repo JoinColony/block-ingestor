@@ -27,8 +27,16 @@ query GetColony($id: ID!) {
   }
 }
 
-query GetColonyByNativeTokenId($nativeTokenId: ID!) {
-  listColonies(filter: { colonyNativeTokenId: { eq: $nativeTokenId } }) {
+query GetColonyByNativeTokenId(
+  $nativeTokenId: ID!
+  $limit: Int
+  $nextToken: String
+) {
+  listColonies(
+    filter: { colonyNativeTokenId: { eq: $nativeTokenId } }
+    limit: $limit
+    nextToken: $nextToken
+  ) {
     items {
       id
       status {
@@ -40,5 +48,6 @@ query GetColonyByNativeTokenId($nativeTokenId: ID!) {
         recovery
       }
     }
+    nextToken
   }
 }
