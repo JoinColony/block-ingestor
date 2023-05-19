@@ -3,7 +3,11 @@
 import { ColonyRole, Id } from '@colony/colony-js';
 
 import { mutate, query } from '~amplifyClient';
-import { ContractEvent, ContractEventsSignatures, ColonyActionType } from '~types';
+import {
+  ContractEvent,
+  ContractEventsSignatures,
+  ColonyActionType,
+} from '~types';
 import {
   verbose,
   getCachedColonyClient,
@@ -15,6 +19,12 @@ import {
   GetColonyHistoricRoleQuery,
   GetColonyHistoricRoleQueryVariables,
   GetColonyHistoricRoleDocument,
+  CreateColonyRoleMutation,
+  CreateColonyRoleMutationVariables,
+  CreateColonyRoleDocument,
+  CreateColonyHistoricRoleMutation,
+  CreateColonyHistoricRoleMutationVariables,
+  CreateColonyHistoricRoleDocument,
 } from '~graphql';
 
 const BASE_ROLES_MAP = {
@@ -37,26 +47,41 @@ export const getColonyHistoricRolesDatabaseId = (
   nativeDomainId: number,
   userAddress: string,
   blockNumber: number,
-): string => `${colonyAddress}_${nativeDomainId}_${userAddress}_${blockNumber}_roles`;
+): string =>
+  `${colonyAddress}_${nativeDomainId}_${userAddress}_${blockNumber}_roles`;
 
 export const getAllRoleEventsFromTransaction = async (
   transactionHash: string,
   colonyAddress: string,
 ): Promise<ContractEvent[]> => {
-  const colonyRoleSetEventName = ContractEventsSignatures.ColonyRoleSet.slice(0, ContractEventsSignatures.ColonyRoleSet.indexOf('('));
-  const colonyRecoveryRoleSetName = ContractEventsSignatures.RecoveryRoleSet.slice(0, ContractEventsSignatures.RecoveryRoleSet.indexOf('('));
+  const colonyRoleSetEventName = ContractEventsSignatures.ColonyRoleSet.slice(
+    0,
+    ContractEventsSignatures.ColonyRoleSet.indexOf('('),
+  );
+  const colonyRecoveryRoleSetName =
+    ContractEventsSignatures.RecoveryRoleSet.slice(
+      0,
+      ContractEventsSignatures.RecoveryRoleSet.indexOf('('),
+    );
 
   const colonyClient = await getCachedColonyClient(colonyAddress);
-  const transactionReceipt = await colonyClient.provider.getTransactionReceipt(transactionHash);
-
-  const events = await Promise.all(
-    transactionReceipt.logs.map(log => mapLogToContractEvent(log, colonyClient.interface)),
+  const transactionReceipt = await colonyClient.provider.getTransactionReceipt(
+    transactionHash,
   );
 
-  const filteredEvents = events.filter(event => {
+  const events = await Promise.all(
+    transactionReceipt.logs.map((log) =>
+      mapLogToContractEvent(log, colonyClient.interface),
+    ),
+  );
+
+  const filteredEvents = events.filter((event) => {
     if (
       !event ||
-      !(event.name === colonyRoleSetEventName || event.name === colonyRecoveryRoleSetName)
+      !(
+        event.name === colonyRoleSetEventName ||
+        event.name === colonyRecoveryRoleSetName
+      )
     ) {
       return false;
     }
@@ -70,13 +95,13 @@ export const getAllRoleEventsFromTransaction = async (
   return filteredEvents as ContractEvent[];
 };
 
-export const getRolesMapFromEvents = (roleEvents: ContractEvent[], setToNull: boolean = true): Record<string, boolean | null> => {
+export const getRolesMapFromEvents = (
+  roleEvents: ContractEvent[],
+  setToNull: boolean = true,
+): Record<string, boolean | null> => {
   let roleMap = {};
 
-  roleEvents.map(({
-    signature,
-    args: { role, setTo },
-  }) => {
+  roleEvents.map(({ signature, args: { role, setTo } }) => {
     /*
      * @NOTE This logic is begining to get kinda complicated so I'm going to attempt to explain it
      *
@@ -91,7 +116,11 @@ export const getRolesMapFromEvents = (roleEvents: ContractEvent[], setToNull: bo
      * to display in the Action's text. For this we use `setToNull`, which, when set (on by default), changes the "off" state to null, and when it's
      * not being set, changes the "off" state to false
      */
-    const roleValue = { [`role_${signature === ContractEventsSignatures.RecoveryRoleSet ? 0 : role}`]: setTo || (setToNull ? null : setTo) };
+    const roleValue = {
+      [`role_${
+        signature === ContractEventsSignatures.RecoveryRoleSet ? 0 : role
+      }`]: setTo || (setToNull ? null : setTo),
+    };
     roleMap = {
       ...roleMap,
       ...roleValue,
@@ -108,17 +137,45 @@ export const createInitialColonyRolesDatabaseEntry = async (
   targetAddress: string,
   transactionHash: string,
 ): Promise<void> => {
-  const rolesDatabaseId = getColonyRolesDatabaseId(colonyAddress, nativeDomainId, targetAddress);
+  const rolesDatabaseId = getColonyRolesDatabaseId(
+    colonyAddress,
+    nativeDomainId,
+    targetAddress,
+  );
   const domainDatabaseId = getDomainDatabaseId(colonyAddress, nativeDomainId);
 
   const colonyClient = await getCachedColonyClient(colonyAddress);
 
-  const recoveryRole = await colonyClient.hasUserRole(targetAddress, nativeDomainId, ColonyRole.Recovery);
-  const rootRole = await colonyClient.hasUserRole(targetAddress, nativeDomainId, ColonyRole.Root);
-  const arbitrationRole = await colonyClient.hasUserRole(targetAddress, nativeDomainId, ColonyRole.Arbitration);
-  const architectureRole = await colonyClient.hasUserRole(targetAddress, nativeDomainId, ColonyRole.Architecture);
-  const fundingRole = await colonyClient.hasUserRole(targetAddress, nativeDomainId, ColonyRole.Funding);
-  const administrationRole = await colonyClient.hasUserRole(targetAddress, nativeDomainId, ColonyRole.Administration);
+  const recoveryRole = await colonyClient.hasUserRole(
+    targetAddress,
+    nativeDomainId,
+    ColonyRole.Recovery,
+  );
+  const rootRole = await colonyClient.hasUserRole(
+    targetAddress,
+    nativeDomainId,
+    ColonyRole.Root,
+  );
+  const arbitrationRole = await colonyClient.hasUserRole(
+    targetAddress,
+    nativeDomainId,
+    ColonyRole.Arbitration,
+  );
+  const architectureRole = await colonyClient.hasUserRole(
+    targetAddress,
+    nativeDomainId,
+    ColonyRole.Architecture,
+  );
+  const fundingRole = await colonyClient.hasUserRole(
+    targetAddress,
+    nativeDomainId,
+    ColonyRole.Funding,
+  );
+  const administrationRole = await colonyClient.hasUserRole(
+    targetAddress,
+    nativeDomainId,
+    ColonyRole.Administration,
+  );
 
   const role_0 = recoveryRole || null;
   const role_1 = rootRole || null;
@@ -127,46 +184,59 @@ export const createInitialColonyRolesDatabaseEntry = async (
   const role_5 = fundingRole || null;
   const role_6 = administrationRole || null;
 
-  const colonyRoleSetEventName = ContractEventsSignatures.ColonyRoleSet.slice(0, ContractEventsSignatures.ColonyRoleSet.indexOf('('));
-  const events = await getAllRoleEventsFromTransaction(transactionHash, colonyAddress);
-  const firstRoleSetEvent = events.find(({ signature }) => signature === ContractEventsSignatures.ColonyRoleSet);
-  const recoveryRoleSetEvent = events.find(({ signature }) => signature === ContractEventsSignatures.RecoveryRoleSet);
+  const colonyRoleSetEventName = ContractEventsSignatures.ColonyRoleSet.slice(
+    0,
+    ContractEventsSignatures.ColonyRoleSet.indexOf('('),
+  );
+  const events = await getAllRoleEventsFromTransaction(
+    transactionHash,
+    colonyAddress,
+  );
+  const firstRoleSetEvent = events.find(
+    ({ signature }) => signature === ContractEventsSignatures.ColonyRoleSet,
+  );
+  const recoveryRoleSetEvent = events.find(
+    ({ signature }) => signature === ContractEventsSignatures.RecoveryRoleSet,
+  );
   const blockNumber = firstRoleSetEvent?.blockNumber ?? 0;
 
-  await mutate('createColonyRole', {
-    input: {
-      id: rolesDatabaseId,
-      latestBlock: blockNumber,
-      // Link the Domain Model
-      colonyRoleDomainId: domainDatabaseId,
-      // Link the Colony Model
-      colonyRolesId: colonyAddress,
-      /*
-       * @NOTE Link the target
-       *
-       * Note that this handler will fire even for events where the target
-       * is something or someone not in the database.
-       *
-       * We try to account for this, by linking address to either a user, colony, or
-       * extension via the target address, but it can happen regardless as the
-       * address can be totally random
-       *
-       * Make sure to be aware of that when fetching the query (you can still fetch
-       * the "targetAddress" value manually, and linking it yourself to the
-       * appropriate entity)
-       */
-      targetAddress,
+  await mutate<CreateColonyRoleMutation, CreateColonyRoleMutationVariables>(
+    CreateColonyRoleDocument,
+    {
+      input: {
+        id: rolesDatabaseId,
+        latestBlock: blockNumber,
+        // Link the Domain Model
+        colonyRoleDomainId: domainDatabaseId,
+        // Link the Colony Model
+        colonyRolesId: colonyAddress,
+        /*
+         * @NOTE Link the target
+         *
+         * Note that this handler will fire even for events where the target
+         * is something or someone not in the database.
+         *
+         * We try to account for this, by linking address to either a user, colony, or
+         * extension via the target address, but it can happen regardless as the
+         * address can be totally random
+         *
+         * Make sure to be aware of that when fetching the query (you can still fetch
+         * the "targetAddress" value manually, and linking it yourself to the
+         * appropriate entity)
+         */
+        targetAddress,
 
-      // Set the permissions
-      ...BASE_ROLES_MAP,
-      role_0,
-      role_1,
-      role_2,
-      role_3,
-      role_5,
-      role_6,
+        // Set the permissions
+        ...BASE_ROLES_MAP,
+        role_0,
+        role_1,
+        role_2,
+        role_3,
+        role_5,
+        role_6,
+      },
     },
-  });
+  );
 
   verbose(
     `Create new Roles entry for ${targetAddress} in colony ${colonyAddress}, under domain ${nativeDomainId}`,
@@ -193,8 +263,8 @@ export const createInitialColonyRolesDatabaseEntry = async (
 
   if (firstRoleSetEvent?.signature === ContractEventsSignatures.ColonyRoleSet) {
     /*
-    * Create the action
-    */
+     * Create the action
+     */
     await writeActionFromEvent(firstRoleSetEvent, colonyAddress, {
       type: ColonyActionType.SetUserRoles,
       fromDomainId: domainDatabaseId,
@@ -209,33 +279,35 @@ export const createInitialColonyRolesDatabaseEntry = async (
         role_5,
         role_6,
       },
-      individualEvents: JSON.stringify(
-        [
-          ...events
-            .filter(({ signature }) => signature !== ContractEventsSignatures.RecoveryRoleSet)
-            .map(({
-              name,
-              args: { role, setTo },
-              transactionHash,
-              logIndex,
-            }) => ({
+      individualEvents: JSON.stringify([
+        ...events
+          .filter(
+            ({ signature }) =>
+              signature !== ContractEventsSignatures.RecoveryRoleSet,
+          )
+          .map(
+            ({ name, args: { role, setTo }, transactionHash, logIndex }) => ({
               id: `${transactionHash}_${logIndex}`,
               type: name,
               role,
               setTo,
-            })),
-          /*
-           * THis is disabled b/c eslint's style cleanup breaks the layout somehow...
-           */
-          // eslint-disable-next-line multiline-ternary
-          ...(recoveryRoleSetEvent ? [{
-            id: `${recoveryRoleSetEvent.transactionHash}_${recoveryRoleSetEvent.logIndex}`,
-            type: colonyRoleSetEventName,
-            role: 0,
-            setTo: recoveryRoleSetEvent.args.setTo,
-          }] : []),
-        ],
-      ),
+            }),
+          ),
+        /*
+         * THis is disabled b/c eslint's style cleanup breaks the layout somehow...
+         */
+        // eslint-disable-next-line multiline-ternary
+        ...(recoveryRoleSetEvent
+          ? [
+              {
+                id: `${recoveryRoleSetEvent.transactionHash}_${recoveryRoleSetEvent.logIndex}`,
+                type: colonyRoleSetEventName,
+                role: 0,
+                setTo: recoveryRoleSetEvent.args.setTo,
+              },
+            ]
+          : []),
+      ]),
     });
   }
 };
@@ -244,19 +316,36 @@ export const createInitialColonyRolesDatabaseEntry = async (
  * This is designed to run at the time a new colony has been created
  * and it expects to be passed the ColonyAdded event
  */
-export const createColonyFounderInitialRoleEntry = async (event: ContractEvent): Promise<void> => {
+export const createColonyFounderInitialRoleEntry = async (
+  event: ContractEvent,
+): Promise<void> => {
   const { name, transactionHash, args } = event;
   const { colonyAddress } = args;
 
-  const ColonyAddedEventName = ContractEventsSignatures.ColonyAdded.slice(0, ContractEventsSignatures.ColonyAdded.indexOf('('));
-  const ColonyRoleSetEventName = ContractEventsSignatures.ColonyRoleSet.slice(0, ContractEventsSignatures.ColonyRoleSet.indexOf('('));
+  const ColonyAddedEventName = ContractEventsSignatures.ColonyAdded.slice(
+    0,
+    ContractEventsSignatures.ColonyAdded.indexOf('('),
+  );
+  const ColonyRoleSetEventName = ContractEventsSignatures.ColonyRoleSet.slice(
+    0,
+    ContractEventsSignatures.ColonyRoleSet.indexOf('('),
+  );
 
   if (name !== ColonyAddedEventName) {
-    throw new Error('The event passed in is not the "ColonyAdded" event. We can\'t determine the colony\'s founder otherwise');
+    throw new Error(
+      'The event passed in is not the "ColonyAdded" event. We can\'t determine the colony\'s founder otherwise',
+    );
   }
 
-  const events = await getAllRoleEventsFromTransaction(transactionHash, colonyAddress);
-  const { args: { user: colonyFounderAddress } } = events.find(event => event?.name === ColonyRoleSetEventName) ?? { args: { user: '' } };
+  const events = await getAllRoleEventsFromTransaction(
+    transactionHash,
+    colonyAddress,
+  );
+  const {
+    args: { user: colonyFounderAddress },
+  } = events.find((event) => event?.name === ColonyRoleSetEventName) ?? {
+    args: { user: '' },
+  };
 
   await createInitialColonyRolesDatabaseEntry(
     colonyAddress,
@@ -279,18 +368,27 @@ export const createColonyHistoricRoleDatabaseEntry = async (
   blockNumber: number,
   roles: Record<string, boolean | null> = BASE_ROLES_MAP,
 ): Promise<void> => {
-  const id = getColonyHistoricRolesDatabaseId(colonyAddress, nativeDomainId, targetAddress, blockNumber);
+  const id = getColonyHistoricRolesDatabaseId(
+    colonyAddress,
+    nativeDomainId,
+    targetAddress,
+    blockNumber,
+  );
   const domainDatabaseId = getDomainDatabaseId(colonyAddress, nativeDomainId);
 
-  const {
-    id: existingColonyRoleId,
-  } = (await query<
-    GetColonyHistoricRoleQuery,
-    GetColonyHistoricRoleQueryVariables
-    >(GetColonyHistoricRoleDocument, { id }))?.data?.getColonyHistoricRole || {};
+  const { id: existingColonyRoleId } =
+    (
+      await query<
+        GetColonyHistoricRoleQuery,
+        GetColonyHistoricRoleQueryVariables
+      >(GetColonyHistoricRoleDocument, { id })
+    )?.data?.getColonyHistoricRole ?? {};
 
   if (!existingColonyRoleId) {
-    await mutate('createColonyHistoricRole', {
+    await mutate<
+      CreateColonyHistoricRoleMutation,
+      CreateColonyHistoricRoleMutationVariables
+    >(CreateColonyHistoricRoleDocument, {
       input: {
         id,
         // Look in schema.grapql (in the CDapp) about why this is needed

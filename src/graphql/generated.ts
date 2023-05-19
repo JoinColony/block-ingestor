@@ -3224,6 +3224,36 @@ export type UpdateCurrentNetworkInverseFeeMutation = {
   } | null;
 };
 
+export type CreateColonyRoleMutationVariables = Exact<{
+  input: CreateColonyRoleInput;
+}>;
+
+export type CreateColonyRoleMutation = {
+  __typename?: 'Mutation';
+  createColonyRole?: { __typename?: 'ColonyRole'; id: string } | null;
+};
+
+export type UpdateColonyRoleMutationVariables = Exact<{
+  input: UpdateColonyRoleInput;
+}>;
+
+export type UpdateColonyRoleMutation = {
+  __typename?: 'Mutation';
+  updateColonyRole?: { __typename?: 'ColonyRole'; id: string } | null;
+};
+
+export type CreateColonyHistoricRoleMutationVariables = Exact<{
+  input: CreateColonyHistoricRoleInput;
+}>;
+
+export type CreateColonyHistoricRoleMutation = {
+  __typename?: 'Mutation';
+  createColonyHistoricRole?: {
+    __typename?: 'ColonyHistoricRole';
+    id: string;
+  } | null;
+};
+
 export type GetContractEventQueryVariables = Exact<{
   id: Scalars['ID'];
 }>;
@@ -3403,6 +3433,27 @@ export const UpdateCurrentNetworkInverseFeeDocument = gql`
     $input: UpdateCurrentNetworkInverseFeeInput!
   ) {
     updateCurrentNetworkInverseFee(input: $input) {
+      id
+    }
+  }
+`;
+export const CreateColonyRoleDocument = gql`
+  mutation CreateColonyRole($input: CreateColonyRoleInput!) {
+    createColonyRole(input: $input) {
+      id
+    }
+  }
+`;
+export const UpdateColonyRoleDocument = gql`
+  mutation UpdateColonyRole($input: UpdateColonyRoleInput!) {
+    updateColonyRole(input: $input) {
+      id
+    }
+  }
+`;
+export const CreateColonyHistoricRoleDocument = gql`
+  mutation CreateColonyHistoricRole($input: CreateColonyHistoricRoleInput!) {
+    createColonyHistoricRole(input: $input) {
       id
     }
   }

@@ -118,27 +118,6 @@ export const mutations = {
       }
     }
   `,
-  createColonyRole: /* GraphQL */ `
-    mutation CreateColonyRole($input: CreateColonyRoleInput!) {
-      createColonyRole(input: $input) {
-        id
-      }
-    }
-  `,
-  updateColonyRole: /* GraphQL */ `
-    mutation UpdateColonyRole($input: UpdateColonyRoleInput!) {
-      updateColonyRole(input: $input) {
-        id
-      }
-    }
-  `,
-  createColonyHistoricRole: /* GraphQL */ `
-    mutation CreateColonyHistoricRole($input: CreateColonyHistoricRoleInput!) {
-      createColonyHistoricRole(input: $input) {
-        id
-      }
-    }
-  `,
 };
 
 /*
