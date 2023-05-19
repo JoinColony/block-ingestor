@@ -188,27 +188,6 @@ export const queries = {
       }
     }
   `,
-  getColonyRole: /* GraphQL */ `
-    query GetColonyRole($id: ID!) {
-      getColonyRole(id: $id) {
-        id
-        latestBlock
-        role_0
-        role_1
-        role_2
-        role_3
-        role_5
-        role_6
-      }
-    }
-  `,
-  getColonyHistoricRole: /* GraphQL */ `
-    query GetColonyHistoricRole($id: ID!) {
-      getColonyHistoricRole(id: $id) {
-        id
-      }
-    }
-  `,
 };
 
 export default (): void => {

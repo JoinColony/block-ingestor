@@ -3,7 +3,7 @@ import { CodegenConfig } from '@graphql-codegen/cli';
 
 dotenv.config();
 
-const endpoint = `${process.env.AWS_APPSYNC_ENDPOINT}/graphql`;
+const endpoint = `${process.env.AWS_APPSYNC_ENDPOINT}`;
 
 const config: CodegenConfig = {
   schema: [

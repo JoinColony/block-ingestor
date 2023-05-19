@@ -10,6 +10,11 @@ import {
   verbose,
   writeActionFromEvent,
 } from '~utils';
+import {
+  GetColonyRoleQuery,
+  GetColonyRoleQueryVariables,
+  GetColonyRoleDocument,
+} from '~graphql';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { args, contractAddress, blockNumber, transactionHash } = event;
@@ -25,9 +30,12 @@ export default async (event: ContractEvent): Promise<void> => {
 
   const {
     id: existingColonyRoleId,
-    latestBlock: existingColonyRoleLatestBlock,
+    latestBlock: existingColonyRoleLatestBlock = 0,
     ...existingRoles
-  } = (await query('getColonyRole', { id })) || {};
+  } = (await query<
+    GetColonyRoleQuery,
+    GetColonyRoleQueryVariables
+      >(GetColonyRoleDocument, { id }))?.data?.getColonyRole ?? {};
 
   /*
    * update the entry
@@ -43,7 +51,7 @@ export default async (event: ContractEvent): Promise<void> => {
      * (it doesn't break anything, as the GraphQL server will just discard it with an error,
      * but it just adds more travel time which is wasted)
      */
-    if (blockNumber > parseInt(existingColonyRoleLatestBlock, 10)) {
+    if (blockNumber > existingColonyRoleLatestBlock) {
       const allRoleEventsUpdates = await getAllRoleEventsFromTransaction(transactionHash, contractAddress);
       const rolesFromAllUpdateEvents = getRolesMapFromEvents(allRoleEventsUpdates);
       const rolesFromAllUpdateEventsForAction = getRolesMapFromEvents(allRoleEventsUpdates, false);

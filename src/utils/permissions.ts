@@ -4,7 +4,6 @@ import { ColonyRole, Id } from '@colony/colony-js';
 
 import { mutate, query } from '~amplifyClient';
 import { ContractEvent, ContractEventsSignatures, ColonyActionType } from '~types';
-
 import {
   verbose,
   getCachedColonyClient,
@@ -12,6 +11,11 @@ import {
   mapLogToContractEvent,
   writeActionFromEvent,
 } from '~utils';
+import {
+  GetColonyHistoricRoleQuery,
+  GetColonyHistoricRoleQueryVariables,
+  GetColonyHistoricRoleDocument,
+} from '~graphql';
 
 const BASE_ROLES_MAP = {
   [`role_${ColonyRole.Recovery}`]: null,
@@ -280,7 +284,10 @@ export const createColonyHistoricRoleDatabaseEntry = async (
 
   const {
     id: existingColonyRoleId,
-  } = (await query('getColonyHistoricRole', { id })) || {};
+  } = (await query<
+    GetColonyHistoricRoleQuery,
+    GetColonyHistoricRoleQueryVariables
+    >(GetColonyHistoricRoleDocument, { id }))?.data?.getColonyHistoricRole || {};
 
   if (!existingColonyRoleId) {
     await mutate('createColonyHistoricRole', {
