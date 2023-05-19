@@ -20,6 +20,7 @@ import {
   GetContractEventDocument,
   GetContractEventQuery,
   GetContractEventQueryVariables,
+  ChainMetadataInput,
 } from '~graphql';
 
 import { getExtensionContract } from './extensions';
@@ -232,7 +233,7 @@ export const saveEvent = async (event: ContractEvent): Promise<void> => {
   const contractEvent: {
     id: string;
     agent: string;
-    chainMetadata: Record<string, string | number>;
+    chainMetadata: ChainMetadataInput;
     name: string;
     signature: string;
     target: string;
