@@ -1,12 +1,11 @@
-import { ClientType, Extension, getTokenClient } from '@colony/colony-js';
-import { Log, Provider } from '@ethersproject/abstract-provider';
+import { ClientType, getTokenClient } from '@colony/colony-js';
+import { Log } from '@ethersproject/abstract-provider';
 import { utils } from 'ethers';
 
 import { query } from '~amplifyClient';
 import { addEvent } from '~eventQueue';
-import networkClient from '~networkClient';
-import { ContractEventsSignatures, NetworkClients } from '~types';
-import { verbose } from '~utils';
+import { ContractEventsSignatures, Filter, NetworkClients } from '~types';
+import { getClient, verbose } from '~utils';
 
 import { saveRemover } from './listenerRemover';
 
@@ -22,10 +21,10 @@ export const eventListenerGenerator = async (
   clientType: ClientType = ClientType.NetworkClient,
   isRemovable: boolean = false,
 ): Promise<void> => {
-  const { client, provider } = await getClientAndProvider(
-    clientType,
-    contractAddress,
-  );
+  const client = await getClient(clientType, contractAddress);
+  if (!client) {
+    return;
+  }
 
   const filter = getEventFilter(eventSignature, contractAddress, clientType);
 
@@ -36,9 +35,10 @@ export const eventListenerGenerator = async (
   );
 
   const handleEvent = async (log: Log): Promise<void> => {
-    await addEventToQueue(client, clientType, contractAddress, log, provider);
+    await addEventToQueue(client, clientType, contractAddress, log);
   };
 
+  const { provider } = client;
   provider.on(filter, handleEvent);
 
   if (isRemovable) {
@@ -56,37 +56,6 @@ export const eventListenerGenerator = async (
 };
 
 /**
- * Handle the event listener generator-specific client and provider logic
- */
-const getClientAndProvider = async (
-  clientType: ClientType,
-  contractAddress: string,
-): Promise<{ client: NetworkClients; provider: Provider }> => {
-  let client: NetworkClients = networkClient;
-  let { provider } = client;
-
-  switch (clientType) {
-    case ClientType.ColonyClient: {
-      client = await networkClient.getColonyClient(contractAddress);
-      break;
-    }
-    case ClientType.VotingReputationClient: {
-      const colonyClient = await networkClient.getColonyClient(contractAddress);
-      client = await colonyClient.getExtensionClient(
-        Extension.VotingReputation,
-      );
-      provider = client.provider;
-      break;
-    }
-    default: {
-      break;
-    }
-  }
-
-  return { client: client as NetworkClients, provider };
-};
-
-/**
  * Get the event filter for the event listener generator.
  *
  */
@@ -94,15 +63,15 @@ export const getEventFilter = (
   eventSignature: string,
   contractAddress: string,
   clientType: ClientType = ClientType.ColonyClient,
-): { topics: Array<string | null>; address?: string } => {
-  const filter: { topics: Array<string | null>; address?: string } = {
+): Filter => {
+  const filter: Filter = {
     topics: [utils.id(eventSignature)],
   };
 
   switch (clientType) {
     case ClientType.TokenClient: {
       filter.topics = [
-        ...filter.topics,
+        ...(filter.topics ?? []),
         null,
         utils.hexZeroPad(contractAddress, 32),
       ];
@@ -130,7 +99,6 @@ const addEventToQueue = async (
   clientType: ClientType,
   contractAddress: string,
   log: Log,
-  provider: Provider,
 ): Promise<void> => {
   const {
     transactionHash,
@@ -139,6 +107,7 @@ const addEventToQueue = async (
     address: eventContractAddress,
   } = log;
   try {
+    const { provider } = client;
     const { hash: blockHash, timestamp } = await provider.getBlock(blockNumber);
 
     const event = {
