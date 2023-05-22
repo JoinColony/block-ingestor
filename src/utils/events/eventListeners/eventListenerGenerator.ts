@@ -90,10 +90,10 @@ const getClientAndProvider = async (
  * Get the event filter for the event listener generator.
  *
  */
-const getEventFilter = (
+export const getEventFilter = (
   eventSignature: string,
   contractAddress: string,
-  clientType: ClientType,
+  clientType: ClientType = ClientType.ColonyClient,
 ): { topics: Array<string | null>; address?: string } => {
   const filter: { topics: Array<string | null>; address?: string } = {
     topics: [utils.id(eventSignature)],

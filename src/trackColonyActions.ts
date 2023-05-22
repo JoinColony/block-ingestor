@@ -1,5 +1,4 @@
 import { getLogs } from '@colony/colony-js';
-import { utils } from 'ethers';
 
 import {
   handleCreateDomainAction,
@@ -13,16 +12,13 @@ import {
   handleVersionUpgradeAction,
 } from '~handlers';
 import networkClient from '~networkClient';
-import { ColonyActionHandler, ContractEventsSignatures, Filter } from '~types';
-import { getCachedColonyClient, mapLogToContractEvent, verbose } from '~utils';
-
-const getFilter = (
-  eventSignature: ContractEventsSignatures,
-  colonyAddress: string,
-): Filter => ({
-  topics: [utils.id(eventSignature)],
-  address: colonyAddress,
-});
+import { ColonyActionHandler, ContractEventsSignatures } from '~types';
+import {
+  getCachedColonyClient,
+  getEventFilter,
+  mapLogToContractEvent,
+  verbose,
+} from '~utils';
 
 /**
  * This function get logs for a particular event, parses them and call a relevant action handler to act upon it
@@ -37,7 +33,7 @@ const trackActionsByEvent = async (
   handler: ColonyActionHandler,
 ): Promise<void> => {
   const colonyClient = await getCachedColonyClient(colonyAddress);
-  const filter = getFilter(eventSignature, colonyAddress);
+  const filter = getEventFilter(eventSignature, colonyAddress);
   const logs = await getLogs(networkClient, filter);
   logs.forEach(async (log) => {
     const event = await mapLogToContractEvent(log, colonyClient.interface);
