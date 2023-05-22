@@ -35,8 +35,9 @@ export default async (event: ContractEvent): Promise<void> => {
       GetColonyByNativeTokenIdQueryVariables
     >(GetColonyByNativeTokenIdDocument, queryVariables)) ?? {};
 
-  const colonies = data?.listColonies?.items.filter(notNull) ?? [];
-  queryVariables.nextToken = data?.listColonies?.nextToken;
+  const colonies =
+    data?.getColoniesByNativeTokenId?.items.filter(notNull) ?? [];
+  queryVariables.nextToken = data?.getColoniesByNativeTokenId?.nextToken;
 
   while (queryVariables.nextToken) {
     const { data: nextData } =
@@ -45,9 +46,11 @@ export default async (event: ContractEvent): Promise<void> => {
         GetColonyByNativeTokenIdQueryVariables
       >(GetColonyByNativeTokenIdDocument, queryVariables)) ?? {};
 
-    colonies.push(...(nextData?.listColonies?.items.filter(notNull) ?? []));
+    colonies.push(
+      ...(nextData?.getColoniesByNativeTokenId?.items.filter(notNull) ?? []),
+    );
 
-    queryVariables.nextToken = nextData?.listColonies?.nextToken;
+    queryVariables.nextToken = nextData?.getColoniesByNativeTokenId?.nextToken;
   }
 
   colonies.forEach(async (colony) => {
