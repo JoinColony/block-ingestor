@@ -32,8 +32,8 @@ query GetColonyByNativeTokenId(
   $limit: Int
   $nextToken: String
 ) {
-  listColonies(
-    filter: { colonyNativeTokenId: { eq: $nativeTokenId } }
+  getColoniesByNativeTokenId(
+    nativeTokenId: $nativeTokenId
     limit: $limit
     nextToken: $nextToken
   ) {
