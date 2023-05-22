@@ -1,4 +1,4 @@
-import { getCachedColonyClient } from './colonyClient';
+import { getCachedColonyClient } from '~utils';
 
 export const getColonyTokenAddress = async (
   colonyAddress: string,
