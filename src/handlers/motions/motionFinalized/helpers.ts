@@ -1,9 +1,18 @@
 import { BigNumber } from 'ethers';
 import { TransactionDescription } from 'ethers/lib/utils';
 
-import { ColonyOperations, MotionQuery, MotionVote, StakerReward } from '~types';
-import { getDomainDatabaseId, getVotingClient, verbose } from '~utils';
-import networkClient from '~networkClient';
+import {
+  ColonyOperations,
+  MotionQuery,
+  MotionVote,
+  StakerReward,
+} from '~types';
+import {
+  getCachedColonyClient,
+  getDomainDatabaseId,
+  getVotingClient,
+  verbose,
+} from '~utils';
 import { mutate } from '~amplifyClient';
 
 export const getStakerReward = async (
@@ -57,7 +66,7 @@ const getParsedActionFromDomainMotion = async (
   domainAction: string,
   colonyAddress: string,
 ): Promise<TransactionDescription | undefined> => {
-  const colonyClient = await networkClient.getColonyClient(colonyAddress);
+  const colonyClient = await getCachedColonyClient(colonyAddress);
 
   // We are only parsing this action in order to know if it's a add/edit domain motion. Therefore, we shouldn't need to try with any other client.
   try {
@@ -70,10 +79,17 @@ const getParsedActionFromDomainMotion = async (
   }
 };
 
-export const linkPendingDomainMetadataWithDomain = async (action: string, colonyAddress: string, finalizedMotion: MotionQuery): Promise<void> => {
-  const parsedDomainAction = await getParsedActionFromDomainMotion(action, colonyAddress);
+export const linkPendingDomainMetadataWithDomain = async (
+  action: string,
+  colonyAddress: string,
+  finalizedMotion: MotionQuery,
+): Promise<void> => {
+  const parsedDomainAction = await getParsedActionFromDomainMotion(
+    action,
+    colonyAddress,
+  );
   if (parsedDomainAction?.name === ColonyOperations.AddDomain) {
-    const colonyClient = await networkClient.getColonyClient(colonyAddress);
+    const colonyClient = await getCachedColonyClient(colonyAddress);
     const domainCount = await colonyClient.getDomainCount();
     // The new domain should be created by now, so we just get the total of existing domains
     // and use that as an id to link the pending metadata.
