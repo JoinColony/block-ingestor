@@ -11,7 +11,7 @@ import {
   getDomainDatabaseId,
   verbose,
   getCachedColonyClient,
-  isSupportedColonyClient,
+  isDomainFromFundingPotSupported,
 } from '~utils';
 import provider from '~provider';
 
@@ -40,7 +40,7 @@ export default async (event: ContractEvent): Promise<void> => {
   const colonyClient = await getCachedColonyClient(colonyAddress);
   let fromDomainId: BigNumber | undefined;
   let toDomainId: BigNumber | undefined;
-  if (isSupportedColonyClient(colonyClient)) {
+  if (isDomainFromFundingPotSupported(colonyClient)) {
     fromDomainId = await colonyClient.getDomainFromFundingPot(fromPot);
     toDomainId = await colonyClient.getDomainFromFundingPot(toPot);
   }
