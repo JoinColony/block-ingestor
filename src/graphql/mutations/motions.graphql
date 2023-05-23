@@ -1,10 +1,10 @@
-mutation CreateColonyMotion($input: ColonyMotionInput!) {
+mutation CreateColonyMotion($input: CreateColonyMotionInput!) {
   createColonyMotion(input: $input) {
     id
   }
 }
 
-mutation UpdateColonyMotion($input: ColonyMotionInput!) {
+mutation UpdateColonyMotion($input: UpdateColonyMotionInput!) {
   updateColonyMotion(input: $input) {
     id
   }
