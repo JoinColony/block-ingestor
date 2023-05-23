@@ -12,8 +12,7 @@ import {
 
 import {
   getStakerReward,
-  linkPendingColonyMetadataWithColony,
-  linkPendingDomainMetadataWithDomain,
+  linkPendingMetadata,
 } from './helpers';
 
 export default async (event: ContractEvent): Promise<void> => {
@@ -48,25 +47,8 @@ export default async (event: ContractEvent): Promise<void> => {
       BigNumber.from(yayVotes).gt(nayVotes) ||
       Number(yayPercentage) > Number(nayPercentage);
 
-    /*
-     * pendingDomainMetadata is a motion data prop that we use to store the metadata of a Domain that COULD be created/edited
-     * if the YAY side of the motion won and the motion was finalized. In this step, if the motion has passed and has a pendingDomainMetadata prop,
-     * then we can assume that the motion's action is a domain action and we need to link this provisional DomainMetadata to the REAL Domain by creating
-     * a new DomainMetadata with the corresponding Domain item id.
-     */
     if (yayWon) {
-      await linkPendingDomainMetadataWithDomain(
-        action,
-        colonyAddress,
-        finalizedMotion,
-      );
-    }
-
-    if (finalizedMotion.pendingColonyMetadata && yayWon) {
-      await linkPendingColonyMetadataWithColony(
-        finalizedMotion.pendingColonyMetadata,
-        colonyAddress,
-      );
+      await linkPendingMetadata(action, colonyAddress, finalizedMotion);
     }
 
     const updatedStakerRewards = await Promise.all(
