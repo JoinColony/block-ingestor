@@ -72,10 +72,15 @@ const getMotionData = async ({
   );
 
   const { chainId } = await votingClient.provider.getNetwork();
+  const motionDatabaseId = getMotionDatabaseId(
+    chainId,
+    votingClient.address,
+    motionId,
+  );
 
   return {
     createdBy: votingClient.address,
-    id: getMotionDatabaseId(chainId, votingClient.address, motionId),
+    id: motionDatabaseId,
     nativeMotionId: motionId.toString(),
     motionStakes: {
       raw: {
@@ -121,6 +126,7 @@ const getMotionData = async ({
         name: MotionEvents.MotionCreated,
         messageKey: getMessageKey(transactionHash, logIndex),
         initiatorAddress: creatorAddress,
+        motionId: motionDatabaseId,
       },
     ],
   };

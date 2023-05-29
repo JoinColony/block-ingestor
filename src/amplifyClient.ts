@@ -335,11 +335,13 @@ export const queries = {
           inRevealPhase
         }
         messages {
-          name
-          messageKey
-          initiatorAddress
-          vote
-          amount
+          items {
+            name
+            messageKey
+            initiatorAddress
+            vote
+            amount            
+          }
         }
       }
     }

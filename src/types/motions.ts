@@ -193,6 +193,7 @@ export interface MotionQuery {
 export interface MotionMessage {
   name: string;
   messageKey: string;
+  motionId: string;
   initiatorAddress?: string;
   vote?: string;
   amount?: string;
