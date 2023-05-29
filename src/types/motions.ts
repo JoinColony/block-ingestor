@@ -224,4 +224,12 @@ export interface ColonyQuery {
       }
     | null
     | undefined;
+  unclaimedStakes:
+    | Array<{
+        transactionHash: string;
+        motionId: string;
+        unclaimedRewards: StakerReward[];
+      }>
+    | null
+    | undefined;
 }
