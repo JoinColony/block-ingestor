@@ -402,6 +402,15 @@ export const queries = {
             tokenAddress: tokenID
           }
         }
+        unclaimedStakes {
+          transactionHash
+          databaseMotionId
+          unclaimedRewards {
+            address
+            rewards
+            isClaimed
+          }
+        }
       }
     }
   `,

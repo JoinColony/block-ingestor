@@ -7,6 +7,7 @@ import {
   getLogs,
 } from '@colony/colony-js';
 import { LogDescription } from '@ethersproject/abi';
+import { StakerReward } from './motions';
 
 /*
  * Custom contract event, since we need some log values as well
@@ -149,6 +150,14 @@ export interface ColonyQuery {
           tokenAddress: string;
         } | null>;
       }
+    | null
+    | undefined;
+  unclaimedStakes:
+    | Array<{
+        transactionHash: string;
+        motionId: string;
+        unclaimedRewards: StakerReward[];
+      }>
     | null
     | undefined;
 }
