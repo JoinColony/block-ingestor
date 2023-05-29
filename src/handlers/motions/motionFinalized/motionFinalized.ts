@@ -1,7 +1,8 @@
 import { BigNumber, constants } from 'ethers';
 
 import { ContractEvent, MotionEvents } from '~types';
-import { getVotingClient } from '~utils';
+import { getColonyFromDB, getVotingClient } from '~utils';
+import { mutate } from '~amplifyClient';
 
 import {
   getMotionDatabaseId,
@@ -10,10 +11,7 @@ import {
   getMessageKey,
 } from '../helpers';
 
-import {
-  getStakerReward,
-  linkPendingMetadata,
-} from './helpers';
+import { getStakerReward, linkPendingMetadata } from './helpers';
 
 export default async (event: ContractEvent): Promise<void> => {
   const {
@@ -73,5 +71,22 @@ export default async (event: ContractEvent): Promise<void> => {
     };
 
     await updateMotionInDB(updatedMotionData, newMotionMessages);
+
+    const colony = await getColonyFromDB(colonyAddress);
+    const unclaimedMotionStake = {
+      transactionHash: finalizedMotion.id,
+      motionId: motionDatabaseId,
+      unclaimedRewards: updatedStakerRewards,
+    };
+
+    await mutate('updateColony', {
+      input: {
+        id: colonyAddress,
+        unclaimedStakes: [
+          ...(colony?.unclaimedStakes ?? []),
+          unclaimedMotionStake,
+        ],
+      },
+    });
   }
 };
