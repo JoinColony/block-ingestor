@@ -109,11 +109,13 @@ query GetColonyMotion($id: ID!) {
       inRevealPhase
     }
     messages {
-      name
-      messageKey
-      initiatorAddress
-      vote
-      amount
+      items {
+        name
+        messageKey
+        initiatorAddress
+        vote
+        amount
+      }
     }
   }
 }

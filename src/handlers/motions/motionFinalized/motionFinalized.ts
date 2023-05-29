@@ -64,6 +64,7 @@ export default async (event: ContractEvent): Promise<void> => {
         initiatorAddress: constants.AddressZero,
         name: MotionEvents.MotionFinalized,
         messageKey: getMessageKey(transactionHash, logIndex),
+        motionId: motionDatabaseId,
       },
     ];
 

@@ -226,6 +226,7 @@ export const getUpdatedMessages = ({
       name: MotionEvents.ObjectionRaised,
       messageKey: `${messageKey}_${MotionEvents.ObjectionRaised}}`,
       initiatorAddress: staker,
+      motionId: motionData.id,
     });
   }
 
@@ -235,6 +236,7 @@ export const getUpdatedMessages = ({
     initiatorAddress: staker,
     vote: vote.toString(),
     amount: amount.toString(),
+    motionId: motionData.id,
   });
 
   if (isFullyYayStaked) {
@@ -245,6 +247,7 @@ export const getUpdatedMessages = ({
       name: messageName,
       messageKey: `${messageKey}_${messageName}`,
       initiatorAddress: staker,
+      motionId: motionData.id,
     });
   }
 
@@ -257,6 +260,7 @@ export const getUpdatedMessages = ({
       name: MotionEvents.ObjectionFullyStaked,
       messageKey: `${messageKey}_${MotionEvents.ObjectionFullyStaked}`,
       initiatorAddress: staker,
+      motionId: motionData.id,
     });
   }
 
@@ -265,6 +269,7 @@ export const getUpdatedMessages = ({
       name: MotionEvents.MotionVotingPhase,
       messageKey: `${messageKey}_${MotionEvents.MotionVotingPhase}`,
       initiatorAddress: constants.AddressZero,
+      motionId: motionData.id,
     });
   }
 

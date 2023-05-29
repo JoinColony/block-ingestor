@@ -58,6 +58,7 @@ export default async (event: ContractEvent): Promise<void> => {
           name: MotionEvents.MotionRewardClaimed,
           messageKey: getMessageKey(transactionHash, logIndex),
           initiatorAddress: staker,
+          motionId: motionDatabaseId,
         },
       ],
     };
