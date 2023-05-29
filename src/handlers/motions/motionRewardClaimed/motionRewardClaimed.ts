@@ -5,7 +5,8 @@ import {
   getMotionFromDB,
   updateMotionInDB,
   getMessageKey,
-} from './helpers';
+} from '../helpers';
+import { updateColonyUnclaimedStakes } from './helpers';
 
 export default async (event: ContractEvent): Promise<void> => {
   const {
@@ -25,9 +26,7 @@ export default async (event: ContractEvent): Promise<void> => {
   const claimedMotion = await getMotionFromDB(motionDatabaseId);
 
   if (claimedMotion) {
-    const {
-      stakerRewards,
-    } = claimedMotion;
+    const { stakerRewards } = claimedMotion;
 
     const updatedStakerRewards = stakerRewards.map((stakerReward) => {
       const { address } = stakerReward;
@@ -61,6 +60,8 @@ export default async (event: ContractEvent): Promise<void> => {
       ...claimedMotion,
       stakerRewards: updatedStakerRewards,
     };
+
+    await updateColonyUnclaimedStakes(colonyAddress, claimedMotion.id, staker);
 
     await updateMotionInDB(updatedMotionData, newMotionMessages);
   }
