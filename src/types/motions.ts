@@ -106,7 +106,6 @@ export interface ColonyMotion {
   skillRep: string;
   hasObjection: boolean;
   motionStateHistory: MotionStateHistory;
-  messages: MotionMessage[];
 }
 
 export interface UserStakes {
