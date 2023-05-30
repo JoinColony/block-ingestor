@@ -19,7 +19,6 @@ import {
   getCachedColonyClient,
   getLatestBlock,
   mapLogToContractEvent,
-  verbose,
 } from '~utils';
 
 const getFilter = (
@@ -63,7 +62,6 @@ const trackActionsByEvent = async (
 };
 
 export default async (colonyAddress: string): Promise<void> => {
-  verbose('Fetching past actions for colony:', colonyAddress);
   await trackActionsByEvent(
     ContractEventsSignatures.TokensMinted,
     colonyAddress,
