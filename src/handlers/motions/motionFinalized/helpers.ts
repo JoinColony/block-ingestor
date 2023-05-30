@@ -159,7 +159,7 @@ const linkPendingDomainMetadataWithDomain = async (
         id: databaseDomainId,
       },
     });
-  };
+  }
 };
 
 const linkPendingColonyMetadataWithColony = async (
@@ -243,17 +243,25 @@ const linkPendingColonyMetadataWithColony = async (
   });
 };
 
-export const linkPendingMetadata = async (action: string, colonyAddress: string, finalizedMotion: ColonyMotion): Promise<void> => {
-  const parsedAction = await getParsedActionFromMotion(
-    action,
-    colonyAddress,
-  );
+export const linkPendingMetadata = async (
+  action: string,
+  colonyAddress: string,
+  finalizedMotion: ColonyMotion,
+): Promise<void> => {
+  const parsedAction = await getParsedActionFromMotion(action, colonyAddress);
 
-  const isMotionAddingADomain = parsedAction?.name === ColonyOperations.AddDomain;
-  const isMotionEditingADomain = parsedAction?.name === ColonyOperations.EditDomain;
-  const isMotionEditingAColony = parsedAction?.name === ColonyOperations.EditColony;
+  const isMotionAddingADomain =
+    parsedAction?.name === ColonyOperations.AddDomain;
+  const isMotionEditingADomain =
+    parsedAction?.name === ColonyOperations.EditDomain;
+  const isMotionEditingAColony =
+    parsedAction?.name === ColonyOperations.EditColony;
 
-  if (isMotionAddingADomain || isMotionEditingADomain || isMotionEditingAColony) {
+  if (
+    isMotionAddingADomain ||
+    isMotionEditingADomain ||
+    isMotionEditingAColony
+  ) {
     const { items: colonyAction } =
       (await query<{ items: MotionQuery[] }>('getColonyActionByMotionId', {
         motionId: finalizedMotion.id,
@@ -264,18 +272,55 @@ export const linkPendingMetadata = async (action: string, colonyAddress: string,
      * then we can assume that the motion's action is a domain action and we need to link this provisional DomainMetadata to the REAL Domain by creating
      * a new DomainMetadata with the corresponding Domain item id.
      */
-    if ((isMotionAddingADomain || isMotionEditingADomain) && colonyAction?.[0]?.pendingDomainMetadata) {
+    if (
+      (isMotionAddingADomain || isMotionEditingADomain) &&
+      colonyAction?.[0]?.pendingDomainMetadata
+    ) {
       await linkPendingDomainMetadataWithDomain(
         colonyAction[0].pendingDomainMetadata,
         colonyAddress,
         isMotionEditingADomain,
         parsedAction,
       );
-    } else if (isMotionEditingAColony && colonyAction?.[0]?.pendingColonyMetadata) {
+    } else if (
+      isMotionEditingAColony &&
+      colonyAction?.[0]?.pendingColonyMetadata
+    ) {
       await linkPendingColonyMetadataWithColony(
         colonyAction[0].pendingColonyMetadata,
         colonyAddress,
       );
     }
+  }
+};
+
+export const updateColonyUnclaimedStakes = async (
+  colonyAddress: string,
+  motionTxHash: string,
+  motionDatabaseId: string,
+  updatedStakerRewards: StakerReward[],
+): Promise<void> => {
+  const colony = await getColonyFromDB(colonyAddress);
+  if (colony) {
+    const unclaimedMotionStake = {
+      transactionHash: motionTxHash,
+      motionId: motionDatabaseId,
+      unclaimedRewards: updatedStakerRewards,
+    };
+
+    let { motionsWithUnclaimedStakes } = colony;
+
+    if (motionsWithUnclaimedStakes) {
+      motionsWithUnclaimedStakes.push(unclaimedMotionStake);
+    } else {
+      motionsWithUnclaimedStakes = [unclaimedMotionStake];
+    }
+
+    await mutate('updateColony', {
+      input: {
+        id: colonyAddress,
+        motionsWithUnclaimedStakes,
+      },
+    });
   }
 };
