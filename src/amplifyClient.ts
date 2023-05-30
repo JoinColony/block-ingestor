@@ -30,7 +30,7 @@ export const query = async <T, TVariables extends Record<string, unknown>>(
   } catch (error) {
     const definitionNode = queryDocument.definitions[0];
     const queryName = isExecutableDefinitionNode(definitionNode)
-      ? definitionNode.name
+      ? definitionNode.name?.value
       : 'Unknown';
     console.error(`Could not fetch query ${queryName}`, error);
     return undefined;
@@ -53,7 +53,7 @@ export const mutate = async <
   } catch (error) {
     const definitionNode = mutationDocument.definitions[0];
     const mutationName = isExecutableDefinitionNode(definitionNode)
-      ? definitionNode.name
+      ? definitionNode.name?.value
       : 'Unknown';
     console.error(`Could not execute mutation ${mutationName}`, error);
     return undefined;
