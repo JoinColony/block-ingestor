@@ -1,20 +1,20 @@
 import dotenv from 'dotenv';
-// import { getLogs } from '@colony/colony-js';
+import { getLogs } from '@colony/colony-js';
 
 import networkClient from '~networkClient';
 import {
-  // output,
-  // verbose,
+  output,
+  verbose,
   addNetworkEventListener,
-  // setToJS,
+  setToJS,
   toNumber,
   updateStats,
 } from '~utils';
-// import { colonySpecificEventsListener } from '~eventListener';
+import { colonySpecificEventsListener } from '~eventListener';
 import { ContractEventsSignatures } from '~types';
 import { mutate } from '~amplifyClient';
 import { COLONY_CURRENT_VERSION_KEY } from '~constants';
-// import trackColonyActions from '~trackColonyActions';
+import trackColonyActions from '~trackColonyActions';
 import {
   SetCurrentVersionDocument,
   SetCurrentVersionMutation,
@@ -26,44 +26,53 @@ dotenv.config();
 export const coloniesSet = new Set<string>();
 
 export default async (): Promise<void> => {
-  // const colonies = coloniesSet;
+  const colonies = coloniesSet;
 
-  // verbose('Fetching already deployed colonies');
+  verbose('Fetching already deployed colonies');
 
-  // /*
-  //  * Get all currently deployed colonies (using events)
-  //  */
-  // const colonyAddedLogs = await getLogs(
-  //   networkClient,
-  //   networkClient.filters.ColonyAdded(),
-  // );
+  /*
+   * Get all currently deployed colonies (using events)
+   */
+  const colonyAddedLogs = await getLogs(
+    networkClient,
+    networkClient.filters.ColonyAdded(),
+  );
 
-  // colonyAddedLogs.forEach((log) => {
-  //   const {
-  //     args: { colonyAddress, token: tokenAddress },
-  //   } = networkClient.interface.parseLog(log) || {};
-  //   /*
-  //    * Add found colonies to a Set
-  //    * - We're using a Set to ensure uniquess
-  //    * - We're using a JSON string since we need to store two values, colony address and token
-  //    */
-  //   colonies.add(JSON.stringify({ colonyAddress, tokenAddress }));
-  // });
+  colonyAddedLogs.forEach((log) => {
+    const {
+      args: { colonyAddress, token: tokenAddress },
+    } = networkClient.interface.parseLog(log) || {};
+    /*
+     * Add found colonies to a Set
+     * - We're using a Set to ensure uniquess
+     * - We're using a JSON string since we need to store two values, colony address and token
+     */
+    colonies.add(JSON.stringify({ colonyAddress, tokenAddress }));
+  });
 
-  // await updateStats({ trackedColonies: colonies.size });
+  await updateStats({ trackedColonies: colonies.size });
 
-  // output('Tracking', colonies.size, 'currently deployed colonies');
+  output('Tracking', colonies.size, 'currently deployed colonies');
 
   /*
    * Once we found all current colonies, setup all Colony related listeners we care about
+   * We map the array of colonies into functions returning Promises
    */
-  // await Promise.all(
-  //   setToJS(coloniesSet).map(async ({ colonyAddress }) => {
-  //     await trackColonyActions(colonyAddress);
+  const trackingPromises = setToJS(coloniesSet).map(
+    ({ colonyAddress }) =>
+      async () => {
+        await trackColonyActions(colonyAddress);
 
-  //     await colonySpecificEventsListener(colonyAddress);
-  //   }),
-  // );
+        await colonySpecificEventsListener(colonyAddress);
+      },
+  );
+
+  /**
+   * Call the promises sequentially so that we don't run into "too many concurrent requests" error
+   */
+  for (const trackingPromise of trackingPromises) {
+    await trackingPromise();
+  }
 
   /*
    * Set a Network level listener to track new colonies that will get created on chain
