@@ -1,4 +1,5 @@
 import { Extension, getExtensionHash, getLogs } from '@colony/colony-js';
+import { BigNumber } from 'ethers';
 
 import networkClient from '~networkClient';
 import {
@@ -15,10 +16,9 @@ import {
 } from '~utils';
 import { SUPPORTED_EXTENSION_IDS } from '~constants';
 import { extensionSpecificEventsListener } from '~eventListener';
-import { BigNumber } from 'ethers';
 
 export default async (): Promise<void> => {
-  const latestBlock = await getLatestBlock();
+  const latestBlock = getLatestBlock();
 
   SUPPORTED_EXTENSION_IDS.forEach(async (extensionId) => {
     verbose(
@@ -60,7 +60,7 @@ const trackExtensionAddedToNetwork = async (
   writeExtensionVersionFromEvent(event);
 };
 
-// ts-ignore
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const trackExtensionEvents = async (
   extensionId: Extension,
   latestBlock: number,
@@ -164,9 +164,7 @@ const trackExtensionEvents = async (
           await getCachedColonyClient(colony)
         ).getExtensionClient(extensionId)
       ).version();
-    } catch (error) {
-
-    }
+    } catch (error) {}
     const convertedVersion = toNumber(version);
 
     const isDeprecated = await isExtensionDeprecated(
