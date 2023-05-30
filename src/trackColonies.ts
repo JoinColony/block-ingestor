@@ -36,6 +36,7 @@ export default async (): Promise<void> => {
   const colonyAddedLogs = await getLogs(
     networkClient,
     networkClient.filters.ColonyAdded(),
+    { fromBlock: 27976203 },
   );
 
   colonyAddedLogs.forEach((log) => {
@@ -58,9 +59,15 @@ export default async (): Promise<void> => {
    * Once we found all current colonies, setup all Colony related listeners we care about
    * We map the array of colonies into functions returning Promises
    */
-  const trackingPromises = setToJS(coloniesSet).map(
-    ({ colonyAddress }) =>
+  const coloniesArray = setToJS(coloniesSet);
+  const trackingPromises = coloniesArray.map(
+    ({ colonyAddress }, index) =>
       async () => {
+        verbose(
+          'Fetching past actions for colony:',
+          colonyAddress,
+          `(${index + 1} out of ${coloniesArray.length})`,
+        );
         await trackColonyActions(colonyAddress);
 
         await colonySpecificEventsListener(colonyAddress);
