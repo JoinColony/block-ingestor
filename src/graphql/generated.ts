@@ -293,13 +293,17 @@ export type ColonyMetadata = {
   createdAt: Scalars['AWSDateTime'];
   displayName: Scalars['String'];
   id: Scalars['ID'];
+  isWhitelistActivated?: Maybe<Scalars['Boolean']>;
   thumbnail?: Maybe<Scalars['String']>;
   updatedAt: Scalars['AWSDateTime'];
+  whitelistedAddresses?: Maybe<Array<Scalars['String']>>;
 };
 
 export type ColonyMetadataChangelog = {
   __typename?: 'ColonyMetadataChangelog';
   hasAvatarChanged: Scalars['Boolean'];
+  hasWhitelistChanged: Scalars['Boolean'];
+  haveTokensChanged: Scalars['Boolean'];
   newDisplayName: Scalars['String'];
   oldDisplayName: Scalars['String'];
   transactionHash: Scalars['String'];
@@ -307,6 +311,8 @@ export type ColonyMetadataChangelog = {
 
 export type ColonyMetadataChangelogInput = {
   hasAvatarChanged: Scalars['Boolean'];
+  hasWhitelistChanged: Scalars['Boolean'];
+  haveTokensChanged: Scalars['Boolean'];
   newDisplayName: Scalars['String'];
   oldDisplayName: Scalars['String'];
   transactionHash: Scalars['String'];
@@ -462,7 +468,9 @@ export type CreateColonyMetadataInput = {
   changelog?: InputMaybe<Array<ColonyMetadataChangelogInput>>;
   displayName: Scalars['String'];
   id?: InputMaybe<Scalars['ID']>;
+  isWhitelistActivated?: InputMaybe<Scalars['Boolean']>;
   thumbnail?: InputMaybe<Scalars['String']>;
+  whitelistedAddresses?: InputMaybe<Array<Scalars['String']>>;
 };
 
 export type CreateColonyRoleInput = {
@@ -525,6 +533,11 @@ export type CreateDomainMetadataInput = {
   description: Scalars['String'];
   id?: InputMaybe<Scalars['ID']>;
   name: Scalars['String'];
+};
+
+export type CreateIngestorStatsInput = {
+  id?: InputMaybe<Scalars['ID']>;
+  value: Scalars['String'];
 };
 
 export type CreateProfileInput = {
@@ -654,6 +667,10 @@ export type DeleteDomainMetadataInput = {
   id: Scalars['ID'];
 };
 
+export type DeleteIngestorStatsInput = {
+  id: Scalars['ID'];
+};
+
 export type DeleteProfileInput = {
   id: Scalars['ID'];
 };
@@ -778,6 +795,14 @@ export type GetUserTokenBalanceReturn = {
   inactiveBalance?: Maybe<Scalars['String']>;
   lockedBalance?: Maybe<Scalars['String']>;
   pendingBalance?: Maybe<Scalars['String']>;
+};
+
+export type IngestorStats = {
+  __typename?: 'IngestorStats';
+  createdAt: Scalars['AWSDateTime'];
+  id: Scalars['ID'];
+  updatedAt: Scalars['AWSDateTime'];
+  value: Scalars['String'];
 };
 
 export type MembersForColonyInput = {
@@ -1003,9 +1028,11 @@ export type ModelColonyMetadataConditionInput = {
   and?: InputMaybe<Array<InputMaybe<ModelColonyMetadataConditionInput>>>;
   avatar?: InputMaybe<ModelStringInput>;
   displayName?: InputMaybe<ModelStringInput>;
+  isWhitelistActivated?: InputMaybe<ModelBooleanInput>;
   not?: InputMaybe<ModelColonyMetadataConditionInput>;
   or?: InputMaybe<Array<InputMaybe<ModelColonyMetadataConditionInput>>>;
   thumbnail?: InputMaybe<ModelStringInput>;
+  whitelistedAddresses?: InputMaybe<ModelStringInput>;
 };
 
 export type ModelColonyMetadataConnection = {
@@ -1019,9 +1046,11 @@ export type ModelColonyMetadataFilterInput = {
   avatar?: InputMaybe<ModelStringInput>;
   displayName?: InputMaybe<ModelStringInput>;
   id?: InputMaybe<ModelIdInput>;
+  isWhitelistActivated?: InputMaybe<ModelBooleanInput>;
   not?: InputMaybe<ModelColonyMetadataFilterInput>;
   or?: InputMaybe<Array<InputMaybe<ModelColonyMetadataFilterInput>>>;
   thumbnail?: InputMaybe<ModelStringInput>;
+  whitelistedAddresses?: InputMaybe<ModelStringInput>;
 };
 
 export type ModelColonyRoleConditionInput = {
@@ -1263,6 +1292,27 @@ export type ModelIdInput = {
   size?: InputMaybe<ModelSizeInput>;
 };
 
+export type ModelIngestorStatsConditionInput = {
+  and?: InputMaybe<Array<InputMaybe<ModelIngestorStatsConditionInput>>>;
+  not?: InputMaybe<ModelIngestorStatsConditionInput>;
+  or?: InputMaybe<Array<InputMaybe<ModelIngestorStatsConditionInput>>>;
+  value?: InputMaybe<ModelStringInput>;
+};
+
+export type ModelIngestorStatsConnection = {
+  __typename?: 'ModelIngestorStatsConnection';
+  items: Array<Maybe<IngestorStats>>;
+  nextToken?: Maybe<Scalars['String']>;
+};
+
+export type ModelIngestorStatsFilterInput = {
+  and?: InputMaybe<Array<InputMaybe<ModelIngestorStatsFilterInput>>>;
+  id?: InputMaybe<ModelIdInput>;
+  not?: InputMaybe<ModelIngestorStatsFilterInput>;
+  or?: InputMaybe<Array<InputMaybe<ModelIngestorStatsFilterInput>>>;
+  value?: InputMaybe<ModelStringInput>;
+};
+
 export type ModelIntInput = {
   attributeExists?: InputMaybe<Scalars['Boolean']>;
   attributeType?: InputMaybe<ModelAttributeTypes>;
@@ -1442,10 +1492,12 @@ export type ModelSubscriptionColonyMetadataFilterInput = {
   avatar?: InputMaybe<ModelSubscriptionStringInput>;
   displayName?: InputMaybe<ModelSubscriptionStringInput>;
   id?: InputMaybe<ModelSubscriptionIdInput>;
+  isWhitelistActivated?: InputMaybe<ModelSubscriptionBooleanInput>;
   or?: InputMaybe<
     Array<InputMaybe<ModelSubscriptionColonyMetadataFilterInput>>
   >;
   thumbnail?: InputMaybe<ModelSubscriptionStringInput>;
+  whitelistedAddresses?: InputMaybe<ModelSubscriptionStringInput>;
 };
 
 export type ModelSubscriptionColonyRoleFilterInput = {
@@ -1556,6 +1608,15 @@ export type ModelSubscriptionIdInput = {
   ne?: InputMaybe<Scalars['ID']>;
   notContains?: InputMaybe<Scalars['ID']>;
   notIn?: InputMaybe<Array<InputMaybe<Scalars['ID']>>>;
+};
+
+export type ModelSubscriptionIngestorStatsFilterInput = {
+  and?: InputMaybe<
+    Array<InputMaybe<ModelSubscriptionIngestorStatsFilterInput>>
+  >;
+  id?: InputMaybe<ModelSubscriptionIdInput>;
+  or?: InputMaybe<Array<InputMaybe<ModelSubscriptionIngestorStatsFilterInput>>>;
+  value?: InputMaybe<ModelSubscriptionStringInput>;
 };
 
 export type ModelSubscriptionIntInput = {
@@ -1761,6 +1822,7 @@ export type Mutation = {
   createCurrentVersion?: Maybe<CurrentVersion>;
   createDomain?: Maybe<Domain>;
   createDomainMetadata?: Maybe<DomainMetadata>;
+  createIngestorStats?: Maybe<IngestorStats>;
   createProfile?: Maybe<Profile>;
   createToken?: Maybe<Token>;
   createUniqueColony?: Maybe<Colony>;
@@ -1781,6 +1843,7 @@ export type Mutation = {
   deleteCurrentVersion?: Maybe<CurrentVersion>;
   deleteDomain?: Maybe<Domain>;
   deleteDomainMetadata?: Maybe<DomainMetadata>;
+  deleteIngestorStats?: Maybe<IngestorStats>;
   deleteProfile?: Maybe<Profile>;
   deleteToken?: Maybe<Token>;
   deleteUser?: Maybe<User>;
@@ -1801,6 +1864,7 @@ export type Mutation = {
   updateDomain?: Maybe<Domain>;
   updateDomainMetadata?: Maybe<DomainMetadata>;
   updateExtensionByColonyAndHash?: Maybe<ColonyExtension>;
+  updateIngestorStats?: Maybe<IngestorStats>;
   updateProfile?: Maybe<Profile>;
   updateToken?: Maybe<Token>;
   updateUser?: Maybe<User>;
@@ -1871,6 +1935,11 @@ export type MutationCreateDomainArgs = {
 export type MutationCreateDomainMetadataArgs = {
   condition?: InputMaybe<ModelDomainMetadataConditionInput>;
   input: CreateDomainMetadataInput;
+};
+
+export type MutationCreateIngestorStatsArgs = {
+  condition?: InputMaybe<ModelIngestorStatsConditionInput>;
+  input: CreateIngestorStatsInput;
 };
 
 export type MutationCreateProfileArgs = {
@@ -1971,6 +2040,11 @@ export type MutationDeleteDomainMetadataArgs = {
   input: DeleteDomainMetadataInput;
 };
 
+export type MutationDeleteIngestorStatsArgs = {
+  condition?: InputMaybe<ModelIngestorStatsConditionInput>;
+  input: DeleteIngestorStatsInput;
+};
+
 export type MutationDeleteProfileArgs = {
   condition?: InputMaybe<ModelProfileConditionInput>;
   input: DeleteProfileInput;
@@ -2067,6 +2141,11 @@ export type MutationUpdateDomainMetadataArgs = {
 
 export type MutationUpdateExtensionByColonyAndHashArgs = {
   input?: InputMaybe<UpdateExtensionByColonyAndHashInput>;
+};
+
+export type MutationUpdateIngestorStatsArgs = {
+  condition?: InputMaybe<ModelIngestorStatsConditionInput>;
+  input: UpdateIngestorStatsInput;
 };
 
 export type MutationUpdateProfileArgs = {
@@ -2173,6 +2252,7 @@ export type Query = {
   getDomain?: Maybe<Domain>;
   getDomainMetadata?: Maybe<DomainMetadata>;
   getExtensionByColonyAndHash?: Maybe<ModelColonyExtensionConnection>;
+  getIngestorStats?: Maybe<IngestorStats>;
   getMembersForColony?: Maybe<MembersForColonyReturn>;
   getProfile?: Maybe<Profile>;
   getProfileByEmail?: Maybe<ModelProfileConnection>;
@@ -2201,6 +2281,7 @@ export type Query = {
   listCurrentVersions?: Maybe<ModelCurrentVersionConnection>;
   listDomainMetadata?: Maybe<ModelDomainMetadataConnection>;
   listDomains?: Maybe<ModelDomainConnection>;
+  listIngestorStats?: Maybe<ModelIngestorStatsConnection>;
   listProfiles?: Maybe<ModelProfileConnection>;
   listTokens?: Maybe<ModelTokenConnection>;
   listUserTokens?: Maybe<ModelUserTokensConnection>;
@@ -2317,6 +2398,10 @@ export type QueryGetExtensionByColonyAndHashArgs = {
   limit?: InputMaybe<Scalars['Int']>;
   nextToken?: InputMaybe<Scalars['String']>;
   sortDirection?: InputMaybe<ModelSortDirection>;
+};
+
+export type QueryGetIngestorStatsArgs = {
+  id: Scalars['ID'];
 };
 
 export type QueryGetMembersForColonyArgs = {
@@ -2477,6 +2562,12 @@ export type QueryListDomainsArgs = {
   nextToken?: InputMaybe<Scalars['String']>;
 };
 
+export type QueryListIngestorStatsArgs = {
+  filter?: InputMaybe<ModelIngestorStatsFilterInput>;
+  limit?: InputMaybe<Scalars['Int']>;
+  nextToken?: InputMaybe<Scalars['String']>;
+};
+
 export type QueryListProfilesArgs = {
   filter?: InputMaybe<ModelProfileFilterInput>;
   limit?: InputMaybe<Scalars['Int']>;
@@ -2534,6 +2625,7 @@ export type Subscription = {
   onCreateCurrentVersion?: Maybe<CurrentVersion>;
   onCreateDomain?: Maybe<Domain>;
   onCreateDomainMetadata?: Maybe<DomainMetadata>;
+  onCreateIngestorStats?: Maybe<IngestorStats>;
   onCreateProfile?: Maybe<Profile>;
   onCreateToken?: Maybe<Token>;
   onCreateUser?: Maybe<User>;
@@ -2552,6 +2644,7 @@ export type Subscription = {
   onDeleteCurrentVersion?: Maybe<CurrentVersion>;
   onDeleteDomain?: Maybe<Domain>;
   onDeleteDomainMetadata?: Maybe<DomainMetadata>;
+  onDeleteIngestorStats?: Maybe<IngestorStats>;
   onDeleteProfile?: Maybe<Profile>;
   onDeleteToken?: Maybe<Token>;
   onDeleteUser?: Maybe<User>;
@@ -2570,6 +2663,7 @@ export type Subscription = {
   onUpdateCurrentVersion?: Maybe<CurrentVersion>;
   onUpdateDomain?: Maybe<Domain>;
   onUpdateDomainMetadata?: Maybe<DomainMetadata>;
+  onUpdateIngestorStats?: Maybe<IngestorStats>;
   onUpdateProfile?: Maybe<Profile>;
   onUpdateToken?: Maybe<Token>;
   onUpdateUser?: Maybe<User>;
@@ -2627,6 +2721,10 @@ export type SubscriptionOnCreateDomainArgs = {
 
 export type SubscriptionOnCreateDomainMetadataArgs = {
   filter?: InputMaybe<ModelSubscriptionDomainMetadataFilterInput>;
+};
+
+export type SubscriptionOnCreateIngestorStatsArgs = {
+  filter?: InputMaybe<ModelSubscriptionIngestorStatsFilterInput>;
 };
 
 export type SubscriptionOnCreateProfileArgs = {
@@ -2701,6 +2799,10 @@ export type SubscriptionOnDeleteDomainMetadataArgs = {
   filter?: InputMaybe<ModelSubscriptionDomainMetadataFilterInput>;
 };
 
+export type SubscriptionOnDeleteIngestorStatsArgs = {
+  filter?: InputMaybe<ModelSubscriptionIngestorStatsFilterInput>;
+};
+
 export type SubscriptionOnDeleteProfileArgs = {
   filter?: InputMaybe<ModelSubscriptionProfileFilterInput>;
 };
@@ -2771,6 +2873,10 @@ export type SubscriptionOnUpdateDomainArgs = {
 
 export type SubscriptionOnUpdateDomainMetadataArgs = {
   filter?: InputMaybe<ModelSubscriptionDomainMetadataFilterInput>;
+};
+
+export type SubscriptionOnUpdateIngestorStatsArgs = {
+  filter?: InputMaybe<ModelSubscriptionIngestorStatsFilterInput>;
 };
 
 export type SubscriptionOnUpdateProfileArgs = {
@@ -2915,7 +3021,9 @@ export type UpdateColonyMetadataInput = {
   changelog?: InputMaybe<Array<ColonyMetadataChangelogInput>>;
   displayName?: InputMaybe<Scalars['String']>;
   id: Scalars['ID'];
+  isWhitelistActivated?: InputMaybe<Scalars['Boolean']>;
   thumbnail?: InputMaybe<Scalars['String']>;
+  whitelistedAddresses?: InputMaybe<Array<Scalars['String']>>;
 };
 
 export type UpdateColonyRoleInput = {
@@ -2989,6 +3097,11 @@ export type UpdateExtensionByColonyAndHashInput = {
   isDeprecated?: InputMaybe<Scalars['Boolean']>;
   isInitialized?: InputMaybe<Scalars['Boolean']>;
   version?: InputMaybe<Scalars['Int']>;
+};
+
+export type UpdateIngestorStatsInput = {
+  id: Scalars['ID'];
+  value?: InputMaybe<Scalars['String']>;
 };
 
 export type UpdateProfileInput = {
@@ -3257,6 +3370,24 @@ export type CreateColonyHistoricRoleMutation = {
   } | null;
 };
 
+export type CreateStatsMutationVariables = Exact<{
+  value: Scalars['String'];
+}>;
+
+export type CreateStatsMutation = {
+  __typename?: 'Mutation';
+  createIngestorStats?: { __typename?: 'IngestorStats'; id: string } | null;
+};
+
+export type UpdateStatsMutationVariables = Exact<{
+  value: Scalars['String'];
+}>;
+
+export type UpdateStatsMutation = {
+  __typename?: 'Mutation';
+  updateIngestorStats?: { __typename?: 'IngestorStats'; id: string } | null;
+};
+
 export type GetContractEventQueryVariables = Exact<{
   id: Scalars['ID'];
 }>;
@@ -3334,6 +3465,13 @@ export type GetColonyHistoricRoleQuery = {
     __typename?: 'ColonyHistoricRole';
     id: string;
   } | null;
+};
+
+export type GetStatsQueryVariables = Exact<{ [key: string]: never }>;
+
+export type GetStatsQuery = {
+  __typename?: 'Query';
+  getIngestorStats?: { __typename?: 'IngestorStats'; value: string } | null;
 };
 
 export const CreateColonyActionDocument = gql`
@@ -3461,6 +3599,20 @@ export const CreateColonyHistoricRoleDocument = gql`
     }
   }
 `;
+export const CreateStatsDocument = gql`
+  mutation CreateStats($value: String!) {
+    createIngestorStats(input: { id: "STATS", value: $value }) {
+      id
+    }
+  }
+`;
+export const UpdateStatsDocument = gql`
+  mutation UpdateStats($value: String!) {
+    updateIngestorStats(input: { id: "STATS", value: $value }) {
+      id
+    }
+  }
+`;
 export const GetContractEventDocument = gql`
   query GetContractEvent($id: ID!) {
     getContractEvent(id: $id) {
@@ -3522,6 +3674,13 @@ export const GetColonyHistoricRoleDocument = gql`
   query GetColonyHistoricRole($id: ID!) {
     getColonyHistoricRole(id: $id) {
       id
+    }
+  }
+`;
+export const GetStatsDocument = gql`
+  query GetStats {
+    getIngestorStats(id: "STATS") {
+      value
     }
   }
 `;
