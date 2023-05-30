@@ -17,9 +17,9 @@ type GraphQLFnReturn<T> = Promise<
   ReturnType<typeof API.graphql<GraphQLQuery<T>>> | undefined
 >;
 
-export const query = async <T, TVariables extends Record<string, unknown> = {}>(
+export const query = async <T, TVariables extends Record<string, unknown>>(
   queryDocument: DocumentNode,
-  variables: TVariables,
+  variables?: TVariables,
 ): GraphQLFnReturn<T> => {
   try {
     const result = await API.graphql<GraphQLQuery<T>>(
