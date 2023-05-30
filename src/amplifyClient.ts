@@ -166,6 +166,13 @@ export const mutations = {
       }
     }
   `,
+  createMotionMessage: /* GraphQL */ `
+    mutation CreateMotionMessage($input: CreateMotionMessageInput!) {
+      createMotionMessage(input: $input) {
+        id
+      }
+    }
+  `,
 };
 
 /*
@@ -333,15 +340,6 @@ export const queries = {
           hasFailed
           hasFailedNotFinalizable
           inRevealPhase
-        }
-        messages {
-          items {
-            name
-            messageKey
-            initiatorAddress
-            vote
-            amount            
-          }
         }
       }
     }

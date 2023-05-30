@@ -42,7 +42,6 @@ export default async (event: ContractEvent): Promise<void> => {
   if (stakedMotion) {
     const {
       usersStakes,
-      messages,
     } = stakedMotion;
 
     const updatedUserStakes = getUpdatedUsersStakes(
@@ -52,9 +51,8 @@ export default async (event: ContractEvent): Promise<void> => {
       amount,
       requiredStake,
     );
-    const updatedMessages = getUpdatedMessages({
+    const newMotionMessages = getUpdatedMessages({
       motionData: stakedMotion,
-      messages,
       requiredStake,
       motionStakes,
       messageKey: getMessageKey(transactionHash, logIndex),
@@ -69,8 +67,8 @@ export default async (event: ContractEvent): Promise<void> => {
         usersStakes: updatedUserStakes,
         motionStakes,
         remainingStakes,
-        messages: updatedMessages,
       },
+      newMotionMessages,
       showInActionsList,
     );
 

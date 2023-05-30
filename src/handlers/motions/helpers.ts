@@ -1,6 +1,6 @@
 import { BigNumber } from 'ethers';
 import { mutate, query } from '~amplifyClient';
-import { ColonyMotion, MotionSide, MotionVote } from '~types';
+import { ColonyMotion, MotionMessage, MotionSide, MotionVote } from '~types';
 import { verbose } from '~utils';
 
 export * from './motionStaked/helpers';
@@ -10,6 +10,7 @@ export const getMotionSide = (vote: BigNumber): MotionSide =>
 
 export const updateMotionInDB = async (
   motionData: ColonyMotion,
+  newMotionMessages?: MotionMessage[],
   showInActionsList?: boolean,
 ): Promise<void> => {
   await mutate('updateColonyMotion', {
@@ -17,6 +18,16 @@ export const updateMotionInDB = async (
       ...motionData,
     },
   });
+
+  if (newMotionMessages?.length) {
+    for (const message of newMotionMessages) {
+      await mutate('createMotionMessage', {
+        input: {
+          ...message,
+        },
+      });
+    }
+  }
 
   if (showInActionsList !== undefined) {
     const { items: colonyActionItems } =
