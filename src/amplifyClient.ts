@@ -30,7 +30,7 @@ export const query = async <T, TVariables extends Record<string, unknown>>(
   } catch (error) {
     const definitionNode = queryDocument.definitions[0];
     const queryName = isExecutableDefinitionNode(definitionNode)
-      ? definitionNode.name
+      ? definitionNode.name?.value
       : 'Unknown';
     console.error(`Could not fetch query ${queryName}`, error);
     return undefined;
