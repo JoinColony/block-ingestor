@@ -1,9 +1,15 @@
 import gql from 'graphql-tag';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
-export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
-export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
-export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
+export type Exact<T extends { [key: string]: unknown }> = {
+  [K in keyof T]: T[K];
+};
+export type MakeOptional<T, K extends keyof T> = Omit<T, K> & {
+  [SubKey in K]?: Maybe<T[SubKey]>;
+};
+export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & {
+  [SubKey in K]: Maybe<T[SubKey]>;
+};
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
   ID: string;
@@ -64,7 +70,6 @@ export type Colony = {
   watchers?: Maybe<ModelWatchedColoniesConnection>;
 };
 
-
 export type ColonyActionsArgs = {
   filter?: InputMaybe<ModelColonyActionFilterInput>;
   limit?: InputMaybe<Scalars['Int']>;
@@ -72,14 +77,12 @@ export type ColonyActionsArgs = {
   sortDirection?: InputMaybe<ModelSortDirection>;
 };
 
-
 export type ColonyDomainsArgs = {
   filter?: InputMaybe<ModelDomainFilterInput>;
   limit?: InputMaybe<Scalars['Int']>;
   nextToken?: InputMaybe<Scalars['String']>;
   sortDirection?: InputMaybe<ModelSortDirection>;
 };
-
 
 export type ColonyExtensionsArgs = {
   filter?: InputMaybe<ModelColonyExtensionFilterInput>;
@@ -89,14 +92,12 @@ export type ColonyExtensionsArgs = {
   sortDirection?: InputMaybe<ModelSortDirection>;
 };
 
-
 export type ColonyFundsClaimsArgs = {
   filter?: InputMaybe<ModelColonyFundsClaimFilterInput>;
   limit?: InputMaybe<Scalars['Int']>;
   nextToken?: InputMaybe<Scalars['String']>;
   sortDirection?: InputMaybe<ModelSortDirection>;
 };
-
 
 export type ColonyRolesArgs = {
   filter?: InputMaybe<ModelColonyRoleFilterInput>;
@@ -105,14 +106,12 @@ export type ColonyRolesArgs = {
   sortDirection?: InputMaybe<ModelSortDirection>;
 };
 
-
 export type ColonyTokensArgs = {
   filter?: InputMaybe<ModelColonyTokensFilterInput>;
   limit?: InputMaybe<Scalars['Int']>;
   nextToken?: InputMaybe<Scalars['String']>;
   sortDirection?: InputMaybe<ModelSortDirection>;
 };
-
 
 export type ColonyWatchersArgs = {
   filter?: InputMaybe<ModelWatchedColoniesFilterInput>;
@@ -208,7 +207,7 @@ export enum ColonyActionType {
   UnlockTokenMotion = 'UNLOCK_TOKEN_MOTION',
   VersionUpgrade = 'VERSION_UPGRADE',
   VersionUpgradeMotion = 'VERSION_UPGRADE_MOTION',
-  WrongColony = 'WRONG_COLONY'
+  WrongColony = 'WRONG_COLONY',
 }
 
 export type ColonyBalance = {
@@ -368,7 +367,6 @@ export type ColonyMotion = {
   voterRecord: Array<VoterRecord>;
 };
 
-
 export type ColonyMotionMessagesArgs = {
   createdAt?: InputMaybe<ModelStringKeyConditionInput>;
   filter?: InputMaybe<ModelMotionMessageFilterInput>;
@@ -423,7 +421,7 @@ export type ColonyTokens = {
 
 export enum ColonyType {
   Colony = 'COLONY',
-  Metacolony = 'METACOLONY'
+  Metacolony = 'METACOLONY',
 }
 
 export type ColonyUnclaimedStake = {
@@ -635,6 +633,11 @@ export type CreateDomainMetadataInput = {
   name: Scalars['String'];
 };
 
+export type CreateIngestorStatsInput = {
+  id?: InputMaybe<Scalars['ID']>;
+  value: Scalars['String'];
+};
+
 export type CreateMotionMessageInput = {
   amount?: InputMaybe<Scalars['String']>;
   createdAt?: InputMaybe<Scalars['AWSDateTime']>;
@@ -777,6 +780,10 @@ export type DeleteDomainMetadataInput = {
   id: Scalars['ID'];
 };
 
+export type DeleteIngestorStatsInput = {
+  id: Scalars['ID'];
+};
+
 export type DeleteMotionMessageInput = {
   id: Scalars['ID'];
 };
@@ -831,7 +838,7 @@ export enum DomainColor {
   Purple = 'PURPLE',
   PurpleGrey = 'PURPLE_GREY',
   Red = 'RED',
-  Yellow = 'YELLOW'
+  Yellow = 'YELLOW',
 }
 
 export type DomainInput = {
@@ -872,7 +879,7 @@ export type DomainMetadataChangelogInput = {
 
 export enum EmailPermissions {
   IsHuman = 'isHuman',
-  SendNotifications = 'sendNotifications'
+  SendNotifications = 'sendNotifications',
 }
 
 export type ExtensionParams = {
@@ -943,6 +950,14 @@ export type GetVoterRewardsInput = {
   voterAddress: Scalars['String'];
 };
 
+export type IngestorStats = {
+  __typename?: 'IngestorStats';
+  createdAt: Scalars['AWSDateTime'];
+  id: Scalars['ID'];
+  updatedAt: Scalars['AWSDateTime'];
+  value: Scalars['String'];
+};
+
 export type MembersForColonyInput = {
   colonyAddress: Scalars['String'];
   domainId?: InputMaybe<Scalars['Int']>;
@@ -966,7 +981,7 @@ export enum ModelAttributeTypes {
   Number = 'number',
   NumberSet = 'numberSet',
   String = 'string',
-  StringSet = 'stringSet'
+  StringSet = 'stringSet',
 }
 
 export type ModelBooleanInput = {
@@ -1349,10 +1364,14 @@ export type ModelContractEventFilterInput = {
 };
 
 export type ModelCurrentNetworkInverseFeeConditionInput = {
-  and?: InputMaybe<Array<InputMaybe<ModelCurrentNetworkInverseFeeConditionInput>>>;
+  and?: InputMaybe<
+    Array<InputMaybe<ModelCurrentNetworkInverseFeeConditionInput>>
+  >;
   inverseFee?: InputMaybe<ModelStringInput>;
   not?: InputMaybe<ModelCurrentNetworkInverseFeeConditionInput>;
-  or?: InputMaybe<Array<InputMaybe<ModelCurrentNetworkInverseFeeConditionInput>>>;
+  or?: InputMaybe<
+    Array<InputMaybe<ModelCurrentNetworkInverseFeeConditionInput>>
+  >;
 };
 
 export type ModelCurrentNetworkInverseFeeConnection = {
@@ -1479,6 +1498,27 @@ export type ModelIdInput = {
   size?: InputMaybe<ModelSizeInput>;
 };
 
+export type ModelIngestorStatsConditionInput = {
+  and?: InputMaybe<Array<InputMaybe<ModelIngestorStatsConditionInput>>>;
+  not?: InputMaybe<ModelIngestorStatsConditionInput>;
+  or?: InputMaybe<Array<InputMaybe<ModelIngestorStatsConditionInput>>>;
+  value?: InputMaybe<ModelStringInput>;
+};
+
+export type ModelIngestorStatsConnection = {
+  __typename?: 'ModelIngestorStatsConnection';
+  items: Array<Maybe<IngestorStats>>;
+  nextToken?: Maybe<Scalars['String']>;
+};
+
+export type ModelIngestorStatsFilterInput = {
+  and?: InputMaybe<Array<InputMaybe<ModelIngestorStatsFilterInput>>>;
+  id?: InputMaybe<ModelIdInput>;
+  not?: InputMaybe<ModelIngestorStatsFilterInput>;
+  or?: InputMaybe<Array<InputMaybe<ModelIngestorStatsFilterInput>>>;
+  value?: InputMaybe<ModelStringInput>;
+};
+
 export type ModelIntInput = {
   attributeExists?: InputMaybe<Scalars['Boolean']>;
   attributeType?: InputMaybe<ModelAttributeTypes>;
@@ -1568,7 +1608,7 @@ export type ModelSizeInput = {
 
 export enum ModelSortDirection {
   Asc = 'ASC',
-  Desc = 'DESC'
+  Desc = 'DESC',
 }
 
 export type ModelStringInput = {
@@ -1628,7 +1668,9 @@ export type ModelSubscriptionColonyActionFilterInput = {
 };
 
 export type ModelSubscriptionColonyExtensionFilterInput = {
-  and?: InputMaybe<Array<InputMaybe<ModelSubscriptionColonyExtensionFilterInput>>>;
+  and?: InputMaybe<
+    Array<InputMaybe<ModelSubscriptionColonyExtensionFilterInput>>
+  >;
   colonyId?: InputMaybe<ModelSubscriptionIdInput>;
   hash?: InputMaybe<ModelSubscriptionStringInput>;
   id?: InputMaybe<ModelSubscriptionIdInput>;
@@ -1637,7 +1679,9 @@ export type ModelSubscriptionColonyExtensionFilterInput = {
   isDeleted?: InputMaybe<ModelSubscriptionBooleanInput>;
   isDeprecated?: InputMaybe<ModelSubscriptionBooleanInput>;
   isInitialized?: InputMaybe<ModelSubscriptionBooleanInput>;
-  or?: InputMaybe<Array<InputMaybe<ModelSubscriptionColonyExtensionFilterInput>>>;
+  or?: InputMaybe<
+    Array<InputMaybe<ModelSubscriptionColonyExtensionFilterInput>>
+  >;
   version?: InputMaybe<ModelSubscriptionIntInput>;
 };
 
@@ -1652,21 +1696,29 @@ export type ModelSubscriptionColonyFilterInput = {
 
 export type ModelSubscriptionColonyFundsClaimFilterInput = {
   amount?: InputMaybe<ModelSubscriptionStringInput>;
-  and?: InputMaybe<Array<InputMaybe<ModelSubscriptionColonyFundsClaimFilterInput>>>;
+  and?: InputMaybe<
+    Array<InputMaybe<ModelSubscriptionColonyFundsClaimFilterInput>>
+  >;
   createdAt?: InputMaybe<ModelSubscriptionStringInput>;
   createdAtBlock?: InputMaybe<ModelSubscriptionIntInput>;
   id?: InputMaybe<ModelSubscriptionIdInput>;
-  or?: InputMaybe<Array<InputMaybe<ModelSubscriptionColonyFundsClaimFilterInput>>>;
+  or?: InputMaybe<
+    Array<InputMaybe<ModelSubscriptionColonyFundsClaimFilterInput>>
+  >;
 };
 
 export type ModelSubscriptionColonyHistoricRoleFilterInput = {
-  and?: InputMaybe<Array<InputMaybe<ModelSubscriptionColonyHistoricRoleFilterInput>>>;
+  and?: InputMaybe<
+    Array<InputMaybe<ModelSubscriptionColonyHistoricRoleFilterInput>>
+  >;
   blockNumber?: InputMaybe<ModelSubscriptionIntInput>;
   colonyId?: InputMaybe<ModelSubscriptionIdInput>;
   createdAt?: InputMaybe<ModelSubscriptionStringInput>;
   domainId?: InputMaybe<ModelSubscriptionIdInput>;
   id?: InputMaybe<ModelSubscriptionIdInput>;
-  or?: InputMaybe<Array<InputMaybe<ModelSubscriptionColonyHistoricRoleFilterInput>>>;
+  or?: InputMaybe<
+    Array<InputMaybe<ModelSubscriptionColonyHistoricRoleFilterInput>>
+  >;
   role_0?: InputMaybe<ModelSubscriptionBooleanInput>;
   role_1?: InputMaybe<ModelSubscriptionBooleanInput>;
   role_2?: InputMaybe<ModelSubscriptionBooleanInput>;
@@ -1678,12 +1730,16 @@ export type ModelSubscriptionColonyHistoricRoleFilterInput = {
 };
 
 export type ModelSubscriptionColonyMetadataFilterInput = {
-  and?: InputMaybe<Array<InputMaybe<ModelSubscriptionColonyMetadataFilterInput>>>;
+  and?: InputMaybe<
+    Array<InputMaybe<ModelSubscriptionColonyMetadataFilterInput>>
+  >;
   avatar?: InputMaybe<ModelSubscriptionStringInput>;
   displayName?: InputMaybe<ModelSubscriptionStringInput>;
   id?: InputMaybe<ModelSubscriptionIdInput>;
   isWhitelistActivated?: InputMaybe<ModelSubscriptionBooleanInput>;
-  or?: InputMaybe<Array<InputMaybe<ModelSubscriptionColonyMetadataFilterInput>>>;
+  or?: InputMaybe<
+    Array<InputMaybe<ModelSubscriptionColonyMetadataFilterInput>>
+  >;
   thumbnail?: InputMaybe<ModelSubscriptionStringInput>;
   whitelistedAddresses?: InputMaybe<ModelSubscriptionStringInput>;
 };
@@ -1730,7 +1786,9 @@ export type ModelSubscriptionColonyTokensFilterInput = {
 
 export type ModelSubscriptionContractEventFilterInput = {
   agent?: InputMaybe<ModelSubscriptionStringInput>;
-  and?: InputMaybe<Array<InputMaybe<ModelSubscriptionContractEventFilterInput>>>;
+  and?: InputMaybe<
+    Array<InputMaybe<ModelSubscriptionContractEventFilterInput>>
+  >;
   encodedArguments?: InputMaybe<ModelSubscriptionStringInput>;
   id?: InputMaybe<ModelSubscriptionIdInput>;
   name?: InputMaybe<ModelSubscriptionStringInput>;
@@ -1740,17 +1798,25 @@ export type ModelSubscriptionContractEventFilterInput = {
 };
 
 export type ModelSubscriptionCurrentNetworkInverseFeeFilterInput = {
-  and?: InputMaybe<Array<InputMaybe<ModelSubscriptionCurrentNetworkInverseFeeFilterInput>>>;
+  and?: InputMaybe<
+    Array<InputMaybe<ModelSubscriptionCurrentNetworkInverseFeeFilterInput>>
+  >;
   id?: InputMaybe<ModelSubscriptionIdInput>;
   inverseFee?: InputMaybe<ModelSubscriptionStringInput>;
-  or?: InputMaybe<Array<InputMaybe<ModelSubscriptionCurrentNetworkInverseFeeFilterInput>>>;
+  or?: InputMaybe<
+    Array<InputMaybe<ModelSubscriptionCurrentNetworkInverseFeeFilterInput>>
+  >;
 };
 
 export type ModelSubscriptionCurrentVersionFilterInput = {
-  and?: InputMaybe<Array<InputMaybe<ModelSubscriptionCurrentVersionFilterInput>>>;
+  and?: InputMaybe<
+    Array<InputMaybe<ModelSubscriptionCurrentVersionFilterInput>>
+  >;
   id?: InputMaybe<ModelSubscriptionIdInput>;
   key?: InputMaybe<ModelSubscriptionStringInput>;
-  or?: InputMaybe<Array<InputMaybe<ModelSubscriptionCurrentVersionFilterInput>>>;
+  or?: InputMaybe<
+    Array<InputMaybe<ModelSubscriptionCurrentVersionFilterInput>>
+  >;
   version?: InputMaybe<ModelSubscriptionIntInput>;
 };
 
@@ -1766,12 +1832,16 @@ export type ModelSubscriptionDomainFilterInput = {
 };
 
 export type ModelSubscriptionDomainMetadataFilterInput = {
-  and?: InputMaybe<Array<InputMaybe<ModelSubscriptionDomainMetadataFilterInput>>>;
+  and?: InputMaybe<
+    Array<InputMaybe<ModelSubscriptionDomainMetadataFilterInput>>
+  >;
   color?: InputMaybe<ModelSubscriptionStringInput>;
   description?: InputMaybe<ModelSubscriptionStringInput>;
   id?: InputMaybe<ModelSubscriptionIdInput>;
   name?: InputMaybe<ModelSubscriptionStringInput>;
-  or?: InputMaybe<Array<InputMaybe<ModelSubscriptionDomainMetadataFilterInput>>>;
+  or?: InputMaybe<
+    Array<InputMaybe<ModelSubscriptionDomainMetadataFilterInput>>
+  >;
 };
 
 export type ModelSubscriptionFloatInput = {
@@ -1801,6 +1871,15 @@ export type ModelSubscriptionIdInput = {
   notIn?: InputMaybe<Array<InputMaybe<Scalars['ID']>>>;
 };
 
+export type ModelSubscriptionIngestorStatsFilterInput = {
+  and?: InputMaybe<
+    Array<InputMaybe<ModelSubscriptionIngestorStatsFilterInput>>
+  >;
+  id?: InputMaybe<ModelSubscriptionIdInput>;
+  or?: InputMaybe<Array<InputMaybe<ModelSubscriptionIngestorStatsFilterInput>>>;
+  value?: InputMaybe<ModelSubscriptionStringInput>;
+};
+
 export type ModelSubscriptionIntInput = {
   between?: InputMaybe<Array<InputMaybe<Scalars['Int']>>>;
   eq?: InputMaybe<Scalars['Int']>;
@@ -1815,7 +1894,9 @@ export type ModelSubscriptionIntInput = {
 
 export type ModelSubscriptionMotionMessageFilterInput = {
   amount?: InputMaybe<ModelSubscriptionStringInput>;
-  and?: InputMaybe<Array<InputMaybe<ModelSubscriptionMotionMessageFilterInput>>>;
+  and?: InputMaybe<
+    Array<InputMaybe<ModelSubscriptionMotionMessageFilterInput>>
+  >;
   createdAt?: InputMaybe<ModelSubscriptionStringInput>;
   initiatorAddress?: InputMaybe<ModelSubscriptionIdInput>;
   messageKey?: InputMaybe<ModelSubscriptionStringInput>;
@@ -1883,10 +1964,14 @@ export type ModelSubscriptionUserTokensFilterInput = {
 };
 
 export type ModelSubscriptionWatchedColoniesFilterInput = {
-  and?: InputMaybe<Array<InputMaybe<ModelSubscriptionWatchedColoniesFilterInput>>>;
+  and?: InputMaybe<
+    Array<InputMaybe<ModelSubscriptionWatchedColoniesFilterInput>>
+  >;
   colonyID?: InputMaybe<ModelSubscriptionIdInput>;
   id?: InputMaybe<ModelSubscriptionIdInput>;
-  or?: InputMaybe<Array<InputMaybe<ModelSubscriptionWatchedColoniesFilterInput>>>;
+  or?: InputMaybe<
+    Array<InputMaybe<ModelSubscriptionWatchedColoniesFilterInput>>
+  >;
   userID?: InputMaybe<ModelSubscriptionIdInput>;
 };
 
@@ -2074,6 +2159,7 @@ export type Mutation = {
   createCurrentVersion?: Maybe<CurrentVersion>;
   createDomain?: Maybe<Domain>;
   createDomainMetadata?: Maybe<DomainMetadata>;
+  createIngestorStats?: Maybe<IngestorStats>;
   createMotionMessage?: Maybe<MotionMessage>;
   createProfile?: Maybe<Profile>;
   createToken?: Maybe<Token>;
@@ -2096,6 +2182,7 @@ export type Mutation = {
   deleteCurrentVersion?: Maybe<CurrentVersion>;
   deleteDomain?: Maybe<Domain>;
   deleteDomainMetadata?: Maybe<DomainMetadata>;
+  deleteIngestorStats?: Maybe<IngestorStats>;
   deleteMotionMessage?: Maybe<MotionMessage>;
   deleteProfile?: Maybe<Profile>;
   deleteToken?: Maybe<Token>;
@@ -2118,6 +2205,7 @@ export type Mutation = {
   updateDomain?: Maybe<Domain>;
   updateDomainMetadata?: Maybe<DomainMetadata>;
   updateExtensionByColonyAndHash?: Maybe<ColonyExtension>;
+  updateIngestorStats?: Maybe<IngestorStats>;
   updateMotionMessage?: Maybe<MotionMessage>;
   updateProfile?: Maybe<Profile>;
   updateToken?: Maybe<Token>;
@@ -2126,380 +2214,331 @@ export type Mutation = {
   updateWatchedColonies?: Maybe<WatchedColonies>;
 };
 
-
 export type MutationCreateColonyArgs = {
   condition?: InputMaybe<ModelColonyConditionInput>;
   input: CreateColonyInput;
 };
-
 
 export type MutationCreateColonyActionArgs = {
   condition?: InputMaybe<ModelColonyActionConditionInput>;
   input: CreateColonyActionInput;
 };
 
-
 export type MutationCreateColonyExtensionArgs = {
   condition?: InputMaybe<ModelColonyExtensionConditionInput>;
   input: CreateColonyExtensionInput;
 };
-
 
 export type MutationCreateColonyFundsClaimArgs = {
   condition?: InputMaybe<ModelColonyFundsClaimConditionInput>;
   input: CreateColonyFundsClaimInput;
 };
 
-
 export type MutationCreateColonyHistoricRoleArgs = {
   condition?: InputMaybe<ModelColonyHistoricRoleConditionInput>;
   input: CreateColonyHistoricRoleInput;
 };
-
 
 export type MutationCreateColonyMetadataArgs = {
   condition?: InputMaybe<ModelColonyMetadataConditionInput>;
   input: CreateColonyMetadataInput;
 };
 
-
 export type MutationCreateColonyMotionArgs = {
   condition?: InputMaybe<ModelColonyMotionConditionInput>;
   input: CreateColonyMotionInput;
 };
-
 
 export type MutationCreateColonyRoleArgs = {
   condition?: InputMaybe<ModelColonyRoleConditionInput>;
   input: CreateColonyRoleInput;
 };
 
-
 export type MutationCreateColonyTokensArgs = {
   condition?: InputMaybe<ModelColonyTokensConditionInput>;
   input: CreateColonyTokensInput;
 };
-
 
 export type MutationCreateContractEventArgs = {
   condition?: InputMaybe<ModelContractEventConditionInput>;
   input: CreateContractEventInput;
 };
 
-
 export type MutationCreateCurrentNetworkInverseFeeArgs = {
   condition?: InputMaybe<ModelCurrentNetworkInverseFeeConditionInput>;
   input: CreateCurrentNetworkInverseFeeInput;
 };
-
 
 export type MutationCreateCurrentVersionArgs = {
   condition?: InputMaybe<ModelCurrentVersionConditionInput>;
   input: CreateCurrentVersionInput;
 };
 
-
 export type MutationCreateDomainArgs = {
   condition?: InputMaybe<ModelDomainConditionInput>;
   input: CreateDomainInput;
 };
-
 
 export type MutationCreateDomainMetadataArgs = {
   condition?: InputMaybe<ModelDomainMetadataConditionInput>;
   input: CreateDomainMetadataInput;
 };
 
+export type MutationCreateIngestorStatsArgs = {
+  condition?: InputMaybe<ModelIngestorStatsConditionInput>;
+  input: CreateIngestorStatsInput;
+};
 
 export type MutationCreateMotionMessageArgs = {
   condition?: InputMaybe<ModelMotionMessageConditionInput>;
   input: CreateMotionMessageInput;
 };
 
-
 export type MutationCreateProfileArgs = {
   condition?: InputMaybe<ModelProfileConditionInput>;
   input: CreateProfileInput;
 };
-
 
 export type MutationCreateTokenArgs = {
   condition?: InputMaybe<ModelTokenConditionInput>;
   input: CreateTokenInput;
 };
 
-
 export type MutationCreateUniqueColonyArgs = {
   input?: InputMaybe<CreateUniqueColonyInput>;
 };
 
-
 export type MutationCreateUniqueUserArgs = {
   input?: InputMaybe<CreateUniqueUserInput>;
 };
-
 
 export type MutationCreateUserArgs = {
   condition?: InputMaybe<ModelUserConditionInput>;
   input: CreateUserInput;
 };
 
-
 export type MutationCreateUserTokensArgs = {
   condition?: InputMaybe<ModelUserTokensConditionInput>;
   input: CreateUserTokensInput;
 };
-
 
 export type MutationCreateWatchedColoniesArgs = {
   condition?: InputMaybe<ModelWatchedColoniesConditionInput>;
   input: CreateWatchedColoniesInput;
 };
 
-
 export type MutationDeleteColonyArgs = {
   condition?: InputMaybe<ModelColonyConditionInput>;
   input: DeleteColonyInput;
 };
-
 
 export type MutationDeleteColonyActionArgs = {
   condition?: InputMaybe<ModelColonyActionConditionInput>;
   input: DeleteColonyActionInput;
 };
 
-
 export type MutationDeleteColonyExtensionArgs = {
   condition?: InputMaybe<ModelColonyExtensionConditionInput>;
   input: DeleteColonyExtensionInput;
 };
-
 
 export type MutationDeleteColonyFundsClaimArgs = {
   condition?: InputMaybe<ModelColonyFundsClaimConditionInput>;
   input: DeleteColonyFundsClaimInput;
 };
 
-
 export type MutationDeleteColonyHistoricRoleArgs = {
   condition?: InputMaybe<ModelColonyHistoricRoleConditionInput>;
   input: DeleteColonyHistoricRoleInput;
 };
-
 
 export type MutationDeleteColonyMetadataArgs = {
   condition?: InputMaybe<ModelColonyMetadataConditionInput>;
   input: DeleteColonyMetadataInput;
 };
 
-
 export type MutationDeleteColonyMotionArgs = {
   condition?: InputMaybe<ModelColonyMotionConditionInput>;
   input: DeleteColonyMotionInput;
 };
-
 
 export type MutationDeleteColonyRoleArgs = {
   condition?: InputMaybe<ModelColonyRoleConditionInput>;
   input: DeleteColonyRoleInput;
 };
 
-
 export type MutationDeleteColonyTokensArgs = {
   condition?: InputMaybe<ModelColonyTokensConditionInput>;
   input: DeleteColonyTokensInput;
 };
-
 
 export type MutationDeleteContractEventArgs = {
   condition?: InputMaybe<ModelContractEventConditionInput>;
   input: DeleteContractEventInput;
 };
 
-
 export type MutationDeleteCurrentNetworkInverseFeeArgs = {
   condition?: InputMaybe<ModelCurrentNetworkInverseFeeConditionInput>;
   input: DeleteCurrentNetworkInverseFeeInput;
 };
-
 
 export type MutationDeleteCurrentVersionArgs = {
   condition?: InputMaybe<ModelCurrentVersionConditionInput>;
   input: DeleteCurrentVersionInput;
 };
 
-
 export type MutationDeleteDomainArgs = {
   condition?: InputMaybe<ModelDomainConditionInput>;
   input: DeleteDomainInput;
 };
-
 
 export type MutationDeleteDomainMetadataArgs = {
   condition?: InputMaybe<ModelDomainMetadataConditionInput>;
   input: DeleteDomainMetadataInput;
 };
 
+export type MutationDeleteIngestorStatsArgs = {
+  condition?: InputMaybe<ModelIngestorStatsConditionInput>;
+  input: DeleteIngestorStatsInput;
+};
 
 export type MutationDeleteMotionMessageArgs = {
   condition?: InputMaybe<ModelMotionMessageConditionInput>;
   input: DeleteMotionMessageInput;
 };
 
-
 export type MutationDeleteProfileArgs = {
   condition?: InputMaybe<ModelProfileConditionInput>;
   input: DeleteProfileInput;
 };
-
 
 export type MutationDeleteTokenArgs = {
   condition?: InputMaybe<ModelTokenConditionInput>;
   input: DeleteTokenInput;
 };
 
-
 export type MutationDeleteUserArgs = {
   condition?: InputMaybe<ModelUserConditionInput>;
   input: DeleteUserInput;
 };
-
 
 export type MutationDeleteUserTokensArgs = {
   condition?: InputMaybe<ModelUserTokensConditionInput>;
   input: DeleteUserTokensInput;
 };
 
-
 export type MutationDeleteWatchedColoniesArgs = {
   condition?: InputMaybe<ModelWatchedColoniesConditionInput>;
   input: DeleteWatchedColoniesInput;
 };
 
-
 export type MutationSetCurrentVersionArgs = {
   input?: InputMaybe<SetCurrentVersionInput>;
 };
-
 
 export type MutationUpdateColonyArgs = {
   condition?: InputMaybe<ModelColonyConditionInput>;
   input: UpdateColonyInput;
 };
 
-
 export type MutationUpdateColonyActionArgs = {
   condition?: InputMaybe<ModelColonyActionConditionInput>;
   input: UpdateColonyActionInput;
 };
-
 
 export type MutationUpdateColonyExtensionArgs = {
   condition?: InputMaybe<ModelColonyExtensionConditionInput>;
   input: UpdateColonyExtensionInput;
 };
 
-
 export type MutationUpdateColonyFundsClaimArgs = {
   condition?: InputMaybe<ModelColonyFundsClaimConditionInput>;
   input: UpdateColonyFundsClaimInput;
 };
-
 
 export type MutationUpdateColonyHistoricRoleArgs = {
   condition?: InputMaybe<ModelColonyHistoricRoleConditionInput>;
   input: UpdateColonyHistoricRoleInput;
 };
 
-
 export type MutationUpdateColonyMetadataArgs = {
   condition?: InputMaybe<ModelColonyMetadataConditionInput>;
   input: UpdateColonyMetadataInput;
 };
-
 
 export type MutationUpdateColonyMotionArgs = {
   condition?: InputMaybe<ModelColonyMotionConditionInput>;
   input: UpdateColonyMotionInput;
 };
 
-
 export type MutationUpdateColonyRoleArgs = {
   condition?: InputMaybe<ModelColonyRoleConditionInput>;
   input: UpdateColonyRoleInput;
 };
-
 
 export type MutationUpdateColonyTokensArgs = {
   condition?: InputMaybe<ModelColonyTokensConditionInput>;
   input: UpdateColonyTokensInput;
 };
 
-
 export type MutationUpdateContractEventArgs = {
   condition?: InputMaybe<ModelContractEventConditionInput>;
   input: UpdateContractEventInput;
 };
-
 
 export type MutationUpdateCurrentNetworkInverseFeeArgs = {
   condition?: InputMaybe<ModelCurrentNetworkInverseFeeConditionInput>;
   input: UpdateCurrentNetworkInverseFeeInput;
 };
 
-
 export type MutationUpdateCurrentVersionArgs = {
   condition?: InputMaybe<ModelCurrentVersionConditionInput>;
   input: UpdateCurrentVersionInput;
 };
-
 
 export type MutationUpdateDomainArgs = {
   condition?: InputMaybe<ModelDomainConditionInput>;
   input: UpdateDomainInput;
 };
 
-
 export type MutationUpdateDomainMetadataArgs = {
   condition?: InputMaybe<ModelDomainMetadataConditionInput>;
   input: UpdateDomainMetadataInput;
 };
 
-
 export type MutationUpdateExtensionByColonyAndHashArgs = {
   input?: InputMaybe<UpdateExtensionByColonyAndHashInput>;
 };
 
+export type MutationUpdateIngestorStatsArgs = {
+  condition?: InputMaybe<ModelIngestorStatsConditionInput>;
+  input: UpdateIngestorStatsInput;
+};
 
 export type MutationUpdateMotionMessageArgs = {
   condition?: InputMaybe<ModelMotionMessageConditionInput>;
   input: UpdateMotionMessageInput;
 };
 
-
 export type MutationUpdateProfileArgs = {
   condition?: InputMaybe<ModelProfileConditionInput>;
   input: UpdateProfileInput;
 };
-
 
 export type MutationUpdateTokenArgs = {
   condition?: InputMaybe<ModelTokenConditionInput>;
   input: UpdateTokenInput;
 };
 
-
 export type MutationUpdateUserArgs = {
   condition?: InputMaybe<ModelUserConditionInput>;
   input: UpdateUserInput;
 };
 
-
 export type MutationUpdateUserTokensArgs = {
   condition?: InputMaybe<ModelUserTokensConditionInput>;
   input: UpdateUserTokensInput;
 };
-
 
 export type MutationUpdateWatchedColoniesArgs = {
   condition?: InputMaybe<ModelWatchedColoniesConditionInput>;
@@ -2524,7 +2563,7 @@ export enum Network {
   Gnosis = 'GNOSIS',
   Gnosisfork = 'GNOSISFORK',
   Goerli = 'GOERLI',
-  Mainnet = 'MAINNET'
+  Mainnet = 'MAINNET',
 }
 
 export type PendingModifiedTokenAddresses = {
@@ -2598,6 +2637,7 @@ export type Query = {
   getDomain?: Maybe<Domain>;
   getDomainMetadata?: Maybe<DomainMetadata>;
   getExtensionByColonyAndHash?: Maybe<ModelColonyExtensionConnection>;
+  getIngestorStats?: Maybe<IngestorStats>;
   getMembersForColony?: Maybe<MembersForColonyReturn>;
   getMotionMessage?: Maybe<MotionMessage>;
   getMotionMessageByMotionId?: Maybe<ModelMotionMessageConnection>;
@@ -2632,6 +2672,7 @@ export type Query = {
   listCurrentVersions?: Maybe<ModelCurrentVersionConnection>;
   listDomainMetadata?: Maybe<ModelDomainMetadataConnection>;
   listDomains?: Maybe<ModelDomainConnection>;
+  listIngestorStats?: Maybe<ModelIngestorStatsConnection>;
   listMotionMessages?: Maybe<ModelMotionMessageConnection>;
   listProfiles?: Maybe<ModelProfileConnection>;
   listTokens?: Maybe<ModelTokenConnection>;
@@ -2639,7 +2680,6 @@ export type Query = {
   listUsers?: Maybe<ModelUserConnection>;
   listWatchedColonies?: Maybe<ModelWatchedColoniesConnection>;
 };
-
 
 export type QueryGetActionsByColonyArgs = {
   colonyId: Scalars['ID'];
@@ -2650,16 +2690,13 @@ export type QueryGetActionsByColonyArgs = {
   sortDirection?: InputMaybe<ModelSortDirection>;
 };
 
-
 export type QueryGetColonyArgs = {
   id: Scalars['ID'];
 };
 
-
 export type QueryGetColonyActionArgs = {
   id: Scalars['ID'];
 };
-
 
 export type QueryGetColonyActionByMotionIdArgs = {
   filter?: InputMaybe<ModelColonyActionFilterInput>;
@@ -2669,7 +2706,6 @@ export type QueryGetColonyActionByMotionIdArgs = {
   sortDirection?: InputMaybe<ModelSortDirection>;
 };
 
-
 export type QueryGetColonyByAddressArgs = {
   filter?: InputMaybe<ModelColonyFilterInput>;
   id: Scalars['ID'];
@@ -2677,7 +2713,6 @@ export type QueryGetColonyByAddressArgs = {
   nextToken?: InputMaybe<Scalars['String']>;
   sortDirection?: InputMaybe<ModelSortDirection>;
 };
-
 
 export type QueryGetColonyByNameArgs = {
   filter?: InputMaybe<ModelColonyFilterInput>;
@@ -2687,7 +2722,6 @@ export type QueryGetColonyByNameArgs = {
   sortDirection?: InputMaybe<ModelSortDirection>;
 };
 
-
 export type QueryGetColonyByTypeArgs = {
   filter?: InputMaybe<ModelColonyFilterInput>;
   limit?: InputMaybe<Scalars['Int']>;
@@ -2696,21 +2730,17 @@ export type QueryGetColonyByTypeArgs = {
   type: ColonyType;
 };
 
-
 export type QueryGetColonyExtensionArgs = {
   id: Scalars['ID'];
 };
-
 
 export type QueryGetColonyFundsClaimArgs = {
   id: Scalars['ID'];
 };
 
-
 export type QueryGetColonyHistoricRoleArgs = {
   id: Scalars['ID'];
 };
-
 
 export type QueryGetColonyHistoricRoleByDateArgs = {
   createdAt?: InputMaybe<ModelStringKeyConditionInput>;
@@ -2721,41 +2751,33 @@ export type QueryGetColonyHistoricRoleByDateArgs = {
   type: Scalars['String'];
 };
 
-
 export type QueryGetColonyMetadataArgs = {
   id: Scalars['ID'];
 };
-
 
 export type QueryGetColonyMotionArgs = {
   id: Scalars['ID'];
 };
 
-
 export type QueryGetColonyRoleArgs = {
   id: Scalars['ID'];
 };
-
 
 export type QueryGetColonyTokensArgs = {
   id: Scalars['ID'];
 };
 
-
 export type QueryGetContractEventArgs = {
   id: Scalars['ID'];
 };
-
 
 export type QueryGetCurrentNetworkInverseFeeArgs = {
   id: Scalars['ID'];
 };
 
-
 export type QueryGetCurrentVersionArgs = {
   id: Scalars['ID'];
 };
-
 
 export type QueryGetCurrentVersionByKeyArgs = {
   filter?: InputMaybe<ModelCurrentVersionFilterInput>;
@@ -2765,16 +2787,13 @@ export type QueryGetCurrentVersionByKeyArgs = {
   sortDirection?: InputMaybe<ModelSortDirection>;
 };
 
-
 export type QueryGetDomainArgs = {
   id: Scalars['ID'];
 };
 
-
 export type QueryGetDomainMetadataArgs = {
   id: Scalars['ID'];
 };
-
 
 export type QueryGetExtensionByColonyAndHashArgs = {
   colonyId: Scalars['ID'];
@@ -2785,16 +2804,17 @@ export type QueryGetExtensionByColonyAndHashArgs = {
   sortDirection?: InputMaybe<ModelSortDirection>;
 };
 
+export type QueryGetIngestorStatsArgs = {
+  id: Scalars['ID'];
+};
 
 export type QueryGetMembersForColonyArgs = {
   input?: InputMaybe<MembersForColonyInput>;
 };
 
-
 export type QueryGetMotionMessageArgs = {
   id: Scalars['ID'];
 };
-
 
 export type QueryGetMotionMessageByMotionIdArgs = {
   createdAt?: InputMaybe<ModelStringKeyConditionInput>;
@@ -2805,21 +2825,17 @@ export type QueryGetMotionMessageByMotionIdArgs = {
   sortDirection?: InputMaybe<ModelSortDirection>;
 };
 
-
 export type QueryGetMotionStateArgs = {
   input?: InputMaybe<GetMotionStateInput>;
 };
-
 
 export type QueryGetMotionTimeoutPeriodsArgs = {
   input?: InputMaybe<GetMotionTimeoutPeriodsInput>;
 };
 
-
 export type QueryGetProfileArgs = {
   id: Scalars['ID'];
 };
-
 
 export type QueryGetProfileByEmailArgs = {
   email: Scalars['AWSEmail'];
@@ -2829,16 +2845,13 @@ export type QueryGetProfileByEmailArgs = {
   sortDirection?: InputMaybe<ModelSortDirection>;
 };
 
-
 export type QueryGetReputationForTopDomainsArgs = {
   input?: InputMaybe<GetReputationForTopDomainsInput>;
 };
 
-
 export type QueryGetTokenArgs = {
   id: Scalars['ID'];
 };
-
 
 export type QueryGetTokenByAddressArgs = {
   filter?: InputMaybe<ModelTokenFilterInput>;
@@ -2848,11 +2861,9 @@ export type QueryGetTokenByAddressArgs = {
   sortDirection?: InputMaybe<ModelSortDirection>;
 };
 
-
 export type QueryGetTokenFromEverywhereArgs = {
   input?: InputMaybe<TokenFromEverywhereArguments>;
 };
-
 
 export type QueryGetTokensByTypeArgs = {
   filter?: InputMaybe<ModelTokenFilterInput>;
@@ -2862,11 +2873,9 @@ export type QueryGetTokensByTypeArgs = {
   type: TokenType;
 };
 
-
 export type QueryGetUserArgs = {
   id: Scalars['ID'];
 };
-
 
 export type QueryGetUserByAddressArgs = {
   filter?: InputMaybe<ModelUserFilterInput>;
@@ -2876,7 +2885,6 @@ export type QueryGetUserByAddressArgs = {
   sortDirection?: InputMaybe<ModelSortDirection>;
 };
 
-
 export type QueryGetUserByNameArgs = {
   filter?: InputMaybe<ModelUserFilterInput>;
   limit?: InputMaybe<Scalars['Int']>;
@@ -2885,31 +2893,25 @@ export type QueryGetUserByNameArgs = {
   sortDirection?: InputMaybe<ModelSortDirection>;
 };
 
-
 export type QueryGetUserReputationArgs = {
   input?: InputMaybe<GetUserReputationInput>;
 };
-
 
 export type QueryGetUserTokenBalanceArgs = {
   input?: InputMaybe<GetUserTokenBalanceInput>;
 };
 
-
 export type QueryGetUserTokensArgs = {
   id: Scalars['ID'];
 };
-
 
 export type QueryGetVoterRewardsArgs = {
   input?: InputMaybe<GetVoterRewardsInput>;
 };
 
-
 export type QueryGetWatchedColoniesArgs = {
   id: Scalars['ID'];
 };
-
 
 export type QueryListColoniesArgs = {
   filter?: InputMaybe<ModelColonyFilterInput>;
@@ -2917,13 +2919,11 @@ export type QueryListColoniesArgs = {
   nextToken?: InputMaybe<Scalars['String']>;
 };
 
-
 export type QueryListColonyActionsArgs = {
   filter?: InputMaybe<ModelColonyActionFilterInput>;
   limit?: InputMaybe<Scalars['Int']>;
   nextToken?: InputMaybe<Scalars['String']>;
 };
-
 
 export type QueryListColonyExtensionsArgs = {
   filter?: InputMaybe<ModelColonyExtensionFilterInput>;
@@ -2931,13 +2931,11 @@ export type QueryListColonyExtensionsArgs = {
   nextToken?: InputMaybe<Scalars['String']>;
 };
 
-
 export type QueryListColonyFundsClaimsArgs = {
   filter?: InputMaybe<ModelColonyFundsClaimFilterInput>;
   limit?: InputMaybe<Scalars['Int']>;
   nextToken?: InputMaybe<Scalars['String']>;
 };
-
 
 export type QueryListColonyHistoricRolesArgs = {
   filter?: InputMaybe<ModelColonyHistoricRoleFilterInput>;
@@ -2945,13 +2943,11 @@ export type QueryListColonyHistoricRolesArgs = {
   nextToken?: InputMaybe<Scalars['String']>;
 };
 
-
 export type QueryListColonyMetadataArgs = {
   filter?: InputMaybe<ModelColonyMetadataFilterInput>;
   limit?: InputMaybe<Scalars['Int']>;
   nextToken?: InputMaybe<Scalars['String']>;
 };
-
 
 export type QueryListColonyMotionsArgs = {
   filter?: InputMaybe<ModelColonyMotionFilterInput>;
@@ -2959,13 +2955,11 @@ export type QueryListColonyMotionsArgs = {
   nextToken?: InputMaybe<Scalars['String']>;
 };
 
-
 export type QueryListColonyRolesArgs = {
   filter?: InputMaybe<ModelColonyRoleFilterInput>;
   limit?: InputMaybe<Scalars['Int']>;
   nextToken?: InputMaybe<Scalars['String']>;
 };
-
 
 export type QueryListColonyTokensArgs = {
   filter?: InputMaybe<ModelColonyTokensFilterInput>;
@@ -2973,13 +2967,11 @@ export type QueryListColonyTokensArgs = {
   nextToken?: InputMaybe<Scalars['String']>;
 };
 
-
 export type QueryListContractEventsArgs = {
   filter?: InputMaybe<ModelContractEventFilterInput>;
   limit?: InputMaybe<Scalars['Int']>;
   nextToken?: InputMaybe<Scalars['String']>;
 };
-
 
 export type QueryListCurrentNetworkInverseFeesArgs = {
   filter?: InputMaybe<ModelCurrentNetworkInverseFeeFilterInput>;
@@ -2987,13 +2979,11 @@ export type QueryListCurrentNetworkInverseFeesArgs = {
   nextToken?: InputMaybe<Scalars['String']>;
 };
 
-
 export type QueryListCurrentVersionsArgs = {
   filter?: InputMaybe<ModelCurrentVersionFilterInput>;
   limit?: InputMaybe<Scalars['Int']>;
   nextToken?: InputMaybe<Scalars['String']>;
 };
-
 
 export type QueryListDomainMetadataArgs = {
   filter?: InputMaybe<ModelDomainMetadataFilterInput>;
@@ -3001,13 +2991,17 @@ export type QueryListDomainMetadataArgs = {
   nextToken?: InputMaybe<Scalars['String']>;
 };
 
-
 export type QueryListDomainsArgs = {
   filter?: InputMaybe<ModelDomainFilterInput>;
   limit?: InputMaybe<Scalars['Int']>;
   nextToken?: InputMaybe<Scalars['String']>;
 };
 
+export type QueryListIngestorStatsArgs = {
+  filter?: InputMaybe<ModelIngestorStatsFilterInput>;
+  limit?: InputMaybe<Scalars['Int']>;
+  nextToken?: InputMaybe<Scalars['String']>;
+};
 
 export type QueryListMotionMessagesArgs = {
   filter?: InputMaybe<ModelMotionMessageFilterInput>;
@@ -3015,13 +3009,11 @@ export type QueryListMotionMessagesArgs = {
   nextToken?: InputMaybe<Scalars['String']>;
 };
 
-
 export type QueryListProfilesArgs = {
   filter?: InputMaybe<ModelProfileFilterInput>;
   limit?: InputMaybe<Scalars['Int']>;
   nextToken?: InputMaybe<Scalars['String']>;
 };
-
 
 export type QueryListTokensArgs = {
   filter?: InputMaybe<ModelTokenFilterInput>;
@@ -3029,20 +3021,17 @@ export type QueryListTokensArgs = {
   nextToken?: InputMaybe<Scalars['String']>;
 };
 
-
 export type QueryListUserTokensArgs = {
   filter?: InputMaybe<ModelUserTokensFilterInput>;
   limit?: InputMaybe<Scalars['Int']>;
   nextToken?: InputMaybe<Scalars['String']>;
 };
 
-
 export type QueryListUsersArgs = {
   filter?: InputMaybe<ModelUserFilterInput>;
   limit?: InputMaybe<Scalars['Int']>;
   nextToken?: InputMaybe<Scalars['String']>;
 };
-
 
 export type QueryListWatchedColoniesArgs = {
   filter?: InputMaybe<ModelWatchedColoniesFilterInput>;
@@ -3059,7 +3048,7 @@ export enum SortingMethod {
   ByHighestRep = 'BY_HIGHEST_REP',
   ByLessPermissions = 'BY_LESS_PERMISSIONS',
   ByLowestRep = 'BY_LOWEST_REP',
-  ByMorePermissions = 'BY_MORE_PERMISSIONS'
+  ByMorePermissions = 'BY_MORE_PERMISSIONS',
 }
 
 export type StakerRewards = {
@@ -3091,6 +3080,7 @@ export type Subscription = {
   onCreateCurrentVersion?: Maybe<CurrentVersion>;
   onCreateDomain?: Maybe<Domain>;
   onCreateDomainMetadata?: Maybe<DomainMetadata>;
+  onCreateIngestorStats?: Maybe<IngestorStats>;
   onCreateMotionMessage?: Maybe<MotionMessage>;
   onCreateProfile?: Maybe<Profile>;
   onCreateToken?: Maybe<Token>;
@@ -3111,6 +3101,7 @@ export type Subscription = {
   onDeleteCurrentVersion?: Maybe<CurrentVersion>;
   onDeleteDomain?: Maybe<Domain>;
   onDeleteDomainMetadata?: Maybe<DomainMetadata>;
+  onDeleteIngestorStats?: Maybe<IngestorStats>;
   onDeleteMotionMessage?: Maybe<MotionMessage>;
   onDeleteProfile?: Maybe<Profile>;
   onDeleteToken?: Maybe<Token>;
@@ -3131,6 +3122,7 @@ export type Subscription = {
   onUpdateCurrentVersion?: Maybe<CurrentVersion>;
   onUpdateDomain?: Maybe<Domain>;
   onUpdateDomainMetadata?: Maybe<DomainMetadata>;
+  onUpdateIngestorStats?: Maybe<IngestorStats>;
   onUpdateMotionMessage?: Maybe<MotionMessage>;
   onUpdateProfile?: Maybe<Profile>;
   onUpdateToken?: Maybe<Token>;
@@ -3139,301 +3131,253 @@ export type Subscription = {
   onUpdateWatchedColonies?: Maybe<WatchedColonies>;
 };
 
-
 export type SubscriptionOnCreateColonyArgs = {
   filter?: InputMaybe<ModelSubscriptionColonyFilterInput>;
 };
-
 
 export type SubscriptionOnCreateColonyActionArgs = {
   filter?: InputMaybe<ModelSubscriptionColonyActionFilterInput>;
 };
 
-
 export type SubscriptionOnCreateColonyExtensionArgs = {
   filter?: InputMaybe<ModelSubscriptionColonyExtensionFilterInput>;
 };
-
 
 export type SubscriptionOnCreateColonyFundsClaimArgs = {
   filter?: InputMaybe<ModelSubscriptionColonyFundsClaimFilterInput>;
 };
 
-
 export type SubscriptionOnCreateColonyHistoricRoleArgs = {
   filter?: InputMaybe<ModelSubscriptionColonyHistoricRoleFilterInput>;
 };
-
 
 export type SubscriptionOnCreateColonyMetadataArgs = {
   filter?: InputMaybe<ModelSubscriptionColonyMetadataFilterInput>;
 };
 
-
 export type SubscriptionOnCreateColonyMotionArgs = {
   filter?: InputMaybe<ModelSubscriptionColonyMotionFilterInput>;
 };
-
 
 export type SubscriptionOnCreateColonyRoleArgs = {
   filter?: InputMaybe<ModelSubscriptionColonyRoleFilterInput>;
 };
 
-
 export type SubscriptionOnCreateColonyTokensArgs = {
   filter?: InputMaybe<ModelSubscriptionColonyTokensFilterInput>;
 };
-
 
 export type SubscriptionOnCreateContractEventArgs = {
   filter?: InputMaybe<ModelSubscriptionContractEventFilterInput>;
 };
 
-
 export type SubscriptionOnCreateCurrentNetworkInverseFeeArgs = {
   filter?: InputMaybe<ModelSubscriptionCurrentNetworkInverseFeeFilterInput>;
 };
-
 
 export type SubscriptionOnCreateCurrentVersionArgs = {
   filter?: InputMaybe<ModelSubscriptionCurrentVersionFilterInput>;
 };
 
-
 export type SubscriptionOnCreateDomainArgs = {
   filter?: InputMaybe<ModelSubscriptionDomainFilterInput>;
 };
-
 
 export type SubscriptionOnCreateDomainMetadataArgs = {
   filter?: InputMaybe<ModelSubscriptionDomainMetadataFilterInput>;
 };
 
+export type SubscriptionOnCreateIngestorStatsArgs = {
+  filter?: InputMaybe<ModelSubscriptionIngestorStatsFilterInput>;
+};
 
 export type SubscriptionOnCreateMotionMessageArgs = {
   filter?: InputMaybe<ModelSubscriptionMotionMessageFilterInput>;
 };
 
-
 export type SubscriptionOnCreateProfileArgs = {
   filter?: InputMaybe<ModelSubscriptionProfileFilterInput>;
 };
-
 
 export type SubscriptionOnCreateTokenArgs = {
   filter?: InputMaybe<ModelSubscriptionTokenFilterInput>;
 };
 
-
 export type SubscriptionOnCreateUserArgs = {
   filter?: InputMaybe<ModelSubscriptionUserFilterInput>;
 };
-
 
 export type SubscriptionOnCreateUserTokensArgs = {
   filter?: InputMaybe<ModelSubscriptionUserTokensFilterInput>;
 };
 
-
 export type SubscriptionOnCreateWatchedColoniesArgs = {
   filter?: InputMaybe<ModelSubscriptionWatchedColoniesFilterInput>;
 };
-
 
 export type SubscriptionOnDeleteColonyArgs = {
   filter?: InputMaybe<ModelSubscriptionColonyFilterInput>;
 };
 
-
 export type SubscriptionOnDeleteColonyActionArgs = {
   filter?: InputMaybe<ModelSubscriptionColonyActionFilterInput>;
 };
-
 
 export type SubscriptionOnDeleteColonyExtensionArgs = {
   filter?: InputMaybe<ModelSubscriptionColonyExtensionFilterInput>;
 };
 
-
 export type SubscriptionOnDeleteColonyFundsClaimArgs = {
   filter?: InputMaybe<ModelSubscriptionColonyFundsClaimFilterInput>;
 };
-
 
 export type SubscriptionOnDeleteColonyHistoricRoleArgs = {
   filter?: InputMaybe<ModelSubscriptionColonyHistoricRoleFilterInput>;
 };
 
-
 export type SubscriptionOnDeleteColonyMetadataArgs = {
   filter?: InputMaybe<ModelSubscriptionColonyMetadataFilterInput>;
 };
-
 
 export type SubscriptionOnDeleteColonyMotionArgs = {
   filter?: InputMaybe<ModelSubscriptionColonyMotionFilterInput>;
 };
 
-
 export type SubscriptionOnDeleteColonyRoleArgs = {
   filter?: InputMaybe<ModelSubscriptionColonyRoleFilterInput>;
 };
-
 
 export type SubscriptionOnDeleteColonyTokensArgs = {
   filter?: InputMaybe<ModelSubscriptionColonyTokensFilterInput>;
 };
 
-
 export type SubscriptionOnDeleteContractEventArgs = {
   filter?: InputMaybe<ModelSubscriptionContractEventFilterInput>;
 };
-
 
 export type SubscriptionOnDeleteCurrentNetworkInverseFeeArgs = {
   filter?: InputMaybe<ModelSubscriptionCurrentNetworkInverseFeeFilterInput>;
 };
 
-
 export type SubscriptionOnDeleteCurrentVersionArgs = {
   filter?: InputMaybe<ModelSubscriptionCurrentVersionFilterInput>;
 };
-
 
 export type SubscriptionOnDeleteDomainArgs = {
   filter?: InputMaybe<ModelSubscriptionDomainFilterInput>;
 };
 
-
 export type SubscriptionOnDeleteDomainMetadataArgs = {
   filter?: InputMaybe<ModelSubscriptionDomainMetadataFilterInput>;
 };
 
+export type SubscriptionOnDeleteIngestorStatsArgs = {
+  filter?: InputMaybe<ModelSubscriptionIngestorStatsFilterInput>;
+};
 
 export type SubscriptionOnDeleteMotionMessageArgs = {
   filter?: InputMaybe<ModelSubscriptionMotionMessageFilterInput>;
 };
 
-
 export type SubscriptionOnDeleteProfileArgs = {
   filter?: InputMaybe<ModelSubscriptionProfileFilterInput>;
 };
-
 
 export type SubscriptionOnDeleteTokenArgs = {
   filter?: InputMaybe<ModelSubscriptionTokenFilterInput>;
 };
 
-
 export type SubscriptionOnDeleteUserArgs = {
   filter?: InputMaybe<ModelSubscriptionUserFilterInput>;
 };
-
 
 export type SubscriptionOnDeleteUserTokensArgs = {
   filter?: InputMaybe<ModelSubscriptionUserTokensFilterInput>;
 };
 
-
 export type SubscriptionOnDeleteWatchedColoniesArgs = {
   filter?: InputMaybe<ModelSubscriptionWatchedColoniesFilterInput>;
 };
-
 
 export type SubscriptionOnUpdateColonyArgs = {
   filter?: InputMaybe<ModelSubscriptionColonyFilterInput>;
 };
 
-
 export type SubscriptionOnUpdateColonyActionArgs = {
   filter?: InputMaybe<ModelSubscriptionColonyActionFilterInput>;
 };
-
 
 export type SubscriptionOnUpdateColonyExtensionArgs = {
   filter?: InputMaybe<ModelSubscriptionColonyExtensionFilterInput>;
 };
 
-
 export type SubscriptionOnUpdateColonyFundsClaimArgs = {
   filter?: InputMaybe<ModelSubscriptionColonyFundsClaimFilterInput>;
 };
-
 
 export type SubscriptionOnUpdateColonyHistoricRoleArgs = {
   filter?: InputMaybe<ModelSubscriptionColonyHistoricRoleFilterInput>;
 };
 
-
 export type SubscriptionOnUpdateColonyMetadataArgs = {
   filter?: InputMaybe<ModelSubscriptionColonyMetadataFilterInput>;
 };
-
 
 export type SubscriptionOnUpdateColonyMotionArgs = {
   filter?: InputMaybe<ModelSubscriptionColonyMotionFilterInput>;
 };
 
-
 export type SubscriptionOnUpdateColonyRoleArgs = {
   filter?: InputMaybe<ModelSubscriptionColonyRoleFilterInput>;
 };
-
 
 export type SubscriptionOnUpdateColonyTokensArgs = {
   filter?: InputMaybe<ModelSubscriptionColonyTokensFilterInput>;
 };
 
-
 export type SubscriptionOnUpdateContractEventArgs = {
   filter?: InputMaybe<ModelSubscriptionContractEventFilterInput>;
 };
-
 
 export type SubscriptionOnUpdateCurrentNetworkInverseFeeArgs = {
   filter?: InputMaybe<ModelSubscriptionCurrentNetworkInverseFeeFilterInput>;
 };
 
-
 export type SubscriptionOnUpdateCurrentVersionArgs = {
   filter?: InputMaybe<ModelSubscriptionCurrentVersionFilterInput>;
 };
-
 
 export type SubscriptionOnUpdateDomainArgs = {
   filter?: InputMaybe<ModelSubscriptionDomainFilterInput>;
 };
 
-
 export type SubscriptionOnUpdateDomainMetadataArgs = {
   filter?: InputMaybe<ModelSubscriptionDomainMetadataFilterInput>;
 };
 
+export type SubscriptionOnUpdateIngestorStatsArgs = {
+  filter?: InputMaybe<ModelSubscriptionIngestorStatsFilterInput>;
+};
 
 export type SubscriptionOnUpdateMotionMessageArgs = {
   filter?: InputMaybe<ModelSubscriptionMotionMessageFilterInput>;
 };
 
-
 export type SubscriptionOnUpdateProfileArgs = {
   filter?: InputMaybe<ModelSubscriptionProfileFilterInput>;
 };
-
 
 export type SubscriptionOnUpdateTokenArgs = {
   filter?: InputMaybe<ModelSubscriptionTokenFilterInput>;
 };
 
-
 export type SubscriptionOnUpdateUserArgs = {
   filter?: InputMaybe<ModelSubscriptionUserFilterInput>;
 };
 
-
 export type SubscriptionOnUpdateUserTokensArgs = {
   filter?: InputMaybe<ModelSubscriptionUserTokensFilterInput>;
 };
-
 
 export type SubscriptionOnUpdateWatchedColoniesArgs = {
   filter?: InputMaybe<ModelSubscriptionWatchedColoniesFilterInput>;
@@ -3455,14 +3399,12 @@ export type Token = {
   users?: Maybe<ModelUserTokensConnection>;
 };
 
-
 export type TokenColoniesArgs = {
   filter?: InputMaybe<ModelColonyTokensFilterInput>;
   limit?: InputMaybe<Scalars['Int']>;
   nextToken?: InputMaybe<Scalars['String']>;
   sortDirection?: InputMaybe<ModelSortDirection>;
 };
-
 
 export type TokenUsersArgs = {
   filter?: InputMaybe<ModelUserTokensFilterInput>;
@@ -3487,7 +3429,7 @@ export type TokenInput = {
 export enum TokenType {
   ChainNative = 'CHAIN_NATIVE',
   Colony = 'COLONY',
-  Erc20 = 'ERC20'
+  Erc20 = 'ERC20',
 }
 
 export type UpdateColonyActionInput = {
@@ -3671,6 +3613,11 @@ export type UpdateExtensionByColonyAndHashInput = {
   version?: InputMaybe<Scalars['Int']>;
 };
 
+export type UpdateIngestorStatsInput = {
+  id: Scalars['ID'];
+  value?: InputMaybe<Scalars['String']>;
+};
+
 export type UpdateMotionMessageInput = {
   amount?: InputMaybe<Scalars['String']>;
   createdAt?: InputMaybe<Scalars['AWSDateTime']>;
@@ -3736,14 +3683,12 @@ export type User = {
   watchlist?: Maybe<ModelWatchedColoniesConnection>;
 };
 
-
 export type UserTokensArgs = {
   filter?: InputMaybe<ModelUserTokensFilterInput>;
   limit?: InputMaybe<Scalars['Int']>;
   nextToken?: InputMaybe<Scalars['String']>;
   sortDirection?: InputMaybe<ModelSortDirection>;
 };
-
 
 export type UserWatchlistArgs = {
   filter?: InputMaybe<ModelWatchedColoniesFilterInput>;
@@ -3839,228 +3784,529 @@ export type Watcher = {
   user?: Maybe<User>;
 };
 
-export type ColonyFragment = { __typename?: 'Colony', colonyAddress: string, tokens?: { __typename?: 'ModelColonyTokensConnection', items: Array<{ __typename?: 'ColonyTokens', id: string, tokenAddress: string } | null> } | null, motionsWithUnclaimedStakes?: Array<{ __typename?: 'ColonyUnclaimedStake', motionId: string, unclaimedRewards: Array<{ __typename?: 'StakerRewards', address: string, isClaimed: boolean, rewards: { __typename?: 'MotionStakeValues', yay: string, nay: string } }> }> | null };
+export type ColonyFragment = {
+  __typename?: 'Colony';
+  colonyAddress: string;
+  tokens?: {
+    __typename?: 'ModelColonyTokensConnection';
+    items: Array<{
+      __typename?: 'ColonyTokens';
+      id: string;
+      tokenAddress: string;
+    } | null>;
+  } | null;
+  motionsWithUnclaimedStakes?: Array<{
+    __typename?: 'ColonyUnclaimedStake';
+    motionId: string;
+    unclaimedRewards: Array<{
+      __typename?: 'StakerRewards';
+      address: string;
+      isClaimed: boolean;
+      rewards: { __typename?: 'MotionStakeValues'; yay: string; nay: string };
+    }>;
+  }> | null;
+};
 
-export type ColonyMotionFragment = { __typename?: 'ColonyMotion', id: string, nativeMotionId: string, requiredStake: string, remainingStakes: Array<string>, userMinStake: string, rootHash: string, nativeMotionDomainId: string, isFinalized: boolean, createdBy: string, repSubmitted: string, skillRep: string, hasObjection: boolean, motionStakes: { __typename?: 'MotionStakes', raw: { __typename?: 'MotionStakeValues', nay: string, yay: string }, percentage: { __typename?: 'MotionStakeValues', nay: string, yay: string } }, usersStakes: Array<{ __typename?: 'UserStakes', address: string, stakes: { __typename?: 'MotionStakes', raw: { __typename?: 'MotionStakeValues', yay: string, nay: string }, percentage: { __typename?: 'MotionStakeValues', yay: string, nay: string } } }>, stakerRewards: Array<{ __typename?: 'StakerRewards', address: string, isClaimed: boolean, rewards: { __typename?: 'MotionStakeValues', yay: string, nay: string } }>, voterRecord: Array<{ __typename?: 'VoterRecord', address: string, voteCount: string, vote?: number | null }>, revealedVotes: { __typename?: 'MotionStakes', raw: { __typename?: 'MotionStakeValues', yay: string, nay: string }, percentage: { __typename?: 'MotionStakeValues', yay: string, nay: string } }, motionStateHistory: { __typename?: 'MotionStateHistory', hasVoted: boolean, hasPassed: boolean, hasFailed: boolean, hasFailedNotFinalizable: boolean, inRevealPhase: boolean } };
+export type ColonyMotionFragment = {
+  __typename?: 'ColonyMotion';
+  id: string;
+  nativeMotionId: string;
+  requiredStake: string;
+  remainingStakes: Array<string>;
+  userMinStake: string;
+  rootHash: string;
+  nativeMotionDomainId: string;
+  isFinalized: boolean;
+  createdBy: string;
+  repSubmitted: string;
+  skillRep: string;
+  hasObjection: boolean;
+  motionStakes: {
+    __typename?: 'MotionStakes';
+    raw: { __typename?: 'MotionStakeValues'; nay: string; yay: string };
+    percentage: { __typename?: 'MotionStakeValues'; nay: string; yay: string };
+  };
+  usersStakes: Array<{
+    __typename?: 'UserStakes';
+    address: string;
+    stakes: {
+      __typename?: 'MotionStakes';
+      raw: { __typename?: 'MotionStakeValues'; yay: string; nay: string };
+      percentage: {
+        __typename?: 'MotionStakeValues';
+        yay: string;
+        nay: string;
+      };
+    };
+  }>;
+  stakerRewards: Array<{
+    __typename?: 'StakerRewards';
+    address: string;
+    isClaimed: boolean;
+    rewards: { __typename?: 'MotionStakeValues'; yay: string; nay: string };
+  }>;
+  voterRecord: Array<{
+    __typename?: 'VoterRecord';
+    address: string;
+    voteCount: string;
+    vote?: number | null;
+  }>;
+  revealedVotes: {
+    __typename?: 'MotionStakes';
+    raw: { __typename?: 'MotionStakeValues'; yay: string; nay: string };
+    percentage: { __typename?: 'MotionStakeValues'; yay: string; nay: string };
+  };
+  motionStateHistory: {
+    __typename?: 'MotionStateHistory';
+    hasVoted: boolean;
+    hasPassed: boolean;
+    hasFailed: boolean;
+    hasFailedNotFinalizable: boolean;
+    inRevealPhase: boolean;
+  };
+};
 
-export type VoterRecordFragment = { __typename?: 'VoterRecord', address: string, voteCount: string, vote?: number | null };
+export type VoterRecordFragment = {
+  __typename?: 'VoterRecord';
+  address: string;
+  voteCount: string;
+  vote?: number | null;
+};
 
-export type StakerRewardFragment = { __typename?: 'StakerRewards', address: string, isClaimed: boolean, rewards: { __typename?: 'MotionStakeValues', yay: string, nay: string } };
+export type StakerRewardFragment = {
+  __typename?: 'StakerRewards';
+  address: string;
+  isClaimed: boolean;
+  rewards: { __typename?: 'MotionStakeValues'; yay: string; nay: string };
+};
 
-export type MotionStakesFragment = { __typename?: 'MotionStakes', raw: { __typename?: 'MotionStakeValues', nay: string, yay: string }, percentage: { __typename?: 'MotionStakeValues', nay: string, yay: string } };
+export type MotionStakesFragment = {
+  __typename?: 'MotionStakes';
+  raw: { __typename?: 'MotionStakeValues'; nay: string; yay: string };
+  percentage: { __typename?: 'MotionStakeValues'; nay: string; yay: string };
+};
 
-export type UserStakesFragment = { __typename?: 'UserStakes', address: string, stakes: { __typename?: 'MotionStakes', raw: { __typename?: 'MotionStakeValues', yay: string, nay: string }, percentage: { __typename?: 'MotionStakeValues', yay: string, nay: string } } };
+export type UserStakesFragment = {
+  __typename?: 'UserStakes';
+  address: string;
+  stakes: {
+    __typename?: 'MotionStakes';
+    raw: { __typename?: 'MotionStakeValues'; yay: string; nay: string };
+    percentage: { __typename?: 'MotionStakeValues'; yay: string; nay: string };
+  };
+};
 
-export type DomainMetadataFragment = { __typename?: 'DomainMetadata', name: string, color: DomainColor, description: string, changelog?: Array<{ __typename?: 'DomainMetadataChangelog', transactionHash: string, oldName: string, newName: string, oldColor: DomainColor, newColor: DomainColor, oldDescription: string, newDescription: string }> | null };
+export type DomainMetadataFragment = {
+  __typename?: 'DomainMetadata';
+  name: string;
+  color: DomainColor;
+  description: string;
+  changelog?: Array<{
+    __typename?: 'DomainMetadataChangelog';
+    transactionHash: string;
+    oldName: string;
+    newName: string;
+    oldColor: DomainColor;
+    newColor: DomainColor;
+    oldDescription: string;
+    newDescription: string;
+  }> | null;
+};
 
-export type ColonyMetadataFragment = { __typename?: 'ColonyMetadata', id: string, displayName: string, avatar?: string | null, thumbnail?: string | null, isWhitelistActivated?: boolean | null, whitelistedAddresses?: Array<string> | null, changelog?: Array<{ __typename?: 'ColonyMetadataChangelog', transactionHash: string, oldDisplayName: string, newDisplayName: string, hasAvatarChanged: boolean, hasWhitelistChanged: boolean, haveTokensChanged: boolean }> | null, modifiedTokenAddresses?: { __typename?: 'PendingModifiedTokenAddresses', added?: Array<string> | null, removed?: Array<string> | null } | null };
+export type ColonyMetadataFragment = {
+  __typename?: 'ColonyMetadata';
+  id: string;
+  displayName: string;
+  avatar?: string | null;
+  thumbnail?: string | null;
+  isWhitelistActivated?: boolean | null;
+  whitelistedAddresses?: Array<string> | null;
+  changelog?: Array<{
+    __typename?: 'ColonyMetadataChangelog';
+    transactionHash: string;
+    oldDisplayName: string;
+    newDisplayName: string;
+    hasAvatarChanged: boolean;
+    hasWhitelistChanged: boolean;
+    haveTokensChanged: boolean;
+  }> | null;
+  modifiedTokenAddresses?: {
+    __typename?: 'PendingModifiedTokenAddresses';
+    added?: Array<string> | null;
+    removed?: Array<string> | null;
+  } | null;
+};
 
 export type CreateColonyActionMutationVariables = Exact<{
   input: CreateColonyActionInput;
 }>;
 
-
-export type CreateColonyActionMutation = { __typename?: 'Mutation', createColonyAction?: { __typename?: 'ColonyAction', id: string } | null };
+export type CreateColonyActionMutation = {
+  __typename?: 'Mutation';
+  createColonyAction?: { __typename?: 'ColonyAction'; id: string } | null;
+};
 
 export type UpdateColonyActionMutationVariables = Exact<{
   input: UpdateColonyActionInput;
 }>;
 
-
-export type UpdateColonyActionMutation = { __typename?: 'Mutation', updateColonyAction?: { __typename?: 'ColonyAction', id: string } | null };
+export type UpdateColonyActionMutation = {
+  __typename?: 'Mutation';
+  updateColonyAction?: { __typename?: 'ColonyAction'; id: string } | null;
+};
 
 export type UpdateColonyMutationVariables = Exact<{
   input: UpdateColonyInput;
 }>;
 
-
-export type UpdateColonyMutation = { __typename?: 'Mutation', updateColony?: { __typename?: 'Colony', id: string } | null };
+export type UpdateColonyMutation = {
+  __typename?: 'Mutation';
+  updateColony?: { __typename?: 'Colony'; id: string } | null;
+};
 
 export type UpdateColonyMetadataMutationVariables = Exact<{
   input: UpdateColonyMetadataInput;
 }>;
 
-
-export type UpdateColonyMetadataMutation = { __typename?: 'Mutation', updateColonyMetadata?: { __typename?: 'ColonyMetadata', id: string } | null };
+export type UpdateColonyMetadataMutation = {
+  __typename?: 'Mutation';
+  updateColonyMetadata?: { __typename?: 'ColonyMetadata'; id: string } | null;
+};
 
 export type SetCurrentVersionMutationVariables = Exact<{
   input: SetCurrentVersionInput;
 }>;
 
-
-export type SetCurrentVersionMutation = { __typename?: 'Mutation', setCurrentVersion?: boolean | null };
+export type SetCurrentVersionMutation = {
+  __typename?: 'Mutation';
+  setCurrentVersion?: boolean | null;
+};
 
 export type CreateDomainMutationVariables = Exact<{
   input: CreateDomainInput;
 }>;
 
-
-export type CreateDomainMutation = { __typename?: 'Mutation', createDomain?: { __typename?: 'Domain', id: string } | null };
+export type CreateDomainMutation = {
+  __typename?: 'Mutation';
+  createDomain?: { __typename?: 'Domain'; id: string } | null;
+};
 
 export type CreateDomainMetadataMutationVariables = Exact<{
   input: CreateDomainMetadataInput;
 }>;
 
-
-export type CreateDomainMetadataMutation = { __typename?: 'Mutation', createDomainMetadata?: { __typename?: 'DomainMetadata', id: string } | null };
+export type CreateDomainMetadataMutation = {
+  __typename?: 'Mutation';
+  createDomainMetadata?: { __typename?: 'DomainMetadata'; id: string } | null;
+};
 
 export type UpdateDomainMetadataMutationVariables = Exact<{
   input: UpdateDomainMetadataInput;
 }>;
 
-
-export type UpdateDomainMetadataMutation = { __typename?: 'Mutation', updateDomainMetadata?: { __typename?: 'DomainMetadata', id: string } | null };
+export type UpdateDomainMetadataMutation = {
+  __typename?: 'Mutation';
+  updateDomainMetadata?: { __typename?: 'DomainMetadata'; id: string } | null;
+};
 
 export type CreateContractEventMutationVariables = Exact<{
   input: CreateContractEventInput;
   condition?: InputMaybe<ModelContractEventConditionInput>;
 }>;
 
-
-export type CreateContractEventMutation = { __typename?: 'Mutation', createContractEvent?: { __typename?: 'ContractEvent', id: string } | null };
+export type CreateContractEventMutation = {
+  __typename?: 'Mutation';
+  createContractEvent?: { __typename?: 'ContractEvent'; id: string } | null;
+};
 
 export type CreateColonyExtensionMutationVariables = Exact<{
   input: CreateColonyExtensionInput;
 }>;
 
-
-export type CreateColonyExtensionMutation = { __typename?: 'Mutation', createColonyExtension?: { __typename?: 'ColonyExtension', id: string } | null };
+export type CreateColonyExtensionMutation = {
+  __typename?: 'Mutation';
+  createColonyExtension?: { __typename?: 'ColonyExtension'; id: string } | null;
+};
 
 export type UpdateColonyExtensionByColonyAndHashMutationVariables = Exact<{
   input: UpdateExtensionByColonyAndHashInput;
 }>;
 
-
-export type UpdateColonyExtensionByColonyAndHashMutation = { __typename?: 'Mutation', updateExtensionByColonyAndHash?: { __typename?: 'ColonyExtension', id: string } | null };
+export type UpdateColonyExtensionByColonyAndHashMutation = {
+  __typename?: 'Mutation';
+  updateExtensionByColonyAndHash?: {
+    __typename?: 'ColonyExtension';
+    id: string;
+  } | null;
+};
 
 export type UpdateColonyExtensionByAddressMutationVariables = Exact<{
   input: UpdateColonyExtensionInput;
 }>;
 
-
-export type UpdateColonyExtensionByAddressMutation = { __typename?: 'Mutation', updateColonyExtension?: { __typename?: 'ColonyExtension', id: string, extensionHash: string, colonyAddress: string } | null };
+export type UpdateColonyExtensionByAddressMutation = {
+  __typename?: 'Mutation';
+  updateColonyExtension?: {
+    __typename?: 'ColonyExtension';
+    id: string;
+    extensionHash: string;
+    colonyAddress: string;
+  } | null;
+};
 
 export type CreateColonyFundsClaimMutationVariables = Exact<{
   input: CreateColonyFundsClaimInput;
   condition?: InputMaybe<ModelColonyFundsClaimConditionInput>;
 }>;
 
-
-export type CreateColonyFundsClaimMutation = { __typename?: 'Mutation', createColonyFundsClaim?: { __typename?: 'ColonyFundsClaim', id: string } | null };
+export type CreateColonyFundsClaimMutation = {
+  __typename?: 'Mutation';
+  createColonyFundsClaim?: {
+    __typename?: 'ColonyFundsClaim';
+    id: string;
+  } | null;
+};
 
 export type DeleteColonyFundsClaimMutationVariables = Exact<{
   input: DeleteColonyFundsClaimInput;
   condition?: InputMaybe<ModelColonyFundsClaimConditionInput>;
 }>;
 
-
-export type DeleteColonyFundsClaimMutation = { __typename?: 'Mutation', deleteColonyFundsClaim?: { __typename?: 'ColonyFundsClaim', id: string } | null };
+export type DeleteColonyFundsClaimMutation = {
+  __typename?: 'Mutation';
+  deleteColonyFundsClaim?: {
+    __typename?: 'ColonyFundsClaim';
+    id: string;
+  } | null;
+};
 
 export type CreateCurrentNetworkInverseFeeMutationVariables = Exact<{
   input: CreateCurrentNetworkInverseFeeInput;
 }>;
 
-
-export type CreateCurrentNetworkInverseFeeMutation = { __typename?: 'Mutation', createCurrentNetworkInverseFee?: { __typename?: 'CurrentNetworkInverseFee', id: string } | null };
+export type CreateCurrentNetworkInverseFeeMutation = {
+  __typename?: 'Mutation';
+  createCurrentNetworkInverseFee?: {
+    __typename?: 'CurrentNetworkInverseFee';
+    id: string;
+  } | null;
+};
 
 export type UpdateCurrentNetworkInverseFeeMutationVariables = Exact<{
   input: UpdateCurrentNetworkInverseFeeInput;
 }>;
 
-
-export type UpdateCurrentNetworkInverseFeeMutation = { __typename?: 'Mutation', updateCurrentNetworkInverseFee?: { __typename?: 'CurrentNetworkInverseFee', id: string } | null };
+export type UpdateCurrentNetworkInverseFeeMutation = {
+  __typename?: 'Mutation';
+  updateCurrentNetworkInverseFee?: {
+    __typename?: 'CurrentNetworkInverseFee';
+    id: string;
+  } | null;
+};
 
 export type CreateColonyMotionMutationVariables = Exact<{
   input: CreateColonyMotionInput;
 }>;
 
-
-export type CreateColonyMotionMutation = { __typename?: 'Mutation', createColonyMotion?: { __typename?: 'ColonyMotion', id: string } | null };
+export type CreateColonyMotionMutation = {
+  __typename?: 'Mutation';
+  createColonyMotion?: { __typename?: 'ColonyMotion'; id: string } | null;
+};
 
 export type UpdateColonyMotionMutationVariables = Exact<{
   input: UpdateColonyMotionInput;
 }>;
 
-
-export type UpdateColonyMotionMutation = { __typename?: 'Mutation', updateColonyMotion?: { __typename?: 'ColonyMotion', id: string } | null };
+export type UpdateColonyMotionMutation = {
+  __typename?: 'Mutation';
+  updateColonyMotion?: { __typename?: 'ColonyMotion'; id: string } | null;
+};
 
 export type CreateColonyRoleMutationVariables = Exact<{
   input: CreateColonyRoleInput;
 }>;
 
-
-export type CreateColonyRoleMutation = { __typename?: 'Mutation', createColonyRole?: { __typename?: 'ColonyRole', id: string } | null };
+export type CreateColonyRoleMutation = {
+  __typename?: 'Mutation';
+  createColonyRole?: { __typename?: 'ColonyRole'; id: string } | null;
+};
 
 export type UpdateColonyRoleMutationVariables = Exact<{
   input: UpdateColonyRoleInput;
 }>;
 
-
-export type UpdateColonyRoleMutation = { __typename?: 'Mutation', updateColonyRole?: { __typename?: 'ColonyRole', id: string } | null };
+export type UpdateColonyRoleMutation = {
+  __typename?: 'Mutation';
+  updateColonyRole?: { __typename?: 'ColonyRole'; id: string } | null;
+};
 
 export type CreateColonyHistoricRoleMutationVariables = Exact<{
   input: CreateColonyHistoricRoleInput;
 }>;
 
+export type CreateColonyHistoricRoleMutation = {
+  __typename?: 'Mutation';
+  createColonyHistoricRole?: {
+    __typename?: 'ColonyHistoricRole';
+    id: string;
+  } | null;
+};
 
-export type CreateColonyHistoricRoleMutation = { __typename?: 'Mutation', createColonyHistoricRole?: { __typename?: 'ColonyHistoricRole', id: string } | null };
+export type CreateStatsMutationVariables = Exact<{
+  value: Scalars['String'];
+}>;
+
+export type CreateStatsMutation = {
+  __typename?: 'Mutation';
+  createIngestorStats?: { __typename?: 'IngestorStats'; id: string } | null;
+};
+
+export type UpdateStatsMutationVariables = Exact<{
+  value: Scalars['String'];
+}>;
+
+export type UpdateStatsMutation = {
+  __typename?: 'Mutation';
+  updateIngestorStats?: { __typename?: 'IngestorStats'; id: string } | null;
+};
 
 export type CreateColonyTokensMutationVariables = Exact<{
   input: CreateColonyTokensInput;
 }>;
 
-
-export type CreateColonyTokensMutation = { __typename?: 'Mutation', createColonyTokens?: { __typename?: 'ColonyTokens', id: string } | null };
+export type CreateColonyTokensMutation = {
+  __typename?: 'Mutation';
+  createColonyTokens?: { __typename?: 'ColonyTokens'; id: string } | null;
+};
 
 export type DeleteColonyTokensMutationVariables = Exact<{
   input: DeleteColonyTokensInput;
 }>;
 
-
-export type DeleteColonyTokensMutation = { __typename?: 'Mutation', deleteColonyTokens?: { __typename?: 'ColonyTokens', id: string } | null };
+export type DeleteColonyTokensMutation = {
+  __typename?: 'Mutation';
+  deleteColonyTokens?: { __typename?: 'ColonyTokens'; id: string } | null;
+};
 
 export type GetColonyMetadataQueryVariables = Exact<{
   id: Scalars['ID'];
 }>;
 
-
-export type GetColonyMetadataQuery = { __typename?: 'Query', getColonyMetadata?: { __typename?: 'ColonyMetadata', id: string, displayName: string, avatar?: string | null, thumbnail?: string | null, isWhitelistActivated?: boolean | null, whitelistedAddresses?: Array<string> | null, changelog?: Array<{ __typename?: 'ColonyMetadataChangelog', transactionHash: string, oldDisplayName: string, newDisplayName: string, hasAvatarChanged: boolean, hasWhitelistChanged: boolean, haveTokensChanged: boolean }> | null, modifiedTokenAddresses?: { __typename?: 'PendingModifiedTokenAddresses', added?: Array<string> | null, removed?: Array<string> | null } | null } | null };
+export type GetColonyMetadataQuery = {
+  __typename?: 'Query';
+  getColonyMetadata?: {
+    __typename?: 'ColonyMetadata';
+    id: string;
+    displayName: string;
+    avatar?: string | null;
+    thumbnail?: string | null;
+    isWhitelistActivated?: boolean | null;
+    whitelistedAddresses?: Array<string> | null;
+    changelog?: Array<{
+      __typename?: 'ColonyMetadataChangelog';
+      transactionHash: string;
+      oldDisplayName: string;
+      newDisplayName: string;
+      hasAvatarChanged: boolean;
+      hasWhitelistChanged: boolean;
+      haveTokensChanged: boolean;
+    }> | null;
+    modifiedTokenAddresses?: {
+      __typename?: 'PendingModifiedTokenAddresses';
+      added?: Array<string> | null;
+      removed?: Array<string> | null;
+    } | null;
+  } | null;
+};
 
 export type GetColonyQueryVariables = Exact<{
   id: Scalars['ID'];
 }>;
 
-
-export type GetColonyQuery = { __typename?: 'Query', getColony?: { __typename?: 'Colony', colonyAddress: string, tokens?: { __typename?: 'ModelColonyTokensConnection', items: Array<{ __typename?: 'ColonyTokens', id: string, tokenAddress: string } | null> } | null, motionsWithUnclaimedStakes?: Array<{ __typename?: 'ColonyUnclaimedStake', motionId: string, unclaimedRewards: Array<{ __typename?: 'StakerRewards', address: string, isClaimed: boolean, rewards: { __typename?: 'MotionStakeValues', yay: string, nay: string } }> }> | null } | null };
+export type GetColonyQuery = {
+  __typename?: 'Query';
+  getColony?: {
+    __typename?: 'Colony';
+    colonyAddress: string;
+    tokens?: {
+      __typename?: 'ModelColonyTokensConnection';
+      items: Array<{
+        __typename?: 'ColonyTokens';
+        id: string;
+        tokenAddress: string;
+      } | null>;
+    } | null;
+    motionsWithUnclaimedStakes?: Array<{
+      __typename?: 'ColonyUnclaimedStake';
+      motionId: string;
+      unclaimedRewards: Array<{
+        __typename?: 'StakerRewards';
+        address: string;
+        isClaimed: boolean;
+        rewards: { __typename?: 'MotionStakeValues'; yay: string; nay: string };
+      }>;
+    }> | null;
+  } | null;
+};
 
 export type GetDomainMetadataQueryVariables = Exact<{
   id: Scalars['ID'];
 }>;
 
-
-export type GetDomainMetadataQuery = { __typename?: 'Query', getDomainMetadata?: { __typename?: 'DomainMetadata', color: DomainColor, description: string, id: string, name: string, changelog?: Array<{ __typename?: 'DomainMetadataChangelog', newColor: DomainColor, newDescription: string, newName: string, oldColor: DomainColor, oldDescription: string, oldName: string, transactionHash: string }> | null } | null };
+export type GetDomainMetadataQuery = {
+  __typename?: 'Query';
+  getDomainMetadata?: {
+    __typename?: 'DomainMetadata';
+    color: DomainColor;
+    description: string;
+    id: string;
+    name: string;
+    changelog?: Array<{
+      __typename?: 'DomainMetadataChangelog';
+      newColor: DomainColor;
+      newDescription: string;
+      newName: string;
+      oldColor: DomainColor;
+      oldDescription: string;
+      oldName: string;
+      transactionHash: string;
+    }> | null;
+  } | null;
+};
 
 export type GetContractEventQueryVariables = Exact<{
   id: Scalars['ID'];
 }>;
 
-
-export type GetContractEventQuery = { __typename?: 'Query', getContractEvent?: { __typename?: 'ContractEvent', id: string } | null };
+export type GetContractEventQuery = {
+  __typename?: 'Query';
+  getContractEvent?: { __typename?: 'ContractEvent'; id: string } | null;
+};
 
 export type GetColonyExtensionQueryVariables = Exact<{
   id: Scalars['ID'];
 }>;
 
-
-export type GetColonyExtensionQuery = { __typename?: 'Query', getColonyExtension?: { __typename?: 'ColonyExtension', colonyId: string } | null };
+export type GetColonyExtensionQuery = {
+  __typename?: 'Query';
+  getColonyExtension?: {
+    __typename?: 'ColonyExtension';
+    colonyId: string;
+  } | null;
+};
 
 export type GetVotingRepInstallationsQueryVariables = Exact<{
   votingRepHash: Scalars['String'];
   colonyAddress: Scalars['ID'];
 }>;
 
-
-export type GetVotingRepInstallationsQuery = { __typename?: 'Query', getExtensionByColonyAndHash?: { __typename?: 'ModelColonyExtensionConnection', items: Array<{ __typename?: 'ColonyExtension', id: string } | null> } | null };
+export type GetVotingRepInstallationsQuery = {
+  __typename?: 'Query';
+  getExtensionByColonyAndHash?: {
+    __typename?: 'ModelColonyExtensionConnection';
+    items: Array<{ __typename?: 'ColonyExtension'; id: string } | null>;
+  } | null;
+};
 
 export type GetColonyUnclaimedFundsQueryVariables = Exact<{
   colonyAddress: Scalars['ID'];
@@ -4068,380 +4314,360 @@ export type GetColonyUnclaimedFundsQueryVariables = Exact<{
   upToBlock?: InputMaybe<Scalars['Int']>;
 }>;
 
-
-export type GetColonyUnclaimedFundsQuery = { __typename?: 'Query', listColonyFundsClaims?: { __typename?: 'ModelColonyFundsClaimConnection', items: Array<{ __typename?: 'ColonyFundsClaim', id: string } | null> } | null };
+export type GetColonyUnclaimedFundsQuery = {
+  __typename?: 'Query';
+  listColonyFundsClaims?: {
+    __typename?: 'ModelColonyFundsClaimConnection';
+    items: Array<{ __typename?: 'ColonyFundsClaim'; id: string } | null>;
+  } | null;
+};
 
 export type GetColonyUnclaimedFundQueryVariables = Exact<{
   claimId: Scalars['ID'];
 }>;
 
+export type GetColonyUnclaimedFundQuery = {
+  __typename?: 'Query';
+  getColonyFundsClaim?: { __typename?: 'ColonyFundsClaim'; id: string } | null;
+};
 
-export type GetColonyUnclaimedFundQuery = { __typename?: 'Query', getColonyFundsClaim?: { __typename?: 'ColonyFundsClaim', id: string } | null };
+export type GetCurrentNetworkInverseFeeQueryVariables = Exact<{
+  [key: string]: never;
+}>;
 
-export type GetCurrentNetworkInverseFeeQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type GetCurrentNetworkInverseFeeQuery = { __typename?: 'Query', listCurrentNetworkInverseFees?: { __typename?: 'ModelCurrentNetworkInverseFeeConnection', items: Array<{ __typename?: 'CurrentNetworkInverseFee', id: string, inverseFee: string } | null> } | null };
+export type GetCurrentNetworkInverseFeeQuery = {
+  __typename?: 'Query';
+  listCurrentNetworkInverseFees?: {
+    __typename?: 'ModelCurrentNetworkInverseFeeConnection';
+    items: Array<{
+      __typename?: 'CurrentNetworkInverseFee';
+      id: string;
+      inverseFee: string;
+    } | null>;
+  } | null;
+};
 
 export type GetColonyActionByMotionIdQueryVariables = Exact<{
   motionId: Scalars['ID'];
 }>;
 
-
-export type GetColonyActionByMotionIdQuery = { __typename?: 'Query', getColonyActionByMotionId?: { __typename?: 'ModelColonyActionConnection', items: Array<{ __typename?: 'ColonyAction', id: string, pendingDomainMetadata?: { __typename?: 'DomainMetadata', name: string, color: DomainColor, description: string, changelog?: Array<{ __typename?: 'DomainMetadataChangelog', transactionHash: string, oldName: string, newName: string, oldColor: DomainColor, newColor: DomainColor, oldDescription: string, newDescription: string }> | null } | null, pendingColonyMetadata?: { __typename?: 'ColonyMetadata', id: string, displayName: string, avatar?: string | null, thumbnail?: string | null, isWhitelistActivated?: boolean | null, whitelistedAddresses?: Array<string> | null, changelog?: Array<{ __typename?: 'ColonyMetadataChangelog', transactionHash: string, oldDisplayName: string, newDisplayName: string, hasAvatarChanged: boolean, hasWhitelistChanged: boolean, haveTokensChanged: boolean }> | null, modifiedTokenAddresses?: { __typename?: 'PendingModifiedTokenAddresses', added?: Array<string> | null, removed?: Array<string> | null } | null } | null } | null> } | null };
+export type GetColonyActionByMotionIdQuery = {
+  __typename?: 'Query';
+  getColonyActionByMotionId?: {
+    __typename?: 'ModelColonyActionConnection';
+    items: Array<{
+      __typename?: 'ColonyAction';
+      id: string;
+      pendingDomainMetadata?: {
+        __typename?: 'DomainMetadata';
+        name: string;
+        color: DomainColor;
+        description: string;
+        changelog?: Array<{
+          __typename?: 'DomainMetadataChangelog';
+          transactionHash: string;
+          oldName: string;
+          newName: string;
+          oldColor: DomainColor;
+          newColor: DomainColor;
+          oldDescription: string;
+          newDescription: string;
+        }> | null;
+      } | null;
+      pendingColonyMetadata?: {
+        __typename?: 'ColonyMetadata';
+        id: string;
+        displayName: string;
+        avatar?: string | null;
+        thumbnail?: string | null;
+        isWhitelistActivated?: boolean | null;
+        whitelistedAddresses?: Array<string> | null;
+        changelog?: Array<{
+          __typename?: 'ColonyMetadataChangelog';
+          transactionHash: string;
+          oldDisplayName: string;
+          newDisplayName: string;
+          hasAvatarChanged: boolean;
+          hasWhitelistChanged: boolean;
+          haveTokensChanged: boolean;
+        }> | null;
+        modifiedTokenAddresses?: {
+          __typename?: 'PendingModifiedTokenAddresses';
+          added?: Array<string> | null;
+          removed?: Array<string> | null;
+        } | null;
+      } | null;
+    } | null>;
+  } | null;
+};
 
 export type GetColonyMotionQueryVariables = Exact<{
   id: Scalars['ID'];
 }>;
 
-
-export type GetColonyMotionQuery = { __typename?: 'Query', getColonyMotion?: { __typename?: 'ColonyMotion', id: string, nativeMotionId: string, requiredStake: string, remainingStakes: Array<string>, userMinStake: string, rootHash: string, nativeMotionDomainId: string, isFinalized: boolean, createdBy: string, repSubmitted: string, skillRep: string, hasObjection: boolean, motionStakes: { __typename?: 'MotionStakes', raw: { __typename?: 'MotionStakeValues', nay: string, yay: string }, percentage: { __typename?: 'MotionStakeValues', nay: string, yay: string } }, usersStakes: Array<{ __typename?: 'UserStakes', address: string, stakes: { __typename?: 'MotionStakes', raw: { __typename?: 'MotionStakeValues', yay: string, nay: string }, percentage: { __typename?: 'MotionStakeValues', yay: string, nay: string } } }>, stakerRewards: Array<{ __typename?: 'StakerRewards', address: string, isClaimed: boolean, rewards: { __typename?: 'MotionStakeValues', yay: string, nay: string } }>, voterRecord: Array<{ __typename?: 'VoterRecord', address: string, voteCount: string, vote?: number | null }>, revealedVotes: { __typename?: 'MotionStakes', raw: { __typename?: 'MotionStakeValues', yay: string, nay: string }, percentage: { __typename?: 'MotionStakeValues', yay: string, nay: string } }, motionStateHistory: { __typename?: 'MotionStateHistory', hasVoted: boolean, hasPassed: boolean, hasFailed: boolean, hasFailedNotFinalizable: boolean, inRevealPhase: boolean } } | null };
+export type GetColonyMotionQuery = {
+  __typename?: 'Query';
+  getColonyMotion?: {
+    __typename?: 'ColonyMotion';
+    id: string;
+    nativeMotionId: string;
+    requiredStake: string;
+    remainingStakes: Array<string>;
+    userMinStake: string;
+    rootHash: string;
+    nativeMotionDomainId: string;
+    isFinalized: boolean;
+    createdBy: string;
+    repSubmitted: string;
+    skillRep: string;
+    hasObjection: boolean;
+    motionStakes: {
+      __typename?: 'MotionStakes';
+      raw: { __typename?: 'MotionStakeValues'; nay: string; yay: string };
+      percentage: {
+        __typename?: 'MotionStakeValues';
+        nay: string;
+        yay: string;
+      };
+    };
+    usersStakes: Array<{
+      __typename?: 'UserStakes';
+      address: string;
+      stakes: {
+        __typename?: 'MotionStakes';
+        raw: { __typename?: 'MotionStakeValues'; yay: string; nay: string };
+        percentage: {
+          __typename?: 'MotionStakeValues';
+          yay: string;
+          nay: string;
+        };
+      };
+    }>;
+    stakerRewards: Array<{
+      __typename?: 'StakerRewards';
+      address: string;
+      isClaimed: boolean;
+      rewards: { __typename?: 'MotionStakeValues'; yay: string; nay: string };
+    }>;
+    voterRecord: Array<{
+      __typename?: 'VoterRecord';
+      address: string;
+      voteCount: string;
+      vote?: number | null;
+    }>;
+    revealedVotes: {
+      __typename?: 'MotionStakes';
+      raw: { __typename?: 'MotionStakeValues'; yay: string; nay: string };
+      percentage: {
+        __typename?: 'MotionStakeValues';
+        yay: string;
+        nay: string;
+      };
+    };
+    motionStateHistory: {
+      __typename?: 'MotionStateHistory';
+      hasVoted: boolean;
+      hasPassed: boolean;
+      hasFailed: boolean;
+      hasFailedNotFinalizable: boolean;
+      inRevealPhase: boolean;
+    };
+  } | null;
+};
 
 export type CreateMotionMessageMutationVariables = Exact<{
   input: CreateMotionMessageInput;
 }>;
 
-
-export type CreateMotionMessageMutation = { __typename?: 'Mutation', createMotionMessage?: { __typename?: 'MotionMessage', id: string } | null };
+export type CreateMotionMessageMutation = {
+  __typename?: 'Mutation';
+  createMotionMessage?: { __typename?: 'MotionMessage'; id: string } | null;
+};
 
 export type GetColonyRoleQueryVariables = Exact<{
   id: Scalars['ID'];
 }>;
 
-
-export type GetColonyRoleQuery = { __typename?: 'Query', getColonyRole?: { __typename?: 'ColonyRole', id: string, latestBlock: number, role_0?: boolean | null, role_1?: boolean | null, role_2?: boolean | null, role_3?: boolean | null, role_5?: boolean | null, role_6?: boolean | null } | null };
+export type GetColonyRoleQuery = {
+  __typename?: 'Query';
+  getColonyRole?: {
+    __typename?: 'ColonyRole';
+    id: string;
+    latestBlock: number;
+    role_0?: boolean | null;
+    role_1?: boolean | null;
+    role_2?: boolean | null;
+    role_3?: boolean | null;
+    role_5?: boolean | null;
+    role_6?: boolean | null;
+  } | null;
+};
 
 export type GetColonyHistoricRoleQueryVariables = Exact<{
   id: Scalars['ID'];
 }>;
 
+export type GetColonyHistoricRoleQuery = {
+  __typename?: 'Query';
+  getColonyHistoricRole?: {
+    __typename?: 'ColonyHistoricRole';
+    id: string;
+  } | null;
+};
 
-export type GetColonyHistoricRoleQuery = { __typename?: 'Query', getColonyHistoricRole?: { __typename?: 'ColonyHistoricRole', id: string } | null };
+export type GetStatsQueryVariables = Exact<{ [key: string]: never }>;
+
+export type GetStatsQuery = {
+  __typename?: 'Query';
+  getIngestorStats?: { __typename?: 'IngestorStats'; value: string } | null;
+};
 
 export type GetTokenFromEverywhereQueryVariables = Exact<{
   input: TokenFromEverywhereArguments;
 }>;
 
-
-export type GetTokenFromEverywhereQuery = { __typename?: 'Query', getTokenFromEverywhere?: { __typename?: 'TokenFromEverywhereReturn', items?: Array<{ __typename?: 'Token', id: string } | null> | null } | null };
+export type GetTokenFromEverywhereQuery = {
+  __typename?: 'Query';
+  getTokenFromEverywhere?: {
+    __typename?: 'TokenFromEverywhereReturn';
+    items?: Array<{ __typename?: 'Token'; id: string } | null> | null;
+  } | null;
+};
 
 export const Colony = gql`
-    fragment Colony on Colony {
-  colonyAddress: id
-  tokens {
-    items {
-      id
-      tokenAddress: tokenID
+  fragment Colony on Colony {
+    colonyAddress: id
+    tokens {
+      items {
+        id
+        tokenAddress: tokenID
+      }
+    }
+    motionsWithUnclaimedStakes {
+      motionId
+      unclaimedRewards {
+        address
+        rewards {
+          yay
+          nay
+        }
+        isClaimed
+      }
     }
   }
-  motionsWithUnclaimedStakes {
-    motionId
-    unclaimedRewards {
-      address
-      rewards {
+`;
+export const MotionStakes = gql`
+  fragment MotionStakes on MotionStakes {
+    raw {
+      nay
+      yay
+    }
+    percentage {
+      nay
+      yay
+    }
+  }
+`;
+export const UserStakes = gql`
+  fragment UserStakes on UserStakes {
+    address
+    stakes {
+      raw {
         yay
         nay
       }
-      isClaimed
+      percentage {
+        yay
+        nay
+      }
     }
   }
-}
-    `;
-export const MotionStakes = gql`
-    fragment MotionStakes on MotionStakes {
-  raw {
-    nay
-    yay
-  }
-  percentage {
-    nay
-    yay
-  }
-}
-    `;
-export const UserStakes = gql`
-    fragment UserStakes on UserStakes {
-  address
-  stakes {
-    raw {
-      yay
-      nay
-    }
-    percentage {
-      yay
-      nay
-    }
-  }
-}
-    `;
+`;
 export const StakerReward = gql`
-    fragment StakerReward on StakerRewards {
-  address
-  rewards {
-    yay
-    nay
+  fragment StakerReward on StakerRewards {
+    address
+    rewards {
+      yay
+      nay
+    }
+    isClaimed
   }
-  isClaimed
-}
-    `;
+`;
 export const VoterRecord = gql`
-    fragment VoterRecord on VoterRecord {
-  address
-  voteCount
-  vote
-}
-    `;
+  fragment VoterRecord on VoterRecord {
+    address
+    voteCount
+    vote
+  }
+`;
 export const ColonyMotion = gql`
-    fragment ColonyMotion on ColonyMotion {
-  id
-  nativeMotionId
-  motionStakes {
-    ...MotionStakes
-  }
-  requiredStake
-  remainingStakes
-  usersStakes {
-    ...UserStakes
-  }
-  userMinStake
-  rootHash
-  nativeMotionDomainId
-  stakerRewards {
-    ...StakerReward
-  }
-  isFinalized
-  createdBy
-  voterRecord {
-    ...VoterRecord
-  }
-  revealedVotes {
-    raw {
-      yay
-      nay
+  fragment ColonyMotion on ColonyMotion {
+    id
+    nativeMotionId
+    motionStakes {
+      ...MotionStakes
     }
-    percentage {
-      yay
-      nay
+    requiredStake
+    remainingStakes
+    usersStakes {
+      ...UserStakes
+    }
+    userMinStake
+    rootHash
+    nativeMotionDomainId
+    stakerRewards {
+      ...StakerReward
+    }
+    isFinalized
+    createdBy
+    voterRecord {
+      ...VoterRecord
+    }
+    revealedVotes {
+      raw {
+        yay
+        nay
+      }
+      percentage {
+        yay
+        nay
+      }
+    }
+    repSubmitted
+    skillRep
+    hasObjection
+    nativeMotionDomainId
+    motionStateHistory {
+      hasVoted
+      hasPassed
+      hasFailed
+      hasFailedNotFinalizable
+      inRevealPhase
     }
   }
-  repSubmitted
-  skillRep
-  hasObjection
-  nativeMotionDomainId
-  motionStateHistory {
-    hasVoted
-    hasPassed
-    hasFailed
-    hasFailedNotFinalizable
-    inRevealPhase
-  }
-}
-    ${MotionStakes}
-${UserStakes}
-${StakerReward}
-${VoterRecord}`;
+  ${MotionStakes}
+  ${UserStakes}
+  ${StakerReward}
+  ${VoterRecord}
+`;
 export const DomainMetadata = gql`
-    fragment DomainMetadata on DomainMetadata {
-  name
-  color
-  description
-  changelog {
-    transactionHash
-    oldName
-    newName
-    oldColor
-    newColor
-    oldDescription
-    newDescription
+  fragment DomainMetadata on DomainMetadata {
+    name
+    color
+    description
+    changelog {
+      transactionHash
+      oldName
+      newName
+      oldColor
+      newColor
+      oldDescription
+      newDescription
+    }
   }
-}
-    `;
+`;
 export const ColonyMetadata = gql`
-    fragment ColonyMetadata on ColonyMetadata {
-  id
-  displayName
-  avatar
-  thumbnail
-  changelog {
-    transactionHash
-    oldDisplayName
-    newDisplayName
-    hasAvatarChanged
-    hasWhitelistChanged
-    haveTokensChanged
-  }
-  isWhitelistActivated
-  whitelistedAddresses
-  modifiedTokenAddresses {
-    added
-    removed
-  }
-}
-    `;
-export const CreateColonyActionDocument = gql`
-    mutation CreateColonyAction($input: CreateColonyActionInput!) {
-  createColonyAction(input: $input) {
-    id
-  }
-}
-    `;
-export const UpdateColonyActionDocument = gql`
-    mutation UpdateColonyAction($input: UpdateColonyActionInput!) {
-  updateColonyAction(input: $input) {
-    id
-  }
-}
-    `;
-export const UpdateColonyDocument = gql`
-    mutation UpdateColony($input: UpdateColonyInput!) {
-  updateColony(input: $input) {
-    id
-  }
-}
-    `;
-export const UpdateColonyMetadataDocument = gql`
-    mutation UpdateColonyMetadata($input: UpdateColonyMetadataInput!) {
-  updateColonyMetadata(input: $input) {
-    id
-  }
-}
-    `;
-export const SetCurrentVersionDocument = gql`
-    mutation SetCurrentVersion($input: SetCurrentVersionInput!) {
-  setCurrentVersion(input: $input)
-}
-    `;
-export const CreateDomainDocument = gql`
-    mutation CreateDomain($input: CreateDomainInput!) {
-  createDomain(input: $input) {
-    id
-  }
-}
-    `;
-export const CreateDomainMetadataDocument = gql`
-    mutation CreateDomainMetadata($input: CreateDomainMetadataInput!) {
-  createDomainMetadata(input: $input) {
-    id
-  }
-}
-    `;
-export const UpdateDomainMetadataDocument = gql`
-    mutation UpdateDomainMetadata($input: UpdateDomainMetadataInput!) {
-  updateDomainMetadata(input: $input) {
-    id
-  }
-}
-    `;
-export const CreateContractEventDocument = gql`
-    mutation CreateContractEvent($input: CreateContractEventInput!, $condition: ModelContractEventConditionInput) {
-  createContractEvent(input: $input, condition: $condition) {
-    id
-  }
-}
-    `;
-export const CreateColonyExtensionDocument = gql`
-    mutation CreateColonyExtension($input: CreateColonyExtensionInput!) {
-  createColonyExtension(input: $input) {
-    id
-  }
-}
-    `;
-export const UpdateColonyExtensionByColonyAndHashDocument = gql`
-    mutation UpdateColonyExtensionByColonyAndHash($input: UpdateExtensionByColonyAndHashInput!) {
-  updateExtensionByColonyAndHash(input: $input) {
-    id
-  }
-}
-    `;
-export const UpdateColonyExtensionByAddressDocument = gql`
-    mutation UpdateColonyExtensionByAddress($input: UpdateColonyExtensionInput!) {
-  updateColonyExtension(input: $input) {
-    id
-    extensionHash: hash
-    colonyAddress: colonyId
-  }
-}
-    `;
-export const CreateColonyFundsClaimDocument = gql`
-    mutation CreateColonyFundsClaim($input: CreateColonyFundsClaimInput!, $condition: ModelColonyFundsClaimConditionInput) {
-  createColonyFundsClaim(input: $input, condition: $condition) {
-    id
-  }
-}
-    `;
-export const DeleteColonyFundsClaimDocument = gql`
-    mutation DeleteColonyFundsClaim($input: DeleteColonyFundsClaimInput!, $condition: ModelColonyFundsClaimConditionInput) {
-  deleteColonyFundsClaim(input: $input, condition: $condition) {
-    id
-  }
-}
-    `;
-export const CreateCurrentNetworkInverseFeeDocument = gql`
-    mutation CreateCurrentNetworkInverseFee($input: CreateCurrentNetworkInverseFeeInput!) {
-  createCurrentNetworkInverseFee(input: $input) {
-    id
-  }
-}
-    `;
-export const UpdateCurrentNetworkInverseFeeDocument = gql`
-    mutation UpdateCurrentNetworkInverseFee($input: UpdateCurrentNetworkInverseFeeInput!) {
-  updateCurrentNetworkInverseFee(input: $input) {
-    id
-  }
-}
-    `;
-export const CreateColonyMotionDocument = gql`
-    mutation CreateColonyMotion($input: CreateColonyMotionInput!) {
-  createColonyMotion(input: $input) {
-    id
-  }
-}
-    `;
-export const UpdateColonyMotionDocument = gql`
-    mutation UpdateColonyMotion($input: UpdateColonyMotionInput!) {
-  updateColonyMotion(input: $input) {
-    id
-  }
-}
-    `;
-export const CreateColonyRoleDocument = gql`
-    mutation CreateColonyRole($input: CreateColonyRoleInput!) {
-  createColonyRole(input: $input) {
-    id
-  }
-}
-    `;
-export const UpdateColonyRoleDocument = gql`
-    mutation UpdateColonyRole($input: UpdateColonyRoleInput!) {
-  updateColonyRole(input: $input) {
-    id
-  }
-}
-    `;
-export const CreateColonyHistoricRoleDocument = gql`
-    mutation CreateColonyHistoricRole($input: CreateColonyHistoricRoleInput!) {
-  createColonyHistoricRole(input: $input) {
-    id
-  }
-}
-    `;
-export const CreateColonyTokensDocument = gql`
-    mutation CreateColonyTokens($input: CreateColonyTokensInput!) {
-  createColonyTokens(input: $input) {
-    id
-  }
-}
-    `;
-export const DeleteColonyTokensDocument = gql`
-    mutation DeleteColonyTokens($input: DeleteColonyTokensInput!) {
-  deleteColonyTokens(input: $input) {
-    id
-  }
-}
-    `;
-export const GetColonyMetadataDocument = gql`
-    query GetColonyMetadata($id: ID!) {
-  getColonyMetadata(id: $id) {
+  fragment ColonyMetadata on ColonyMetadata {
     id
     displayName
     avatar
@@ -4461,145 +4687,379 @@ export const GetColonyMetadataDocument = gql`
       removed
     }
   }
-}
-    `;
+`;
+export const CreateColonyActionDocument = gql`
+  mutation CreateColonyAction($input: CreateColonyActionInput!) {
+    createColonyAction(input: $input) {
+      id
+    }
+  }
+`;
+export const UpdateColonyActionDocument = gql`
+  mutation UpdateColonyAction($input: UpdateColonyActionInput!) {
+    updateColonyAction(input: $input) {
+      id
+    }
+  }
+`;
+export const UpdateColonyDocument = gql`
+  mutation UpdateColony($input: UpdateColonyInput!) {
+    updateColony(input: $input) {
+      id
+    }
+  }
+`;
+export const UpdateColonyMetadataDocument = gql`
+  mutation UpdateColonyMetadata($input: UpdateColonyMetadataInput!) {
+    updateColonyMetadata(input: $input) {
+      id
+    }
+  }
+`;
+export const SetCurrentVersionDocument = gql`
+  mutation SetCurrentVersion($input: SetCurrentVersionInput!) {
+    setCurrentVersion(input: $input)
+  }
+`;
+export const CreateDomainDocument = gql`
+  mutation CreateDomain($input: CreateDomainInput!) {
+    createDomain(input: $input) {
+      id
+    }
+  }
+`;
+export const CreateDomainMetadataDocument = gql`
+  mutation CreateDomainMetadata($input: CreateDomainMetadataInput!) {
+    createDomainMetadata(input: $input) {
+      id
+    }
+  }
+`;
+export const UpdateDomainMetadataDocument = gql`
+  mutation UpdateDomainMetadata($input: UpdateDomainMetadataInput!) {
+    updateDomainMetadata(input: $input) {
+      id
+    }
+  }
+`;
+export const CreateContractEventDocument = gql`
+  mutation CreateContractEvent(
+    $input: CreateContractEventInput!
+    $condition: ModelContractEventConditionInput
+  ) {
+    createContractEvent(input: $input, condition: $condition) {
+      id
+    }
+  }
+`;
+export const CreateColonyExtensionDocument = gql`
+  mutation CreateColonyExtension($input: CreateColonyExtensionInput!) {
+    createColonyExtension(input: $input) {
+      id
+    }
+  }
+`;
+export const UpdateColonyExtensionByColonyAndHashDocument = gql`
+  mutation UpdateColonyExtensionByColonyAndHash(
+    $input: UpdateExtensionByColonyAndHashInput!
+  ) {
+    updateExtensionByColonyAndHash(input: $input) {
+      id
+    }
+  }
+`;
+export const UpdateColonyExtensionByAddressDocument = gql`
+  mutation UpdateColonyExtensionByAddress($input: UpdateColonyExtensionInput!) {
+    updateColonyExtension(input: $input) {
+      id
+      extensionHash: hash
+      colonyAddress: colonyId
+    }
+  }
+`;
+export const CreateColonyFundsClaimDocument = gql`
+  mutation CreateColonyFundsClaim(
+    $input: CreateColonyFundsClaimInput!
+    $condition: ModelColonyFundsClaimConditionInput
+  ) {
+    createColonyFundsClaim(input: $input, condition: $condition) {
+      id
+    }
+  }
+`;
+export const DeleteColonyFundsClaimDocument = gql`
+  mutation DeleteColonyFundsClaim(
+    $input: DeleteColonyFundsClaimInput!
+    $condition: ModelColonyFundsClaimConditionInput
+  ) {
+    deleteColonyFundsClaim(input: $input, condition: $condition) {
+      id
+    }
+  }
+`;
+export const CreateCurrentNetworkInverseFeeDocument = gql`
+  mutation CreateCurrentNetworkInverseFee(
+    $input: CreateCurrentNetworkInverseFeeInput!
+  ) {
+    createCurrentNetworkInverseFee(input: $input) {
+      id
+    }
+  }
+`;
+export const UpdateCurrentNetworkInverseFeeDocument = gql`
+  mutation UpdateCurrentNetworkInverseFee(
+    $input: UpdateCurrentNetworkInverseFeeInput!
+  ) {
+    updateCurrentNetworkInverseFee(input: $input) {
+      id
+    }
+  }
+`;
+export const CreateColonyMotionDocument = gql`
+  mutation CreateColonyMotion($input: CreateColonyMotionInput!) {
+    createColonyMotion(input: $input) {
+      id
+    }
+  }
+`;
+export const UpdateColonyMotionDocument = gql`
+  mutation UpdateColonyMotion($input: UpdateColonyMotionInput!) {
+    updateColonyMotion(input: $input) {
+      id
+    }
+  }
+`;
+export const CreateColonyRoleDocument = gql`
+  mutation CreateColonyRole($input: CreateColonyRoleInput!) {
+    createColonyRole(input: $input) {
+      id
+    }
+  }
+`;
+export const UpdateColonyRoleDocument = gql`
+  mutation UpdateColonyRole($input: UpdateColonyRoleInput!) {
+    updateColonyRole(input: $input) {
+      id
+    }
+  }
+`;
+export const CreateColonyHistoricRoleDocument = gql`
+  mutation CreateColonyHistoricRole($input: CreateColonyHistoricRoleInput!) {
+    createColonyHistoricRole(input: $input) {
+      id
+    }
+  }
+`;
+export const CreateStatsDocument = gql`
+  mutation CreateStats($value: String!) {
+    createIngestorStats(input: { id: "STATS", value: $value }) {
+      id
+    }
+  }
+`;
+export const UpdateStatsDocument = gql`
+  mutation UpdateStats($value: String!) {
+    updateIngestorStats(input: { id: "STATS", value: $value }) {
+      id
+    }
+  }
+`;
+export const CreateColonyTokensDocument = gql`
+  mutation CreateColonyTokens($input: CreateColonyTokensInput!) {
+    createColonyTokens(input: $input) {
+      id
+    }
+  }
+`;
+export const DeleteColonyTokensDocument = gql`
+  mutation DeleteColonyTokens($input: DeleteColonyTokensInput!) {
+    deleteColonyTokens(input: $input) {
+      id
+    }
+  }
+`;
+export const GetColonyMetadataDocument = gql`
+  query GetColonyMetadata($id: ID!) {
+    getColonyMetadata(id: $id) {
+      id
+      displayName
+      avatar
+      thumbnail
+      changelog {
+        transactionHash
+        oldDisplayName
+        newDisplayName
+        hasAvatarChanged
+        hasWhitelistChanged
+        haveTokensChanged
+      }
+      isWhitelistActivated
+      whitelistedAddresses
+      modifiedTokenAddresses {
+        added
+        removed
+      }
+    }
+  }
+`;
 export const GetColonyDocument = gql`
-    query GetColony($id: ID!) {
-  getColony(id: $id) {
-    ...Colony
+  query GetColony($id: ID!) {
+    getColony(id: $id) {
+      ...Colony
+    }
   }
-}
-    ${Colony}`;
+  ${Colony}
+`;
 export const GetDomainMetadataDocument = gql`
-    query GetDomainMetadata($id: ID!) {
-  getDomainMetadata(id: $id) {
-    color
-    description
-    id
-    name
-    changelog {
-      newColor
-      newDescription
-      newName
-      oldColor
-      oldDescription
-      oldName
-      transactionHash
+  query GetDomainMetadata($id: ID!) {
+    getDomainMetadata(id: $id) {
+      color
+      description
+      id
+      name
+      changelog {
+        newColor
+        newDescription
+        newName
+        oldColor
+        oldDescription
+        oldName
+        transactionHash
+      }
     }
   }
-}
-    `;
+`;
 export const GetContractEventDocument = gql`
-    query GetContractEvent($id: ID!) {
-  getContractEvent(id: $id) {
-    id
+  query GetContractEvent($id: ID!) {
+    getContractEvent(id: $id) {
+      id
+    }
   }
-}
-    `;
+`;
 export const GetColonyExtensionDocument = gql`
-    query GetColonyExtension($id: ID!) {
-  getColonyExtension(id: $id) {
-    colonyId
+  query GetColonyExtension($id: ID!) {
+    getColonyExtension(id: $id) {
+      colonyId
+    }
   }
-}
-    `;
+`;
 export const GetVotingRepInstallationsDocument = gql`
-    query GetVotingRepInstallations($votingRepHash: String!, $colonyAddress: ID!) {
-  getExtensionByColonyAndHash(
-    colonyId: $colonyAddress
-    hash: {eq: $votingRepHash}
+  query GetVotingRepInstallations(
+    $votingRepHash: String!
+    $colonyAddress: ID!
   ) {
-    items {
-      id
+    getExtensionByColonyAndHash(
+      colonyId: $colonyAddress
+      hash: { eq: $votingRepHash }
+    ) {
+      items {
+        id
+      }
     }
   }
-}
-    `;
+`;
 export const GetColonyUnclaimedFundsDocument = gql`
-    query GetColonyUnclaimedFunds($colonyAddress: ID!, $tokenAddress: ID!, $upToBlock: Int = 1) {
-  listColonyFundsClaims(
-    filter: {colonyFundsClaimsId: {eq: $colonyAddress}, colonyFundsClaimTokenId: {eq: $tokenAddress}, createdAtBlock: {le: $upToBlock}}
+  query GetColonyUnclaimedFunds(
+    $colonyAddress: ID!
+    $tokenAddress: ID!
+    $upToBlock: Int = 1
   ) {
-    items {
-      id
+    listColonyFundsClaims(
+      filter: {
+        colonyFundsClaimsId: { eq: $colonyAddress }
+        colonyFundsClaimTokenId: { eq: $tokenAddress }
+        createdAtBlock: { le: $upToBlock }
+      }
+    ) {
+      items {
+        id
+      }
     }
   }
-}
-    `;
+`;
 export const GetColonyUnclaimedFundDocument = gql`
-    query GetColonyUnclaimedFund($claimId: ID!) {
-  getColonyFundsClaim(id: $claimId) {
-    id
+  query GetColonyUnclaimedFund($claimId: ID!) {
+    getColonyFundsClaim(id: $claimId) {
+      id
+    }
   }
-}
-    `;
+`;
 export const GetCurrentNetworkInverseFeeDocument = gql`
-    query GetCurrentNetworkInverseFee {
-  listCurrentNetworkInverseFees(limit: 1) {
-    items {
-      id
-      inverseFee
+  query GetCurrentNetworkInverseFee {
+    listCurrentNetworkInverseFees(limit: 1) {
+      items {
+        id
+        inverseFee
+      }
     }
   }
-}
-    `;
+`;
 export const GetColonyActionByMotionIdDocument = gql`
-    query GetColonyActionByMotionId($motionId: ID!) {
-  getColonyActionByMotionId(motionId: $motionId) {
-    items {
-      id
-      pendingDomainMetadata {
-        ...DomainMetadata
-      }
-      pendingColonyMetadata {
-        ...ColonyMetadata
+  query GetColonyActionByMotionId($motionId: ID!) {
+    getColonyActionByMotionId(motionId: $motionId) {
+      items {
+        id
+        pendingDomainMetadata {
+          ...DomainMetadata
+        }
+        pendingColonyMetadata {
+          ...ColonyMetadata
+        }
       }
     }
   }
-}
-    ${DomainMetadata}
-${ColonyMetadata}`;
+  ${DomainMetadata}
+  ${ColonyMetadata}
+`;
 export const GetColonyMotionDocument = gql`
-    query GetColonyMotion($id: ID!) {
-  getColonyMotion(id: $id) {
-    ...ColonyMotion
+  query GetColonyMotion($id: ID!) {
+    getColonyMotion(id: $id) {
+      ...ColonyMotion
+    }
   }
-}
-    ${ColonyMotion}`;
+  ${ColonyMotion}
+`;
 export const CreateMotionMessageDocument = gql`
-    mutation CreateMotionMessage($input: CreateMotionMessageInput!) {
-  createMotionMessage(input: $input) {
-    id
-  }
-}
-    `;
-export const GetColonyRoleDocument = gql`
-    query GetColonyRole($id: ID!) {
-  getColonyRole(id: $id) {
-    id
-    latestBlock
-    role_0
-    role_1
-    role_2
-    role_3
-    role_5
-    role_6
-  }
-}
-    `;
-export const GetColonyHistoricRoleDocument = gql`
-    query GetColonyHistoricRole($id: ID!) {
-  getColonyHistoricRole(id: $id) {
-    id
-  }
-}
-    `;
-export const GetTokenFromEverywhereDocument = gql`
-    query GetTokenFromEverywhere($input: TokenFromEverywhereArguments!) {
-  getTokenFromEverywhere(input: $input) {
-    items {
+  mutation CreateMotionMessage($input: CreateMotionMessageInput!) {
+    createMotionMessage(input: $input) {
       id
     }
   }
-}
-    `;
+`;
+export const GetColonyRoleDocument = gql`
+  query GetColonyRole($id: ID!) {
+    getColonyRole(id: $id) {
+      id
+      latestBlock
+      role_0
+      role_1
+      role_2
+      role_3
+      role_5
+      role_6
+    }
+  }
+`;
+export const GetColonyHistoricRoleDocument = gql`
+  query GetColonyHistoricRole($id: ID!) {
+    getColonyHistoricRole(id: $id) {
+      id
+    }
+  }
+`;
+export const GetStatsDocument = gql`
+  query GetStats {
+    getIngestorStats(id: "STATS") {
+      value
+    }
+  }
+`;
+export const GetTokenFromEverywhereDocument = gql`
+  query GetTokenFromEverywhere($input: TokenFromEverywhereArguments!) {
+    getTokenFromEverywhere(input: $input) {
+      items {
+        id
+      }
+    }
+  }
+`;
