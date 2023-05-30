@@ -1,7 +1,6 @@
 import express from 'express';
-import storage from 'node-persist';
 
-import { getLatestBlock, getStats, output } from '~utils';
+import { getLatestBlock, getStats, initStats, output } from '~utils';
 import { getChainId } from '~provider';
 
 const app = express();
@@ -22,7 +21,7 @@ app.get('/liveness', (_, res) => res.sendStatus(200));
  * Use to check various service stats
  */
 app.get('/stats', async (_, res) => {
-  const stats = await getStats();
+  const stats = getStats();
   res.type('json').send(stats);
 });
 
@@ -31,10 +30,8 @@ export const startStatsServer = async (): Promise<void> => {
     return;
   }
 
-  await storage.init({
-    dir: './stats/',
-  });
-  const latestBlock = await getLatestBlock();
+  await initStats();
+  const latestBlock = getLatestBlock();
 
   app.listen(port, async () => {
     output('Block Ingestor started on chain', getChainId());

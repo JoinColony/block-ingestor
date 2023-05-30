@@ -1,6 +1,19 @@
-import storage from 'node-persist';
+import { mutate, query } from '~amplifyClient';
+import {
+  CreateStatsDocument,
+  CreateStatsMutation,
+  CreateStatsMutationVariables,
+  GetStatsDocument,
+  GetStatsQuery,
+  GetStatsQueryVariables,
+  UpdateStatsDocument,
+  UpdateStatsMutation,
+  UpdateStatsMutationVariables,
+} from '~graphql';
 
-import { verbose } from './logger';
+import { output, verbose } from './logger';
+
+let stats: Record<string, unknown> = {};
 
 type ObjectOrFunction =
   | Record<string, unknown>
@@ -25,31 +38,57 @@ export const updateStats = async (
     return;
   }
 
-  let newStats = {};
-  const currentStats = (await storage.getItem('stats')) ?? {};
-
   if (typeof objectOrFunction === 'function') {
-    newStats = {
-      ...currentStats,
-      ...objectOrFunction(currentStats),
+    stats = {
+      ...stats,
+      ...objectOrFunction(stats),
     };
   } else {
-    newStats = {
-      ...currentStats,
+    stats = {
+      ...stats,
       ...objectOrFunction,
     };
   }
 
-  await storage.setItem('stats', newStats);
+  await mutate<UpdateStatsMutation, UpdateStatsMutationVariables>(
+    UpdateStatsDocument,
+    {
+      value: JSON.stringify(stats),
+    },
+  );
+
   verbose('Stats file updated');
 };
 
-export const getStats = async (): Promise<Record<string, unknown>> => {
-  const stats = (await storage.getItem('stats')) ?? {};
-  return stats;
-};
+// This exists as a function to prevent accidental overwriting of the `stats` variable
+export const getStats = (): typeof stats => ({ ...stats });
 
-export const getLatestBlock = async (): Promise<number> => {
-  const stats = await getStats();
-  return Number(stats.latestBlock ?? 1);
+export const getLatestBlock = (): number =>
+  Number.isInteger(stats.latestBlock) ? Number(stats.latestBlock) : 1;
+
+/**
+ * Function fetching the last stored stats from the DB
+ * If no stats entry is found, it will create one
+ */
+export const initStats = async (): Promise<void> => {
+  const { value: jsonStats } =
+    (await query<GetStatsQuery, GetStatsQueryVariables>(GetStatsDocument, {}))
+      ?.data?.getIngestorStats ?? {};
+
+  if (!jsonStats) {
+    await mutate<CreateStatsMutation, CreateStatsMutationVariables>(
+      CreateStatsDocument,
+      {
+        value: JSON.stringify({}),
+      },
+    );
+  } else {
+    try {
+      stats = JSON.parse(jsonStats);
+    } catch {
+      output(
+        'Could not parse stats from the DB. The value is not a valid JSON.',
+      );
+    }
+  }
 };
