@@ -61,8 +61,11 @@ export default async (event: ContractEvent): Promise<void> => {
       stakerRewards: updatedStakerRewards,
     };
 
-    await updateColonyUnclaimedStakes(colonyAddress, claimedMotion.id, staker);
-
     await updateMotionInDB(updatedMotionData, newMotionMessages);
+    await updateColonyUnclaimedStakes(
+      colonyAddress,
+      motionDatabaseId,
+      updatedStakerRewards,
+    );
   }
 };

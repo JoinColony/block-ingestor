@@ -152,7 +152,7 @@ export interface ColonyQuery {
       }
     | null
     | undefined;
-  unclaimedStakes:
+  motionsWithUnclaimedStakes:
     | Array<{
         transactionHash: string;
         motionId: string;

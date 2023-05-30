@@ -1,36 +1,50 @@
 import { mutate } from '~amplifyClient';
+import { StakerReward } from '~types';
 import { getColonyFromDB } from '~utils';
 
 export const updateColonyUnclaimedStakes = async (
   colonyAddress: string,
-  motionId: string,
-  staker: string,
+  motionDatabaseId: string,
+  updatedStakerRewards: StakerReward[],
 ): Promise<void> => {
   const colony = await getColonyFromDB(colonyAddress);
-  const updatedUnclaimedStakes = colony?.unclaimedStakes?.map(
-    (unclaimedStake) => {
-      const { transactionHash } = unclaimedStake;
+  if (colony) {
+    const { motionsWithUnclaimedStakes } = colony;
+    const motionWithUnclaimedStakes = motionsWithUnclaimedStakes?.find(
+      ({ motionId }) => motionDatabaseId === motionId,
+    );
 
-      if (motionId !== transactionHash) {
-        return unclaimedStake;
-      }
-
-      /* Remove rewards that have been claimed by this staker */
-      const updatedUnclaimedRewards = unclaimedStake?.unclaimedRewards.filter(
-        ({ address }) => address !== staker,
+    if (motionWithUnclaimedStakes) {
+      const unclaimedRewards = updatedStakerRewards.filter(
+        ({ isClaimed }) => !isClaimed,
       );
 
-      return {
-        ...unclaimedStake,
-        unclaimedRewards: updatedUnclaimedRewards,
-      };
-    },
-  );
-
-  await mutate('updateColony', {
-    input: {
-      id: colonyAddress,
-      unclaimedStakes: updatedUnclaimedStakes,
-    },
-  });
+      if (unclaimedRewards.length) {
+        motionWithUnclaimedStakes.unclaimedRewards = unclaimedRewards;
+        await mutate('updateColony', {
+          input: {
+            id: colonyAddress,
+            motionsWithUnclaimedStakes,
+          },
+        });
+      } else {
+        /* If there are no more unclaimed stakes, remove this motion from the array of
+           motions with unclaimed stakes */
+        const updatedMotionsWithUnclaimedStakes =
+          motionsWithUnclaimedStakes?.filter(
+            ({ motionId }) => motionDatabaseId !== motionId,
+          );
+        await mutate('updateColony', {
+          input: {
+            id: colonyAddress,
+            motionsWithUnclaimedStakes: updatedMotionsWithUnclaimedStakes,
+          },
+        });
+      }
+    } else {
+      console.log(
+        `Unable to find unclaimed stake with a motion id: ${motionDatabaseId}. This is a bug and should be investigated.`,
+      );
+    }
+  }
 };
