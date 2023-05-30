@@ -50,7 +50,7 @@ const trackActionsByEvent = async (
 
   const filter = getFilter(eventSignature, colonyAddress);
   const logs = await getLogs(networkClient, filter, {
-    fromBlock: await getLatestBlock(),
+    fromBlock: getLatestBlock(),
   });
   logs.forEach(async (log) => {
     const event = await mapLogToContractEvent(log, colonyClient.interface);

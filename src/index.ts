@@ -36,10 +36,10 @@ const startIngestor = async (): Promise<void> => {
 };
 
 const start = async (): Promise<void> => {
+  amplifyClientSetup();
   await initialiseProvider();
   await startStatsServer();
   startIngestor();
-  amplifyClientSetup();
 };
 
 start();

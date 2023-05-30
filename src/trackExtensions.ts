@@ -23,7 +23,7 @@ import {
 } from '~eventListener';
 
 export default async (): Promise<void> => {
-  const latestBlock = await getLatestBlock();
+  const latestBlock = getLatestBlock();
 
   SUPPORTED_EXTENSION_IDS.forEach(async (extensionId) => {
     verbose(
@@ -65,7 +65,7 @@ const trackExtensionAddedToNetwork = async (
   writeExtensionVersionFromEvent(event);
 };
 
-// ts-ignore
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const trackExtensionEvents = async (
   extensionId: Extension,
   latestBlock: number,
@@ -165,7 +165,6 @@ const trackExtensionEvents = async (
      */
     let version = BigNumber.from(1);
     const colonyClient = await getCachedColonyClient(colony);
-
     if (colonyClient) {
       try {
         version = await (
@@ -173,7 +172,6 @@ const trackExtensionEvents = async (
         ).version();
       } catch (error) {}
     }
-
     const convertedVersion = toNumber(version);
 
     const isDeprecated = await isExtensionDeprecated(
