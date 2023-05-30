@@ -191,7 +191,6 @@ export const getUserMinStake = (
 
 interface Props {
   motionData: ColonyMotion;
-  messages: MotionMessage[];
   requiredStake: BigNumber;
   motionStakes: MotionStakes;
   messageKey: string;
@@ -202,7 +201,6 @@ interface Props {
 
 export const getUpdatedMessages = ({
   motionData,
-  messages,
   requiredStake,
   motionStakes,
   messageKey,
@@ -210,7 +208,7 @@ export const getUpdatedMessages = ({
   staker,
   amount,
 }: Props): MotionMessage[] => {
-  const updatedMessages = [...messages];
+  const updatedMessages = [];
   const isFirstObjection = vote.eq(MotionVote.NAY) && !motionData.hasObjection;
   const isFullyYayStaked =
     vote.eq(MotionVote.YAY) && requiredStake.eq(motionStakes.raw.yay);

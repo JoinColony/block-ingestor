@@ -119,3 +119,9 @@ query GetColonyMotion($id: ID!) {
     }
   }
 }
+
+mutation CreateMotionMessage($input: CreateMotionMessageInput!) {
+  createMotionMessage(input: $input) {
+    id
+  }
+}

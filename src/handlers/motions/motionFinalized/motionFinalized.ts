@@ -40,7 +40,6 @@ export default async (event: ContractEvent): Promise<void> => {
       motionStakes: {
         percentage: { yay: yayPercentage, nay: nayPercentage },
       },
-      messages,
     } = finalizedMotion;
 
     const yayWon =
@@ -58,8 +57,7 @@ export default async (event: ContractEvent): Promise<void> => {
       ),
     );
 
-    const updatedMessages = [
-      ...messages,
+    const newMotionMessages = [
       {
         initiatorAddress: constants.AddressZero,
         name: MotionEvents.MotionFinalized,
@@ -72,9 +70,8 @@ export default async (event: ContractEvent): Promise<void> => {
       ...finalizedMotion,
       stakerRewards: updatedStakerRewards,
       isFinalized: true,
-      messages: updatedMessages,
     };
 
-    await updateMotionInDB(updatedMotionData);
+    await updateMotionInDB(updatedMotionData, newMotionMessages);
   }
 };

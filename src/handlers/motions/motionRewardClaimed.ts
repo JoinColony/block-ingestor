@@ -27,7 +27,6 @@ export default async (event: ContractEvent): Promise<void> => {
   if (claimedMotion) {
     const {
       stakerRewards,
-      messages,
     } = claimedMotion;
 
     const updatedStakerRewards = stakerRewards.map((stakerReward) => {
@@ -49,20 +48,20 @@ export default async (event: ContractEvent): Promise<void> => {
       };
     });
 
+    const newMotionMessages = [
+      {
+        name: MotionEvents.MotionRewardClaimed,
+        messageKey: getMessageKey(transactionHash, logIndex),
+        initiatorAddress: staker,
+        motionId: motionDatabaseId,
+      },
+    ];
+
     const updatedMotionData: ColonyMotion = {
       ...claimedMotion,
       stakerRewards: updatedStakerRewards,
-      messages: [
-        ...messages,
-        {
-          name: MotionEvents.MotionRewardClaimed,
-          messageKey: getMessageKey(transactionHash, logIndex),
-          initiatorAddress: staker,
-          motionId: motionDatabaseId,
-        },
-      ],
     };
 
-    await updateMotionInDB(updatedMotionData);
+    await updateMotionInDB(updatedMotionData, newMotionMessages);
   }
 };
