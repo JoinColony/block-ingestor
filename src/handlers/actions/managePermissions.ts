@@ -1,3 +1,4 @@
+import { BigNumber } from 'ethers';
 import { mutate, query } from '~amplifyClient';
 import { ContractEvent, ColonyActionType } from '~types';
 import {
@@ -21,7 +22,16 @@ import {
 
 export default async (event: ContractEvent): Promise<void> => {
   const { args, contractAddress, blockNumber, transactionHash } = event;
-  const { agent, user: targetAddress, domainId } = args;
+  const {
+    agent,
+    user: targetAddress,
+    /*
+     * RecoveryRoleSet doesn't have a `domainId` value inside the it's event args
+     * since it can only be emmitted in the Root domain, so for such cases, we
+     * default to the Root Domain
+     */
+    domainId = BigNumber.from(1),
+  } = args;
 
   const id = getColonyRolesDatabaseId(
     contractAddress,
@@ -32,11 +42,6 @@ export default async (event: ContractEvent): Promise<void> => {
     contractAddress,
     domainId.toString(),
   );
-
-  /*
-   * @TODO
-   * - create action list entry
-   */
 
   const {
     id: existingColonyRoleId,
