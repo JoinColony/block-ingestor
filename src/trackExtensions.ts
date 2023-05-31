@@ -20,15 +20,22 @@ import { extensionSpecificEventsListener } from '~eventListener';
 export default async (): Promise<void> => {
   const latestBlock = getLatestBlock();
 
-  SUPPORTED_EXTENSION_IDS.forEach(async (extensionId) => {
-    verbose(
-      `Fetching current version of extension: ${extensionId} starting from block: ${latestBlock}`,
-    );
-    await trackExtensionAddedToNetwork(extensionId, latestBlock);
+  const trackingPromises = SUPPORTED_EXTENSION_IDS.map(
+    (extensionId) => async () => {
+      verbose(
+        `Fetching current version of extension: ${extensionId} starting from block: ${latestBlock}`,
+      );
 
-    // verbose(`Fetching events for extension: ${extensionId}`);
-    // await trackExtensionEvents(extensionId, latestBlock);
-  });
+      await trackExtensionAddedToNetwork(extensionId, latestBlock);
+
+      verbose(`Fetching events for extension: ${extensionId}`);
+      await trackExtensionEvents(extensionId, latestBlock);
+    },
+  );
+
+  for (const trackingPromise of trackingPromises) {
+    await trackingPromise();
+  }
 };
 
 const trackExtensionAddedToNetwork = async (
@@ -60,7 +67,6 @@ const trackExtensionAddedToNetwork = async (
   writeExtensionVersionFromEvent(event);
 };
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const trackExtensionEvents = async (
   extensionId: Extension,
   latestBlock: number,
