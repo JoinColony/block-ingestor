@@ -36,6 +36,8 @@ export default async (): Promise<void> => {
   const colonyAddedLogs = await getLogs(
     networkClient,
     networkClient.filters.ColonyAdded(),
+    // @NOTE This is temporary for QA to skip the colonies created before it launched
+    { fromBlock: 27717536 },
   );
 
   colonyAddedLogs.forEach((log) => {
