@@ -36,7 +36,6 @@ export default async (): Promise<void> => {
   const colonyAddedLogs = await getLogs(
     networkClient,
     networkClient.filters.ColonyAdded(),
-    { fromBlock: 27976203 },
   );
 
   colonyAddedLogs.forEach((log) => {
