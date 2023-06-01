@@ -1,5 +1,6 @@
 import { Extension, getExtensionHash, getLogs } from '@colony/colony-js';
 import { BigNumber } from 'ethers';
+import { Log } from '@ethersproject/providers';
 
 import networkClient from '~networkClient';
 import {
@@ -112,8 +113,10 @@ const trackExtensionEvents = async (
      * If installation count is 0, that means the extension has been uninstalled
      */
     if (installationsCount <= 0) {
-      const mostRecentUninstalledLog =
-        extensionUninstalledLogs[extensionUninstalledLogs.length - 1];
+      const mostRecentUninstalledLog = getMostRecentLog(
+        extensionUninstalledLogs,
+        colony,
+      );
       /**
        * Short circuit if there's no log or it happened before the latest processed block
        * (meaning it's already reflected in the db)
@@ -148,13 +151,18 @@ const trackExtensionEvents = async (
     await extensionSpecificEventsListener(extensionAddress, extensionHash);
 
     // Store the most recent installation in the db
-    const mostRecentInstalledLog =
-      extensionInstalledLogs[extensionInstalledLogs.length - 1];
+    const mostRecentInstalledLog = getMostRecentLog(
+      extensionInstalledLogs,
+      colony,
+    );
+    if (!mostRecentInstalledLog) {
+      return;
+    }
+
     const event = await mapLogToContractEvent(
       mostRecentInstalledLog,
       networkClient.interface,
     );
-
     if (!event) {
       return;
     }
@@ -193,4 +201,16 @@ const trackExtensionEvents = async (
       true,
     );
   }
+};
+
+// Util returning the most recent extension installed/uninstalled log for a given colony address
+const getMostRecentLog = (
+  logs: Log[],
+  colonyAddress: string,
+): Log | undefined => {
+  const colonyFilteredLogs = logs.filter(
+    (log) =>
+      networkClient.interface.parseLog(log).args.colony === colonyAddress,
+  );
+  return colonyFilteredLogs[colonyFilteredLogs.length - 1];
 };
