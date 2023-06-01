@@ -12,6 +12,7 @@ import {
   isExtensionDeprecated,
   isExtensionInitialised,
   mapLogToContractEvent,
+  output,
   toNumber,
   verbose,
   writeExtensionFromEvent,
@@ -28,13 +29,13 @@ export default async (): Promise<void> => {
 
   const trackingPromises = SUPPORTED_EXTENSION_IDS.map(
     (extensionId) => async () => {
-      verbose(
+      output(
         `Fetching current version of extension: ${extensionId} starting from block: ${latestBlock}`,
       );
 
       await trackExtensionAddedToNetwork(extensionId, latestBlock);
 
-      verbose(`Fetching events for extension: ${extensionId}`);
+      output(`Fetching events for extension: ${extensionId}`);
       await trackExtensionEvents(extensionId, latestBlock);
     },
   );
@@ -112,9 +113,15 @@ const trackExtensionEvents = async (
     }
   });
 
-  for (const [colony, installationsCount] of Object.entries(
-    installedInColonyCount,
-  )) {
+  const installationsEntries = Object.entries(installedInColonyCount);
+  const coloniesCount = installationsEntries.length;
+  let currentColonyIndex = 0;
+  for (const [colony, installationsCount] of installationsEntries) {
+    currentColonyIndex++;
+    verbose(
+      `Processing extension events for colony ${colony} (${currentColonyIndex} out of ${coloniesCount})`,
+    );
+
     /**
      * If installation count is 0, that means the extension has been uninstalled
      */
@@ -131,7 +138,7 @@ const trackExtensionEvents = async (
         !mostRecentUninstalledLog ||
         mostRecentUninstalledLog.blockNumber < latestBlock
       ) {
-        return;
+        continue;
       }
 
       const event = await mapLogToContractEvent(
@@ -139,12 +146,12 @@ const trackExtensionEvents = async (
         networkClient.interface,
       );
       if (!event) {
-        return;
+        continue;
       }
 
       await deleteExtensionFromEvent(event);
 
-      return;
+      continue;
     }
 
     // Otherwise, the extension is currently installed
@@ -162,7 +169,7 @@ const trackExtensionEvents = async (
       colony,
     );
     if (!mostRecentInstalledLog) {
-      return;
+      continue;
     }
 
     const event = await mapLogToContractEvent(
@@ -170,7 +177,7 @@ const trackExtensionEvents = async (
       networkClient.interface,
     );
     if (!event) {
-      return;
+      continue;
     }
 
     /**
