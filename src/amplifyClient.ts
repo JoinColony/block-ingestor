@@ -403,7 +403,6 @@ export const queries = {
           }
         }
         motionsWithUnclaimedStakes {
-          transactionHash
           motionId
           unclaimedRewards {
             address
