@@ -18,6 +18,7 @@ import {
   getCachedColonyClient,
   getLatestBlock,
   mapLogToContractEvent,
+  verbose,
 } from '~utils';
 
 interface HandlerMappingType {
