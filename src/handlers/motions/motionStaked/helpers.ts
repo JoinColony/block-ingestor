@@ -3,7 +3,7 @@ import {
   MotionStakes,
   UserStakes,
   MotionMessage,
-  MotionData,
+  ColonyMotion,
   MotionVote,
   MotionEvents,
 } from '~types';
@@ -190,8 +190,7 @@ export const getUserMinStake = (
 };
 
 interface Props {
-  motionData: MotionData;
-  messages: MotionMessage[];
+  motionData: ColonyMotion;
   requiredStake: BigNumber;
   motionStakes: MotionStakes;
   messageKey: string;
@@ -202,7 +201,6 @@ interface Props {
 
 export const getUpdatedMessages = ({
   motionData,
-  messages,
   requiredStake,
   motionStakes,
   messageKey,
@@ -210,7 +208,7 @@ export const getUpdatedMessages = ({
   staker,
   amount,
 }: Props): MotionMessage[] => {
-  const updatedMessages = [...messages];
+  const updatedMessages = [];
   const isFirstObjection = vote.eq(MotionVote.NAY) && !motionData.hasObjection;
   const isFullyYayStaked =
     vote.eq(MotionVote.YAY) && requiredStake.eq(motionStakes.raw.yay);
@@ -226,6 +224,7 @@ export const getUpdatedMessages = ({
       name: MotionEvents.ObjectionRaised,
       messageKey: `${messageKey}_${MotionEvents.ObjectionRaised}}`,
       initiatorAddress: staker,
+      motionId: motionData.id,
     });
   }
 
@@ -235,6 +234,7 @@ export const getUpdatedMessages = ({
     initiatorAddress: staker,
     vote: vote.toString(),
     amount: amount.toString(),
+    motionId: motionData.id,
   });
 
   if (isFullyYayStaked) {
@@ -245,6 +245,7 @@ export const getUpdatedMessages = ({
       name: messageName,
       messageKey: `${messageKey}_${messageName}`,
       initiatorAddress: staker,
+      motionId: motionData.id,
     });
   }
 
@@ -257,6 +258,7 @@ export const getUpdatedMessages = ({
       name: MotionEvents.ObjectionFullyStaked,
       messageKey: `${messageKey}_${MotionEvents.ObjectionFullyStaked}`,
       initiatorAddress: staker,
+      motionId: motionData.id,
     });
   }
 
@@ -265,6 +267,7 @@ export const getUpdatedMessages = ({
       name: MotionEvents.MotionVotingPhase,
       messageKey: `${messageKey}_${MotionEvents.MotionVotingPhase}`,
       initiatorAddress: constants.AddressZero,
+      motionId: motionData.id,
     });
   }
 

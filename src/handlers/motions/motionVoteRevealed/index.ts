@@ -22,13 +22,11 @@ export default async (event: ContractEvent): Promise<void> => {
     votingClient.address,
     motionId,
   );
-  const revealedMotion = await getMotionFromDB(colonyAddress, motionDatabaseId);
+  const revealedMotion = await getMotionFromDB(motionDatabaseId);
 
   if (revealedMotion) {
     const {
-      id,
-      motionData: { voterRecord },
-      motionData,
+      voterRecord,
     } = revealedMotion;
     const updatedVoterRecord = voterRecord.map((record) => {
       const { address } = record;
@@ -47,8 +45,8 @@ export default async (event: ContractEvent): Promise<void> => {
     const totalVotes = nayVotes.add(yayVotes);
     const yayVotePercentage = yayVotes.mul(100).div(totalVotes);
     const nayVotePercentage = nayVotes.mul(100).div(totalVotes);
-    await updateMotionInDB(id, {
-      ...motionData,
+    await updateMotionInDB({
+      ...revealedMotion,
       voterRecord: updatedVoterRecord,
       revealedVotes: {
         raw: {

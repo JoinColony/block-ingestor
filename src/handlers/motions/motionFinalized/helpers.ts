@@ -7,6 +7,8 @@ import {
   DomainMetadata,
   MotionVote,
   StakerReward,
+  ColonyMotion,
+  MotionQuery,
 } from '~types';
 import {
   getColonyFromDB,
@@ -66,8 +68,8 @@ export const getStakerReward = async (
   };
 };
 
-const getParsedActionFromDomainMotion = async (
-  domainAction: string,
+const getParsedActionFromMotion = async (
+  action: string,
   colonyAddress: string,
 ): Promise<TransactionDescription | undefined> => {
   const colonyClient = await networkClient.getColonyClient(colonyAddress);
@@ -75,24 +77,21 @@ const getParsedActionFromDomainMotion = async (
   // We are only parsing this action in order to know if it's a add/edit domain motion. Therefore, we shouldn't need to try with any other client.
   try {
     return colonyClient.interface.parseTransaction({
-      data: domainAction,
+      data: action,
     });
   } catch {
-    verbose(`Unable to parse ${domainAction} using colony client`);
+    verbose(`Unable to parse ${action} using colony client`);
     return undefined;
   }
 };
 
-export const linkPendingDomainMetadataWithDomain = async (
-  action: string,
-  colonyAddress: string,
+const linkPendingDomainMetadataWithDomain = async (
   pendingDomainMetadata: DomainMetadata,
+  colonyAddress: string,
+  isEditingADomain: boolean,
+  parsedAction: TransactionDescription,
 ): Promise<void> => {
-  const parsedDomainAction = await getParsedActionFromDomainMotion(
-    action,
-    colonyAddress,
-  );
-  if (parsedDomainAction?.name === ColonyOperations.AddDomain) {
+  if (!isEditingADomain) {
     const colonyClient = await networkClient.getColonyClient(colonyAddress);
     const domainCount = await colonyClient.getDomainCount();
     // The new domain should be created by now, so we just get the total of existing domains
@@ -105,8 +104,8 @@ export const linkPendingDomainMetadataWithDomain = async (
         id: getDomainDatabaseId(colonyAddress, nativeDomainId),
       },
     });
-  } else if (parsedDomainAction?.name === ColonyOperations.EditDomain) {
-    const nativeDomainId = parsedDomainAction.args[2].toNumber(); // domainId arg from editDomain action
+  } else if (isEditingADomain) {
+    const nativeDomainId = parsedAction.args[2].toNumber(); // domainId arg from editDomain action
     const databaseDomainId = getDomainDatabaseId(colonyAddress, nativeDomainId);
 
     const currentDomainMetadata = await query<DomainMetadata>(
@@ -120,7 +119,7 @@ export const linkPendingDomainMetadataWithDomain = async (
       ...currentDomainMetadata,
     };
 
-    const { changelog: pendingChangelog = [] } = pendingDomainMetadata;
+    const pendingChangelog = pendingDomainMetadata?.changelog ?? [];
 
     if (!pendingChangelog.length) {
       console.error(
@@ -160,10 +159,10 @@ export const linkPendingDomainMetadataWithDomain = async (
         id: databaseDomainId,
       },
     });
-  }
+  };
 };
 
-export const linkPendingColonyMetadataWithColony = async (
+const linkPendingColonyMetadataWithColony = async (
   pendingColonyMetadata: ColonyMetadata,
   colonyAddress: string,
 ): Promise<void> => {
@@ -242,4 +241,41 @@ export const linkPendingColonyMetadataWithColony = async (
       ],
     },
   });
+};
+
+export const linkPendingMetadata = async (action: string, colonyAddress: string, finalizedMotion: ColonyMotion): Promise<void> => {
+  const parsedAction = await getParsedActionFromMotion(
+    action,
+    colonyAddress,
+  );
+
+  const isMotionAddingADomain = parsedAction?.name === ColonyOperations.AddDomain;
+  const isMotionEditingADomain = parsedAction?.name === ColonyOperations.EditDomain;
+  const isMotionEditingAColony = parsedAction?.name === ColonyOperations.EditColony;
+
+  if (isMotionAddingADomain || isMotionEditingADomain || isMotionEditingAColony) {
+    const { items: colonyAction } =
+      (await query<{ items: MotionQuery[] }>('getColonyActionByMotionId', {
+        motionId: finalizedMotion.id,
+      })) ?? {};
+    /*
+     * pendingDomainMetadata is a motion data prop that we use to store the metadata of a Domain that COULD be created/edited
+     * if the YAY side of the motion won and the motion was finalized. In this step, if the motion has passed and has a pendingDomainMetadata prop,
+     * then we can assume that the motion's action is a domain action and we need to link this provisional DomainMetadata to the REAL Domain by creating
+     * a new DomainMetadata with the corresponding Domain item id.
+     */
+    if ((isMotionAddingADomain || isMotionEditingADomain) && colonyAction?.[0]?.pendingDomainMetadata) {
+      await linkPendingDomainMetadataWithDomain(
+        colonyAction[0].pendingDomainMetadata,
+        colonyAddress,
+        isMotionEditingADomain,
+        parsedAction,
+      );
+    } else if (isMotionEditingAColony && colonyAction?.[0]?.pendingColonyMetadata) {
+      await linkPendingColonyMetadataWithColony(
+        colonyAction[0].pendingColonyMetadata,
+        colonyAddress,
+      );
+    }
+  }
 };

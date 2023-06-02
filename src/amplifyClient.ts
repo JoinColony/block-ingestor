@@ -152,6 +152,27 @@ export const mutations = {
       }
     }
   `,
+  createColonyMotion: /* GraphQL */ `
+    mutation CreateColonyMotion($input: CreateColonyMotionInput!) {
+      createColonyMotion(input: $input) {
+        id
+      }
+    }
+  `,
+  updateColonyMotion: /* GraphQL */ `
+    mutation UpdateColonyMotion($input: UpdateColonyMotionInput!) {
+      updateColonyMotion(input: $input) {
+        id
+      }
+    }
+  `,
+  createMotionMessage: /* GraphQL */ `
+    mutation CreateMotionMessage($input: CreateMotionMessageInput!) {
+      createMotionMessage(input: $input) {
+        id
+      }
+    }
+  `,
 };
 
 /*
@@ -208,88 +229,11 @@ export const queries = {
       }
     }
   `,
-  getColonyMotions: /* GraphQL */ `
-    query GetActionsByColony($colonyAddress: ID!) {
-      getActionsByColony(
-        colonyId: $colonyAddress
-        filter: { isMotion: { eq: true } }
-      ) {
+  getColonyActionByMotionId: /* GraphQL */ `
+    query GetColonyActionByMotionId($motionId: ID!) {
+      getColonyActionByMotionId(motionId: $motionId) {
         items {
           id
-          motionData {
-            motionId
-            nativeMotionId
-            motionStakes {
-              raw {
-                nay
-                yay
-              }
-              percentage {
-                nay
-                yay
-              }
-            }
-            requiredStake
-            remainingStakes
-            usersStakes {
-              address
-              stakes {
-                raw {
-                  yay
-                  nay
-                }
-                percentage {
-                  yay
-                  nay
-                }
-              }
-            }
-            userMinStake
-            rootHash
-            motionDomainId
-            stakerRewards {
-              address
-              rewards {
-                yay
-                nay
-              }
-              isClaimed
-            }
-            isFinalized
-            createdBy
-            voterRecord {
-              address
-              voteCount
-              vote
-            }
-            revealedVotes {
-              raw {
-                yay
-                nay
-              }
-              percentage {
-                yay
-                nay
-              }
-            }
-            repSubmitted
-            skillRep
-            hasObjection
-            motionStateHistory {
-              hasVoted
-              hasPassed
-              hasFailed
-              hasFailedNotFinalizable
-              inRevealPhase
-            }
-            messages {
-              name
-              messageKey
-              initiatorAddress
-              vote
-              amount
-            }
-          }
           pendingDomainMetadata {
             name
             color
@@ -324,6 +268,78 @@ export const queries = {
               removed
             }
           }
+        }
+      }
+    }
+  `,
+  getColonyMotion: /* GraphQL */ `
+    query GetColonyMotion($id: ID!) {
+      getColonyMotion(id: $id) {
+        id
+        nativeMotionId
+        motionStakes {
+          raw {
+            nay
+            yay
+          }
+          percentage {
+            nay
+            yay
+          }
+        }
+        requiredStake
+        remainingStakes
+        usersStakes {
+          address
+          stakes {
+            raw {
+              yay
+              nay
+            }
+            percentage {
+              yay
+              nay
+            }
+          }
+        }
+        userMinStake
+        rootHash
+        nativeMotionDomainId
+        stakerRewards {
+          address
+          rewards {
+            yay
+            nay
+          }
+          isClaimed
+        }
+        isFinalized
+        createdBy
+        voterRecord {
+          address
+          voteCount
+          vote
+        }
+        revealedVotes {
+          raw {
+            yay
+            nay
+          }
+          percentage {
+            yay
+            nay
+          }
+        }
+        repSubmitted
+        skillRep
+        hasObjection
+        nativeMotionDomainId
+        motionStateHistory {
+          hasVoted
+          hasPassed
+          hasFailed
+          hasFailedNotFinalizable
+          inRevealPhase
         }
       }
     }

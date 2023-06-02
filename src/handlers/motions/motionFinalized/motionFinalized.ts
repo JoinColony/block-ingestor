@@ -12,8 +12,7 @@ import {
 
 import {
   getStakerReward,
-  linkPendingColonyMetadataWithColony,
-  linkPendingDomainMetadataWithDomain,
+  linkPendingMetadata,
 } from './helpers';
 
 export default async (event: ContractEvent): Promise<void> => {
@@ -31,48 +30,24 @@ export default async (event: ContractEvent): Promise<void> => {
     votingClient.address,
     motionId,
   );
-  const finalizedMotion = await getMotionFromDB(
-    colonyAddress,
-    motionDatabaseId,
-  );
+  const finalizedMotion = await getMotionFromDB(motionDatabaseId);
   if (finalizedMotion) {
     const {
-      motionData: {
-        usersStakes,
-        revealedVotes: {
-          raw: { yay: yayVotes, nay: nayVotes },
-        },
-        motionStakes: {
-          percentage: { yay: yayPercentage, nay: nayPercentage },
-        },
-        messages,
+      usersStakes,
+      revealedVotes: {
+        raw: { yay: yayVotes, nay: nayVotes },
       },
-      motionData,
+      motionStakes: {
+        percentage: { yay: yayPercentage, nay: nayPercentage },
+      },
     } = finalizedMotion;
 
     const yayWon =
       BigNumber.from(yayVotes).gt(nayVotes) ||
       Number(yayPercentage) > Number(nayPercentage);
 
-    /*
-     * pendingDomainMetadata is a motion data prop that we use to store the metadata of a Domain that COULD be created/edited
-     * if the YAY side of the motion won and the motion was finalized. In this step, if the motion has passed and has a pendingDomainMetadata prop,
-     * then we can assume that the motion's action is a domain action and we need to link this provisional DomainMetadata to the REAL Domain by creating
-     * a new DomainMetadata with the corresponding Domain item id.
-     */
-    if (finalizedMotion.pendingDomainMetadata && yayWon) {
-      await linkPendingDomainMetadataWithDomain(
-        action,
-        colonyAddress,
-        finalizedMotion.pendingDomainMetadata,
-      );
-    }
-
-    if (finalizedMotion.pendingColonyMetadata && yayWon) {
-      await linkPendingColonyMetadataWithColony(
-        finalizedMotion.pendingColonyMetadata,
-        colonyAddress,
-      );
+    if (yayWon) {
+      await linkPendingMetadata(action, colonyAddress, finalizedMotion);
     }
 
     const updatedStakerRewards = await Promise.all(
@@ -82,22 +57,21 @@ export default async (event: ContractEvent): Promise<void> => {
       ),
     );
 
-    const updatedMessages = [
-      ...messages,
+    const newMotionMessages = [
       {
         initiatorAddress: constants.AddressZero,
         name: MotionEvents.MotionFinalized,
         messageKey: getMessageKey(transactionHash, logIndex),
+        motionId: motionDatabaseId,
       },
     ];
 
     const updatedMotionData = {
-      ...motionData,
+      ...finalizedMotion,
       stakerRewards: updatedStakerRewards,
       isFinalized: true,
-      messages: updatedMessages,
     };
 
-    await updateMotionInDB(finalizedMotion.id, updatedMotionData);
+    await updateMotionInDB(updatedMotionData, newMotionMessages);
   }
 };

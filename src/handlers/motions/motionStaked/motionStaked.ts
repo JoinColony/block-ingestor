@@ -37,13 +37,11 @@ export default async (event: ContractEvent): Promise<void> => {
     votingClient.address,
     motionId,
   );
-  const stakedMotion = await getMotionFromDB(colonyAddress, motionDatabaseId);
+  const stakedMotion = await getMotionFromDB(motionDatabaseId);
 
   if (stakedMotion) {
     const {
-      id,
-      motionData: { usersStakes, messages },
-      motionData,
+      usersStakes,
     } = stakedMotion;
 
     const updatedUserStakes = getUpdatedUsersStakes(
@@ -53,9 +51,8 @@ export default async (event: ContractEvent): Promise<void> => {
       amount,
       requiredStake,
     );
-    const updatedMessages = getUpdatedMessages({
-      motionData,
-      messages,
+    const newMotionMessages = getUpdatedMessages({
+      motionData: stakedMotion,
       requiredStake,
       motionStakes,
       messageKey: getMessageKey(transactionHash, logIndex),
@@ -65,14 +62,13 @@ export default async (event: ContractEvent): Promise<void> => {
     });
 
     await updateMotionInDB(
-      id,
       {
-        ...motionData,
+        ...stakedMotion,
         usersStakes: updatedUserStakes,
         motionStakes,
         remainingStakes,
-        messages: updatedMessages,
       },
+      newMotionMessages,
       showInActionsList,
     );
 

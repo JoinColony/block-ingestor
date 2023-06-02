@@ -1,6 +1,6 @@
 import { BigNumber } from 'ethers';
 import { mutate, query } from '~amplifyClient';
-import { MotionData, MotionQuery, MotionSide, MotionVote } from '~types';
+import { ColonyMotion, MotionMessage, MotionSide, MotionVote } from '~types';
 import { verbose } from '~utils';
 
 export * from './motionStaked/helpers';
@@ -9,17 +9,45 @@ export const getMotionSide = (vote: BigNumber): MotionSide =>
   vote.eq(MotionVote.YAY) ? MotionSide.YAY : MotionSide.NAY;
 
 export const updateMotionInDB = async (
-  id: string,
-  motionData: MotionData,
+  motionData: ColonyMotion,
+  newMotionMessages?: MotionMessage[],
   showInActionsList?: boolean,
 ): Promise<void> => {
-  await mutate('updateColonyAction', {
+  await mutate('updateColonyMotion', {
     input: {
-      id,
-      motionData,
-      ...(showInActionsList === undefined ? {} : { showInActionsList }),
+      ...motionData,
     },
   });
+
+  if (newMotionMessages?.length) {
+    for (const message of newMotionMessages) {
+      await mutate('createMotionMessage', {
+        input: {
+          ...message,
+        },
+      });
+    }
+  }
+
+  if (showInActionsList !== undefined) {
+    const { items: colonyActionItems } =
+      (await query<{ items: Array<{ id: string }> }>('getColonyActionByMotionId', {
+        motionId: motionData.id,
+      })) ?? {};
+
+    if (!colonyActionItems?.length) {
+      verbose(
+        'Could not find the action in the db. This is a bug and needs investigating.',
+      );
+    } else {
+      await mutate('updateColonyAction', {
+        input: {
+          id: colonyActionItems[0].id,
+          showInActionsList,
+        },
+      });
+    }
+  }
 };
 
 export const getMotionDatabaseId = (
@@ -29,25 +57,12 @@ export const getMotionDatabaseId = (
 ): string => `${chainId}-${votingRepExtnAddress}_${nativeMotionId}`;
 
 export const getMotionFromDB = async (
-  colonyAddress: string,
   databaseMotionId: string,
-): Promise<MotionQuery | undefined> => {
-  const { items: motions } =
-    (await query<{ items: MotionQuery[] }>('getColonyMotions', {
-      colonyAddress,
-    })) ?? {};
-
-  if (!motions) {
-    verbose(
-      'Could not query motions in the db. This is a bug and needs investigating.',
-    );
-
-    return undefined;
-  }
-
-  const motion = motions.find(
-    ({ motionData: { motionId } }) => motionId === databaseMotionId,
-  );
+): Promise<ColonyMotion | undefined> => {
+  const motion =
+    await query<ColonyMotion>('getColonyMotion', {
+      id: databaseMotionId,
+    });
 
   if (!motion) {
     verbose(
