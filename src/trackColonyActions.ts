@@ -1,4 +1,3 @@
-import { getLogs } from '@colony/colony-js';
 import { utils } from 'ethers';
 
 import {
@@ -21,13 +20,9 @@ import {
   mapLogToContractEvent,
 } from '~utils';
 
-const getFilter = (
-  eventSignature: ContractEventsSignatures,
-  colonyAddress: string,
-): Filter => ({
-  topics: [utils.id(eventSignature)],
-  address: colonyAddress,
-});
+interface HandlerMappingType {
+  [key: string]: ColonyActionHandler;
+}
 
 /**
  * This function get logs for a particular event, parses them and call a relevant action handler to act upon it
@@ -37,74 +32,50 @@ const getFilter = (
  * So this can only work with our custom, nethermind based node.
  */
 const trackActionsByEvent = async (
-  eventSignature: ContractEventsSignatures,
   colonyAddress: string,
-  handler: ColonyActionHandler,
+  handlerMapping: HandlerMappingType,
 ): Promise<void> => {
   const colonyClient = await getCachedColonyClient(colonyAddress);
-  const filter = getFilter(eventSignature, colonyAddress);
-  const logs = await getLogs(networkClient, filter, {
-    fromBlock: getLatestBlock(),
-  });
+
+  const filter: Filter = {
+    topics: [Object.keys(handlerMapping).map((x) => utils.id(x))],
+    address: colonyAddress,
+  };
+  filter.fromBlock = await getLatestBlock();
+  const logs = await networkClient.provider.getLogs(filter);
   logs.forEach(async (log) => {
     const event = await mapLogToContractEvent(log, colonyClient.interface);
     if (!event) {
       return;
     }
-
-    handler(event);
+    await handlerMapping[event.signature](event);
   });
 };
 
 export default async (colonyAddress: string): Promise<void> => {
-  await trackActionsByEvent(
-    ContractEventsSignatures.TokensMinted,
-    colonyAddress,
-    handleMintTokensAction,
-  );
-  await trackActionsByEvent(
-    ContractEventsSignatures.PaymentAdded,
-    colonyAddress,
-    handlePaymentAction,
-  );
-  await trackActionsByEvent(
-    ContractEventsSignatures.TokenUnlocked,
-    colonyAddress,
-    handleTokenUnlockedAction,
-  );
-  await trackActionsByEvent(
-    ContractEventsSignatures.DomainAdded,
-    colonyAddress,
-    handleCreateDomainAction,
-  );
-  await trackActionsByEvent(
-    ContractEventsSignatures.DomainMetadata,
-    colonyAddress,
-    handleEditDomainAction,
-  );
-  await trackActionsByEvent(
-    ContractEventsSignatures.ColonyFundsMovedBetweenFundingPots,
-    colonyAddress,
-    handleMoveFundsAction,
-  );
-  await trackActionsByEvent(
-    ContractEventsSignatures.ColonyMetadata,
-    colonyAddress,
-    handleEditColonyAction,
-  );
-  await trackActionsByEvent(
-    ContractEventsSignatures.ColonyUpgraded,
-    colonyAddress,
-    handleVersionUpgradeAction,
-  );
-  await trackActionsByEvent(
-    ContractEventsSignatures.ArbitraryReputationUpdate,
-    colonyAddress,
-    handleEmitDomainReputationAction,
-  );
-  await trackActionsByEvent(
-    ContractEventsSignatures.ColonyRoleSet,
-    colonyAddress,
-    handleManagePermissionsAction,
-  );
+  verbose('Fetching past actions for colony:', colonyAddress);
+
+  const handlerMapping: HandlerMappingType = {};
+
+  handlerMapping[ContractEventsSignatures.TokensMinted] =
+    handleMintTokensAction;
+  handlerMapping[ContractEventsSignatures.PaymentAdded] = handlePaymentAction;
+  handlerMapping[ContractEventsSignatures.TokenUnlocked] =
+    handleTokenUnlockedAction;
+  handlerMapping[ContractEventsSignatures.DomainAdded] =
+    handleCreateDomainAction;
+  handlerMapping[ContractEventsSignatures.DomainMetadata] =
+    handleEditDomainAction;
+  handlerMapping[ContractEventsSignatures.ColonyFundsMovedBetweenFundingPots] =
+    handleMoveFundsAction;
+  handlerMapping[ContractEventsSignatures.ColonyMetadata] =
+    handleEditColonyAction;
+  handlerMapping[ContractEventsSignatures.ColonyUpgraded] =
+    handleVersionUpgradeAction;
+  handlerMapping[ContractEventsSignatures.ArbitraryReputationUpdate] =
+    handleEmitDomainReputationAction;
+  handlerMapping[ContractEventsSignatures.ColonyRoleSet] =
+    handleManagePermissionsAction;
+
+  await trackActionsByEvent(colonyAddress, handlerMapping);
 };
