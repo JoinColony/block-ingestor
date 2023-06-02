@@ -296,14 +296,12 @@ export const linkPendingMetadata = async (
 
 export const updateColonyUnclaimedStakes = async (
   colonyAddress: string,
-  motionTxHash: string,
   motionDatabaseId: string,
   updatedStakerRewards: StakerReward[],
 ): Promise<void> => {
   const colony = await getColonyFromDB(colonyAddress);
   if (colony) {
     const unclaimedMotionStake = {
-      transactionHash: motionTxHash,
       motionId: motionDatabaseId,
       unclaimedRewards: updatedStakerRewards,
     };

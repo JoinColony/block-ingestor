@@ -108,15 +108,6 @@ query GetColonyMotion($id: ID!) {
       hasFailedNotFinalizable
       inRevealPhase
     }
-    messages {
-      items {
-        name
-        messageKey
-        initiatorAddress
-        vote
-        amount
-      }
-    }
   }
 }
 

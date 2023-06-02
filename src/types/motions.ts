@@ -226,7 +226,6 @@ export interface ColonyQuery {
     | undefined;
   motionsWithUnclaimedStakes:
     | Array<{
-        transactionHash: string;
         motionId: string;
         unclaimedRewards: StakerReward[];
       }>
