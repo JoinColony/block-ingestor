@@ -1,0 +1,17 @@
+mutation CreateColonyRole($input: CreateColonyRoleInput!) {
+  createColonyRole(input: $input) {
+    id
+  }
+}
+
+mutation UpdateColonyRole($input: UpdateColonyRoleInput!) {
+  updateColonyRole(input: $input) {
+    id
+  }
+}
+
+mutation CreateColonyHistoricRole($input: CreateColonyHistoricRoleInput!) {
+  createColonyHistoricRole(input: $input) {
+    id
+  }
+}

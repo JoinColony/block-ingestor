@@ -15,7 +15,13 @@ export const getCachedColonyClient = async (
     return colonyClientsCache[colonyAddress];
   }
 
-  const colonyClient = await networkClient.getColonyClient(colonyAddress);
-  colonyClientsCache[colonyAddress] = colonyClient;
-  return colonyClient;
+  try {
+    const colonyClient = await networkClient.getColonyClient(colonyAddress);
+    colonyClientsCache[colonyAddress] = colonyClient;
+    return colonyClient;
+  } catch (error) {
+
+  }
+  // @ts-ignore
+  return {};
 };

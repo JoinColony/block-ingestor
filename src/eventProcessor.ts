@@ -22,6 +22,7 @@ import {
   handleVersionUpgradeAction,
   handleEmitDomainReputationAction,
   handleNetworkFeeInverseSet,
+  handleManagePermissionsAction,
 } from './handlers';
 
 dotenv.config();
@@ -155,6 +156,21 @@ export default async (event: ContractEvent): Promise<void> => {
 
     case ContractEventsSignatures.ArbitraryReputationUpdate: {
       await handleEmitDomainReputationAction(event);
+      return;
+    }
+
+    case ContractEventsSignatures.ColonyRoleSet: {
+      await handleManagePermissionsAction(event);
+      return;
+    }
+
+    case ContractEventsSignatures.ColonyRoleSet_OLD: {
+      await handleManagePermissionsAction(event);
+      return;
+    }
+
+    case ContractEventsSignatures.RecoveryRoleSet: {
+      await handleManagePermissionsAction(event);
       return;
     }
 

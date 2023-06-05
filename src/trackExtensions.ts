@@ -15,6 +15,7 @@ import {
 } from '~utils';
 import { SUPPORTED_EXTENSION_IDS } from '~constants';
 import { extensionSpecificEventsListener } from '~eventListener';
+import { BigNumber } from 'ethers';
 
 export default async (): Promise<void> => {
   const latestBlock = await getLatestBlock();
@@ -25,8 +26,8 @@ export default async (): Promise<void> => {
     );
     await trackExtensionAddedToNetwork(extensionId, latestBlock);
 
-    verbose(`Fetching events for extension: ${extensionId}`);
-    await trackExtensionEvents(extensionId, latestBlock);
+    // verbose(`Fetching events for extension: ${extensionId}`);
+    // await trackExtensionEvents(extensionId, latestBlock);
   });
 };
 
@@ -59,6 +60,7 @@ const trackExtensionAddedToNetwork = async (
   writeExtensionVersionFromEvent(event);
 };
 
+// ts-ignore
 const trackExtensionEvents = async (
   extensionId: Extension,
   latestBlock: number,
@@ -155,11 +157,16 @@ const trackExtensionEvents = async (
      * Get the currently installed version of extension
      * (so we don't have to worry about ExtensionUpgraded events)
      */
-    const version = await (
-      await (
-        await getCachedColonyClient(colony)
-      ).getExtensionClient(extensionId)
-    ).version();
+    let version = BigNumber.from(1);
+    try {
+      version = await (
+        await (
+          await getCachedColonyClient(colony)
+        ).getExtensionClient(extensionId)
+      ).version();
+    } catch (error) {
+
+    }
     const convertedVersion = toNumber(version);
 
     const isDeprecated = await isExtensionDeprecated(
