@@ -31,7 +31,7 @@ export type Scalars = {
 export type ChainMetadata = {
   __typename?: 'ChainMetadata';
   blockNumber?: Maybe<Scalars['Int']>;
-  chainId: Scalars['Int'];
+  chainId?: Maybe<Scalars['Int']>;
   logIndex?: Maybe<Scalars['Int']>;
   network?: Maybe<Network>;
   transactionHash?: Maybe<Scalars['String']>;
@@ -39,7 +39,7 @@ export type ChainMetadata = {
 
 export type ChainMetadataInput = {
   blockNumber?: InputMaybe<Scalars['Int']>;
-  chainId: Scalars['Int'];
+  chainId?: InputMaybe<Scalars['Int']>;
   logIndex?: InputMaybe<Scalars['Int']>;
   network?: InputMaybe<Network>;
   transactionHash?: InputMaybe<Scalars['String']>;
@@ -50,7 +50,7 @@ export type Colony = {
   actions?: Maybe<ModelColonyActionConnection>;
   balances?: Maybe<ColonyBalances>;
   chainFundsClaim?: Maybe<ColonyChainFundsClaim>;
-  chainMetadata: ChainMetadata;
+  chainMetadata?: Maybe<ChainMetadata>;
   colonyNativeTokenId: Scalars['ID'];
   createdAt: Scalars['AWSDateTime'];
   domains?: Maybe<ModelDomainConnection>;
@@ -191,14 +191,14 @@ export enum ColonyActionType {
 export type ColonyBalance = {
   __typename?: 'ColonyBalance';
   balance: Scalars['String'];
-  domain: Domain;
+  domain?: Maybe<Domain>;
   id: Scalars['ID'];
   token: Token;
 };
 
 export type ColonyBalanceInput = {
   balance: Scalars['String'];
-  domain: DomainInput;
+  domain?: InputMaybe<DomainInput>;
   id?: InputMaybe<Scalars['ID']>;
   token: TokenInput;
 };
@@ -261,10 +261,10 @@ export type ColonyHistoricRole = {
   __typename?: 'ColonyHistoricRole';
   blockNumber: Scalars['Int'];
   colony: Colony;
-  colonyHistoricRoleColonyId: Scalars['ID'];
-  colonyHistoricRoleDomainId: Scalars['ID'];
+  colonyId: Scalars['ID'];
   createdAt: Scalars['AWSDateTime'];
   domain: Domain;
+  domainId: Scalars['ID'];
   id: Scalars['ID'];
   role_0?: Maybe<Scalars['Boolean']>;
   role_1?: Maybe<Scalars['Boolean']>;
@@ -314,10 +314,10 @@ export type ColonyMetadataChangelogInput = {
 
 export type ColonyRole = {
   __typename?: 'ColonyRole';
-  colonyRoleDomainId: Scalars['ID'];
   colonyRolesId?: Maybe<Scalars['ID']>;
   createdAt: Scalars['AWSDateTime'];
   domain: Domain;
+  domainId: Scalars['ID'];
   id: Scalars['ID'];
   latestBlock: Scalars['Int'];
   role_0?: Maybe<Scalars['Boolean']>;
@@ -431,9 +431,9 @@ export type CreateColonyFundsClaimInput = {
 
 export type CreateColonyHistoricRoleInput = {
   blockNumber: Scalars['Int'];
-  colonyHistoricRoleColonyId: Scalars['ID'];
-  colonyHistoricRoleDomainId: Scalars['ID'];
+  colonyId: Scalars['ID'];
   createdAt?: InputMaybe<Scalars['AWSDateTime']>;
+  domainId: Scalars['ID'];
   id?: InputMaybe<Scalars['ID']>;
   role_0?: InputMaybe<Scalars['Boolean']>;
   role_1?: InputMaybe<Scalars['Boolean']>;
@@ -448,7 +448,7 @@ export type CreateColonyHistoricRoleInput = {
 export type CreateColonyInput = {
   balances?: InputMaybe<ColonyBalancesInput>;
   chainFundsClaim?: InputMaybe<ColonyChainFundsClaimInput>;
-  chainMetadata: ChainMetadataInput;
+  chainMetadata?: InputMaybe<ChainMetadataInput>;
   colonyNativeTokenId: Scalars['ID'];
   id?: InputMaybe<Scalars['ID']>;
   name: Scalars['String'];
@@ -466,8 +466,8 @@ export type CreateColonyMetadataInput = {
 };
 
 export type CreateColonyRoleInput = {
-  colonyRoleDomainId: Scalars['ID'];
   colonyRolesId?: InputMaybe<Scalars['ID']>;
+  domainId: Scalars['ID'];
   id?: InputMaybe<Scalars['ID']>;
   latestBlock: Scalars['Int'];
   role_0?: InputMaybe<Scalars['Boolean']>;
@@ -541,7 +541,7 @@ export type CreateProfileInput = {
 
 export type CreateTokenInput = {
   avatar?: InputMaybe<Scalars['String']>;
-  chainMetadata: ChainMetadataInput;
+  chainMetadata?: InputMaybe<ChainMetadataInput>;
   createdAt?: InputMaybe<Scalars['AWSDateTime']>;
   decimals: Scalars['Int'];
   id?: InputMaybe<Scalars['ID']>;
@@ -552,7 +552,7 @@ export type CreateTokenInput = {
 };
 
 export type CreateUniqueColonyInput = {
-  chainMetadata: ChainMetadataInput;
+  chainMetadata?: InputMaybe<ChainMetadataInput>;
   colonyNativeTokenId: Scalars['ID'];
   id: Scalars['ID'];
   name: Scalars['String'];
@@ -569,7 +569,7 @@ export type CreateUniqueUserInput = {
 
 export type CreateUserInput = {
   id?: InputMaybe<Scalars['ID']>;
-  name?: InputMaybe<Scalars['String']>;
+  name: Scalars['String'];
   profileId?: InputMaybe<Scalars['ID']>;
 };
 
@@ -959,9 +959,9 @@ export type ModelColonyFundsClaimFilterInput = {
 export type ModelColonyHistoricRoleConditionInput = {
   and?: InputMaybe<Array<InputMaybe<ModelColonyHistoricRoleConditionInput>>>;
   blockNumber?: InputMaybe<ModelIntInput>;
-  colonyHistoricRoleColonyId?: InputMaybe<ModelIdInput>;
-  colonyHistoricRoleDomainId?: InputMaybe<ModelIdInput>;
+  colonyId?: InputMaybe<ModelIdInput>;
   createdAt?: InputMaybe<ModelStringInput>;
+  domainId?: InputMaybe<ModelIdInput>;
   not?: InputMaybe<ModelColonyHistoricRoleConditionInput>;
   or?: InputMaybe<Array<InputMaybe<ModelColonyHistoricRoleConditionInput>>>;
   role_0?: InputMaybe<ModelBooleanInput>;
@@ -983,9 +983,9 @@ export type ModelColonyHistoricRoleConnection = {
 export type ModelColonyHistoricRoleFilterInput = {
   and?: InputMaybe<Array<InputMaybe<ModelColonyHistoricRoleFilterInput>>>;
   blockNumber?: InputMaybe<ModelIntInput>;
-  colonyHistoricRoleColonyId?: InputMaybe<ModelIdInput>;
-  colonyHistoricRoleDomainId?: InputMaybe<ModelIdInput>;
+  colonyId?: InputMaybe<ModelIdInput>;
   createdAt?: InputMaybe<ModelStringInput>;
+  domainId?: InputMaybe<ModelIdInput>;
   id?: InputMaybe<ModelIdInput>;
   not?: InputMaybe<ModelColonyHistoricRoleFilterInput>;
   or?: InputMaybe<Array<InputMaybe<ModelColonyHistoricRoleFilterInput>>>;
@@ -1026,8 +1026,8 @@ export type ModelColonyMetadataFilterInput = {
 
 export type ModelColonyRoleConditionInput = {
   and?: InputMaybe<Array<InputMaybe<ModelColonyRoleConditionInput>>>;
-  colonyRoleDomainId?: InputMaybe<ModelIdInput>;
   colonyRolesId?: InputMaybe<ModelIdInput>;
+  domainId?: InputMaybe<ModelIdInput>;
   latestBlock?: InputMaybe<ModelIntInput>;
   not?: InputMaybe<ModelColonyRoleConditionInput>;
   or?: InputMaybe<Array<InputMaybe<ModelColonyRoleConditionInput>>>;
@@ -1048,8 +1048,8 @@ export type ModelColonyRoleConnection = {
 
 export type ModelColonyRoleFilterInput = {
   and?: InputMaybe<Array<InputMaybe<ModelColonyRoleFilterInput>>>;
-  colonyRoleDomainId?: InputMaybe<ModelIdInput>;
   colonyRolesId?: InputMaybe<ModelIdInput>;
+  domainId?: InputMaybe<ModelIdInput>;
   id?: InputMaybe<ModelIdInput>;
   latestBlock?: InputMaybe<ModelIntInput>;
   not?: InputMaybe<ModelColonyRoleFilterInput>;
@@ -1418,7 +1418,9 @@ export type ModelSubscriptionColonyHistoricRoleFilterInput = {
     Array<InputMaybe<ModelSubscriptionColonyHistoricRoleFilterInput>>
   >;
   blockNumber?: InputMaybe<ModelSubscriptionIntInput>;
+  colonyId?: InputMaybe<ModelSubscriptionIdInput>;
   createdAt?: InputMaybe<ModelSubscriptionStringInput>;
+  domainId?: InputMaybe<ModelSubscriptionIdInput>;
   id?: InputMaybe<ModelSubscriptionIdInput>;
   or?: InputMaybe<
     Array<InputMaybe<ModelSubscriptionColonyHistoricRoleFilterInput>>
@@ -1448,6 +1450,7 @@ export type ModelSubscriptionColonyMetadataFilterInput = {
 
 export type ModelSubscriptionColonyRoleFilterInput = {
   and?: InputMaybe<Array<InputMaybe<ModelSubscriptionColonyRoleFilterInput>>>;
+  domainId?: InputMaybe<ModelSubscriptionIdInput>;
   id?: InputMaybe<ModelSubscriptionIdInput>;
   latestBlock?: InputMaybe<ModelSubscriptionIntInput>;
   or?: InputMaybe<Array<InputMaybe<ModelSubscriptionColonyRoleFilterInput>>>;
@@ -2793,7 +2796,7 @@ export type SubscriptionOnUpdateWatchedColoniesArgs = {
 export type Token = {
   __typename?: 'Token';
   avatar?: Maybe<Scalars['String']>;
-  chainMetadata: ChainMetadata;
+  chainMetadata?: Maybe<ChainMetadata>;
   colonies?: Maybe<ModelColonyTokensConnection>;
   createdAt: Scalars['AWSDateTime'];
   decimals: Scalars['Int'];
@@ -2881,9 +2884,9 @@ export type UpdateColonyFundsClaimInput = {
 
 export type UpdateColonyHistoricRoleInput = {
   blockNumber?: InputMaybe<Scalars['Int']>;
-  colonyHistoricRoleColonyId?: InputMaybe<Scalars['ID']>;
-  colonyHistoricRoleDomainId?: InputMaybe<Scalars['ID']>;
+  colonyId?: InputMaybe<Scalars['ID']>;
   createdAt?: InputMaybe<Scalars['AWSDateTime']>;
+  domainId?: InputMaybe<Scalars['ID']>;
   id: Scalars['ID'];
   role_0?: InputMaybe<Scalars['Boolean']>;
   role_1?: InputMaybe<Scalars['Boolean']>;
@@ -2916,8 +2919,8 @@ export type UpdateColonyMetadataInput = {
 };
 
 export type UpdateColonyRoleInput = {
-  colonyRoleDomainId?: InputMaybe<Scalars['ID']>;
   colonyRolesId?: InputMaybe<Scalars['ID']>;
+  domainId?: InputMaybe<Scalars['ID']>;
   id: Scalars['ID'];
   latestBlock?: InputMaybe<Scalars['Int']>;
   role_0?: InputMaybe<Scalars['Boolean']>;
@@ -3034,7 +3037,7 @@ export type User = {
   __typename?: 'User';
   createdAt: Scalars['AWSDateTime'];
   id: Scalars['ID'];
-  name?: Maybe<Scalars['String']>;
+  name: Scalars['String'];
   profile?: Maybe<Profile>;
   profileId?: Maybe<Scalars['ID']>;
   tokens?: Maybe<ModelUserTokensConnection>;

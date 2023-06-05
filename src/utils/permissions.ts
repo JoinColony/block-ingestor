@@ -207,7 +207,7 @@ export const createInitialColonyRolesDatabaseEntry = async (
         id: rolesDatabaseId,
         latestBlock: blockNumber,
         // Link the Domain Model
-        colonyRoleDomainId: domainDatabaseId,
+        domainId: domainDatabaseId,
         // Link the Colony Model
         colonyRolesId: colonyAddress,
         /*
@@ -395,9 +395,9 @@ export const createColonyHistoricRoleDatabaseEntry = async (
         type: 'SortedHistoricRole',
         blockNumber,
         // Link the Domain Model
-        colonyHistoricRoleDomainId: domainDatabaseId,
+        domainId: domainDatabaseId,
         // Link the Colony Model
-        colonyHistoricRoleColonyId: colonyAddress,
+        colonyId: colonyAddress,
         /*
          * @NOTE Link the target
          *
