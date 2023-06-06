@@ -19,6 +19,7 @@ export const updateColonyUnclaimedStakes = async (
         ({ isClaimed }) => !isClaimed,
       );
 
+      /* If we still have some unclaimed stakes, update the array */
       if (unclaimedRewards.length) {
         motionWithUnclaimedStakes.unclaimedRewards = unclaimedRewards;
         await mutate('updateColony', {
