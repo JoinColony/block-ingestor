@@ -10,6 +10,11 @@ import { getCachedColonyClient } from '~utils/colonyClient';
 import { verbose } from '~utils/logger';
 
 import { saveRemover } from './listenerRemover';
+import {
+  GetColonyExtensionDocument,
+  GetColonyExtensionQuery,
+  GetColonyExtensionQueryVariables,
+} from '~graphql';
 
 /**
  * Generator method for events listeners
@@ -68,15 +73,20 @@ const getClientAndProvider = async (
 
   switch (clientType) {
     case ClientType.ColonyClient: {
-      client = await getCachedColonyClient(contractAddress);
+      const colonyClient = await getCachedColonyClient(contractAddress);
+      if (colonyClient) {
+        client = colonyClient;
+      }
       break;
     }
     case ClientType.VotingReputationClient: {
       const colonyClient = await getCachedColonyClient(contractAddress);
-      client = await colonyClient.getExtensionClient(
-        Extension.VotingReputation,
-      );
-      provider = client.provider;
+      if (colonyClient) {
+        client = await colonyClient.getExtensionClient(
+          Extension.VotingReputation,
+        );
+        provider = client.provider;
+      }
       break;
     }
     default: {
@@ -170,9 +180,16 @@ const addEventToQueue = async (
          * In the case of Voting Rep, only add the event to the queue if the colony address
          * associated with the event is the same as the colony address the listener is associated with.
          */
-        const { colonyId } = await query(GetColonyExtensionDocument, {
-          id: eventContractAddress,
-        });
+        const { data } =
+          (await query<
+            GetColonyExtensionQuery,
+            GetColonyExtensionQueryVariables
+          >(GetColonyExtensionDocument, {
+            id: eventContractAddress,
+          })) ?? {};
+
+        const colonyId = data?.getColonyExtension?.colonyId;
+
         if (colonyId === contractAddress) {
           addEvent({
             ...client.interface.parseLog(log),

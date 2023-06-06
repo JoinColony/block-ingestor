@@ -43,18 +43,21 @@ const trackActionsByEvent = async (
   handler: ColonyActionHandler,
 ): Promise<void> => {
   const colonyClient = await getCachedColonyClient(colonyAddress);
-  const filter = getFilter(eventSignature, colonyAddress);
-  const logs = await getLogs(networkClient, filter, {
-    fromBlock: await getLatestBlock(),
-  });
-  logs.forEach(async (log) => {
-    const event = await mapLogToContractEvent(log, colonyClient.interface);
-    if (!event) {
-      return;
-    }
 
-    handler(event);
-  });
+  if (colonyClient) {
+    const filter = getFilter(eventSignature, colonyAddress);
+    const logs = await getLogs(networkClient, filter, {
+      fromBlock: await getLatestBlock(),
+    });
+    logs.forEach(async (log) => {
+      const event = await mapLogToContractEvent(log, colonyClient.interface);
+      if (!event) {
+        return;
+      }
+
+      handler(event);
+    });
+  }
 };
 
 export default async (colonyAddress: string): Promise<void> => {

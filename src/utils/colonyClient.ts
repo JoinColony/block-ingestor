@@ -1,8 +1,13 @@
 import { AnyColonyClient } from '@colony/colony-js';
 
 import { query } from '~amplifyClient';
+import {
+  Colony,
+  GetColonyDocument,
+  GetColonyQuery,
+  GetColonyQueryVariables,
+} from '~graphql';
 import networkClient from '~networkClient';
-import { ColonyQuery } from '~types';
 
 const colonyClientsCache: Record<string, AnyColonyClient> = {};
 
@@ -12,7 +17,7 @@ const colonyClientsCache: Record<string, AnyColonyClient> = {};
  */
 export const getCachedColonyClient = async (
   colonyAddress: string,
-): Promise<AnyColonyClient> => {
+): Promise<AnyColonyClient | undefined> => {
   if (colonyAddress in colonyClientsCache) {
     return colonyClientsCache[colonyAddress];
   }
@@ -22,18 +27,24 @@ export const getCachedColonyClient = async (
     colonyClientsCache[colonyAddress] = colonyClient;
     return colonyClient;
   } catch (error) {
-
+    console.error(
+      `Unable to fetch colony client for address: ${colonyAddress}`,
+      error,
+    );
   }
-  // @ts-ignore
-  return {};
+
+  return;
 };
 
 export const getColonyFromDB = async (
   colonyAddress: string,
-): Promise<ColonyQuery | undefined> => {
-  const colony = await query<ColonyQuery>('getColony', {
-    id: colonyAddress,
-  });
+): Promise<Colony | undefined> => {
+  const { data } =
+    (await query<GetColonyQuery, GetColonyQueryVariables>(GetColonyDocument, {
+      id: colonyAddress,
+    })) ?? {};
+
+  const colony = data?.getColony;
 
   if (!colony) {
     console.error(

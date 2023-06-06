@@ -4,18 +4,23 @@ import {
   CreateColonyActionInput,
   CreateColonyActionMutation,
   CreateColonyActionMutationVariables,
+  GetVotingRepInstallationsDocument,
+  GetVotingRepInstallationsQuery,
+  GetVotingRepInstallationsQueryVariables,
 } from '~graphql';
 import { ContractEvent } from '~types';
 import { Extension, getExtensionHash } from '@colony/colony-js';
-import { verbose } from '~utils';
+import { notNull, verbose } from '~utils';
+
+type ActionFields = Omit<
+  CreateColonyActionInput,
+  'blockNumber' | 'colonyId' | 'colonyActionsId' | 'showInActionsList'
+>;
 
 export const writeActionFromEvent = async (
   event: ContractEvent,
   colonyAddress: string,
-  actionFields: Omit<
-    CreateColonyActionInput,
-    'blockNumber' | 'colonyId' | 'colonyActionsId'
-  >,
+  actionFields: ActionFields,
 ): Promise<void> => {
   const { transactionHash, blockNumber, timestamp } = event;
 
@@ -43,16 +48,20 @@ export const writeActionFromEvent = async (
 
 const getVotingReputationInstallations = async (
   colonyAddress: string,
-): Promise<Array<{ id: string }> | undefined> => {
+): Promise<
+  Array<{ __typename?: 'ColonyExtension'; id: string } | null> | undefined
+> => {
   const votingRepHash = getExtensionHash(Extension.VotingReputation);
-  const { items } =
-    (await query<{ items: Array<{ id: string }> }>(
-      GetVotingRepInstallationsQueryDocument,
-      {
-        votingRepHash,
-        colonyAddress,
-      },
-    )) ?? {};
+  const { data } =
+    (await query<
+      GetVotingRepInstallationsQuery,
+      GetVotingRepInstallationsQueryVariables
+    >(GetVotingRepInstallationsDocument, {
+      votingRepHash,
+      colonyAddress,
+    })) ?? {};
+
+  const items = data?.getExtensionByColonyAndHash?.items;
 
   return items;
 };
@@ -68,5 +77,7 @@ const showActionInActionsList = async (
   }
 
   // If the action was created by a motion, don't show it in the list
-  return !votingRepIds.some(({ id }) => id === initiatorAddress);
+  return !votingRepIds
+    .filter(notNull)
+    .some(({ id }) => id === initiatorAddress);
 };

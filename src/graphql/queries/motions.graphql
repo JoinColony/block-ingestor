@@ -3,38 +3,10 @@ query GetColonyActionByMotionId($motionId: ID!) {
     items {
       id
       pendingDomainMetadata {
-        name
-        color
-        description
-        changelog {
-          transactionHash
-          oldName
-          newName
-          oldColor
-          newColor
-          oldDescription
-          newDescription
-        }
+        ...DomainMetadata
       }
       pendingColonyMetadata {
-        id
-        displayName
-        avatar
-        thumbnail
-        changelog {
-          transactionHash
-          oldDisplayName
-          newDisplayName
-          hasAvatarChanged
-          hasWhitelistChanged
-          haveTokensChanged
-        }
-        isWhitelistActivated
-        whitelistedAddresses
-        modifiedTokenAddresses {
-          added
-          removed
-        }
+        ...ColonyMetadata
       }
     }
   }
@@ -42,72 +14,7 @@ query GetColonyActionByMotionId($motionId: ID!) {
 
 query GetColonyMotion($id: ID!) {
   getColonyMotion(id: $id) {
-    id
-    nativeMotionId
-    motionStakes {
-      raw {
-        nay
-        yay
-      }
-      percentage {
-        nay
-        yay
-      }
-    }
-    requiredStake
-    remainingStakes
-    usersStakes {
-      address
-      stakes {
-        raw {
-          yay
-          nay
-        }
-        percentage {
-          yay
-          nay
-        }
-      }
-    }
-    userMinStake
-    rootHash
-    nativeMotionDomainId
-    stakerRewards {
-      address
-      rewards {
-        yay
-        nay
-      }
-      isClaimed
-    }
-    isFinalized
-    createdBy
-    voterRecord {
-      address
-      voteCount
-      vote
-    }
-    revealedVotes {
-      raw {
-        yay
-        nay
-      }
-      percentage {
-        yay
-        nay
-      }
-    }
-    repSubmitted
-    skillRep
-    hasObjection
-    nativeMotionDomainId
-    motionStateHistory {
-      hasVoted
-      hasPassed
-      hasFailed
-      hasFailedNotFinalizable
-      inRevealPhase
-    }
+    ...ColonyMotion
   }
 }
 

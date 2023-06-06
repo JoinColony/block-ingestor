@@ -1,13 +1,12 @@
 import { BigNumber, constants } from 'ethers';
+import { MotionVote, MotionEvents } from '~types';
+import { getMotionSide } from '../helpers';
 import {
+  ColonyMotion,
+  CreateMotionMessageInput,
   MotionStakes,
   UserStakes,
-  MotionMessage,
-  ColonyMotion,
-  MotionVote,
-  MotionEvents,
-} from '~types';
-import { getMotionSide } from '../helpers';
+} from '~graphql';
 
 export const getRequiredStake = (
   skillRep: BigNumber,
@@ -207,7 +206,7 @@ export const getUpdatedMessages = ({
   vote,
   staker,
   amount,
-}: Props): MotionMessage[] => {
+}: Props): CreateMotionMessageInput[] => {
   const updatedMessages = [];
   const isFirstObjection = vote.eq(MotionVote.NAY) && !motionData.hasObjection;
   const isFullyYayStaked =

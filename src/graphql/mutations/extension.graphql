@@ -15,7 +15,7 @@ mutation UpdateColonyExtensionByColonyAndHash(
 mutation UpdateColonyExtensionByAddress($input: UpdateColonyExtensionInput!) {
   updateColonyExtension(input: $input) {
     id
-    hash: extensionHash
-    colonyId: colonyAddress
+    extensionHash: hash
+    colonyAddress: colonyId
   }
 }

@@ -1,10 +1,11 @@
-import { ContractEvent, VoterRecord, MotionSide } from '~types';
+import { ContractEvent, MotionSide } from '~types';
 import { getVotingClient, verbose } from '~utils';
 import {
   getMotionDatabaseId,
   getMotionFromDB,
   updateMotionInDB,
 } from '../helpers';
+import { VoterRecord } from '~graphql';
 
 export default async (event: ContractEvent): Promise<void> => {
   const {
@@ -25,9 +26,7 @@ export default async (event: ContractEvent): Promise<void> => {
   const revealedMotion = await getMotionFromDB(motionDatabaseId);
 
   if (revealedMotion) {
-    const {
-      voterRecord,
-    } = revealedMotion;
+    const { voterRecord } = revealedMotion;
     const updatedVoterRecord = voterRecord.map((record) => {
       const { address } = record;
       if (address !== voter) {

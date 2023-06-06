@@ -114,11 +114,24 @@ export enum ColonyActionType {
 // The Filter type doesn't seem to be exported from colony-js
 export type Filter = Parameters<typeof getLogs>[1];
 
-// Export here to avoid circular dependency with ColonyActionType
-export * from './motions';
-
 export type NetworkClients =
   | ColonyNetworkClient
   | TokenClient
   | AnyColonyClient
   | AnyVotingReputationClient;
+
+/*
+ * Contract calls
+ */
+export enum ColonyOperations {
+  MintTokens = 'mintTokens',
+  AddDomain = 'addDomain',
+  EditDomain = 'editDomain',
+  Upgrade = 'upgrade',
+  UnlockToken = 'unlockToken',
+  MakePaymentFundedFromDomain = 'makePaymentFundedFromDomain',
+  MoveFundsBetweenPots = 'moveFundsBetweenPots',
+  EmitDomainReputationPenalty = 'emitDomainReputationPenalty',
+  EmitDomainReputationReward = 'emitDomainReputationReward',
+  EditColony = 'editColony',
+}

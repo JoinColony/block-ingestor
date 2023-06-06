@@ -1,5 +1,10 @@
 import { mutate } from '~amplifyClient';
-import { StakerReward } from '~types';
+import {
+  StakerReward,
+  UpdateColonyDocument,
+  UpdateColonyMutation,
+  UpdateColonyMutationVariables,
+} from '~graphql';
 import { getColonyFromDB } from '~utils';
 
 export const updateColonyUnclaimedStakes = async (
@@ -22,12 +27,15 @@ export const updateColonyUnclaimedStakes = async (
       /* If we still have some unclaimed stakes, update the array */
       if (unclaimedRewards.length) {
         motionWithUnclaimedStakes.unclaimedRewards = unclaimedRewards;
-        await mutate('updateColony', {
-          input: {
-            id: colonyAddress,
-            motionsWithUnclaimedStakes,
+        await mutate<UpdateColonyMutation, UpdateColonyMutationVariables>(
+          UpdateColonyDocument,
+          {
+            input: {
+              id: colonyAddress,
+              motionsWithUnclaimedStakes,
+            },
           },
-        });
+        );
       } else {
         /* If there are no more unclaimed stakes, remove this motion from the array of
            motions with unclaimed stakes */
@@ -35,12 +43,15 @@ export const updateColonyUnclaimedStakes = async (
           motionsWithUnclaimedStakes?.filter(
             ({ motionId }) => motionDatabaseId !== motionId,
           );
-        await mutate('updateColony', {
-          input: {
-            id: colonyAddress,
-            motionsWithUnclaimedStakes: updatedMotionsWithUnclaimedStakes,
+        await mutate<UpdateColonyMutation, UpdateColonyMutationVariables>(
+          UpdateColonyDocument,
+          {
+            input: {
+              id: colonyAddress,
+              motionsWithUnclaimedStakes: updatedMotionsWithUnclaimedStakes,
+            },
           },
-        });
+        );
       }
     } else {
       console.log(

@@ -1,0 +1,20 @@
+fragment Colony on Colony {
+  colonyAddress: id
+  tokens {
+    items {
+      id
+      tokenAddress: tokenID
+    }
+  }
+  motionsWithUnclaimedStakes {
+    motionId
+    unclaimedRewards {
+      address
+      rewards {
+        yay
+        nay
+      }
+      isClaimed
+    }
+  }
+}

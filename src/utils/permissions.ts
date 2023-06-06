@@ -65,34 +65,38 @@ export const getAllRoleEventsFromTransaction = async (
     );
 
   const colonyClient = await getCachedColonyClient(colonyAddress);
-  const transactionReceipt = await colonyClient.provider.getTransactionReceipt(
-    transactionHash,
-  );
 
-  const events = await Promise.all(
-    transactionReceipt.logs.map((log) =>
-      mapLogToContractEvent(log, colonyClient.interface),
-    ),
-  );
+  if (colonyClient) {
+    const transactionReceipt =
+      await colonyClient.provider.getTransactionReceipt(transactionHash);
 
-  const filteredEvents = events.filter((event) => {
-    if (
-      !event ||
-      !(
-        event.name === colonyRoleSetEventName ||
-        event.name === colonyRecoveryRoleSetName
-      )
-    ) {
-      return false;
-    }
-    return true;
-  });
+    const events = await Promise.all(
+      transactionReceipt.logs.map((log) =>
+        mapLogToContractEvent(log, colonyClient.interface),
+      ),
+    );
 
-  /*
-   * Typecasting since apparently TS doesn't realize we are actually filtering
-   * to ensure that the Array only contains proper events
-   */
-  return filteredEvents as ContractEvent[];
+    const filteredEvents = events.filter((event) => {
+      if (
+        !event ||
+        !(
+          event.name === colonyRoleSetEventName ||
+          event.name === colonyRecoveryRoleSetName
+        )
+      ) {
+        return false;
+      }
+      return true;
+    });
+
+    /*
+     * Typecasting since apparently TS doesn't realize we are actually filtering
+     * to ensure that the Array only contains proper events
+     */
+    return filteredEvents as ContractEvent[];
+  }
+
+  return [];
 };
 
 export const getRolesMapFromEvents = (
@@ -145,6 +149,10 @@ export const createInitialColonyRolesDatabaseEntry = async (
   const domainDatabaseId = getDomainDatabaseId(colonyAddress, nativeDomainId);
 
   const colonyClient = await getCachedColonyClient(colonyAddress);
+
+  if (!colonyClient) {
+    return;
+  }
 
   const recoveryRole = await colonyClient.hasUserRole(
     targetAddress,

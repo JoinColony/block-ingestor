@@ -1,5 +1,5 @@
 import { BigNumber } from 'ethers';
-import { VoterRecord } from '~types';
+import { VoterRecord } from '~graphql';
 
 export const getUpdatedVoterRecord = (
   voterRecord: VoterRecord[],

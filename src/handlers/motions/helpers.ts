@@ -1,7 +1,20 @@
 import { BigNumber } from 'ethers';
 import { mutate, query } from '~amplifyClient';
-import { ColonyMotion, MotionMessage, MotionSide, MotionVote } from '~types';
-import { verbose } from '~utils';
+import {
+  ColonyMotion,
+  CreateMotionMessageDocument,
+  CreateMotionMessageInput,
+  GetColonyActionByMotionIdDocument,
+  GetColonyActionByMotionIdQuery,
+  GetColonyActionByMotionIdQueryVariables,
+  GetColonyMotionDocument,
+  GetColonyMotionQuery,
+  GetColonyMotionQueryVariables,
+  UpdateColonyActionDocument,
+  UpdateColonyMotionDocument,
+} from '~graphql';
+import { MotionSide, MotionVote } from '~types';
+import { notNull, verbose } from '~utils';
 
 export * from './motionStaked/helpers';
 
@@ -10,10 +23,10 @@ export const getMotionSide = (vote: BigNumber): MotionSide =>
 
 export const updateMotionInDB = async (
   motionData: ColonyMotion,
-  newMotionMessages?: MotionMessage[],
+  newMotionMessages?: CreateMotionMessageInput[],
   showInActionsList?: boolean,
 ): Promise<void> => {
-  await mutate('updateColonyMotion', {
+  await mutate(UpdateColonyMotionDocument, {
     input: {
       ...motionData,
     },
@@ -21,7 +34,7 @@ export const updateMotionInDB = async (
 
   if (newMotionMessages?.length) {
     for (const message of newMotionMessages) {
-      await mutate('createMotionMessage', {
+      await mutate(CreateMotionMessageDocument, {
         input: {
           ...message,
         },
@@ -30,17 +43,23 @@ export const updateMotionInDB = async (
   }
 
   if (showInActionsList !== undefined) {
-    const { items: colonyActionItems } =
-      (await query<{ items: Array<{ id: string }> }>('getColonyActionByMotionId', {
+    const { data } =
+      (await query<
+        GetColonyActionByMotionIdQuery,
+        GetColonyActionByMotionIdQueryVariables
+      >(GetColonyActionByMotionIdDocument, {
         motionId: motionData.id,
       })) ?? {};
+
+    const colonyActionItems =
+      data?.getColonyActionByMotionId?.items.filter(notNull);
 
     if (!colonyActionItems?.length) {
       verbose(
         'Could not find the action in the db. This is a bug and needs investigating.',
       );
     } else {
-      await mutate('updateColonyAction', {
+      await mutate(UpdateColonyActionDocument, {
         input: {
           id: colonyActionItems[0].id,
           showInActionsList,
@@ -58,11 +77,16 @@ export const getMotionDatabaseId = (
 
 export const getMotionFromDB = async (
   databaseMotionId: string,
-): Promise<ColonyMotion | undefined> => {
-  const motion =
-    await query<ColonyMotion>('getColonyMotion', {
-      id: databaseMotionId,
-    });
+): Promise<ColonyMotion | null | undefined> => {
+  const { data } =
+    (await query<GetColonyMotionQuery, GetColonyMotionQueryVariables>(
+      GetColonyMotionDocument,
+      {
+        id: databaseMotionId,
+      },
+    )) ?? {};
+
+  const motion = data?.getColonyMotion;
 
   if (!motion) {
     verbose(

@@ -20,21 +20,25 @@ export default async (event: ContractEvent): Promise<void> => {
   const databaseDomainId = getDomainDatabaseId(colonyAddress, nativeDomainId);
 
   const colonyClient = await getCachedColonyClient(colonyAddress);
-  const [skillId, fundingPotId] = await colonyClient.getDomain(nativeDomainId);
+  if (colonyClient) {
+    const [skillId, fundingPotId] = await colonyClient.getDomain(
+      nativeDomainId,
+    );
 
-  await mutate<CreateDomainMutation, CreateDomainMutationVariables>(
-    CreateDomainDocument,
-    {
-      input: {
-        id: databaseDomainId,
-        colonyId: colonyAddress,
-        nativeId: nativeDomainId,
-        isRoot: false,
-        nativeFundingPotId: toNumber(fundingPotId),
-        nativeSkillId: toNumber(skillId),
+    await mutate<CreateDomainMutation, CreateDomainMutationVariables>(
+      CreateDomainDocument,
+      {
+        input: {
+          id: databaseDomainId,
+          colonyId: colonyAddress,
+          nativeId: nativeDomainId,
+          isRoot: false,
+          nativeFundingPotId: toNumber(fundingPotId),
+          nativeSkillId: toNumber(skillId),
+        },
       },
-    },
-  );
+    );
+  }
 
   await writeActionFromEvent(event, colonyAddress, {
     type: ColonyActionType.CreateDomain,

@@ -164,13 +164,16 @@ const trackExtensionEvents = async (
      * (so we don't have to worry about ExtensionUpgraded events)
      */
     let version = BigNumber.from(1);
-    try {
-      version = await (
-        await (
-          await getCachedColonyClient(colony)
-        ).getExtensionClient(extensionId)
-      ).version();
-    } catch (error) {}
+    const colonyClient = await getCachedColonyClient(colony);
+
+    if (colonyClient) {
+      try {
+        version = await (
+          await colonyClient.getExtensionClient(extensionId)
+        ).version();
+      } catch (error) {}
+    }
+
     const convertedVersion = toNumber(version);
 
     const isDeprecated = await isExtensionDeprecated(

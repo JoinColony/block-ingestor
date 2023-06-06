@@ -2,10 +2,24 @@ import { BigNumber } from 'ethers';
 import { TransactionDescription } from 'ethers/lib/utils';
 import { AnyColonyClient, AnyOneTxPaymentClient } from '@colony/colony-js';
 
-import { ColonyMotion, ContractEvent, MotionEvents, ColonyActionInput, ColonyAction, MotionMessage } from '~types';
+import { ContractEvent, MotionEvents } from '~types';
 import { getVotingClient, verbose } from '~utils';
-
 import { mutate } from '~amplifyClient';
+import {
+  ColonyMotion,
+  CreateColonyActionDocument,
+  CreateColonyActionInput,
+  CreateColonyActionMutation,
+  CreateColonyActionMutationVariables,
+  CreateColonyMotionDocument,
+  CreateColonyMotionInput,
+  CreateColonyMotionMutation,
+  CreateColonyMotionMutationVariables,
+  CreateMotionMessageDocument,
+  CreateMotionMessageInput,
+  CreateMotionMessageMutation,
+  CreateMotionMessageMutationVariables,
+} from '~graphql';
 
 import {
   getMotionDatabaseId,
@@ -118,7 +132,13 @@ const getMotionData = async ({
   };
 };
 
-const getInitialMotionMessage = async (colonyAddress: string, motionId: BigNumber, transactionHash: string, logIndex: number, creatorAddress: string): Promise<MotionMessage> => {
+const getInitialMotionMessage = async (
+  colonyAddress: string,
+  motionId: BigNumber,
+  transactionHash: string,
+  logIndex: number,
+  creatorAddress: string,
+): Promise<CreateMotionMessageInput> => {
   const votingClient = await getVotingClient(colonyAddress);
   const { chainId } = await votingClient.provider.getNetwork();
   const motionDatabaseId = getMotionDatabaseId(
@@ -136,27 +156,36 @@ const getInitialMotionMessage = async (colonyAddress: string, motionId: BigNumbe
 };
 
 const createActionWithMotion = async (
-  actionData: ColonyAction,
-  motionData: ColonyMotion,
-  initialMotionMessage: MotionMessage,
+  actionData: CreateColonyActionInput,
+  motionData: CreateColonyMotionInput,
+  initialMotionMessage: CreateMotionMessageInput,
 ): Promise<void> => {
-  await mutate('createColonyMotion', {
-    input: {
-      ...motionData,
+  await mutate<CreateColonyMotionMutation, CreateColonyMotionMutationVariables>(
+    CreateColonyMotionDocument,
+    {
+      input: {
+        ...motionData,
+      },
     },
-  });
+  );
 
-  await mutate('createMotionMessage', {
+  await mutate<
+    CreateMotionMessageMutation,
+    CreateMotionMessageMutationVariables
+  >(CreateMotionMessageDocument, {
     input: {
       ...initialMotionMessage,
     },
   });
 
-  await mutate('createColonyAction', {
-    input: {
-      ...actionData,
+  await mutate<CreateColonyActionMutation, CreateColonyActionMutationVariables>(
+    CreateColonyActionDocument,
+    {
+      input: {
+        ...actionData,
+      },
     },
-  });
+  );
 };
 
 export const createMotionInDB = async (
@@ -167,7 +196,16 @@ export const createMotionInDB = async (
     contractAddress: colonyAddress,
     args: { motionId, creator: creatorAddress, domainId },
   }: ContractEvent,
-  input: ColonyActionInput,
+  input: Omit<
+    CreateColonyActionInput,
+    | 'id'
+    | 'colonyId'
+    | 'showInActionsList'
+    | 'isMotion'
+    | 'motionId'
+    | 'initiatorAddress'
+    | 'blockNumber'
+  >,
 ): Promise<void> => {
   const motionData = await getMotionData({
     colonyAddress,
@@ -175,7 +213,13 @@ export const createMotionInDB = async (
     domainId,
   });
 
-  const initialMotionMessage = await getInitialMotionMessage(colonyAddress, motionId, transactionHash, logIndex, creatorAddress);
+  const initialMotionMessage = await getInitialMotionMessage(
+    colonyAddress,
+    motionId,
+    transactionHash,
+    logIndex,
+    creatorAddress,
+  );
 
   const actionData = {
     id: transactionHash,

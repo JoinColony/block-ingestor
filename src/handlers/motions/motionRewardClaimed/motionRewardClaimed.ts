@@ -1,4 +1,4 @@
-import { ContractEvent, ColonyMotion, MotionEvents } from '~types';
+import { ContractEvent, MotionEvents } from '~types';
 import { getVotingClient } from '~utils';
 import {
   getMotionDatabaseId,
@@ -7,6 +7,7 @@ import {
   getMessageKey,
 } from '../helpers';
 import { updateColonyUnclaimedStakes } from './helpers';
+import { ColonyMotion } from '~graphql';
 
 export default async (event: ContractEvent): Promise<void> => {
   const {

@@ -23,24 +23,6 @@ query GetColonyMetadata($id: ID!) {
 
 query GetColony($id: ID!) {
   getColony(id: $id) {
-    colonyAddress: id
-    tokens {
-      items {
-        id
-        tokenAddress: tokenID
-      }
-    }
-    motionsWithUnclaimedStakes {
-      transactionHash
-      motionId
-      unclaimedRewards {
-        address
-        rewards {
-          yay
-          nay
-        }
-        isClaimed
-      }
-    }
+    ...Colony
   }
 }

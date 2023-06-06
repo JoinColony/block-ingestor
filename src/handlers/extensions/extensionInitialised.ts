@@ -32,7 +32,10 @@ export default async (event: ContractEvent): Promise<void> => {
     mutationResult?.data?.updateColonyExtension?.colonyAddress;
 
   /* Listen for motions once Voting Reputation is enabled. */
-  if (getExtensionHash(Extension.VotingReputation) === extensionHash) {
+  if (
+    colonyAddress &&
+    getExtensionHash(Extension.VotingReputation) === extensionHash
+  ) {
     await motionSpecificEventsListener(colonyAddress);
     await addVotingReputationParamsToDB(extensionAddress, colonyAddress);
   }

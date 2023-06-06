@@ -1,15 +1,7 @@
 import { BigNumber } from 'ethers';
 import { TransactionDescription } from 'ethers/lib/utils';
 
-import {
-  ColonyMetadata,
-  ColonyOperations,
-  DomainMetadata,
-  MotionVote,
-  StakerReward,
-  ColonyMotion,
-  MotionQuery,
-} from '~types';
+import { ColonyOperations, MotionVote } from '~types';
 import {
   getColonyFromDB,
   getDomainDatabaseId,
@@ -20,6 +12,25 @@ import {
 } from '~utils';
 import networkClient from '~networkClient';
 import { query, mutate } from '~amplifyClient';
+import {
+  ColonyMetadata,
+  ColonyMotion,
+  CreateDomainMetadataDocument,
+  DomainMetadata,
+  GetColonyActionByMotionIdDocument,
+  GetColonyActionByMotionIdQuery,
+  GetColonyActionByMotionIdQueryVariables,
+  GetColonyMetadataDocument,
+  GetColonyMetadataQuery,
+  GetColonyMetadataQueryVariables,
+  GetDomainMetadataDocument,
+  GetDomainMetadataQuery,
+  GetDomainMetadataQueryVariables,
+  StakerReward,
+  UpdateColonyDocument,
+  UpdateColonyMetadataDocument,
+  UpdateDomainMetadataDocument,
+} from '~graphql';
 
 export const getStakerReward = async (
   motionId: string,
@@ -98,7 +109,7 @@ const linkPendingDomainMetadataWithDomain = async (
     // and use that as an id to link the pending metadata.
     const nativeDomainId = domainCount.toNumber();
 
-    await mutate('createDomainMetadata', {
+    await mutate(CreateDomainMetadataDocument, {
       input: {
         ...pendingDomainMetadata,
         id: getDomainDatabaseId(colonyAddress, nativeDomainId),
@@ -108,12 +119,22 @@ const linkPendingDomainMetadataWithDomain = async (
     const nativeDomainId = parsedAction.args[2].toNumber(); // domainId arg from editDomain action
     const databaseDomainId = getDomainDatabaseId(colonyAddress, nativeDomainId);
 
-    const currentDomainMetadata = await query<DomainMetadata>(
-      'getDomainMetadata',
-      {
-        id: databaseDomainId,
-      },
-    );
+    const { data } =
+      (await query<GetDomainMetadataQuery, GetDomainMetadataQueryVariables>(
+        GetDomainMetadataDocument,
+        {
+          id: databaseDomainId,
+        },
+      )) ?? {};
+
+    const currentDomainMetadata = data?.getDomainMetadata;
+
+    if (!currentDomainMetadata) {
+      console.error(
+        `Unable to find current domain metadata for colony: ${colonyAddress} with nativeDomainId ${nativeDomainId}`,
+      );
+      return;
+    }
 
     const updatedMetadata = {
       ...currentDomainMetadata,
@@ -153,7 +174,7 @@ const linkPendingDomainMetadataWithDomain = async (
       updatedMetadata.name = newName;
     }
 
-    await mutate('updateDomainMetadata', {
+    await mutate(UpdateDomainMetadataDocument, {
       input: {
         ...updatedMetadata,
         id: databaseDomainId,
@@ -166,12 +187,15 @@ const linkPendingColonyMetadataWithColony = async (
   pendingColonyMetadata: ColonyMetadata,
   colonyAddress: string,
 ): Promise<void> => {
-  const currentColonyMetadata = await query<ColonyMetadata>(
-    'getColonyMetadata',
-    {
-      id: colonyAddress,
-    },
-  );
+  const { data } =
+    (await query<GetColonyMetadataQuery, GetColonyMetadataQueryVariables>(
+      GetColonyMetadataDocument,
+      {
+        id: colonyAddress,
+      },
+    )) ?? {};
+
+  const currentColonyMetadata = data?.getColonyMetadata;
 
   if (!currentColonyMetadata) {
     console.error(
@@ -232,7 +256,7 @@ const linkPendingColonyMetadataWithColony = async (
     }
   }
 
-  await mutate('updateColonyMetadata', {
+  await mutate(UpdateColonyMetadataDocument, {
     input: {
       ...updatedMetadata,
       changelog: [
@@ -262,10 +286,15 @@ export const linkPendingMetadata = async (
     isMotionEditingADomain ||
     isMotionEditingAColony
   ) {
-    const { items: colonyAction } =
-      (await query<{ items: MotionQuery[] }>('getColonyActionByMotionId', {
+    const { data } =
+      (await query<
+        GetColonyActionByMotionIdQuery,
+        GetColonyActionByMotionIdQueryVariables
+      >(GetColonyActionByMotionIdDocument, {
         motionId: finalizedMotion.id,
       })) ?? {};
+
+    const colonyAction = data?.getColonyActionByMotionId?.items;
     /*
      * pendingDomainMetadata is a motion data prop that we use to store the metadata of a Domain that COULD be created/edited
      * if the YAY side of the motion won and the motion was finalized. In this step, if the motion has passed and has a pendingDomainMetadata prop,
@@ -314,7 +343,7 @@ export const updateColonyUnclaimedStakes = async (
       motionsWithUnclaimedStakes = [unclaimedMotionStake];
     }
 
-    await mutate('updateColony', {
+    await mutate(UpdateColonyDocument, {
       input: {
         id: colonyAddress,
         motionsWithUnclaimedStakes,

@@ -2,11 +2,6 @@ import { ContractEvent } from './events';
 
 export type ColonyActionHandler = (event: ContractEvent) => Promise<void>;
 
-export interface ColonyActionInput {
-  type: string;
-  [key: string]: any;
-}
-
 export interface ColonyAction {
   id: string;
   colonyId: string;

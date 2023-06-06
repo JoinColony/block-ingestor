@@ -1,0 +1,120 @@
+fragment ColonyMotion on ColonyMotion {
+  id
+  nativeMotionId
+  motionStakes {
+    ...MotionStakes
+  }
+  requiredStake
+  remainingStakes
+  usersStakes {
+    ...UserStakes
+  }
+  userMinStake
+  rootHash
+  nativeMotionDomainId
+  stakerRewards {
+    ...StakerReward
+  }
+  isFinalized
+  createdBy
+  voterRecord {
+    ...VoterRecord
+  }
+  revealedVotes {
+    raw {
+      yay
+      nay
+    }
+    percentage {
+      yay
+      nay
+    }
+  }
+  repSubmitted
+  skillRep
+  hasObjection
+  nativeMotionDomainId
+  motionStateHistory {
+    hasVoted
+    hasPassed
+    hasFailed
+    hasFailedNotFinalizable
+    inRevealPhase
+  }
+}
+
+fragment VoterRecord on VoterRecord {
+  address
+  voteCount
+  vote
+}
+
+fragment StakerReward on StakerRewards {
+  address
+  rewards {
+    yay
+    nay
+  }
+  isClaimed
+}
+
+fragment MotionStakes on MotionStakes {
+  raw {
+    nay
+    yay
+  }
+  percentage {
+    nay
+    yay
+  }
+}
+
+fragment UserStakes on UserStakes {
+  address
+  stakes {
+    raw {
+      yay
+      nay
+    }
+    percentage {
+      yay
+      nay
+    }
+  }
+}
+
+fragment DomainMetadata on DomainMetadata {
+  name
+  color
+  description
+  changelog {
+    transactionHash
+    oldName
+    newName
+    oldColor
+    newColor
+    oldDescription
+    newDescription
+  }
+}
+
+fragment ColonyMetadata on ColonyMetadata {
+  id
+  displayName
+  avatar
+  thumbnail
+  changelog {
+    transactionHash
+    oldDisplayName
+    newDisplayName
+    hasAvatarChanged
+    hasWhitelistChanged
+    haveTokensChanged
+  }
+  isWhitelistActivated
+  whitelistedAddresses
+  modifiedTokenAddresses {
+    added
+    removed
+  }
+}
