@@ -7,7 +7,7 @@ import {
   getDomainDatabaseId,
   verbose,
   getCachedColonyClient,
-  isSupportedColonyClient,
+  isDomainFromFundingPotSupported,
 } from '~utils';
 import provider from '~provider';
 import { ColonyActionType } from '~graphql';
@@ -42,7 +42,7 @@ export default async (event: ContractEvent): Promise<void> => {
     return;
   }
 
-  if (isSupportedColonyClient(colonyClient)) {
+  if (isDomainFromFundingPotSupported(colonyClient)) {
     fromDomainId = await colonyClient.getDomainFromFundingPot(fromPot);
     toDomainId = await colonyClient.getDomainFromFundingPot(toPot);
   }
