@@ -1,6 +1,6 @@
 import { mutate, query } from '~amplifyClient';
 
-import { getCachedColonyClient } from './colonyClient';
+import { getCachedColonyClient } from './clients';
 import { notNull } from './arrays';
 import {
   Colony,

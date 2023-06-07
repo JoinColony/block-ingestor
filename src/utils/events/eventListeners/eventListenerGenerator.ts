@@ -6,7 +6,7 @@ import { query } from '~amplifyClient';
 import { addEvent } from '~eventQueue';
 import networkClient from '~networkClient';
 import { ContractEventsSignatures, NetworkClients } from '~types';
-import { getCachedColonyClient } from '~utils/colonyClient';
+import { getCachedColonyClient } from '~utils';
 import { verbose } from '~utils/logger';
 
 import { saveRemover } from './listenerRemover';
