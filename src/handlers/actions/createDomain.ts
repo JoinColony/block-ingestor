@@ -20,6 +20,11 @@ export default async (event: ContractEvent): Promise<void> => {
   const databaseDomainId = getDomainDatabaseId(colonyAddress, nativeDomainId);
 
   const colonyClient = await getCachedColonyClient(colonyAddress);
+
+  if (!colonyClient) {
+    return;
+  }
+
   const [skillId, fundingPotId] = await colonyClient.getDomain(nativeDomainId);
 
   await mutate<CreateDomainMutation, CreateDomainMutationVariables>(

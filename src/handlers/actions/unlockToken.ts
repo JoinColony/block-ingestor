@@ -12,6 +12,11 @@ export default async (event: ContractEvent): Promise<void> => {
   const { agent: initiatorAddress } = event.args;
 
   const colonyClient = await getCachedColonyClient(colonyAddress);
+
+  if (!colonyClient) {
+    return;
+  }
+
   const tokenAddress = await colonyClient.getToken();
 
   await writeActionFromEvent(event, colonyAddress, {

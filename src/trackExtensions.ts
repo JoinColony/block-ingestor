@@ -1,7 +1,10 @@
+import { BigNumber } from 'ethers';
 import { Extension, getExtensionHash, getLogs } from '@colony/colony-js';
 
 import networkClient from '~networkClient';
+
 import {
+  addVotingReputationParamsToDB,
   deleteExtensionFromEvent,
   getCachedColonyClient,
   getLatestBlock,
@@ -14,8 +17,10 @@ import {
   writeExtensionVersionFromEvent,
 } from '~utils';
 import { SUPPORTED_EXTENSION_IDS } from '~constants';
-import { extensionSpecificEventsListener } from '~eventListener';
-import { BigNumber } from 'ethers';
+import {
+  extensionSpecificEventsListener,
+  motionSpecificEventsListener,
+} from '~eventListener';
 
 export default async (): Promise<void> => {
   const latestBlock = await getLatestBlock();
@@ -90,6 +95,7 @@ const trackExtensionEvents = async (
       installedInColonyCount[colony] = 1;
     }
   });
+
   extensionUninstalledLogs.forEach((log) => {
     const parsedLog = networkClient.interface.parseLog(log);
     const { colony } = parsedLog.args;
@@ -158,15 +164,16 @@ const trackExtensionEvents = async (
      * (so we don't have to worry about ExtensionUpgraded events)
      */
     let version = BigNumber.from(1);
-    try {
-      version = await (
-        await (
-          await getCachedColonyClient(colony)
-        ).getExtensionClient(extensionId)
-      ).version();
-    } catch (error) {
+    const colonyClient = await getCachedColonyClient(colony);
 
+    if (colonyClient) {
+      try {
+        version = await (
+          await colonyClient.getExtensionClient(extensionId)
+        ).version();
+      } catch (error) {}
     }
+
     const convertedVersion = toNumber(version);
 
     const isDeprecated = await isExtensionDeprecated(
@@ -179,6 +186,12 @@ const trackExtensionEvents = async (
       extensionAddress,
       mostRecentInstalledLog,
     );
+
+    // Listen for motions if Voting Reputation is initialised.
+    if (Extension.VotingReputation === extensionId && isInitialised) {
+      await motionSpecificEventsListener(colony);
+      await addVotingReputationParamsToDB(extensionAddress, colony);
+    }
 
     await writeExtensionFromEvent(
       event,

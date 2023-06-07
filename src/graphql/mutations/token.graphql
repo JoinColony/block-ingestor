@@ -1,0 +1,11 @@
+mutation CreateColonyTokens($input: CreateColonyTokensInput!) {
+  createColonyTokens(input: $input) {
+    id
+  }
+}
+
+mutation DeleteColonyTokens($input: DeleteColonyTokensInput!) {
+  deleteColonyTokens(input: $input) {
+    id
+  }
+}

@@ -65,6 +65,11 @@ export const getAllRoleEventsFromTransaction = async (
     );
 
   const colonyClient = await getCachedColonyClient(colonyAddress);
+
+  if (!colonyClient) {
+    return [];
+  }
+
   const transactionReceipt = await colonyClient.provider.getTransactionReceipt(
     transactionHash,
   );
@@ -145,6 +150,10 @@ export const createInitialColonyRolesDatabaseEntry = async (
   const domainDatabaseId = getDomainDatabaseId(colonyAddress, nativeDomainId);
 
   const colonyClient = await getCachedColonyClient(colonyAddress);
+
+  if (!colonyClient) {
+    return;
+  }
 
   const recoveryRole = await colonyClient.hasUserRole(
     targetAddress,

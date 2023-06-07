@@ -23,6 +23,12 @@ import {
   handleEmitDomainReputationAction,
   handleNetworkFeeInverseSet,
   handleManagePermissionsAction,
+  handleMotionCreated,
+  handleMotionStaked,
+  handleMotionFinalized,
+  handleMotionRewardClaimed,
+  handleMotionVoteSubmitted,
+  handleMotionVoteRevealed,
 } from './handlers';
 
 dotenv.config();
@@ -111,6 +117,37 @@ export default async (event: ContractEvent): Promise<void> => {
 
     case ContractEventsSignatures.ExtensionInitialised: {
       await handleExtensionInitialised(event);
+      return;
+    }
+
+    /* Entry point for a newly created motion. */
+    case ContractEventsSignatures.MotionCreated: {
+      await handleMotionCreated(event);
+      return;
+    }
+
+    case ContractEventsSignatures.MotionStaked: {
+      await handleMotionStaked(event);
+      return;
+    }
+
+    case ContractEventsSignatures.MotionFinalized: {
+      await handleMotionFinalized(event);
+      return;
+    }
+
+    case ContractEventsSignatures.MotionRewardClaimed: {
+      await handleMotionRewardClaimed(event);
+      return;
+    }
+
+    case ContractEventsSignatures.MotionVoteSubmitted: {
+      await handleMotionVoteSubmitted(event);
+      return;
+    }
+
+    case ContractEventsSignatures.MotionVoteRevealed: {
+      await handleMotionVoteRevealed(event);
       return;
     }
 

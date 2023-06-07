@@ -1,0 +1,25 @@
+query GetColonyActionByMotionId($motionId: ID!) {
+  getColonyActionByMotionId(motionId: $motionId) {
+    items {
+      id
+      pendingDomainMetadata {
+        ...DomainMetadata
+      }
+      pendingColonyMetadata {
+        ...ColonyMetadata
+      }
+    }
+  }
+}
+
+query GetColonyMotion($id: ID!) {
+  getColonyMotion(id: $id) {
+    ...ColonyMotion
+  }
+}
+
+mutation CreateMotionMessage($input: CreateMotionMessageInput!) {
+  createMotionMessage(input: $input) {
+    id
+  }
+}

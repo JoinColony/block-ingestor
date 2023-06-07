@@ -1,5 +1,11 @@
-import { getLogs } from '@colony/colony-js';
-import { LogDescription } from 'ethers/lib/utils';
+import {
+  AnyColonyClient,
+  AnyVotingReputationClient,
+  ColonyNetworkClient,
+  TokenClient,
+  getLogs,
+} from '@colony/colony-js';
+import { LogDescription } from '@ethersproject/abi';
 
 /*
  * Custom contract event, since we need some log values as well
@@ -58,6 +64,14 @@ export enum ContractEventsSignatures {
   ColonyRoleSet = 'ColonyRoleSet(address,address,uint256,uint8,bool)',
   ColonyRoleSet_OLD = 'ColonyRoleSet(address,uint256,uint8,bool)',
   RecoveryRoleSet = 'RecoveryRoleSet(address,bool)',
+
+  // Motions
+  MotionCreated = 'MotionCreated(uint256,address,uint256)',
+  MotionStaked = 'MotionStaked(uint256,address,uint256,uint256)',
+  MotionFinalized = 'MotionFinalized(uint256,bytes,bool)',
+  MotionRewardClaimed = 'MotionRewardClaimed(uint256,address,uint256,uint256)',
+  MotionVoteSubmitted = 'MotionVoteSubmitted(uint256,address)',
+  MotionVoteRevealed = 'MotionVoteRevealed(uint256,address,uint256)',
 }
 
 /*
@@ -85,7 +99,39 @@ export enum ColonyActionType {
   EmitDomainReputationPenalty = 'EMIT_DOMAIN_REPUTATION_PENALTY',
   EmitDomainReputationReward = 'EMIT_DOMAIN_REPUTATION_REWARD',
   SetUserRoles = 'SET_USER_ROLES',
+  MintTokensMotion = 'MINT_TOKENS_MOTION',
+  CreateDomainMotion = 'CREATE_DOMAIN_MOTION',
+  EditDomainMotion = 'EDIT_DOMAIN_MOTION',
+  VersionUpgradeMotion = 'VERSION_UPGRADE_MOTION',
+  UnlockTokenMotion = 'UNLOCK_TOKEN_MOTION',
+  PaymentMotion = 'PAYMENT_MOTION',
+  MoveFundsMotion = 'MOVE_FUNDS_MOTION',
+  EmitDomainReputationPenaltyMotion = 'EMIT_DOMAIN_REPUTATION_PENALTY_MOTION',
+  EmitDomainReputationRewardMotion = 'EMIT_DOMAIN_REPUTATION_REWARD_MOTION',
+  ColonyEditMotion = 'COLONY_EDIT_MOTION',
 }
 
 // The Filter type doesn't seem to be exported from colony-js
 export type Filter = Parameters<typeof getLogs>[1];
+
+export type NetworkClients =
+  | ColonyNetworkClient
+  | TokenClient
+  | AnyColonyClient
+  | AnyVotingReputationClient;
+
+/*
+ * Contract calls
+ */
+export enum ColonyOperations {
+  MintTokens = 'mintTokens',
+  AddDomain = 'addDomain',
+  EditDomain = 'editDomain',
+  Upgrade = 'upgrade',
+  UnlockToken = 'unlockToken',
+  MakePaymentFundedFromDomain = 'makePaymentFundedFromDomain',
+  MoveFundsBetweenPots = 'moveFundsBetweenPots',
+  EmitDomainReputationPenalty = 'emitDomainReputationPenalty',
+  EmitDomainReputationReward = 'emitDomainReputationReward',
+  EditColony = 'editColony',
+}

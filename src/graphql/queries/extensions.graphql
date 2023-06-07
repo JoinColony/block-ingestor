@@ -1,0 +1,16 @@
+query GetColonyExtension($id: ID!) {
+  getColonyExtension(id: $id) {
+    colonyId
+  }
+}
+
+query GetVotingRepInstallations($votingRepHash: String!, $colonyAddress: ID!) {
+  getExtensionByColonyAndHash(
+    colonyId: $colonyAddress
+    hash: { eq: $votingRepHash }
+  ) {
+    items {
+      id
+    }
+  }
+}

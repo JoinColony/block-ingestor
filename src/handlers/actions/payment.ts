@@ -25,6 +25,10 @@ export default async (paymentAddedEvent: ContractEvent): Promise<void> => {
 
   const colonyClient = await getCachedColonyClient(colonyAddress);
 
+  if (!colonyClient) {
+    return;
+  }
+
   const receipt = await provider.getTransactionReceipt(transactionHash);
   const [, payoutClaimedLog, oneTxPaymentMadeLog] = receipt.logs.filter((log) =>
     hashedSignatures.includes(log.topics[0] as ContractEventsSignatures),

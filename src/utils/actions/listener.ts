@@ -1,6 +1,5 @@
 import { ContractEventsSignatures } from '~types';
-
-import { addColonyEventListener } from '../events';
+import { addColonyEventListener } from '~utils';
 
 export const addActionEventListeners = async (
   colonyAddress: string,

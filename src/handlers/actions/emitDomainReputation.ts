@@ -42,6 +42,11 @@ export default async (event: ContractEvent): Promise<void> => {
     : ColonyActionType.EmitDomainReputationPenalty;
 
   const colonyClient = await getCachedColonyClient(colonyAddress);
+
+  if (!colonyClient) {
+    return;
+  }
+
   const domainAddedFilter = colonyClient.filters.DomainAdded(null, null);
   const domainAddedEvents = await getEvents(colonyClient, domainAddedFilter);
   const changeDomainId = await getChangeDomainId(
