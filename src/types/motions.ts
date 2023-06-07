@@ -18,22 +18,19 @@ export enum MotionEvents {
 
 export const motionNameMapping: { [key: string]: ColonyActionType } = {
   [ColonyOperations.MintTokens]: ColonyActionType.MintTokensMotion,
-  // makePaymentFundedFromDomain: ColonyMotions.PaymentMotion,
-  // unlockToken: ColonyMotions.UnlockTokenMotion,
   [ColonyOperations.AddDomain]: ColonyActionType.CreateDomainMotion,
   [ColonyOperations.EditDomain]: ColonyActionType.EditDomainMotion,
   [ColonyOperations.MakePaymentFundedFromDomain]:
     ColonyActionType.PaymentMotion,
   [ColonyOperations.UnlockToken]: ColonyActionType.UnlockTokenMotion,
-  // addDomain: ColonyMotions.CreateDomainMotion,
-  // editDomain: ColonyMotions.EditDomainMotion,
   [ColonyOperations.EditColony]: ColonyActionType.ColonyEditMotion,
   // setUserRoles: ColonyMotions.SetUserRolesMotion,
   [ColonyOperations.MoveFundsBetweenPots]: ColonyActionType.MoveFundsMotion,
   [ColonyOperations.Upgrade]: ColonyActionType.VersionUpgradeMotion,
-  emitDomainReputationPenalty:
+  [ColonyOperations.EmitDomainReputationPenalty]:
     ColonyActionType.EmitDomainReputationPenaltyMotion,
-  emitDomainReputationReward: ColonyActionType.EmitDomainReputationRewardMotion,
+  [ColonyOperations.EmitDomainReputationReward]:
+    ColonyActionType.EmitDomainReputationRewardMotion,
 };
 
 export interface ExtensionParams {

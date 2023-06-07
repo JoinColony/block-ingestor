@@ -53,7 +53,7 @@ export const mutate = async <
   } catch (error) {
     const definitionNode = mutationDocument.definitions[0];
     const mutationName = isExecutableDefinitionNode(definitionNode)
-      ? definitionNode.name?.kind
+      ? definitionNode.name?.value
       : 'Unknown';
     console.trace(
       `Could not execute mutation ${mutationName}. Error: ${error}`,
