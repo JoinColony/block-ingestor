@@ -66,37 +66,38 @@ export const getAllRoleEventsFromTransaction = async (
 
   const colonyClient = await getCachedColonyClient(colonyAddress);
 
-  if (colonyClient) {
-    const transactionReceipt =
-      await colonyClient.provider.getTransactionReceipt(transactionHash);
-
-    const events = await Promise.all(
-      transactionReceipt.logs.map((log) =>
-        mapLogToContractEvent(log, colonyClient.interface),
-      ),
-    );
-
-    const filteredEvents = events.filter((event) => {
-      if (
-        !event ||
-        !(
-          event.name === colonyRoleSetEventName ||
-          event.name === colonyRecoveryRoleSetName
-        )
-      ) {
-        return false;
-      }
-      return true;
-    });
-
-    /*
-     * Typecasting since apparently TS doesn't realize we are actually filtering
-     * to ensure that the Array only contains proper events
-     */
-    return filteredEvents as ContractEvent[];
+  if (!colonyClient) {
+    return [];
   }
 
-  return [];
+  const transactionReceipt = await colonyClient.provider.getTransactionReceipt(
+    transactionHash,
+  );
+
+  const events = await Promise.all(
+    transactionReceipt.logs.map((log) =>
+      mapLogToContractEvent(log, colonyClient.interface),
+    ),
+  );
+
+  const filteredEvents = events.filter((event) => {
+    if (
+      !event ||
+      !(
+        event.name === colonyRoleSetEventName ||
+        event.name === colonyRecoveryRoleSetName
+      )
+    ) {
+      return false;
+    }
+    return true;
+  });
+
+  /*
+   * Typecasting since apparently TS doesn't realize we are actually filtering
+   * to ensure that the Array only contains proper events
+   */
+  return filteredEvents as ContractEvent[];
 };
 
 export const getRolesMapFromEvents = (

@@ -2,8 +2,12 @@ import { TransactionDescription } from 'ethers/lib/utils';
 import { BigNumber } from 'ethers';
 
 import { ContractEvent, motionNameMapping } from '~types';
-import { getDomainDatabaseId, isSupportedColonyClient, toNumber } from '~utils';
-import networkClient from '~networkClient';
+import {
+  getCachedColonyClient,
+  getDomainDatabaseId,
+  isSupportedColonyClient,
+  toNumber,
+} from '~utils';
 
 import { createMotionInDB } from '../helpers';
 
@@ -16,7 +20,11 @@ export const handleMoveFundsMotion = async (
 
   const [, , , , , fromPot, toPot, amount, tokenAddress] = actionArgs;
 
-  const colonyClient = await networkClient.getColonyClient(colonyAddress);
+  const colonyClient = await getCachedColonyClient(colonyAddress);
+
+  if (!colonyClient) {
+    return;
+  }
 
   let fromDomainId: BigNumber | undefined;
   let toDomainId: BigNumber | undefined;

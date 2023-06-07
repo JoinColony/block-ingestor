@@ -1,8 +1,7 @@
 import { Extension } from '@colony/colony-js';
 
-import networkClient from '~networkClient';
 import { ColonyOperations, ContractEvent } from '~types';
-import { verbose } from '~utils';
+import { getCachedColonyClient, verbose } from '~utils';
 import { getParsedActionFromMotion } from './helpers';
 import {
   handleManageDomainMotion,
@@ -21,7 +20,12 @@ export default async (event: ContractEvent): Promise<void> => {
     args: { motionId },
   } = event;
 
-  const colonyClient = await networkClient.getColonyClient(colonyAddress);
+  const colonyClient = await getCachedColonyClient(colonyAddress);
+
+  if (!colonyClient) {
+    return;
+  }
+
   const oneTxPaymentClient = await colonyClient.getExtensionClient(
     Extension.OneTxPayment,
   );

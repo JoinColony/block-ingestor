@@ -38,23 +38,25 @@ export default async (event: ContractEvent): Promise<void> => {
   let fromDomainId: BigNumber | undefined;
   let toDomainId: BigNumber | undefined;
 
-  if (colonyClient) {
-    if (isSupportedColonyClient(colonyClient)) {
-      fromDomainId = await colonyClient.getDomainFromFundingPot(fromPot);
-      toDomainId = await colonyClient.getDomainFromFundingPot(toPot);
-    }
-
-    await writeActionFromEvent(event, colonyAddress, {
-      type: ColonyActionType.MoveFunds,
-      initiatorAddress,
-      tokenAddress,
-      amount: amount.toString(),
-      fromDomainId: fromDomainId
-        ? getDomainDatabaseId(colonyAddress, toNumber(fromDomainId))
-        : undefined,
-      toDomainId: toDomainId
-        ? getDomainDatabaseId(colonyAddress, toNumber(toDomainId))
-        : undefined,
-    });
+  if (!colonyClient) {
+    return;
   }
+
+  if (isSupportedColonyClient(colonyClient)) {
+    fromDomainId = await colonyClient.getDomainFromFundingPot(fromPot);
+    toDomainId = await colonyClient.getDomainFromFundingPot(toPot);
+  }
+
+  await writeActionFromEvent(event, colonyAddress, {
+    type: ColonyActionType.MoveFunds,
+    initiatorAddress,
+    tokenAddress,
+    amount: amount.toString(),
+    fromDomainId: fromDomainId
+      ? getDomainDatabaseId(colonyAddress, toNumber(fromDomainId))
+      : undefined,
+    toDomainId: toDomainId
+      ? getDomainDatabaseId(colonyAddress, toNumber(toDomainId))
+      : undefined,
+  });
 };

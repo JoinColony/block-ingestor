@@ -43,28 +43,30 @@ export default async (event: ContractEvent): Promise<void> => {
 
   const colonyClient = await getCachedColonyClient(colonyAddress);
 
-  if (colonyClient) {
-    const domainAddedFilter = colonyClient.filters.DomainAdded(null, null);
-    const domainAddedEvents = await getEvents(colonyClient, domainAddedFilter);
-    const changeDomainId = await getChangeDomainId(
-      domainAddedEvents,
-      colonyClient,
-      skillId,
-    );
-
-    if (!changeDomainId) {
-      verbose(
-        'Not acting upon the ArbitraryReputationUpdate event as a domain matching the skillId was not found',
-      );
-      return;
-    }
-
-    await writeActionFromEvent(event, colonyAddress, {
-      type: actionType,
-      initiatorAddress,
-      recipientAddress: userAddress,
-      amount: amount.toString(),
-      fromDomainId: getDomainDatabaseId(colonyAddress, changeDomainId),
-    });
+  if (!colonyClient) {
+    return;
   }
+
+  const domainAddedFilter = colonyClient.filters.DomainAdded(null, null);
+  const domainAddedEvents = await getEvents(colonyClient, domainAddedFilter);
+  const changeDomainId = await getChangeDomainId(
+    domainAddedEvents,
+    colonyClient,
+    skillId,
+  );
+
+  if (!changeDomainId) {
+    verbose(
+      'Not acting upon the ArbitraryReputationUpdate event as a domain matching the skillId was not found',
+    );
+    return;
+  }
+
+  await writeActionFromEvent(event, colonyAddress, {
+    type: actionType,
+    initiatorAddress,
+    recipientAddress: userAddress,
+    amount: amount.toString(),
+    fromDomainId: getDomainDatabaseId(colonyAddress, changeDomainId),
+  });
 };

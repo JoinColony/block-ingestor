@@ -1,16 +1,16 @@
 import { BigNumber } from 'ethers';
 import { TransactionDescription } from 'ethers/lib/utils';
+import { AnyVotingReputationClient } from '@colony/colony-js';
 
 import { ColonyOperations, MotionVote } from '~types';
 import {
+  getCachedColonyClient,
   getColonyFromDB,
   getDomainDatabaseId,
   getExistingTokenAddresses,
-  getVotingClient,
   updateColonyTokens,
   verbose,
 } from '~utils';
-import networkClient from '~networkClient';
 import { query, mutate } from '~amplifyClient';
 import {
   ColonyMetadata,
@@ -35,10 +35,8 @@ import {
 export const getStakerReward = async (
   motionId: string,
   userAddress: string,
-  colonyAddress: string,
+  votingReputationClient: AnyVotingReputationClient,
 ): Promise<StakerReward> => {
-  const votingReputationClient = await getVotingClient(colonyAddress);
-
   /*
    * If **anyone** staked on a side, calling the rewards function returns 0 if there's no reward (even for
    * a user who didnd't stake).
@@ -83,7 +81,11 @@ const getParsedActionFromMotion = async (
   action: string,
   colonyAddress: string,
 ): Promise<TransactionDescription | undefined> => {
-  const colonyClient = await networkClient.getColonyClient(colonyAddress);
+  const colonyClient = await getCachedColonyClient(colonyAddress);
+
+  if (!colonyClient) {
+    return;
+  }
 
   // We are only parsing this action in order to know if it's a add/edit domain motion. Therefore, we shouldn't need to try with any other client.
   try {
@@ -103,7 +105,12 @@ const linkPendingDomainMetadataWithDomain = async (
   parsedAction: TransactionDescription,
 ): Promise<void> => {
   if (!isEditingADomain) {
-    const colonyClient = await networkClient.getColonyClient(colonyAddress);
+    const colonyClient = await getCachedColonyClient(colonyAddress);
+
+    if (!colonyClient) {
+      return;
+    }
+
     const domainCount = await colonyClient.getDomainCount();
     // The new domain should be created by now, so we just get the total of existing domains
     // and use that as an id to link the pending metadata.

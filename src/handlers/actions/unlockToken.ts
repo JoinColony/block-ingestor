@@ -13,14 +13,16 @@ export default async (event: ContractEvent): Promise<void> => {
 
   const colonyClient = await getCachedColonyClient(colonyAddress);
 
-  if (colonyClient) {
-    const tokenAddress = await colonyClient.getToken();
-
-    await writeActionFromEvent(event, colonyAddress, {
-      type: ColonyActionType.UnlockToken,
-      initiatorAddress,
-      tokenAddress,
-      fromDomainId: getDomainDatabaseId(colonyAddress, Id.RootDomain),
-    });
+  if (!colonyClient) {
+    return;
   }
+
+  const tokenAddress = await colonyClient.getToken();
+
+  await writeActionFromEvent(event, colonyAddress, {
+    type: ColonyActionType.UnlockToken,
+    initiatorAddress,
+    tokenAddress,
+    fromDomainId: getDomainDatabaseId(colonyAddress, Id.RootDomain),
+  });
 };
