@@ -337,9 +337,12 @@ export const updateColonyUnclaimedStakes = async (
 ): Promise<void> => {
   const colony = await getColonyFromDB(colonyAddress);
   if (colony) {
+    const unclaimedRewards = updatedStakerRewards.filter(
+      ({ rewards }) => rewards.yay !== '0' || rewards.nay !== '0',
+    );
     const unclaimedMotionStake = {
       motionId: motionDatabaseId,
-      unclaimedRewards: updatedStakerRewards,
+      unclaimedRewards,
     };
 
     let { motionsWithUnclaimedStakes } = colony;
