@@ -14,6 +14,11 @@ export default async (event: ContractEvent): Promise<void> => {
   } = event;
 
   const votingClient = await getVotingClient(colonyAddress);
+
+  if (!votingClient) {
+    return;
+  }
+
   const {
     votes: [nayVotes, yayVotes],
   } = await votingClient.getMotion(motionId);

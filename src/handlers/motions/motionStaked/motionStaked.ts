@@ -22,6 +22,11 @@ export default async (event: ContractEvent): Promise<void> => {
   } = event;
 
   const votingClient = await getVotingClient(colonyAddress);
+
+  if (!votingClient) {
+    return;
+  }
+
   const totalStakeFraction = await votingClient.getTotalStakeFraction();
   const { skillRep, stakes } = await votingClient.getMotion(motionId);
 
@@ -40,9 +45,7 @@ export default async (event: ContractEvent): Promise<void> => {
   const stakedMotion = await getMotionFromDB(motionDatabaseId);
 
   if (stakedMotion) {
-    const {
-      usersStakes,
-    } = stakedMotion;
+    const { usersStakes } = stakedMotion;
 
     const updatedUserStakes = getUpdatedUsersStakes(
       usersStakes,

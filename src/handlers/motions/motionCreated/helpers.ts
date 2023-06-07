@@ -1,6 +1,10 @@
 import { BigNumber } from 'ethers';
 import { TransactionDescription } from 'ethers/lib/utils';
-import { AnyColonyClient, AnyOneTxPaymentClient } from '@colony/colony-js';
+import {
+  AnyColonyClient,
+  AnyOneTxPaymentClient,
+  AnyVotingReputationClient,
+} from '@colony/colony-js';
 
 import { ContractEvent, MotionEvents } from '~types';
 import { getVotingClient, verbose } from '~utils';
@@ -34,6 +38,11 @@ export const getParsedActionFromMotion = async (
   clients: [AnyColonyClient, AnyOneTxPaymentClient],
 ): Promise<TransactionDescription | undefined> => {
   const votingClient = await getVotingClient(colonyAddress);
+
+  if (!votingClient) {
+    return;
+  }
+
   const motion = await votingClient.getMotion(motionId);
 
   for (const client of clients) {
@@ -52,17 +61,16 @@ export const getParsedActionFromMotion = async (
 };
 
 interface Props {
-  colonyAddress: string;
   motionId: BigNumber;
   domainId: BigNumber;
+  votingClient: AnyVotingReputationClient;
 }
 
 const getMotionData = async ({
-  colonyAddress,
   motionId,
   domainId,
+  votingClient,
 }: Props): Promise<ColonyMotion> => {
-  const votingClient = await getVotingClient(colonyAddress);
   const { skillRep, rootHash, repSubmitted } = await votingClient.getMotion(
     motionId,
   );
@@ -133,13 +141,12 @@ const getMotionData = async ({
 };
 
 const getInitialMotionMessage = async (
-  colonyAddress: string,
+  votingClient: AnyVotingReputationClient,
   motionId: BigNumber,
   transactionHash: string,
   logIndex: number,
   creatorAddress: string,
 ): Promise<CreateMotionMessageInput> => {
-  const votingClient = await getVotingClient(colonyAddress);
   const { chainId } = await votingClient.provider.getNetwork();
   const motionDatabaseId = getMotionDatabaseId(
     chainId,
@@ -207,14 +214,20 @@ export const createMotionInDB = async (
     | 'blockNumber'
   >,
 ): Promise<void> => {
+  const votingClient = await getVotingClient(colonyAddress);
+
+  if (!votingClient) {
+    return;
+  }
+
   const motionData = await getMotionData({
-    colonyAddress,
+    votingClient,
     motionId,
     domainId,
   });
 
   const initialMotionMessage = await getInitialMotionMessage(
-    colonyAddress,
+    votingClient,
     motionId,
     transactionHash,
     logIndex,

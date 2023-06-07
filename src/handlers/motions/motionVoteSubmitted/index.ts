@@ -14,6 +14,11 @@ export default async (event: ContractEvent): Promise<void> => {
   } = event;
 
   const votingClient = await getVotingClient(colonyAddress);
+
+  if (!votingClient) {
+    return;
+  }
+
   const { repSubmitted } = await votingClient.getMotion(motionId);
   const { chainId } = await votingClient.provider.getNetwork();
   const motionDatabaseId = getMotionDatabaseId(
@@ -24,9 +29,7 @@ export default async (event: ContractEvent): Promise<void> => {
   const votedMotion = await getMotionFromDB(motionDatabaseId);
 
   if (votedMotion) {
-    const {
-      voterRecord,
-    } = votedMotion;
+    const { voterRecord } = votedMotion;
 
     const updatedVoterRecord = getUpdatedVoterRecord(voterRecord, voter);
     await updateMotionInDB({

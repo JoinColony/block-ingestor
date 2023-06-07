@@ -7,13 +7,15 @@ import {
   ColonyClientV4,
   Extension,
 } from '@colony/colony-js';
-import networkClient from '../networkClient';
+import { getCachedColonyClient } from './colonyClient';
 
 export const getVotingClient = async (
   colonyAddress: string,
-): Promise<AnyVotingReputationClient> => {
-  const colonyClient = await networkClient.getColonyClient(colonyAddress);
-  return await colonyClient.getExtensionClient(Extension.VotingReputation);
+): Promise<AnyVotingReputationClient | undefined> => {
+  const colonyClient = await getCachedColonyClient(colonyAddress);
+  if (colonyClient) {
+    return await colonyClient.getExtensionClient(Extension.VotingReputation);
+  }
 };
 
 /**

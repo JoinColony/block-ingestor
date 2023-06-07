@@ -1,28 +1,33 @@
+import { AnyVotingReputationClient } from '@colony/colony-js/*';
 import { mutate } from '~amplifyClient';
 import { UpdateColonyExtensionByAddressDocument } from '~graphql';
 import { ExtensionParams } from '~types';
 import { getVotingClient } from '~utils';
 
 const getVotingReputationParams = async (
-  colonyAddress: string,
+  votingClient: AnyVotingReputationClient,
 ): Promise<ExtensionParams> => {
-  const votingClient = await getVotingClient(colonyAddress);
-  const totalStakeFraction = (
-    await votingClient.getTotalStakeFraction()
-  ).toString();
-  const voterRewardFraction = (
-    await votingClient.getVoterRewardFraction()
-  ).toString();
-  const userMinStakeFraction = (
-    await votingClient.getUserMinStakeFraction()
-  ).toString();
-  const maxVoteFraction = (await votingClient.getMaxVoteFraction()).toString();
-  const stakePeriod = (await votingClient.getStakePeriod()).toString();
-  const submitPeriod = (await votingClient.getSubmitPeriod()).toString();
-  const revealPeriod = (await votingClient.getRevealPeriod()).toString();
-  const escalationPeriod = (
-    await votingClient.getEscalationPeriod()
-  ).toString();
+  const [
+    totalStakeFraction,
+    voterRewardFraction,
+    userMinStakeFraction,
+    maxVoteFraction,
+    stakePeriod,
+    submitPeriod,
+    revealPeriod,
+    escalationPeriod,
+  ] = (
+    await Promise.all([
+      votingClient.getTotalStakeFraction(),
+      votingClient.getVoterRewardFraction(),
+      votingClient.getUserMinStakeFraction(),
+      votingClient.getMaxVoteFraction(),
+      votingClient.getStakePeriod(),
+      votingClient.getSubmitPeriod(),
+      votingClient.getRevealPeriod(),
+      votingClient.getEscalationPeriod(),
+    ])
+  ).map((bigNum) => bigNum.toString());
 
   return {
     votingReputation: {
@@ -42,7 +47,13 @@ export const addVotingReputationParamsToDB = async (
   extensionAddress: string,
   colonyAddress: string,
 ): Promise<void> => {
-  const params = await getVotingReputationParams(colonyAddress);
+  const votingClient = await getVotingClient(colonyAddress);
+
+  if (!votingClient) {
+    return;
+  }
+
+  const params = await getVotingReputationParams(votingClient);
   await mutate(UpdateColonyExtensionByAddressDocument, {
     input: {
       id: extensionAddress,
