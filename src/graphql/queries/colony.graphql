@@ -51,3 +51,11 @@ query GetColonyByNativeTokenId(
     nextToken
   }
 }
+
+query ListColonies($nextToken: String) {
+  listColonies(limit: 1000, nextToken: $nextToken) {
+    items {
+      id
+    }
+  }
+}
