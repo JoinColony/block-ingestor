@@ -1,5 +1,21 @@
 import { ColonyActionType } from '~graphql';
-import { ColonyOperations } from './events';
+
+/*
+ * Contract calls
+ */
+export enum ColonyOperations {
+  MintTokens = 'mintTokens',
+  AddDomain = 'addDomain',
+  EditDomain = 'editDomain',
+  Upgrade = 'upgrade',
+  UnlockToken = 'unlockToken',
+  MakePaymentFundedFromDomain = 'makePaymentFundedFromDomain',
+  MoveFundsBetweenPots = 'moveFundsBetweenPots',
+  EmitDomainReputationPenalty = 'emitDomainReputationPenalty',
+  EmitDomainReputationReward = 'emitDomainReputationReward',
+  EditColony = 'editColony',
+  SetUserRoles = 'setUserRoles',
+}
 
 export enum MotionEvents {
   MotionCreated = 'MotionCreated',

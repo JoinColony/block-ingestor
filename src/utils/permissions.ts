@@ -4,11 +4,7 @@ import { ColonyRole, Id } from '@colony/colony-js';
 import { hexStripZeros } from 'ethers/lib/utils';
 
 import { mutate, query } from '~amplifyClient';
-import {
-  ContractEvent,
-  ContractEventsSignatures,
-  ColonyActionType,
-} from '~types';
+import { ContractEvent, ContractEventsSignatures } from '~types';
 import {
   verbose,
   getCachedColonyClient,
@@ -29,6 +25,7 @@ import {
   GetColonyRoleQuery,
   GetColonyRoleQueryVariables,
   GetColonyRoleDocument,
+  ColonyActionType,
 } from '~graphql';
 
 const BASE_ROLES_MAP = {
