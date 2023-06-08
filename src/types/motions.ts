@@ -24,7 +24,7 @@ export const motionNameMapping: { [key: string]: ColonyActionType } = {
     ColonyActionType.PaymentMotion,
   [ColonyOperations.UnlockToken]: ColonyActionType.UnlockTokenMotion,
   [ColonyOperations.EditColony]: ColonyActionType.ColonyEditMotion,
-  // setUserRoles: ColonyMotions.SetUserRolesMotion,
+  [ColonyOperations.SetUserRoles]: ColonyActionType.SetUserRolesMotion,
   [ColonyOperations.MoveFundsBetweenPots]: ColonyActionType.MoveFundsMotion,
   [ColonyOperations.Upgrade]: ColonyActionType.VersionUpgradeMotion,
   [ColonyOperations.EmitDomainReputationPenalty]:

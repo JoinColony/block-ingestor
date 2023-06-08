@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 
 import { ColonyRole, Id } from '@colony/colony-js';
+import { hexStripZeros } from 'ethers/lib/utils';
 
 import { mutate, query } from '~amplifyClient';
 import {
@@ -131,6 +132,20 @@ export const getRolesMapFromEvents = (
       ...roleValue,
     };
     return undefined;
+  });
+
+  return roleMap;
+};
+
+export const getRolesMapFromHexString = (
+  rolesHexString: string,
+): Record<string, boolean | null> => {
+  const roleMap: Record<string, boolean | null> = {};
+  const roleBitMask = parseInt(hexStripZeros(rolesHexString), 16).toString(2);
+  const roleBitMaskArray = roleBitMask.split('').reverse();
+
+  Object.keys(BASE_ROLES_MAP).forEach((role) => {
+    roleMap[role] = roleBitMaskArray[Number(role.slice(-1))] === '1';
   });
 
   return roleMap;

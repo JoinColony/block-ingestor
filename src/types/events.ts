@@ -134,4 +134,5 @@ export enum ColonyOperations {
   EmitDomainReputationPenalty = 'emitDomainReputationPenalty',
   EmitDomainReputationReward = 'emitDomainReputationReward',
   EditColony = 'editColony',
+  SetUserRoles = 'setUserRoles',
 }
