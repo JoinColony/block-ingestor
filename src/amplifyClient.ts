@@ -42,7 +42,7 @@ export const mutate = async <
   TVariables extends Record<string, unknown> = {},
 >(
   mutationDocument: DocumentNode,
-  variables: TVariables,
+  variables?: TVariables,
 ): GraphQLFnReturn<T> => {
   try {
     const result = await API.graphql<GraphQLQuery<T>>(
