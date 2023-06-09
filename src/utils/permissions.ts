@@ -148,23 +148,22 @@ export const getRolesMapFromHexString = async (
   const roleBitMask = parseInt(hexStripZeros(rolesHexString), 16).toString(2);
   const roleBitMaskArray = roleBitMask.split('').reverse();
 
-  const getColonyRoleData = (
-    await query<GetColonyRoleQuery, GetColonyRoleQueryVariables>(
-      GetColonyRoleDocument,
-      { id: colonyRolesDatabaseId },
-    )
-  )?.data?.getColonyRole;
+  const getColonyRoleData =
+    (
+      await query<GetColonyRoleQuery, GetColonyRoleQueryVariables>(
+        GetColonyRoleDocument,
+        { id: colonyRolesDatabaseId },
+      )
+    )?.data?.getColonyRole ?? {};
 
-  if (getColonyRoleData) {
-    Object.keys(BASE_ROLES_MAP).forEach((role) => {
-      const currentRoleValue =
-        getColonyRoleData[role as keyof typeof getColonyRoleData];
-      const motionRoleValue = roleBitMaskArray[Number(role.slice(-1))] === '1';
-      if (currentRoleValue !== motionRoleValue) {
-        roleMap[role] = motionRoleValue;
-      }
-    });
-  }
+  Object.keys(BASE_ROLES_MAP).forEach((role) => {
+    const currentRoleValue =
+      !!getColonyRoleData[role as keyof typeof getColonyRoleData];
+    const motionRoleValue = roleBitMaskArray[Number(role.slice(-1))] === '1';
+    if (currentRoleValue !== motionRoleValue) {
+      roleMap[role] = motionRoleValue;
+    }
+  });
 
   return roleMap;
 };
