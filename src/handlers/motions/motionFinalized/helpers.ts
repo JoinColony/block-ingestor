@@ -337,9 +337,16 @@ export const updateColonyUnclaimedStakes = async (
 ): Promise<void> => {
   const colony = await getColonyFromDB(colonyAddress);
   if (colony) {
+    /*
+     * @NOTE: We only want to store unclaimed stakes that have a non-zero yay or nay reward.
+     * Otherwise, they will show up as unclaimed stakes in the stakes tab, but will not be claimable.
+     */
+    const unclaimedRewards = updatedStakerRewards.filter(
+      ({ rewards }) => rewards.yay !== '0' || rewards.nay !== '0',
+    );
     const unclaimedMotionStake = {
       motionId: motionDatabaseId,
-      unclaimedRewards: updatedStakerRewards,
+      unclaimedRewards,
     };
 
     let { motionsWithUnclaimedStakes } = colony;
