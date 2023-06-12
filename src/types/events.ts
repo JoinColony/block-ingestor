@@ -6,6 +6,7 @@ import {
   getLogs,
 } from '@colony/colony-js';
 import { LogDescription } from '@ethersproject/abi';
+import provider from '~provider';
 
 /*
  * Custom contract event, since we need some log values as well
@@ -86,6 +87,8 @@ export type ChainID = number;
 
 // The Filter type doesn't seem to be exported from colony-js
 export type Filter = Parameters<typeof getLogs>[1];
+
+export type Block = Awaited<ReturnType<typeof provider.getBlock>>;
 
 export type NetworkClients =
   | ColonyNetworkClient
