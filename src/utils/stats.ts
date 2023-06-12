@@ -28,16 +28,6 @@ type ObjectOrFunction =
 export const updateStats = async (
   objectOrFunction: ObjectOrFunction,
 ): Promise<void> => {
-  const port = process.env.STATS_PORT;
-  if (!port) {
-    verbose('Stats are DISABLED, no point in writing to the stats file');
-    /*
-     * If the port isn't set, it means the stats are disabled, so there's no point
-     * in keep writing the stats file, so we exit early
-     */
-    return;
-  }
-
   if (typeof objectOrFunction === 'function') {
     stats = {
       ...stats,
@@ -65,6 +55,10 @@ export const getStats = (): typeof stats => ({ ...stats });
 
 export const getLatestBlock = (): number =>
   Number.isInteger(stats.latestBlock) ? Number(stats.latestBlock) : 1;
+
+export const setLatestBlock = (latestBlock: number): void => {
+  updateStats({ latestBlock });
+};
 
 /**
  * Function fetching the last stored stats from the DB
