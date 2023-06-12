@@ -1,11 +1,8 @@
 import { ClientType } from '@colony/colony-js';
-import { ContractEvent, ContractEventsSignatures } from '~types';
-
-export type EventHandler = (event: ContractEvent) => void | Promise<void>;
+import { ContractEventsSignatures } from '~types';
 
 export interface EventListener {
   eventSignature: ContractEventsSignatures;
   clientType: ClientType;
-  address: string;
-  handler: EventHandler;
+  address?: string;
 }

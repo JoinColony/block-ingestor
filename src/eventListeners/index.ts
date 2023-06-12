@@ -3,6 +3,7 @@ import { utils } from 'ethers';
 import { EventListener } from './types';
 
 export * from './colony';
+export * from './network';
 
 const listeners: EventListener[] = [];
 
