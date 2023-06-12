@@ -1,5 +1,6 @@
+import { ClientType } from '@colony/colony-js';
+
 import { query } from '~amplifyClient';
-import { addColonyEventListener } from '~eventListeners';
 import {
   ListColoniesDocument,
   ListColoniesQuery,
@@ -7,6 +8,22 @@ import {
 } from '~graphql';
 import { ContractEventsSignatures } from '~types';
 import { notNull } from '~utils';
+import { addEventListener } from '~eventListeners';
+
+import { EventHandler } from './types';
+
+const addColonyEventListener = (
+  eventSignature: ContractEventsSignatures,
+  address: string,
+  handler: EventHandler,
+): void => {
+  addEventListener({
+    clientType: ClientType.ColonyClient,
+    eventSignature,
+    address,
+    handler,
+  });
+};
 
 const fetchColoniesAddresses = async (): Promise<string[]> => {
   const colonies = [];
