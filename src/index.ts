@@ -10,6 +10,7 @@ import trackExtensions from '~trackExtensions';
 // import trackNetworkInverseFee from '~trackNetworkInverseFee';
 import { startStatsServer } from '~stats';
 import { setupListenersForExistingColonies } from '~eventListeners';
+import { setupListenersForExtensions } from '~eventListeners/extensions';
 
 dotenv.config();
 utils.Logger.setLogLevel(utils.Logger.levels.ERROR);
@@ -39,6 +40,7 @@ const start = async (): Promise<void> => {
   amplifyClientSetup();
   startBlockListener();
   setupListenersForExistingColonies();
+  setupListenersForExtensions();
   await trackExtensions();
   await initialiseProvider();
   await startStatsServer();
