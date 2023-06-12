@@ -54,6 +54,7 @@ query GetColonyByNativeTokenId(
 
 query ListColonies($nextToken: String) {
   listColonies(limit: 1000, nextToken: $nextToken) {
+    nextToken
     items {
       id
     }
