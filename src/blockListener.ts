@@ -2,6 +2,7 @@ import { getClient, output, mapLogToContractEvent } from '~utils';
 import { Block, EthersObserverEvents } from '~types';
 import provider from '~provider';
 import { getListenersLogTopics, getMatchingListener } from '~eventListeners';
+import eventProcessor from '~eventProcessor';
 
 const blocks: Record<number, Block | undefined> = {};
 let latestBlockNumber: number | null = null;
@@ -75,8 +76,8 @@ const processNextBlock = async (): Promise<void> => {
         continue;
       }
 
-      // Call the handler in a blocking way to ensure events get processed sequentially
-      await listener.handler(event);
+      // Call the processor in a blocking way to ensure events get processed sequentially
+      await eventProcessor(event);
     }
 
     latestBlockNumber += 1;

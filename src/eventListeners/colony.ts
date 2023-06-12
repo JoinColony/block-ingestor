@@ -7,21 +7,17 @@ import {
   ListColoniesQueryVariables,
 } from '~graphql';
 import { ContractEventsSignatures } from '~types';
-import { notNull } from '~utils';
+import { notNull, output } from '~utils';
 import { addEventListener } from '~eventListeners';
-
-import { EventHandler } from './types';
 
 const addColonyEventListener = (
   eventSignature: ContractEventsSignatures,
   address: string,
-  handler: EventHandler,
 ): void => {
   addEventListener({
     clientType: ClientType.ColonyClient,
     eventSignature,
     address,
-    handler,
   });
 };
 
@@ -53,18 +49,27 @@ export const setupListenersForExistingColonies = async (): Promise<void> => {
 };
 
 const setupListenersForColony = (colonyAddress: string): void => {
-  addColonyEventListener(
+  output(`Setting up listeners for colony ${colonyAddress}`);
+
+  const colonyEvents = [
+    ContractEventsSignatures.ColonyFundsClaimed,
+    ContractEventsSignatures.ColonyUpgraded,
+    ContractEventsSignatures.TokensMinted,
+    ContractEventsSignatures.PaymentAdded,
     ContractEventsSignatures.DomainAdded,
-    colonyAddress,
-    () => {
-      console.log('Domain Added');
-    },
-  );
-  addColonyEventListener(
     ContractEventsSignatures.DomainMetadata,
-    colonyAddress,
-    () => {
-      console.log('Domain Metadata');
-    },
+    ContractEventsSignatures.TokenUnlocked,
+    ContractEventsSignatures.ColonyFundsMovedBetweenFundingPots,
+    ContractEventsSignatures.ColonyMetadata,
+    ContractEventsSignatures.ArbitraryReputationUpdate,
+    ContractEventsSignatures.ColonyRoleSet,
+    ContractEventsSignatures.RecoveryRoleSet,
+    ContractEventsSignatures.ColonyRoleSet_OLD,
+  ];
+
+  colonyEvents.forEach((eventSignature) =>
+    addColonyEventListener(eventSignature, colonyAddress),
   );
+
+  // @TODO: Add token event listener
 };
