@@ -23,6 +23,7 @@ import { verbose } from '../logger';
 export const setToJS = (set: Set<string>): Array<Record<string, string>> =>
   Array.from(set).map((entry) => JSON.parse(entry));
 
+// @TODO: Refactor to use block data already fetched by the block listener
 export const mapLogToContractEvent = async (
   log: Log,
   iface: utils.Interface,
