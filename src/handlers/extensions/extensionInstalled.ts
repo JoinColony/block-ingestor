@@ -1,4 +1,4 @@
-import { extensionSpecificEventsListener } from '~eventListener';
+import { setupListenersForExtension } from '~eventListeners/extensions';
 import networkClient from '~networkClient';
 import { ContractEvent } from '~types';
 import { writeExtensionFromEvent } from '~utils';
@@ -11,5 +11,5 @@ export default async (event: ContractEvent): Promise<void> => {
   );
 
   await writeExtensionFromEvent(event, extensionAddress);
-  await extensionSpecificEventsListener(extensionAddress, extensionHash);
+  setupListenersForExtension(extensionAddress, extensionHash);
 };

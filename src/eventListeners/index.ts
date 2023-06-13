@@ -6,6 +6,7 @@ import { EventListener } from './types';
 
 export * from './colony';
 export * from './network';
+export * from './extensions';
 
 const listeners: EventListener[] = [];
 

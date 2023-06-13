@@ -37,7 +37,7 @@ const fetchExtensionsAddresses = async (
   return extensions.filter(notNull).map((extension) => extension.id);
 };
 
-export const setupListenersForExtensions = async (): Promise<void> => {
+export const setupListenersForExistingExtensions = async (): Promise<void> => {
   addNetworkEventListener(ContractEventsSignatures.ExtensionInstalled);
   addNetworkEventListener(ContractEventsSignatures.ExtensionUninstalled);
   addNetworkEventListener(ContractEventsSignatures.ExtensionDeprecated);
@@ -46,11 +46,20 @@ export const setupListenersForExtensions = async (): Promise<void> => {
   output(`Setting up listeners for VotingReputation extensions`);
   const extensionHash = getExtensionHash(Extension.VotingReputation);
   const addresses = await fetchExtensionsAddresses(extensionHash);
-  addresses.forEach((extensionAddress) => {
+  addresses.forEach((extensionAddress) =>
+    setupListenersForExtension(extensionAddress, extensionHash),
+  );
+};
+
+export const setupListenersForExtension = (
+  extensionAddress: string,
+  extensionHash: string,
+): void => {
+  if (extensionHash === getExtensionHash(Extension.VotingReputation)) {
     addEventListener({
       eventSignature: ContractEventsSignatures.ExtensionInitialised,
       address: extensionAddress,
       clientType: ClientType.VotingReputationClient,
     });
-  });
+  }
 };
