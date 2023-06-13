@@ -1,8 +1,9 @@
-import { getClient, output, mapLogToContractEvent } from '~utils';
+import { output, mapLogToContractEvent } from '~utils';
 import { Block, EthersObserverEvents } from '~types';
 import provider from '~provider';
 import { getListenersLogTopics, getMatchingListener } from '~eventListeners';
 import eventProcessor from '~eventProcessor';
+import { getInterfaceByClientType } from '~interfaces';
 
 const blocks: Record<number, Block | undefined> = {};
 let latestBlockNumber: number | null = null;
@@ -63,12 +64,15 @@ const processNextBlock = async (): Promise<void> => {
         continue;
       }
 
-      const client = await getClient(listener.clientType, log.address);
-      if (!client) {
+      const iface = getInterfaceByClientType(listener.clientType);
+      if (!iface) {
+        output(
+          `Failed to get an interface for a log with client type ${listener.clientType}`,
+        );
         continue;
       }
 
-      const event = await mapLogToContractEvent(log, client.interface);
+      const event = await mapLogToContractEvent(log, iface);
       if (!event) {
         output(
           `Failed to map log ${log.logIndex} from transaction ${log.transactionHash}`,
