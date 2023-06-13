@@ -1,8 +1,7 @@
 import dotenv from 'dotenv';
 
 import networkClient from '~networkClient';
-import { addNetworkEventListener, toNumber } from '~utils';
-import { ContractEventsSignatures } from '~types';
+import { toNumber } from '~utils';
 import { mutate } from '~amplifyClient';
 import { COLONY_CURRENT_VERSION_KEY } from '~constants';
 import {
@@ -16,11 +15,6 @@ dotenv.config();
 export const coloniesSet = new Set<string>();
 
 export default async (): Promise<void> => {
-  /*
-   * Set a Network level listener to track new colonies that will get created on chain
-   */
-  await addNetworkEventListener(ContractEventsSignatures.ColonyAdded);
-
   await writeCurrentNetworkColonyVersion();
 };
 

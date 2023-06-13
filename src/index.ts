@@ -7,8 +7,8 @@ import { initialiseProvider } from '~provider';
 // import trackNetworkInverseFee from '~trackNetworkInverseFee';
 import { startStatsServer } from '~stats';
 import {
-  setupListenersForExistingColonies,
-  setupListenersForExistingExtensions,
+  setupListenersForColonies,
+  setupListenersForExtensions,
 } from '~eventListeners';
 
 dotenv.config();
@@ -27,9 +27,9 @@ const start = async (): Promise<void> => {
 
   startBlockListener();
 
-  setupListenersForExistingColonies();
+  setupListenersForColonies();
 
-  setupListenersForExistingExtensions();
+  setupListenersForExtensions();
 
   await initialiseProvider();
 

@@ -8,7 +8,7 @@ import {
 } from '~graphql';
 import { ContractEventsSignatures } from '~types';
 import { notNull, output } from '~utils';
-import { addEventListener } from '~eventListeners';
+import { addEventListener, addNetworkEventListener } from '~eventListeners';
 
 const addColonyEventListener = (
   eventSignature: ContractEventsSignatures,
@@ -41,14 +41,16 @@ const fetchColoniesAddresses = async (): Promise<string[]> => {
   return colonies.filter(notNull).map((colony) => colony.id);
 };
 
-export const setupListenersForExistingColonies = async (): Promise<void> => {
+export const setupListenersForColonies = async (): Promise<void> => {
   const addresses = await fetchColoniesAddresses();
   addresses.forEach((colonyAddress) => {
     setupListenersForColony(colonyAddress);
   });
+
+  addNetworkEventListener(ContractEventsSignatures.ColonyAdded);
 };
 
-const setupListenersForColony = (colonyAddress: string): void => {
+export const setupListenersForColony = (colonyAddress: string): void => {
   output(`Setting up listeners for colony ${colonyAddress}`);
 
   const colonyEvents = [

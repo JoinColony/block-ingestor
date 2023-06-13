@@ -37,11 +37,17 @@ const fetchExtensionsAddresses = async (
   return extensions.filter(notNull).map((extension) => extension.id);
 };
 
-export const setupListenersForExistingExtensions = async (): Promise<void> => {
-  addNetworkEventListener(ContractEventsSignatures.ExtensionInstalled);
-  addNetworkEventListener(ContractEventsSignatures.ExtensionUninstalled);
-  addNetworkEventListener(ContractEventsSignatures.ExtensionDeprecated);
-  addNetworkEventListener(ContractEventsSignatures.ExtensionUpgraded);
+export const setupListenersForExtensions = async (): Promise<void> => {
+  const extensionEvents = [
+    ContractEventsSignatures.ExtensionInstalled,
+    ContractEventsSignatures.ExtensionUninstalled,
+    ContractEventsSignatures.ExtensionDeprecated,
+    ContractEventsSignatures.ExtensionUpgraded,
+  ];
+
+  extensionEvents.forEach((eventSignature) =>
+    addNetworkEventListener(eventSignature),
+  );
 
   output(`Setting up listeners for VotingReputation extensions`);
   const extensionHash = getExtensionHash(Extension.VotingReputation);
@@ -51,6 +57,12 @@ export const setupListenersForExistingExtensions = async (): Promise<void> => {
   );
 };
 
+/**
+ * Function setting up listeners for an extension with a given address and hash
+ * Currently it only supports VotingReputation extension
+ * NOTE: If we ever want to extend it to other extensions, we'll most likely
+ * need a mapping between extension hashes and the corresponding client types
+ */
 export const setupListenersForExtension = (
   extensionAddress: string,
   extensionHash: string,
