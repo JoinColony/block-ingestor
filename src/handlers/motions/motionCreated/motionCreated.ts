@@ -12,6 +12,7 @@ import {
   handleMoveFundsMotion,
   handleDomainEditReputationMotion,
   handleEditColonyMotion,
+  handleSetUserRolesMotion,
 } from './handlers';
 
 export default async (event: ContractEvent): Promise<void> => {
@@ -77,6 +78,11 @@ export default async (event: ContractEvent): Promise<void> => {
 
       case ColonyOperations.EditColony: {
         await handleEditColonyMotion(event, parsedAction);
+        break;
+      }
+
+      case ColonyOperations.SetUserRoles: {
+        await handleSetUserRolesMotion(event, parsedAction);
         break;
       }
 

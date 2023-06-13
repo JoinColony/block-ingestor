@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 
 import { ColonyRole, Id } from '@colony/colony-js';
+import { hexStripZeros } from 'ethers/lib/utils';
 
 import { mutate, query } from '~amplifyClient';
 import {
@@ -25,6 +26,9 @@ import {
   CreateColonyHistoricRoleMutation,
   CreateColonyHistoricRoleMutationVariables,
   CreateColonyHistoricRoleDocument,
+  GetColonyRoleQuery,
+  GetColonyRoleQueryVariables,
+  GetColonyRoleDocument,
 } from '~graphql';
 
 const BASE_ROLES_MAP = {
@@ -131,6 +135,34 @@ export const getRolesMapFromEvents = (
       ...roleValue,
     };
     return undefined;
+  });
+
+  return roleMap;
+};
+
+export const getRolesMapFromHexString = async (
+  rolesHexString: string,
+  colonyRolesDatabaseId: string,
+): Promise<Record<string, boolean | null>> => {
+  const roleMap: Record<string, boolean | null> = {};
+  const roleBitMask = parseInt(hexStripZeros(rolesHexString), 16).toString(2);
+  const roleBitMaskArray = roleBitMask.split('').reverse();
+
+  const getColonyRoleData =
+    (
+      await query<GetColonyRoleQuery, GetColonyRoleQueryVariables>(
+        GetColonyRoleDocument,
+        { id: colonyRolesDatabaseId },
+      )
+    )?.data?.getColonyRole ?? {};
+
+  Object.keys(BASE_ROLES_MAP).forEach((role) => {
+    const currentRoleValue =
+      !!getColonyRoleData[role as keyof typeof getColonyRoleData];
+    const motionRoleValue = roleBitMaskArray[Number(role.slice(-1))] === '1';
+    if (currentRoleValue !== motionRoleValue) {
+      roleMap[role] = motionRoleValue;
+    }
   });
 
   return roleMap;
