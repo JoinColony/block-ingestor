@@ -10,18 +10,20 @@ export * from './extensions';
 
 const listeners: EventListener[] = [];
 
-export const addEventListener = (listener: EventListener): void => {
+export const addEventListener = (
+  listener: Omit<EventListener, 'topic'>,
+): void => {
   verbose(
     `Added listener for event ${listener.eventSignature}`,
     listener.address ? `filtering address ${listener.address}` : '',
   );
-  listeners.push(listener);
+  listeners.push({ ...listener, topic: utils.id(listener.eventSignature) });
 };
 
 // @TODO: removeEventListener function
 
 export const getListenersLogTopics = (): string[][] => [
-  listeners.map((listener) => utils.id(listener.eventSignature)),
+  listeners.map((listener) => listener.topic),
 ];
 
 export const getMatchingListener = (
@@ -36,3 +38,5 @@ export const getMatchingListener = (
     ) ?? null
   );
 };
+
+export const getListenersStats = (): string => JSON.stringify(listeners);

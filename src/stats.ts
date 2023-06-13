@@ -2,6 +2,7 @@ import express from 'express';
 
 import { getLatestBlock, getStats, initStats, output } from '~utils';
 import { getChainId } from '~provider';
+import { getListenersStats } from '~eventListeners';
 
 const app = express();
 const port = process.env.STATS_PORT;
@@ -23,6 +24,13 @@ app.get('/liveness', (_, res) => res.sendStatus(200));
 app.get('/stats', async (_, res) => {
   const stats = getStats();
   res.type('json').send(stats);
+});
+
+/**
+ * Use to check currently active listeners
+ */
+app.get('/listeners', async (_, res) => {
+  res.type('json').send(getListenersStats());
 });
 
 export const startStatsServer = async (): Promise<void> => {

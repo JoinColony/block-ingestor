@@ -5,4 +5,5 @@ export interface EventListener {
   eventSignature: ContractEventsSignatures;
   clientType: ClientType;
   address?: string;
+  topic: string;
 }
