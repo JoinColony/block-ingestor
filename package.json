@@ -26,6 +26,7 @@
   "homepage": "https://github.com/JoinColony/tx-ingestor",
   "dependencies": {
     "@colony/colony-js": "^6.3.6",
+    "@colony/events": "^0.2.0",
     "aws-amplify": "^4.3.43",
     "dotenv": "^16.0.3",
     "ethers": "^5.7.2",
