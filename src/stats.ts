@@ -4,6 +4,8 @@ import { getLatestBlock, getStats, initStats, output } from '~utils';
 import { getChainId } from '~provider';
 import { getListenersStats } from '~eventListeners';
 
+export const coloniesSet = new Set<string>();
+
 const app = express();
 const port = process.env.STATS_PORT;
 

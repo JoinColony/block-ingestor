@@ -1,5 +1,5 @@
 import { setupListenersForColony } from '~eventListeners';
-import { coloniesSet } from '~trackColonies';
+import { coloniesSet } from '~stats';
 import { ContractEvent } from '~types';
 import {
   output,
