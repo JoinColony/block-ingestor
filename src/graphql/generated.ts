@@ -4209,6 +4209,18 @@ export type GetVotingRepInstallationsQueryVariables = Exact<{
 
 export type GetVotingRepInstallationsQuery = { __typename?: 'Query', getExtensionByColonyAndHash?: { __typename?: 'ModelColonyExtensionConnection', items: Array<{ __typename?: 'ColonyExtension', id: string } | null> } | null };
 
+export type GetColonyExtensionsByColonyAddressQueryVariables = Exact<{
+  colonyAddress: Scalars['ID'];
+}>;
+
+export type GetColonyExtensionsByColonyAddressQuery = {
+  __typename?: 'Query';
+  listColonyExtensions?: {
+    __typename?: 'ModelColonyExtensionConnection';
+    items: Array<{ __typename?: 'ColonyExtension'; id: string } | null>;
+  } | null;
+};
+
 export type GetColonyUnclaimedFundsQueryVariables = Exact<{
   colonyAddress: Scalars['ID'];
   tokenAddress: Scalars['ID'];
@@ -4702,7 +4714,16 @@ export const GetVotingRepInstallationsDocument = gql`
     }
   }
 }
-    `;
+`;
+export const GetColonyExtensionsByColonyAddressDocument = gql`
+  query GetColonyExtensionsByColonyAddress($colonyAddress: ID!) {
+    listColonyExtensions(filter: { colonyId: { eq: $colonyAddress } }) {
+      items {
+        id
+      }
+    }
+  }
+`;
 export const GetColonyUnclaimedFundsDocument = gql`
     query GetColonyUnclaimedFunds($colonyAddress: ID!, $tokenAddress: ID!, $upToBlock: Int = 1) {
   listColonyFundsClaims(

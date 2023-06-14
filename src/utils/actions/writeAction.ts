@@ -1,15 +1,19 @@
+import { Extension, getExtensionHash } from '@colony/colony-js';
+
 import { mutate, query } from '~amplifyClient';
 import {
   CreateColonyActionDocument,
   CreateColonyActionInput,
   CreateColonyActionMutation,
   CreateColonyActionMutationVariables,
+  GetColonyExtensionsByColonyAddressDocument,
+  GetColonyExtensionsByColonyAddressQuery,
+  GetColonyExtensionsByColonyAddressQueryVariables,
   GetVotingRepInstallationsDocument,
   GetVotingRepInstallationsQuery,
   GetVotingRepInstallationsQueryVariables,
 } from '~graphql';
 import { ContractEvent } from '~types';
-import { Extension, getExtensionHash } from '@colony/colony-js';
 import { notNull, verbose } from '~utils';
 
 type ActionFields = Omit<
@@ -22,18 +26,38 @@ export const writeActionFromEvent = async (
   colonyAddress: string,
   actionFields: ActionFields,
 ): Promise<void> => {
-  const { transactionHash, blockNumber, timestamp } = event;
+  const { data } =
+    (await query<
+      GetColonyExtensionsByColonyAddressQuery,
+      GetColonyExtensionsByColonyAddressQueryVariables
+    >(GetColonyExtensionsByColonyAddressDocument, {
+      colonyAddress,
+    })) ?? {};
+  const extensionAddresses =
+    data?.listColonyExtensions?.items
+      .filter(notNull)
+      .map((colonyExtension) => colonyExtension.id) ?? [];
 
-  const actionType = actionFields.type ?? 'UNKNOWN';
-  const showInActionsList = await showActionInActionsList(
-    colonyAddress,
-    actionFields.initiatorAddress ?? '',
-  );
+  if (
+    !extensionAddresses.find(
+      (extensionAddress) =>
+        extensionAddress === actionFields.initiatorAddress ||
+        extensionAddress === actionFields.recipientAddress,
+    )
+  ) {
+    const { transactionHash, blockNumber, timestamp } = event;
 
-  verbose('Action', actionType, 'took place in Colony:', colonyAddress);
-  await mutate<CreateColonyActionMutation, CreateColonyActionMutationVariables>(
-    CreateColonyActionDocument,
-    {
+    const actionType = actionFields.type ?? 'UNKNOWN';
+    const showInActionsList = await showActionInActionsList(
+      colonyAddress,
+      actionFields.initiatorAddress ?? '',
+    );
+
+    verbose('Action', actionType, 'took place in Colony:', colonyAddress);
+    await mutate<
+      CreateColonyActionMutation,
+      CreateColonyActionMutationVariables
+    >(CreateColonyActionDocument, {
       input: {
         id: transactionHash,
         colonyId: colonyAddress,
@@ -42,8 +66,8 @@ export const writeActionFromEvent = async (
         showInActionsList,
         ...actionFields,
       },
-    },
-  );
+    });
+  }
 };
 
 const getVotingReputationInstallations = async (
