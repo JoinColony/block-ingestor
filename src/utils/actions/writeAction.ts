@@ -15,6 +15,7 @@ import {
 } from '~graphql';
 import { ContractEvent } from '~types';
 import { notNull, verbose } from '~utils';
+import networkClient from '~networkClient';
 
 type ActionFields = Omit<
   CreateColonyActionInput,
@@ -38,13 +39,16 @@ export const writeActionFromEvent = async (
       .filter(notNull)
       .map((colonyExtension) => colonyExtension.id) ?? [];
 
-  if (
-    !extensionAddresses.find(
-      (extensionAddress) =>
-        extensionAddress === actionFields.initiatorAddress ||
-        extensionAddress === actionFields.recipientAddress,
-    )
-  ) {
+  const isAddressInitiatorOrRecipient = (address: string): boolean =>
+    address === actionFields.initiatorAddress ||
+    address === actionFields.recipientAddress;
+  // @NOTE: If the action's initiator or recipient is an extension/network client, then we shouldn't show it in the action list.
+  const shouldShowAction = !(
+    extensionAddresses.find(isAddressInitiatorOrRecipient) ??
+    isAddressInitiatorOrRecipient(networkClient.address)
+  );
+
+  if (shouldShowAction) {
     const { transactionHash, blockNumber, timestamp } = event;
 
     const actionType = actionFields.type ?? 'UNKNOWN';
