@@ -1,6 +1,7 @@
 import { utils } from 'ethers';
 
 import { verbose } from '~utils';
+import { ContractEventsSignatures } from '~types';
 
 import { EventListener } from './types';
 
@@ -8,7 +9,7 @@ export * from './colony';
 export * from './network';
 export * from './extensions';
 
-const listeners: EventListener[] = [];
+let listeners: EventListener[] = [];
 
 export const addEventListener = (
   listener: Omit<EventListener, 'topic'>,
@@ -20,7 +21,20 @@ export const addEventListener = (
   listeners.push({ ...listener, topic: utils.id(listener.eventSignature) });
 };
 
-// @TODO: removeEventListener function
+export const removeEventListener = (
+  eventSignature: ContractEventsSignatures,
+  address?: string,
+): void => {
+  verbose(
+    `Removed listener for event ${eventSignature}`,
+    address ? `filtering address ${address}` : '',
+  );
+  listeners = listeners.filter(
+    (listener) =>
+      listener.eventSignature !== eventSignature ||
+      listener.address !== address,
+  );
+};
 
 export const getListenersLogTopics = (): string[][] => [
   listeners.map((listener) => listener.topic),
