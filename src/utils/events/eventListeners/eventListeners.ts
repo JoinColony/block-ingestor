@@ -1,9 +1,5 @@
 import { ClientType } from '@colony/colony-js';
-import { Log } from '@ethersproject/abstract-provider';
-import { utils } from 'ethers';
 
-import { mapLogToContractEvent, getExtensionContract, verbose } from '~utils';
-import { addEvent } from '~eventQueue';
 import networkClient from '~networkClient';
 import { ContractEventsSignatures } from '~types';
 
@@ -60,34 +56,3 @@ export const addMotionEventListener = async (
     ClientType.VotingReputationClient,
     true,
   );
-
-/**
- * Extension specific event listener
- * It creates a new interface with ABI data describing
- * possible event signature
- */
-export const addExtensionEventListener = async (
-  eventSignature: ContractEventsSignatures,
-  extensionAddress: string,
-): Promise<void> => {
-  const { provider } = networkClient;
-  const extensionContract = getExtensionContract(extensionAddress);
-  const filter = {
-    topics: [utils.id(eventSignature)],
-    address: extensionAddress,
-  };
-
-  verbose(
-    'Added listener for Event:',
-    eventSignature,
-    extensionAddress ? `filtering Address: ${extensionAddress}` : '',
-  );
-
-  provider.on(filter, async (log: Log) => {
-    const event = await mapLogToContractEvent(log, extensionContract.interface);
-
-    if (event) {
-      addEvent(event);
-    }
-  });
-};

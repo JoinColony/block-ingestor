@@ -1,8 +1,6 @@
 import {
-  addColonyEventListener,
   addNetworkEventListener,
   addTokenEventListener,
-  addActionEventListeners,
   addMotionEventListener,
 } from './utils';
 import { ContractEventsSignatures } from '~types';
@@ -14,16 +12,7 @@ import { ContractEventsSignatures } from '~types';
 export const colonySpecificEventsListener = async (
   colonyAddress: string,
 ): Promise<void> => {
-  await addColonyEventListener(
-    ContractEventsSignatures.ColonyFundsClaimed,
-    colonyAddress,
-  );
-  await addColonyEventListener(
-    ContractEventsSignatures.ColonyUpgraded,
-    colonyAddress,
-  );
   await addTokenEventListener(ContractEventsSignatures.Transfer, colonyAddress);
-  await addActionEventListeners(colonyAddress);
 };
 
 export const motionSpecificEventsListener = async (
