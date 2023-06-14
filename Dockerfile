@@ -4,7 +4,7 @@ FROM node:16.16.0
 COPY . .
 
 # Install block ingestor dependencies
-RUN npm install
+RUN npm ci
 
 # the command that starts our app
 CMD ["npm","run","prod"]

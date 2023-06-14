@@ -17,9 +17,9 @@ type GraphQLFnReturn<T> = Promise<
   ReturnType<typeof API.graphql<GraphQLQuery<T>>> | undefined
 >;
 
-export const query = async <T, TVariables extends Record<string, unknown> = {}>(
+export const query = async <T, TVariables extends Record<string, unknown>>(
   queryDocument: DocumentNode,
-  variables: TVariables,
+  variables?: TVariables,
 ): GraphQLFnReturn<T> => {
   try {
     const result = await API.graphql<GraphQLQuery<T>>(
@@ -30,7 +30,7 @@ export const query = async <T, TVariables extends Record<string, unknown> = {}>(
   } catch (error) {
     const definitionNode = queryDocument.definitions[0];
     const queryName = isExecutableDefinitionNode(definitionNode)
-      ? definitionNode.name
+      ? definitionNode.name?.value
       : 'Unknown';
     console.error(`Could not fetch query ${queryName}`, error);
     return undefined;
