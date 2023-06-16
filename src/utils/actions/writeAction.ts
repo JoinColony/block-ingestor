@@ -13,7 +13,7 @@ import {
   GetVotingRepInstallationsQuery,
   GetVotingRepInstallationsQueryVariables,
 } from '~graphql';
-import { ContractEvent } from '~types';
+import { ColonyActionType, ContractEvent } from '~types';
 import { notNull, verbose } from '~utils';
 import networkClient from '~networkClient';
 
@@ -27,41 +27,18 @@ export const writeActionFromEvent = async (
   colonyAddress: string,
   actionFields: ActionFields,
 ): Promise<void> => {
-  const { data } =
-    (await query<
-      GetColonyExtensionsByColonyAddressQuery,
-      GetColonyExtensionsByColonyAddressQueryVariables
-    >(GetColonyExtensionsByColonyAddressDocument, {
-      colonyAddress,
-    })) ?? {};
-  const extensionAddresses =
-    data?.listColonyExtensions?.items
-      .filter(notNull)
-      .map((colonyExtension) => colonyExtension.id) ?? [];
+  const { transactionHash, blockNumber, timestamp } = event;
 
-  const isAddressInitiatorOrRecipient = (address: string): boolean =>
-    address === actionFields.initiatorAddress ||
-    address === actionFields.recipientAddress;
-  // @NOTE: If the action's initiator or recipient is an extension/network client, then we shouldn't show it in the action list.
-  const shouldShowAction = !(
-    extensionAddresses.find(isAddressInitiatorOrRecipient) ??
-    isAddressInitiatorOrRecipient(networkClient.address)
+  const actionType = actionFields.type ?? 'UNKNOWN';
+  const showInActionsList = await showActionInActionsList(
+    colonyAddress,
+    actionFields,
   );
 
-  if (shouldShowAction) {
-    const { transactionHash, blockNumber, timestamp } = event;
-
-    const actionType = actionFields.type ?? 'UNKNOWN';
-    const showInActionsList = await showActionInActionsList(
-      colonyAddress,
-      actionFields.initiatorAddress ?? '',
-    );
-
-    verbose('Action', actionType, 'took place in Colony:', colonyAddress);
-    await mutate<
-      CreateColonyActionMutation,
-      CreateColonyActionMutationVariables
-    >(CreateColonyActionDocument, {
+  verbose('Action', actionType, 'took place in Colony:', colonyAddress);
+  await mutate<CreateColonyActionMutation, CreateColonyActionMutationVariables>(
+    CreateColonyActionDocument,
+    {
       input: {
         id: transactionHash,
         colonyId: colonyAddress,
@@ -70,8 +47,8 @@ export const writeActionFromEvent = async (
         showInActionsList,
         ...actionFields,
       },
-    });
-  }
+    },
+  );
 };
 
 const getVotingReputationInstallations = async (
@@ -96,8 +73,32 @@ const getVotingReputationInstallations = async (
 
 const showActionInActionsList = async (
   colonyAddress: string,
-  initiatorAddress: string,
+  actionFields: ActionFields,
 ): Promise<boolean> => {
+  const { initiatorAddress, recipientAddress, type } = actionFields;
+
+  if (type === ColonyActionType.SetUserRoles) {
+    const { data } =
+      (await query<
+        GetColonyExtensionsByColonyAddressQuery,
+        GetColonyExtensionsByColonyAddressQueryVariables
+      >(GetColonyExtensionsByColonyAddressDocument, {
+        colonyAddress,
+      })) ?? {};
+    const extensionAddresses =
+      data?.listColonyExtensions?.items
+        .filter(notNull)
+        .map((colonyExtension) => colonyExtension.id) ?? [];
+
+    const isAddressInitiatorOrRecipient = (address: string): boolean =>
+      address === initiatorAddress || address === recipientAddress;
+    // @NOTE: If the action's initiator or recipient is an extension/network client, then we shouldn't show it in the action list.
+    return !(
+      extensionAddresses.find(isAddressInitiatorOrRecipient) ??
+      isAddressInitiatorOrRecipient(networkClient.address)
+    );
+  }
+
   const votingRepIds = await getVotingReputationInstallations(colonyAddress);
 
   if (!votingRepIds) {
