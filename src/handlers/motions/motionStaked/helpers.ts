@@ -76,6 +76,12 @@ const getNewUserStakes = (
   const invertedVote = BigNumber.from(1).sub(vote);
   const stakedSide = getMotionSide(vote);
   const unstakedSide = getMotionSide(invertedVote);
+  let stakePercentage = getStakePercentage(amount, requiredStake);
+  // May be zero due to rounding. Since a user cannot stake 0%, we round up to 1.
+  if (stakePercentage.isZero()) {
+    stakePercentage = stakePercentage.add(1);
+  }
+
   return {
     address: staker,
     stakes: {
@@ -85,7 +91,7 @@ const getNewUserStakes = (
       },
 
       percentage: {
-        [stakedSide]: getStakePercentage(amount, requiredStake).toString(),
+        [stakedSide]: stakePercentage.toString(),
         [unstakedSide]: '0',
       },
     }, // TS doesn't like the computed keys, but we know they're correct
