@@ -19,22 +19,15 @@ export const getMotionStakes = (
   [totalNayStakesRaw, totalYayStakesRaw]: [BigNumber, BigNumber],
   vote: BigNumber,
 ): MotionStakes => {
-  let totalYayStakesPercentage = getStakePercentage(
+  const totalYayStakesPercentage = getStakePercentage(
     totalYayStakesRaw,
     requiredStake,
   );
 
-  let totalNayStakesPercentage = getStakePercentage(
+  const totalNayStakesPercentage = getStakePercentage(
     totalNayStakesRaw,
     requiredStake,
   );
-
-  // May be zero due to rounding. Since a user cannot stake 0%, we round up to 1.
-  if (vote.eq(MotionVote.YAY) && totalYayStakesPercentage.isZero()) {
-    totalYayStakesPercentage = totalYayStakesPercentage.add(1);
-  } else if (vote.eq(MotionVote.NAY) && totalNayStakesPercentage.isZero()) {
-    totalNayStakesPercentage = totalYayStakesPercentage.add(1);
-  }
 
   const motionStakes: MotionStakes = {
     raw: {
@@ -62,7 +55,11 @@ export const getRemainingStakes = (
 export const getStakePercentage = (
   stake: BigNumber,
   requiredStake: BigNumber,
-): BigNumber => stake.mul(100).div(requiredStake);
+): BigNumber => {
+  const stakePercentage = stake.mul(100).div(requiredStake);
+  // May be zero due to rounding. Since a user cannot stake 0%, we round up to 1.
+  return stakePercentage.isZero() ? stakePercentage.add(1) : stakePercentage;
+};
 
 /**
  * Given staking data, format and return new UserStakes object
@@ -76,11 +73,7 @@ const getNewUserStakes = (
   const invertedVote = BigNumber.from(1).sub(vote);
   const stakedSide = getMotionSide(vote);
   const unstakedSide = getMotionSide(invertedVote);
-  let stakePercentage = getStakePercentage(amount, requiredStake);
-  // May be zero due to rounding. Since a user cannot stake 0%, we round up to 1.
-  if (stakePercentage.isZero()) {
-    stakePercentage = stakePercentage.add(1);
-  }
+  const stakePercentage = getStakePercentage(amount, requiredStake);
 
   return {
     address: staker,
