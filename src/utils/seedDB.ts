@@ -1,9 +1,3 @@
-/**
- * In development, where both the chain and the DB gets reset everytime,
- * we need to "seed" some initial data, such as versions or the current network fee
- * In live environments, these values will already have been saved in the DB
- */
-
 import { getExtensionHash, getLogs } from '@colony/colony-js';
 import { mutate } from '~amplifyClient';
 import {

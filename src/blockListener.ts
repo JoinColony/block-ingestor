@@ -18,6 +18,7 @@ export const startBlockListener = (): void => {
       blocksMap[block.number] = block;
 
       output(`Block ${blockNumber} added to the queue`);
+
       processNextBlock();
     } catch {
       output(`Observed block ${blockNumber} but failed to get its data`);
@@ -29,6 +30,10 @@ export const startBlockListener = (): void => {
   trackMissedBlocks();
 };
 
+/**
+ * Function fetching all the blocks between the last processed block and the current block
+ * that happened when ingestor was not actively listening
+ */
 export const trackMissedBlocks = async (): Promise<void> => {
   const lastBlockNumber = getLastBlockNumber();
   const currentBlockNumber = await provider.getBlockNumber();
