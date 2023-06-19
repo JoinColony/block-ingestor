@@ -14,6 +14,7 @@ import {
   GetContractEventQueryVariables,
   ChainMetadataInput,
 } from '~graphql';
+import { blocksMap } from '~blockListener';
 
 import { verbose } from '../logger';
 
@@ -23,7 +24,6 @@ import { verbose } from '../logger';
 export const setToJS = (set: Set<string>): Array<Record<string, string>> =>
   Array.from(set).map((entry) => JSON.parse(entry));
 
-// @TODO: Refactor to use block data already fetched by the block listener
 export const mapLogToContractEvent = async (
   log: Log,
   iface: utils.Interface,
@@ -37,7 +37,13 @@ export const mapLogToContractEvent = async (
   } = log;
 
   try {
-    const { hash: blockHash, timestamp } = await provider.getBlock(blockNumber);
+    // Attempt to first get a block from the map as we might have already fetched its info
+    let block = blocksMap[blockNumber];
+    if (!block) {
+      block = await provider.getBlock(blockNumber);
+    }
+
+    const { hash: blockHash, timestamp } = block;
     const parsedLog = iface.parseLog(log);
 
     return {
