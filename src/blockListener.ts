@@ -24,7 +24,28 @@ export const startBlockListener = (): void => {
       output(`Observed block ${blockNumber} but failed to get its data`);
     }
   });
+
   output('Block listener started');
+
+  trackMissedBlocks();
+};
+
+export const trackMissedBlocks = async (): Promise<void> => {
+  const lastBlockNumber = getLastBlockNumber();
+  const currentBlockNumber = await provider.getBlockNumber();
+
+  output(
+    `Fetching blocks from block ${
+      lastBlockNumber + 1
+    } to ${currentBlockNumber}`,
+  );
+
+  for (let i = lastBlockNumber; i < currentBlockNumber; i += 1) {
+    const block = await provider.getBlock(i);
+    blocks[i] = block;
+  }
+
+  processNextBlock();
 };
 
 let isProcessing = false;

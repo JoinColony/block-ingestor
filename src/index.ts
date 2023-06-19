@@ -25,15 +25,15 @@ utils.Logger.setLogLevel(utils.Logger.levels.ERROR);
 const start = async (): Promise<void> => {
   amplifyClientSetup();
 
+  await startStatsServer();
+
+  await setupListenersForColonies();
+
+  await setupListenersForExtensions();
+
   startBlockListener();
 
-  setupListenersForColonies();
-
-  setupListenersForExtensions();
-
   await initialiseProvider();
-
-  await startStatsServer();
 };
 
 start();
