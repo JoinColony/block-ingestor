@@ -6,7 +6,7 @@
   "scripts": {
     "build": "rm -rf dist/* run/* && npx tsc",
     "start": "node -r ts-node/register/transpile-only -r tsconfig-paths/register dist/index.js",
-    "dev": "ts-node-dev -r tsconfig-paths/register src/index.ts",
+    "dev": "NODE_ENV=development ts-node-dev -r tsconfig-paths/register src/index.ts",
     "prod": "npm run build && NODE_ENV=production npm run start",
     "typecheck": "tsc --noEmit",
     "lint": "eslint src/ --ext .ts",
