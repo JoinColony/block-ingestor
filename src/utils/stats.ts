@@ -53,11 +53,11 @@ export const updateStats = async (
 // This exists as a function to prevent accidental overwriting of the `stats` variable
 export const getStats = (): typeof stats => ({ ...stats });
 
-export const getLatestBlock = (): number =>
-  Number.isInteger(stats.latestBlock) ? Number(stats.latestBlock) : 1;
+export const getLastBlockNumber = (): number =>
+  Number.isInteger(stats.lastBlockNumber) ? Number(stats.lastBlockNumber) : 1;
 
-export const setLatestBlock = (latestBlock: number): void => {
-  updateStats({ latestBlock });
+export const setLastBlockNumber = (lastBlockNumber: number): void => {
+  updateStats({ lastBlockNumber });
 };
 
 /**

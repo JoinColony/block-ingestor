@@ -1,8 +1,8 @@
 import {
   output,
   mapLogToContractEvent,
-  getLatestBlock,
-  setLatestBlock,
+  getLastBlockNumber,
+  setLastBlockNumber,
 } from '~utils';
 import { Block, EthersObserverEvents } from '~types';
 import provider from '~provider';
@@ -33,14 +33,14 @@ const processNextBlock = async (): Promise<void> => {
     return;
   }
 
-  let latestBlockNumber = getLatestBlock();
-
   // Only allow one instance of the function to run at any given time
   isProcessing = true;
 
+  let lastBlockNumber = getLastBlockNumber();
+
   // Process as many blocks as are available sequentially
-  while (blocks[latestBlockNumber + 1]) {
-    const currentBlockNumber = latestBlockNumber + 1;
+  while (blocks[lastBlockNumber + 1]) {
+    const currentBlockNumber = lastBlockNumber + 1;
     output(`Processing block ${currentBlockNumber}`);
 
     const block = blocks[currentBlockNumber];
@@ -80,8 +80,8 @@ const processNextBlock = async (): Promise<void> => {
       await eventProcessor(event);
     }
 
-    latestBlockNumber = currentBlockNumber;
-    setLatestBlock(currentBlockNumber);
+    lastBlockNumber = currentBlockNumber;
+    setLastBlockNumber(currentBlockNumber);
   }
 
   isProcessing = false;
