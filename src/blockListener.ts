@@ -34,6 +34,10 @@ export const trackMissedBlocks = async (): Promise<void> => {
   const lastBlockNumber = getLastBlockNumber();
   const currentBlockNumber = await provider.getBlockNumber();
 
+  if (lastBlockNumber >= currentBlockNumber) {
+    return;
+  }
+
   output(
     `Fetching blocks from block ${
       lastBlockNumber + 1
