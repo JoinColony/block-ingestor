@@ -1,23 +1,22 @@
-import { output, mapLogToContractEvent } from '~utils';
+import {
+  output,
+  mapLogToContractEvent,
+  getLatestBlock,
+  setLatestBlock,
+} from '~utils';
 import { Block, EthersObserverEvents } from '~types';
 import provider from '~provider';
 import { getListenersLogTopics, getMatchingListener } from '~eventListeners';
 import eventProcessor from '~eventProcessor';
 import { getInterfaceByClientType } from '~interfaces';
 
-const blocks: Record<number, Block | undefined> = {};
-let latestBlockNumber: number | null = null;
+export const blocks: Record<number, Block | undefined> = {};
 
 export const startBlockListener = (): void => {
   provider.on(EthersObserverEvents.Block, async (blockNumber: number) => {
     try {
       const block = await provider.getBlock(blockNumber);
       blocks[block.number] = block;
-
-      // @NOTE: Temp
-      if (!latestBlockNumber) {
-        latestBlockNumber = block.number - 1;
-      }
 
       output(`Block ${blockNumber} added to the queue`);
       processNextBlock();
@@ -34,10 +33,7 @@ const processNextBlock = async (): Promise<void> => {
     return;
   }
 
-  // @NOTE: Temp
-  if (!latestBlockNumber) {
-    return;
-  }
+  let latestBlockNumber = getLatestBlock();
 
   // Only allow one instance of the function to run at any given time
   isProcessing = true;
@@ -84,7 +80,8 @@ const processNextBlock = async (): Promise<void> => {
       await eventProcessor(event);
     }
 
-    latestBlockNumber += 1;
+    latestBlockNumber = currentBlockNumber;
+    setLatestBlock(currentBlockNumber);
   }
 
   isProcessing = false;
