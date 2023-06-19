@@ -1,20 +1,19 @@
-import dotenv from 'dotenv';
-
-import networkClient from './networkClient';
-import { output, verbose } from './utils';
-import { mutate } from './amplifyClient';
+import { mutate } from '~amplifyClient';
 import { NETWORK_INVERSE_FEE_DATABASE_ID } from '~constants';
 import {
   CreateCurrentNetworkInverseFeeDocument,
   CreateCurrentNetworkInverseFeeMutation,
   CreateCurrentNetworkInverseFeeMutationVariables,
 } from '~graphql';
+import networkClient from '~networkClient';
 
-dotenv.config();
+import { verbose } from './logger';
 
-export default async (): Promise<void> => {
-  verbose('Fetching current network inverse fee');
-
+/**
+ * Function only relevant for dev environment since the network fee will have already been
+ * stored in the DB in other environments
+ */
+export const writeCurrentNetworkFee = async (): Promise<void> => {
   const networkInverseFee = await networkClient.getFeeInverse();
   const convertedFee = networkInverseFee.toString();
 
@@ -28,5 +27,5 @@ export default async (): Promise<void> => {
     },
   });
 
-  output('Current network inverse fee is: ', convertedFee);
+  verbose('Current network inverse fee is: ', convertedFee);
 };

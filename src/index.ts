@@ -4,23 +4,15 @@ import { utils } from 'ethers';
 import { startBlockListener } from '~blockListener';
 import amplifyClientSetup from '~amplifyClient';
 import { initialiseProvider } from '~provider';
-// import trackNetworkInverseFee from '~trackNetworkInverseFee';
 import { startStatsServer } from '~stats';
 import {
   setupListenersForColonies,
   setupListenersForExtensions,
 } from '~eventListeners';
+import { writeCurrentNetworkFee } from '~utils';
 
 dotenv.config();
 utils.Logger.setLogLevel(utils.Logger.levels.ERROR);
-
-// const startIngestor = async (): Promise<void> => {
-
-//   /*
-//    * Get initial network inverse fee and setup listener for future ones
-//    */
-//   await trackNetworkInverseFee();
-// };
 
 const start = async (): Promise<void> => {
   amplifyClientSetup();
@@ -34,6 +26,10 @@ const start = async (): Promise<void> => {
   startBlockListener();
 
   await initialiseProvider();
+
+  if (process.env.NODE_ENV === 'development') {
+    await writeCurrentNetworkFee();
+  }
 };
 
 start();
