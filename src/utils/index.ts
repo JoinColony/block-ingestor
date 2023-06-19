@@ -11,4 +11,4 @@ export * from './arrays';
 export * from './permissions';
 export * from './events';
 export * from './clients';
-export * from './networkFee';
+export * from './seedDB';

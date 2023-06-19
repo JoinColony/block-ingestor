@@ -9,7 +9,7 @@ import {
   setupListenersForColonies,
   setupListenersForExtensions,
 } from '~eventListeners';
-import { writeCurrentNetworkFee } from '~utils';
+import { seedDB } from '~utils';
 
 dotenv.config();
 utils.Logger.setLogLevel(utils.Logger.levels.ERROR);
@@ -28,7 +28,7 @@ const start = async (): Promise<void> => {
   await initialiseProvider();
 
   if (process.env.NODE_ENV === 'development') {
-    await writeCurrentNetworkFee();
+    await seedDB();
   }
 };
 
