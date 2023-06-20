@@ -1,5 +1,3 @@
-import { Extension, getExtensionHash } from '@colony/colony-js';
-
 import { mutate, query } from '~amplifyClient';
 import {
   CreateColonyActionDocument,
@@ -9,11 +7,8 @@ import {
   GetColonyExtensionsByColonyAddressDocument,
   GetColonyExtensionsByColonyAddressQuery,
   GetColonyExtensionsByColonyAddressQueryVariables,
-  GetVotingRepInstallationsDocument,
-  GetVotingRepInstallationsQuery,
-  GetVotingRepInstallationsQueryVariables,
 } from '~graphql';
-import { ColonyActionType, ContractEvent } from '~types';
+import { ContractEvent } from '~types';
 import { notNull, verbose } from '~utils';
 import networkClient from '~networkClient';
 
@@ -51,62 +46,29 @@ export const writeActionFromEvent = async (
   );
 };
 
-const getVotingReputationInstallations = async (
-  colonyAddress: string,
-): Promise<
-  Array<{ __typename?: 'ColonyExtension'; id: string } | null> | undefined
-> => {
-  const votingRepHash = getExtensionHash(Extension.VotingReputation);
-  const { data } =
-    (await query<
-      GetVotingRepInstallationsQuery,
-      GetVotingRepInstallationsQueryVariables
-    >(GetVotingRepInstallationsDocument, {
-      votingRepHash,
-      colonyAddress,
-    })) ?? {};
-
-  const items = data?.getExtensionByColonyAndHash?.items;
-
-  return items;
-};
-
 const showActionInActionsList = async (
   colonyAddress: string,
   actionFields: ActionFields,
 ): Promise<boolean> => {
-  const { initiatorAddress, recipientAddress, type } = actionFields;
+  const { initiatorAddress, recipientAddress } = actionFields;
 
-  if (type === ColonyActionType.SetUserRoles) {
-    const { data } =
-      (await query<
-        GetColonyExtensionsByColonyAddressQuery,
-        GetColonyExtensionsByColonyAddressQueryVariables
-      >(GetColonyExtensionsByColonyAddressDocument, {
-        colonyAddress,
-      })) ?? {};
-    const extensionAddresses =
-      data?.listColonyExtensions?.items
-        .filter(notNull)
-        .map((colonyExtension) => colonyExtension.id) ?? [];
+  const { data } =
+    (await query<
+      GetColonyExtensionsByColonyAddressQuery,
+      GetColonyExtensionsByColonyAddressQueryVariables
+    >(GetColonyExtensionsByColonyAddressDocument, {
+      colonyAddress,
+    })) ?? {};
+  const extensionAddresses =
+    data?.getExtensionByColonyAndHash?.items
+      .filter(notNull)
+      .map((colonyExtension) => colonyExtension.id) ?? [];
 
-    const isAddressInitiatorOrRecipient = (address: string): boolean =>
-      address === initiatorAddress || address === recipientAddress;
-    // @NOTE: If the action's initiator or recipient is an extension/network client, then we shouldn't show it in the action list.
-    return !(
-      extensionAddresses.find(isAddressInitiatorOrRecipient) ??
-      isAddressInitiatorOrRecipient(networkClient.address)
-    );
-  }
-
-  const votingRepIds = await getVotingReputationInstallations(colonyAddress);
-
-  if (!votingRepIds) {
-    return true;
-  }
-
-  // If the action was created by a motion, don't show it in the list
-  return !votingRepIds
-    .filter(notNull)
-    .some(({ id }) => id === initiatorAddress);
+  const isAddressInitiatorOrRecipient = (address: string): boolean =>
+    address === initiatorAddress || address === recipientAddress;
+  // @NOTE: If the action's initiator or recipient is an extension/network client, then we shouldn't show it in the action list.
+  return !(
+    extensionAddresses.find(isAddressInitiatorOrRecipient) ??
+    isAddressInitiatorOrRecipient(networkClient.address)
+  );
 };

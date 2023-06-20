@@ -16,8 +16,8 @@ query GetVotingRepInstallations($votingRepHash: String!, $colonyAddress: ID!) {
 }
 
 query GetColonyExtensionsByColonyAddress($colonyAddress: ID!) {
-  listColonyExtensions(
-    filter: { colonyId: { eq: $colonyAddress }}
+  getExtensionByColonyAndHash(
+    colonyId: $colonyAddress
   ) {
     items {
       id
