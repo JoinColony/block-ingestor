@@ -4,7 +4,7 @@
   "description": "Microservice that ingests ERC20 transactions for Colony Network Contracts",
   "main": "index.ts",
   "scripts": {
-    "build": "rm -rf dist/* run/* && npx tsc",
+    "build": "rm -rf dist/* && npx tsc",
     "start": "node -r ts-node/register/transpile-only -r tsconfig-paths/register dist/index.js",
     "dev": "NODE_ENV=development ts-node-dev -r tsconfig-paths/register src/index.ts",
     "prod": "npm run build && NODE_ENV=production npm run start",
