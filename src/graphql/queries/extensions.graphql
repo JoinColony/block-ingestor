@@ -14,3 +14,13 @@ query GetVotingRepInstallations($votingRepHash: String!, $colonyAddress: ID!) {
     }
   }
 }
+
+query GetColonyExtensionsByColonyAddress($colonyAddress: ID!) {
+  getExtensionByColonyAndHash(
+    colonyId: $colonyAddress
+  ) {
+    items {
+      id
+    }
+  }
+}
