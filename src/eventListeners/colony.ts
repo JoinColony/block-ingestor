@@ -8,7 +8,11 @@ import {
 } from '~graphql';
 import { ContractEventsSignatures } from '~types';
 import { notNull, output } from '~utils';
-import { addEventListener, addNetworkEventListener } from '~eventListeners';
+import {
+  addEventListener,
+  addNetworkEventListener,
+  addTokenEventListener,
+} from '~eventListeners';
 
 const addColonyEventListener = (
   eventSignature: ContractEventsSignatures,
@@ -74,4 +78,5 @@ export const setupListenersForColony = (colonyAddress: string): void => {
   );
 
   // @TODO: Add token event listener
+  addTokenEventListener(ContractEventsSignatures.Transfer, colonyAddress);
 };
