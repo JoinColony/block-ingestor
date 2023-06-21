@@ -1,0 +1,4 @@
+fragment Extension on ColonyExtension {
+  id
+  isInitialized
+}

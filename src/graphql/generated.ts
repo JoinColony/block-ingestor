@@ -3967,6 +3967,8 @@ export type Watcher = {
 
 export type ColonyFragment = { __typename?: 'Colony', colonyAddress: string, tokens?: { __typename?: 'ModelColonyTokensConnection', items: Array<{ __typename?: 'ColonyTokens', id: string, tokenAddress: string } | null> } | null, motionsWithUnclaimedStakes?: Array<{ __typename?: 'ColonyUnclaimedStake', motionId: string, unclaimedRewards: Array<{ __typename?: 'StakerRewards', address: string, isClaimed: boolean, rewards: { __typename?: 'MotionStakeValues', yay: string, nay: string } }> }> | null };
 
+export type ExtensionFragment = { __typename?: 'ColonyExtension', id: string, isInitialized: boolean };
+
 export type ColonyMotionFragment = { __typename?: 'ColonyMotion', id: string, nativeMotionId: string, requiredStake: string, remainingStakes: Array<string>, userMinStake: string, rootHash: string, nativeMotionDomainId: string, isFinalized: boolean, createdBy: string, repSubmitted: string, skillRep: string, hasObjection: boolean, motionStakes: { __typename?: 'MotionStakes', raw: { __typename?: 'MotionStakeValues', nay: string, yay: string }, percentage: { __typename?: 'MotionStakeValues', nay: string, yay: string } }, usersStakes: Array<{ __typename?: 'UserStakes', address: string, stakes: { __typename?: 'MotionStakes', raw: { __typename?: 'MotionStakeValues', yay: string, nay: string }, percentage: { __typename?: 'MotionStakeValues', yay: string, nay: string } } }>, stakerRewards: Array<{ __typename?: 'StakerRewards', address: string, isClaimed: boolean, rewards: { __typename?: 'MotionStakeValues', yay: string, nay: string } }>, voterRecord: Array<{ __typename?: 'VoterRecord', address: string, voteCount: string, vote?: number | null }>, revealedVotes: { __typename?: 'MotionStakes', raw: { __typename?: 'MotionStakeValues', yay: string, nay: string }, percentage: { __typename?: 'MotionStakeValues', yay: string, nay: string } }, motionStateHistory: { __typename?: 'MotionStateHistory', hasVoted: boolean, hasPassed: boolean, hasFailed: boolean, hasFailedNotFinalizable: boolean, inRevealPhase: boolean } };
 
 export type VoterRecordFragment = { __typename?: 'VoterRecord', address: string, voteCount: string, vote?: number | null };
@@ -4225,13 +4227,13 @@ export type GetColonyExtensionsByColonyAddressQueryVariables = Exact<{
 
 export type GetColonyExtensionsByColonyAddressQuery = { __typename?: 'Query', getExtensionByColonyAndHash?: { __typename?: 'ModelColonyExtensionConnection', items: Array<{ __typename?: 'ColonyExtension', id: string } | null> } | null };
 
-export type ListUninitializedExtensionsQueryVariables = Exact<{
+export type ListExtensionsQueryVariables = Exact<{
   hash: Scalars['String'];
   nextToken?: InputMaybe<Scalars['String']>;
 }>;
 
 
-export type ListUninitializedExtensionsQuery = { __typename?: 'Query', getExtensionsByHash?: { __typename?: 'ModelColonyExtensionConnection', nextToken?: string | null, items: Array<{ __typename?: 'ColonyExtension', id: string } | null> } | null };
+export type ListExtensionsQuery = { __typename?: 'Query', getExtensionsByHash?: { __typename?: 'ModelColonyExtensionConnection', nextToken?: string | null, items: Array<{ __typename?: 'ColonyExtension', id: string, isInitialized: boolean } | null> } | null };
 
 export type GetColonyUnclaimedFundsQueryVariables = Exact<{
   colonyAddress: Scalars['ID'];
@@ -4321,6 +4323,12 @@ export const Colony = gql`
       isClaimed
     }
   }
+}
+    `;
+export const Extension = gql`
+    fragment Extension on ColonyExtension {
+  id
+  isInitialized
 }
     `;
 export const MotionStakes = gql`
@@ -4746,21 +4754,21 @@ export const GetColonyExtensionsByColonyAddressDocument = gql`
   }
 }
     `;
-export const ListUninitializedExtensionsDocument = gql`
-    query ListUninitializedExtensions($hash: String!, $nextToken: String) {
+export const ListExtensionsDocument = gql`
+    query ListExtensions($hash: String!, $nextToken: String) {
   getExtensionsByHash(
     hash: $hash
     limit: 1000
     nextToken: $nextToken
-    filter: {and: {isDeleted: {eq: false}, isInitialized: {eq: false}}}
+    filter: {isDeleted: {eq: false}}
   ) {
     nextToken
     items {
-      id
+      ...Extension
     }
   }
 }
-    `;
+    ${Extension}`;
 export const GetColonyUnclaimedFundsDocument = gql`
     query GetColonyUnclaimedFunds($colonyAddress: ID!, $tokenAddress: ID!, $upToBlock: Int = 1) {
   listColonyFundsClaims(

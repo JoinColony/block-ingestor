@@ -23,16 +23,16 @@ query GetColonyExtensionsByColonyAddress($colonyAddress: ID!) {
   }
 }
 
-query ListUninitializedExtensions($hash: String!, $nextToken: String) {
+query ListExtensions($hash: String!, $nextToken: String) {
   getExtensionsByHash(
     hash: $hash
     limit: 1000
     nextToken: $nextToken
-    filter: { and: { isDeleted: { eq: false }, isInitialized: { eq: false } } }
+    filter: { isDeleted: { eq: false } }
   ) {
     nextToken
     items {
-      id
+      ...Extension
     }
   }
 }

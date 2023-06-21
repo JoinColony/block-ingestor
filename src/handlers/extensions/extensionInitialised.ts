@@ -7,9 +7,8 @@ import {
   UpdateColonyExtensionByAddressMutationVariables,
 } from '~graphql';
 import { ContractEvent } from '~types';
-import { motionSpecificEventsListener } from '~eventListener';
-
 import { verbose, addVotingReputationParamsToDB } from '~utils';
+import { setupMotionsListeners } from '~eventListeners';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { contractAddress: extensionAddress } = event;
@@ -36,7 +35,7 @@ export default async (event: ContractEvent): Promise<void> => {
     colonyAddress &&
     getExtensionHash(Extension.VotingReputation) === extensionHash
   ) {
-    await motionSpecificEventsListener(colonyAddress);
+    setupMotionsListeners(extensionAddress);
     await addVotingReputationParamsToDB(extensionAddress, colonyAddress);
   }
 };

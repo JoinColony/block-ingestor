@@ -3,30 +3,31 @@ import { ClientType, Extension, getExtensionHash } from '@colony/colony-js';
 import { ContractEventsSignatures } from '~types';
 import { query } from '~amplifyClient';
 import {
-  ListUninitializedExtensionsDocument,
-  ListUninitializedExtensionsQuery,
-  ListUninitializedExtensionsQueryVariables,
+  ExtensionFragment,
+  ListExtensionsDocument,
+  ListExtensionsQuery,
+  ListExtensionsQueryVariables,
 } from '~graphql';
 import { notNull, output } from '~utils';
 import { addEventListener } from '~eventListeners';
 
 import { addNetworkEventListener } from './network';
 
-const fetchExtensionsAddresses = async (
+const fetchExtensions = async (
   extensionHash: string,
-): Promise<string[]> => {
+): Promise<ExtensionFragment[]> => {
   const extensions = [];
   let nextToken: string | undefined;
 
   do {
     const { data } =
-      (await query<
-        ListUninitializedExtensionsQuery,
-        ListUninitializedExtensionsQueryVariables
-      >(ListUninitializedExtensionsDocument, {
-        nextToken,
-        hash: extensionHash,
-      })) ?? {};
+      (await query<ListExtensionsQuery, ListExtensionsQueryVariables>(
+        ListExtensionsDocument,
+        {
+          nextToken,
+          hash: extensionHash,
+        },
+      )) ?? {};
 
     const { items } = data?.getExtensionsByHash ?? {};
     extensions.push(...(items ?? []));
@@ -34,7 +35,7 @@ const fetchExtensionsAddresses = async (
     nextToken = data?.getExtensionsByHash?.nextToken ?? '';
   } while (nextToken);
 
-  return extensions.filter(notNull).map((extension) => extension.id);
+  return extensions.filter(notNull);
 };
 
 export const setupListenersForExtensions = async (): Promise<void> => {
@@ -51,9 +52,13 @@ export const setupListenersForExtensions = async (): Promise<void> => {
 
   output(`Setting up listeners for VotingReputation extensions`);
   const extensionHash = getExtensionHash(Extension.VotingReputation);
-  const addresses = await fetchExtensionsAddresses(extensionHash);
-  addresses.forEach((extensionAddress) =>
-    setupListenersForExtension(extensionAddress, extensionHash),
+  const addresses = await fetchExtensions(extensionHash);
+  addresses.forEach((extension) =>
+    setupListenersForExtension(
+      extension.id,
+      extensionHash,
+      extension.isInitialized,
+    ),
   );
 };
 
@@ -66,12 +71,38 @@ export const setupListenersForExtensions = async (): Promise<void> => {
 export const setupListenersForExtension = (
   extensionAddress: string,
   extensionHash: string,
+  isInitialized: boolean,
 ): void => {
   if (extensionHash === getExtensionHash(Extension.VotingReputation)) {
-    addEventListener({
-      eventSignature: ContractEventsSignatures.ExtensionInitialised,
-      address: extensionAddress,
-      clientType: ClientType.VotingReputationClient,
-    });
+    if (isInitialized) {
+      setupMotionsListeners(extensionAddress);
+    } else {
+      addEventListener({
+        eventSignature: ContractEventsSignatures.ExtensionInitialised,
+        address: extensionAddress,
+        clientType: ClientType.VotingReputationClient,
+      });
+    }
   }
+};
+
+export const setupMotionsListeners = (
+  votingReputationAddress: string,
+): void => {
+  const motionEvents = [
+    ContractEventsSignatures.MotionCreated,
+    ContractEventsSignatures.MotionStaked,
+    ContractEventsSignatures.MotionFinalized,
+    ContractEventsSignatures.MotionRewardClaimed,
+    ContractEventsSignatures.MotionVoteSubmitted,
+    ContractEventsSignatures.MotionVoteRevealed,
+  ];
+
+  motionEvents.forEach((eventSignature) =>
+    addEventListener({
+      clientType: ClientType.VotingReputationClient,
+      eventSignature,
+      address: votingReputationAddress,
+    }),
+  );
 };
