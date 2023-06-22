@@ -1,6 +1,4 @@
 import { constants } from 'ethers';
-import { Log } from '@ethersproject/providers';
-import { getLogs } from '@colony/colony-js';
 
 import networkClient from '~networkClient';
 import { mutate } from '~amplifyClient';
@@ -17,8 +15,6 @@ import {
   UpdateColonyExtensionByColonyAndHashMutation,
   UpdateColonyExtensionByColonyAndHashMutationVariables,
 } from '~graphql';
-
-import { getExtensionContract } from './contracts';
 
 /**
  * Function writing the extension version to the db based on the ExtensionAddedToNetwork event payload
@@ -126,63 +122,4 @@ export const deleteExtensionFromEvent = async (
       isDeleted: true,
     },
   });
-};
-
-/**
- * Function determining whether an extension has been deprecated in colony
- * since its installation, based on the ExtensionInstalled event log
- */
-export const isExtensionDeprecated = async (
-  extensionHash: string,
-  colonyAddress: string,
-  installedLog: Log,
-): Promise<boolean> => {
-  const extensionDeprecatedLogs = await getLogs(
-    networkClient,
-    networkClient.filters.ExtensionDeprecated(extensionHash, colonyAddress),
-    {
-      fromBlock: installedLog.blockNumber,
-    },
-  );
-  const mostRecentDeprecatedLog =
-    extensionDeprecatedLogs[extensionDeprecatedLogs.length - 1];
-
-  // Short-circuit if there's no log or it happened before the installation
-  if (
-    !mostRecentDeprecatedLog ||
-    mostRecentDeprecatedLog.blockNumber < installedLog.blockNumber
-  ) {
-    return false;
-  }
-
-  const parsedLog = await networkClient.interface.parseLog(
-    mostRecentDeprecatedLog,
-  );
-
-  return !!parsedLog.args.deprecated;
-};
-
-export const isExtensionInitialised = async (
-  extensionAddress: string,
-  installedLog: Log,
-): Promise<boolean> => {
-  const extensionContract = getExtensionContract(extensionAddress);
-
-  const extensionInitialisedLogs = await getLogs(
-    networkClient,
-    {
-      topics: extensionContract.filters.ExtensionInitialised().topics,
-      address: extensionAddress,
-    },
-    {
-      fromBlock: installedLog.blockNumber,
-    },
-  );
-  const mostRecentInitialisedLog =
-    extensionInitialisedLogs[extensionInitialisedLogs.length - 1];
-
-  return !!(
-    mostRecentInitialisedLog &&
-    mostRecentInitialisedLog.blockNumber >= installedLog.blockNumber
-  );
 };
