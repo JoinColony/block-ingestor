@@ -1,11 +1,14 @@
-import { ClientType } from '@colony/colony-js/tokens';
-import { addEventListener } from '~eventListeners';
+import { utils } from 'ethers';
+
+import { EventListenerType, addEventListener } from '~eventListeners';
 import { ContractEventsSignatures } from '~types';
 
 export const addNetworkEventListener = (
   eventSignature: ContractEventsSignatures,
 ): void =>
   addEventListener({
+    type: EventListenerType.Network,
     eventSignature,
-    clientType: ClientType.NetworkClient,
+    topics: [utils.id(eventSignature)],
+    address: process.env.CHAIN_CONTRACT_ADDRESS ?? '',
   });

@@ -15,7 +15,11 @@ export const handleMoveFundsMotion = async (
   event: ContractEvent,
   parsedAction: TransactionDescription,
 ): Promise<void> => {
-  const { contractAddress: colonyAddress } = event;
+  const { colonyAddress } = event;
+  if (!colonyAddress) {
+    return;
+  }
+
   const { name, args: actionArgs } = parsedAction;
 
   const [, , , , , fromPot, toPot, amount, tokenAddress] = actionArgs;

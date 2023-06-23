@@ -18,6 +18,8 @@ export interface ContractEvent extends LogDescription {
   blockNumber: number;
   blockHash: string;
   timestamp: number;
+  // Optional property that will be set if the event is emitted by an extension
+  colonyAddress?: string;
 }
 
 /*

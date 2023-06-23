@@ -35,7 +35,7 @@ export default async (event: ContractEvent): Promise<void> => {
     colonyAddress &&
     getExtensionHash(Extension.VotingReputation) === extensionHash
   ) {
-    setupMotionsListeners(extensionAddress);
+    setupMotionsListeners(extensionAddress, colonyAddress);
     await addVotingReputationParamsToDB(extensionAddress, colonyAddress);
   }
 };

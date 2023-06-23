@@ -8,7 +8,11 @@ export const handleUnlockTokenMotion = async (
   event: ContractEvent,
   parsedAction: TransactionDescription,
 ): Promise<void> => {
-  const { contractAddress: colonyAddress } = event;
+  const { colonyAddress } = event;
+  if (!colonyAddress) {
+    return;
+  }
+
   const { name } = parsedAction;
   const tokenAddress = await getColonyTokenAddress(colonyAddress);
 

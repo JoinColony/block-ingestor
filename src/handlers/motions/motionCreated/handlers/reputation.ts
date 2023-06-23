@@ -8,7 +8,11 @@ export const handleDomainEditReputationMotion = async (
   event: ContractEvent,
   parsedAction: TransactionDescription,
 ): Promise<void> => {
-  const { contractAddress: colonyAddress } = event;
+  const { colonyAddress } = event;
+  if (!colonyAddress) {
+    return;
+  }
+
   const { name, args: actionArgs } = parsedAction;
   const [domainId, userAddress, amount] = actionArgs.slice(-3);
   await createMotionInDB(event, {

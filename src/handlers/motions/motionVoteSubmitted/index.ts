@@ -9,9 +9,13 @@ import { getUpdatedVoterRecord } from './helpers';
 
 export default async (event: ContractEvent): Promise<void> => {
   const {
-    contractAddress: colonyAddress,
+    colonyAddress,
     args: { motionId, voter },
   } = event;
+
+  if (!colonyAddress) {
+    return;
+  }
 
   const votingClient = await getVotingClient(colonyAddress);
 

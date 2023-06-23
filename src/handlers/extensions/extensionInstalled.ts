@@ -11,5 +11,5 @@ export default async (event: ContractEvent): Promise<void> => {
   );
 
   await writeExtensionFromEvent(event, extensionAddress);
-  setupListenersForExtension(extensionAddress, extensionHash, false);
+  setupListenersForExtension(extensionAddress, colony, extensionHash, false);
 };

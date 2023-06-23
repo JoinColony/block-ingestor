@@ -15,6 +15,10 @@ import {
   ChainMetadataInput,
 } from '~graphql';
 import { blocksMap } from '~blockListener';
+import {
+  getListenerContractEventProperties,
+  EventListener,
+} from '~eventListeners';
 
 import { verbose } from '../logger';
 
@@ -27,6 +31,8 @@ export const setToJS = (set: Set<string>): Array<Record<string, string>> =>
 export const mapLogToContractEvent = async (
   log: Log,
   iface: utils.Interface,
+  // If listener is specified, the mapped event will be augmented by some listener specific properties, e.g. colony address
+  listener?: EventListener,
 ): Promise<ContractEvent | null> => {
   const { provider } = networkClient;
   const {
@@ -54,6 +60,7 @@ export const mapLogToContractEvent = async (
       contractAddress: eventContractAddress,
       blockHash,
       timestamp,
+      ...(listener ? getListenerContractEventProperties(listener) : {}),
     };
   } catch (error) {
     /*

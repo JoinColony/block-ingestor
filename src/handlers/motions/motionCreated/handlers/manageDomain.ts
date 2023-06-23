@@ -7,7 +7,11 @@ export const handleManageDomainMotion = async (
   event: ContractEvent,
   parsedAction: TransactionDescription,
 ): Promise<void> => {
-  const { transactionHash, contractAddress: colonyAddress } = event;
+  const { transactionHash, colonyAddress } = event;
+  if (!colonyAddress) {
+    return;
+  }
+
   const { name } = parsedAction;
   const pendingDomainMetadataId = getPendingMetadataDatabaseId(
     colonyAddress,

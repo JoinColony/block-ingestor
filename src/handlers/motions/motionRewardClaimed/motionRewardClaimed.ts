@@ -11,11 +11,15 @@ import { ColonyMotion } from '~graphql';
 
 export default async (event: ContractEvent): Promise<void> => {
   const {
-    contractAddress: colonyAddress,
+    colonyAddress,
     args: { motionId, staker },
     transactionHash,
     logIndex,
   } = event;
+
+  if (!colonyAddress) {
+    return;
+  }
 
   const votingClient = await getVotingClient(colonyAddress);
 

@@ -1,9 +1,41 @@
-import { ClientType } from '@colony/colony-js';
 import { ContractEventsSignatures } from '~types';
 
-export interface EventListener {
+export interface BaseEventListener {
+  type: EventListenerType;
   eventSignature: ContractEventsSignatures;
-  clientType: ClientType;
+  topics: Array<string | null>;
   address?: string;
-  topic: string;
 }
+
+export enum EventListenerType {
+  Colony = 'Colony',
+  Network = 'Network',
+  Extension = 'Extension',
+  Token = 'Token',
+}
+
+interface ColonyEventListener extends BaseEventListener {
+  type: EventListenerType.Colony;
+  address: string;
+}
+
+interface NetworkEventListener extends BaseEventListener {
+  type: EventListenerType.Network;
+  address: string;
+}
+
+interface ExtensionEventListener extends BaseEventListener {
+  type: EventListenerType.Extension;
+  address: string;
+  colonyAddress: string;
+}
+
+interface TokenEventListener extends BaseEventListener {
+  type: EventListenerType.Token;
+}
+
+export type EventListener =
+  | ColonyEventListener
+  | NetworkEventListener
+  | ExtensionEventListener
+  | TokenEventListener;

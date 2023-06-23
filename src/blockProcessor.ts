@@ -1,7 +1,7 @@
 import { blocksMap } from '~blockListener';
-import { getListenersLogTopics, getMatchingListener } from '~eventListeners';
+import { getMatchingListener } from '~eventListeners';
 import eventProcessor from '~eventProcessor';
-import { getInterfaceByClientType } from '~interfaces';
+import { getInterfaceByListenerType } from '~interfaces';
 import provider from '~provider';
 import {
   getLastBlockNumber,
@@ -35,7 +35,6 @@ export const processNextBlock = async (): Promise<void> => {
     const logs = await provider.getLogs({
       fromBlock: block.number,
       toBlock: block.number,
-      topics: getListenersLogTopics(),
     });
 
     for (const log of logs) {
@@ -44,15 +43,15 @@ export const processNextBlock = async (): Promise<void> => {
         continue;
       }
 
-      const iface = getInterfaceByClientType(listener.clientType);
+      const iface = getInterfaceByListenerType(listener.type);
       if (!iface) {
         output(
-          `Failed to get an interface for a log with client type ${listener.clientType}`,
+          `Failed to get an interface for a log with listener type ${listener.type}`,
         );
         continue;
       }
 
-      const event = await mapLogToContractEvent(log, iface);
+      const event = await mapLogToContractEvent(log, iface, listener);
       if (!event) {
         output(
           `Failed to map log ${log.logIndex} from transaction ${log.transactionHash}`,

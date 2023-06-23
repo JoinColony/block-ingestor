@@ -1,4 +1,4 @@
-import { ClientType } from '@colony/colony-js';
+import { utils } from 'ethers';
 
 import { query } from '~amplifyClient';
 import {
@@ -14,14 +14,17 @@ import {
   addTokenEventListener,
 } from '~eventListeners';
 
+import { EventListenerType } from './types';
+
 const addColonyEventListener = (
   eventSignature: ContractEventsSignatures,
   address: string,
 ): void => {
   addEventListener({
-    clientType: ClientType.ColonyClient,
-    eventSignature,
+    type: EventListenerType.Colony,
     address,
+    eventSignature,
+    topics: [utils.id(eventSignature)],
   });
 };
 
@@ -77,6 +80,5 @@ export const setupListenersForColony = (colonyAddress: string): void => {
     addColonyEventListener(eventSignature, colonyAddress),
   );
 
-  // @TODO: Add token event listener
   addTokenEventListener(ContractEventsSignatures.Transfer, colonyAddress);
 };

@@ -1,4 +1,5 @@
-import { ClientType, Extension, getExtensionHash } from '@colony/colony-js';
+import { Extension, getExtensionHash } from '@colony/colony-js';
+import { utils } from 'ethers';
 
 import { ContractEventsSignatures } from '~types';
 import { query } from '~amplifyClient';
@@ -12,6 +13,21 @@ import { notNull, output } from '~utils';
 import { addEventListener } from '~eventListeners';
 
 import { addNetworkEventListener } from './network';
+import { EventListenerType } from './types';
+
+export const addExtensionEventListener = (
+  eventSignature: ContractEventsSignatures,
+  extensionAddress: string,
+  colonyAddress: string,
+): void => {
+  addEventListener({
+    type: EventListenerType.Extension,
+    eventSignature,
+    address: extensionAddress,
+    colonyAddress,
+    topics: [utils.id(eventSignature)],
+  });
+};
 
 const fetchExtensions = async (
   extensionHash: string,
@@ -56,6 +72,7 @@ export const setupListenersForExtensions = async (): Promise<void> => {
   addresses.forEach((extension) =>
     setupListenersForExtension(
       extension.id,
+      extension.colonyId,
       extensionHash,
       extension.isInitialized,
     ),
@@ -70,24 +87,26 @@ export const setupListenersForExtensions = async (): Promise<void> => {
  */
 export const setupListenersForExtension = (
   extensionAddress: string,
+  colonyAddress: string,
   extensionHash: string,
   isInitialized: boolean,
 ): void => {
   if (extensionHash === getExtensionHash(Extension.VotingReputation)) {
     if (isInitialized) {
-      setupMotionsListeners(extensionAddress);
+      setupMotionsListeners(extensionAddress, colonyAddress);
     } else {
-      addEventListener({
-        eventSignature: ContractEventsSignatures.ExtensionInitialised,
-        address: extensionAddress,
-        clientType: ClientType.VotingReputationClient,
-      });
+      addExtensionEventListener(
+        ContractEventsSignatures.ExtensionInitialised,
+        extensionAddress,
+        colonyAddress,
+      );
     }
   }
 };
 
 export const setupMotionsListeners = (
   votingReputationAddress: string,
+  colonyAddress: string,
 ): void => {
   const motionEvents = [
     ContractEventsSignatures.MotionCreated,
@@ -99,10 +118,10 @@ export const setupMotionsListeners = (
   ];
 
   motionEvents.forEach((eventSignature) =>
-    addEventListener({
-      clientType: ClientType.VotingReputationClient,
+    addExtensionEventListener(
       eventSignature,
-      address: votingReputationAddress,
-    }),
+      votingReputationAddress,
+      colonyAddress,
+    ),
   );
 };

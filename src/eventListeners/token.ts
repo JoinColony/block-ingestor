@@ -1,21 +1,18 @@
-import { ClientType } from '@colony/colony-js';
-
 import { ContractEventsSignatures } from '~types';
 import { addEventListener } from '~eventListeners';
+import { EventListenerType } from './types';
+import { utils } from 'ethers';
 
 /**
- * @NOTE: Currently, adding a token listener will use the address argument
- * to filter events where the address is the recipient
- * @TODO: Extend the token listener to support adding listeners filtering
- * on token address/sender address
+ * @NOTE: Currently, token event listeners only support filtering on the recipient address
  */
 export const addTokenEventListener = (
   eventSignature: ContractEventsSignatures,
-  address: string,
+  recipientAddress: string,
 ): void => {
   addEventListener({
-    clientType: ClientType.TokenClient,
+    type: EventListenerType.Token,
     eventSignature,
-    address,
+    topics: [utils.id(eventSignature), null, recipientAddress],
   });
 };
