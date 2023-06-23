@@ -22,11 +22,13 @@ export const getMotionStakes = (
   const totalYayStakesPercentage = getStakePercentage(
     totalYayStakesRaw,
     requiredStake,
+    vote.eq(MotionVote.YAY),
   );
 
   const totalNayStakesPercentage = getStakePercentage(
     totalNayStakesRaw,
     requiredStake,
+    vote.eq(MotionVote.NAY),
   );
 
   const motionStakes: MotionStakes = {
@@ -55,10 +57,13 @@ export const getRemainingStakes = (
 export const getStakePercentage = (
   stake: BigNumber,
   requiredStake: BigNumber,
+  roundToOne: boolean,
 ): BigNumber => {
   const stakePercentage = stake.mul(100).div(requiredStake);
   // May be zero due to rounding. Since a user cannot stake 0%, we round up to 1.
-  return stakePercentage.isZero() ? stakePercentage.add(1) : stakePercentage;
+  return roundToOne && stakePercentage.isZero()
+    ? stakePercentage.add(1)
+    : stakePercentage;
 };
 
 /**
@@ -73,7 +78,7 @@ const getNewUserStakes = (
   const invertedVote = BigNumber.from(1).sub(vote);
   const stakedSide = getMotionSide(vote);
   const unstakedSide = getMotionSide(invertedVote);
-  const stakePercentage = getStakePercentage(amount, requiredStake);
+  const stakePercentage = getStakePercentage(amount, requiredStake, true);
 
   return {
     address: staker,
@@ -103,7 +108,11 @@ const getUpdatedUserStakes = (
   const stakedSide = getMotionSide(vote);
   const existingRawStake = existingUserStakes.stakes.raw[stakedSide];
   const updatedRawStake = amount.add(existingRawStake);
-  const updatedPercentage = getStakePercentage(updatedRawStake, requiredStake);
+  const updatedPercentage = getStakePercentage(
+    updatedRawStake,
+    requiredStake,
+    true,
+  );
   const updatedUserStakes: UserStakes = {
     ...existingUserStakes,
     stakes: {
