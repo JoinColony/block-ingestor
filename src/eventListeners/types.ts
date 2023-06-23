@@ -24,7 +24,7 @@ interface NetworkEventListener extends BaseEventListener {
   address: string;
 }
 
-interface VotingReputationnEventListener extends BaseEventListener {
+interface VotingReputationEventListener extends BaseEventListener {
   type: EventListenerType.VotingReputation;
   address: string;
   colonyAddress: string;
@@ -37,5 +37,5 @@ interface TokenEventListener extends BaseEventListener {
 export type EventListener =
   | ColonyEventListener
   | NetworkEventListener
-  | VotingReputationnEventListener
+  | VotingReputationEventListener
   | TokenEventListener;
