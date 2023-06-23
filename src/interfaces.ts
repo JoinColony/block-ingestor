@@ -24,7 +24,7 @@ export const getInterfaceByListenerType = (
       return ColonyEventsFactory.connect(constants.AddressZero, provider)
         .interface;
     }
-    case EventListenerType.Extension: {
+    case EventListenerType.VotingReputation: {
       return VotingReputationEventsFactory.connect(
         constants.AddressZero,
         provider,

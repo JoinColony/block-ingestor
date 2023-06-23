@@ -10,7 +10,7 @@ export interface BaseEventListener {
 export enum EventListenerType {
   Colony = 'Colony',
   Network = 'Network',
-  Extension = 'Extension',
+  VotingReputation = 'VotingReputation',
   Token = 'Token',
 }
 
@@ -24,8 +24,8 @@ interface NetworkEventListener extends BaseEventListener {
   address: string;
 }
 
-interface ExtensionEventListener extends BaseEventListener {
-  type: EventListenerType.Extension;
+interface VotingReputationnEventListener extends BaseEventListener {
+  type: EventListenerType.VotingReputation;
   address: string;
   colonyAddress: string;
 }
@@ -37,5 +37,5 @@ interface TokenEventListener extends BaseEventListener {
 export type EventListener =
   | ColonyEventListener
   | NetworkEventListener
-  | ExtensionEventListener
+  | VotingReputationnEventListener
   | TokenEventListener;

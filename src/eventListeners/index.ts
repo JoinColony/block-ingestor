@@ -1,15 +1,21 @@
 import { verbose } from '~utils';
-import { ContractEventsSignatures } from '~types';
 
 import { EventListener, EventListenerType } from './types';
 
 export * from './types';
 export * from './colony';
 export * from './network';
+export * from './votingReputation';
 export * from './extensions';
 export * from './token';
 
 let listeners: EventListener[] = [];
+
+export const getEventListeners = (): EventListener[] => listeners;
+
+export const setEventListeners = (newListeners: EventListener[]): void => {
+  listeners = newListeners;
+};
 
 export const addEventListener = (listener: EventListener): void => {
   verbose(
@@ -17,21 +23,6 @@ export const addEventListener = (listener: EventListener): void => {
     listener.address ? `filtering address ${listener.address}` : '',
   );
   listeners.push(listener);
-};
-
-export const removeEventListener = (
-  eventSignature: ContractEventsSignatures,
-  address?: string,
-): void => {
-  verbose(
-    `Removed listener for event ${eventSignature}`,
-    address ? `filtering address ${address}` : '',
-  );
-  listeners = listeners.filter(
-    (listener) =>
-      listener.eventSignature !== eventSignature ||
-      listener.address !== address,
-  );
 };
 
 export const getMatchingListener = (
@@ -62,7 +53,7 @@ export const getListenerContractEventProperties = (
   listener: EventListener,
 ): Record<string, unknown> => {
   switch (listener.type) {
-    case EventListenerType.Extension: {
+    case EventListenerType.VotingReputation: {
       return {
         colonyAddress: listener.colonyAddress,
       };

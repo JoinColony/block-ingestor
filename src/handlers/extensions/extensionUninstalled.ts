@@ -1,17 +1,12 @@
-import { ContractEvent, ContractEventsSignatures } from '~types';
-import { deleteExtensionFromEvent, removeMotionListeners } from '~utils';
-import { removeEventListener } from '~eventListeners';
+import { removeVotingReputationListeners } from '~eventListeners';
+import { ContractEvent } from '~types';
+import { deleteExtensionFromEvent } from '~utils';
 
 export default async (event: ContractEvent): Promise<void> => {
-  const {
-    contractAddress: extensionAddress,
-    args: { colony: colonyAddress },
-  } = event;
+  const { contractAddress: extensionAddress } = event;
+
+  console.log('Extension uninstalled: ', event);
 
   await deleteExtensionFromEvent(event);
-  removeEventListener(
-    ContractEventsSignatures.ExtensionUninstalled,
-    extensionAddress,
-  );
-  removeMotionListeners(colonyAddress);
+  removeVotingReputationListeners(extensionAddress);
 };
