@@ -32,17 +32,20 @@ export const processNextBlock = async (): Promise<void> => {
       return;
     }
 
+    // Get logs contained in the current block
     const logs = await provider.getLogs({
       fromBlock: block.number,
       toBlock: block.number,
     });
 
     for (const log of logs) {
+      // For each log, try to find a matching listener to establish if we should handle or dismiss it
       const listener = getMatchingListener(log.topics, log.address);
       if (!listener) {
         continue;
       }
 
+      // In order to parse the log, we need an ether's interface
       const iface = getInterfaceByListenerType(listener.type);
       if (!iface) {
         output(
