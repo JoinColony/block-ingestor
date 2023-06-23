@@ -34,7 +34,7 @@ export const startBlockListener = (): void => {
  * Function fetching all the blocks between the last processed block and the current block
  * that happened when ingestor was not actively listening
  */
-export const trackMissedBlocks = async (): Promise<void> => {
+const trackMissedBlocks = async (): Promise<void> => {
   const lastBlockNumber = getLastBlockNumber();
   const currentBlockNumber = await provider.getBlockNumber();
 
