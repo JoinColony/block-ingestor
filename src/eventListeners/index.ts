@@ -49,7 +49,7 @@ export const getMatchingListener = (
 
 export const getListenersStats = (): string => JSON.stringify(listeners);
 
-export const getListenerContractEventProperties = (
+export const getAdditionalContractEventProperties = (
   listener: EventListener,
 ): Record<string, unknown> => {
   switch (listener.type) {

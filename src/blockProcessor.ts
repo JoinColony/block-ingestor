@@ -1,5 +1,8 @@
 import { blocksMap } from '~blockListener';
-import { getMatchingListener } from '~eventListeners';
+import {
+  getAdditionalContractEventProperties,
+  getMatchingListener,
+} from '~eventListeners';
 import eventProcessor from '~eventProcessor';
 import { getInterfaceByListenerType } from '~interfaces';
 import provider from '~provider';
@@ -54,7 +57,14 @@ export const processNextBlock = async (): Promise<void> => {
         continue;
       }
 
-      const event = await mapLogToContractEvent(log, iface, listener);
+      // Depending on the listener type, we might want to "attach" some additional properties to the mapped event
+      const additionalProperties =
+        getAdditionalContractEventProperties(listener);
+      const event = await mapLogToContractEvent(
+        log,
+        iface,
+        additionalProperties,
+      );
       if (!event) {
         output(
           `Failed to map log ${log.logIndex} from transaction ${log.transactionHash}`,
