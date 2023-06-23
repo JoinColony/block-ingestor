@@ -44,7 +44,7 @@ export const mapLogToContractEvent = async (
 
   try {
     // Attempt to first get a block from the map as we might have already fetched its info
-    let block = blocksMap[blockNumber];
+    let block = blocksMap.get(blockNumber);
     if (!block) {
       block = await provider.getBlock(blockNumber);
     }

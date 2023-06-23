@@ -4,18 +4,17 @@ import provider from '~provider';
 import { processNextBlock } from '~blockProcessor';
 
 /**
- * Object storing blocks that have been either picked up by the block listener
+ * Map storing blocks that have been either picked up by the block listener
  * or missed blocks tracking
- * The ability to index on block number made it much easier to ensure sequential
- * processing of the blocks
+ * @TODO: Explore the possiblity of removing blocks once they've been processed
  */
-export const blocksMap: Record<number, Block | undefined> = {};
+export const blocksMap = new Map<number, Block>();
 
 export const startBlockListener = (): void => {
   provider.on(EthersObserverEvents.Block, async (blockNumber: number) => {
     try {
       const block = await provider.getBlock(blockNumber);
-      blocksMap[block.number] = block;
+      blocksMap.set(block.number, block);
 
       output(`Block ${blockNumber} added to the queue`);
 
@@ -50,7 +49,7 @@ const trackMissedBlocks = async (): Promise<void> => {
 
   for (let i = lastBlockNumber; i < currentBlockNumber; i += 1) {
     const block = await provider.getBlock(i);
-    blocksMap[i] = block;
+    blocksMap.set(i, block);
   }
 
   processNextBlock();

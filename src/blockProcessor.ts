@@ -23,11 +23,11 @@ export const processNextBlock = async (): Promise<void> => {
   let lastBlockNumber = getLastBlockNumber();
 
   // Process as many blocks as are available sequentially
-  while (blocksMap[lastBlockNumber + 1]) {
+  while (blocksMap.get(lastBlockNumber + 1)) {
     const currentBlockNumber = lastBlockNumber + 1;
     output(`Processing block ${currentBlockNumber}`);
 
-    const block = blocksMap[currentBlockNumber];
+    const block = blocksMap.get(currentBlockNumber);
     if (!block) {
       return;
     }
