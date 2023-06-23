@@ -47,7 +47,7 @@ const trackMissedBlocks = async (): Promise<void> => {
     } to ${currentBlockNumber}`,
   );
 
-  for (let i = lastBlockNumber; i < currentBlockNumber; i += 1) {
+  for (let i = lastBlockNumber + 1; i <= currentBlockNumber; i += 1) {
     const block = await provider.getBlock(i);
     blocksMap.set(i, block);
   }
