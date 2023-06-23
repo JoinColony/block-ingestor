@@ -3,7 +3,6 @@ import {
   AnyVotingReputationClient,
   ColonyNetworkClient,
   TokenClient,
-  getLogs,
 } from '@colony/colony-js';
 import { LogDescription } from '@ethersproject/abi';
 import provider from '~provider';
@@ -20,17 +19,6 @@ export interface ContractEvent extends LogDescription {
   timestamp: number;
   // Optional property that will be set if the event is emitted by an extension
   colonyAddress?: string;
-}
-
-/*
- * Event names used for our internal Events Queue System
- */
-export enum QueueEvents {
-  NewEvent = 'NewEvent',
-  QueueUpdated = 'QueueUpdated',
-  ProcessEvents = 'ProcessEvents', // start processing events in queue
-  ProcessEvent = 'ProcessEvent', // process a individual event
-  EventProcessed = 'EventProcessed',
 }
 
 /*
@@ -86,9 +74,6 @@ export enum EthersObserverEvents {
 }
 
 export type ChainID = number;
-
-// The Filter type doesn't seem to be exported from colony-js
-export type Filter = Parameters<typeof getLogs>[1];
 
 export type Block = Awaited<ReturnType<typeof provider.getBlock>>;
 

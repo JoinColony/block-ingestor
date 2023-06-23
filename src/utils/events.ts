@@ -18,12 +18,6 @@ import { blocksMap } from '~blockListener';
 
 import { verbose } from './logger';
 
-/**
- * Convert a Set that contains a JSON string, back into JS form
- */
-export const setToJS = (set: Set<string>): Array<Record<string, string>> =>
-  Array.from(set).map((entry) => JSON.parse(entry));
-
 export const mapLogToContractEvent = async (
   log: Log,
   iface: utils.Interface,
