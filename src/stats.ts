@@ -1,7 +1,10 @@
 import express from 'express';
 
-import { getLatestBlock, getStats, initStats, output } from '~utils';
+import { getLastBlockNumber, getStats, initStats, output } from '~utils';
 import { getChainId } from '~provider';
+import { getListenersStats } from '~eventListeners';
+
+export const coloniesSet = new Set<string>();
 
 const app = express();
 const port = process.env.STATS_PORT;
@@ -25,18 +28,25 @@ app.get('/stats', async (_, res) => {
   res.type('json').send(stats);
 });
 
+/**
+ * Use to check currently active listeners
+ */
+app.get('/listeners', async (_, res) => {
+  res.type('json').send(getListenersStats());
+});
+
 export const startStatsServer = async (): Promise<void> => {
   if (!port) {
     return;
   }
 
   await initStats();
-  const latestBlock = getLatestBlock();
+  const lastBlockNumber = getLastBlockNumber();
 
   app.listen(port, async () => {
     output('Block Ingestor started on chain', getChainId());
     output(`Stats available at http://localhost:${port}/stats`);
     output(`Liveness check available at http://localhost:${port}/liveness`);
-    output(`Last processed block number: ${latestBlock}`);
+    output(`Last processed block number: ${lastBlockNumber}`);
   });
 };

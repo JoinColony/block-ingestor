@@ -5,7 +5,7 @@ import { ContractEvent, motionNameMapping } from '~types';
 import {
   getCachedColonyClient,
   getDomainDatabaseId,
-  isSupportedColonyClient,
+  isDomainFromFundingPotSupported,
   toNumber,
 } from '~utils';
 
@@ -15,7 +15,11 @@ export const handleMoveFundsMotion = async (
   event: ContractEvent,
   parsedAction: TransactionDescription,
 ): Promise<void> => {
-  const { contractAddress: colonyAddress } = event;
+  const { colonyAddress } = event;
+  if (!colonyAddress) {
+    return;
+  }
+
   const { name, args: actionArgs } = parsedAction;
 
   const [, , , , , fromPot, toPot, amount, tokenAddress] = actionArgs;
@@ -29,7 +33,7 @@ export const handleMoveFundsMotion = async (
   let fromDomainId: BigNumber | undefined;
   let toDomainId: BigNumber | undefined;
 
-  if (isSupportedColonyClient(colonyClient)) {
+  if (isDomainFromFundingPotSupported(colonyClient)) {
     fromDomainId = await colonyClient.getDomainFromFundingPot(fromPot);
     toDomainId = await colonyClient.getDomainFromFundingPot(toPot);
   }

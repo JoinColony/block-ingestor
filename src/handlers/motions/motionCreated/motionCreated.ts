@@ -17,9 +17,13 @@ import {
 
 export default async (event: ContractEvent): Promise<void> => {
   const {
-    contractAddress: colonyAddress,
     args: { motionId },
+    colonyAddress,
   } = event;
+
+  if (!colonyAddress) {
+    return;
+  }
 
   const colonyClient = await getCachedColonyClient(colonyAddress);
 

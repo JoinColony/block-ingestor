@@ -13,7 +13,11 @@ export const handleSetUserRolesMotion = async (
   event: ContractEvent,
   parsedAction: TransactionDescription,
 ): Promise<void> => {
-  const { contractAddress: colonyAddress } = event;
+  const { colonyAddress } = event;
+  if (!colonyAddress) {
+    return;
+  }
+
   const { name, args: actionArgs } = parsedAction;
   const [userAddress, domainId, zeroPadHexString] = actionArgs.slice(-3);
   const colonyRolesDatabaseId = getColonyRolesDatabaseId(

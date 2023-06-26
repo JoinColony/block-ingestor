@@ -2,6 +2,7 @@ import { Amplify, API, graphqlOperation } from 'aws-amplify';
 import { GraphQLQuery } from '@aws-amplify/api';
 import dotenv from 'dotenv';
 import { DocumentNode, isExecutableDefinitionNode } from 'graphql';
+import { verbose } from '~utils';
 
 dotenv.config();
 
@@ -42,7 +43,7 @@ export const mutate = async <
   TVariables extends Record<string, unknown> = {},
 >(
   mutationDocument: DocumentNode,
-  variables: TVariables,
+  variables?: TVariables,
 ): GraphQLFnReturn<T> => {
   try {
     const result = await API.graphql<GraphQLQuery<T>>(
@@ -50,14 +51,15 @@ export const mutate = async <
     );
 
     return result;
-  } catch (error) {
+  } catch (error: any) {
     const definitionNode = mutationDocument.definitions[0];
     const mutationName = isExecutableDefinitionNode(definitionNode)
       ? definitionNode.name?.value
       : 'Unknown';
-    console.trace(
-      `Could not execute mutation ${mutationName}. Error: ${error}`,
-    );
+
+    const errMsg = 'errors' in error ? error.errors : error;
+
+    verbose(`Could not execute mutation ${mutationName}. Error: ${errMsg}`);
     return undefined;
   }
 };

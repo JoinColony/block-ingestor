@@ -3,6 +3,7 @@ import {
   ColonyMetadataFragment,
   ColonyMotionFragment,
   DomainMetadataFragment,
+  ExtensionFragment,
   MotionStakesFragment,
   StakerRewardFragment,
   UserStakesFragment,
@@ -18,3 +19,4 @@ export type Colony = ColonyFragment;
 export type MotionStakes = MotionStakesFragment;
 export type UserStakes = UserStakesFragment;
 export type VoterRecord = VoterRecordFragment;
+export type Extension = ExtensionFragment;

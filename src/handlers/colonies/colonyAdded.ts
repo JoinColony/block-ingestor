@@ -1,7 +1,11 @@
-import { colonySpecificEventsListener } from '~eventListener';
-import { coloniesSet } from '~trackColonies';
+import { setupListenersForColony } from '~eventListeners';
+import { coloniesSet } from '~stats';
 import { ContractEvent } from '~types';
-import { output, updateStats, createColonyFounderInitialRoleEntry } from '~utils';
+import {
+  output,
+  updateStats,
+  createColonyFounderInitialRoleEntry,
+} from '~utils';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { colonyAddress, token: tokenAddress } = event.args ?? {};
@@ -40,5 +44,5 @@ export default async (event: ContractEvent): Promise<void> => {
   /*
    * Setup all Colony specific listeners for it
    */
-  await colonySpecificEventsListener(colonyAddress);
+  setupListenersForColony(colonyAddress);
 };

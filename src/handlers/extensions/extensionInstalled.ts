@@ -1,4 +1,6 @@
-import { extensionSpecificEventsListener } from '~eventListener';
+import { Extension, getExtensionHash } from '@colony/colony-js';
+
+import { setupListenersForVotingReputation } from '~eventListeners';
 import networkClient from '~networkClient';
 import { ContractEvent } from '~types';
 import { writeExtensionFromEvent } from '~utils';
@@ -11,5 +13,8 @@ export default async (event: ContractEvent): Promise<void> => {
   );
 
   await writeExtensionFromEvent(event, extensionAddress);
-  await extensionSpecificEventsListener(extensionAddress, extensionHash);
+
+  if (extensionHash === getExtensionHash(Extension.VotingReputation)) {
+    setupListenersForVotingReputation(extensionAddress, colony, false);
+  }
 };

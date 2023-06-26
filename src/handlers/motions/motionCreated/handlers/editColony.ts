@@ -7,7 +7,11 @@ export const handleEditColonyMotion = async (
   event: ContractEvent,
   { name }: TransactionDescription,
 ): Promise<void> => {
-  const { transactionHash, contractAddress: colonyAddress } = event;
+  const { transactionHash, colonyAddress } = event;
+  if (!colonyAddress) {
+    return;
+  }
+
   const pendingColonyMetadataId = getPendingMetadataDatabaseId(
     colonyAddress,
     transactionHash,

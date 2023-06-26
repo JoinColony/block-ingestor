@@ -14,18 +14,15 @@ import {
   GetContractEventQueryVariables,
   ChainMetadataInput,
 } from '~graphql';
+import { blocksMap } from '~blockListener';
 
-import { verbose } from '../logger';
-
-/**
- * Convert a Set that contains a JSON string, back into JS form
- */
-export const setToJS = (set: Set<string>): Array<Record<string, string>> =>
-  Array.from(set).map((entry) => JSON.parse(entry));
+import { verbose } from './logger';
 
 export const mapLogToContractEvent = async (
   log: Log,
   iface: utils.Interface,
+  // Additional properties to attach to the contract event
+  additionalProperties?: Record<string, unknown>,
 ): Promise<ContractEvent | null> => {
   const { provider } = networkClient;
   const {
@@ -36,7 +33,13 @@ export const mapLogToContractEvent = async (
   } = log;
 
   try {
-    const { hash: blockHash, timestamp } = await provider.getBlock(blockNumber);
+    // Attempt to first get a block from the map as we might have already fetched its info
+    let block = blocksMap.get(blockNumber);
+    if (!block) {
+      block = await provider.getBlock(blockNumber);
+    }
+
+    const { hash: blockHash, timestamp } = block;
     const parsedLog = iface.parseLog(log);
 
     return {
@@ -47,6 +50,7 @@ export const mapLogToContractEvent = async (
       contractAddress: eventContractAddress,
       blockHash,
       timestamp,
+      ...additionalProperties,
     };
   } catch (error) {
     /*

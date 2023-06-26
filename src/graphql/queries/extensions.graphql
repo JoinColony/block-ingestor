@@ -16,11 +16,23 @@ query GetVotingRepInstallations($votingRepHash: String!, $colonyAddress: ID!) {
 }
 
 query GetColonyExtensionsByColonyAddress($colonyAddress: ID!) {
-  getExtensionByColonyAndHash(
-    colonyId: $colonyAddress
-  ) {
+  getExtensionByColonyAndHash(colonyId: $colonyAddress) {
     items {
       id
+    }
+  }
+}
+
+query ListExtensions($hash: String!, $nextToken: String) {
+  getExtensionsByHash(
+    hash: $hash
+    limit: 1000
+    nextToken: $nextToken
+    filter: { isDeleted: { eq: false } }
+  ) {
+    nextToken
+    items {
+      ...Extension
     }
   }
 }

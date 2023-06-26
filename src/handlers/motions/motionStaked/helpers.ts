@@ -52,7 +52,7 @@ export const getRemainingStakes = (
   return [remainingNayStake, remainingYayStake];
 };
 
-export const getStakePercentage = (
+const getStakePercentage = (
   stake: BigNumber,
   requiredStake: BigNumber,
 ): BigNumber => {

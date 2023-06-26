@@ -31,7 +31,7 @@ export type Scalars = {
 export type ChainMetadata = {
   __typename?: 'ChainMetadata';
   blockNumber?: Maybe<Scalars['Int']>;
-  chainId?: Maybe<Scalars['Int']>;
+  chainId: Scalars['Int'];
   logIndex?: Maybe<Scalars['Int']>;
   network?: Maybe<Network>;
   transactionHash?: Maybe<Scalars['String']>;
@@ -39,7 +39,7 @@ export type ChainMetadata = {
 
 export type ChainMetadataInput = {
   blockNumber?: InputMaybe<Scalars['Int']>;
-  chainId?: InputMaybe<Scalars['Int']>;
+  chainId: Scalars['Int'];
   logIndex?: InputMaybe<Scalars['Int']>;
   network?: InputMaybe<Network>;
   transactionHash?: InputMaybe<Scalars['String']>;
@@ -50,7 +50,7 @@ export type Colony = {
   actions?: Maybe<ModelColonyActionConnection>;
   balances?: Maybe<ColonyBalances>;
   chainFundsClaim?: Maybe<ColonyChainFundsClaim>;
-  chainMetadata?: Maybe<ChainMetadata>;
+  chainMetadata: ChainMetadata;
   createdAt: Scalars['AWSDateTime'];
   domains?: Maybe<ModelDomainConnection>;
   extensions?: Maybe<ModelColonyExtensionConnection>;
@@ -458,6 +458,7 @@ export type ContractEvent = {
 
 export type Contributor = {
   __typename?: 'Contributor';
+  address: Scalars['String'];
   reputationAmount?: Maybe<Scalars['String']>;
   reputationPercentage?: Maybe<Scalars['String']>;
   user?: Maybe<User>;
@@ -529,7 +530,7 @@ export type CreateColonyHistoricRoleInput = {
 export type CreateColonyInput = {
   balances?: InputMaybe<ColonyBalancesInput>;
   chainFundsClaim?: InputMaybe<ColonyChainFundsClaimInput>;
-  chainMetadata?: InputMaybe<ChainMetadataInput>;
+  chainMetadata: ChainMetadataInput;
   id?: InputMaybe<Scalars['ID']>;
   motionsWithUnclaimedStakes?: InputMaybe<Array<ColonyUnclaimedStakeInput>>;
   name: Scalars['String'];
@@ -663,7 +664,7 @@ export type CreateProfileInput = {
 
 export type CreateTokenInput = {
   avatar?: InputMaybe<Scalars['String']>;
-  chainMetadata?: InputMaybe<ChainMetadataInput>;
+  chainMetadata: ChainMetadataInput;
   createdAt?: InputMaybe<Scalars['AWSDateTime']>;
   decimals: Scalars['Int'];
   id?: InputMaybe<Scalars['ID']>;
@@ -674,7 +675,7 @@ export type CreateTokenInput = {
 };
 
 export type CreateUniqueColonyInput = {
-  chainMetadata?: InputMaybe<ChainMetadataInput>;
+  chainMetadata: ChainMetadataInput;
   colonyNativeTokenId: Scalars['ID'];
   id: Scalars['ID'];
   name: Scalars['String'];
@@ -3405,7 +3406,7 @@ export type SubscriptionOnUpdateWatchedColoniesArgs = {
 export type Token = {
   __typename?: 'Token';
   avatar?: Maybe<Scalars['String']>;
-  chainMetadata?: Maybe<ChainMetadata>;
+  chainMetadata: ChainMetadata;
   colonies?: Maybe<ModelColonyTokensConnection>;
   createdAt: Scalars['AWSDateTime'];
   decimals: Scalars['Int'];
@@ -3800,6 +3801,7 @@ export type WatchedColonies = {
 
 export type Watcher = {
   __typename?: 'Watcher';
+  address: Scalars['String'];
   user?: Maybe<User>;
 };
 
@@ -3824,6 +3826,13 @@ export type ColonyFragment = {
       rewards: { __typename?: 'MotionStakeValues'; yay: string; nay: string };
     }>;
   }> | null;
+};
+
+export type ExtensionFragment = {
+  __typename?: 'ColonyExtension';
+  id: string;
+  colonyId: string;
+  isInitialized: boolean;
 };
 
 export type ColonyMotionFragment = {
@@ -4296,6 +4305,19 @@ export type GetColonyByNativeTokenIdQuery = {
   } | null;
 };
 
+export type ListColoniesQueryVariables = Exact<{
+  nextToken?: InputMaybe<Scalars['String']>;
+}>;
+
+export type ListColoniesQuery = {
+  __typename?: 'Query';
+  listColonies?: {
+    __typename?: 'ModelColonyConnection';
+    nextToken?: string | null;
+    items: Array<{ __typename?: 'Colony'; id: string } | null>;
+  } | null;
+};
+
 export type GetDomainMetadataQueryVariables = Exact<{
   id: Scalars['ID'];
 }>;
@@ -4364,6 +4386,25 @@ export type GetColonyExtensionsByColonyAddressQuery = {
   getExtensionByColonyAndHash?: {
     __typename?: 'ModelColonyExtensionConnection';
     items: Array<{ __typename?: 'ColonyExtension'; id: string } | null>;
+  } | null;
+};
+
+export type ListExtensionsQueryVariables = Exact<{
+  hash: Scalars['String'];
+  nextToken?: InputMaybe<Scalars['String']>;
+}>;
+
+export type ListExtensionsQuery = {
+  __typename?: 'Query';
+  getExtensionsByHash?: {
+    __typename?: 'ModelColonyExtensionConnection';
+    nextToken?: string | null;
+    items: Array<{
+      __typename?: 'ColonyExtension';
+      id: string;
+      colonyId: string;
+      isInitialized: boolean;
+    } | null>;
   } | null;
 };
 
@@ -4613,6 +4654,13 @@ export const Colony = gql`
         isClaimed
       }
     }
+  }
+`;
+export const Extension = gql`
+  fragment Extension on ColonyExtension {
+    id
+    colonyId
+    isInitialized
   }
 `;
 export const MotionStakes = gql`
@@ -4995,6 +5043,16 @@ export const GetColonyByNativeTokenIdDocument = gql`
     }
   }
 `;
+export const ListColoniesDocument = gql`
+  query ListColonies($nextToken: String) {
+    listColonies(limit: 1000, nextToken: $nextToken) {
+      nextToken
+      items {
+        id
+      }
+    }
+  }
+`;
 export const GetDomainMetadataDocument = gql`
   query GetDomainMetadata($id: ID!) {
     getDomainMetadata(id: $id) {
@@ -5051,6 +5109,22 @@ export const GetColonyExtensionsByColonyAddressDocument = gql`
       }
     }
   }
+`;
+export const ListExtensionsDocument = gql`
+  query ListExtensions($hash: String!, $nextToken: String) {
+    getExtensionsByHash(
+      hash: $hash
+      limit: 1000
+      nextToken: $nextToken
+      filter: { isDeleted: { eq: false } }
+    ) {
+      nextToken
+      items {
+        ...Extension
+      }
+    }
+  }
+  ${Extension}
 `;
 export const GetColonyUnclaimedFundsDocument = gql`
   query GetColonyUnclaimedFunds(

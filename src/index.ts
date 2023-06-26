@@ -1,45 +1,49 @@
 import dotenv from 'dotenv';
 import { utils } from 'ethers';
 
-import blockListener from '~blockListener';
-import trackColonies from '~trackColonies';
-import eventListener from '~eventListener';
+import { startBlockListener } from '~blockListener';
 import amplifyClientSetup from '~amplifyClient';
 import { initialiseProvider } from '~provider';
-import trackExtensions from '~trackExtensions';
-import trackNetworkInverseFee from '~trackNetworkInverseFee';
 import { startStatsServer } from '~stats';
+import {
+  setupListenersForColonies,
+  setupListenersForExtensions,
+} from '~eventListeners';
+import { seedDB } from '~utils';
 
 dotenv.config();
 utils.Logger.setLogLevel(utils.Logger.levels.ERROR);
 
-const startIngestor = async (): Promise<void> => {
-  /*
-   * Get all colonies currently deployed
-   */
-  await trackColonies();
-  /*
-   * Get all supported extensions currently installed in colonies
-   */
-  await trackExtensions();
-
-  /*
-   * Get initial network inverse fee and setup listener for future ones
-   */
-  await trackNetworkInverseFee();
-
-  /*
-   * Setup all listeners we care about
-   */
-  blockListener();
-  await eventListener();
-};
-
 const start = async (): Promise<void> => {
   amplifyClientSetup();
-  await initialiseProvider();
+
+  /**
+   * Start express server providing stats and fetch existing stats from the DB
+   */
   await startStatsServer();
-  startIngestor();
+
+  /**
+   * Setup the listeners we care about for existing colonies, extensions
+   * This has to be done before the block listener is started to ensure the events are not missed
+   */
+  await setupListenersForColonies();
+  await setupListenersForExtensions();
+
+  /**
+   * Start the main block listener
+   */
+  startBlockListener();
+
+  await initialiseProvider();
+
+  /**
+   * In development, where both the chain and the DB gets reset everytime,
+   * we need to "seed" some initial data, such as versions or the current network fee
+   * In live environments, these values will already have been saved in the DB
+   */
+  if (process.env.NODE_ENV === 'development') {
+    await seedDB();
+  }
 };
 
 start();

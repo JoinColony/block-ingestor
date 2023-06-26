@@ -8,9 +8,13 @@ export const handleMintTokensMotion = async (
   parsedAction: TransactionDescription,
 ): Promise<void> => {
   const {
-    contractAddress: colonyAddress,
+    colonyAddress,
     args: { domainId },
   } = event;
+  if (!colonyAddress) {
+    return;
+  }
+
   const { name, args: actionArgs } = parsedAction;
   const amount = actionArgs[0].toString();
   const tokenAddress = await getColonyTokenAddress(colonyAddress);

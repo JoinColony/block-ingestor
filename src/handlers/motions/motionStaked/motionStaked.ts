@@ -15,11 +15,15 @@ import {
 
 export default async (event: ContractEvent): Promise<void> => {
   const {
-    contractAddress: colonyAddress,
+    colonyAddress,
     logIndex,
     transactionHash,
     args: { vote, amount, staker, motionId },
   } = event;
+
+  if (!colonyAddress) {
+    return;
+  }
 
   const votingClient = await getVotingClient(colonyAddress);
 

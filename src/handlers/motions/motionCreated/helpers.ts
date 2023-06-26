@@ -200,7 +200,7 @@ export const createMotionInDB = async (
     transactionHash,
     blockNumber,
     logIndex,
-    contractAddress: colonyAddress,
+    colonyAddress,
     args: { motionId, creator: creatorAddress, domainId },
   }: ContractEvent,
   input: Omit<
@@ -214,6 +214,10 @@ export const createMotionInDB = async (
     | 'blockNumber'
   >,
 ): Promise<void> => {
+  if (!colonyAddress) {
+    return;
+  }
+
   const votingClient = await getVotingClient(colonyAddress);
 
   if (!votingClient) {

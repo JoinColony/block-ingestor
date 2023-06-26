@@ -1,6 +1,6 @@
 import { BigNumber } from 'ethers';
 import { mutate, query } from '~amplifyClient';
-import { ContractEvent, ColonyActionType } from '~types';
+import { ContractEvent } from '~types';
 import {
   getColonyRolesDatabaseId,
   getDomainDatabaseId,
@@ -18,6 +18,7 @@ import {
   UpdateColonyRoleMutation,
   UpdateColonyRoleMutationVariables,
   UpdateColonyRoleDocument,
+  ColonyActionType,
 } from '~graphql';
 
 export default async (event: ContractEvent): Promise<void> => {
