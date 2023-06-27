@@ -57,7 +57,7 @@ export const getRemainingStakes = (
 export const getStakePercentage = (
   stake: BigNumber,
   requiredStake: BigNumber,
-  roundToOne: boolean,
+  roundToOne: boolean = true,
 ): BigNumber => {
   const stakePercentage = stake.mul(100).div(requiredStake);
   // May be zero due to rounding. Since a user cannot stake 0%, we round up to 1.
@@ -78,7 +78,7 @@ const getNewUserStakes = (
   const invertedVote = BigNumber.from(1).sub(vote);
   const stakedSide = getMotionSide(vote);
   const unstakedSide = getMotionSide(invertedVote);
-  const stakePercentage = getStakePercentage(amount, requiredStake, true);
+  const stakePercentage = getStakePercentage(amount, requiredStake);
 
   return {
     address: staker,
@@ -108,11 +108,7 @@ const getUpdatedUserStakes = (
   const stakedSide = getMotionSide(vote);
   const existingRawStake = existingUserStakes.stakes.raw[stakedSide];
   const updatedRawStake = amount.add(existingRawStake);
-  const updatedPercentage = getStakePercentage(
-    updatedRawStake,
-    requiredStake,
-    true,
-  );
+  const updatedPercentage = getStakePercentage(updatedRawStake, requiredStake);
   const updatedUserStakes: UserStakes = {
     ...existingUserStakes,
     stakes: {
