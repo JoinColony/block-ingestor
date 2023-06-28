@@ -1,0 +1,5 @@
+query GetColonyStake($colonyStakeId: ID!) {
+  getColonyStake(id: $colonyStakeId) {
+    totalAmount
+  }
+}
