@@ -6,7 +6,12 @@ import {
   updateMotionInDB,
   getMessageKey,
 } from '../helpers';
-import { updateColonyUnclaimedStakes } from './helpers';
+import {
+  updateColonyUnclaimedStakes,
+  reclaimUserStake,
+  getUpdatedStakerRewards,
+  getUserStake,
+} from './helpers';
 import { ColonyMotion } from '~graphql';
 
 export default async (event: ContractEvent): Promise<void> => {
@@ -36,26 +41,10 @@ export default async (event: ContractEvent): Promise<void> => {
   const claimedMotion = await getMotionFromDB(motionDatabaseId);
 
   if (claimedMotion) {
-    const { stakerRewards } = claimedMotion;
+    const { stakerRewards, usersStakes } = claimedMotion;
 
-    const updatedStakerRewards = stakerRewards.map((stakerReward) => {
-      const { address } = stakerReward;
-
-      if (address !== staker) {
-        return stakerReward;
-      }
-
-      return {
-        ...stakerReward,
-        /*
-         * This is safe because, from the front end,
-         * we claim both sides (if there were rewards on both sides)
-         * at the same time. Simply adding a flag lets us preserve the original values,
-         * which is useful for displaying winnings in the Claim Widget.
-         */
-        isClaimed: true,
-      };
-    });
+    const userStake = getUserStake(usersStakes, staker);
+    const updatedStakerRewards = getUpdatedStakerRewards(stakerRewards, staker);
 
     const newMotionMessages = [
       {
@@ -77,5 +66,6 @@ export default async (event: ContractEvent): Promise<void> => {
       motionDatabaseId,
       updatedStakerRewards,
     );
+    await reclaimUserStake(staker, colonyAddress, userStake);
   }
 };
