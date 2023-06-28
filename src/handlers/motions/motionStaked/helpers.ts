@@ -282,6 +282,10 @@ export const getUpdatedMessages = ({
   return updatedMessages;
 };
 
+/**
+ * If it's the first time a user has staked in a colony, we create a Colony Stake record for the user,
+ * else we update the amount they've currently got staked in the colony.
+ */
 export const updateUserStake = async (
   userAddress: string,
   colonyAddress: string,
