@@ -11,6 +11,7 @@ import {
   getUpdatedMessages,
   updateMotionInDB,
   getMessageKey,
+  updateUserStake,
 } from '../helpers';
 
 export default async (event: ContractEvent): Promise<void> => {
@@ -24,6 +25,8 @@ export default async (event: ContractEvent): Promise<void> => {
   if (!colonyAddress) {
     return;
   }
+
+  await updateUserStake(staker, colonyAddress, amount);
 
   const votingClient = await getVotingClient(colonyAddress);
 
