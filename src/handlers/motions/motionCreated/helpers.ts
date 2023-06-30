@@ -7,7 +7,7 @@ import {
 } from '@colony/colony-js';
 
 import { ContractEvent, MotionEvents } from '~types';
-import { getVotingClient, verbose } from '~utils';
+import { getDomainDatabaseId, getVotingClient, verbose } from '~utils';
 import { mutate } from '~amplifyClient';
 import {
   ColonyMotion,
@@ -64,12 +64,14 @@ interface Props {
   motionId: BigNumber;
   domainId: BigNumber;
   votingClient: AnyVotingReputationClient;
+  colonyAddress: string;
 }
 
 const getMotionData = async ({
   motionId,
   domainId,
   votingClient,
+  colonyAddress,
 }: Props): Promise<ColonyMotion> => {
   const { skillRep, rootHash, repSubmitted } = await votingClient.getMotion(
     motionId,
@@ -113,6 +115,7 @@ const getMotionData = async ({
     usersStakes: [],
     userMinStake,
     rootHash,
+    motionDomainId: getDomainDatabaseId(colonyAddress, domainId.toNumber()),
     nativeMotionDomainId: domainId.toString(),
     stakerRewards: [],
     voterRecord: [],
@@ -228,6 +231,7 @@ export const createMotionInDB = async (
     votingClient,
     motionId,
     domainId,
+    colonyAddress,
   });
 
   const initialMotionMessage = await getInitialMotionMessage(

@@ -350,6 +350,8 @@ export type ColonyMotion = {
   id: Scalars['ID'];
   isFinalized: Scalars['Boolean'];
   messages?: Maybe<ModelMotionMessageConnection>;
+  motionDomain: Domain;
+  motionDomainId: Scalars['ID'];
   motionStakes: MotionStakes;
   motionStateHistory: MotionStateHistory;
   nativeMotionDomainId: Scalars['String'];
@@ -556,6 +558,7 @@ export type CreateColonyMotionInput = {
   hasObjection: Scalars['Boolean'];
   id?: InputMaybe<Scalars['ID']>;
   isFinalized: Scalars['Boolean'];
+  motionDomainId: Scalars['ID'];
   motionStakes: MotionStakesInput;
   motionStateHistory: MotionStateHistoryInput;
   nativeMotionDomainId: Scalars['String'];
@@ -1224,6 +1227,7 @@ export type ModelColonyMotionConditionInput = {
   createdBy?: InputMaybe<ModelStringInput>;
   hasObjection?: InputMaybe<ModelBooleanInput>;
   isFinalized?: InputMaybe<ModelBooleanInput>;
+  motionDomainId?: InputMaybe<ModelIdInput>;
   nativeMotionDomainId?: InputMaybe<ModelStringInput>;
   nativeMotionId?: InputMaybe<ModelStringInput>;
   not?: InputMaybe<ModelColonyMotionConditionInput>;
@@ -1248,6 +1252,7 @@ export type ModelColonyMotionFilterInput = {
   hasObjection?: InputMaybe<ModelBooleanInput>;
   id?: InputMaybe<ModelIdInput>;
   isFinalized?: InputMaybe<ModelBooleanInput>;
+  motionDomainId?: InputMaybe<ModelIdInput>;
   nativeMotionDomainId?: InputMaybe<ModelStringInput>;
   nativeMotionId?: InputMaybe<ModelStringInput>;
   not?: InputMaybe<ModelColonyMotionFilterInput>;
@@ -1752,6 +1757,7 @@ export type ModelSubscriptionColonyMotionFilterInput = {
   hasObjection?: InputMaybe<ModelSubscriptionBooleanInput>;
   id?: InputMaybe<ModelSubscriptionIdInput>;
   isFinalized?: InputMaybe<ModelSubscriptionBooleanInput>;
+  motionDomainId?: InputMaybe<ModelSubscriptionIdInput>;
   nativeMotionDomainId?: InputMaybe<ModelSubscriptionStringInput>;
   nativeMotionId?: InputMaybe<ModelSubscriptionStringInput>;
   or?: InputMaybe<Array<InputMaybe<ModelSubscriptionColonyMotionFilterInput>>>;
@@ -3544,6 +3550,7 @@ export type UpdateColonyMotionInput = {
   hasObjection?: InputMaybe<Scalars['Boolean']>;
   id: Scalars['ID'];
   isFinalized?: InputMaybe<Scalars['Boolean']>;
+  motionDomainId?: InputMaybe<Scalars['ID']>;
   motionStakes?: InputMaybe<MotionStakesInput>;
   motionStateHistory?: InputMaybe<MotionStateHistoryInput>;
   nativeMotionDomainId?: InputMaybe<Scalars['String']>;
@@ -3849,6 +3856,7 @@ export type ColonyMotionFragment = {
   repSubmitted: string;
   skillRep: string;
   hasObjection: boolean;
+  motionDomainId: string;
   motionStakes: {
     __typename?: 'MotionStakes';
     raw: { __typename?: 'MotionStakeValues'; nay: string; yay: string };
@@ -4521,6 +4529,7 @@ export type GetColonyMotionQuery = {
     repSubmitted: string;
     skillRep: string;
     hasObjection: boolean;
+    motionDomainId: string;
     motionStakes: {
       __typename?: 'MotionStakes';
       raw: { __typename?: 'MotionStakeValues'; nay: string; yay: string };
@@ -4743,6 +4752,7 @@ export const ColonyMotion = gql`
     repSubmitted
     skillRep
     hasObjection
+    motionDomainId
     nativeMotionDomainId
     motionStateHistory {
       hasVoted
