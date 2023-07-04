@@ -33,6 +33,7 @@ fragment ColonyMotion on ColonyMotion {
   repSubmitted
   skillRep
   hasObjection
+  motionDomainId
   nativeMotionDomainId
   motionStateHistory {
     hasVoted
