@@ -1,12 +1,22 @@
 import { BigNumber, constants } from 'ethers';
 import { MotionVote, MotionEvents } from '~types';
-import { getMotionSide } from '../helpers';
 import {
   ColonyMotion,
+  CreateColonyStakeDocument,
+  CreateColonyStakeMutation,
+  CreateColonyStakeMutationVariables,
   CreateMotionMessageInput,
+  GetColonyStakeDocument,
+  GetColonyStakeQuery,
+  GetColonyStakeQueryVariables,
   MotionStakes,
+  UpdateColonyStakeDocument,
+  UpdateColonyStakeMutation,
+  UpdateColonyStakeMutationVariables,
   UserStakes,
 } from '~graphql';
+import { mutate, query } from '~amplifyClient';
+import { getMotionSide, getColonyStakeId } from '../helpers';
 
 export const getRequiredStake = (
   skillRep: BigNumber,
@@ -275,4 +285,46 @@ export const getUpdatedMessages = ({
   }
 
   return updatedMessages;
+};
+
+/**
+ * If it's the first time a user has staked in a colony, we create a Colony Stake record for the user,
+ * else we update the amount they've currently got staked in the colony.
+ */
+export const updateUserStake = async (
+  userAddress: string,
+  colonyAddress: string,
+  stakeAmount: BigNumber,
+): Promise<void> => {
+  const colonyStakeId = getColonyStakeId(userAddress, colonyAddress);
+  const { data } =
+    (await query<GetColonyStakeQuery, GetColonyStakeQueryVariables>(
+      GetColonyStakeDocument,
+      {
+        colonyStakeId,
+      },
+    )) ?? {};
+
+  if (data?.getColonyStake) {
+    const { totalAmount } = data?.getColonyStake;
+    const updatedTotal = BigNumber.from(totalAmount).add(stakeAmount);
+
+    await mutate<UpdateColonyStakeMutation, UpdateColonyStakeMutationVariables>(
+      UpdateColonyStakeDocument,
+      {
+        totalAmount: updatedTotal.toString(),
+        colonyStakeId,
+      },
+    );
+  } else {
+    await mutate<CreateColonyStakeMutation, CreateColonyStakeMutationVariables>(
+      CreateColonyStakeDocument,
+      {
+        totalAmount: stakeAmount.toString(),
+        colonyStakeId,
+        colonyAddress,
+        userAddress,
+      },
+    );
+  }
 };

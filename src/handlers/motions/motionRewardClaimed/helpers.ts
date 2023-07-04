@@ -1,11 +1,44 @@
-import { mutate } from '~amplifyClient';
+import { BigNumber } from 'ethers';
+import { mutate, query } from '~amplifyClient';
 import {
+  GetColonyStakeDocument,
+  GetColonyStakeQuery,
+  GetColonyStakeQueryVariables,
   StakerReward,
   UpdateColonyDocument,
   UpdateColonyMutation,
   UpdateColonyMutationVariables,
+  UpdateColonyStakeDocument,
+  UpdateColonyStakeMutation,
+  UpdateColonyStakeMutationVariables,
+  UserStakes,
 } from '~graphql';
-import { getColonyFromDB } from '~utils';
+import { getColonyFromDB, verbose } from '~utils';
+
+import { getColonyStakeId } from '../helpers';
+
+export const getUpdatedStakerRewards = (
+  stakerRewards: StakerReward[],
+  stakerAddress: string,
+): StakerReward[] =>
+  stakerRewards.map((stakerReward) => {
+    const { address } = stakerReward;
+
+    if (address !== stakerAddress) {
+      return stakerReward;
+    }
+
+    return {
+      ...stakerReward,
+      /*
+       * This is safe because, from the front end,
+       * we claim both sides (if there were rewards on both sides)
+       * at the same time. Simply adding a flag lets us preserve the original values,
+       * which is useful for displaying winnings in the Claim Widget.
+       */
+      isClaimed: true,
+    };
+  });
 
 export const updateColonyUnclaimedStakes = async (
   colonyAddress: string,
@@ -59,4 +92,66 @@ export const updateColonyUnclaimedStakes = async (
       );
     }
   }
+};
+
+/**
+ *
+ * When a user claims their staker rewards, we need to subtract these rewards from
+ * the record of the amount they've staked in the colony (their UserStake).
+ *
+ */
+export const reclaimUserStake = async (
+  userAddress: string,
+  colonyAddress: string,
+  reclaimAmount: BigNumber,
+): Promise<void> => {
+  const colonyStakeId = getColonyStakeId(userAddress, colonyAddress);
+  const { data } =
+    (await query<GetColonyStakeQuery, GetColonyStakeQueryVariables>(
+      GetColonyStakeDocument,
+      {
+        colonyStakeId,
+      },
+    )) ?? {};
+
+  if (!data?.getColonyStake) {
+    verbose(
+      `Could not find user stake for user ${userAddress} in colony ${colonyAddress}. This is a bug and should be investigated.`,
+    );
+    return;
+  }
+
+  const totalAmount = data.getColonyStake.totalAmount;
+  let updatedAmount = BigNumber.from(totalAmount).sub(reclaimAmount);
+
+  // Should never be negative, but just in case.
+  if (updatedAmount.isNegative()) {
+    updatedAmount = BigNumber.from(0);
+  }
+
+  await mutate<UpdateColonyStakeMutation, UpdateColonyStakeMutationVariables>(
+    UpdateColonyStakeDocument,
+    {
+      colonyStakeId,
+      totalAmount: updatedAmount.toString(),
+    },
+  );
+};
+
+export const getUserStake = (
+  usersStakes: UserStakes[],
+  userAddress: string,
+): BigNumber => {
+  const userStakes = usersStakes.find(({ address }) => address === userAddress);
+
+  if (!userStakes) {
+    verbose(
+      `Could not find the stakes for user ${userAddress}. This is a bug and should be investigated.`,
+    );
+    return BigNumber.from(0);
+  }
+
+  return BigNumber.from(userStakes.stakes.raw.yay).add(
+    userStakes.stakes.raw.nay,
+  );
 };

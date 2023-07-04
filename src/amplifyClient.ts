@@ -58,8 +58,7 @@ export const mutate = async <
       : 'Unknown';
 
     const errMsg = 'errors' in error ? error.errors : error;
-
-    verbose(`Could not execute mutation ${mutationName}. Error: ${errMsg}`);
+    verbose(`Could not execute mutation ${mutationName}. Error: `, errMsg);
     return undefined;
   }
 };
