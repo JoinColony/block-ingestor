@@ -29,6 +29,7 @@ import {
   handleMotionRewardClaimed,
   handleMotionVoteSubmitted,
   handleMotionVoteRevealed,
+  handleExpenditureAdded,
 } from './handlers';
 
 dotenv.config();
@@ -208,6 +209,11 @@ export default async (event: ContractEvent): Promise<void> => {
 
     case ContractEventsSignatures.RecoveryRoleSet: {
       await handleManagePermissionsAction(event);
+      return;
+    }
+
+    case ContractEventsSignatures.ExpenditureAdded: {
+      await handleExpenditureAdded(event);
       return;
     }
 
