@@ -4345,6 +4345,15 @@ export type CreateExpenditureMutation = {
   createExpenditure?: { __typename?: 'Expenditure'; id: string } | null;
 };
 
+export type UpdateExpenditureMutationVariables = Exact<{
+  input: UpdateExpenditureInput;
+}>;
+
+export type UpdateExpenditureMutation = {
+  __typename?: 'Mutation';
+  updateExpenditure?: { __typename?: 'Expenditure'; id: string } | null;
+};
+
 export type CreateColonyExtensionMutationVariables = Exact<{
   input: CreateColonyExtensionInput;
 }>;
@@ -4670,6 +4679,23 @@ export type GetContractEventQueryVariables = Exact<{
 export type GetContractEventQuery = {
   __typename?: 'Query';
   getContractEvent?: { __typename?: 'ContractEvent'; id: string } | null;
+};
+
+export type GetExpenditureQueryVariables = Exact<{
+  id: Scalars['ID'];
+}>;
+
+export type GetExpenditureQuery = {
+  __typename?: 'Query';
+  getExpenditure?: {
+    __typename?: 'Expenditure';
+    id: string;
+    recipients: Array<{
+      __typename?: 'ExpenditureRecipient';
+      slot: number;
+      address: string;
+    }>;
+  } | null;
 };
 
 export type GetColonyExtensionQueryVariables = Exact<{
@@ -5197,6 +5223,13 @@ export const CreateExpenditureDocument = gql`
     }
   }
 `;
+export const UpdateExpenditureDocument = gql`
+  mutation UpdateExpenditure($input: UpdateExpenditureInput!) {
+    updateExpenditure(input: $input) {
+      id
+    }
+  }
+`;
 export const CreateColonyExtensionDocument = gql`
   mutation CreateColonyExtension($input: CreateColonyExtensionInput!) {
     createColonyExtension(input: $input) {
@@ -5442,6 +5475,17 @@ export const GetContractEventDocument = gql`
   query GetContractEvent($id: ID!) {
     getContractEvent(id: $id) {
       id
+    }
+  }
+`;
+export const GetExpenditureDocument = gql`
+  query GetExpenditure($id: ID!) {
+    getExpenditure(id: $id) {
+      id
+      recipients {
+        slot
+        address
+      }
     }
   }
 `;
