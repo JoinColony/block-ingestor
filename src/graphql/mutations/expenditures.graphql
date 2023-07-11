@@ -3,3 +3,9 @@ mutation CreateExpenditure($input: CreateExpenditureInput!) {
     id
   }
 }
+
+mutation UpdateExpenditure($input: UpdateExpenditureInput!) {
+  updateExpenditure(input: $input) {
+    id
+  }
+}

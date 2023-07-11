@@ -5252,6 +5252,15 @@ export type CreateExpenditureMutationVariables = Exact<{
 
 export type CreateExpenditureMutation = { __typename?: 'Mutation', createExpenditure?: { __typename?: 'Expenditure', id: string } | null };
 
+export type UpdateExpenditureMutationVariables = Exact<{
+  input: UpdateExpenditureInput;
+}>;
+
+export type UpdateExpenditureMutation = {
+  __typename?: 'Mutation';
+  updateExpenditure?: { __typename?: 'Expenditure'; id: string } | null;
+};
+
 export type CreateColonyExtensionMutationVariables = Exact<{
   input: CreateColonyExtensionInput;
 }>;
@@ -5427,6 +5436,23 @@ export type GetContractEventQueryVariables = Exact<{
 
 
 export type GetContractEventQuery = { __typename?: 'Query', getContractEvent?: { __typename?: 'ContractEvent', id: string } | null };
+
+export type GetExpenditureQueryVariables = Exact<{
+  id: Scalars['ID'];
+}>;
+
+export type GetExpenditureQuery = {
+  __typename?: 'Query';
+  getExpenditure?: {
+    __typename?: 'Expenditure';
+    id: string;
+    recipients: Array<{
+      __typename?: 'ExpenditureRecipient';
+      slot: number;
+      address: string;
+    }>;
+  } | null;
+};
 
 export type GetColonyExtensionQueryVariables = Exact<{
   id: Scalars['ID'];
@@ -5914,8 +5940,268 @@ export const GetColonyMetadataDocument = gql`
       removed
     }
   }
+<<<<<<< HEAD
 }
     `;
+=======
+`;
+export const CreateColonyActionDocument = gql`
+  mutation CreateColonyAction($input: CreateColonyActionInput!) {
+    createColonyAction(input: $input) {
+      id
+    }
+  }
+`;
+export const UpdateColonyActionDocument = gql`
+  mutation UpdateColonyAction($input: UpdateColonyActionInput!) {
+    updateColonyAction(input: $input) {
+      id
+    }
+  }
+`;
+export const UpdateColonyDocument = gql`
+  mutation UpdateColony($input: UpdateColonyInput!) {
+    updateColony(input: $input) {
+      id
+    }
+  }
+`;
+export const UpdateColonyMetadataDocument = gql`
+  mutation UpdateColonyMetadata($input: UpdateColonyMetadataInput!) {
+    updateColonyMetadata(input: $input) {
+      id
+    }
+  }
+`;
+export const SetCurrentVersionDocument = gql`
+  mutation SetCurrentVersion($input: SetCurrentVersionInput!) {
+    setCurrentVersion(input: $input)
+  }
+`;
+export const CreateDomainDocument = gql`
+  mutation CreateDomain($input: CreateDomainInput!) {
+    createDomain(input: $input) {
+      id
+    }
+  }
+`;
+export const CreateDomainMetadataDocument = gql`
+  mutation CreateDomainMetadata($input: CreateDomainMetadataInput!) {
+    createDomainMetadata(input: $input) {
+      id
+    }
+  }
+`;
+export const UpdateDomainMetadataDocument = gql`
+  mutation UpdateDomainMetadata($input: UpdateDomainMetadataInput!) {
+    updateDomainMetadata(input: $input) {
+      id
+    }
+  }
+`;
+export const CreateContractEventDocument = gql`
+  mutation CreateContractEvent(
+    $input: CreateContractEventInput!
+    $condition: ModelContractEventConditionInput
+  ) {
+    createContractEvent(input: $input, condition: $condition) {
+      id
+    }
+  }
+`;
+export const CreateExpenditureDocument = gql`
+  mutation CreateExpenditure($input: CreateExpenditureInput!) {
+    createExpenditure(input: $input) {
+      id
+    }
+  }
+`;
+export const UpdateExpenditureDocument = gql`
+  mutation UpdateExpenditure($input: UpdateExpenditureInput!) {
+    updateExpenditure(input: $input) {
+      id
+    }
+  }
+`;
+export const CreateColonyExtensionDocument = gql`
+  mutation CreateColonyExtension($input: CreateColonyExtensionInput!) {
+    createColonyExtension(input: $input) {
+      id
+    }
+  }
+`;
+export const UpdateColonyExtensionByColonyAndHashDocument = gql`
+  mutation UpdateColonyExtensionByColonyAndHash(
+    $input: UpdateExtensionByColonyAndHashInput!
+  ) {
+    updateExtensionByColonyAndHash(input: $input) {
+      id
+    }
+  }
+`;
+export const UpdateColonyExtensionByAddressDocument = gql`
+  mutation UpdateColonyExtensionByAddress($input: UpdateColonyExtensionInput!) {
+    updateColonyExtension(input: $input) {
+      id
+      extensionHash: hash
+      colonyAddress: colonyId
+    }
+  }
+`;
+export const CreateColonyFundsClaimDocument = gql`
+  mutation CreateColonyFundsClaim(
+    $input: CreateColonyFundsClaimInput!
+    $condition: ModelColonyFundsClaimConditionInput
+  ) {
+    createColonyFundsClaim(input: $input, condition: $condition) {
+      id
+    }
+  }
+`;
+export const DeleteColonyFundsClaimDocument = gql`
+  mutation DeleteColonyFundsClaim(
+    $input: DeleteColonyFundsClaimInput!
+    $condition: ModelColonyFundsClaimConditionInput
+  ) {
+    deleteColonyFundsClaim(input: $input, condition: $condition) {
+      id
+    }
+  }
+`;
+export const CreateCurrentNetworkInverseFeeDocument = gql`
+  mutation CreateCurrentNetworkInverseFee(
+    $input: CreateCurrentNetworkInverseFeeInput!
+  ) {
+    createCurrentNetworkInverseFee(input: $input) {
+      id
+    }
+  }
+`;
+export const UpdateCurrentNetworkInverseFeeDocument = gql`
+  mutation UpdateCurrentNetworkInverseFee(
+    $input: UpdateCurrentNetworkInverseFeeInput!
+  ) {
+    updateCurrentNetworkInverseFee(input: $input) {
+      id
+    }
+  }
+`;
+export const CreateColonyMotionDocument = gql`
+  mutation CreateColonyMotion($input: CreateColonyMotionInput!) {
+    createColonyMotion(input: $input) {
+      id
+    }
+  }
+`;
+export const UpdateColonyMotionDocument = gql`
+  mutation UpdateColonyMotion($input: UpdateColonyMotionInput!) {
+    updateColonyMotion(input: $input) {
+      id
+    }
+  }
+`;
+export const CreateColonyRoleDocument = gql`
+  mutation CreateColonyRole($input: CreateColonyRoleInput!) {
+    createColonyRole(input: $input) {
+      id
+    }
+  }
+`;
+export const UpdateColonyRoleDocument = gql`
+  mutation UpdateColonyRole($input: UpdateColonyRoleInput!) {
+    updateColonyRole(input: $input) {
+      id
+    }
+  }
+`;
+export const CreateColonyHistoricRoleDocument = gql`
+  mutation CreateColonyHistoricRole($input: CreateColonyHistoricRoleInput!) {
+    createColonyHistoricRole(input: $input) {
+      id
+    }
+  }
+`;
+export const CreateStatsDocument = gql`
+  mutation CreateStats($value: String!) {
+    createIngestorStats(input: { id: "STATS", value: $value }) {
+      id
+    }
+  }
+`;
+export const UpdateStatsDocument = gql`
+  mutation UpdateStats($value: String!) {
+    updateIngestorStats(input: { id: "STATS", value: $value }) {
+      id
+    }
+  }
+`;
+export const CreateColonyTokensDocument = gql`
+  mutation CreateColonyTokens($input: CreateColonyTokensInput!) {
+    createColonyTokens(input: $input) {
+      id
+    }
+  }
+`;
+export const DeleteColonyTokensDocument = gql`
+  mutation DeleteColonyTokens($input: DeleteColonyTokensInput!) {
+    deleteColonyTokens(input: $input) {
+      id
+    }
+  }
+`;
+export const CreateColonyStakeDocument = gql`
+  mutation CreateColonyStake(
+    $colonyStakeId: ID!
+    $userAddress: ID!
+    $colonyAddress: ID!
+    $totalAmount: String!
+  ) {
+    createColonyStake(
+      input: {
+        id: $colonyStakeId
+        userId: $userAddress
+        colonyId: $colonyAddress
+        totalAmount: $totalAmount
+      }
+    ) {
+      id
+    }
+  }
+`;
+export const UpdateColonyStakeDocument = gql`
+  mutation UpdateColonyStake($colonyStakeId: ID!, $totalAmount: String!) {
+    updateColonyStake(
+      input: { id: $colonyStakeId, totalAmount: $totalAmount }
+    ) {
+      id
+    }
+  }
+`;
+export const GetColonyMetadataDocument = gql`
+  query GetColonyMetadata($id: ID!) {
+    getColonyMetadata(id: $id) {
+      id
+      displayName
+      avatar
+      thumbnail
+      changelog {
+        transactionHash
+        oldDisplayName
+        newDisplayName
+        hasAvatarChanged
+        hasWhitelistChanged
+        haveTokensChanged
+      }
+      isWhitelistActivated
+      whitelistedAddresses
+      modifiedTokenAddresses {
+        added
+        removed
+      }
+    }
+  }
+`;
+>>>>>>> 2c19904 (Feat: Write recipients to the DB in expenditureRecipientSet handler)
 export const GetColonyDocument = gql`
     query GetColony($id: ID!) {
   getColony(id: $id) {
@@ -5979,8 +6265,23 @@ export const GetContractEventDocument = gql`
   getContractEvent(id: $id) {
     id
   }
+<<<<<<< HEAD
 }
     `;
+=======
+`;
+export const GetExpenditureDocument = gql`
+  query GetExpenditure($id: ID!) {
+    getExpenditure(id: $id) {
+      id
+      recipients {
+        slot
+        address
+      }
+    }
+  }
+`;
+>>>>>>> 2c19904 (Feat: Write recipients to the DB in expenditureRecipientSet handler)
 export const GetColonyExtensionDocument = gql`
     query GetColonyExtension($id: ID!) {
   getColonyExtension(id: $id) {

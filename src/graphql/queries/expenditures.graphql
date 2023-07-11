@@ -1,0 +1,9 @@
+query GetExpenditure($id: ID!) {
+  getExpenditure(id: $id) {
+    id
+    recipients {
+      slot
+      address
+    }
+  }
+}
