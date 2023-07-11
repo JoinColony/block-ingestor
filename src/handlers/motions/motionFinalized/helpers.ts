@@ -8,6 +8,7 @@ import {
   getColonyFromDB,
   getDomainDatabaseId,
   getExistingTokenAddresses,
+  output,
   updateColonyTokens,
   verbose,
 } from '~utils';
@@ -137,7 +138,7 @@ const linkPendingDomainMetadataWithDomain = async (
     const currentDomainMetadata = data?.getDomainMetadata;
 
     if (!currentDomainMetadata) {
-      console.error(
+      output(
         `Unable to find current domain metadata for colony: ${colonyAddress} with nativeDomainId ${nativeDomainId}`,
       );
       return;
@@ -150,7 +151,7 @@ const linkPendingDomainMetadataWithDomain = async (
     const pendingChangelog = pendingDomainMetadata?.changelog ?? [];
 
     if (!pendingChangelog.length) {
-      console.error(
+      output(
         `Pending changelog for domain with database id: ${databaseDomainId} could not be found.
         This is a bug and should be investigated.`,
       );
@@ -205,7 +206,7 @@ const linkPendingColonyMetadataWithColony = async (
   const currentColonyMetadata = data?.getColonyMetadata;
 
   if (!currentColonyMetadata) {
-    console.error(
+    output(
       `Could not find the current metadata for the colony: ${colonyAddress}. This is a bug and should be investigated.`,
     );
     return;
