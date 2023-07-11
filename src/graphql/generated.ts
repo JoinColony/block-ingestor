@@ -119,6 +119,7 @@ export type ColonyDomainsArgs = {
 
 /** Represents a Colony within the Colony Network */
 export type ColonyExpendituresArgs = {
+  createdAt?: InputMaybe<ModelStringKeyConditionInput>;
   filter?: InputMaybe<ModelExpenditureFilterInput>;
   limit?: InputMaybe<Scalars['Int']>;
   nextToken?: InputMaybe<Scalars['String']>;
@@ -967,10 +968,11 @@ export type CreateDomainMetadataInput = {
 };
 
 export type CreateExpenditureInput = {
-  colonyExpendituresId?: InputMaybe<Scalars['ID']>;
   colonyId: Scalars['ID'];
   createdAt?: InputMaybe<Scalars['AWSDateTime']>;
   id?: InputMaybe<Scalars['ID']>;
+  nativeFundingPotId: Scalars['Int'];
+  nativeId: Scalars['Int'];
   ownerAddress: Scalars['ID'];
   slots: Array<ExpenditureSlotInput>;
   status: ExpenditureStatus;
@@ -1319,10 +1321,11 @@ export enum EmailPermissions {
 export type Expenditure = {
   __typename?: 'Expenditure';
   colony: Colony;
-  colonyExpendituresId?: Maybe<Scalars['ID']>;
   colonyId: Scalars['ID'];
   createdAt: Scalars['AWSDateTime'];
   id: Scalars['ID'];
+  nativeFundingPotId: Scalars['Int'];
+  nativeId: Scalars['Int'];
   ownerAddress: Scalars['ID'];
   slots: Array<ExpenditureSlot>;
   status: ExpenditureStatus;
@@ -2061,9 +2064,10 @@ export type ModelDomainMetadataFilterInput = {
 
 export type ModelExpenditureConditionInput = {
   and?: InputMaybe<Array<InputMaybe<ModelExpenditureConditionInput>>>;
-  colonyExpendituresId?: InputMaybe<ModelIdInput>;
   colonyId?: InputMaybe<ModelIdInput>;
   createdAt?: InputMaybe<ModelStringInput>;
+  nativeFundingPotId?: InputMaybe<ModelIntInput>;
+  nativeId?: InputMaybe<ModelIntInput>;
   not?: InputMaybe<ModelExpenditureConditionInput>;
   or?: InputMaybe<Array<InputMaybe<ModelExpenditureConditionInput>>>;
   ownerAddress?: InputMaybe<ModelIdInput>;
@@ -2078,10 +2082,11 @@ export type ModelExpenditureConnection = {
 
 export type ModelExpenditureFilterInput = {
   and?: InputMaybe<Array<InputMaybe<ModelExpenditureFilterInput>>>;
-  colonyExpendituresId?: InputMaybe<ModelIdInput>;
   colonyId?: InputMaybe<ModelIdInput>;
   createdAt?: InputMaybe<ModelStringInput>;
   id?: InputMaybe<ModelIdInput>;
+  nativeFundingPotId?: InputMaybe<ModelIntInput>;
+  nativeId?: InputMaybe<ModelIntInput>;
   not?: InputMaybe<ModelExpenditureFilterInput>;
   or?: InputMaybe<Array<InputMaybe<ModelExpenditureFilterInput>>>;
   ownerAddress?: InputMaybe<ModelIdInput>;
@@ -2494,6 +2499,8 @@ export type ModelSubscriptionExpenditureFilterInput = {
   colonyId?: InputMaybe<ModelSubscriptionIdInput>;
   createdAt?: InputMaybe<ModelSubscriptionStringInput>;
   id?: InputMaybe<ModelSubscriptionIdInput>;
+  nativeFundingPotId?: InputMaybe<ModelSubscriptionIntInput>;
+  nativeId?: InputMaybe<ModelSubscriptionIntInput>;
   or?: InputMaybe<Array<InputMaybe<ModelSubscriptionExpenditureFilterInput>>>;
   ownerAddress?: InputMaybe<ModelSubscriptionIdInput>;
   status?: InputMaybe<ModelSubscriptionStringInput>;
@@ -3468,26 +3475,14 @@ export type ProfileInput = {
 /** Represents metadata for a user's profile. Mostly user specific settings */
 export type ProfileMetadata = {
   __typename?: 'ProfileMetadata';
-  /** The URL of the user's custom RPC node */
-  customRpc?: Maybe<Scalars['String']>;
-  /** A flag to indicate whether the user has enabled the decentralized mode */
-  decentralizedModeEnabled?: Maybe<Scalars['Boolean']>;
   /** List of email permissions for the user */
   emailPermissions: Array<Scalars['String']>;
-  /** A flag to indicate whether the user has enabled metatransactions */
-  metatransactionsEnabled?: Maybe<Scalars['Boolean']>;
 };
 
 /** Input data for a user's profile metadata */
 export type ProfileMetadataInput = {
-  /** The URL of the user's custom RPC node */
-  customRpc?: InputMaybe<Scalars['String']>;
-  /** A flag to indicate whether the user has enabled the decentralized mode */
-  decentralizedModeEnabled?: InputMaybe<Scalars['Boolean']>;
   /** List of email permissions for the user */
   emailPermissions: Array<Scalars['String']>;
-  /** A flag to indicate whether the user has enabled metatransactions */
-  metatransactionsEnabled?: InputMaybe<Scalars['Boolean']>;
 };
 
 /** Root query type */
@@ -4707,10 +4702,11 @@ export type UpdateDomainMetadataInput = {
 };
 
 export type UpdateExpenditureInput = {
-  colonyExpendituresId?: InputMaybe<Scalars['ID']>;
   colonyId?: InputMaybe<Scalars['ID']>;
   createdAt?: InputMaybe<Scalars['AWSDateTime']>;
   id: Scalars['ID'];
+  nativeFundingPotId?: InputMaybe<Scalars['Int']>;
+  nativeId?: InputMaybe<Scalars['Int']>;
   ownerAddress?: InputMaybe<Scalars['ID']>;
   slots?: InputMaybe<Array<ExpenditureSlotInput>>;
   status?: InputMaybe<ExpenditureStatus>;
@@ -5233,6 +5229,15 @@ export type CreateContractEventMutationVariables = Exact<{
 export type CreateContractEventMutation = {
   __typename?: 'Mutation';
   createContractEvent?: { __typename?: 'ContractEvent'; id: string } | null;
+};
+
+export type CreateExpenditureMutationVariables = Exact<{
+  input: CreateExpenditureInput;
+}>;
+
+export type CreateExpenditureMutation = {
+  __typename?: 'Mutation';
+  createExpenditure?: { __typename?: 'Expenditure'; id: string } | null;
 };
 
 export type CreateColonyExtensionMutationVariables = Exact<{
@@ -6076,6 +6081,13 @@ export const CreateContractEventDocument = gql`
     $condition: ModelContractEventConditionInput
   ) {
     createContractEvent(input: $input, condition: $condition) {
+      id
+    }
+  }
+`;
+export const CreateExpenditureDocument = gql`
+  mutation CreateExpenditure($input: CreateExpenditureInput!) {
+    createExpenditure(input: $input) {
       id
     }
   }
