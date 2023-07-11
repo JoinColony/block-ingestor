@@ -25,6 +25,7 @@ export default async (event: ContractEvent): Promise<void> => {
       input: {
         colonyId: colonyAddress,
         ownerAddress,
+        recipients: [],
       },
     },
   );
