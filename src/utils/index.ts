@@ -12,3 +12,4 @@ export * from './permissions';
 export * from './events';
 export * from './clients';
 export * from './seedDB';
+export * from './expenditures';

@@ -5,7 +5,7 @@ import {
   CreateExpenditureMutationVariables,
 } from '~graphql';
 import { ContractEvent } from '~types';
-import { toNumber, verbose } from '~utils';
+import { getExpenditureDatabaseId, toNumber, verbose } from '~utils';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { contractAddress: colonyAddress } = event;
@@ -23,6 +23,7 @@ export default async (event: ContractEvent): Promise<void> => {
     CreateExpenditureDocument,
     {
       input: {
+        id: getExpenditureDatabaseId(colonyAddress, convertedExpenditureId),
         colonyId: colonyAddress,
         ownerAddress,
         recipients: [],
