@@ -14,7 +14,7 @@ import {
   UpdateColonyMotionDocument,
 } from '~graphql';
 import { MotionSide, MotionVote } from '~types';
-import { notNull, verbose } from '~utils';
+import { notNull, output } from '~utils';
 
 export * from './motionStaked/helpers';
 
@@ -55,7 +55,7 @@ export const updateMotionInDB = async (
       data?.getColonyActionByMotionId?.items.filter(notNull);
 
     if (!colonyActionItems?.length) {
-      verbose(
+      output(
         'Could not find the action in the db. This is a bug and needs investigating.',
       );
     } else {
@@ -89,7 +89,7 @@ export const getMotionFromDB = async (
   const motion = data?.getColonyMotion;
 
   if (!motion) {
-    verbose(
+    output(
       'Could not find the motion in the db. This is a bug and needs investigating.',
     );
   }
