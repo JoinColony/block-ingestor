@@ -668,6 +668,7 @@ export type CreateExpenditureInput = {
   createdAt?: InputMaybe<Scalars['AWSDateTime']>;
   id?: InputMaybe<Scalars['ID']>;
   ownerAddress: Scalars['ID'];
+  recipients: Array<ExpenditureRecipientInput>;
 };
 
 export type CreateIngestorStatsInput = {
@@ -935,7 +936,19 @@ export type Expenditure = {
   createdAt: Scalars['AWSDateTime'];
   id: Scalars['ID'];
   ownerAddress: Scalars['ID'];
+  recipients: Array<ExpenditureRecipient>;
   updatedAt: Scalars['AWSDateTime'];
+};
+
+export type ExpenditureRecipient = {
+  __typename?: 'ExpenditureRecipient';
+  address: Scalars['String'];
+  slot: Scalars['Int'];
+};
+
+export type ExpenditureRecipientInput = {
+  address: Scalars['String'];
+  slot: Scalars['Int'];
 };
 
 export type ExtensionParams = {
@@ -3885,6 +3898,7 @@ export type UpdateExpenditureInput = {
   createdAt?: InputMaybe<Scalars['AWSDateTime']>;
   id: Scalars['ID'];
   ownerAddress?: InputMaybe<Scalars['ID']>;
+  recipients?: InputMaybe<Array<ExpenditureRecipientInput>>;
 };
 
 export type UpdateExtensionByColonyAndHashInput = {
