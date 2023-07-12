@@ -76,6 +76,7 @@ export const setupListenersForColony = (colonyAddress: string): void => {
     ContractEventsSignatures.ColonyRoleSet_OLD,
     ContractEventsSignatures.ExpenditureAdded,
     ContractEventsSignatures.ExpenditureRecipientSet,
+    ContractEventsSignatures.ExpenditurePayoutSet,
   ];
 
   colonyEvents.forEach((eventSignature) =>
