@@ -26,7 +26,7 @@ export default async (event: ContractEvent): Promise<void> => {
         id: getExpenditureDatabaseId(colonyAddress, convertedExpenditureId),
         colonyId: colonyAddress,
         ownerAddress,
-        recipients: [],
+        slots: [],
       },
     },
   );

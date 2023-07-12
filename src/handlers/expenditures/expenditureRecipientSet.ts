@@ -1,12 +1,13 @@
 import { mutate } from '~amplifyClient';
 import {
-  ExpenditureRecipient,
+  ExpenditureSlot,
   UpdateExpenditureDocument,
   UpdateExpenditureMutation,
   UpdateExpenditureMutationVariables,
 } from '~graphql';
 import { ContractEvent } from '~types';
 import { getExpenditureDatabaseId, output, toNumber, verbose } from '~utils';
+
 import { getExpenditure } from './helpers';
 
 export default async (event: ContractEvent): Promise<void> => {
@@ -28,15 +29,17 @@ export default async (event: ContractEvent): Promise<void> => {
     return;
   }
 
-  const recipient: ExpenditureRecipient = {
-    slot: convertedSlot,
-    address: recipientAddress,
+  const existingSlot = expenditure.slots.find(
+    (slot) => slot.id === convertedSlot,
+  );
+  const updatedSlot: ExpenditureSlot = {
+    ...existingSlot,
+    id: convertedSlot,
+    recipientAddress,
   };
-  const updatedRecipients = [
-    ...expenditure.recipients.filter(
-      (recipient) => recipient.slot !== convertedSlot,
-    ),
-    recipient,
+  const updatedSlots = [
+    ...expenditure.slots.filter((slot) => slot.id !== convertedSlot),
+    updatedSlot,
   ];
 
   verbose(
@@ -48,7 +51,7 @@ export default async (event: ContractEvent): Promise<void> => {
     {
       input: {
         id: databaseId,
-        recipients: updatedRecipients,
+        slots: updatedSlots,
       },
     },
   );
