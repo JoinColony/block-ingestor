@@ -668,7 +668,7 @@ export type CreateExpenditureInput = {
   createdAt?: InputMaybe<Scalars['AWSDateTime']>;
   id?: InputMaybe<Scalars['ID']>;
   ownerAddress: Scalars['ID'];
-  recipients: Array<ExpenditureRecipientInput>;
+  slots: Array<ExpenditureSlotInput>;
 };
 
 export type CreateIngestorStatsInput = {
@@ -936,19 +936,32 @@ export type Expenditure = {
   createdAt: Scalars['AWSDateTime'];
   id: Scalars['ID'];
   ownerAddress: Scalars['ID'];
-  recipients: Array<ExpenditureRecipient>;
+  slots: Array<ExpenditureSlot>;
   updatedAt: Scalars['AWSDateTime'];
 };
 
-export type ExpenditureRecipient = {
-  __typename?: 'ExpenditureRecipient';
-  address: Scalars['String'];
-  slot: Scalars['Int'];
+export type ExpenditurePayout = {
+  __typename?: 'ExpenditurePayout';
+  amount: Scalars['String'];
+  tokenAddress: Scalars['ID'];
 };
 
-export type ExpenditureRecipientInput = {
-  address: Scalars['String'];
-  slot: Scalars['Int'];
+export type ExpenditurePayoutInput = {
+  amount: Scalars['String'];
+  tokenAddress: Scalars['ID'];
+};
+
+export type ExpenditureSlot = {
+  __typename?: 'ExpenditureSlot';
+  id: Scalars['Int'];
+  payouts?: Maybe<Array<ExpenditurePayout>>;
+  recipientAddress?: Maybe<Scalars['String']>;
+};
+
+export type ExpenditureSlotInput = {
+  id: Scalars['Int'];
+  payouts?: InputMaybe<Array<ExpenditurePayoutInput>>;
+  recipientAddress?: InputMaybe<Scalars['String']>;
 };
 
 export type ExtensionParams = {
@@ -3898,7 +3911,7 @@ export type UpdateExpenditureInput = {
   createdAt?: InputMaybe<Scalars['AWSDateTime']>;
   id: Scalars['ID'];
   ownerAddress?: InputMaybe<Scalars['ID']>;
-  recipients?: InputMaybe<Array<ExpenditureRecipientInput>>;
+  slots?: InputMaybe<Array<ExpenditureSlotInput>>;
 };
 
 export type UpdateExtensionByColonyAndHashInput = {
@@ -4690,10 +4703,15 @@ export type GetExpenditureQuery = {
   getExpenditure?: {
     __typename?: 'Expenditure';
     id: string;
-    recipients: Array<{
-      __typename?: 'ExpenditureRecipient';
-      slot: number;
-      address: string;
+    slots: Array<{
+      __typename?: 'ExpenditureSlot';
+      id: number;
+      recipientAddress?: string | null;
+      payouts?: Array<{
+        __typename?: 'ExpenditurePayout';
+        tokenAddress: string;
+        amount: string;
+      }> | null;
     }>;
   } | null;
 };
@@ -5482,9 +5500,13 @@ export const GetExpenditureDocument = gql`
   query GetExpenditure($id: ID!) {
     getExpenditure(id: $id) {
       id
-      recipients {
-        slot
-        address
+      slots {
+        id
+        recipientAddress
+        payouts {
+          tokenAddress
+          amount
+        }
       }
     }
   }
