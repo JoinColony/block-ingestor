@@ -1,15 +1,13 @@
-import { mutate, query } from '~amplifyClient';
+import { mutate } from '~amplifyClient';
 import {
   ExpenditureRecipient,
-  GetExpenditureDocument,
-  GetExpenditureQuery,
-  GetExpenditureQueryVariables,
   UpdateExpenditureDocument,
   UpdateExpenditureMutation,
   UpdateExpenditureMutationVariables,
 } from '~graphql';
 import { ContractEvent } from '~types';
 import { getExpenditureDatabaseId, output, toNumber, verbose } from '~utils';
+import { getExpenditure } from './helpers';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { contractAddress: colonyAddress } = event;
@@ -22,14 +20,7 @@ export default async (event: ContractEvent): Promise<void> => {
     convertedExpenditureId,
   );
 
-  const response = await query<
-    GetExpenditureQuery,
-    GetExpenditureQueryVariables
-  >(GetExpenditureDocument, {
-    id: databaseId,
-  });
-  const expenditure = response?.data?.getExpenditure;
-
+  const expenditure = await getExpenditure(databaseId);
   if (!expenditure) {
     output(
       `Could not find expenditure with ID: ${convertedExpenditureId} and colony address: ${colonyAddress} in the db. This is a bug and needs investigating.`,
