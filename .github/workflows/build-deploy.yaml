@@ -143,6 +143,8 @@ jobs:
 
     needs: deployQA
 
+    environment: prod
+
     runs-on: ubuntu-latest
 
     env:
