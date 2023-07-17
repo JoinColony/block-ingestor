@@ -3,3 +3,4 @@ export { default as handleExpenditureRecipientSet } from './expenditureRecipient
 export { default as handleExpenditurePayoutSet } from './expenditurePayoutSet';
 export { default as handleExpenditureLocked } from './expenditureLocked';
 export { default as handleExpenditureCancelled } from './expenditureCancelled';
+export { default as handleExpenditureFinalized } from './expenditureFinalized';
