@@ -669,6 +669,7 @@ export type CreateExpenditureInput = {
   id?: InputMaybe<Scalars['ID']>;
   ownerAddress: Scalars['ID'];
   slots: Array<ExpenditureSlotInput>;
+  status: ExpenditureStatus;
 };
 
 export type CreateIngestorStatsInput = {
@@ -937,6 +938,7 @@ export type Expenditure = {
   id: Scalars['ID'];
   ownerAddress: Scalars['ID'];
   slots: Array<ExpenditureSlot>;
+  status: ExpenditureStatus;
   updatedAt: Scalars['AWSDateTime'];
 };
 
@@ -963,6 +965,13 @@ export type ExpenditureSlotInput = {
   payouts?: InputMaybe<Array<ExpenditurePayoutInput>>;
   recipientAddress?: InputMaybe<Scalars['String']>;
 };
+
+export enum ExpenditureStatus {
+  Cancelled = 'CANCELLED',
+  Draft = 'DRAFT',
+  Finalized = 'FINALIZED',
+  Locked = 'LOCKED',
+}
 
 export type ExtensionParams = {
   __typename?: 'ExtensionParams';
@@ -1588,6 +1597,7 @@ export type ModelExpenditureConditionInput = {
   not?: InputMaybe<ModelExpenditureConditionInput>;
   or?: InputMaybe<Array<InputMaybe<ModelExpenditureConditionInput>>>;
   ownerAddress?: InputMaybe<ModelIdInput>;
+  status?: InputMaybe<ModelExpenditureStatusInput>;
 };
 
 export type ModelExpenditureConnection = {
@@ -1605,6 +1615,12 @@ export type ModelExpenditureFilterInput = {
   not?: InputMaybe<ModelExpenditureFilterInput>;
   or?: InputMaybe<Array<InputMaybe<ModelExpenditureFilterInput>>>;
   ownerAddress?: InputMaybe<ModelIdInput>;
+  status?: InputMaybe<ModelExpenditureStatusInput>;
+};
+
+export type ModelExpenditureStatusInput = {
+  eq?: InputMaybe<ExpenditureStatus>;
+  ne?: InputMaybe<ExpenditureStatus>;
 };
 
 export type ModelFloatInput = {
@@ -2009,6 +2025,7 @@ export type ModelSubscriptionExpenditureFilterInput = {
   id?: InputMaybe<ModelSubscriptionIdInput>;
   or?: InputMaybe<Array<InputMaybe<ModelSubscriptionExpenditureFilterInput>>>;
   ownerAddress?: InputMaybe<ModelSubscriptionIdInput>;
+  status?: InputMaybe<ModelSubscriptionStringInput>;
 };
 
 export type ModelSubscriptionFloatInput = {
@@ -3912,6 +3929,7 @@ export type UpdateExpenditureInput = {
   id: Scalars['ID'];
   ownerAddress?: InputMaybe<Scalars['ID']>;
   slots?: InputMaybe<Array<ExpenditureSlotInput>>;
+  status?: InputMaybe<ExpenditureStatus>;
 };
 
 export type UpdateExtensionByColonyAndHashInput = {

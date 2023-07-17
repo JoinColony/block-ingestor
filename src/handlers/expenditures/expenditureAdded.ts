@@ -3,6 +3,7 @@ import {
   CreateExpenditureDocument,
   CreateExpenditureMutation,
   CreateExpenditureMutationVariables,
+  ExpenditureStatus,
 } from '~graphql';
 import { ContractEvent } from '~types';
 import { getExpenditureDatabaseId, toNumber, verbose } from '~utils';
@@ -26,6 +27,7 @@ export default async (event: ContractEvent): Promise<void> => {
         id: getExpenditureDatabaseId(colonyAddress, convertedExpenditureId),
         colonyId: colonyAddress,
         ownerAddress,
+        status: ExpenditureStatus.Draft,
         slots: [],
       },
     },
