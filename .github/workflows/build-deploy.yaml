@@ -138,7 +138,7 @@ jobs:
         webhook: ${{ secrets.DISCORD_WEBHOOK }}
         title: "Deploy cdapp block-ingestor to ${{ env.ENVIRONMENT_TAG }}"
 
-  # Deploy cdapp block-ingestor to QA environment
+  # Deploy cdapp block-ingestor to Prod environment
   deployProd:
 
     needs: deployQA
