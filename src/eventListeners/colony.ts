@@ -80,6 +80,7 @@ export const setupListenersForColony = (colonyAddress: string): void => {
     ContractEventsSignatures.ExpenditureLocked,
     ContractEventsSignatures.ExpenditureCancelled,
     ContractEventsSignatures.ExpenditureFinalized,
+    ContractEventsSignatures.ExpenditureTransferred,
   ];
 
   colonyEvents.forEach((eventSignature) =>
