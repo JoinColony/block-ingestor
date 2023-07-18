@@ -36,6 +36,7 @@ import {
   handleExpenditureCancelled,
   handleExpenditureFinalized,
   handleExpenditureTransferred,
+  handleExpenditureGlobalClaimDelaySet,
 } from './handlers';
 
 dotenv.config();
@@ -215,6 +216,11 @@ export default async (event: ContractEvent): Promise<void> => {
 
     case ContractEventsSignatures.RecoveryRoleSet: {
       await handleManagePermissionsAction(event);
+      return;
+    }
+
+    case ContractEventsSignatures.ExpenditureGlobalClaimDelaySet: {
+      await handleExpenditureGlobalClaimDelaySet(event);
       return;
     }
 
