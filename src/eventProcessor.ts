@@ -35,6 +35,7 @@ import {
   handleExpenditureLocked,
   handleExpenditureCancelled,
   handleExpenditureFinalized,
+  handleExpenditureTransferred,
 } from './handlers';
 
 dotenv.config();
@@ -244,6 +245,11 @@ export default async (event: ContractEvent): Promise<void> => {
 
     case ContractEventsSignatures.ExpenditureFinalized: {
       await handleExpenditureFinalized(event);
+      return;
+    }
+
+    case ContractEventsSignatures.ExpenditureTransferred: {
+      await handleExpenditureTransferred(event);
       return;
     }
 
