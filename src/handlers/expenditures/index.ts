@@ -6,3 +6,4 @@ export { default as handleExpenditureCancelled } from './expenditureCancelled';
 export { default as handleExpenditureFinalized } from './expenditureFinalized';
 export { default as handleExpenditureTransferred } from './expenditureTransferred';
 export { default as handleExpenditureGlobalClaimDelaySet } from './expenditureGlobalClaimDelaySet';
+export { default as handleExpenditureClaimDelaySet } from './expenditureClaimDelaySet';
