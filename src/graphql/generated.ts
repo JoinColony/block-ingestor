@@ -54,6 +54,7 @@ export type Colony = {
   createdAt: Scalars['AWSDateTime'];
   domains?: Maybe<ModelDomainConnection>;
   expenditures?: Maybe<ModelExpenditureConnection>;
+  expendituresGlobalClaimDelay?: Maybe<Scalars['Int']>;
   extensions?: Maybe<ModelColonyExtensionConnection>;
   fundsClaims?: Maybe<ModelColonyFundsClaimConnection>;
   id: Scalars['ID'];
@@ -551,6 +552,7 @@ export type CreateColonyInput = {
   balances?: InputMaybe<ColonyBalancesInput>;
   chainFundsClaim?: InputMaybe<ColonyChainFundsClaimInput>;
   chainMetadata: ChainMetadataInput;
+  expendituresGlobalClaimDelay?: InputMaybe<Scalars['Int']>;
   id?: InputMaybe<Scalars['ID']>;
   motionsWithUnclaimedStakes?: InputMaybe<Array<ColonyUnclaimedStakeInput>>;
   name: Scalars['String'];
@@ -1149,6 +1151,7 @@ export type ModelColonyActionTypeInput = {
 
 export type ModelColonyConditionInput = {
   and?: InputMaybe<Array<InputMaybe<ModelColonyConditionInput>>>;
+  expendituresGlobalClaimDelay?: InputMaybe<ModelIntInput>;
   name?: InputMaybe<ModelStringInput>;
   nativeTokenId?: InputMaybe<ModelIdInput>;
   not?: InputMaybe<ModelColonyConditionInput>;
@@ -1200,6 +1203,7 @@ export type ModelColonyExtensionFilterInput = {
 
 export type ModelColonyFilterInput = {
   and?: InputMaybe<Array<InputMaybe<ModelColonyFilterInput>>>;
+  expendituresGlobalClaimDelay?: InputMaybe<ModelIntInput>;
   id?: InputMaybe<ModelIdInput>;
   name?: InputMaybe<ModelStringInput>;
   nativeTokenId?: InputMaybe<ModelIdInput>;
@@ -1850,6 +1854,7 @@ export type ModelSubscriptionColonyExtensionFilterInput = {
 
 export type ModelSubscriptionColonyFilterInput = {
   and?: InputMaybe<Array<InputMaybe<ModelSubscriptionColonyFilterInput>>>;
+  expendituresGlobalClaimDelay?: InputMaybe<ModelSubscriptionIntInput>;
   id?: InputMaybe<ModelSubscriptionIdInput>;
   name?: InputMaybe<ModelSubscriptionStringInput>;
   nativeTokenId?: InputMaybe<ModelSubscriptionIdInput>;
@@ -3811,6 +3816,7 @@ export type UpdateColonyInput = {
   balances?: InputMaybe<ColonyBalancesInput>;
   chainFundsClaim?: InputMaybe<ColonyChainFundsClaimInput>;
   chainMetadata?: InputMaybe<ChainMetadataInput>;
+  expendituresGlobalClaimDelay?: InputMaybe<Scalars['Int']>;
   id: Scalars['ID'];
   motionsWithUnclaimedStakes?: InputMaybe<Array<ColonyUnclaimedStakeInput>>;
   name?: InputMaybe<Scalars['String']>;
