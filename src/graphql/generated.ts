@@ -957,12 +957,14 @@ export type ExpenditurePayoutInput = {
 
 export type ExpenditureSlot = {
   __typename?: 'ExpenditureSlot';
+  claimDelay?: Maybe<Scalars['Int']>;
   id: Scalars['Int'];
   payouts?: Maybe<Array<ExpenditurePayout>>;
   recipientAddress?: Maybe<Scalars['String']>;
 };
 
 export type ExpenditureSlotInput = {
+  claimDelay?: InputMaybe<Scalars['Int']>;
   id: Scalars['Int'];
   payouts?: InputMaybe<Array<ExpenditurePayoutInput>>;
   recipientAddress?: InputMaybe<Scalars['String']>;
@@ -4731,6 +4733,7 @@ export type GetExpenditureQuery = {
       __typename?: 'ExpenditureSlot';
       id: number;
       recipientAddress?: string | null;
+      claimDelay?: number | null;
       payouts?: Array<{
         __typename?: 'ExpenditurePayout';
         tokenAddress: string;
@@ -5527,6 +5530,7 @@ export const GetExpenditureDocument = gql`
       slots {
         id
         recipientAddress
+        claimDelay
         payouts {
           tokenAddress
           amount

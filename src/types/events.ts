@@ -66,6 +66,7 @@ export enum ContractEventsSignatures {
 
   // Expenditures
   ExpenditureGlobalClaimDelaySet = 'ExpenditureGlobalClaimDelaySet(address,uint256)',
+  ExpenditureClaimDelaySet = 'ExpenditureClaimDelaySet(address,uint256,uint256,uint256)',
   ExpenditureAdded = 'ExpenditureAdded(address,uint256)',
   ExpenditureTransferred = 'ExpenditureTransferred(address,uint256,address)',
   ExpenditureCancelled = 'ExpenditureCancelled(address,uint256)',

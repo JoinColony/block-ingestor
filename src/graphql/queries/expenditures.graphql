@@ -4,6 +4,7 @@ query GetExpenditure($id: ID!) {
     slots {
       id
       recipientAddress
+      claimDelay
       payouts {
         tokenAddress
         amount
