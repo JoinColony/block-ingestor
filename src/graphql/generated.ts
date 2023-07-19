@@ -5440,7 +5440,7 @@ export type GetExpenditureQueryVariables = Exact<{
 }>;
 
 
-export type GetExpenditureQuery = { __typename?: 'Query', getExpenditure?: { __typename?: 'Expenditure', id: string, slots: Array<{ __typename?: 'ExpenditureSlot', id: number, recipientAddress?: string | null, claimDelay?: number | null, payouts?: Array<{ __typename?: 'ExpenditurePayout', tokenAddress: string, amount: string }> | null }> } | null };
+export type GetExpenditureQuery = { __typename?: 'Query', getExpenditure?: { __typename?: 'Expenditure', id: string, slots: Array<{ __typename?: 'ExpenditureSlot', id: number, recipientAddress?: string | null, claimDelay?: number | null, payoutModifier?: number | null, payouts?: Array<{ __typename?: 'ExpenditurePayout', tokenAddress: string, amount: string }> | null }> } | null };
 
 export type GetColonyExtensionQueryVariables = Exact<{
   id: Scalars['ID'];
@@ -6010,6 +6010,7 @@ export const GetExpenditureDocument = gql`
       id
       recipientAddress
       claimDelay
+      payoutModifier
       payouts {
         tokenAddress
         amount
