@@ -5,6 +5,7 @@ query GetExpenditure($id: ID!) {
       id
       recipientAddress
       claimDelay
+      payoutModifier
       payouts {
         tokenAddress
         amount
