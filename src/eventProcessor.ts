@@ -36,6 +36,8 @@ import {
   handleExpenditureCancelled,
   handleExpenditureFinalized,
   handleExpenditureTransferred,
+  handleExpenditureGlobalClaimDelaySet,
+  handleExpenditureClaimDelaySet,
 } from './handlers';
 
 dotenv.config();
@@ -218,6 +220,11 @@ export default async (event: ContractEvent): Promise<void> => {
       return;
     }
 
+    case ContractEventsSignatures.ExpenditureGlobalClaimDelaySet: {
+      await handleExpenditureGlobalClaimDelaySet(event);
+      return;
+    }
+
     case ContractEventsSignatures.ExpenditureAdded: {
       await handleExpenditureAdded(event);
       return;
@@ -250,6 +257,11 @@ export default async (event: ContractEvent): Promise<void> => {
 
     case ContractEventsSignatures.ExpenditureTransferred: {
       await handleExpenditureTransferred(event);
+      return;
+    }
+
+    case ContractEventsSignatures.ExpenditureClaimDelaySet: {
+      await handleExpenditureClaimDelaySet(event);
       return;
     }
 
