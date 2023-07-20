@@ -83,6 +83,7 @@ export const setupListenersForColony = (colonyAddress: string): void => {
     ContractEventsSignatures.ExpenditureFinalized,
     ContractEventsSignatures.ExpenditureTransferred,
     ContractEventsSignatures.ExpenditureClaimDelaySet,
+    ContractEventsSignatures.ExpenditurePayoutModifierSet,
   ];
 
   colonyEvents.forEach((eventSignature) =>

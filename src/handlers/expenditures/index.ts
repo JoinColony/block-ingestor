@@ -7,3 +7,4 @@ export { default as handleExpenditureFinalized } from './expenditureFinalized';
 export { default as handleExpenditureTransferred } from './expenditureTransferred';
 export { default as handleExpenditureGlobalClaimDelaySet } from './expenditureGlobalClaimDelaySet';
 export { default as handleExpenditureClaimDelaySet } from './expenditureClaimDelaySet';
+export { default as handleExpenditurePayoutModifierSet } from './expenditurePayoutModifierSet';
