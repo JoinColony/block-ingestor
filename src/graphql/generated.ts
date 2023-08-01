@@ -134,6 +134,7 @@ export type ColonyDomainsArgs = {
 
 /** Represents a Colony within the Colony Network */
 export type ColonyExpendituresArgs = {
+  createdAt?: InputMaybe<ModelStringKeyConditionInput>;
   filter?: InputMaybe<ModelExpenditureFilterInput>;
   limit?: InputMaybe<Scalars['Int']>;
   nextToken?: InputMaybe<Scalars['String']>;
@@ -1034,10 +1035,10 @@ export type CreateDomainMetadataInput = {
 };
 
 export type CreateExpenditureInput = {
-  colonyExpendituresId?: InputMaybe<Scalars['ID']>;
   colonyId: Scalars['ID'];
   createdAt?: InputMaybe<Scalars['AWSDateTime']>;
   id?: InputMaybe<Scalars['ID']>;
+  nativeId: Scalars['Int'];
   ownerAddress: Scalars['ID'];
   slots: Array<ExpenditureSlotInput>;
   status: ExpenditureStatus;
@@ -1394,10 +1395,10 @@ export enum EmailPermissions {
 export type Expenditure = {
   __typename?: 'Expenditure';
   colony: Colony;
-  colonyExpendituresId?: Maybe<Scalars['ID']>;
   colonyId: Scalars['ID'];
   createdAt: Scalars['AWSDateTime'];
   id: Scalars['ID'];
+  nativeId: Scalars['Int'];
   ownerAddress: Scalars['ID'];
   slots: Array<ExpenditureSlot>;
   status: ExpenditureStatus;
@@ -2204,9 +2205,9 @@ export type ModelDomainMetadataFilterInput = {
 
 export type ModelExpenditureConditionInput = {
   and?: InputMaybe<Array<InputMaybe<ModelExpenditureConditionInput>>>;
-  colonyExpendituresId?: InputMaybe<ModelIdInput>;
   colonyId?: InputMaybe<ModelIdInput>;
   createdAt?: InputMaybe<ModelStringInput>;
+  nativeId?: InputMaybe<ModelIntInput>;
   not?: InputMaybe<ModelExpenditureConditionInput>;
   or?: InputMaybe<Array<InputMaybe<ModelExpenditureConditionInput>>>;
   ownerAddress?: InputMaybe<ModelIdInput>;
@@ -2221,10 +2222,10 @@ export type ModelExpenditureConnection = {
 
 export type ModelExpenditureFilterInput = {
   and?: InputMaybe<Array<InputMaybe<ModelExpenditureFilterInput>>>;
-  colonyExpendituresId?: InputMaybe<ModelIdInput>;
   colonyId?: InputMaybe<ModelIdInput>;
   createdAt?: InputMaybe<ModelStringInput>;
   id?: InputMaybe<ModelIdInput>;
+  nativeId?: InputMaybe<ModelIntInput>;
   not?: InputMaybe<ModelExpenditureFilterInput>;
   or?: InputMaybe<Array<InputMaybe<ModelExpenditureFilterInput>>>;
   ownerAddress?: InputMaybe<ModelIdInput>;
@@ -2668,6 +2669,7 @@ export type ModelSubscriptionExpenditureFilterInput = {
   colonyId?: InputMaybe<ModelSubscriptionIdInput>;
   createdAt?: InputMaybe<ModelSubscriptionStringInput>;
   id?: InputMaybe<ModelSubscriptionIdInput>;
+  nativeId?: InputMaybe<ModelSubscriptionIntInput>;
   or?: InputMaybe<Array<InputMaybe<ModelSubscriptionExpenditureFilterInput>>>;
   ownerAddress?: InputMaybe<ModelSubscriptionIdInput>;
   status?: InputMaybe<ModelSubscriptionStringInput>;
@@ -3674,26 +3676,14 @@ export type ProfileInput = {
 /** Represents metadata for a user's profile. Mostly user specific settings */
 export type ProfileMetadata = {
   __typename?: 'ProfileMetadata';
-  /** The URL of the user's custom RPC node */
-  customRpc?: Maybe<Scalars['String']>;
-  /** A flag to indicate whether the user has enabled the decentralized mode */
-  decentralizedModeEnabled?: Maybe<Scalars['Boolean']>;
   /** List of email permissions for the user */
   emailPermissions: Array<Scalars['String']>;
-  /** A flag to indicate whether the user has enabled metatransactions */
-  metatransactionsEnabled?: Maybe<Scalars['Boolean']>;
 };
 
 /** Input data for a user's profile metadata */
 export type ProfileMetadataInput = {
-  /** The URL of the user's custom RPC node */
-  customRpc?: InputMaybe<Scalars['String']>;
-  /** A flag to indicate whether the user has enabled the decentralized mode */
-  decentralizedModeEnabled?: InputMaybe<Scalars['Boolean']>;
   /** List of email permissions for the user */
   emailPermissions: Array<Scalars['String']>;
-  /** A flag to indicate whether the user has enabled metatransactions */
-  metatransactionsEnabled?: InputMaybe<Scalars['Boolean']>;
 };
 
 /** Root query type */
@@ -5015,10 +5005,10 @@ export type UpdateDomainMetadataInput = {
 };
 
 export type UpdateExpenditureInput = {
-  colonyExpendituresId?: InputMaybe<Scalars['ID']>;
   colonyId?: InputMaybe<Scalars['ID']>;
   createdAt?: InputMaybe<Scalars['AWSDateTime']>;
   id: Scalars['ID'];
+  nativeId?: InputMaybe<Scalars['Int']>;
   ownerAddress?: InputMaybe<Scalars['ID']>;
   slots?: InputMaybe<Array<ExpenditureSlotInput>>;
   status?: InputMaybe<ExpenditureStatus>;
