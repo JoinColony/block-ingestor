@@ -42,6 +42,7 @@ fragment ColonyMotion on ColonyMotion {
     hasFailedNotFinalizable
     inRevealPhase
   }
+  isDecision
 }
 
 fragment VoterRecord on VoterRecord {

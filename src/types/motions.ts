@@ -15,6 +15,7 @@ export enum ColonyOperations {
   EmitDomainReputationReward = 'emitDomainReputationReward',
   EditColony = 'editColony',
   SetUserRoles = 'setUserRoles',
+  SimpleDecision = 'simpleDecision',
 }
 
 export enum MotionEvents {
@@ -47,6 +48,7 @@ export const motionNameMapping: { [key: string]: ColonyActionType } = {
     ColonyActionType.EmitDomainReputationPenaltyMotion,
   [ColonyOperations.EmitDomainReputationReward]:
     ColonyActionType.EmitDomainReputationRewardMotion,
+  [ColonyOperations.SimpleDecision]: ColonyActionType.CreateDecisionMotion,
 };
 
 export interface ExtensionParams {

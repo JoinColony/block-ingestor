@@ -8,6 +8,7 @@ query GetColonyActionByMotionId($motionId: ID!) {
       pendingColonyMetadata {
         ...ColonyMetadata
       }
+      colonyDecisionId
     }
   }
 }
@@ -15,11 +16,5 @@ query GetColonyActionByMotionId($motionId: ID!) {
 query GetColonyMotion($id: ID!) {
   getColonyMotion(id: $id) {
     ...ColonyMotion
-  }
-}
-
-mutation CreateMotionMessage($input: CreateMotionMessageInput!) {
-  createMotionMessage(input: $input) {
-    id
   }
 }

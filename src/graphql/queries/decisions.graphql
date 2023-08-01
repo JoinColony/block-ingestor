@@ -1,0 +1,7 @@
+query GetColonyDecisionByActionId($actionId: ID!) {
+  getColonyDecisionByActionId(actionId: $actionId) {
+    items {
+      id
+    }
+  }
+}

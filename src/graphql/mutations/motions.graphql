@@ -9,3 +9,9 @@ mutation UpdateColonyMotion($input: UpdateColonyMotionInput!) {
     id
   }
 }
+
+mutation CreateMotionMessage($input: CreateMotionMessageInput!) {
+  createMotionMessage(input: $input) {
+    id
+  }
+}

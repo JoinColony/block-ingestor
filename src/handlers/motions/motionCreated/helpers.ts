@@ -6,7 +6,7 @@ import {
   AnyVotingReputationClient,
 } from '@colony/colony-js';
 
-import { ContractEvent, MotionEvents } from '~types';
+import { ColonyOperations, ContractEvent, MotionEvents } from '~types';
 import { getDomainDatabaseId, getVotingClient, verbose } from '~utils';
 import { mutate } from '~amplifyClient';
 import {
@@ -31,12 +31,19 @@ import {
   getUserMinStake,
   getMessageKey,
 } from '../helpers';
+import { SIMPLE_DECISIONS_ACTION_CODE } from '~constants';
+
+export interface SimpleTransactionDescription {
+  name: ColonyOperations.SimpleDecision;
+}
 
 export const getParsedActionFromMotion = async (
   motionId: string,
   colonyAddress: string,
   clients: [AnyColonyClient, AnyOneTxPaymentClient],
-): Promise<TransactionDescription | undefined> => {
+): Promise<
+  TransactionDescription | SimpleTransactionDescription | undefined
+> => {
   const votingClient = await getVotingClient(colonyAddress);
 
   if (!votingClient) {
@@ -44,12 +51,19 @@ export const getParsedActionFromMotion = async (
   }
 
   const motion = await votingClient.getMotion(motionId);
+  const { action } = motion;
+
+  if (action === SIMPLE_DECISIONS_ACTION_CODE) {
+    return {
+      name: ColonyOperations.SimpleDecision,
+    };
+  }
 
   for (const client of clients) {
     // Return the first time a client can successfully parse the motion
     try {
       return client.interface.parseTransaction({
-        data: motion.action,
+        data: action,
       });
     } catch {
       continue;
@@ -65,6 +79,7 @@ interface Props {
   domainId: BigNumber;
   votingClient: AnyVotingReputationClient;
   colonyAddress: string;
+  isDecision?: boolean;
 }
 
 const getMotionData = async ({
@@ -72,6 +87,7 @@ const getMotionData = async ({
   domainId,
   votingClient,
   colonyAddress,
+  isDecision = false,
 }: Props): Promise<ColonyMotion> => {
   const { skillRep, rootHash, repSubmitted } = await votingClient.getMotion(
     motionId,
@@ -140,6 +156,7 @@ const getMotionData = async ({
       hasFailedNotFinalizable: false,
       inRevealPhase: false,
     },
+    isDecision,
   };
 };
 
@@ -232,6 +249,7 @@ export const createMotionInDB = async (
     motionId,
     domainId,
     colonyAddress,
+    isDecision: !!input.colonyDecisionId,
   });
 
   const initialMotionMessage = await getInitialMotionMessage(

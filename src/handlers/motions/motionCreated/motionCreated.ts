@@ -2,7 +2,10 @@ import { Extension } from '@colony/colony-js';
 
 import { ColonyOperations, ContractEvent } from '~types';
 import { getCachedColonyClient, verbose } from '~utils';
-import { getParsedActionFromMotion } from './helpers';
+import {
+  SimpleTransactionDescription,
+  getParsedActionFromMotion,
+} from './helpers';
 import {
   handleManageDomainMotion,
   handleMintTokensMotion,
@@ -13,6 +16,7 @@ import {
   handleDomainEditReputationMotion,
   handleEditColonyMotion,
   handleSetUserRolesMotion,
+  handleSimpleDecisionMotion,
 } from './handlers';
 
 export default async (event: ContractEvent): Promise<void> => {
@@ -87,6 +91,14 @@ export default async (event: ContractEvent): Promise<void> => {
 
       case ColonyOperations.SetUserRoles: {
         await handleSetUserRolesMotion(event, parsedAction);
+        break;
+      }
+
+      case ColonyOperations.SimpleDecision: {
+        await handleSimpleDecisionMotion(
+          event,
+          parsedAction as SimpleTransactionDescription,
+        );
         break;
       }
 

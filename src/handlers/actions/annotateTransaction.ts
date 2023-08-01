@@ -37,7 +37,7 @@ export default async ({ args }: ContractEvent): Promise<void> => {
   const isMotionObjection = actionId !== txHash;
 
   verbose(
-    actionId !== txHash
+    isMotionObjection
       ? 'Adding objection annotation to db for motion: '
       : 'Adding annotation to db for action: ',
     actionId,
