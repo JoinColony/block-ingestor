@@ -1,4 +1,3 @@
-import { utils } from 'ethers';
 import { mutate } from '~amplifyClient';
 import {
   CreateExpenditureDocument,
@@ -6,49 +5,23 @@ import {
   CreateExpenditureMutationVariables,
   ExpenditureStatus,
 } from '~graphql';
-import provider from '~provider';
-import { ContractEvent, ContractEventsSignatures } from '~types';
-import {
-  getCachedColonyClient,
-  getExpenditureDatabaseId,
-  mapLogToContractEvent,
-  output,
-  toNumber,
-  verbose,
-} from '~utils';
+import { ContractEvent } from '~types';
+import { getExpenditureDatabaseId, output, toNumber, verbose } from '~utils';
+
+import { getExpenditureFundingPotId } from './helpers';
 
 export default async (event: ContractEvent): Promise<void> => {
-  const { contractAddress: colonyAddress, transactionHash } = event;
+  const { contractAddress: colonyAddress } = event;
   const { agent: ownerAddress, expenditureId } = event.args;
   const convertedExpenditureId = toNumber(expenditureId);
 
-  const receipt = await provider.getTransactionReceipt(transactionHash);
-  const fundingPotAddedLog = receipt.logs.find(
-    (log) =>
-      log.topics[0] === utils.id(ContractEventsSignatures.FundingPotAdded),
-  );
-
-  if (!fundingPotAddedLog) {
+  const fundingPotId = await getExpenditureFundingPotId(event);
+  if (!fundingPotId) {
     output(
-      'No FundingPotAdded event found in transaction receipt containing ExpenditureAdded event',
+      `Could not get funding pot ID for expenditure with ID ${convertedExpenditureId} in colony ${colonyAddress}`,
     );
     return;
   }
-
-  const colonyClient = await getCachedColonyClient(colonyAddress);
-  if (!colonyClient) {
-    return;
-  }
-
-  const fundingPotAddedEvent = await mapLogToContractEvent(
-    fundingPotAddedLog,
-    colonyClient.interface,
-  );
-  if (!fundingPotAddedEvent) {
-    return;
-  }
-
-  const fundingPotId = toNumber(fundingPotAddedEvent.args.fundingPotId);
 
   verbose(
     'Expenditure with ID',
