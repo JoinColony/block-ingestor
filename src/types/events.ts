@@ -63,6 +63,18 @@ export enum ContractEventsSignatures {
   MotionRewardClaimed = 'MotionRewardClaimed(uint256,address,uint256,uint256)',
   MotionVoteSubmitted = 'MotionVoteSubmitted(uint256,address)',
   MotionVoteRevealed = 'MotionVoteRevealed(uint256,address,uint256)',
+
+  // Expenditures
+  ExpenditureGlobalClaimDelaySet = 'ExpenditureGlobalClaimDelaySet(address,uint256)',
+  ExpenditureClaimDelaySet = 'ExpenditureClaimDelaySet(address,uint256,uint256,uint256)',
+  ExpenditureAdded = 'ExpenditureAdded(address,uint256)',
+  ExpenditureTransferred = 'ExpenditureTransferred(address,uint256,address)',
+  ExpenditureCancelled = 'ExpenditureCancelled(address,uint256)',
+  ExpenditureLocked = 'ExpenditureLocked(address,uint256)',
+  ExpenditureFinalized = 'ExpenditureFinalized(address,uint256)',
+  ExpenditureRecipientSet = 'ExpenditureRecipientSet(address,uint256,uint256,address)',
+  ExpenditurePayoutSet = 'ExpenditurePayoutSet(address,uint256,uint256,address,uint256)',
+  ExpenditurePayoutModifierSet = 'ExpenditurePayoutModifierSet(address,uint256,uint256,int256)',
 }
 
 /*

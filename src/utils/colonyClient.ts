@@ -5,6 +5,7 @@ import {
   GetColonyQuery,
   GetColonyQueryVariables,
 } from '~graphql';
+import { output } from './logger';
 
 // @TODO: Consider refactoring this as it doesn't feel like it's in the right place
 export const getColonyFromDB = async (
@@ -18,7 +19,7 @@ export const getColonyFromDB = async (
   const colony = data?.getColony;
 
   if (!colony) {
-    console.error(
+    output(
       `Could not find colony: ${colonyAddress} in database. This is a bug and should be investigated.`,
     );
     return;

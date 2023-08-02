@@ -1,0 +1,11 @@
+mutation CreateExpenditure($input: CreateExpenditureInput!) {
+  createExpenditure(input: $input) {
+    id
+  }
+}
+
+mutation UpdateExpenditure($input: UpdateExpenditureInput!) {
+  updateExpenditure(input: $input) {
+    id
+  }
+}

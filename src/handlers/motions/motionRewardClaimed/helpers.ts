@@ -13,7 +13,7 @@ import {
   UpdateColonyStakeMutationVariables,
   UserStakes,
 } from '~graphql';
-import { getColonyFromDB, verbose } from '~utils';
+import { getColonyFromDB, output } from '~utils';
 
 import { getColonyStakeId } from '../helpers';
 
@@ -87,7 +87,7 @@ export const updateColonyUnclaimedStakes = async (
         );
       }
     } else {
-      console.log(
+      output(
         `Unable to find unclaimed stake with a motion id: ${motionDatabaseId}. This is a bug and should be investigated.`,
       );
     }
@@ -115,7 +115,7 @@ export const reclaimUserStake = async (
     )) ?? {};
 
   if (!data?.getColonyStake) {
-    verbose(
+    output(
       `Could not find user stake for user ${userAddress} in colony ${colonyAddress}. This is a bug and should be investigated.`,
     );
     return;
@@ -145,7 +145,7 @@ export const getUserStake = (
   const userStakes = usersStakes.find(({ address }) => address === userAddress);
 
   if (!userStakes) {
-    verbose(
+    output(
       `Could not find the stakes for user ${userAddress}. This is a bug and should be investigated.`,
     );
     return BigNumber.from(0);

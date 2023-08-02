@@ -3,3 +3,4 @@ export * from './actions';
 export * from './extensions';
 export * from './network';
 export * from './motions';
+export * from './expenditures';

@@ -29,6 +29,16 @@ import {
   handleMotionRewardClaimed,
   handleMotionVoteSubmitted,
   handleMotionVoteRevealed,
+  handleExpenditureAdded,
+  handleExpenditureRecipientSet,
+  handleExpenditurePayoutSet,
+  handleExpenditureLocked,
+  handleExpenditureCancelled,
+  handleExpenditureFinalized,
+  handleExpenditureTransferred,
+  handleExpenditureGlobalClaimDelaySet,
+  handleExpenditureClaimDelaySet,
+  handleExpenditurePayoutModifierSet,
 } from './handlers';
 
 dotenv.config();
@@ -208,6 +218,56 @@ export default async (event: ContractEvent): Promise<void> => {
 
     case ContractEventsSignatures.RecoveryRoleSet: {
       await handleManagePermissionsAction(event);
+      return;
+    }
+
+    case ContractEventsSignatures.ExpenditureGlobalClaimDelaySet: {
+      await handleExpenditureGlobalClaimDelaySet(event);
+      return;
+    }
+
+    case ContractEventsSignatures.ExpenditureAdded: {
+      await handleExpenditureAdded(event);
+      return;
+    }
+
+    case ContractEventsSignatures.ExpenditureRecipientSet: {
+      await handleExpenditureRecipientSet(event);
+      return;
+    }
+
+    case ContractEventsSignatures.ExpenditurePayoutSet: {
+      await handleExpenditurePayoutSet(event);
+      return;
+    }
+
+    case ContractEventsSignatures.ExpenditureLocked: {
+      await handleExpenditureLocked(event);
+      return;
+    }
+
+    case ContractEventsSignatures.ExpenditureCancelled: {
+      await handleExpenditureCancelled(event);
+      return;
+    }
+
+    case ContractEventsSignatures.ExpenditureFinalized: {
+      await handleExpenditureFinalized(event);
+      return;
+    }
+
+    case ContractEventsSignatures.ExpenditureTransferred: {
+      await handleExpenditureTransferred(event);
+      return;
+    }
+
+    case ContractEventsSignatures.ExpenditureClaimDelaySet: {
+      await handleExpenditureClaimDelaySet(event);
+      return;
+    }
+
+    case ContractEventsSignatures.ExpenditurePayoutModifierSet: {
+      await handleExpenditurePayoutModifierSet(event);
       return;
     }
 
