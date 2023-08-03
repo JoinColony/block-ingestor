@@ -1,0 +1,13 @@
+query GetMotionIdFromAction($id: ID!) {
+  getColonyAction(id: $id) {
+    motionData {
+      id
+    }
+  }
+}
+
+query getActionIdFromAnnotation($id: ID!) {
+  getAnnotation(id: $id) {
+    actionId
+  }
+}

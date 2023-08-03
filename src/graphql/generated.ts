@@ -31,6 +31,8 @@ export type Scalars = {
 /** Defines an annotation for actions, motions and decisions */
 export type Annotation = {
   __typename?: 'Annotation';
+  /** The id of the action it annotates */
+  actionId: Scalars['ID'];
   createdAt: Scalars['AWSDateTime'];
   /** The id of the annotation. */
   id: Scalars['ID'];
@@ -606,6 +608,10 @@ export type ColonyMotion = {
   nativeMotionDomainId: Scalars['String'];
   /** The on chain id of the motion */
   nativeMotionId: Scalars['String'];
+  /** The annotation object associated with the objection to the motion, if any */
+  objectionAnnotation?: Maybe<Annotation>;
+  /** Id of the associated objection annotation, if any */
+  objectionAnnotationId?: Maybe<Scalars['ID']>;
   /**
    * Stakes remaining to activate either side of the motion
    * It's a tuple: `[nayRemaining, yayRemaining]`
@@ -815,6 +821,7 @@ export type Contributor = {
 };
 
 export type CreateAnnotationInput = {
+  actionId: Scalars['ID'];
   id?: InputMaybe<Scalars['ID']>;
   ipfsHash?: InputMaybe<Scalars['String']>;
   message: Scalars['String'];
@@ -920,6 +927,7 @@ export type CreateColonyMotionInput = {
   motionStateHistory: MotionStateHistoryInput;
   nativeMotionDomainId: Scalars['String'];
   nativeMotionId: Scalars['String'];
+  objectionAnnotationId?: InputMaybe<Scalars['ID']>;
   remainingStakes: Array<Scalars['String']>;
   repSubmitted: Scalars['String'];
   requiredStake: Scalars['String'];
@@ -1571,6 +1579,7 @@ export type MembersForColonyReturn = {
 };
 
 export type ModelAnnotationConditionInput = {
+  actionId?: InputMaybe<ModelIdInput>;
   and?: InputMaybe<Array<InputMaybe<ModelAnnotationConditionInput>>>;
   ipfsHash?: InputMaybe<ModelStringInput>;
   message?: InputMaybe<ModelStringInput>;
@@ -1586,6 +1595,7 @@ export type ModelAnnotationConnection = {
 };
 
 export type ModelAnnotationFilterInput = {
+  actionId?: InputMaybe<ModelIdInput>;
   and?: InputMaybe<Array<InputMaybe<ModelAnnotationFilterInput>>>;
   id?: InputMaybe<ModelIdInput>;
   ipfsHash?: InputMaybe<ModelStringInput>;
@@ -1860,6 +1870,7 @@ export type ModelColonyMotionConditionInput = {
   nativeMotionDomainId?: InputMaybe<ModelStringInput>;
   nativeMotionId?: InputMaybe<ModelStringInput>;
   not?: InputMaybe<ModelColonyMotionConditionInput>;
+  objectionAnnotationId?: InputMaybe<ModelIdInput>;
   or?: InputMaybe<Array<InputMaybe<ModelColonyMotionConditionInput>>>;
   remainingStakes?: InputMaybe<ModelStringInput>;
   repSubmitted?: InputMaybe<ModelStringInput>;
@@ -1885,6 +1896,7 @@ export type ModelColonyMotionFilterInput = {
   nativeMotionDomainId?: InputMaybe<ModelStringInput>;
   nativeMotionId?: InputMaybe<ModelStringInput>;
   not?: InputMaybe<ModelColonyMotionFilterInput>;
+  objectionAnnotationId?: InputMaybe<ModelIdInput>;
   or?: InputMaybe<Array<InputMaybe<ModelColonyMotionFilterInput>>>;
   remainingStakes?: InputMaybe<ModelStringInput>;
   repSubmitted?: InputMaybe<ModelStringInput>;
@@ -2342,6 +2354,7 @@ export type ModelStringKeyConditionInput = {
 };
 
 export type ModelSubscriptionAnnotationFilterInput = {
+  actionId?: InputMaybe<ModelSubscriptionIdInput>;
   and?: InputMaybe<Array<InputMaybe<ModelSubscriptionAnnotationFilterInput>>>;
   id?: InputMaybe<ModelSubscriptionIdInput>;
   ipfsHash?: InputMaybe<ModelSubscriptionStringInput>;
@@ -2469,6 +2482,7 @@ export type ModelSubscriptionColonyMotionFilterInput = {
   motionDomainId?: InputMaybe<ModelSubscriptionIdInput>;
   nativeMotionDomainId?: InputMaybe<ModelSubscriptionStringInput>;
   nativeMotionId?: InputMaybe<ModelSubscriptionStringInput>;
+  objectionAnnotationId?: InputMaybe<ModelSubscriptionIdInput>;
   or?: InputMaybe<Array<InputMaybe<ModelSubscriptionColonyMotionFilterInput>>>;
   remainingStakes?: InputMaybe<ModelSubscriptionStringInput>;
   repSubmitted?: InputMaybe<ModelSubscriptionStringInput>;
@@ -4659,6 +4673,7 @@ export enum TokenType {
 }
 
 export type UpdateAnnotationInput = {
+  actionId?: InputMaybe<Scalars['ID']>;
   id: Scalars['ID'];
   ipfsHash?: InputMaybe<Scalars['String']>;
   message?: InputMaybe<Scalars['String']>;
@@ -4764,6 +4779,7 @@ export type UpdateColonyMotionInput = {
   motionStateHistory?: InputMaybe<MotionStateHistoryInput>;
   nativeMotionDomainId?: InputMaybe<Scalars['String']>;
   nativeMotionId?: InputMaybe<Scalars['String']>;
+  objectionAnnotationId?: InputMaybe<Scalars['ID']>;
   remainingStakes?: InputMaybe<Array<Scalars['String']>>;
   repSubmitted?: InputMaybe<Scalars['String']>;
   requiredStake?: InputMaybe<Scalars['String']>;
@@ -5581,6 +5597,39 @@ export type UpdateColonyStakeMutationVariables = Exact<{
 export type UpdateColonyStakeMutation = {
   __typename?: 'Mutation';
   updateColonyStake?: { __typename?: 'ColonyStake'; id: string } | null;
+};
+
+export type GetAnnotationIdFromActionQueryVariables = Exact<{
+  id: Scalars['ID'];
+}>;
+
+export type GetAnnotationIdFromActionQuery = {
+  __typename?: 'Query';
+  getColonyAction?: {
+    __typename?: 'ColonyAction';
+    annotationId?: string | null;
+  } | null;
+};
+
+export type GetMotionIdFromActionQueryVariables = Exact<{
+  id: Scalars['ID'];
+}>;
+
+export type GetMotionIdFromActionQuery = {
+  __typename?: 'Query';
+  getColonyAction?: {
+    __typename?: 'ColonyAction';
+    motionData?: { __typename?: 'ColonyMotion'; id: string } | null;
+  } | null;
+};
+
+export type GetActionIdFromAnnotationQueryVariables = Exact<{
+  id: Scalars['ID'];
+}>;
+
+export type GetActionIdFromAnnotationQuery = {
+  __typename?: 'Query';
+  getAnnotation?: { __typename?: 'Annotation'; actionId: string } | null;
 };
 
 export type GetColonyMetadataQueryVariables = Exact<{
@@ -6426,6 +6475,29 @@ export const UpdateColonyStakeDocument = gql`
       input: { id: $colonyStakeId, totalAmount: $totalAmount }
     ) {
       id
+    }
+  }
+`;
+export const GetAnnotationIdFromActionDocument = gql`
+  query GetAnnotationIdFromAction($id: ID!) {
+    getColonyAction(id: $id) {
+      annotationId
+    }
+  }
+`;
+export const GetMotionIdFromActionDocument = gql`
+  query GetMotionIdFromAction($id: ID!) {
+    getColonyAction(id: $id) {
+      motionData {
+        id
+      }
+    }
+  }
+`;
+export const GetActionIdFromAnnotationDocument = gql`
+  query getActionIdFromAnnotation($id: ID!) {
+    getAnnotation(id: $id) {
+      actionId
     }
   }
 `;
