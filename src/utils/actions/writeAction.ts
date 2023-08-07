@@ -72,6 +72,8 @@ const showActionInActionsList = async (
     const isFundingExpenditure =
       !!data?.getExpendituresByNativeFundingPotId?.items.length;
 
+    // if we're funding an expenditure, we don't want to show it in the action list
+    // else, we still want to check if the action's initiator or recipient is an extension/network client
     if (isFundingExpenditure) {
       return false;
     }
