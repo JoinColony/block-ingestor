@@ -9,3 +9,4 @@ export { default as handleVersionUpgradeAction } from './versionUpgrade';
 export { default as handleEmitDomainReputationAction } from './emitDomainReputation';
 export { default as handleManagePermissionsAction } from './managePermissions';
 export { default as handleAnnotateTransaction } from './annotateTransaction';
+export { default as handleMakeAbitraryTransactionAction } from './makeArbitraryTransaction';
