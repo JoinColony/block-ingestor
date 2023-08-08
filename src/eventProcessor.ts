@@ -45,7 +45,7 @@ import {
   handleExpenditureMadeStaged,
   handleStagedPaymentReleased,
   handleExpenditureStakerPunished,
-  handleArbitraryTransaction,
+  handleMakeAbitraryTransactionAction,
 } from './handlers';
 
 dotenv.config();
@@ -309,7 +309,7 @@ export default async (event: ContractEvent): Promise<void> => {
     }
 
     case ContractEventsSignatures.ArbitraryTransaction: {
-      await handleArbitraryTransaction(event);
+      await handleMakeAbitraryTransactionAction(event);
       return;
     }
 
