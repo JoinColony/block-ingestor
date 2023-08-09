@@ -6495,7 +6495,7 @@ export const GetMotionIdFromActionDocument = gql`
   }
 `;
 export const GetActionIdFromAnnotationDocument = gql`
-  query getActionIdFromAnnotation($id: ID!) {
+  query GetActionIdFromAnnotation($id: ID!) {
     getAnnotation(id: $id) {
       actionId
     }

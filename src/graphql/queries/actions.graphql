@@ -6,7 +6,7 @@ query GetMotionIdFromAction($id: ID!) {
   }
 }
 
-query getActionIdFromAnnotation($id: ID!) {
+query GetActionIdFromAnnotation($id: ID!) {
   getAnnotation(id: $id) {
     actionId
   }
