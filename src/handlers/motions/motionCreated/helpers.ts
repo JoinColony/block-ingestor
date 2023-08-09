@@ -253,5 +253,5 @@ export const createMotionInDB = async (
     ...input,
   };
 
-  createActionWithMotion(actionData, motionData, initialMotionMessage);
+  await createActionWithMotion(actionData, motionData, initialMotionMessage);
 };
