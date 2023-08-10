@@ -205,10 +205,14 @@ export type ColonyAction = {
   /** The Colony that the action belongs to */
   colony: Colony;
   colonyActionsId?: Maybe<Scalars['ID']>;
+  /** If the action is a Simple Decision, it will have an id that corresponds to a ColonyDecision entry in the database. */
+  colonyDecisionId?: Maybe<Scalars['ID']>;
   /** The identifier of the Colony that the action belongs to */
   colonyId: Scalars['ID'];
   /** The timestamp when the action was created */
   createdAt: Scalars['AWSDateTime'];
+  /** Corresponding Decision data, if action is a Simple Decision */
+  decisionData?: Maybe<ColonyDecision>;
   /** The source Domain of the action, if applicable */
   fromDomain?: Maybe<Domain>;
   /** The source Domain identifier, if applicable */
@@ -229,6 +233,7 @@ export type ColonyAction = {
   initiatorToken?: Maybe<Token>;
   /** The User who initiated the action, if applicable */
   initiatorUser?: Maybe<User>;
+  /** Will be true if the action is a motion */
   isMotion?: Maybe<Scalars['Boolean']>;
   /** Expanded `ColonyMotion` for the corresponding `motionId` */
   motionData?: Maybe<ColonyMotion>;
@@ -312,6 +317,8 @@ export enum ColonyActionType {
   ColonyEdit = 'COLONY_EDIT',
   /** An action related to editing a Colony's details via a motion */
   ColonyEditMotion = 'COLONY_EDIT_MOTION',
+  /** An action related to a creating a Decision within a Colony via a motion */
+  CreateDecisionMotion = 'CREATE_DECISION_MOTION',
   /** An action related to creating a domain within a Colony */
   CreateDomain = 'CREATE_DOMAIN',
   /** An action related to creating a domain within a Colony via a motion */
@@ -422,6 +429,21 @@ export type ColonyChainFundsClaimInput = {
   updatedAt?: InputMaybe<Scalars['AWSDateTime']>;
 };
 
+export type ColonyDecision = {
+  __typename?: 'ColonyDecision';
+  action?: Maybe<ColonyAction>;
+  actionId: Scalars['ID'];
+  colonyAddress: Scalars['String'];
+  createdAt: Scalars['AWSDateTime'];
+  description: Scalars['String'];
+  id: Scalars['ID'];
+  motionDomainId: Scalars['Int'];
+  showInDecisionsList: Scalars['Boolean'];
+  title: Scalars['String'];
+  updatedAt: Scalars['AWSDateTime'];
+  walletAddress: Scalars['String'];
+};
+
 /** Represents a single extension installed on a Colony */
 export type ColonyExtension = {
   __typename?: 'ColonyExtension';
@@ -472,10 +494,7 @@ export type ColonyFundsClaim = {
   updatedAt: Scalars['AWSDateTime'];
 };
 
-/**
- * "
- * Snapshot of the user's full roles/permissions at a specific block
- */
+/** Snapshot of the user's full roles/permissions at a specific block */
 export type ColonyHistoricRole = {
   __typename?: 'ColonyHistoricRole';
   /** Block at which the snapshot was taken */
@@ -593,6 +612,8 @@ export type ColonyMotion = {
    * To ensure uniqueness, we format as: `chainId-votingRepExtnAddress_nativeMotionId`
    */
   id: Scalars['ID'];
+  /** Whether the motion is a Simple Decision */
+  isDecision: Scalars['Boolean'];
   /** Whether the motion was finalized or not */
   isFinalized: Scalars['Boolean'];
   messages?: Maybe<ModelMotionMessageConnection>;
@@ -833,6 +854,7 @@ export type CreateColonyActionInput = {
   annotationId?: InputMaybe<Scalars['ID']>;
   blockNumber: Scalars['Int'];
   colonyActionsId?: InputMaybe<Scalars['ID']>;
+  colonyDecisionId?: InputMaybe<Scalars['ID']>;
   colonyId: Scalars['ID'];
   createdAt?: InputMaybe<Scalars['AWSDateTime']>;
   fromDomainId?: InputMaybe<Scalars['ID']>;
@@ -852,6 +874,18 @@ export type CreateColonyActionInput = {
   toDomainId?: InputMaybe<Scalars['ID']>;
   tokenAddress?: InputMaybe<Scalars['ID']>;
   type: ColonyActionType;
+};
+
+export type CreateColonyDecisionInput = {
+  actionId: Scalars['ID'];
+  colonyAddress: Scalars['String'];
+  createdAt?: InputMaybe<Scalars['AWSDateTime']>;
+  description: Scalars['String'];
+  id?: InputMaybe<Scalars['ID']>;
+  motionDomainId: Scalars['Int'];
+  showInDecisionsList: Scalars['Boolean'];
+  title: Scalars['String'];
+  walletAddress: Scalars['String'];
 };
 
 export type CreateColonyExtensionInput = {
@@ -921,6 +955,7 @@ export type CreateColonyMotionInput = {
   createdBy: Scalars['String'];
   hasObjection: Scalars['Boolean'];
   id?: InputMaybe<Scalars['ID']>;
+  isDecision: Scalars['Boolean'];
   isFinalized: Scalars['Boolean'];
   motionDomainId: Scalars['ID'];
   motionStakes: MotionStakesInput;
@@ -1137,6 +1172,10 @@ export type DeleteAnnotationInput = {
 };
 
 export type DeleteColonyActionInput = {
+  id: Scalars['ID'];
+};
+
+export type DeleteColonyDecisionInput = {
   id: Scalars['ID'];
 };
 
@@ -1636,6 +1675,7 @@ export type ModelColonyActionConditionInput = {
   annotationId?: InputMaybe<ModelIdInput>;
   blockNumber?: InputMaybe<ModelIntInput>;
   colonyActionsId?: InputMaybe<ModelIdInput>;
+  colonyDecisionId?: InputMaybe<ModelIdInput>;
   colonyId?: InputMaybe<ModelIdInput>;
   createdAt?: InputMaybe<ModelStringInput>;
   fromDomainId?: InputMaybe<ModelIdInput>;
@@ -1669,6 +1709,7 @@ export type ModelColonyActionFilterInput = {
   annotationId?: InputMaybe<ModelIdInput>;
   blockNumber?: InputMaybe<ModelIntInput>;
   colonyActionsId?: InputMaybe<ModelIdInput>;
+  colonyDecisionId?: InputMaybe<ModelIdInput>;
   colonyId?: InputMaybe<ModelIdInput>;
   createdAt?: InputMaybe<ModelStringInput>;
   fromDomainId?: InputMaybe<ModelIdInput>;
@@ -1711,6 +1752,41 @@ export type ModelColonyConnection = {
   __typename?: 'ModelColonyConnection';
   items: Array<Maybe<Colony>>;
   nextToken?: Maybe<Scalars['String']>;
+};
+
+export type ModelColonyDecisionConditionInput = {
+  actionId?: InputMaybe<ModelIdInput>;
+  and?: InputMaybe<Array<InputMaybe<ModelColonyDecisionConditionInput>>>;
+  colonyAddress?: InputMaybe<ModelStringInput>;
+  createdAt?: InputMaybe<ModelStringInput>;
+  description?: InputMaybe<ModelStringInput>;
+  motionDomainId?: InputMaybe<ModelIntInput>;
+  not?: InputMaybe<ModelColonyDecisionConditionInput>;
+  or?: InputMaybe<Array<InputMaybe<ModelColonyDecisionConditionInput>>>;
+  showInDecisionsList?: InputMaybe<ModelBooleanInput>;
+  title?: InputMaybe<ModelStringInput>;
+  walletAddress?: InputMaybe<ModelStringInput>;
+};
+
+export type ModelColonyDecisionConnection = {
+  __typename?: 'ModelColonyDecisionConnection';
+  items: Array<Maybe<ColonyDecision>>;
+  nextToken?: Maybe<Scalars['String']>;
+};
+
+export type ModelColonyDecisionFilterInput = {
+  actionId?: InputMaybe<ModelIdInput>;
+  and?: InputMaybe<Array<InputMaybe<ModelColonyDecisionFilterInput>>>;
+  colonyAddress?: InputMaybe<ModelStringInput>;
+  createdAt?: InputMaybe<ModelStringInput>;
+  description?: InputMaybe<ModelStringInput>;
+  id?: InputMaybe<ModelIdInput>;
+  motionDomainId?: InputMaybe<ModelIntInput>;
+  not?: InputMaybe<ModelColonyDecisionFilterInput>;
+  or?: InputMaybe<Array<InputMaybe<ModelColonyDecisionFilterInput>>>;
+  showInDecisionsList?: InputMaybe<ModelBooleanInput>;
+  title?: InputMaybe<ModelStringInput>;
+  walletAddress?: InputMaybe<ModelStringInput>;
 };
 
 export type ModelColonyExtensionConditionInput = {
@@ -1865,6 +1941,7 @@ export type ModelColonyMotionConditionInput = {
   and?: InputMaybe<Array<InputMaybe<ModelColonyMotionConditionInput>>>;
   createdBy?: InputMaybe<ModelStringInput>;
   hasObjection?: InputMaybe<ModelBooleanInput>;
+  isDecision?: InputMaybe<ModelBooleanInput>;
   isFinalized?: InputMaybe<ModelBooleanInput>;
   motionDomainId?: InputMaybe<ModelIdInput>;
   nativeMotionDomainId?: InputMaybe<ModelStringInput>;
@@ -1891,6 +1968,7 @@ export type ModelColonyMotionFilterInput = {
   createdBy?: InputMaybe<ModelStringInput>;
   hasObjection?: InputMaybe<ModelBooleanInput>;
   id?: InputMaybe<ModelIdInput>;
+  isDecision?: InputMaybe<ModelBooleanInput>;
   isFinalized?: InputMaybe<ModelBooleanInput>;
   motionDomainId?: InputMaybe<ModelIdInput>;
   nativeMotionDomainId?: InputMaybe<ModelStringInput>;
@@ -2373,6 +2451,7 @@ export type ModelSubscriptionColonyActionFilterInput = {
   and?: InputMaybe<Array<InputMaybe<ModelSubscriptionColonyActionFilterInput>>>;
   annotationId?: InputMaybe<ModelSubscriptionIdInput>;
   blockNumber?: InputMaybe<ModelSubscriptionIntInput>;
+  colonyDecisionId?: InputMaybe<ModelSubscriptionIdInput>;
   colonyId?: InputMaybe<ModelSubscriptionIdInput>;
   createdAt?: InputMaybe<ModelSubscriptionStringInput>;
   fromDomainId?: InputMaybe<ModelSubscriptionIdInput>;
@@ -2392,6 +2471,24 @@ export type ModelSubscriptionColonyActionFilterInput = {
   toDomainId?: InputMaybe<ModelSubscriptionIdInput>;
   tokenAddress?: InputMaybe<ModelSubscriptionIdInput>;
   type?: InputMaybe<ModelSubscriptionStringInput>;
+};
+
+export type ModelSubscriptionColonyDecisionFilterInput = {
+  actionId?: InputMaybe<ModelSubscriptionIdInput>;
+  and?: InputMaybe<
+    Array<InputMaybe<ModelSubscriptionColonyDecisionFilterInput>>
+  >;
+  colonyAddress?: InputMaybe<ModelSubscriptionStringInput>;
+  createdAt?: InputMaybe<ModelSubscriptionStringInput>;
+  description?: InputMaybe<ModelSubscriptionStringInput>;
+  id?: InputMaybe<ModelSubscriptionIdInput>;
+  motionDomainId?: InputMaybe<ModelSubscriptionIntInput>;
+  or?: InputMaybe<
+    Array<InputMaybe<ModelSubscriptionColonyDecisionFilterInput>>
+  >;
+  showInDecisionsList?: InputMaybe<ModelSubscriptionBooleanInput>;
+  title?: InputMaybe<ModelSubscriptionStringInput>;
+  walletAddress?: InputMaybe<ModelSubscriptionStringInput>;
 };
 
 export type ModelSubscriptionColonyExtensionFilterInput = {
@@ -2478,6 +2575,7 @@ export type ModelSubscriptionColonyMotionFilterInput = {
   createdBy?: InputMaybe<ModelSubscriptionStringInput>;
   hasObjection?: InputMaybe<ModelSubscriptionBooleanInput>;
   id?: InputMaybe<ModelSubscriptionIdInput>;
+  isDecision?: InputMaybe<ModelSubscriptionBooleanInput>;
   isFinalized?: InputMaybe<ModelSubscriptionBooleanInput>;
   motionDomainId?: InputMaybe<ModelSubscriptionIdInput>;
   nativeMotionDomainId?: InputMaybe<ModelSubscriptionStringInput>;
@@ -2944,6 +3042,7 @@ export type Mutation = {
   createAnnotation?: Maybe<Annotation>;
   createColony?: Maybe<Colony>;
   createColonyAction?: Maybe<ColonyAction>;
+  createColonyDecision?: Maybe<ColonyDecision>;
   createColonyExtension?: Maybe<ColonyExtension>;
   createColonyFundsClaim?: Maybe<ColonyFundsClaim>;
   createColonyHistoricRole?: Maybe<ColonyHistoricRole>;
@@ -2972,6 +3071,7 @@ export type Mutation = {
   deleteAnnotation?: Maybe<Annotation>;
   deleteColony?: Maybe<Colony>;
   deleteColonyAction?: Maybe<ColonyAction>;
+  deleteColonyDecision?: Maybe<ColonyDecision>;
   deleteColonyExtension?: Maybe<ColonyExtension>;
   deleteColonyFundsClaim?: Maybe<ColonyFundsClaim>;
   deleteColonyHistoricRole?: Maybe<ColonyHistoricRole>;
@@ -2998,6 +3098,7 @@ export type Mutation = {
   updateAnnotation?: Maybe<Annotation>;
   updateColony?: Maybe<Colony>;
   updateColonyAction?: Maybe<ColonyAction>;
+  updateColonyDecision?: Maybe<ColonyDecision>;
   updateColonyExtension?: Maybe<ColonyExtension>;
   updateColonyFundsClaim?: Maybe<ColonyFundsClaim>;
   updateColonyHistoricRole?: Maybe<ColonyHistoricRole>;
@@ -3042,6 +3143,12 @@ export type MutationCreateColonyArgs = {
 export type MutationCreateColonyActionArgs = {
   condition?: InputMaybe<ModelColonyActionConditionInput>;
   input: CreateColonyActionInput;
+};
+
+/** Root mutation type */
+export type MutationCreateColonyDecisionArgs = {
+  condition?: InputMaybe<ModelColonyDecisionConditionInput>;
+  input: CreateColonyDecisionInput;
 };
 
 /** Root mutation type */
@@ -3199,6 +3306,12 @@ export type MutationDeleteColonyActionArgs = {
 };
 
 /** Root mutation type */
+export type MutationDeleteColonyDecisionArgs = {
+  condition?: InputMaybe<ModelColonyDecisionConditionInput>;
+  input: DeleteColonyDecisionInput;
+};
+
+/** Root mutation type */
 export type MutationDeleteColonyExtensionArgs = {
   condition?: InputMaybe<ModelColonyExtensionConditionInput>;
   input: DeleteColonyExtensionInput;
@@ -3345,6 +3458,12 @@ export type MutationUpdateColonyArgs = {
 export type MutationUpdateColonyActionArgs = {
   condition?: InputMaybe<ModelColonyActionConditionInput>;
   input: UpdateColonyActionInput;
+};
+
+/** Root mutation type */
+export type MutationUpdateColonyDecisionArgs = {
+  condition?: InputMaybe<ModelColonyDecisionConditionInput>;
+  input: UpdateColonyDecisionInput;
 };
 
 /** Root mutation type */
@@ -3618,6 +3737,9 @@ export type Query = {
   getColonyByAddress?: Maybe<ModelColonyConnection>;
   getColonyByName?: Maybe<ModelColonyConnection>;
   getColonyByType?: Maybe<ModelColonyConnection>;
+  getColonyDecision?: Maybe<ColonyDecision>;
+  getColonyDecisionByActionId?: Maybe<ModelColonyDecisionConnection>;
+  getColonyDecisionByColonyAddress?: Maybe<ModelColonyDecisionConnection>;
   getColonyExtension?: Maybe<ColonyExtension>;
   getColonyFundsClaim?: Maybe<ColonyFundsClaim>;
   getColonyHistoricRole?: Maybe<ColonyHistoricRole>;
@@ -3670,6 +3792,7 @@ export type Query = {
   listAnnotations?: Maybe<ModelAnnotationConnection>;
   listColonies?: Maybe<ModelColonyConnection>;
   listColonyActions?: Maybe<ModelColonyActionConnection>;
+  listColonyDecisions?: Maybe<ModelColonyDecisionConnection>;
   listColonyExtensions?: Maybe<ModelColonyExtensionConnection>;
   listColonyFundsClaims?: Maybe<ModelColonyFundsClaimConnection>;
   listColonyHistoricRoles?: Maybe<ModelColonyHistoricRoleConnection>;
@@ -3761,6 +3884,30 @@ export type QueryGetColonyByTypeArgs = {
   nextToken?: InputMaybe<Scalars['String']>;
   sortDirection?: InputMaybe<ModelSortDirection>;
   type: ColonyType;
+};
+
+/** Root query type */
+export type QueryGetColonyDecisionArgs = {
+  id: Scalars['ID'];
+};
+
+/** Root query type */
+export type QueryGetColonyDecisionByActionIdArgs = {
+  actionId: Scalars['ID'];
+  filter?: InputMaybe<ModelColonyDecisionFilterInput>;
+  limit?: InputMaybe<Scalars['Int']>;
+  nextToken?: InputMaybe<Scalars['String']>;
+  sortDirection?: InputMaybe<ModelSortDirection>;
+};
+
+/** Root query type */
+export type QueryGetColonyDecisionByColonyAddressArgs = {
+  colonyAddress: Scalars['String'];
+  createdAt?: InputMaybe<ModelStringKeyConditionInput>;
+  filter?: InputMaybe<ModelColonyDecisionFilterInput>;
+  limit?: InputMaybe<Scalars['Int']>;
+  nextToken?: InputMaybe<Scalars['String']>;
+  sortDirection?: InputMaybe<ModelSortDirection>;
 };
 
 /** Root query type */
@@ -4043,6 +4190,13 @@ export type QueryListColonyActionsArgs = {
 };
 
 /** Root query type */
+export type QueryListColonyDecisionsArgs = {
+  filter?: InputMaybe<ModelColonyDecisionFilterInput>;
+  limit?: InputMaybe<Scalars['Int']>;
+  nextToken?: InputMaybe<Scalars['String']>;
+};
+
+/** Root query type */
 export type QueryListColonyExtensionsArgs = {
   filter?: InputMaybe<ModelColonyExtensionFilterInput>;
   limit?: InputMaybe<Scalars['Int']>;
@@ -4239,6 +4393,7 @@ export type Subscription = {
   onCreateAnnotation?: Maybe<Annotation>;
   onCreateColony?: Maybe<Colony>;
   onCreateColonyAction?: Maybe<ColonyAction>;
+  onCreateColonyDecision?: Maybe<ColonyDecision>;
   onCreateColonyExtension?: Maybe<ColonyExtension>;
   onCreateColonyFundsClaim?: Maybe<ColonyFundsClaim>;
   onCreateColonyHistoricRole?: Maybe<ColonyHistoricRole>;
@@ -4263,6 +4418,7 @@ export type Subscription = {
   onDeleteAnnotation?: Maybe<Annotation>;
   onDeleteColony?: Maybe<Colony>;
   onDeleteColonyAction?: Maybe<ColonyAction>;
+  onDeleteColonyDecision?: Maybe<ColonyDecision>;
   onDeleteColonyExtension?: Maybe<ColonyExtension>;
   onDeleteColonyFundsClaim?: Maybe<ColonyFundsClaim>;
   onDeleteColonyHistoricRole?: Maybe<ColonyHistoricRole>;
@@ -4287,6 +4443,7 @@ export type Subscription = {
   onUpdateAnnotation?: Maybe<Annotation>;
   onUpdateColony?: Maybe<Colony>;
   onUpdateColonyAction?: Maybe<ColonyAction>;
+  onUpdateColonyDecision?: Maybe<ColonyDecision>;
   onUpdateColonyExtension?: Maybe<ColonyExtension>;
   onUpdateColonyFundsClaim?: Maybe<ColonyFundsClaim>;
   onUpdateColonyHistoricRole?: Maybe<ColonyHistoricRole>;
@@ -4320,6 +4477,10 @@ export type SubscriptionOnCreateColonyArgs = {
 
 export type SubscriptionOnCreateColonyActionArgs = {
   filter?: InputMaybe<ModelSubscriptionColonyActionFilterInput>;
+};
+
+export type SubscriptionOnCreateColonyDecisionArgs = {
+  filter?: InputMaybe<ModelSubscriptionColonyDecisionFilterInput>;
 };
 
 export type SubscriptionOnCreateColonyExtensionArgs = {
@@ -4418,6 +4579,10 @@ export type SubscriptionOnDeleteColonyActionArgs = {
   filter?: InputMaybe<ModelSubscriptionColonyActionFilterInput>;
 };
 
+export type SubscriptionOnDeleteColonyDecisionArgs = {
+  filter?: InputMaybe<ModelSubscriptionColonyDecisionFilterInput>;
+};
+
 export type SubscriptionOnDeleteColonyExtensionArgs = {
   filter?: InputMaybe<ModelSubscriptionColonyExtensionFilterInput>;
 };
@@ -4512,6 +4677,10 @@ export type SubscriptionOnUpdateColonyArgs = {
 
 export type SubscriptionOnUpdateColonyActionArgs = {
   filter?: InputMaybe<ModelSubscriptionColonyActionFilterInput>;
+};
+
+export type SubscriptionOnUpdateColonyDecisionArgs = {
+  filter?: InputMaybe<ModelSubscriptionColonyDecisionFilterInput>;
 };
 
 export type SubscriptionOnUpdateColonyExtensionArgs = {
@@ -4685,6 +4854,7 @@ export type UpdateColonyActionInput = {
   annotationId?: InputMaybe<Scalars['ID']>;
   blockNumber?: InputMaybe<Scalars['Int']>;
   colonyActionsId?: InputMaybe<Scalars['ID']>;
+  colonyDecisionId?: InputMaybe<Scalars['ID']>;
   colonyId?: InputMaybe<Scalars['ID']>;
   createdAt?: InputMaybe<Scalars['AWSDateTime']>;
   fromDomainId?: InputMaybe<Scalars['ID']>;
@@ -4704,6 +4874,18 @@ export type UpdateColonyActionInput = {
   toDomainId?: InputMaybe<Scalars['ID']>;
   tokenAddress?: InputMaybe<Scalars['ID']>;
   type?: InputMaybe<ColonyActionType>;
+};
+
+export type UpdateColonyDecisionInput = {
+  actionId?: InputMaybe<Scalars['ID']>;
+  colonyAddress?: InputMaybe<Scalars['String']>;
+  createdAt?: InputMaybe<Scalars['AWSDateTime']>;
+  description?: InputMaybe<Scalars['String']>;
+  id: Scalars['ID'];
+  motionDomainId?: InputMaybe<Scalars['Int']>;
+  showInDecisionsList?: InputMaybe<Scalars['Boolean']>;
+  title?: InputMaybe<Scalars['String']>;
+  walletAddress?: InputMaybe<Scalars['String']>;
 };
 
 export type UpdateColonyExtensionInput = {
@@ -4773,6 +4955,7 @@ export type UpdateColonyMotionInput = {
   createdBy?: InputMaybe<Scalars['String']>;
   hasObjection?: InputMaybe<Scalars['Boolean']>;
   id: Scalars['ID'];
+  isDecision?: InputMaybe<Scalars['Boolean']>;
   isFinalized?: InputMaybe<Scalars['Boolean']>;
   motionDomainId?: InputMaybe<Scalars['ID']>;
   motionStakes?: InputMaybe<MotionStakesInput>;
@@ -5192,6 +5375,7 @@ export type ColonyMotionFragment = {
   skillRep: string;
   hasObjection: boolean;
   motionDomainId: string;
+  isDecision: boolean;
   motionStakes: {
     __typename?: 'MotionStakes';
     raw: { __typename?: 'MotionStakeValues'; nay: string; yay: string };
@@ -5353,6 +5537,16 @@ export type SetCurrentVersionMutation = {
   setCurrentVersion?: boolean | null;
 };
 
+export type UpdateColonyDecisionMutationVariables = Exact<{
+  id: Scalars['ID'];
+  showInDecisionsList: Scalars['Boolean'];
+}>;
+
+export type UpdateColonyDecisionMutation = {
+  __typename?: 'Mutation';
+  updateColonyDecision?: { __typename?: 'ColonyDecision'; id: string } | null;
+};
+
 export type CreateDomainMutationVariables = Exact<{
   input: CreateDomainInput;
 }>;
@@ -5511,6 +5705,15 @@ export type UpdateColonyMotionMutation = {
   updateColonyMotion?: { __typename?: 'ColonyMotion'; id: string } | null;
 };
 
+export type CreateMotionMessageMutationVariables = Exact<{
+  input: CreateMotionMessageInput;
+}>;
+
+export type CreateMotionMessageMutation = {
+  __typename?: 'Mutation';
+  createMotionMessage?: { __typename?: 'MotionMessage'; id: string } | null;
+};
+
 export type CreateColonyRoleMutationVariables = Exact<{
   input: CreateColonyRoleInput;
 }>;
@@ -5597,18 +5800,6 @@ export type UpdateColonyStakeMutationVariables = Exact<{
 export type UpdateColonyStakeMutation = {
   __typename?: 'Mutation';
   updateColonyStake?: { __typename?: 'ColonyStake'; id: string } | null;
-};
-
-export type GetAnnotationIdFromActionQueryVariables = Exact<{
-  id: Scalars['ID'];
-}>;
-
-export type GetAnnotationIdFromActionQuery = {
-  __typename?: 'Query';
-  getColonyAction?: {
-    __typename?: 'ColonyAction';
-    annotationId?: string | null;
-  } | null;
 };
 
 export type GetMotionIdFromActionQueryVariables = Exact<{
@@ -5731,6 +5922,18 @@ export type ListColoniesQuery = {
     __typename?: 'ModelColonyConnection';
     nextToken?: string | null;
     items: Array<{ __typename?: 'Colony'; id: string } | null>;
+  } | null;
+};
+
+export type GetColonyDecisionByActionIdQueryVariables = Exact<{
+  actionId: Scalars['ID'];
+}>;
+
+export type GetColonyDecisionByActionIdQuery = {
+  __typename?: 'Query';
+  getColonyDecisionByActionId?: {
+    __typename?: 'ModelColonyDecisionConnection';
+    items: Array<{ __typename?: 'ColonyDecision'; id: string } | null>;
   } | null;
 };
 
@@ -5898,6 +6101,7 @@ export type GetColonyActionByMotionIdQuery = {
     items: Array<{
       __typename?: 'ColonyAction';
       id: string;
+      colonyDecisionId?: string | null;
       pendingDomainMetadata?: {
         __typename?: 'DomainMetadata';
         name: string;
@@ -5962,6 +6166,7 @@ export type GetColonyMotionQuery = {
     skillRep: string;
     hasObjection: boolean;
     motionDomainId: string;
+    isDecision: boolean;
     motionStakes: {
       __typename?: 'MotionStakes';
       raw: { __typename?: 'MotionStakeValues'; nay: string; yay: string };
@@ -6014,15 +6219,6 @@ export type GetColonyMotionQuery = {
       inRevealPhase: boolean;
     };
   } | null;
-};
-
-export type CreateMotionMessageMutationVariables = Exact<{
-  input: CreateMotionMessageInput;
-}>;
-
-export type CreateMotionMessageMutation = {
-  __typename?: 'Mutation';
-  createMotionMessage?: { __typename?: 'MotionMessage'; id: string } | null;
 };
 
 export type GetColonyRoleQueryVariables = Exact<{
@@ -6202,6 +6398,7 @@ export const ColonyMotion = gql`
       hasFailedNotFinalizable
       inRevealPhase
     }
+    isDecision
   }
   ${MotionStakes}
   ${UserStakes}
@@ -6277,6 +6474,15 @@ export const UpdateColonyMetadataDocument = gql`
 export const SetCurrentVersionDocument = gql`
   mutation SetCurrentVersion($input: SetCurrentVersionInput!) {
     setCurrentVersion(input: $input)
+  }
+`;
+export const UpdateColonyDecisionDocument = gql`
+  mutation UpdateColonyDecision($id: ID!, $showInDecisionsList: Boolean!) {
+    updateColonyDecision(
+      input: { id: $id, showInDecisionsList: $showInDecisionsList }
+    ) {
+      id
+    }
   }
 `;
 export const CreateDomainDocument = gql`
@@ -6401,6 +6607,13 @@ export const UpdateColonyMotionDocument = gql`
     }
   }
 `;
+export const CreateMotionMessageDocument = gql`
+  mutation CreateMotionMessage($input: CreateMotionMessageInput!) {
+    createMotionMessage(input: $input) {
+      id
+    }
+  }
+`;
 export const CreateColonyRoleDocument = gql`
   mutation CreateColonyRole($input: CreateColonyRoleInput!) {
     createColonyRole(input: $input) {
@@ -6475,13 +6688,6 @@ export const UpdateColonyStakeDocument = gql`
       input: { id: $colonyStakeId, totalAmount: $totalAmount }
     ) {
       id
-    }
-  }
-`;
-export const GetAnnotationIdFromActionDocument = gql`
-  query GetAnnotationIdFromAction($id: ID!) {
-    getColonyAction(id: $id) {
-      annotationId
     }
   }
 `;
@@ -6563,6 +6769,15 @@ export const ListColoniesDocument = gql`
   query ListColonies($nextToken: String) {
     listColonies(limit: 1000, nextToken: $nextToken) {
       nextToken
+      items {
+        id
+      }
+    }
+  }
+`;
+export const GetColonyDecisionByActionIdDocument = gql`
+  query GetColonyDecisionByActionId($actionId: ID!) {
+    getColonyDecisionByActionId(actionId: $actionId) {
       items {
         id
       }
@@ -6706,6 +6921,7 @@ export const GetColonyActionByMotionIdDocument = gql`
         pendingColonyMetadata {
           ...ColonyMetadata
         }
+        colonyDecisionId
       }
     }
   }
@@ -6719,13 +6935,6 @@ export const GetColonyMotionDocument = gql`
     }
   }
   ${ColonyMotion}
-`;
-export const CreateMotionMessageDocument = gql`
-  mutation CreateMotionMessage($input: CreateMotionMessageInput!) {
-    createMotionMessage(input: $input) {
-      id
-    }
-  }
 `;
 export const GetColonyRoleDocument = gql`
   query GetColonyRole($id: ID!) {

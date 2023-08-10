@@ -7,19 +7,49 @@ import {
   GetColonyActionByMotionIdDocument,
   GetColonyActionByMotionIdQuery,
   GetColonyActionByMotionIdQueryVariables,
+  GetColonyDecisionByActionIdDocument,
+  GetColonyDecisionByActionIdQuery,
+  GetColonyDecisionByActionIdQueryVariables,
   GetColonyMotionDocument,
   GetColonyMotionQuery,
   GetColonyMotionQueryVariables,
   UpdateColonyActionDocument,
+  UpdateColonyDecisionDocument,
+  UpdateColonyDecisionMutation,
+  UpdateColonyDecisionMutationVariables,
   UpdateColonyMotionDocument,
 } from '~graphql';
 import { MotionSide, MotionVote } from '~types';
-import { notNull, output } from '~utils';
+import { verbose, output } from '~utils';
 
 export * from './motionStaked/helpers';
 
 export const getMotionSide = (vote: BigNumber): MotionSide =>
   vote.eq(MotionVote.YAY) ? MotionSide.YAY : MotionSide.NAY;
+
+const updateDecisionInDB = async (
+  actionId: string,
+  decisionData: Omit<UpdateColonyDecisionMutationVariables, 'id'>,
+): Promise<void> => {
+  const { data } =
+    (await query<
+      GetColonyDecisionByActionIdQuery,
+      GetColonyDecisionByActionIdQueryVariables
+    >(GetColonyDecisionByActionIdDocument, {
+      actionId,
+    })) ?? {};
+
+  const decision = data?.getColonyDecisionByActionId?.items[0];
+
+  if (decision)
+    await mutate<
+      UpdateColonyDecisionMutation,
+      UpdateColonyDecisionMutationVariables
+    >(UpdateColonyDecisionDocument, {
+      id: decision.id,
+      ...decisionData,
+    });
+};
 
 export const updateMotionInDB = async (
   motionData: ColonyMotion,
@@ -51,20 +81,26 @@ export const updateMotionInDB = async (
         motionId: motionData.id,
       })) ?? {};
 
-    const colonyActionItems =
-      data?.getColonyActionByMotionId?.items.filter(notNull);
+    const colonyAction = data?.getColonyActionByMotionId?.items[0];
 
-    if (!colonyActionItems?.length) {
-      output(
+    if (!colonyAction) {
+      verbose(
         'Could not find the action in the db. This is a bug and needs investigating.',
       );
     } else {
       await mutate(UpdateColonyActionDocument, {
         input: {
-          id: colonyActionItems[0].id,
+          id: colonyAction.id,
           showInActionsList,
         },
       });
+
+      // If is decision
+      if (colonyAction.colonyDecisionId) {
+        await updateDecisionInDB(colonyAction.id, {
+          showInDecisionsList: showInActionsList,
+        });
+      }
     }
   }
 };

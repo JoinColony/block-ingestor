@@ -8,3 +8,5 @@ export const SUPPORTED_EXTENSION_IDS = [
   Extension.OneTxPayment,
   Extension.VotingReputation,
 ];
+
+export const SIMPLE_DECISIONS_ACTION_CODE = '0x12345678';
