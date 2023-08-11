@@ -13,3 +13,11 @@ query GetExpenditure($id: ID!) {
     }
   }
 }
+
+query GetExpenditureByNativeFundingPotId($nativeFundingPotId: Int!) {
+  getExpendituresByNativeFundingPotId(nativeFundingPotId: $nativeFundingPotId) {
+    items {
+      id
+    }
+  }
+}
