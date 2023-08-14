@@ -1,4 +1,5 @@
 import { BigNumber } from 'ethers';
+import { Id } from '@colony/colony-js';
 import { mutate, query } from '~amplifyClient';
 import { ContractEvent } from '~types';
 import {
@@ -23,7 +24,12 @@ import {
 import provider from '~provider';
 
 export default async (event: ContractEvent): Promise<void> => {
-  const { args, contractAddress, blockNumber, transactionHash } = event;
+  const {
+    args,
+    contractAddress: colonyAddress,
+    blockNumber,
+    transactionHash,
+  } = event;
   const {
     user: targetAddress,
     /*
@@ -31,17 +37,17 @@ export default async (event: ContractEvent): Promise<void> => {
      * since it can only be emmitted in the Root domain, so for such cases, we
      * default to the Root Domain
      */
-    domainId = BigNumber.from(1),
+    domainId = BigNumber.from(Id.RootDomain),
   } = args;
   let { agent } = args;
 
   const id = getColonyRolesDatabaseId(
-    contractAddress,
+    colonyAddress,
     domainId.toString(),
     targetAddress,
   );
   const domainDatabaseId = getDomainDatabaseId(
-    contractAddress,
+    colonyAddress,
     domainId.toString(),
   );
 
@@ -88,7 +94,7 @@ export default async (event: ContractEvent): Promise<void> => {
       }
       const allRoleEventsUpdates = await getAllRoleEventsFromTransaction(
         transactionHash,
-        contractAddress,
+        colonyAddress,
       );
       const rolesFromAllUpdateEvents =
         getRolesMapFromEvents(allRoleEventsUpdates);
@@ -109,14 +115,14 @@ export default async (event: ContractEvent): Promise<void> => {
       );
 
       verbose(
-        `Update the Roles entry for ${targetAddress} in colony ${contractAddress}, under domain ${domainId.toNumber()}`,
+        `Update the Roles entry for ${targetAddress} in colony ${colonyAddress}, under domain ${domainId.toNumber()}`,
       );
 
       /*
        * Create the historic role entry
        */
       await createColonyHistoricRoleDatabaseEntry(
-        contractAddress,
+        colonyAddress,
         domainId.toNumber(),
         targetAddress,
         blockNumber,
@@ -129,7 +135,7 @@ export default async (event: ContractEvent): Promise<void> => {
       /*
        * Create the action
        */
-      await writeActionFromEvent(event, contractAddress, {
+      await writeActionFromEvent(event, colonyAddress, {
         type: ColonyActionType.SetUserRoles,
         fromDomainId: domainDatabaseId,
         initiatorAddress: agent,
@@ -167,7 +173,7 @@ export default async (event: ContractEvent): Promise<void> => {
      */
 
     await createInitialColonyRolesDatabaseEntry(
-      contractAddress,
+      colonyAddress,
       domainId.toNumber(),
       targetAddress,
       transactionHash,

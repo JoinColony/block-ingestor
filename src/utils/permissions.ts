@@ -248,6 +248,7 @@ export const createInitialColonyRolesDatabaseEntry = async (
         domainId: domainDatabaseId,
         // Link the Colony Model
         colonyRolesId: colonyAddress,
+        colonyAddress,
         /*
          * @NOTE Link the target
          *
