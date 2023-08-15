@@ -8,7 +8,7 @@ import {
 } from '~graphql';
 import { mutate } from '~amplifyClient';
 
-import { getExpenditure } from './helpers';
+import { getExpenditureFromDB } from './helpers';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { contractAddress: colonyAddress } = event;
@@ -19,7 +19,7 @@ export default async (event: ContractEvent): Promise<void> => {
 
   const databaseId = getExpenditureDatabaseId(colonyAddress, expenditureId);
 
-  const expenditure = await getExpenditure(databaseId);
+  const expenditure = await getExpenditureFromDB(databaseId);
   if (!expenditure) {
     output(
       `Could not find expenditure with ID: ${convertedExpenditureId} and colony address: ${colonyAddress} in the db. This is a bug and needs investigating.`,
