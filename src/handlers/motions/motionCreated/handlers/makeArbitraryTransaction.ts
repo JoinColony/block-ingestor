@@ -8,11 +8,6 @@ export const handleMakeArbitraryTransactionMotion = async (
   event: ContractEvent,
   parsedAction: TransactionDescription,
 ): Promise<void> => {
-  const { colonyAddress } = event;
-  if (!colonyAddress) {
-    return;
-  }
-
   const { name, args: actionArgs } = parsedAction;
   const [recipients] = actionArgs;
 
