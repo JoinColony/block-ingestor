@@ -4,7 +4,7 @@ import { ContractEvent, motionNameMapping } from '~types';
 
 import { createMotionInDB } from '../helpers';
 
-export const handleMakeArbitraryTransactionMotion = async (
+export const handleMakeArbitraryTransactionsMotion = async (
   event: ContractEvent,
   parsedAction: TransactionDescription,
 ): Promise<void> => {

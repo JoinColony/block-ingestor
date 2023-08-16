@@ -17,7 +17,7 @@ export enum ColonyOperations {
   SetUserRoles = 'setUserRoles',
   SimpleDecision = 'simpleDecision',
   Multicall = 'multicall',
-  MakeArbitraryTransaction = 'makeArbitraryTransaction',
+  MakeArbitraryTransactions = 'makeArbitraryTransactions',
 }
 
 export enum MotionEvents {
@@ -51,8 +51,8 @@ export const motionNameMapping: { [key: string]: ColonyActionType } = {
   [ColonyOperations.EmitDomainReputationReward]:
     ColonyActionType.EmitDomainReputationRewardMotion,
   [ColonyOperations.SimpleDecision]: ColonyActionType.CreateDecisionMotion,
-  [ColonyOperations.MakeArbitraryTransaction]:
-    ColonyActionType.MakeArbitraryTransactionMotion,
+  [ColonyOperations.MakeArbitraryTransactions]:
+    ColonyActionType.MakeArbitraryTransactionsMotion,
 };
 
 export enum MotionSide {

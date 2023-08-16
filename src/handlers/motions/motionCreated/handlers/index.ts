@@ -9,4 +9,4 @@ export { handleEditColonyMotion } from './editColony';
 export { handleSetUserRolesMotion } from './setUserRoles';
 export { handleSimpleDecisionMotion } from './simpleDecision';
 export { handleMulticallMotion } from './multicall';
-export { handleMakeArbitraryTransactionMotion } from './makeArbitraryTransaction';
+export { handleMakeArbitraryTransactionsMotion } from './makeArbitraryTransactions';

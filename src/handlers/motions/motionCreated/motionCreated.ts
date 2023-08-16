@@ -19,7 +19,7 @@ import {
   handleSetUserRolesMotion,
   handleSimpleDecisionMotion,
   handleMulticallMotion,
-  handleMakeArbitraryTransactionMotion,
+  handleMakeArbitraryTransactionsMotion,
 } from './handlers';
 
 export default async (event: ContractEvent): Promise<void> => {
@@ -156,8 +156,8 @@ export default async (event: ContractEvent): Promise<void> => {
         break;
       }
 
-      case ColonyOperations.MakeArbitraryTransaction: {
-        await handleMakeArbitraryTransactionMotion(event, parsedAction);
+      case ColonyOperations.MakeArbitraryTransactions: {
+        await handleMakeArbitraryTransactionsMotion(event, parsedAction);
         break;
       }
 
