@@ -8,20 +8,26 @@ import {
 import { ContractEvent } from '~types';
 import { getExpenditureDatabaseId, output, toNumber, verbose } from '~utils';
 
-import { getExpenditureFundingPotId } from './helpers';
+import { getExpenditure } from './helpers';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { contractAddress: colonyAddress } = event;
   const { agent: ownerAddress, expenditureId } = event.args;
   const convertedExpenditureId = toNumber(expenditureId);
 
-  const fundingPotId = await getExpenditureFundingPotId(event);
-  if (!fundingPotId) {
+  const expenditure = await getExpenditure(
+    colonyAddress,
+    convertedExpenditureId,
+  );
+  if (!expenditure) {
     output(
-      `Could not get funding pot ID for expenditure with ID ${convertedExpenditureId} in colony ${colonyAddress}`,
+      `Could not get expenditure with ID ${convertedExpenditureId} in colony ${colonyAddress}`,
     );
     return;
   }
+
+  const domainId = toNumber(expenditure.domainId);
+  const fundingPotId = toNumber(expenditure.fundingPotId);
 
   verbose(
     'Expenditure with ID',
@@ -41,6 +47,7 @@ export default async (event: ContractEvent): Promise<void> => {
         status: ExpenditureStatus.Draft,
         slots: [],
         nativeFundingPotId: fundingPotId,
+        nativeDomainId: domainId,
       },
     },
   );
