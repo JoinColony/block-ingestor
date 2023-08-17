@@ -11,6 +11,7 @@ import {
   getDomainDatabaseId,
   mapLogToContractEvent,
   writeActionFromEvent,
+  getExtensionInstallations,
 } from '~utils';
 import {
   GetColonyHistoricRoleQuery,
@@ -27,6 +28,7 @@ import {
   GetColonyRoleDocument,
   ColonyActionType,
 } from '~graphql';
+import { createColonyContributor, isAlreadyContributor } from './contributors';
 
 const BASE_ROLES_MAP = {
   [`role_${ColonyRole.Recovery}`]: null,
@@ -347,6 +349,26 @@ export const createInitialColonyRolesDatabaseEntry = async (
             ]
           : []),
       ]),
+    });
+  }
+
+  /*
+   * Create contributor if necessary
+   */
+
+  const isContributor = await isAlreadyContributor({
+    colonyAddress,
+    contributorAddress: targetAddress,
+  });
+
+  const installedExtensions = new Set(
+    await getExtensionInstallations(colonyAddress),
+  );
+
+  if (!isContributor && !installedExtensions.has(targetAddress)) {
+    await createColonyContributor({
+      colonyAddress,
+      contributorAddress: targetAddress,
     });
   }
 };
