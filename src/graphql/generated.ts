@@ -94,6 +94,8 @@ export type Colony = {
   fundsClaims?: Maybe<ModelColonyFundsClaimConnection>;
   /** Unique identifier for the Colony (contract address) */
   id: Scalars['ID'];
+  /** Time at which the contributors with reputation in the colony were last updated */
+  lastUpdatedContributorsWithReputation?: Maybe<Scalars['AWSDateTime']>;
   /** Metadata of the Colony */
   metadata?: Maybe<ColonyMetadata>;
   /** List of motions within the Colony that have unclaimed stakes */
@@ -423,6 +425,48 @@ export type ColonyChainFundsClaimInput = {
   updatedAt?: InputMaybe<Scalars['AWSDateTime']>;
 };
 
+/** The ColonyContributor model represents a contributor to the Colony. */
+export type ColonyContributor = {
+  __typename?: 'ColonyContributor';
+  /** Address of the colony the contributor is under */
+  colonyAddress: Scalars['ID'];
+  /** The contributor's reputation percentage in the colony */
+  colonyReputationPercentage: Scalars['Float'];
+  /** The address of the contributor */
+  contributorAddress: Scalars['ID'];
+  createdAt: Scalars['AWSDateTime'];
+  /**
+   * Unique identifier
+   * Format: <colonyAddress>_<contributorAddress>
+   */
+  id: Scalars['ID'];
+  reputation?: Maybe<ModelContributorReputationConnection>;
+  roles?: Maybe<ModelColonyRoleConnection>;
+  /** The type of the contributor */
+  type?: Maybe<ContributorType>;
+  updatedAt: Scalars['AWSDateTime'];
+  /** Associated user, if any */
+  user?: Maybe<User>;
+  /** Is the contributor a member of the colony's whitelist? */
+  verified: Scalars['Boolean'];
+};
+
+/** The ColonyContributor model represents a contributor to the Colony. */
+export type ColonyContributorReputationArgs = {
+  filter?: InputMaybe<ModelContributorReputationFilterInput>;
+  limit?: InputMaybe<Scalars['Int']>;
+  nextToken?: InputMaybe<Scalars['String']>;
+  sortDirection?: InputMaybe<ModelSortDirection>;
+};
+
+/** The ColonyContributor model represents a contributor to the Colony. */
+export type ColonyContributorRolesArgs = {
+  filter?: InputMaybe<ModelColonyRoleFilterInput>;
+  limit?: InputMaybe<Scalars['Int']>;
+  nextToken?: InputMaybe<Scalars['String']>;
+  sortDirection?: InputMaybe<ModelSortDirection>;
+};
+
 export type ColonyDecision = {
   __typename?: 'ColonyDecision';
   action?: Maybe<ColonyAction>;
@@ -678,10 +722,10 @@ export type ColonyMotionMessagesArgs = {
 export type ColonyRole = {
   __typename?: 'ColonyRole';
   /** The colony in which the role was set */
-  colonyAddress: Scalars['String'];
+  colonyAddress: Scalars['ID'];
   colonyRolesId?: Maybe<Scalars['ID']>;
   createdAt: Scalars['AWSDateTime'];
-  /** Expaneded `Domain` model, based on the `domainId` given */
+  /** Expanded `Domain` model, based on the `domainId` given */
   domain: Domain;
   /** Unique identifier of the domain */
   domainId: Scalars['ID'];
@@ -846,6 +890,29 @@ export type Contributor = {
   user?: Maybe<User>;
 };
 
+export type ContributorReputation = {
+  __typename?: 'ContributorReputation';
+  /** The colony the reputation was earned in */
+  colonyAddress: Scalars['ID'];
+  /** The address of the contributor */
+  contributorAddress: Scalars['ID'];
+  createdAt: Scalars['AWSDateTime'];
+  /** The associated Domain model */
+  domain: Domain;
+  /** The domain id in which the contributor has reputation */
+  domainId: Scalars['ID'];
+  /**
+   * Unique identifier
+   * Format: `<colonyAddress>_<domainNativeId>_<contributorAddress>`
+   */
+  id: Scalars['ID'];
+  /** The percentage of the contributor's reputation in the domain */
+  reputationPercentage: Scalars['Float'];
+  /** The raw value of the contributor's reputation in the domain */
+  reputationRaw: Scalars['String'];
+  updatedAt: Scalars['AWSDateTime'];
+};
+
 /** The types of contributor a user can be in a colony */
 export enum ContributorType {
   Active = 'ACTIVE',
@@ -888,6 +955,15 @@ export type CreateColonyActionInput = {
   toDomainId?: InputMaybe<Scalars['ID']>;
   tokenAddress?: InputMaybe<Scalars['ID']>;
   type: ColonyActionType;
+};
+
+export type CreateColonyContributorInput = {
+  colonyAddress: Scalars['ID'];
+  colonyReputationPercentage: Scalars['Float'];
+  contributorAddress: Scalars['ID'];
+  id?: InputMaybe<Scalars['ID']>;
+  type?: InputMaybe<ContributorType>;
+  verified: Scalars['Boolean'];
 };
 
 export type CreateColonyDecisionInput = {
@@ -946,6 +1022,7 @@ export type CreateColonyInput = {
   chainMetadata: ChainMetadataInput;
   expendituresGlobalClaimDelay?: InputMaybe<Scalars['Int']>;
   id?: InputMaybe<Scalars['ID']>;
+  lastUpdatedContributorsWithReputation?: InputMaybe<Scalars['AWSDateTime']>;
   motionsWithUnclaimedStakes?: InputMaybe<Array<ColonyUnclaimedStakeInput>>;
   name: Scalars['String'];
   nativeTokenId: Scalars['ID'];
@@ -993,7 +1070,7 @@ export type CreateColonyMotionInput = {
 };
 
 export type CreateColonyRoleInput = {
-  colonyAddress: Scalars['String'];
+  colonyAddress: Scalars['ID'];
   colonyRolesId?: InputMaybe<Scalars['ID']>;
   domainId: Scalars['ID'];
   id?: InputMaybe<Scalars['ID']>;
@@ -1032,6 +1109,15 @@ export type CreateContractEventInput = {
   name: Scalars['String'];
   signature: Scalars['String'];
   target: Scalars['String'];
+};
+
+export type CreateContributorReputationInput = {
+  colonyAddress: Scalars['ID'];
+  contributorAddress: Scalars['ID'];
+  domainId: Scalars['ID'];
+  id?: InputMaybe<Scalars['ID']>;
+  reputationPercentage: Scalars['Float'];
+  reputationRaw: Scalars['String'];
 };
 
 export type CreateCurrentNetworkInverseFeeInput = {
@@ -1113,17 +1199,6 @@ export type CreateProfileInput = {
   meta?: InputMaybe<ProfileMetadataInput>;
   thumbnail?: InputMaybe<Scalars['String']>;
   website?: InputMaybe<Scalars['AWSURL']>;
-};
-
-export type CreateReputedContributorInput = {
-  colonyAddress: Scalars['String'];
-  colonyReputationPercentage: Scalars['String'];
-  contributorAddress: Scalars['ID'];
-  domainId: Scalars['String'];
-  domainReputationPercentage: Scalars['String'];
-  id?: InputMaybe<Scalars['ID']>;
-  reputation: Scalars['String'];
-  type?: InputMaybe<ContributorType>;
 };
 
 export type CreateTokenInput = {
@@ -1219,6 +1294,10 @@ export type DeleteColonyActionInput = {
   id: Scalars['ID'];
 };
 
+export type DeleteColonyContributorInput = {
+  id: Scalars['ID'];
+};
+
 export type DeleteColonyDecisionInput = {
   id: Scalars['ID'];
 };
@@ -1263,6 +1342,10 @@ export type DeleteContractEventInput = {
   id: Scalars['ID'];
 };
 
+export type DeleteContributorReputationInput = {
+  id: Scalars['ID'];
+};
+
 export type DeleteCurrentNetworkInverseFeeInput = {
   id: Scalars['ID'];
 };
@@ -1296,10 +1379,6 @@ export type DeleteMotionMessageInput = {
 };
 
 export type DeleteProfileInput = {
-  id: Scalars['ID'];
-};
-
-export type DeleteReputedContributorInput = {
   id: Scalars['ID'];
 };
 
@@ -1857,6 +1936,7 @@ export type ModelColonyActionTypeInput = {
 export type ModelColonyConditionInput = {
   and?: InputMaybe<Array<InputMaybe<ModelColonyConditionInput>>>;
   expendituresGlobalClaimDelay?: InputMaybe<ModelIntInput>;
+  lastUpdatedContributorsWithReputation?: InputMaybe<ModelStringInput>;
   name?: InputMaybe<ModelStringInput>;
   nativeTokenId?: InputMaybe<ModelIdInput>;
   not?: InputMaybe<ModelColonyConditionInput>;
@@ -1869,6 +1949,35 @@ export type ModelColonyConnection = {
   __typename?: 'ModelColonyConnection';
   items: Array<Maybe<Colony>>;
   nextToken?: Maybe<Scalars['String']>;
+};
+
+export type ModelColonyContributorConditionInput = {
+  and?: InputMaybe<Array<InputMaybe<ModelColonyContributorConditionInput>>>;
+  colonyAddress?: InputMaybe<ModelIdInput>;
+  colonyReputationPercentage?: InputMaybe<ModelFloatInput>;
+  contributorAddress?: InputMaybe<ModelIdInput>;
+  not?: InputMaybe<ModelColonyContributorConditionInput>;
+  or?: InputMaybe<Array<InputMaybe<ModelColonyContributorConditionInput>>>;
+  type?: InputMaybe<ModelContributorTypeInput>;
+  verified?: InputMaybe<ModelBooleanInput>;
+};
+
+export type ModelColonyContributorConnection = {
+  __typename?: 'ModelColonyContributorConnection';
+  items: Array<Maybe<ColonyContributor>>;
+  nextToken?: Maybe<Scalars['String']>;
+};
+
+export type ModelColonyContributorFilterInput = {
+  and?: InputMaybe<Array<InputMaybe<ModelColonyContributorFilterInput>>>;
+  colonyAddress?: InputMaybe<ModelIdInput>;
+  colonyReputationPercentage?: InputMaybe<ModelFloatInput>;
+  contributorAddress?: InputMaybe<ModelIdInput>;
+  id?: InputMaybe<ModelIdInput>;
+  not?: InputMaybe<ModelColonyContributorFilterInput>;
+  or?: InputMaybe<Array<InputMaybe<ModelColonyContributorFilterInput>>>;
+  type?: InputMaybe<ModelContributorTypeInput>;
+  verified?: InputMaybe<ModelBooleanInput>;
 };
 
 export type ModelColonyDecisionConditionInput = {
@@ -1945,6 +2054,7 @@ export type ModelColonyFilterInput = {
   and?: InputMaybe<Array<InputMaybe<ModelColonyFilterInput>>>;
   expendituresGlobalClaimDelay?: InputMaybe<ModelIntInput>;
   id?: InputMaybe<ModelIdInput>;
+  lastUpdatedContributorsWithReputation?: InputMaybe<ModelStringInput>;
   name?: InputMaybe<ModelStringInput>;
   nativeTokenId?: InputMaybe<ModelIdInput>;
   not?: InputMaybe<ModelColonyFilterInput>;
@@ -2109,7 +2219,7 @@ export type ModelColonyMotionFilterInput = {
 
 export type ModelColonyRoleConditionInput = {
   and?: InputMaybe<Array<InputMaybe<ModelColonyRoleConditionInput>>>;
-  colonyAddress?: InputMaybe<ModelStringInput>;
+  colonyAddress?: InputMaybe<ModelIdInput>;
   colonyRolesId?: InputMaybe<ModelIdInput>;
   domainId?: InputMaybe<ModelIdInput>;
   latestBlock?: InputMaybe<ModelIntInput>;
@@ -2132,7 +2242,7 @@ export type ModelColonyRoleConnection = {
 
 export type ModelColonyRoleFilterInput = {
   and?: InputMaybe<Array<InputMaybe<ModelColonyRoleFilterInput>>>;
-  colonyAddress?: InputMaybe<ModelStringInput>;
+  colonyAddress?: InputMaybe<ModelIdInput>;
   colonyRolesId?: InputMaybe<ModelIdInput>;
   domainId?: InputMaybe<ModelIdInput>;
   id?: InputMaybe<ModelIdInput>;
@@ -2236,6 +2346,35 @@ export type ModelContractEventFilterInput = {
   or?: InputMaybe<Array<InputMaybe<ModelContractEventFilterInput>>>;
   signature?: InputMaybe<ModelStringInput>;
   target?: InputMaybe<ModelStringInput>;
+};
+
+export type ModelContributorReputationConditionInput = {
+  and?: InputMaybe<Array<InputMaybe<ModelContributorReputationConditionInput>>>;
+  colonyAddress?: InputMaybe<ModelIdInput>;
+  contributorAddress?: InputMaybe<ModelIdInput>;
+  domainId?: InputMaybe<ModelIdInput>;
+  not?: InputMaybe<ModelContributorReputationConditionInput>;
+  or?: InputMaybe<Array<InputMaybe<ModelContributorReputationConditionInput>>>;
+  reputationPercentage?: InputMaybe<ModelFloatInput>;
+  reputationRaw?: InputMaybe<ModelStringInput>;
+};
+
+export type ModelContributorReputationConnection = {
+  __typename?: 'ModelContributorReputationConnection';
+  items: Array<Maybe<ContributorReputation>>;
+  nextToken?: Maybe<Scalars['String']>;
+};
+
+export type ModelContributorReputationFilterInput = {
+  and?: InputMaybe<Array<InputMaybe<ModelContributorReputationFilterInput>>>;
+  colonyAddress?: InputMaybe<ModelIdInput>;
+  contributorAddress?: InputMaybe<ModelIdInput>;
+  domainId?: InputMaybe<ModelIdInput>;
+  id?: InputMaybe<ModelIdInput>;
+  not?: InputMaybe<ModelContributorReputationFilterInput>;
+  or?: InputMaybe<Array<InputMaybe<ModelContributorReputationFilterInput>>>;
+  reputationPercentage?: InputMaybe<ModelFloatInput>;
+  reputationRaw?: InputMaybe<ModelStringInput>;
 };
 
 export type ModelContributorTypeInput = {
@@ -2438,6 +2577,15 @@ export type ModelFloatInput = {
   ne?: InputMaybe<Scalars['Float']>;
 };
 
+export type ModelFloatKeyConditionInput = {
+  between?: InputMaybe<Array<InputMaybe<Scalars['Float']>>>;
+  eq?: InputMaybe<Scalars['Float']>;
+  ge?: InputMaybe<Scalars['Float']>;
+  gt?: InputMaybe<Scalars['Float']>;
+  le?: InputMaybe<Scalars['Float']>;
+  lt?: InputMaybe<Scalars['Float']>;
+};
+
 export type ModelIdInput = {
   attributeExists?: InputMaybe<Scalars['Boolean']>;
   attributeType?: InputMaybe<ModelAttributeTypes>;
@@ -2571,39 +2719,6 @@ export type ModelProfileFilterInput = {
   website?: InputMaybe<ModelStringInput>;
 };
 
-export type ModelReputedContributorConditionInput = {
-  and?: InputMaybe<Array<InputMaybe<ModelReputedContributorConditionInput>>>;
-  colonyAddress?: InputMaybe<ModelStringInput>;
-  colonyReputationPercentage?: InputMaybe<ModelStringInput>;
-  contributorAddress?: InputMaybe<ModelIdInput>;
-  domainId?: InputMaybe<ModelStringInput>;
-  domainReputationPercentage?: InputMaybe<ModelStringInput>;
-  not?: InputMaybe<ModelReputedContributorConditionInput>;
-  or?: InputMaybe<Array<InputMaybe<ModelReputedContributorConditionInput>>>;
-  reputation?: InputMaybe<ModelStringInput>;
-  type?: InputMaybe<ModelContributorTypeInput>;
-};
-
-export type ModelReputedContributorConnection = {
-  __typename?: 'ModelReputedContributorConnection';
-  items: Array<Maybe<ReputedContributor>>;
-  nextToken?: Maybe<Scalars['String']>;
-};
-
-export type ModelReputedContributorFilterInput = {
-  and?: InputMaybe<Array<InputMaybe<ModelReputedContributorFilterInput>>>;
-  colonyAddress?: InputMaybe<ModelStringInput>;
-  colonyReputationPercentage?: InputMaybe<ModelStringInput>;
-  contributorAddress?: InputMaybe<ModelIdInput>;
-  domainId?: InputMaybe<ModelStringInput>;
-  domainReputationPercentage?: InputMaybe<ModelStringInput>;
-  id?: InputMaybe<ModelIdInput>;
-  not?: InputMaybe<ModelReputedContributorFilterInput>;
-  or?: InputMaybe<Array<InputMaybe<ModelReputedContributorFilterInput>>>;
-  reputation?: InputMaybe<ModelStringInput>;
-  type?: InputMaybe<ModelContributorTypeInput>;
-};
-
 export type ModelSizeInput = {
   between?: InputMaybe<Array<InputMaybe<Scalars['Int']>>>;
   eq?: InputMaybe<Scalars['Int']>;
@@ -2686,6 +2801,21 @@ export type ModelSubscriptionColonyActionFilterInput = {
   type?: InputMaybe<ModelSubscriptionStringInput>;
 };
 
+export type ModelSubscriptionColonyContributorFilterInput = {
+  and?: InputMaybe<
+    Array<InputMaybe<ModelSubscriptionColonyContributorFilterInput>>
+  >;
+  colonyAddress?: InputMaybe<ModelSubscriptionIdInput>;
+  colonyReputationPercentage?: InputMaybe<ModelSubscriptionFloatInput>;
+  contributorAddress?: InputMaybe<ModelSubscriptionIdInput>;
+  id?: InputMaybe<ModelSubscriptionIdInput>;
+  or?: InputMaybe<
+    Array<InputMaybe<ModelSubscriptionColonyContributorFilterInput>>
+  >;
+  type?: InputMaybe<ModelSubscriptionStringInput>;
+  verified?: InputMaybe<ModelSubscriptionBooleanInput>;
+};
+
 export type ModelSubscriptionColonyDecisionFilterInput = {
   actionId?: InputMaybe<ModelSubscriptionIdInput>;
   and?: InputMaybe<
@@ -2726,6 +2856,7 @@ export type ModelSubscriptionColonyFilterInput = {
   and?: InputMaybe<Array<InputMaybe<ModelSubscriptionColonyFilterInput>>>;
   expendituresGlobalClaimDelay?: InputMaybe<ModelSubscriptionIntInput>;
   id?: InputMaybe<ModelSubscriptionIdInput>;
+  lastUpdatedContributorsWithReputation?: InputMaybe<ModelSubscriptionStringInput>;
   name?: InputMaybe<ModelSubscriptionStringInput>;
   nativeTokenId?: InputMaybe<ModelSubscriptionIdInput>;
   or?: InputMaybe<Array<InputMaybe<ModelSubscriptionColonyFilterInput>>>;
@@ -2808,7 +2939,7 @@ export type ModelSubscriptionColonyMotionFilterInput = {
 
 export type ModelSubscriptionColonyRoleFilterInput = {
   and?: InputMaybe<Array<InputMaybe<ModelSubscriptionColonyRoleFilterInput>>>;
-  colonyAddress?: InputMaybe<ModelSubscriptionStringInput>;
+  colonyAddress?: InputMaybe<ModelSubscriptionIdInput>;
   domainId?: InputMaybe<ModelSubscriptionIdInput>;
   id?: InputMaybe<ModelSubscriptionIdInput>;
   latestBlock?: InputMaybe<ModelSubscriptionIntInput>;
@@ -2850,6 +2981,21 @@ export type ModelSubscriptionContractEventFilterInput = {
   or?: InputMaybe<Array<InputMaybe<ModelSubscriptionContractEventFilterInput>>>;
   signature?: InputMaybe<ModelSubscriptionStringInput>;
   target?: InputMaybe<ModelSubscriptionStringInput>;
+};
+
+export type ModelSubscriptionContributorReputationFilterInput = {
+  and?: InputMaybe<
+    Array<InputMaybe<ModelSubscriptionContributorReputationFilterInput>>
+  >;
+  colonyAddress?: InputMaybe<ModelSubscriptionIdInput>;
+  contributorAddress?: InputMaybe<ModelSubscriptionIdInput>;
+  domainId?: InputMaybe<ModelSubscriptionIdInput>;
+  id?: InputMaybe<ModelSubscriptionIdInput>;
+  or?: InputMaybe<
+    Array<InputMaybe<ModelSubscriptionContributorReputationFilterInput>>
+  >;
+  reputationPercentage?: InputMaybe<ModelSubscriptionFloatInput>;
+  reputationRaw?: InputMaybe<ModelSubscriptionStringInput>;
 };
 
 export type ModelSubscriptionCurrentNetworkInverseFeeFilterInput = {
@@ -3002,23 +3148,6 @@ export type ModelSubscriptionProfileFilterInput = {
   or?: InputMaybe<Array<InputMaybe<ModelSubscriptionProfileFilterInput>>>;
   thumbnail?: InputMaybe<ModelSubscriptionStringInput>;
   website?: InputMaybe<ModelSubscriptionStringInput>;
-};
-
-export type ModelSubscriptionReputedContributorFilterInput = {
-  and?: InputMaybe<
-    Array<InputMaybe<ModelSubscriptionReputedContributorFilterInput>>
-  >;
-  colonyAddress?: InputMaybe<ModelSubscriptionStringInput>;
-  colonyReputationPercentage?: InputMaybe<ModelSubscriptionStringInput>;
-  contributorAddress?: InputMaybe<ModelSubscriptionIdInput>;
-  domainId?: InputMaybe<ModelSubscriptionStringInput>;
-  domainReputationPercentage?: InputMaybe<ModelSubscriptionStringInput>;
-  id?: InputMaybe<ModelSubscriptionIdInput>;
-  or?: InputMaybe<
-    Array<InputMaybe<ModelSubscriptionReputedContributorFilterInput>>
-  >;
-  reputation?: InputMaybe<ModelSubscriptionStringInput>;
-  type?: InputMaybe<ModelSubscriptionStringInput>;
 };
 
 export type ModelSubscriptionStringInput = {
@@ -3296,6 +3425,7 @@ export type Mutation = {
   createAnnotation?: Maybe<Annotation>;
   createColony?: Maybe<Colony>;
   createColonyAction?: Maybe<ColonyAction>;
+  createColonyContributor?: Maybe<ColonyContributor>;
   createColonyDecision?: Maybe<ColonyDecision>;
   createColonyExtension?: Maybe<ColonyExtension>;
   createColonyFundsClaim?: Maybe<ColonyFundsClaim>;
@@ -3306,6 +3436,7 @@ export type Mutation = {
   createColonyStake?: Maybe<ColonyStake>;
   createColonyTokens?: Maybe<ColonyTokens>;
   createContractEvent?: Maybe<ContractEvent>;
+  createContributorReputation?: Maybe<ContributorReputation>;
   createCurrentNetworkInverseFee?: Maybe<CurrentNetworkInverseFee>;
   createCurrentVersion?: Maybe<CurrentVersion>;
   createDomain?: Maybe<Domain>;
@@ -3315,7 +3446,6 @@ export type Mutation = {
   createIngestorStats?: Maybe<IngestorStats>;
   createMotionMessage?: Maybe<MotionMessage>;
   createProfile?: Maybe<Profile>;
-  createReputedContributor?: Maybe<ReputedContributor>;
   createToken?: Maybe<Token>;
   /** Create a unique Colony within the Colony Network. Use this instead of the automatically generated `createColony` mutation */
   createUniqueColony?: Maybe<Colony>;
@@ -3327,6 +3457,7 @@ export type Mutation = {
   deleteAnnotation?: Maybe<Annotation>;
   deleteColony?: Maybe<Colony>;
   deleteColonyAction?: Maybe<ColonyAction>;
+  deleteColonyContributor?: Maybe<ColonyContributor>;
   deleteColonyDecision?: Maybe<ColonyDecision>;
   deleteColonyExtension?: Maybe<ColonyExtension>;
   deleteColonyFundsClaim?: Maybe<ColonyFundsClaim>;
@@ -3337,6 +3468,7 @@ export type Mutation = {
   deleteColonyStake?: Maybe<ColonyStake>;
   deleteColonyTokens?: Maybe<ColonyTokens>;
   deleteContractEvent?: Maybe<ContractEvent>;
+  deleteContributorReputation?: Maybe<ContributorReputation>;
   deleteCurrentNetworkInverseFee?: Maybe<CurrentNetworkInverseFee>;
   deleteCurrentVersion?: Maybe<CurrentVersion>;
   deleteDomain?: Maybe<Domain>;
@@ -3346,7 +3478,6 @@ export type Mutation = {
   deleteIngestorStats?: Maybe<IngestorStats>;
   deleteMotionMessage?: Maybe<MotionMessage>;
   deleteProfile?: Maybe<Profile>;
-  deleteReputedContributor?: Maybe<ReputedContributor>;
   deleteToken?: Maybe<Token>;
   deleteUser?: Maybe<User>;
   deleteUserTokens?: Maybe<UserTokens>;
@@ -3356,6 +3487,7 @@ export type Mutation = {
   updateAnnotation?: Maybe<Annotation>;
   updateColony?: Maybe<Colony>;
   updateColonyAction?: Maybe<ColonyAction>;
+  updateColonyContributor?: Maybe<ColonyContributor>;
   updateColonyDecision?: Maybe<ColonyDecision>;
   updateColonyExtension?: Maybe<ColonyExtension>;
   updateColonyFundsClaim?: Maybe<ColonyFundsClaim>;
@@ -3366,6 +3498,9 @@ export type Mutation = {
   updateColonyStake?: Maybe<ColonyStake>;
   updateColonyTokens?: Maybe<ColonyTokens>;
   updateContractEvent?: Maybe<ContractEvent>;
+  updateContributorReputation?: Maybe<ContributorReputation>;
+  /** Update contributors with reputation in the database for a colony */
+  updateContributorsWithReputation?: Maybe<Scalars['Boolean']>;
   updateCurrentNetworkInverseFee?: Maybe<CurrentNetworkInverseFee>;
   updateCurrentVersion?: Maybe<CurrentVersion>;
   updateDomain?: Maybe<Domain>;
@@ -3375,9 +3510,6 @@ export type Mutation = {
   updateIngestorStats?: Maybe<IngestorStats>;
   updateMotionMessage?: Maybe<MotionMessage>;
   updateProfile?: Maybe<Profile>;
-  updateReputedContributor?: Maybe<ReputedContributor>;
-  /** Update reputed contributors in the database for a colony */
-  updateReputedContributors?: Maybe<Scalars['Boolean']>;
   updateToken?: Maybe<Token>;
   updateUser?: Maybe<User>;
   updateUserTokens?: Maybe<UserTokens>;
@@ -3400,6 +3532,12 @@ export type MutationCreateColonyArgs = {
 export type MutationCreateColonyActionArgs = {
   condition?: InputMaybe<ModelColonyActionConditionInput>;
   input: CreateColonyActionInput;
+};
+
+/** Root mutation type */
+export type MutationCreateColonyContributorArgs = {
+  condition?: InputMaybe<ModelColonyContributorConditionInput>;
+  input: CreateColonyContributorInput;
 };
 
 /** Root mutation type */
@@ -3463,6 +3601,12 @@ export type MutationCreateContractEventArgs = {
 };
 
 /** Root mutation type */
+export type MutationCreateContributorReputationArgs = {
+  condition?: InputMaybe<ModelContributorReputationConditionInput>;
+  input: CreateContributorReputationInput;
+};
+
+/** Root mutation type */
 export type MutationCreateCurrentNetworkInverseFeeArgs = {
   condition?: InputMaybe<ModelCurrentNetworkInverseFeeConditionInput>;
   input: CreateCurrentNetworkInverseFeeInput;
@@ -3517,12 +3661,6 @@ export type MutationCreateProfileArgs = {
 };
 
 /** Root mutation type */
-export type MutationCreateReputedContributorArgs = {
-  condition?: InputMaybe<ModelReputedContributorConditionInput>;
-  input: CreateReputedContributorInput;
-};
-
-/** Root mutation type */
 export type MutationCreateTokenArgs = {
   condition?: InputMaybe<ModelTokenConditionInput>;
   input: CreateTokenInput;
@@ -3572,6 +3710,12 @@ export type MutationDeleteColonyArgs = {
 export type MutationDeleteColonyActionArgs = {
   condition?: InputMaybe<ModelColonyActionConditionInput>;
   input: DeleteColonyActionInput;
+};
+
+/** Root mutation type */
+export type MutationDeleteColonyContributorArgs = {
+  condition?: InputMaybe<ModelColonyContributorConditionInput>;
+  input: DeleteColonyContributorInput;
 };
 
 /** Root mutation type */
@@ -3635,6 +3779,12 @@ export type MutationDeleteContractEventArgs = {
 };
 
 /** Root mutation type */
+export type MutationDeleteContributorReputationArgs = {
+  condition?: InputMaybe<ModelContributorReputationConditionInput>;
+  input: DeleteContributorReputationInput;
+};
+
+/** Root mutation type */
 export type MutationDeleteCurrentNetworkInverseFeeArgs = {
   condition?: InputMaybe<ModelCurrentNetworkInverseFeeConditionInput>;
   input: DeleteCurrentNetworkInverseFeeInput;
@@ -3689,12 +3839,6 @@ export type MutationDeleteProfileArgs = {
 };
 
 /** Root mutation type */
-export type MutationDeleteReputedContributorArgs = {
-  condition?: InputMaybe<ModelReputedContributorConditionInput>;
-  input: DeleteReputedContributorInput;
-};
-
-/** Root mutation type */
 export type MutationDeleteTokenArgs = {
   condition?: InputMaybe<ModelTokenConditionInput>;
   input: DeleteTokenInput;
@@ -3739,6 +3883,12 @@ export type MutationUpdateColonyArgs = {
 export type MutationUpdateColonyActionArgs = {
   condition?: InputMaybe<ModelColonyActionConditionInput>;
   input: UpdateColonyActionInput;
+};
+
+/** Root mutation type */
+export type MutationUpdateColonyContributorArgs = {
+  condition?: InputMaybe<ModelColonyContributorConditionInput>;
+  input: UpdateColonyContributorInput;
 };
 
 /** Root mutation type */
@@ -3802,6 +3952,17 @@ export type MutationUpdateContractEventArgs = {
 };
 
 /** Root mutation type */
+export type MutationUpdateContributorReputationArgs = {
+  condition?: InputMaybe<ModelContributorReputationConditionInput>;
+  input: UpdateContributorReputationInput;
+};
+
+/** Root mutation type */
+export type MutationUpdateContributorsWithReputationArgs = {
+  input: UpdateContributorsWithReputationInput;
+};
+
+/** Root mutation type */
 export type MutationUpdateCurrentNetworkInverseFeeArgs = {
   condition?: InputMaybe<ModelCurrentNetworkInverseFeeConditionInput>;
   input: UpdateCurrentNetworkInverseFeeInput;
@@ -3853,17 +4014,6 @@ export type MutationUpdateMotionMessageArgs = {
 export type MutationUpdateProfileArgs = {
   condition?: InputMaybe<ModelProfileConditionInput>;
   input: UpdateProfileInput;
-};
-
-/** Root mutation type */
-export type MutationUpdateReputedContributorArgs = {
-  condition?: InputMaybe<ModelReputedContributorConditionInput>;
-  input: UpdateReputedContributorInput;
-};
-
-/** Root mutation type */
-export type MutationUpdateReputedContributorsArgs = {
-  input: UpdateReputedContributorsInput;
 };
 
 /** Root mutation type */
@@ -4030,6 +4180,7 @@ export type Query = {
   getColonyByAddress?: Maybe<ModelColonyConnection>;
   getColonyByName?: Maybe<ModelColonyConnection>;
   getColonyByType?: Maybe<ModelColonyConnection>;
+  getColonyContributor?: Maybe<ColonyContributor>;
   getColonyDecision?: Maybe<ColonyDecision>;
   getColonyDecisionByActionId?: Maybe<ModelColonyDecisionConnection>;
   getColonyDecisionByColonyAddress?: Maybe<ModelColonyDecisionConnection>;
@@ -4044,8 +4195,9 @@ export type Query = {
   getColonyStakeByUserAddress?: Maybe<ModelColonyStakeConnection>;
   getColonyTokens?: Maybe<ColonyTokens>;
   getContractEvent?: Maybe<ContractEvent>;
-  getContributorByAddressAndColony?: Maybe<ModelReputedContributorConnection>;
-  getContributorsByDomainAndColony?: Maybe<ModelReputedContributorConnection>;
+  getContributorByAddress?: Maybe<ModelColonyContributorConnection>;
+  getContributorReputation?: Maybe<ContributorReputation>;
+  getContributorsByColony?: Maybe<ModelColonyContributorConnection>;
   getCurrentNetworkInverseFee?: Maybe<CurrentNetworkInverseFee>;
   getCurrentVersion?: Maybe<CurrentVersion>;
   getCurrentVersionByKey?: Maybe<ModelCurrentVersionConnection>;
@@ -4072,7 +4224,6 @@ export type Query = {
   getProfileByEmail?: Maybe<ModelProfileConnection>;
   /** Retrieve a user's reputation within the top domains of a Colony */
   getReputationForTopDomains?: Maybe<GetReputationForTopDomainsReturn>;
-  getReputedContributor?: Maybe<ReputedContributor>;
   getRoleByDomainAndColony?: Maybe<ModelColonyRoleConnection>;
   getToken?: Maybe<Token>;
   getTokenByAddress?: Maybe<ModelTokenConnection>;
@@ -4093,6 +4244,7 @@ export type Query = {
   listAnnotations?: Maybe<ModelAnnotationConnection>;
   listColonies?: Maybe<ModelColonyConnection>;
   listColonyActions?: Maybe<ModelColonyActionConnection>;
+  listColonyContributors?: Maybe<ModelColonyContributorConnection>;
   listColonyDecisions?: Maybe<ModelColonyDecisionConnection>;
   listColonyExtensions?: Maybe<ModelColonyExtensionConnection>;
   listColonyFundsClaims?: Maybe<ModelColonyFundsClaimConnection>;
@@ -4103,6 +4255,7 @@ export type Query = {
   listColonyStakes?: Maybe<ModelColonyStakeConnection>;
   listColonyTokens?: Maybe<ModelColonyTokensConnection>;
   listContractEvents?: Maybe<ModelContractEventConnection>;
+  listContributorReputations?: Maybe<ModelContributorReputationConnection>;
   listCurrentNetworkInverseFees?: Maybe<ModelCurrentNetworkInverseFeeConnection>;
   listCurrentVersions?: Maybe<ModelCurrentVersionConnection>;
   listDomainMetadata?: Maybe<ModelDomainMetadataConnection>;
@@ -4112,7 +4265,6 @@ export type Query = {
   listIngestorStats?: Maybe<ModelIngestorStatsConnection>;
   listMotionMessages?: Maybe<ModelMotionMessageConnection>;
   listProfiles?: Maybe<ModelProfileConnection>;
-  listReputedContributors?: Maybe<ModelReputedContributorConnection>;
   listTokens?: Maybe<ModelTokenConnection>;
   listUserTokens?: Maybe<ModelUserTokensConnection>;
   listUsers?: Maybe<ModelUserConnection>;
@@ -4187,6 +4339,11 @@ export type QueryGetColonyByTypeArgs = {
   nextToken?: InputMaybe<Scalars['String']>;
   sortDirection?: InputMaybe<ModelSortDirection>;
   type: ColonyType;
+};
+
+/** Root query type */
+export type QueryGetColonyContributorArgs = {
+  id: Scalars['ID'];
 };
 
 /** Root query type */
@@ -4279,20 +4436,25 @@ export type QueryGetContractEventArgs = {
 };
 
 /** Root query type */
-export type QueryGetContributorByAddressAndColonyArgs = {
-  colonyAddress?: InputMaybe<ModelStringKeyConditionInput>;
+export type QueryGetContributorByAddressArgs = {
+  colonyReputationPercentage?: InputMaybe<ModelFloatKeyConditionInput>;
   contributorAddress: Scalars['ID'];
-  filter?: InputMaybe<ModelReputedContributorFilterInput>;
+  filter?: InputMaybe<ModelColonyContributorFilterInput>;
   limit?: InputMaybe<Scalars['Int']>;
   nextToken?: InputMaybe<Scalars['String']>;
   sortDirection?: InputMaybe<ModelSortDirection>;
 };
 
 /** Root query type */
-export type QueryGetContributorsByDomainAndColonyArgs = {
-  colonyAddress: Scalars['String'];
-  domainId?: InputMaybe<ModelStringKeyConditionInput>;
-  filter?: InputMaybe<ModelReputedContributorFilterInput>;
+export type QueryGetContributorReputationArgs = {
+  id: Scalars['ID'];
+};
+
+/** Root query type */
+export type QueryGetContributorsByColonyArgs = {
+  colonyAddress: Scalars['ID'];
+  colonyReputationPercentage?: InputMaybe<ModelFloatKeyConditionInput>;
+  filter?: InputMaybe<ModelColonyContributorFilterInput>;
   limit?: InputMaybe<Scalars['Int']>;
   nextToken?: InputMaybe<Scalars['String']>;
   sortDirection?: InputMaybe<ModelSortDirection>;
@@ -4449,13 +4611,8 @@ export type QueryGetReputationForTopDomainsArgs = {
 };
 
 /** Root query type */
-export type QueryGetReputedContributorArgs = {
-  id: Scalars['ID'];
-};
-
-/** Root query type */
 export type QueryGetRoleByDomainAndColonyArgs = {
-  colonyAddress?: InputMaybe<ModelStringKeyConditionInput>;
+  colonyAddress?: InputMaybe<ModelIdKeyConditionInput>;
   domainId: Scalars['ID'];
   filter?: InputMaybe<ModelColonyRoleFilterInput>;
   limit?: InputMaybe<Scalars['Int']>;
@@ -4561,6 +4718,13 @@ export type QueryListColonyActionsArgs = {
 };
 
 /** Root query type */
+export type QueryListColonyContributorsArgs = {
+  filter?: InputMaybe<ModelColonyContributorFilterInput>;
+  limit?: InputMaybe<Scalars['Int']>;
+  nextToken?: InputMaybe<Scalars['String']>;
+};
+
+/** Root query type */
 export type QueryListColonyDecisionsArgs = {
   filter?: InputMaybe<ModelColonyDecisionFilterInput>;
   limit?: InputMaybe<Scalars['Int']>;
@@ -4631,6 +4795,13 @@ export type QueryListContractEventsArgs = {
 };
 
 /** Root query type */
+export type QueryListContributorReputationsArgs = {
+  filter?: InputMaybe<ModelContributorReputationFilterInput>;
+  limit?: InputMaybe<Scalars['Int']>;
+  nextToken?: InputMaybe<Scalars['String']>;
+};
+
+/** Root query type */
 export type QueryListCurrentNetworkInverseFeesArgs = {
   filter?: InputMaybe<ModelCurrentNetworkInverseFeeFilterInput>;
   limit?: InputMaybe<Scalars['Int']>;
@@ -4694,13 +4865,6 @@ export type QueryListProfilesArgs = {
 };
 
 /** Root query type */
-export type QueryListReputedContributorsArgs = {
-  filter?: InputMaybe<ModelReputedContributorFilterInput>;
-  limit?: InputMaybe<Scalars['Int']>;
-  nextToken?: InputMaybe<Scalars['String']>;
-};
-
-/** Root query type */
 export type QueryListTokensArgs = {
   filter?: InputMaybe<ModelTokenFilterInput>;
   limit?: InputMaybe<Scalars['Int']>;
@@ -4726,38 +4890,6 @@ export type QueryListWatchedColoniesArgs = {
   filter?: InputMaybe<ModelWatchedColoniesFilterInput>;
   limit?: InputMaybe<Scalars['Int']>;
   nextToken?: InputMaybe<Scalars['String']>;
-};
-
-/** The ReputedContributor model represents an address with reputation. */
-export type ReputedContributor = {
-  __typename?: 'ReputedContributor';
-  /** Address of the colony the contributor is under */
-  colonyAddress: Scalars['String'];
-  /**
-   * The percentage of the contributor's reputation in the colony
-   * (Even though the ReputedContributor model is domain-specific, we store the colony-wide percentage here as well
-   * to enable fast and simple sorting on the MembersPage)
-   */
-  colonyReputationPercentage: Scalars['String'];
-  /** The address of the contributor */
-  contributorAddress: Scalars['ID'];
-  createdAt: Scalars['AWSDateTime'];
-  /** The domain id the contributor is associated with */
-  domainId: Scalars['String'];
-  /** The percentage of the contributor's reputation in the domain */
-  domainReputationPercentage: Scalars['String'];
-  /**
-   * Unique identifier
-   * Format: <colonyAddress>_<nativeDomainId>_<contributorAddress>
-   */
-  id: Scalars['ID'];
-  /** The contributor's reputation */
-  reputation: Scalars['String'];
-  /** The type of the contributor */
-  type?: Maybe<ContributorType>;
-  updatedAt: Scalars['AWSDateTime'];
-  /** Associated user, if any */
-  user?: Maybe<User>;
 };
 
 /**
@@ -4819,6 +4951,7 @@ export type Subscription = {
   onCreateAnnotation?: Maybe<Annotation>;
   onCreateColony?: Maybe<Colony>;
   onCreateColonyAction?: Maybe<ColonyAction>;
+  onCreateColonyContributor?: Maybe<ColonyContributor>;
   onCreateColonyDecision?: Maybe<ColonyDecision>;
   onCreateColonyExtension?: Maybe<ColonyExtension>;
   onCreateColonyFundsClaim?: Maybe<ColonyFundsClaim>;
@@ -4829,6 +4962,7 @@ export type Subscription = {
   onCreateColonyStake?: Maybe<ColonyStake>;
   onCreateColonyTokens?: Maybe<ColonyTokens>;
   onCreateContractEvent?: Maybe<ContractEvent>;
+  onCreateContributorReputation?: Maybe<ContributorReputation>;
   onCreateCurrentNetworkInverseFee?: Maybe<CurrentNetworkInverseFee>;
   onCreateCurrentVersion?: Maybe<CurrentVersion>;
   onCreateDomain?: Maybe<Domain>;
@@ -4838,7 +4972,6 @@ export type Subscription = {
   onCreateIngestorStats?: Maybe<IngestorStats>;
   onCreateMotionMessage?: Maybe<MotionMessage>;
   onCreateProfile?: Maybe<Profile>;
-  onCreateReputedContributor?: Maybe<ReputedContributor>;
   onCreateToken?: Maybe<Token>;
   onCreateUser?: Maybe<User>;
   onCreateUserTokens?: Maybe<UserTokens>;
@@ -4846,6 +4979,7 @@ export type Subscription = {
   onDeleteAnnotation?: Maybe<Annotation>;
   onDeleteColony?: Maybe<Colony>;
   onDeleteColonyAction?: Maybe<ColonyAction>;
+  onDeleteColonyContributor?: Maybe<ColonyContributor>;
   onDeleteColonyDecision?: Maybe<ColonyDecision>;
   onDeleteColonyExtension?: Maybe<ColonyExtension>;
   onDeleteColonyFundsClaim?: Maybe<ColonyFundsClaim>;
@@ -4856,6 +4990,7 @@ export type Subscription = {
   onDeleteColonyStake?: Maybe<ColonyStake>;
   onDeleteColonyTokens?: Maybe<ColonyTokens>;
   onDeleteContractEvent?: Maybe<ContractEvent>;
+  onDeleteContributorReputation?: Maybe<ContributorReputation>;
   onDeleteCurrentNetworkInverseFee?: Maybe<CurrentNetworkInverseFee>;
   onDeleteCurrentVersion?: Maybe<CurrentVersion>;
   onDeleteDomain?: Maybe<Domain>;
@@ -4865,7 +5000,6 @@ export type Subscription = {
   onDeleteIngestorStats?: Maybe<IngestorStats>;
   onDeleteMotionMessage?: Maybe<MotionMessage>;
   onDeleteProfile?: Maybe<Profile>;
-  onDeleteReputedContributor?: Maybe<ReputedContributor>;
   onDeleteToken?: Maybe<Token>;
   onDeleteUser?: Maybe<User>;
   onDeleteUserTokens?: Maybe<UserTokens>;
@@ -4873,6 +5007,7 @@ export type Subscription = {
   onUpdateAnnotation?: Maybe<Annotation>;
   onUpdateColony?: Maybe<Colony>;
   onUpdateColonyAction?: Maybe<ColonyAction>;
+  onUpdateColonyContributor?: Maybe<ColonyContributor>;
   onUpdateColonyDecision?: Maybe<ColonyDecision>;
   onUpdateColonyExtension?: Maybe<ColonyExtension>;
   onUpdateColonyFundsClaim?: Maybe<ColonyFundsClaim>;
@@ -4883,6 +5018,7 @@ export type Subscription = {
   onUpdateColonyStake?: Maybe<ColonyStake>;
   onUpdateColonyTokens?: Maybe<ColonyTokens>;
   onUpdateContractEvent?: Maybe<ContractEvent>;
+  onUpdateContributorReputation?: Maybe<ContributorReputation>;
   onUpdateCurrentNetworkInverseFee?: Maybe<CurrentNetworkInverseFee>;
   onUpdateCurrentVersion?: Maybe<CurrentVersion>;
   onUpdateDomain?: Maybe<Domain>;
@@ -4892,7 +5028,6 @@ export type Subscription = {
   onUpdateIngestorStats?: Maybe<IngestorStats>;
   onUpdateMotionMessage?: Maybe<MotionMessage>;
   onUpdateProfile?: Maybe<Profile>;
-  onUpdateReputedContributor?: Maybe<ReputedContributor>;
   onUpdateToken?: Maybe<Token>;
   onUpdateUser?: Maybe<User>;
   onUpdateUserTokens?: Maybe<UserTokens>;
@@ -4909,6 +5044,10 @@ export type SubscriptionOnCreateColonyArgs = {
 
 export type SubscriptionOnCreateColonyActionArgs = {
   filter?: InputMaybe<ModelSubscriptionColonyActionFilterInput>;
+};
+
+export type SubscriptionOnCreateColonyContributorArgs = {
+  filter?: InputMaybe<ModelSubscriptionColonyContributorFilterInput>;
 };
 
 export type SubscriptionOnCreateColonyDecisionArgs = {
@@ -4951,6 +5090,10 @@ export type SubscriptionOnCreateContractEventArgs = {
   filter?: InputMaybe<ModelSubscriptionContractEventFilterInput>;
 };
 
+export type SubscriptionOnCreateContributorReputationArgs = {
+  filter?: InputMaybe<ModelSubscriptionContributorReputationFilterInput>;
+};
+
 export type SubscriptionOnCreateCurrentNetworkInverseFeeArgs = {
   filter?: InputMaybe<ModelSubscriptionCurrentNetworkInverseFeeFilterInput>;
 };
@@ -4987,10 +5130,6 @@ export type SubscriptionOnCreateProfileArgs = {
   filter?: InputMaybe<ModelSubscriptionProfileFilterInput>;
 };
 
-export type SubscriptionOnCreateReputedContributorArgs = {
-  filter?: InputMaybe<ModelSubscriptionReputedContributorFilterInput>;
-};
-
 export type SubscriptionOnCreateTokenArgs = {
   filter?: InputMaybe<ModelSubscriptionTokenFilterInput>;
 };
@@ -5017,6 +5156,10 @@ export type SubscriptionOnDeleteColonyArgs = {
 
 export type SubscriptionOnDeleteColonyActionArgs = {
   filter?: InputMaybe<ModelSubscriptionColonyActionFilterInput>;
+};
+
+export type SubscriptionOnDeleteColonyContributorArgs = {
+  filter?: InputMaybe<ModelSubscriptionColonyContributorFilterInput>;
 };
 
 export type SubscriptionOnDeleteColonyDecisionArgs = {
@@ -5059,6 +5202,10 @@ export type SubscriptionOnDeleteContractEventArgs = {
   filter?: InputMaybe<ModelSubscriptionContractEventFilterInput>;
 };
 
+export type SubscriptionOnDeleteContributorReputationArgs = {
+  filter?: InputMaybe<ModelSubscriptionContributorReputationFilterInput>;
+};
+
 export type SubscriptionOnDeleteCurrentNetworkInverseFeeArgs = {
   filter?: InputMaybe<ModelSubscriptionCurrentNetworkInverseFeeFilterInput>;
 };
@@ -5095,10 +5242,6 @@ export type SubscriptionOnDeleteProfileArgs = {
   filter?: InputMaybe<ModelSubscriptionProfileFilterInput>;
 };
 
-export type SubscriptionOnDeleteReputedContributorArgs = {
-  filter?: InputMaybe<ModelSubscriptionReputedContributorFilterInput>;
-};
-
 export type SubscriptionOnDeleteTokenArgs = {
   filter?: InputMaybe<ModelSubscriptionTokenFilterInput>;
 };
@@ -5125,6 +5268,10 @@ export type SubscriptionOnUpdateColonyArgs = {
 
 export type SubscriptionOnUpdateColonyActionArgs = {
   filter?: InputMaybe<ModelSubscriptionColonyActionFilterInput>;
+};
+
+export type SubscriptionOnUpdateColonyContributorArgs = {
+  filter?: InputMaybe<ModelSubscriptionColonyContributorFilterInput>;
 };
 
 export type SubscriptionOnUpdateColonyDecisionArgs = {
@@ -5167,6 +5314,10 @@ export type SubscriptionOnUpdateContractEventArgs = {
   filter?: InputMaybe<ModelSubscriptionContractEventFilterInput>;
 };
 
+export type SubscriptionOnUpdateContributorReputationArgs = {
+  filter?: InputMaybe<ModelSubscriptionContributorReputationFilterInput>;
+};
+
 export type SubscriptionOnUpdateCurrentNetworkInverseFeeArgs = {
   filter?: InputMaybe<ModelSubscriptionCurrentNetworkInverseFeeFilterInput>;
 };
@@ -5201,10 +5352,6 @@ export type SubscriptionOnUpdateMotionMessageArgs = {
 
 export type SubscriptionOnUpdateProfileArgs = {
   filter?: InputMaybe<ModelSubscriptionProfileFilterInput>;
-};
-
-export type SubscriptionOnUpdateReputedContributorArgs = {
-  filter?: InputMaybe<ModelSubscriptionReputedContributorFilterInput>;
 };
 
 export type SubscriptionOnUpdateTokenArgs = {
@@ -5331,6 +5478,15 @@ export type UpdateColonyActionInput = {
   type?: InputMaybe<ColonyActionType>;
 };
 
+export type UpdateColonyContributorInput = {
+  colonyAddress?: InputMaybe<Scalars['ID']>;
+  colonyReputationPercentage?: InputMaybe<Scalars['Float']>;
+  contributorAddress?: InputMaybe<Scalars['ID']>;
+  id: Scalars['ID'];
+  type?: InputMaybe<ContributorType>;
+  verified?: InputMaybe<Scalars['Boolean']>;
+};
+
 export type UpdateColonyDecisionInput = {
   actionId?: InputMaybe<Scalars['ID']>;
   colonyAddress?: InputMaybe<Scalars['String']>;
@@ -5387,6 +5543,7 @@ export type UpdateColonyInput = {
   chainMetadata?: InputMaybe<ChainMetadataInput>;
   expendituresGlobalClaimDelay?: InputMaybe<Scalars['Int']>;
   id: Scalars['ID'];
+  lastUpdatedContributorsWithReputation?: InputMaybe<Scalars['AWSDateTime']>;
   motionsWithUnclaimedStakes?: InputMaybe<Array<ColonyUnclaimedStakeInput>>;
   name?: InputMaybe<Scalars['String']>;
   nativeTokenId?: InputMaybe<Scalars['ID']>;
@@ -5434,7 +5591,7 @@ export type UpdateColonyMotionInput = {
 };
 
 export type UpdateColonyRoleInput = {
-  colonyAddress?: InputMaybe<Scalars['String']>;
+  colonyAddress?: InputMaybe<Scalars['ID']>;
   colonyRolesId?: InputMaybe<Scalars['ID']>;
   domainId?: InputMaybe<Scalars['ID']>;
   id: Scalars['ID'];
@@ -5473,6 +5630,20 @@ export type UpdateContractEventInput = {
   name?: InputMaybe<Scalars['String']>;
   signature?: InputMaybe<Scalars['String']>;
   target?: InputMaybe<Scalars['String']>;
+};
+
+export type UpdateContributorReputationInput = {
+  colonyAddress?: InputMaybe<Scalars['ID']>;
+  contributorAddress?: InputMaybe<Scalars['ID']>;
+  domainId?: InputMaybe<Scalars['ID']>;
+  id: Scalars['ID'];
+  reputationPercentage?: InputMaybe<Scalars['Float']>;
+  reputationRaw?: InputMaybe<Scalars['String']>;
+};
+
+export type UpdateContributorsWithReputationInput = {
+  /** The colony address */
+  colonyAddress?: InputMaybe<Scalars['String']>;
 };
 
 export type UpdateCurrentNetworkInverseFeeInput = {
@@ -5577,22 +5748,6 @@ export type UpdateProfileInput = {
   meta?: InputMaybe<ProfileMetadataInput>;
   thumbnail?: InputMaybe<Scalars['String']>;
   website?: InputMaybe<Scalars['AWSURL']>;
-};
-
-export type UpdateReputedContributorInput = {
-  colonyAddress?: InputMaybe<Scalars['String']>;
-  colonyReputationPercentage?: InputMaybe<Scalars['String']>;
-  contributorAddress?: InputMaybe<Scalars['ID']>;
-  domainId?: InputMaybe<Scalars['String']>;
-  domainReputationPercentage?: InputMaybe<Scalars['String']>;
-  id: Scalars['ID'];
-  reputation?: InputMaybe<Scalars['String']>;
-  type?: InputMaybe<ContributorType>;
-};
-
-export type UpdateReputedContributorsInput = {
-  /** The colony address */
-  colonyAddress?: InputMaybe<Scalars['String']>;
 };
 
 export type UpdateTokenInput = {
@@ -6019,6 +6174,18 @@ export type UpdateColonyMetadataMutation = {
   updateColonyMetadata?: { __typename?: 'ColonyMetadata'; id: string } | null;
 };
 
+export type CreateColonyContributorMutationVariables = Exact<{
+  input: CreateColonyContributorInput;
+}>;
+
+export type CreateColonyContributorMutation = {
+  __typename?: 'Mutation';
+  createColonyContributor?: {
+    __typename?: 'ColonyContributor';
+    id: string;
+  } | null;
+};
+
 export type SetCurrentVersionMutationVariables = Exact<{
   input: SetCurrentVersionInput;
 }>;
@@ -6413,6 +6580,18 @@ export type ListColoniesQuery = {
     __typename?: 'ModelColonyConnection';
     nextToken?: string | null;
     items: Array<{ __typename?: 'Colony'; id: string } | null>;
+  } | null;
+};
+
+export type GetColonyContributorQueryVariables = Exact<{
+  id: Scalars['ID'];
+}>;
+
+export type GetColonyContributorQuery = {
+  __typename?: 'Query';
+  getColonyContributor?: {
+    __typename?: 'ColonyContributor';
+    id: string;
   } | null;
 };
 
@@ -7018,6 +7197,13 @@ export const UpdateColonyMetadataDocument = gql`
     }
   }
 `;
+export const CreateColonyContributorDocument = gql`
+  mutation CreateColonyContributor($input: CreateColonyContributorInput!) {
+    createColonyContributor(input: $input) {
+      id
+    }
+  }
+`;
 export const SetCurrentVersionDocument = gql`
   mutation SetCurrentVersion($input: SetCurrentVersionInput!) {
     setCurrentVersion(input: $input)
@@ -7317,6 +7503,13 @@ export const ListColoniesDocument = gql`
       items {
         id
       }
+    }
+  }
+`;
+export const GetColonyContributorDocument = gql`
+  query GetColonyContributor($id: ID!) {
+    getColonyContributor(id: $id) {
+      id
     }
   }
 `;

@@ -5,15 +5,12 @@ import {
   CreateColonyActionInput,
   CreateColonyActionMutation,
   CreateColonyActionMutationVariables,
-  GetColonyExtensionsByColonyAddressDocument,
-  GetColonyExtensionsByColonyAddressQuery,
-  GetColonyExtensionsByColonyAddressQueryVariables,
   GetExpenditureByNativeFundingPotIdAndColonyDocument,
   GetExpenditureByNativeFundingPotIdAndColonyQuery,
   GetExpenditureByNativeFundingPotIdAndColonyQueryVariables,
 } from '~graphql';
+import { toNumber, verbose, getExtensionInstallations } from '~utils';
 import { ContractEvent } from '~types';
-import { notNull, toNumber, verbose } from '~utils';
 import networkClient from '~networkClient';
 
 type ActionFields = Omit<
@@ -80,17 +77,7 @@ const showActionInActionsList = async (
     }
   }
 
-  const { data } =
-    (await query<
-      GetColonyExtensionsByColonyAddressQuery,
-      GetColonyExtensionsByColonyAddressQueryVariables
-    >(GetColonyExtensionsByColonyAddressDocument, {
-      colonyAddress,
-    })) ?? {};
-  const extensionAddresses =
-    data?.getExtensionByColonyAndHash?.items
-      .filter(notNull)
-      .map((colonyExtension) => colonyExtension.id) ?? [];
+  const extensionAddresses = await getExtensionInstallations(colonyAddress);
 
   const isAddressInitiatorOrRecipient = (address: string): boolean =>
     address === initiatorAddress || address === recipientAddress;
