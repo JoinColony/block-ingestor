@@ -11,6 +11,7 @@ import {
   getRolesMapFromEvents,
   verbose,
   writeActionFromEvent,
+  getExtensionInstallations,
 } from '~utils';
 import {
   GetColonyRoleQuery,
@@ -22,6 +23,7 @@ import {
   ColonyActionType,
 } from '~graphql';
 import provider from '~provider';
+import { updateColonyContributor } from '~utils/contributors';
 
 export default async (event: ContractEvent): Promise<void> => {
   const {
@@ -179,4 +181,19 @@ export default async (event: ContractEvent): Promise<void> => {
       transactionHash,
     );
   }
+
+  /*
+   * Whenever a permission is added/removed, confirm that the target address still has at least one permission in the colony
+   */
+
+  const installedExtensions = new Set(
+    await getExtensionInstallations(colonyAddress),
+  );
+
+  // We don't create contributor entries for extensions
+  if (!installedExtensions.has(targetAddress))
+    await updateColonyContributor({
+      colonyAddress,
+      contributorAddress: targetAddress,
+    });
 };
