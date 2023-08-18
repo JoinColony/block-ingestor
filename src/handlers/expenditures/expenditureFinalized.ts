@@ -26,6 +26,7 @@ export default async (event: ContractEvent): Promise<void> => {
       input: {
         id: getExpenditureDatabaseId(colonyAddress, convertedExpenditureId),
         status: ExpenditureStatus.Finalized,
+        finalizedAt: event.timestamp,
       },
     },
   );
