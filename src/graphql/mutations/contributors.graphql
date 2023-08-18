@@ -3,3 +3,9 @@ mutation CreateColonyContributor($input: CreateColonyContributorInput!) {
     id
   }
 }
+
+mutation UpdateColonyContributor($input: UpdateColonyContributorInput!) {
+  updateColonyContributor(input: $input) {
+    id
+  }
+}

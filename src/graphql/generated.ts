@@ -435,11 +435,19 @@ export type ColonyContributor = {
   /** The address of the contributor */
   contributorAddress: Scalars['ID'];
   createdAt: Scalars['AWSDateTime'];
+  /** Does the contributor have any permission in any domain the colony? */
+  hasPermissions?: Maybe<Scalars['Boolean']>;
+  /** Does the contributor have any reputation the colony? */
+  hasReputation?: Maybe<Scalars['Boolean']>;
   /**
    * Unique identifier
    * Format: <colonyAddress>_<contributorAddress>
    */
   id: Scalars['ID'];
+  /** Is the contributor a member of the colony's whitelist? */
+  isVerified: Scalars['Boolean'];
+  /** Is the contributor watching the colony */
+  isWatching?: Maybe<Scalars['Boolean']>;
   reputation?: Maybe<ModelContributorReputationConnection>;
   roles?: Maybe<ModelColonyRoleConnection>;
   /** The type of the contributor */
@@ -447,8 +455,6 @@ export type ColonyContributor = {
   updatedAt: Scalars['AWSDateTime'];
   /** Associated user, if any */
   user?: Maybe<User>;
-  /** Is the contributor a member of the colony's whitelist? */
-  verified: Scalars['Boolean'];
 };
 
 /** The ColonyContributor model represents a contributor to the Colony. */
@@ -461,6 +467,7 @@ export type ColonyContributorReputationArgs = {
 
 /** The ColonyContributor model represents a contributor to the Colony. */
 export type ColonyContributorRolesArgs = {
+  colonyAddress?: InputMaybe<ModelIdKeyConditionInput>;
   filter?: InputMaybe<ModelColonyRoleFilterInput>;
   limit?: InputMaybe<Scalars['Int']>;
   nextToken?: InputMaybe<Scalars['String']>;
@@ -920,7 +927,6 @@ export enum ContributorType {
   General = 'GENERAL',
   New = 'NEW',
   Top = 'TOP',
-  Verified = 'VERIFIED',
 }
 
 export type CreateAnnotationInput = {
@@ -961,9 +967,12 @@ export type CreateColonyContributorInput = {
   colonyAddress: Scalars['ID'];
   colonyReputationPercentage: Scalars['Float'];
   contributorAddress: Scalars['ID'];
+  hasPermissions?: InputMaybe<Scalars['Boolean']>;
+  hasReputation?: InputMaybe<Scalars['Boolean']>;
   id?: InputMaybe<Scalars['ID']>;
+  isVerified: Scalars['Boolean'];
+  isWatching?: InputMaybe<Scalars['Boolean']>;
   type?: InputMaybe<ContributorType>;
-  verified: Scalars['Boolean'];
 };
 
 export type CreateColonyDecisionInput = {
@@ -1715,6 +1724,18 @@ export type GetReputationForTopDomainsReturn = {
   items?: Maybe<Array<UserDomainReputation>>;
 };
 
+/** The type of input of the getTotalMemberCount lambda */
+export type GetTotalMemberCountInput = {
+  colonyAddress: Scalars['ID'];
+};
+
+/** The return type of the getTotalMemberCount lambda */
+export type GetTotalMemberCountReturn = {
+  __typename?: 'GetTotalMemberCountReturn';
+  contributorCount: Scalars['Int'];
+  memberCount: Scalars['Int'];
+};
+
 /**
  * Input data for a user's reputation within a Domain in a Colony. If no `domainId` is passed, the Root Domain is used
  * A `rootHash` can be provided, to get reputation at a certain point in the past
@@ -1791,6 +1812,11 @@ export type IngestorStats = {
   /** JSON string to pass custom, dynamic values */
   value: Scalars['String'];
 };
+
+export enum MemberTotalType {
+  All = 'ALL',
+  Contributors = 'CONTRIBUTORS',
+}
 
 /** Input data for fetching the list of members for a specific Colony */
 export type MembersForColonyInput = {
@@ -1956,10 +1982,13 @@ export type ModelColonyContributorConditionInput = {
   colonyAddress?: InputMaybe<ModelIdInput>;
   colonyReputationPercentage?: InputMaybe<ModelFloatInput>;
   contributorAddress?: InputMaybe<ModelIdInput>;
+  hasPermissions?: InputMaybe<ModelBooleanInput>;
+  hasReputation?: InputMaybe<ModelBooleanInput>;
+  isVerified?: InputMaybe<ModelBooleanInput>;
+  isWatching?: InputMaybe<ModelBooleanInput>;
   not?: InputMaybe<ModelColonyContributorConditionInput>;
   or?: InputMaybe<Array<InputMaybe<ModelColonyContributorConditionInput>>>;
   type?: InputMaybe<ModelContributorTypeInput>;
-  verified?: InputMaybe<ModelBooleanInput>;
 };
 
 export type ModelColonyContributorConnection = {
@@ -1973,11 +2002,14 @@ export type ModelColonyContributorFilterInput = {
   colonyAddress?: InputMaybe<ModelIdInput>;
   colonyReputationPercentage?: InputMaybe<ModelFloatInput>;
   contributorAddress?: InputMaybe<ModelIdInput>;
+  hasPermissions?: InputMaybe<ModelBooleanInput>;
+  hasReputation?: InputMaybe<ModelBooleanInput>;
   id?: InputMaybe<ModelIdInput>;
+  isVerified?: InputMaybe<ModelBooleanInput>;
+  isWatching?: InputMaybe<ModelBooleanInput>;
   not?: InputMaybe<ModelColonyContributorFilterInput>;
   or?: InputMaybe<Array<InputMaybe<ModelColonyContributorFilterInput>>>;
   type?: InputMaybe<ModelContributorTypeInput>;
-  verified?: InputMaybe<ModelBooleanInput>;
 };
 
 export type ModelColonyDecisionConditionInput = {
@@ -2808,12 +2840,15 @@ export type ModelSubscriptionColonyContributorFilterInput = {
   colonyAddress?: InputMaybe<ModelSubscriptionIdInput>;
   colonyReputationPercentage?: InputMaybe<ModelSubscriptionFloatInput>;
   contributorAddress?: InputMaybe<ModelSubscriptionIdInput>;
+  hasPermissions?: InputMaybe<ModelSubscriptionBooleanInput>;
+  hasReputation?: InputMaybe<ModelSubscriptionBooleanInput>;
   id?: InputMaybe<ModelSubscriptionIdInput>;
+  isVerified?: InputMaybe<ModelSubscriptionBooleanInput>;
+  isWatching?: InputMaybe<ModelSubscriptionBooleanInput>;
   or?: InputMaybe<
     Array<InputMaybe<ModelSubscriptionColonyContributorFilterInput>>
   >;
   type?: InputMaybe<ModelSubscriptionStringInput>;
-  verified?: InputMaybe<ModelSubscriptionBooleanInput>;
 };
 
 export type ModelSubscriptionColonyDecisionFilterInput = {
@@ -4225,11 +4260,13 @@ export type Query = {
   /** Retrieve a user's reputation within the top domains of a Colony */
   getReputationForTopDomains?: Maybe<GetReputationForTopDomainsReturn>;
   getRoleByDomainAndColony?: Maybe<ModelColonyRoleConnection>;
+  getRoleByTargetAddressAndColony?: Maybe<ModelColonyRoleConnection>;
   getToken?: Maybe<Token>;
   getTokenByAddress?: Maybe<ModelTokenConnection>;
   /** Fetch a token's information. Tries to get the data from the DB first, if that fails, resolves to get data from chain */
   getTokenFromEverywhere?: Maybe<TokenFromEverywhereReturn>;
   getTokensByType?: Maybe<ModelTokenConnection>;
+  getTotalMemberCount: GetTotalMemberCountReturn;
   getUser?: Maybe<User>;
   getUserByAddress?: Maybe<ModelUserConnection>;
   getUserByName?: Maybe<ModelUserConnection>;
@@ -4621,6 +4658,16 @@ export type QueryGetRoleByDomainAndColonyArgs = {
 };
 
 /** Root query type */
+export type QueryGetRoleByTargetAddressAndColonyArgs = {
+  colonyAddress?: InputMaybe<ModelIdKeyConditionInput>;
+  filter?: InputMaybe<ModelColonyRoleFilterInput>;
+  limit?: InputMaybe<Scalars['Int']>;
+  nextToken?: InputMaybe<Scalars['String']>;
+  sortDirection?: InputMaybe<ModelSortDirection>;
+  targetAddress: Scalars['ID'];
+};
+
+/** Root query type */
 export type QueryGetTokenArgs = {
   id: Scalars['ID'];
 };
@@ -4646,6 +4693,11 @@ export type QueryGetTokensByTypeArgs = {
   nextToken?: InputMaybe<Scalars['String']>;
   sortDirection?: InputMaybe<ModelSortDirection>;
   type: TokenType;
+};
+
+/** Root query type */
+export type QueryGetTotalMemberCountArgs = {
+  input: GetTotalMemberCountInput;
 };
 
 /** Root query type */
@@ -5482,9 +5534,12 @@ export type UpdateColonyContributorInput = {
   colonyAddress?: InputMaybe<Scalars['ID']>;
   colonyReputationPercentage?: InputMaybe<Scalars['Float']>;
   contributorAddress?: InputMaybe<Scalars['ID']>;
+  hasPermissions?: InputMaybe<Scalars['Boolean']>;
+  hasReputation?: InputMaybe<Scalars['Boolean']>;
   id: Scalars['ID'];
+  isVerified?: InputMaybe<Scalars['Boolean']>;
+  isWatching?: InputMaybe<Scalars['Boolean']>;
   type?: InputMaybe<ContributorType>;
-  verified?: InputMaybe<Scalars['Boolean']>;
 };
 
 export type UpdateColonyDecisionInput = {
@@ -5801,6 +5856,7 @@ export type User = {
 
 /** Represents a User within the Colony Network */
 export type UserRolesArgs = {
+  colonyAddress?: InputMaybe<ModelIdKeyConditionInput>;
   filter?: InputMaybe<ModelColonyRoleFilterInput>;
   limit?: InputMaybe<Scalars['Int']>;
   nextToken?: InputMaybe<Scalars['String']>;
@@ -6181,6 +6237,18 @@ export type CreateColonyContributorMutationVariables = Exact<{
 export type CreateColonyContributorMutation = {
   __typename?: 'Mutation';
   createColonyContributor?: {
+    __typename?: 'ColonyContributor';
+    id: string;
+  } | null;
+};
+
+export type UpdateColonyContributorMutationVariables = Exact<{
+  input: UpdateColonyContributorInput;
+}>;
+
+export type UpdateColonyContributorMutation = {
+  __typename?: 'Mutation';
+  updateColonyContributor?: {
     __typename?: 'ColonyContributor';
     id: string;
   } | null;
@@ -6965,6 +7033,28 @@ export type GetColonyRoleQuery = {
   } | null;
 };
 
+export type GetAllColonyRolesQueryVariables = Exact<{
+  targetAddress: Scalars['ID'];
+  colonyAddress: Scalars['ID'];
+}>;
+
+export type GetAllColonyRolesQuery = {
+  __typename?: 'Query';
+  getRoleByTargetAddressAndColony?: {
+    __typename?: 'ModelColonyRoleConnection';
+    items: Array<{
+      __typename?: 'ColonyRole';
+      id: string;
+      role_0?: boolean | null;
+      role_1?: boolean | null;
+      role_2?: boolean | null;
+      role_3?: boolean | null;
+      role_5?: boolean | null;
+      role_6?: boolean | null;
+    } | null>;
+  } | null;
+};
+
 export type GetColonyHistoricRoleQueryVariables = Exact<{
   id: Scalars['ID'];
 }>;
@@ -7200,6 +7290,13 @@ export const UpdateColonyMetadataDocument = gql`
 export const CreateColonyContributorDocument = gql`
   mutation CreateColonyContributor($input: CreateColonyContributorInput!) {
     createColonyContributor(input: $input) {
+      id
+    }
+  }
+`;
+export const UpdateColonyContributorDocument = gql`
+  mutation UpdateColonyContributor($input: UpdateColonyContributorInput!) {
+    updateColonyContributor(input: $input) {
       id
     }
   }
@@ -7732,6 +7829,24 @@ export const GetColonyRoleDocument = gql`
       role_3
       role_5
       role_6
+    }
+  }
+`;
+export const GetAllColonyRolesDocument = gql`
+  query GetAllColonyRoles($targetAddress: ID!, $colonyAddress: ID!) {
+    getRoleByTargetAddressAndColony(
+      targetAddress: $targetAddress
+      colonyAddress: { eq: $colonyAddress }
+    ) {
+      items {
+        id
+        role_0
+        role_1
+        role_2
+        role_3
+        role_5
+        role_6
+      }
     }
   }
 `;
