@@ -51,21 +51,6 @@ export const motionNameMapping: { [key: string]: ColonyActionType } = {
   [ColonyOperations.SimpleDecision]: ColonyActionType.CreateDecisionMotion,
 };
 
-export interface ExtensionParams {
-  votingReputation?: VotingReputationParams;
-}
-
-interface VotingReputationParams {
-  totalStakeFraction: string;
-  voterRewardFraction: string;
-  userMinStakeFraction: string;
-  maxVoteFraction: string;
-  stakePeriod: string;
-  submitPeriod: string;
-  revealPeriod: string;
-  escalationPeriod: string;
-}
-
 export enum MotionSide {
   YAY = 'yay',
   NAY = 'nay',
