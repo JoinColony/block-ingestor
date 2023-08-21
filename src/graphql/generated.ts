@@ -1482,11 +1482,14 @@ export enum ExpenditureStatus {
 /** Map of parameters that extensions are initialised with */
 export type ExtensionParams = {
   __typename?: 'ExtensionParams';
+  /** Initialization parameters for the `StakedExpenditure` extension */
+  stakedExpenditure?: Maybe<StakedExpenditureParams>;
   /** Initialization parameters for the `VotingReputation` extension */
   votingReputation?: Maybe<VotingReputationParams>;
 };
 
 export type ExtensionParamsInput = {
+  stakedExpenditure?: InputMaybe<StakedExpenditureParamsInput>;
   votingReputation?: InputMaybe<VotingReputationParamsInput>;
 };
 
@@ -4462,6 +4465,15 @@ export enum SortingMethod {
   /** Sort members by having more permissions */
   ByMorePermissions = 'BY_MORE_PERMISSIONS',
 }
+
+export type StakedExpenditureParams = {
+  __typename?: 'StakedExpenditureParams';
+  stakeFraction: Scalars['String'];
+};
+
+export type StakedExpenditureParamsInput = {
+  stakeFraction: Scalars['String'];
+};
 
 /** Staker rewards of a user for a motion */
 export type StakerRewards = {
