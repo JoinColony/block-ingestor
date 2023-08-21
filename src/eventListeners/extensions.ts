@@ -2,6 +2,7 @@ import { ContractEventsSignatures } from '~types';
 
 import { addNetworkEventListener } from './network';
 import { setupListenersForVotingReputationExtensions } from './votingReputation';
+import { setupListenersForStakedExpenditureExtensions } from './stakedExpenditure';
 
 export const setupListenersForExtensions = async (): Promise<void> => {
   const extensionEvents = [
@@ -16,4 +17,5 @@ export const setupListenersForExtensions = async (): Promise<void> => {
   );
 
   setupListenersForVotingReputationExtensions();
+  setupListenersForStakedExpenditureExtensions();
 };
