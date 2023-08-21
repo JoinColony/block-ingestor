@@ -2,7 +2,12 @@ import { utils } from 'ethers';
 import { Extension, getExtensionHash } from '@colony/colony-js';
 
 import { ContractEventsSignatures } from '~types';
-import { EventListenerType, addEventListener } from '~eventListeners';
+import {
+  EventListenerType,
+  addEventListener,
+  getEventListeners,
+  setEventListeners,
+} from '~eventListeners';
 import { notNull, output } from '~utils';
 import {
   ExtensionFragment,
@@ -24,6 +29,21 @@ export const addStakedExpenditureEventListener = (
     colonyAddress,
     topics: [utils.id(eventSignature)],
   });
+};
+
+export const removeStakedExpenditureListeners = (
+  colonyAddress: string,
+): void => {
+  const existingListeners = getEventListeners();
+  setEventListeners(
+    existingListeners.filter((listener) => {
+      if (listener.type !== EventListenerType.StakedExpenditure) {
+        return true;
+      }
+
+      return listener.colonyAddress !== colonyAddress;
+    }),
+  );
 };
 
 export const setupListenersForStakedExpenditureExtensions =
