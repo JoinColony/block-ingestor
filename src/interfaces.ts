@@ -2,6 +2,7 @@ import { utils, constants } from 'ethers';
 import {
   IColonyEvents__factory as ColonyEventsFactory,
   VotingReputationEvents__factory as VotingReputationEventsFactory,
+  StakedExpenditureEvents__factory as StakedExpenditureEventsFactory,
   TokenEvents__factory as TokenEventsFactory,
 } from '@colony/events';
 
@@ -26,6 +27,12 @@ export const getInterfaceByListenerType = (
     }
     case EventListenerType.VotingReputation: {
       return VotingReputationEventsFactory.connect(
+        constants.AddressZero,
+        provider,
+      ).interface;
+    }
+    case EventListenerType.StakedExpenditure: {
+      return StakedExpenditureEventsFactory.connect(
         constants.AddressZero,
         provider,
       ).interface;
