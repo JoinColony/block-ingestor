@@ -26,6 +26,12 @@ const config: CodegenConfig = {
       ],
       config: {
         nameSuffix: 'Document',
+        scalars: {
+          AWSDateTime: 'string',
+          AWSEmail: 'string',
+          AWSURL: 'string',
+          AWSTimestamp: 'number',
+        },
       },
     },
   },

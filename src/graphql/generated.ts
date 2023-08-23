@@ -18,14 +18,14 @@ export type Scalars = {
   Int: number;
   Float: number;
   AWSDate: any;
-  AWSDateTime: any;
-  AWSEmail: any;
+  AWSDateTime: string;
+  AWSEmail: string;
   AWSIPAddress: any;
   AWSJSON: any;
   AWSPhone: any;
   AWSTime: any;
-  AWSTimestamp: any;
-  AWSURL: any;
+  AWSTimestamp: number;
+  AWSURL: string;
 };
 
 /**
@@ -971,6 +971,7 @@ export type CreateExpenditureInput = {
   balances?: InputMaybe<Array<ExpenditureBalanceInput>>;
   colonyId: Scalars['ID'];
   createdAt?: InputMaybe<Scalars['AWSDateTime']>;
+  finalizedAt?: InputMaybe<Scalars['AWSTimestamp']>;
   id?: InputMaybe<Scalars['ID']>;
   nativeDomainId: Scalars['Int'];
   nativeFundingPotId: Scalars['Int'];
@@ -1335,6 +1336,7 @@ export type Expenditure = {
   colony: Colony;
   colonyId: Scalars['ID'];
   createdAt: Scalars['AWSDateTime'];
+  finalizedAt?: Maybe<Scalars['AWSTimestamp']>;
   id: Scalars['ID'];
   metadata?: Maybe<ExpenditureMetadata>;
   nativeDomainId: Scalars['Int'];
@@ -2101,6 +2103,7 @@ export type ModelExpenditureConditionInput = {
   and?: InputMaybe<Array<InputMaybe<ModelExpenditureConditionInput>>>;
   colonyId?: InputMaybe<ModelIdInput>;
   createdAt?: InputMaybe<ModelStringInput>;
+  finalizedAt?: InputMaybe<ModelIntInput>;
   nativeDomainId?: InputMaybe<ModelIntInput>;
   nativeFundingPotId?: InputMaybe<ModelIntInput>;
   nativeId?: InputMaybe<ModelIntInput>;
@@ -2120,6 +2123,7 @@ export type ModelExpenditureFilterInput = {
   and?: InputMaybe<Array<InputMaybe<ModelExpenditureFilterInput>>>;
   colonyId?: InputMaybe<ModelIdInput>;
   createdAt?: InputMaybe<ModelStringInput>;
+  finalizedAt?: InputMaybe<ModelIntInput>;
   id?: InputMaybe<ModelIdInput>;
   nativeDomainId?: InputMaybe<ModelIntInput>;
   nativeFundingPotId?: InputMaybe<ModelIntInput>;
@@ -2556,6 +2560,7 @@ export type ModelSubscriptionExpenditureFilterInput = {
   and?: InputMaybe<Array<InputMaybe<ModelSubscriptionExpenditureFilterInput>>>;
   colonyId?: InputMaybe<ModelSubscriptionIdInput>;
   createdAt?: InputMaybe<ModelSubscriptionStringInput>;
+  finalizedAt?: InputMaybe<ModelSubscriptionIntInput>;
   id?: InputMaybe<ModelSubscriptionIdInput>;
   nativeDomainId?: InputMaybe<ModelSubscriptionIntInput>;
   nativeFundingPotId?: InputMaybe<ModelSubscriptionIntInput>;
@@ -4835,6 +4840,7 @@ export type UpdateExpenditureInput = {
   balances?: InputMaybe<Array<ExpenditureBalanceInput>>;
   colonyId?: InputMaybe<Scalars['ID']>;
   createdAt?: InputMaybe<Scalars['AWSDateTime']>;
+  finalizedAt?: InputMaybe<Scalars['AWSTimestamp']>;
   id: Scalars['ID'];
   nativeDomainId?: InputMaybe<Scalars['Int']>;
   nativeFundingPotId?: InputMaybe<Scalars['Int']>;
