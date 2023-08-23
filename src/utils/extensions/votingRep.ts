@@ -1,7 +1,11 @@
 import { AnyVotingReputationClient } from '@colony/colony-js/*';
 import { mutate } from '~amplifyClient';
-import { UpdateColonyExtensionByAddressDocument } from '~graphql';
-import { ExtensionParams } from '~types';
+import {
+  ExtensionParams,
+  UpdateColonyExtensionByAddressDocument,
+  UpdateColonyExtensionByAddressMutation,
+  UpdateColonyExtensionByAddressMutationVariables,
+} from '~graphql';
 import { getVotingClient } from '~utils';
 
 const getVotingReputationParams = async (
@@ -54,7 +58,10 @@ export const addVotingReputationParamsToDB = async (
   }
 
   const params = await getVotingReputationParams(votingClient);
-  await mutate(UpdateColonyExtensionByAddressDocument, {
+  await mutate<
+    UpdateColonyExtensionByAddressMutation,
+    UpdateColonyExtensionByAddressMutationVariables
+  >(UpdateColonyExtensionByAddressDocument, {
     input: {
       id: extensionAddress,
       params,
