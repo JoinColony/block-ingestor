@@ -94,9 +94,10 @@ const showActionInActionsList = async (
 
   const isAddressInitiatorOrRecipient = (address: string): boolean =>
     address === initiatorAddress || address === recipientAddress;
-  // @NOTE: If the action's initiator or recipient is an extension/network client, then we shouldn't show it in the action list.
+  // @NOTE: If the action's initiator or recipient is an extension/network client or the colony itself, then we shouldn't show it in the action list.
   return !(
-    extensionAddresses.find(isAddressInitiatorOrRecipient) ??
-    isAddressInitiatorOrRecipient(networkClient.address)
+    !!extensionAddresses.find(isAddressInitiatorOrRecipient) ||
+    isAddressInitiatorOrRecipient(networkClient.address) ||
+    isAddressInitiatorOrRecipient(colonyAddress)
   );
 };
