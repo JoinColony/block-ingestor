@@ -379,6 +379,7 @@ export const createInitialColonyRolesDatabaseEntry = async (
  */
 export const createColonyFounderInitialRoleEntry = async (
   event: ContractEvent,
+  colonyFounderAddress: string,
 ): Promise<void> => {
   const { name, transactionHash, args } = event;
   const { colonyAddress } = args;
@@ -387,26 +388,12 @@ export const createColonyFounderInitialRoleEntry = async (
     0,
     ContractEventsSignatures.ColonyAdded.indexOf('('),
   );
-  const ColonyRoleSetEventName = ContractEventsSignatures.ColonyRoleSet.slice(
-    0,
-    ContractEventsSignatures.ColonyRoleSet.indexOf('('),
-  );
 
   if (name !== ColonyAddedEventName) {
     throw new Error(
       'The event passed in is not the "ColonyAdded" event. We can\'t determine the colony\'s founder otherwise',
     );
   }
-
-  const events = await getAllRoleEventsFromTransaction(
-    transactionHash,
-    colonyAddress,
-  );
-  const {
-    args: { user: colonyFounderAddress },
-  } = events.find((event) => event?.name === ColonyRoleSetEventName) ?? {
-    args: { user: '' },
-  };
 
   await createInitialColonyRolesDatabaseEntry(
     colonyAddress,

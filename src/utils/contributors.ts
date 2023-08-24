@@ -15,7 +15,7 @@ import {
 } from '~graphql';
 import { notNull } from './arrays';
 
-const getColonyContributorId = (
+export const getColonyContributorId = (
   colonyAddress: string,
   contributorAddress: string,
 ): string => {
