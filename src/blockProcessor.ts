@@ -67,7 +67,7 @@ export const processNextBlock = async (): Promise<void> => {
       );
       if (!event) {
         output(
-          `Failed to map log ${log.logIndex} from transaction ${log.transactionHash}`,
+          `Failed to map log describing event ${listener.eventSignature} in transaction ${log.transactionHash} `,
         );
         continue;
       }
