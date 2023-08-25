@@ -6996,6 +6996,15 @@ export type GetColonyHistoricRoleQuery = {
   } | null;
 };
 
+export type GetSafeTransactionByTransactionHashQueryVariables = Exact<{
+  transactionHash: Scalars['ID'];
+}>;
+
+export type GetSafeTransactionByTransactionHashQuery = {
+  __typename?: 'Query';
+  getSafeTransaction?: { __typename?: 'SafeTransaction'; id: string } | null;
+};
+
 export type GetStatsQueryVariables = Exact<{ [key: string]: never }>;
 
 export type GetStatsQuery = {
@@ -7750,6 +7759,13 @@ export const GetColonyRoleDocument = gql`
 export const GetColonyHistoricRoleDocument = gql`
   query GetColonyHistoricRole($id: ID!) {
     getColonyHistoricRole(id: $id) {
+      id
+    }
+  }
+`;
+export const GetSafeTransactionByTransactionHashDocument = gql`
+  query GetSafeTransactionByTransactionHash($transactionHash: ID!) {
+    getSafeTransaction(id: $transactionHash) {
       id
     }
   }
