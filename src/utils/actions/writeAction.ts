@@ -98,6 +98,6 @@ const showActionInActionsList = async (
   return !(
     !!extensionAddresses.find(isAddressInitiatorOrRecipient) ||
     isAddressInitiatorOrRecipient(networkClient.address) ||
-    isAddressInitiatorOrRecipient(colonyAddress)
+    colonyAddress === initiatorAddress
   );
 };
