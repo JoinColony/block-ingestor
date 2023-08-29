@@ -93,9 +93,16 @@ export const setupListenersForStakedExpenditure = (
     return;
   }
 
-  addStakedExpenditureEventListener(
+  const extensionEvents = [
     ContractEventsSignatures.ExtensionInitialised,
-    stakedExpenditureAddress,
-    colonyAddress,
-  );
+    ContractEventsSignatures.StakeReclaimed,
+  ];
+
+  extensionEvents.forEach((eventSignature) => {
+    addStakedExpenditureEventListener(
+      eventSignature,
+      stakedExpenditureAddress,
+      colonyAddress,
+    );
+  });
 };
