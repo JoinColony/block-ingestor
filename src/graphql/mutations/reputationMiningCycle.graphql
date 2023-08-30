@@ -1,0 +1,15 @@
+mutation UpdateReputationMiningCycleMetadata(
+  $input: UpdateReputationMiningCycleMetadataInput!
+) {
+  updateReputationMiningCycleMetadata(input: $input) {
+    id
+  }
+}
+
+mutation CreateReputationMiningCycleMetadata(
+  $input: CreateReputationMiningCycleMetadataInput!
+) {
+  createReputationMiningCycleMetadata(input: $input) {
+    id
+  }
+}
