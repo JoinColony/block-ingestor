@@ -88,6 +88,9 @@ export enum ContractEventsSignatures {
 
   // Annotations
   AnnotateTransaction = 'Annotation(address,bytes32,string)',
+
+  // Reputation
+  ReputationMiningCycleComplete = 'ReputationMiningCycleComplete(bytes32,uint256)',
 }
 
 /*
