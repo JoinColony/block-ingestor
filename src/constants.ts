@@ -8,4 +8,5 @@ export const SUPPORTED_EXTENSION_IDS = [
   Extension.OneTxPayment,
   Extension.VotingReputation,
   Extension.StakedExpenditure,
+  Extension.StagedExpenditure,
 ];
