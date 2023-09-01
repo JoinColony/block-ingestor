@@ -76,6 +76,10 @@ export enum ContractEventsSignatures {
   ExpenditureRecipientSet = 'ExpenditureRecipientSet(address,uint256,uint256,address)',
   ExpenditurePayoutSet = 'ExpenditurePayoutSet(address,uint256,uint256,address,uint256)',
   ExpenditurePayoutModifierSet = 'ExpenditurePayoutModifierSet(address,uint256,uint256,int256)',
+  ExpenditurePayoutClaimed = 'PayoutClaimed(address,uint256,uint256,address,uint256)',
+
+  // Staked Expenditures
+  StakeReclaimed = 'StakeReclaimed(uint256)',
 }
 
 /*
