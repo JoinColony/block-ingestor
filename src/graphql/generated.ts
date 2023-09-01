@@ -6481,6 +6481,15 @@ export type UpdateColonyStakeMutation = {
   updateColonyStake?: { __typename?: 'ColonyStake'; id: string } | null;
 };
 
+export type GetColonyActionQueryVariables = Exact<{
+  transactionHash: Scalars['ID'];
+}>;
+
+export type GetColonyActionQuery = {
+  __typename?: 'Query';
+  getColonyAction?: { __typename?: 'ColonyAction'; id: string } | null;
+};
+
 export type GetMotionIdFromActionQueryVariables = Exact<{
   id: Scalars['ID'];
 }>;
@@ -7446,6 +7455,13 @@ export const UpdateColonyStakeDocument = gql`
     updateColonyStake(
       input: { id: $colonyStakeId, totalAmount: $totalAmount }
     ) {
+      id
+    }
+  }
+`;
+export const GetColonyActionDocument = gql`
+  query GetColonyAction($transactionHash: ID!) {
+    getColonyAction(id: $transactionHash) {
       id
     }
   }
