@@ -1451,11 +1451,13 @@ export type ExpenditureMetadata = {
 export type ExpenditurePayout = {
   __typename?: 'ExpenditurePayout';
   amount: Scalars['String'];
+  isClaimed: Scalars['Boolean'];
   tokenAddress: Scalars['ID'];
 };
 
 export type ExpenditurePayoutInput = {
   amount: Scalars['String'];
+  isClaimed: Scalars['Boolean'];
   tokenAddress: Scalars['ID'];
 };
 
@@ -6134,6 +6136,7 @@ export type GetExpenditureQuery = {
         __typename?: 'ExpenditurePayout';
         tokenAddress: string;
         amount: string;
+        isClaimed: boolean;
       }> | null;
     }>;
   } | null;
@@ -6982,6 +6985,7 @@ export const GetExpenditureDocument = gql`
         payouts {
           tokenAddress
           amount
+          isClaimed
         }
       }
     }
