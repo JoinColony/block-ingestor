@@ -4,7 +4,7 @@ import {
   VotingReputationEvents__factory as VotingReputationEventsFactory,
   StakedExpenditureEvents__factory as StakedExpenditureEventsFactory,
   TokenEvents__factory as TokenEventsFactory,
-} from '@colony/events';
+} from '@colony/colony-js/events';
 
 import networkClient from '~networkClient';
 import provider from '~provider';
