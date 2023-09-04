@@ -616,8 +616,12 @@ export type ColonyMetadata = {
   /** List of Colony metadata changelog entries */
   changelog?: Maybe<Array<ColonyMetadataChangelog>>;
   createdAt: Scalars['AWSDateTime'];
+  /** Description of the colony */
+  description?: Maybe<Scalars['String']>;
   /** Display name of the Colony */
   displayName: Scalars['String'];
+  /** An array of external links to related pages */
+  externalLinks?: Maybe<Array<ExternalLink>>;
   /** Unique identifier for the Colony (contract address) */
   id: Scalars['ID'];
   /** The address book feature (aka Whitelist is active for this Colony) */
@@ -642,8 +646,12 @@ export type ColonyMetadataChangelog = {
   __typename?: 'ColonyMetadataChangelog';
   /** Indicates whether the avatar has changed */
   hasAvatarChanged: Scalars['Boolean'];
+  /** Whether the colony description has changed */
+  hasDescriptionChanged?: Maybe<Scalars['Boolean']>;
   /** Whether entries in the address book (whitelist) have changed */
   hasWhitelistChanged: Scalars['Boolean'];
+  /** Whether the colony's external links have changed */
+  haveExternalLinksChanged?: Maybe<Scalars['Boolean']>;
   /** Whether tokens have been added or removed from the Colony's token list */
   haveTokensChanged: Scalars['Boolean'];
   /** Display name of the Colony after the change */
@@ -656,7 +664,9 @@ export type ColonyMetadataChangelog = {
 
 export type ColonyMetadataChangelogInput = {
   hasAvatarChanged: Scalars['Boolean'];
+  hasDescriptionChanged?: InputMaybe<Scalars['Boolean']>;
   hasWhitelistChanged: Scalars['Boolean'];
+  haveExternalLinksChanged?: InputMaybe<Scalars['Boolean']>;
   haveTokensChanged: Scalars['Boolean'];
   newDisplayName: Scalars['String'];
   oldDisplayName: Scalars['String'];
@@ -1065,7 +1075,9 @@ export type CreateColonyInput = {
 export type CreateColonyMetadataInput = {
   avatar?: InputMaybe<Scalars['String']>;
   changelog?: InputMaybe<Array<ColonyMetadataChangelogInput>>;
+  description?: InputMaybe<Scalars['String']>;
   displayName: Scalars['String'];
+  externalLinks?: InputMaybe<Array<ExternalLinkInput>>;
   id?: InputMaybe<Scalars['ID']>;
   isWhitelistActivated?: InputMaybe<Scalars['Boolean']>;
   modifiedTokenAddresses?: InputMaybe<PendingModifiedTokenAddressesInput>;
@@ -1733,6 +1745,28 @@ export type ExtensionParamsInput = {
   votingReputation?: InputMaybe<VotingReputationParamsInput>;
 };
 
+export type ExternalLink = {
+  __typename?: 'ExternalLink';
+  link: Scalars['String'];
+  name: ExternalLinks;
+};
+
+export type ExternalLinkInput = {
+  link: Scalars['String'];
+  name: ExternalLinks;
+};
+
+export enum ExternalLinks {
+  Custom = 'Custom',
+  Discord = 'Discord',
+  Github = 'Github',
+  Instagram = 'Instagram',
+  Telegram = 'Telegram',
+  Twitter = 'Twitter',
+  Whitepaper = 'Whitepaper',
+  Youtube = 'Youtube',
+}
+
 export enum FilteringMethod {
   /** Apply an intersection filter */
   Intersection = 'INTERSECTION',
@@ -2240,6 +2274,7 @@ export type ModelColonyHistoricRoleFilterInput = {
 export type ModelColonyMetadataConditionInput = {
   and?: InputMaybe<Array<InputMaybe<ModelColonyMetadataConditionInput>>>;
   avatar?: InputMaybe<ModelStringInput>;
+  description?: InputMaybe<ModelStringInput>;
   displayName?: InputMaybe<ModelStringInput>;
   isWhitelistActivated?: InputMaybe<ModelBooleanInput>;
   not?: InputMaybe<ModelColonyMetadataConditionInput>;
@@ -2257,6 +2292,7 @@ export type ModelColonyMetadataConnection = {
 export type ModelColonyMetadataFilterInput = {
   and?: InputMaybe<Array<InputMaybe<ModelColonyMetadataFilterInput>>>;
   avatar?: InputMaybe<ModelStringInput>;
+  description?: InputMaybe<ModelStringInput>;
   displayName?: InputMaybe<ModelStringInput>;
   id?: InputMaybe<ModelIdInput>;
   isWhitelistActivated?: InputMaybe<ModelBooleanInput>;
@@ -3038,6 +3074,7 @@ export type ModelSubscriptionColonyMetadataFilterInput = {
     Array<InputMaybe<ModelSubscriptionColonyMetadataFilterInput>>
   >;
   avatar?: InputMaybe<ModelSubscriptionStringInput>;
+  description?: InputMaybe<ModelSubscriptionStringInput>;
   displayName?: InputMaybe<ModelSubscriptionStringInput>;
   id?: InputMaybe<ModelSubscriptionIdInput>;
   isWhitelistActivated?: InputMaybe<ModelSubscriptionBooleanInput>;
@@ -6074,7 +6111,9 @@ export type UpdateColonyInput = {
 export type UpdateColonyMetadataInput = {
   avatar?: InputMaybe<Scalars['String']>;
   changelog?: InputMaybe<Array<ColonyMetadataChangelogInput>>;
+  description?: InputMaybe<Scalars['String']>;
   displayName?: InputMaybe<Scalars['String']>;
+  externalLinks?: InputMaybe<Array<ExternalLinkInput>>;
   id: Scalars['ID'];
   isWhitelistActivated?: InputMaybe<Scalars['Boolean']>;
   modifiedTokenAddresses?: InputMaybe<PendingModifiedTokenAddressesInput>;
@@ -6563,6 +6602,38 @@ export type ColonyFragment = {
   }> | null;
 };
 
+export type ColonyMetadataFragment = {
+  __typename?: 'ColonyMetadata';
+  id: string;
+  displayName: string;
+  avatar?: string | null;
+  thumbnail?: string | null;
+  description?: string | null;
+  isWhitelistActivated?: boolean | null;
+  whitelistedAddresses?: Array<string> | null;
+  externalLinks?: Array<{
+    __typename?: 'ExternalLink';
+    name: ExternalLinks;
+    link: string;
+  }> | null;
+  changelog?: Array<{
+    __typename?: 'ColonyMetadataChangelog';
+    transactionHash: string;
+    oldDisplayName: string;
+    newDisplayName: string;
+    hasAvatarChanged: boolean;
+    hasWhitelistChanged: boolean;
+    haveTokensChanged: boolean;
+    hasDescriptionChanged?: boolean | null;
+    haveExternalLinksChanged?: boolean | null;
+  }> | null;
+  modifiedTokenAddresses?: {
+    __typename?: 'PendingModifiedTokenAddresses';
+    added?: Array<string> | null;
+    removed?: Array<string> | null;
+  } | null;
+};
+
 export type ExtensionFragment = {
   __typename?: 'ColonyExtension';
   id: string;
@@ -6677,30 +6748,6 @@ export type DomainMetadataFragment = {
     oldDescription: string;
     newDescription: string;
   }> | null;
-};
-
-export type ColonyMetadataFragment = {
-  __typename?: 'ColonyMetadata';
-  id: string;
-  displayName: string;
-  avatar?: string | null;
-  thumbnail?: string | null;
-  isWhitelistActivated?: boolean | null;
-  whitelistedAddresses?: Array<string> | null;
-  changelog?: Array<{
-    __typename?: 'ColonyMetadataChangelog';
-    transactionHash: string;
-    oldDisplayName: string;
-    newDisplayName: string;
-    hasAvatarChanged: boolean;
-    hasWhitelistChanged: boolean;
-    haveTokensChanged: boolean;
-  }> | null;
-  modifiedTokenAddresses?: {
-    __typename?: 'PendingModifiedTokenAddresses';
-    added?: Array<string> | null;
-    removed?: Array<string> | null;
-  } | null;
 };
 
 export type CreateColonyActionMutationVariables = Exact<{
@@ -7094,8 +7141,14 @@ export type GetColonyMetadataQuery = {
     displayName: string;
     avatar?: string | null;
     thumbnail?: string | null;
+    description?: string | null;
     isWhitelistActivated?: boolean | null;
     whitelistedAddresses?: Array<string> | null;
+    externalLinks?: Array<{
+      __typename?: 'ExternalLink';
+      name: ExternalLinks;
+      link: string;
+    }> | null;
     changelog?: Array<{
       __typename?: 'ColonyMetadataChangelog';
       transactionHash: string;
@@ -7104,6 +7157,8 @@ export type GetColonyMetadataQuery = {
       hasAvatarChanged: boolean;
       hasWhitelistChanged: boolean;
       haveTokensChanged: boolean;
+      hasDescriptionChanged?: boolean | null;
+      haveExternalLinksChanged?: boolean | null;
     }> | null;
     modifiedTokenAddresses?: {
       __typename?: 'PendingModifiedTokenAddresses';
@@ -7449,8 +7504,14 @@ export type GetColonyActionByMotionIdQuery = {
         displayName: string;
         avatar?: string | null;
         thumbnail?: string | null;
+        description?: string | null;
         isWhitelistActivated?: boolean | null;
         whitelistedAddresses?: Array<string> | null;
+        externalLinks?: Array<{
+          __typename?: 'ExternalLink';
+          name: ExternalLinks;
+          link: string;
+        }> | null;
         changelog?: Array<{
           __typename?: 'ColonyMetadataChangelog';
           transactionHash: string;
@@ -7459,6 +7520,8 @@ export type GetColonyActionByMotionIdQuery = {
           hasAvatarChanged: boolean;
           hasWhitelistChanged: boolean;
           haveTokensChanged: boolean;
+          hasDescriptionChanged?: boolean | null;
+          haveExternalLinksChanged?: boolean | null;
         }> | null;
         modifiedTokenAddresses?: {
           __typename?: 'PendingModifiedTokenAddresses';
@@ -7662,6 +7725,35 @@ export const Colony = gql`
     }
   }
 `;
+export const ColonyMetadata = gql`
+  fragment ColonyMetadata on ColonyMetadata {
+    id
+    displayName
+    avatar
+    thumbnail
+    description
+    externalLinks {
+      name
+      link
+    }
+    changelog {
+      transactionHash
+      oldDisplayName
+      newDisplayName
+      hasAvatarChanged
+      hasWhitelistChanged
+      haveTokensChanged
+      hasDescriptionChanged
+      haveExternalLinksChanged
+    }
+    isWhitelistActivated
+    whitelistedAddresses
+    modifiedTokenAddresses {
+      added
+      removed
+    }
+  }
+`;
 export const Extension = gql`
   fragment Extension on ColonyExtension {
     id
@@ -7779,28 +7871,6 @@ export const DomainMetadata = gql`
       newColor
       oldDescription
       newDescription
-    }
-  }
-`;
-export const ColonyMetadata = gql`
-  fragment ColonyMetadata on ColonyMetadata {
-    id
-    displayName
-    avatar
-    thumbnail
-    changelog {
-      transactionHash
-      oldDisplayName
-      newDisplayName
-      hasAvatarChanged
-      hasWhitelistChanged
-      haveTokensChanged
-    }
-    isWhitelistActivated
-    whitelistedAddresses
-    modifiedTokenAddresses {
-      added
-      removed
     }
   }
 `;
@@ -8101,26 +8171,10 @@ export const GetActionIdFromAnnotationDocument = gql`
 export const GetColonyMetadataDocument = gql`
   query GetColonyMetadata($id: ID!) {
     getColonyMetadata(id: $id) {
-      id
-      displayName
-      avatar
-      thumbnail
-      changelog {
-        transactionHash
-        oldDisplayName
-        newDisplayName
-        hasAvatarChanged
-        hasWhitelistChanged
-        haveTokensChanged
-      }
-      isWhitelistActivated
-      whitelistedAddresses
-      modifiedTokenAddresses {
-        added
-        removed
-      }
+      ...ColonyMetadata
     }
   }
+  ${ColonyMetadata}
 `;
 export const GetColonyDocument = gql`
   query GetColony($id: ID!) {

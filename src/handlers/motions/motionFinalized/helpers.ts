@@ -218,6 +218,8 @@ const linkPendingColonyMetadataWithColony = async (
     hasWhitelistChanged,
     newDisplayName,
     oldDisplayName,
+    hasDescriptionChanged,
+    haveExternalLinksChanged,
   } = pendingColonyMetadata.changelog?.[0] ?? {};
 
   const updatedMetadata = {
@@ -247,6 +249,14 @@ const linkPendingColonyMetadataWithColony = async (
   if (newDisplayName !== oldDisplayName) {
     // If displayName has changed, update displayName
     updatedMetadata.displayName = pendingColonyMetadata.displayName;
+  }
+
+  if (hasDescriptionChanged) {
+    updatedMetadata.description = pendingColonyMetadata.description;
+  }
+
+  if (haveExternalLinksChanged) {
+    updatedMetadata.externalLinks = pendingColonyMetadata.externalLinks;
   }
 
   if (haveTokensChanged && pendingColonyMetadata.modifiedTokenAddresses) {

@@ -100,24 +100,3 @@ fragment DomainMetadata on DomainMetadata {
     newDescription
   }
 }
-
-fragment ColonyMetadata on ColonyMetadata {
-  id
-  displayName
-  avatar
-  thumbnail
-  changelog {
-    transactionHash
-    oldDisplayName
-    newDisplayName
-    hasAvatarChanged
-    hasWhitelistChanged
-    haveTokensChanged
-  }
-  isWhitelistActivated
-  whitelistedAddresses
-  modifiedTokenAddresses {
-    added
-    removed
-  }
-}

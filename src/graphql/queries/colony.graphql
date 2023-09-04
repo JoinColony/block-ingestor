@@ -1,23 +1,6 @@
 query GetColonyMetadata($id: ID!) {
   getColonyMetadata(id: $id) {
-    id
-    displayName
-    avatar
-    thumbnail
-    changelog {
-      transactionHash
-      oldDisplayName
-      newDisplayName
-      hasAvatarChanged
-      hasWhitelistChanged
-      haveTokensChanged
-    }
-    isWhitelistActivated
-    whitelistedAddresses
-    modifiedTokenAddresses {
-      added
-      removed
-    }
+    ...ColonyMetadata
   }
 }
 
