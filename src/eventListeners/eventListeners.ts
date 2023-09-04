@@ -46,8 +46,7 @@ export const getAdditionalContractEventProperties = (
   listener: EventListener,
 ): Record<string, unknown> => {
   switch (listener.type) {
-    case EventListenerType.StakedExpenditure:
-    case EventListenerType.VotingReputation:
+    case EventListenerType.Extension:
       return {
         colonyAddress: listener.colonyAddress,
       };
