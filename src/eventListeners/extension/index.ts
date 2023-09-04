@@ -6,6 +6,7 @@ import {
   addEventListener,
   getEventListeners,
   setEventListeners,
+  setupListenersForStagedExpenditureExtensions,
 } from '~eventListeners';
 import {
   ExtensionFragment,
@@ -21,6 +22,7 @@ import { setupListenersForVotingReputationExtensions } from './votingReputation'
 import { setupListenersForStakedExpenditureExtensions } from './stakedExpenditure';
 
 export * from './stakedExpenditure';
+export * from './stagedExpenditure';
 export * from './votingReputation';
 
 export const addExtensionEventListener = (
@@ -68,6 +70,7 @@ export const setupListenersForExtensions = async (): Promise<void> => {
 
   setupListenersForVotingReputationExtensions();
   setupListenersForStakedExpenditureExtensions();
+  setupListenersForStagedExpenditureExtensions();
 };
 
 export const fetchExistingExtensions = async (

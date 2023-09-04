@@ -10,3 +10,4 @@ export { default as handleExpenditureClaimDelaySet } from './expenditureClaimDel
 export { default as handleExpenditurePayoutModifierSet } from './expenditurePayoutModifierSet';
 export { default as handleExpenditurePayoutClaimed } from './expenditurePayoutClaimed';
 export { default as handleStakeReclaimed } from './stakeReclaimed';
+export { default as handleExpenditureMadeStaged } from './expenditureMadeStaged';
