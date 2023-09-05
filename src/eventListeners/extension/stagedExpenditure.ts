@@ -20,10 +20,17 @@ export const setupListenersForStagedExpenditure = (
   stagedExpenditureAddress: string,
   colonyAddress: string,
 ): void => {
-  addExtensionEventListener(
+  const events = [
     ContractEventsSignatures.ExpenditureMadeStaged,
-    Extension.StagedExpenditure,
-    stagedExpenditureAddress,
-    colonyAddress,
+    ContractEventsSignatures.StagedPaymentReleased,
+  ];
+
+  events.forEach((eventSignature) =>
+    addExtensionEventListener(
+      eventSignature,
+      Extension.StagedExpenditure,
+      stagedExpenditureAddress,
+      colonyAddress,
+    ),
   );
 };
