@@ -11,3 +11,4 @@ export { default as handleExpenditurePayoutModifierSet } from './expenditurePayo
 export { default as handleExpenditurePayoutClaimed } from './expenditurePayoutClaimed';
 export { default as handleStakeReclaimed } from './stakeReclaimed';
 export { default as handleExpenditureMadeStaged } from './expenditureMadeStaged';
+export { default as handleStagedPaymentReleased } from './expenditureMadeStaged';
