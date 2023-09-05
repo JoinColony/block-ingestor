@@ -48,6 +48,7 @@ export default async (event: ContractEvent): Promise<void> => {
         slots: [],
         nativeFundingPotId: fundingPotId,
         nativeDomainId: domainId,
+        isStaged: false,
       },
     },
   );
