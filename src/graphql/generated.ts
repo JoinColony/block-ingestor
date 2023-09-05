@@ -1055,6 +1055,7 @@ export type CreateExpenditureInput = {
   finalizedAt?: InputMaybe<Scalars['AWSTimestamp']>;
   hasReclaimedStake?: InputMaybe<Scalars['Boolean']>;
   id?: InputMaybe<Scalars['ID']>;
+  isStaged: Scalars['Boolean'];
   nativeDomainId: Scalars['Int'];
   nativeFundingPotId: Scalars['Int'];
   nativeId: Scalars['Int'];
@@ -1431,6 +1432,7 @@ export type Expenditure = {
   fundingMotions?: Maybe<ModelColonyMotionConnection>;
   hasReclaimedStake?: Maybe<Scalars['Boolean']>;
   id: Scalars['ID'];
+  isStaged: Scalars['Boolean'];
   metadata?: Maybe<ExpenditureMetadata>;
   nativeDomainId: Scalars['Int'];
   nativeFundingPotId: Scalars['Int'];
@@ -2291,6 +2293,7 @@ export type ModelExpenditureConditionInput = {
   createdAt?: InputMaybe<ModelStringInput>;
   finalizedAt?: InputMaybe<ModelIntInput>;
   hasReclaimedStake?: InputMaybe<ModelBooleanInput>;
+  isStaged?: InputMaybe<ModelBooleanInput>;
   nativeDomainId?: InputMaybe<ModelIntInput>;
   nativeFundingPotId?: InputMaybe<ModelIntInput>;
   nativeId?: InputMaybe<ModelIntInput>;
@@ -2313,6 +2316,7 @@ export type ModelExpenditureFilterInput = {
   finalizedAt?: InputMaybe<ModelIntInput>;
   hasReclaimedStake?: InputMaybe<ModelBooleanInput>;
   id?: InputMaybe<ModelIdInput>;
+  isStaged?: InputMaybe<ModelBooleanInput>;
   nativeDomainId?: InputMaybe<ModelIntInput>;
   nativeFundingPotId?: InputMaybe<ModelIntInput>;
   nativeId?: InputMaybe<ModelIntInput>;
@@ -2792,6 +2796,7 @@ export type ModelSubscriptionExpenditureFilterInput = {
   finalizedAt?: InputMaybe<ModelSubscriptionIntInput>;
   hasReclaimedStake?: InputMaybe<ModelSubscriptionBooleanInput>;
   id?: InputMaybe<ModelSubscriptionIdInput>;
+  isStaged?: InputMaybe<ModelSubscriptionBooleanInput>;
   nativeDomainId?: InputMaybe<ModelSubscriptionIntInput>;
   nativeFundingPotId?: InputMaybe<ModelSubscriptionIntInput>;
   nativeId?: InputMaybe<ModelSubscriptionIntInput>;
@@ -5251,6 +5256,7 @@ export type UpdateExpenditureInput = {
   finalizedAt?: InputMaybe<Scalars['AWSTimestamp']>;
   hasReclaimedStake?: InputMaybe<Scalars['Boolean']>;
   id: Scalars['ID'];
+  isStaged?: InputMaybe<Scalars['Boolean']>;
   nativeDomainId?: InputMaybe<Scalars['Int']>;
   nativeFundingPotId?: InputMaybe<Scalars['Int']>;
   nativeId?: InputMaybe<Scalars['Int']>;
