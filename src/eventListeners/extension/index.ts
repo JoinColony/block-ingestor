@@ -1,4 +1,5 @@
 import { utils } from 'ethers';
+import { Extension, getExtensionHash } from '@colony/colony-js';
 
 import { ContractEventsSignatures } from '~types';
 import {
@@ -27,7 +28,7 @@ export * from './votingReputation';
 
 export const addExtensionEventListener = (
   eventSignature: ContractEventsSignatures,
-  extensionHash: string,
+  extensionId: Extension,
   extensionAddress: string,
   colonyAddress: string,
 ): void => {
@@ -37,7 +38,7 @@ export const addExtensionEventListener = (
     address: extensionAddress,
     colonyAddress,
     topics: [utils.id(eventSignature)],
-    extensionHash,
+    extensionHash: getExtensionHash(extensionId),
   });
 };
 
