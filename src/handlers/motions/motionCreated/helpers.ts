@@ -162,15 +162,15 @@ const getInitialMotionMessage = async (
 
 const createColonyMotion = async (
   motionData: CreateColonyMotionInput,
-): Promise<GraphQLFnReturn<CreateColonyMotionMutation> | undefined> => {
-  return await mutate<
-    CreateColonyMotionMutation,
-    CreateColonyMotionMutationVariables
-  >(CreateColonyMotionDocument, {
-    input: {
-      ...motionData,
+): Promise<void> => {
+  await mutate<CreateColonyMotionMutation, CreateColonyMotionMutationVariables>(
+    CreateColonyMotionDocument,
+    {
+      input: {
+        ...motionData,
+      },
     },
-  });
+  );
 };
 
 const createMotionMessage = async (
@@ -257,11 +257,9 @@ export const createMotionInDB = async (
     ...input,
   };
 
-  const [motionMutationResult] = await Promise.all([
+  await Promise.all([
     createColonyMotion({ ...motionData, gasEstimate }),
     createMotionMessage(initialMotionMessage),
     createColonyAction(actionData),
   ]);
-
-  return motionMutationResult;
 };
