@@ -14,20 +14,35 @@ import { createMotionInDB } from '../helpers';
 export const handleMoveFundsMotion = async (
   event: ContractEvent,
   parsedAction: TransactionDescription,
+  gasEstimate: BigNumber,
 ): Promise<void> => {
   const { colonyAddress } = event;
+
   if (!colonyAddress) {
     return;
   }
 
   const { name, args: actionArgs } = parsedAction;
 
-  const [, , , , , fromPot, toPot, amount, tokenAddress] = actionArgs;
-
   const colonyClient = await getCachedColonyClient(colonyAddress);
 
   if (!colonyClient) {
     return;
+  }
+
+  const colonyVersion = await colonyClient.version();
+
+  // There are two moveFundsBetweenPots actions, one pre colony version 7 and one post.
+  let fromPot: BigNumber,
+    toPot: BigNumber,
+    amount: BigNumber,
+    tokenAddress: string;
+
+  const isOldVersion = colonyVersion.lte(6);
+  if (isOldVersion) {
+    [, , , fromPot, toPot, amount, tokenAddress] = actionArgs;
+  } else {
+    [, , , , , fromPot, toPot, amount, tokenAddress] = actionArgs;
   }
 
   let fromDomainId: BigNumber | undefined;
@@ -48,5 +63,6 @@ export const handleMoveFundsMotion = async (
     toDomainId: toDomainId
       ? getDomainDatabaseId(colonyAddress, toNumber(toDomainId))
       : undefined,
+    gasEstimate: gasEstimate.toString(),
   });
 };

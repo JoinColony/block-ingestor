@@ -8,9 +8,9 @@ import {
   GetColonyExtensionsByColonyAddressDocument,
   GetColonyExtensionsByColonyAddressQuery,
   GetColonyExtensionsByColonyAddressQueryVariables,
-  GetExpenditureByNativeFundingPotIdDocument,
-  GetExpenditureByNativeFundingPotIdQuery,
-  GetExpenditureByNativeFundingPotIdQueryVariables,
+  GetExpenditureByNativeFundingPotIdAndColonyDocument,
+  GetExpenditureByNativeFundingPotIdAndColonyQuery,
+  GetExpenditureByNativeFundingPotIdAndColonyQueryVariables,
 } from '~graphql';
 import { ContractEvent } from '~types';
 import { notNull, toNumber, verbose } from '~utils';
@@ -62,15 +62,16 @@ const showActionInActionsList = async (
 
     const { data } =
       (await query<
-        GetExpenditureByNativeFundingPotIdQuery,
-        GetExpenditureByNativeFundingPotIdQueryVariables
-      >(GetExpenditureByNativeFundingPotIdDocument, {
+        GetExpenditureByNativeFundingPotIdAndColonyQuery,
+        GetExpenditureByNativeFundingPotIdAndColonyQueryVariables
+      >(GetExpenditureByNativeFundingPotIdAndColonyDocument, {
         nativeFundingPotId: toNumber(toPot),
+        colonyAddress,
       })) ?? {};
 
     // if there's an expenditure in the db with this funding pot id, it means we're funding an expenditure
     const isFundingExpenditure =
-      !!data?.getExpendituresByNativeFundingPotId?.items.length;
+      !!data?.getExpendituresByNativeFundingPotIdAndColony?.items.length;
 
     // if we're funding an expenditure, we don't want to show it in the action list
     // else, we still want to check if the action's initiator or recipient is an extension/network client
