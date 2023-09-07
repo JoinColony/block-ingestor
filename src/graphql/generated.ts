@@ -326,6 +326,8 @@ export enum ColonyActionType {
   EmitDomainReputationReward = 'EMIT_DOMAIN_REPUTATION_REWARD',
   /** An action related to a domain reputation reward within a Colony via a motion */
   EmitDomainReputationRewardMotion = 'EMIT_DOMAIN_REPUTATION_REWARD_MOTION',
+  /** An action related to creating a motion for funding an expenditure */
+  FundExpenditureMotion = 'FUND_EXPENDITURE_MOTION',
   /** A generic or unspecified Colony action */
   Generic = 'GENERIC',
   /** An action related to minting tokens within a Colony */
@@ -596,6 +598,11 @@ export type ColonyMotion = {
    * Useful to check if we're viewing a "read-only" motion
    */
   createdBy: Scalars['String'];
+  /**
+   * An option to manually specify the amount of gas to estimate for the finalization of this motion.
+   * Particularly useful for "heavy" actions, such as a multicall.
+   */
+  gasEstimate: Scalars['String'];
   /** Simple flag indicating whether both sides of staking have been activated */
   hasObjection: Scalars['Boolean'];
   /**
@@ -644,6 +651,8 @@ export type ColonyMotion = {
   skillRep: Scalars['String'];
   /** List of staker rewards users will be receiving for a motion */
   stakerRewards: Array<StakerRewards>;
+  /** The transaction hash of the createMotion action */
+  transactionHash: Scalars['String'];
   updatedAt: Scalars['AWSDateTime'];
   /** The minimum stake that a user has to provide for it to be accepted */
   userMinStake: Scalars['String'];
@@ -943,6 +952,7 @@ export type CreateColonyMetadataInput = {
 
 export type CreateColonyMotionInput = {
   createdBy: Scalars['String'];
+  gasEstimate: Scalars['String'];
   hasObjection: Scalars['Boolean'];
   id?: InputMaybe<Scalars['ID']>;
   isDecision: Scalars['Boolean'];
@@ -960,6 +970,7 @@ export type CreateColonyMotionInput = {
   rootHash: Scalars['String'];
   skillRep: Scalars['String'];
   stakerRewards: Array<StakerRewardsInput>;
+  transactionHash: Scalars['String'];
   userMinStake: Scalars['String'];
   usersStakes: Array<UserStakesInput>;
   voterRecord: Array<VoterRecordInput>;
@@ -1039,6 +1050,7 @@ export type CreateExpenditureInput = {
   colonyId: Scalars['ID'];
   createdAt?: InputMaybe<Scalars['AWSDateTime']>;
   finalizedAt?: InputMaybe<Scalars['AWSTimestamp']>;
+  fundingMotionId?: InputMaybe<Scalars['ID']>;
   hasReclaimedStake?: InputMaybe<Scalars['Boolean']>;
   id?: InputMaybe<Scalars['ID']>;
   nativeDomainId: Scalars['Int'];
@@ -1414,6 +1426,10 @@ export type Expenditure = {
   colonyId: Scalars['ID'];
   createdAt: Scalars['AWSDateTime'];
   finalizedAt?: Maybe<Scalars['AWSTimestamp']>;
+  /** The funding motion associated with this expenditure, if there is one */
+  fundingMotion?: Maybe<ColonyMotion>;
+  /** The id of the motion created to fund this expenditure, if there is one */
+  fundingMotionId?: Maybe<Scalars['ID']>;
   hasReclaimedStake?: Maybe<Scalars['Boolean']>;
   id: Scalars['ID'];
   metadata?: Maybe<ExpenditureMetadata>;
@@ -1979,6 +1995,7 @@ export type ModelColonyMetadataFilterInput = {
 export type ModelColonyMotionConditionInput = {
   and?: InputMaybe<Array<InputMaybe<ModelColonyMotionConditionInput>>>;
   createdBy?: InputMaybe<ModelStringInput>;
+  gasEstimate?: InputMaybe<ModelStringInput>;
   hasObjection?: InputMaybe<ModelBooleanInput>;
   isDecision?: InputMaybe<ModelBooleanInput>;
   isFinalized?: InputMaybe<ModelBooleanInput>;
@@ -1993,6 +2010,7 @@ export type ModelColonyMotionConditionInput = {
   requiredStake?: InputMaybe<ModelStringInput>;
   rootHash?: InputMaybe<ModelStringInput>;
   skillRep?: InputMaybe<ModelStringInput>;
+  transactionHash?: InputMaybe<ModelStringInput>;
   userMinStake?: InputMaybe<ModelStringInput>;
 };
 
@@ -2005,6 +2023,7 @@ export type ModelColonyMotionConnection = {
 export type ModelColonyMotionFilterInput = {
   and?: InputMaybe<Array<InputMaybe<ModelColonyMotionFilterInput>>>;
   createdBy?: InputMaybe<ModelStringInput>;
+  gasEstimate?: InputMaybe<ModelStringInput>;
   hasObjection?: InputMaybe<ModelBooleanInput>;
   id?: InputMaybe<ModelIdInput>;
   isDecision?: InputMaybe<ModelBooleanInput>;
@@ -2020,6 +2039,7 @@ export type ModelColonyMotionFilterInput = {
   requiredStake?: InputMaybe<ModelStringInput>;
   rootHash?: InputMaybe<ModelStringInput>;
   skillRep?: InputMaybe<ModelStringInput>;
+  transactionHash?: InputMaybe<ModelStringInput>;
   userMinStake?: InputMaybe<ModelStringInput>;
 };
 
@@ -2264,6 +2284,7 @@ export type ModelExpenditureConditionInput = {
   colonyId?: InputMaybe<ModelIdInput>;
   createdAt?: InputMaybe<ModelStringInput>;
   finalizedAt?: InputMaybe<ModelIntInput>;
+  fundingMotionId?: InputMaybe<ModelIdInput>;
   hasReclaimedStake?: InputMaybe<ModelBooleanInput>;
   nativeDomainId?: InputMaybe<ModelIntInput>;
   nativeFundingPotId?: InputMaybe<ModelIntInput>;
@@ -2285,6 +2306,7 @@ export type ModelExpenditureFilterInput = {
   colonyId?: InputMaybe<ModelIdInput>;
   createdAt?: InputMaybe<ModelStringInput>;
   finalizedAt?: InputMaybe<ModelIntInput>;
+  fundingMotionId?: InputMaybe<ModelIdInput>;
   hasReclaimedStake?: InputMaybe<ModelBooleanInput>;
   id?: InputMaybe<ModelIdInput>;
   nativeDomainId?: InputMaybe<ModelIntInput>;
@@ -2647,6 +2669,7 @@ export type ModelSubscriptionColonyMetadataFilterInput = {
 export type ModelSubscriptionColonyMotionFilterInput = {
   and?: InputMaybe<Array<InputMaybe<ModelSubscriptionColonyMotionFilterInput>>>;
   createdBy?: InputMaybe<ModelSubscriptionStringInput>;
+  gasEstimate?: InputMaybe<ModelSubscriptionStringInput>;
   hasObjection?: InputMaybe<ModelSubscriptionBooleanInput>;
   id?: InputMaybe<ModelSubscriptionIdInput>;
   isDecision?: InputMaybe<ModelSubscriptionBooleanInput>;
@@ -2661,6 +2684,7 @@ export type ModelSubscriptionColonyMotionFilterInput = {
   requiredStake?: InputMaybe<ModelSubscriptionStringInput>;
   rootHash?: InputMaybe<ModelSubscriptionStringInput>;
   skillRep?: InputMaybe<ModelSubscriptionStringInput>;
+  transactionHash?: InputMaybe<ModelSubscriptionStringInput>;
   userMinStake?: InputMaybe<ModelSubscriptionStringInput>;
 };
 
@@ -2761,6 +2785,7 @@ export type ModelSubscriptionExpenditureFilterInput = {
   colonyId?: InputMaybe<ModelSubscriptionIdInput>;
   createdAt?: InputMaybe<ModelSubscriptionStringInput>;
   finalizedAt?: InputMaybe<ModelSubscriptionIntInput>;
+  fundingMotionId?: InputMaybe<ModelSubscriptionIdInput>;
   hasReclaimedStake?: InputMaybe<ModelSubscriptionBooleanInput>;
   id?: InputMaybe<ModelSubscriptionIdInput>;
   nativeDomainId?: InputMaybe<ModelSubscriptionIntInput>;
@@ -3859,7 +3884,7 @@ export type Query = {
   getExpenditure?: Maybe<Expenditure>;
   getExpenditureMetadata?: Maybe<ExpenditureMetadata>;
   getExpendituresByColony?: Maybe<ModelExpenditureConnection>;
-  getExpendituresByNativeFundingPotId?: Maybe<ModelExpenditureConnection>;
+  getExpendituresByNativeFundingPotIdAndColony?: Maybe<ModelExpenditureConnection>;
   getExtensionByColonyAndHash?: Maybe<ModelColonyExtensionConnection>;
   getExtensionsByHash?: Maybe<ModelColonyExtensionConnection>;
   getIngestorStats?: Maybe<IngestorStats>;
@@ -4128,7 +4153,8 @@ export type QueryGetExpendituresByColonyArgs = {
 };
 
 /** Root query type */
-export type QueryGetExpendituresByNativeFundingPotIdArgs = {
+export type QueryGetExpendituresByNativeFundingPotIdAndColonyArgs = {
+  colonyId?: InputMaybe<ModelIdKeyConditionInput>;
   filter?: InputMaybe<ModelExpenditureFilterInput>;
   limit?: InputMaybe<Scalars['Int']>;
   nativeFundingPotId: Scalars['Int'];
@@ -5100,6 +5126,7 @@ export type UpdateColonyMetadataInput = {
 
 export type UpdateColonyMotionInput = {
   createdBy?: InputMaybe<Scalars['String']>;
+  gasEstimate?: InputMaybe<Scalars['String']>;
   hasObjection?: InputMaybe<Scalars['Boolean']>;
   id: Scalars['ID'];
   isDecision?: InputMaybe<Scalars['Boolean']>;
@@ -5117,6 +5144,7 @@ export type UpdateColonyMotionInput = {
   rootHash?: InputMaybe<Scalars['String']>;
   skillRep?: InputMaybe<Scalars['String']>;
   stakerRewards?: InputMaybe<Array<StakerRewardsInput>>;
+  transactionHash?: InputMaybe<Scalars['String']>;
   userMinStake?: InputMaybe<Scalars['String']>;
   usersStakes?: InputMaybe<Array<UserStakesInput>>;
   voterRecord?: InputMaybe<Array<VoterRecordInput>>;
@@ -5196,6 +5224,7 @@ export type UpdateExpenditureInput = {
   colonyId?: InputMaybe<Scalars['ID']>;
   createdAt?: InputMaybe<Scalars['AWSDateTime']>;
   finalizedAt?: InputMaybe<Scalars['AWSTimestamp']>;
+  fundingMotionId?: InputMaybe<Scalars['ID']>;
   hasReclaimedStake?: InputMaybe<Scalars['Boolean']>;
   id: Scalars['ID'];
   nativeDomainId?: InputMaybe<Scalars['Int']>;
@@ -5534,6 +5563,7 @@ export type ColonyMotionFragment = {
   hasObjection: boolean;
   motionDomainId: string;
   isDecision: boolean;
+  transactionHash: string;
   motionStakes: {
     __typename?: 'MotionStakes';
     raw: { __typename?: 'MotionStakeValues'; nay: string; yay: string };
@@ -6142,15 +6172,20 @@ export type GetExpenditureQuery = {
   } | null;
 };
 
-export type GetExpenditureByNativeFundingPotIdQueryVariables = Exact<{
+export type GetExpenditureByNativeFundingPotIdAndColonyQueryVariables = Exact<{
   nativeFundingPotId: Scalars['Int'];
+  colonyAddress: Scalars['ID'];
 }>;
 
-export type GetExpenditureByNativeFundingPotIdQuery = {
+export type GetExpenditureByNativeFundingPotIdAndColonyQuery = {
   __typename?: 'Query';
-  getExpendituresByNativeFundingPotId?: {
+  getExpendituresByNativeFundingPotIdAndColony?: {
     __typename?: 'ModelExpenditureConnection';
-    items: Array<{ __typename?: 'Expenditure'; id: string } | null>;
+    items: Array<{
+      __typename?: 'Expenditure';
+      id: string;
+      fundingMotionId?: string | null;
+    } | null>;
   } | null;
 };
 
@@ -6339,6 +6374,7 @@ export type GetColonyMotionQuery = {
     hasObjection: boolean;
     motionDomainId: string;
     isDecision: boolean;
+    transactionHash: string;
     motionStakes: {
       __typename?: 'MotionStakes';
       raw: { __typename?: 'MotionStakeValues'; nay: string; yay: string };
@@ -6571,6 +6607,7 @@ export const ColonyMotion = gql`
       inRevealPhase
     }
     isDecision
+    transactionHash
   }
   ${MotionStakes}
   ${UserStakes}
@@ -6991,13 +7028,18 @@ export const GetExpenditureDocument = gql`
     }
   }
 `;
-export const GetExpenditureByNativeFundingPotIdDocument = gql`
-  query GetExpenditureByNativeFundingPotId($nativeFundingPotId: Int!) {
-    getExpendituresByNativeFundingPotId(
+export const GetExpenditureByNativeFundingPotIdAndColonyDocument = gql`
+  query GetExpenditureByNativeFundingPotIdAndColony(
+    $nativeFundingPotId: Int!
+    $colonyAddress: ID!
+  ) {
+    getExpendituresByNativeFundingPotIdAndColony(
       nativeFundingPotId: $nativeFundingPotId
+      colonyId: { eq: $colonyAddress }
     ) {
       items {
         id
+        fundingMotionId
       }
     }
   }

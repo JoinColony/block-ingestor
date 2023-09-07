@@ -43,6 +43,7 @@ fragment ColonyMotion on ColonyMotion {
     inRevealPhase
   }
   isDecision
+  transactionHash
 }
 
 fragment VoterRecord on VoterRecord {
