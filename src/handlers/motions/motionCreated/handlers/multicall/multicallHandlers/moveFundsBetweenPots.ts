@@ -1,13 +1,10 @@
 import { Result } from 'ethers/lib/utils';
-import { mutate, query } from '~amplifyClient';
+import { query } from '~amplifyClient';
 import {
   ColonyActionType,
   GetExpenditureByNativeFundingPotIdAndColonyDocument,
   GetExpenditureByNativeFundingPotIdAndColonyQuery,
   GetExpenditureByNativeFundingPotIdAndColonyQueryVariables,
-  UpdateExpenditureDocument,
-  UpdateExpenditureMutation,
-  UpdateExpenditureMutationVariables,
 } from '~graphql';
 import { createMotionInDB } from '~handlers/motions/motionCreated/helpers';
 import { ContractEvent } from '~types';
@@ -52,8 +49,11 @@ export const moveFundsBetweenPotsMulti = async ({
    * associated a funding motion with the expenditure, we don't need to do it again.
    */
   const existingFundMotions = new Set(
-    expenditure?.fundingMotionTransactionHashes ?? [],
+    expenditure?.fundingMotions?.items
+      ?.filter(notNull)
+      .map(({ transactionHash }) => transactionHash) ?? [],
   );
+
   if (!expenditure || existingFundMotions.has(transactionHash)) {
     return;
   }
@@ -64,23 +64,11 @@ export const moveFundsBetweenPotsMulti = async ({
     return;
   }
 
+  const expenditureId = expenditure.id;
+
   await createMotionInDB(event, {
     type: ColonyActionType.FundExpenditureMotion,
     gasEstimate,
+    expenditureId,
   });
-
-  const expenditureId = expenditure.id;
-
-  await mutate<UpdateExpenditureMutation, UpdateExpenditureMutationVariables>(
-    UpdateExpenditureDocument,
-    {
-      input: {
-        id: expenditureId,
-        fundingMotionTransactionHashes: [
-          ...existingFundMotions,
-          transactionHash,
-        ],
-      },
-    },
-  );
 };
