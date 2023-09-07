@@ -16,6 +16,7 @@ export enum ColonyOperations {
   EditColony = 'editColony',
   SetUserRoles = 'setUserRoles',
   SimpleDecision = 'simpleDecision',
+  Multicall = 'multicall',
 }
 
 export enum MotionEvents {

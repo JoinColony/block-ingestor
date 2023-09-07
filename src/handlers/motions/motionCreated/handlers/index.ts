@@ -8,3 +8,4 @@ export { handleDomainEditReputationMotion } from './reputation';
 export { handleEditColonyMotion } from './editColony';
 export { handleSetUserRolesMotion } from './setUserRoles';
 export { handleSimpleDecisionMotion } from './simpleDecision';
+export { handleMulticallMotion } from './multicall';
