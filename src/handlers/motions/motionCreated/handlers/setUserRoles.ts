@@ -1,4 +1,5 @@
 import { TransactionDescription } from 'ethers/lib/utils';
+import { BigNumber } from 'ethers';
 
 import { ContractEvent, motionNameMapping } from '~types';
 import {
@@ -12,6 +13,7 @@ import { createMotionInDB } from '../helpers';
 export const handleSetUserRolesMotion = async (
   event: ContractEvent,
   parsedAction: TransactionDescription,
+  gasEstimate: BigNumber,
 ): Promise<void> => {
   const { colonyAddress } = event;
   if (!colonyAddress) {
@@ -35,5 +37,6 @@ export const handleSetUserRolesMotion = async (
     fromDomainId: getDomainDatabaseId(colonyAddress, domainId),
     recipientAddress: userAddress,
     roles,
+    gasEstimate: gasEstimate.toString(),
   });
 };
