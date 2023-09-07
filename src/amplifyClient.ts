@@ -14,7 +14,7 @@ export default (): void => {
   });
 };
 
-export type GraphQLFnReturn<T> = Promise<
+type GraphQLFnReturn<T> = Promise<
   ReturnType<typeof API.graphql<GraphQLQuery<T>>> | undefined
 >;
 

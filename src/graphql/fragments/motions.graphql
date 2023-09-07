@@ -42,7 +42,6 @@ fragment ColonyMotion on ColonyMotion {
     hasFailedNotFinalizable
     inRevealPhase
   }
-  transactionHash
 }
 
 fragment VoterRecord on VoterRecord {

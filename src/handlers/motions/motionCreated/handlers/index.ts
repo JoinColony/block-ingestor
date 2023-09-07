@@ -7,4 +7,3 @@ export { handleMoveFundsMotion } from './moveFunds';
 export { handleDomainEditReputationMotion } from './reputation';
 export { handleEditColonyMotion } from './editColony';
 export { handleSetUserRolesMotion } from './setUserRoles';
-export { handleMulticallMotion } from './multicall';

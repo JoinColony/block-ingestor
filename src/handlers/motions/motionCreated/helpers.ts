@@ -1,6 +1,5 @@
 import { BigNumber } from 'ethers';
 import { TransactionDescription } from 'ethers/lib/utils';
-
 import {
   AnyColonyClient,
   AnyOneTxPaymentClient,
@@ -9,7 +8,7 @@ import {
 
 import { ContractEvent, MotionEvents } from '~types';
 import { getDomainDatabaseId, getVotingClient, verbose } from '~utils';
-import { GraphQLFnReturn, mutate } from '~amplifyClient';
+import { mutate } from '~amplifyClient';
 import {
   ColonyMotion,
   CreateColonyActionDocument,
@@ -34,9 +33,18 @@ import {
 } from '../helpers';
 
 export const getParsedActionFromMotion = async (
-  motion: { action: string },
+  motionId: string,
+  colonyAddress: string,
   clients: [AnyColonyClient, AnyOneTxPaymentClient],
 ): Promise<TransactionDescription | undefined> => {
+  const votingClient = await getVotingClient(colonyAddress);
+
+  if (!votingClient) {
+    return;
+  }
+
+  const motion = await votingClient.getMotion(motionId);
+
   for (const client of clients) {
     // Return the first time a client can successfully parse the motion
     try {
@@ -52,21 +60,19 @@ export const getParsedActionFromMotion = async (
   return undefined;
 };
 
-interface GetMotionDataArgs {
-  transactionHash: string;
+interface Props {
   motionId: BigNumber;
   domainId: BigNumber;
   votingClient: AnyVotingReputationClient;
   colonyAddress: string;
 }
 
-export const getMotionData = async ({
-  transactionHash,
+const getMotionData = async ({
   motionId,
   domainId,
   votingClient,
   colonyAddress,
-}: GetMotionDataArgs): Promise<ColonyMotion> => {
+}: Props): Promise<ColonyMotion> => {
   const { skillRep, rootHash, repSubmitted } = await votingClient.getMotion(
     motionId,
   );
@@ -134,7 +140,6 @@ export const getMotionData = async ({
       hasFailedNotFinalizable: false,
       inRevealPhase: false,
     },
-    transactionHash,
   };
 };
 
@@ -160,22 +165,20 @@ const getInitialMotionMessage = async (
   };
 };
 
-const createColonyMotion = async (
+const createActionWithMotion = async (
+  actionData: CreateColonyActionInput,
   motionData: CreateColonyMotionInput,
-): Promise<GraphQLFnReturn<CreateColonyMotionMutation> | undefined> => {
-  return await mutate<
-    CreateColonyMotionMutation,
-    CreateColonyMotionMutationVariables
-  >(CreateColonyMotionDocument, {
-    input: {
-      ...motionData,
-    },
-  });
-};
-
-const createMotionMessage = async (
   initialMotionMessage: CreateMotionMessageInput,
 ): Promise<void> => {
+  await mutate<CreateColonyMotionMutation, CreateColonyMotionMutationVariables>(
+    CreateColonyMotionDocument,
+    {
+      input: {
+        ...motionData,
+      },
+    },
+  );
+
   await mutate<
     CreateMotionMessageMutation,
     CreateMotionMessageMutationVariables
@@ -184,10 +187,7 @@ const createMotionMessage = async (
       ...initialMotionMessage,
     },
   });
-};
-const createColonyAction = async (
-  actionData: CreateColonyActionInput,
-): Promise<void> => {
+
   await mutate<CreateColonyActionMutation, CreateColonyActionMutationVariables>(
     CreateColonyActionDocument,
     {
@@ -206,10 +206,7 @@ export const createMotionInDB = async (
     colonyAddress,
     args: { motionId, creator: creatorAddress, domainId },
   }: ContractEvent,
-  {
-    gasEstimate,
-    ...input
-  }: Omit<
+  input: Omit<
     CreateColonyActionInput,
     | 'id'
     | 'colonyId'
@@ -218,8 +215,8 @@ export const createMotionInDB = async (
     | 'motionId'
     | 'initiatorAddress'
     | 'blockNumber'
-  > & { gasEstimate: string },
-): Promise<GraphQLFnReturn<CreateColonyMotionMutation> | undefined> => {
+  >,
+): Promise<void> => {
   if (!colonyAddress) {
     return;
   }
@@ -231,7 +228,6 @@ export const createMotionInDB = async (
   }
 
   const motionData = await getMotionData({
-    transactionHash,
     votingClient,
     motionId,
     domainId,
@@ -257,11 +253,5 @@ export const createMotionInDB = async (
     ...input,
   };
 
-  const [motionMutationResult] = await Promise.all([
-    createColonyMotion({ ...motionData, gasEstimate }),
-    createMotionMessage(initialMotionMessage),
-    createColonyAction(actionData),
-  ]);
-
-  return motionMutationResult;
+  createActionWithMotion(actionData, motionData, initialMotionMessage);
 };

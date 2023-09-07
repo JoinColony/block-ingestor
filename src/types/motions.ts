@@ -15,7 +15,6 @@ export enum ColonyOperations {
   EmitDomainReputationReward = 'emitDomainReputationReward',
   EditColony = 'editColony',
   SetUserRoles = 'setUserRoles',
-  Multicall = 'multicall',
 }
 
 export enum MotionEvents {
