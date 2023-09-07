@@ -208,6 +208,7 @@ export const createMotionInDB = async (
   }: ContractEvent,
   {
     gasEstimate,
+    expenditureId,
     ...input
   }: Omit<
     CreateColonyActionInput,
@@ -218,7 +219,7 @@ export const createMotionInDB = async (
     | 'motionId'
     | 'initiatorAddress'
     | 'blockNumber'
-  > & { gasEstimate: string },
+  > & { gasEstimate: string; expenditureId?: string },
 ): Promise<GraphQLFnReturn<CreateColonyMotionMutation> | undefined> => {
   if (!colonyAddress) {
     return;
@@ -258,7 +259,7 @@ export const createMotionInDB = async (
   };
 
   await Promise.all([
-    createColonyMotion({ ...motionData, gasEstimate }),
+    createColonyMotion({ ...motionData, gasEstimate, expenditureId }),
     createMotionMessage(initialMotionMessage),
     createColonyAction(actionData),
   ]);

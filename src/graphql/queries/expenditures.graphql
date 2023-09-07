@@ -25,7 +25,11 @@ query GetExpenditureByNativeFundingPotIdAndColony(
   ) {
     items {
       id
-      fundingMotionTransactionHashes
+      fundingMotions {
+        items {
+          transactionHash
+        }
+      }
     }
   }
 }
