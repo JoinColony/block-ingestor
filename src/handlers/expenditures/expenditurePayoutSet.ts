@@ -41,6 +41,7 @@ export default async (event: ContractEvent): Promise<void> => {
     {
       tokenAddress,
       amount: amount.toString(),
+      isClaimed: false,
     },
   ];
 
