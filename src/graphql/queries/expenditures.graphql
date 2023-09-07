@@ -14,10 +14,17 @@ query GetExpenditure($id: ID!) {
   }
 }
 
-query GetExpenditureByNativeFundingPotId($nativeFundingPotId: Int!) {
-  getExpendituresByNativeFundingPotId(nativeFundingPotId: $nativeFundingPotId) {
+query GetExpenditureByNativeFundingPotIdAndColony(
+  $nativeFundingPotId: Int!
+  $colonyAddress: ID!
+) {
+  getExpendituresByNativeFundingPotIdAndColony(
+    nativeFundingPotId: $nativeFundingPotId
+    colonyId: { eq: $colonyAddress }
+  ) {
     items {
       id
+      fundingMotionId
     }
   }
 }
