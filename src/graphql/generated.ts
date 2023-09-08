@@ -986,6 +986,7 @@ export type CreateExpenditureInput = {
 export type CreateExpenditureMetadataInput = {
   fundFromDomainNativeId: Scalars['Int'];
   id?: InputMaybe<Scalars['ID']>;
+  stages?: InputMaybe<Array<ExpenditureStageInput>>;
   type: ExpenditureType;
 };
 
@@ -1371,6 +1372,7 @@ export type ExpenditureMetadata = {
   createdAt: Scalars['AWSDateTime'];
   fundFromDomainNativeId: Scalars['Int'];
   id: Scalars['ID'];
+  stages?: Maybe<Array<ExpenditureStage>>;
   type: ExpenditureType;
   updatedAt: Scalars['AWSDateTime'];
 };
@@ -1403,6 +1405,19 @@ export type ExpenditureSlotInput = {
   payoutModifier?: InputMaybe<Scalars['Int']>;
   payouts?: InputMaybe<Array<ExpenditurePayoutInput>>;
   recipientAddress?: InputMaybe<Scalars['String']>;
+};
+
+export type ExpenditureStage = {
+  __typename?: 'ExpenditureStage';
+  isReleased: Scalars['Boolean'];
+  name: Scalars['String'];
+  slotId: Scalars['Int'];
+};
+
+export type ExpenditureStageInput = {
+  isReleased: Scalars['Boolean'];
+  name: Scalars['String'];
+  slotId: Scalars['Int'];
 };
 
 export enum ExpenditureStatus {
@@ -4897,6 +4912,7 @@ export type UpdateExpenditureInput = {
 export type UpdateExpenditureMetadataInput = {
   fundFromDomainNativeId?: InputMaybe<Scalars['Int']>;
   id: Scalars['ID'];
+  stages?: InputMaybe<Array<ExpenditureStageInput>>;
   type?: InputMaybe<ExpenditureType>;
 };
 
@@ -5437,6 +5453,18 @@ export type UpdateExpenditureMutation = {
   updateExpenditure?: { __typename?: 'Expenditure'; id: string } | null;
 };
 
+export type UpdateExpenditureMetadataMutationVariables = Exact<{
+  input: UpdateExpenditureMetadataInput;
+}>;
+
+export type UpdateExpenditureMetadataMutation = {
+  __typename?: 'Mutation';
+  updateExpenditureMetadata?: {
+    __typename?: 'ExpenditureMetadata';
+    id: string;
+  } | null;
+};
+
 export type CreateColonyExtensionMutationVariables = Exact<{
   input: CreateColonyExtensionInput;
 }>;
@@ -5798,6 +5826,23 @@ export type GetExpenditureByNativeFundingPotIdQuery = {
   getExpendituresByNativeFundingPotId?: {
     __typename?: 'ModelExpenditureConnection';
     items: Array<{ __typename?: 'Expenditure'; id: string } | null>;
+  } | null;
+};
+
+export type GetExpenditureMetadataQueryVariables = Exact<{
+  id: Scalars['ID'];
+}>;
+
+export type GetExpenditureMetadataQuery = {
+  __typename?: 'Query';
+  getExpenditureMetadata?: {
+    __typename?: 'ExpenditureMetadata';
+    stages?: Array<{
+      __typename?: 'ExpenditureStage';
+      name: string;
+      slotId: number;
+      isReleased: boolean;
+    }> | null;
   } | null;
 };
 
@@ -6333,6 +6378,13 @@ export const UpdateExpenditureDocument = gql`
     }
   }
 `;
+export const UpdateExpenditureMetadataDocument = gql`
+  mutation UpdateExpenditureMetadata($input: UpdateExpenditureMetadataInput!) {
+    updateExpenditureMetadata(input: $input) {
+      id
+    }
+  }
+`;
 export const CreateColonyExtensionDocument = gql`
   mutation CreateColonyExtension($input: CreateColonyExtensionInput!) {
     createColonyExtension(input: $input) {
@@ -6606,6 +6658,17 @@ export const GetExpenditureByNativeFundingPotIdDocument = gql`
     ) {
       items {
         id
+      }
+    }
+  }
+`;
+export const GetExpenditureMetadataDocument = gql`
+  query GetExpenditureMetadata($id: ID!) {
+    getExpenditureMetadata(id: $id) {
+      stages {
+        name
+        slotId
+        isReleased
       }
     }
   }

@@ -1,7 +1,11 @@
 import { ContractEvent } from '~types';
-import { getExpenditureDatabaseId, output, toNumber, verbose } from '~utils';
-
-import { getExpenditureFromDB } from './helpers';
+import {
+  getExpenditureDatabaseId,
+  insertAtIndex,
+  output,
+  toNumber,
+  verbose,
+} from '~utils';
 import {
   ExpenditurePayout,
   UpdateExpenditureDocument,
@@ -10,17 +14,22 @@ import {
 } from '~graphql';
 import { mutate } from '~amplifyClient';
 
+import { getExpenditureFromDB } from './helpers';
+
 export default async (event: ContractEvent): Promise<void> => {
   const { contractAddress: colonyAddress } = event;
   const { id: expenditureId, slot, token: tokenAddress } = event.args;
   const convertedExpenditureId = toNumber(expenditureId);
   const convertedSlotId = toNumber(slot);
-  const databaseId = getExpenditureDatabaseId(colonyAddress, expenditureId);
+  const databaseId = getExpenditureDatabaseId(
+    colonyAddress,
+    convertedExpenditureId,
+  );
 
   const expenditure = await getExpenditureFromDB(databaseId);
   if (!expenditure) {
     output(
-      `Could not find expenditure with ID: ${convertedExpenditureId} and colony address: ${colonyAddress} in the db. This is a bug and needs investigating.`,
+      `Could not find expenditure with ID: ${databaseId} in the db. This is a bug and needs investigating.`,
     );
     return;
   }
@@ -41,26 +50,20 @@ export default async (event: ContractEvent): Promise<void> => {
     return;
   }
 
-  const updatedPayouts: ExpenditurePayout[] = [
-    ...existingSlot.payouts.slice(0, existingPayoutIndex),
+  const updatedPayouts: ExpenditurePayout[] = insertAtIndex(
+    existingSlot.payouts,
+    existingPayoutIndex,
     {
       ...existingPayout,
       isClaimed: true,
     },
-    ...existingSlot.payouts.slice(existingPayoutIndex + 1),
-  ];
-  const updatedSlots = [
-    ...expenditure.slots.slice(0, existingSlotIndex),
-    {
-      ...existingSlot,
-      payouts: updatedPayouts,
-    },
-    ...expenditure.slots.slice(existingSlotIndex + 1),
-  ];
-
-  verbose(
-    `Payout claimed in expenditure with ID ${convertedExpenditureId} in colony ${colonyAddress}`,
   );
+  const updatedSlots = insertAtIndex(expenditure.slots, existingPayoutIndex, {
+    ...existingSlot,
+    payouts: updatedPayouts,
+  });
+
+  verbose(`Payout claimed in expenditure with ID ${databaseId}`);
 
   await mutate<UpdateExpenditureMutation, UpdateExpenditureMutationVariables>(
     UpdateExpenditureDocument,
