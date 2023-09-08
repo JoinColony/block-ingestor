@@ -58,7 +58,7 @@ export default async (event: ContractEvent): Promise<void> => {
       isClaimed: true,
     },
   );
-  const updatedSlots = insertAtIndex(expenditure.slots, existingPayoutIndex, {
+  const updatedSlots = insertAtIndex(expenditure.slots, existingSlotIndex, {
     ...existingSlot,
     payouts: updatedPayouts,
   });
