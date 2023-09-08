@@ -22,7 +22,7 @@ export default async (event: ContractEvent): Promise<void> => {
   const expenditure = await getExpenditureFromDB(databaseId);
   if (!expenditure) {
     output(
-      `Could not find expenditure with ID: ${convertedExpenditureId} and colony address: ${colonyAddress} in the db. This is a bug and needs investigating.`,
+      `Could not find expenditure with ID: ${databaseId} in the db. This is a bug and needs investigating.`,
     );
     return;
   }
