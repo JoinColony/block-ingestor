@@ -23,7 +23,7 @@ export default async (event: ContractEvent): Promise<void> => {
   const convertedSlot = toNumber(slot);
 
   if (!colonyAddress) {
-    console.log('Colony address missing for StagedPaymentReleased event');
+    output('Colony address missing for StagedPaymentReleased event');
     return;
   }
 
@@ -51,7 +51,7 @@ export default async (event: ContractEvent): Promise<void> => {
     (stage) => stage.slotId === convertedSlot,
   );
   const existingStage = metadata.stages[existingStageIndex];
-  console.log(metadata.stages);
+
   // If the stage doesn't exist or it's been already set to released, we don't need to do anything
   if (!existingStage || existingStage.isReleased) {
     return;
