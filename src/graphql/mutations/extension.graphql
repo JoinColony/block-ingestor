@@ -4,14 +4,6 @@ mutation CreateColonyExtension($input: CreateColonyExtensionInput!) {
   }
 }
 
-mutation UpdateColonyExtensionByColonyAndHash(
-  $input: UpdateExtensionByColonyAndHashInput!
-) {
-  updateExtensionByColonyAndHash(input: $input) {
-    id
-  }
-}
-
 mutation UpdateColonyExtensionByAddress($input: UpdateColonyExtensionInput!) {
   updateColonyExtension(input: $input) {
     id
