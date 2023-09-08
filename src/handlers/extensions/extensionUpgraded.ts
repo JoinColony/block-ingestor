@@ -1,14 +1,19 @@
 import { mutate } from '~amplifyClient';
 import {
-  UpdateColonyExtensionByColonyAndHashDocument,
-  UpdateColonyExtensionByColonyAndHashMutation,
-  UpdateColonyExtensionByColonyAndHashMutationVariables,
+  UpdateColonyExtensionByAddressDocument,
+  UpdateColonyExtensionByAddressMutation,
+  UpdateColonyExtensionByAddressMutationVariables,
 } from '~graphql';
 import { ContractEvent } from '~types';
 import { toNumber, verbose } from '~utils';
 
 export default async (event: ContractEvent): Promise<void> => {
-  const { extensionId: extensionHash, colony, version } = event.args;
+  const {
+    extensionId: extensionHash,
+    colony,
+    version,
+    contractAddress: extensionAddress,
+  } = event.args;
   const convertedVersion = toNumber(version);
 
   verbose(
@@ -21,10 +26,11 @@ export default async (event: ContractEvent): Promise<void> => {
   );
 
   await mutate<
-    UpdateColonyExtensionByColonyAndHashMutation,
-    UpdateColonyExtensionByColonyAndHashMutationVariables
-  >(UpdateColonyExtensionByColonyAndHashDocument, {
+    UpdateColonyExtensionByAddressMutation,
+    UpdateColonyExtensionByAddressMutationVariables
+  >(UpdateColonyExtensionByAddressDocument, {
     input: {
+      id: extensionAddress,
       colonyId: colony,
       hash: extensionHash,
       version: convertedVersion,
