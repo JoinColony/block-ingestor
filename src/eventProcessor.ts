@@ -44,6 +44,7 @@ import {
   handleStakeReclaimed,
   handleExpenditureMadeStaged,
   handleStagedPaymentReleased,
+  handleStakedExpenditureCancelled,
 } from './handlers';
 
 dotenv.config();
@@ -283,6 +284,11 @@ export default async (event: ContractEvent): Promise<void> => {
 
     case ContractEventsSignatures.StakeReclaimed: {
       await handleStakeReclaimed(event);
+      return;
+    }
+
+    case ContractEventsSignatures.StakedExpenditureCancelled: {
+      await handleStakedExpenditureCancelled(event);
       return;
     }
 
