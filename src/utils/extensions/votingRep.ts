@@ -1,4 +1,4 @@
-import { AnyVotingReputationClient } from '@colony/colony-js/*';
+import { AnyVotingReputationClient } from '@colony/colony-js';
 import { mutate } from '~amplifyClient';
 import {
   ExtensionParams,

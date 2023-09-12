@@ -25,6 +25,7 @@ import { setupListenersForStakedExpenditureExtensions } from './stakedExpenditur
 export * from './stakedExpenditure';
 export * from './stagedExpenditure';
 export * from './votingReputation';
+export * from './oneTxPayment';
 
 export const addExtensionEventListener = (
   eventSignature: ContractEventsSignatures,

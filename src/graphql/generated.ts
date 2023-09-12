@@ -104,6 +104,8 @@ export type Colony = {
   nativeToken: Token;
   /** The unique address of the native token of the Colony */
   nativeTokenId: Scalars['ID'];
+  /** The total reputation amount in the colony */
+  reputation?: Maybe<Scalars['String']>;
   roles?: Maybe<ModelColonyRoleConnection>;
   /** Status information for the Colony */
   status?: Maybe<ColonyStatus>;
@@ -208,8 +210,6 @@ export type ColonyAction = {
   fromDomain?: Maybe<Domain>;
   /** The source Domain identifier, if applicable */
   fromDomainId?: Maybe<Scalars['ID']>;
-  /** The fundamental chain id */
-  fundamentalChainId?: Maybe<Scalars['Int']>;
   /** Unique identifier for the ColonyAction */
   id: Scalars['ID'];
   /** JSON string to pass custom, dynamic event data */
@@ -234,6 +234,10 @@ export type ColonyAction = {
   motionId?: Maybe<Scalars['ID']>;
   /** The resulting new Colony version, if applicable */
   newColonyVersion?: Maybe<Scalars['Int']>;
+  /** The native id of the payment */
+  paymentId?: Maybe<Scalars['Int']>;
+  /** Payment data for multiple OneTxPayments */
+  payments?: Maybe<Array<Payment>>;
   /** Colony metadata that is stored temporarily and commited to the database once the corresponding motion passes */
   pendingColonyMetadata?: Maybe<ColonyMetadata>;
   /** Identifier of Colony metadata that is stored temporarily and commited to the database once the corresponding motion passes */
@@ -346,6 +350,10 @@ export enum ColonyActionType {
   MoveFunds = 'MOVE_FUNDS',
   /** An action related to moving funds between domains via a motion */
   MoveFundsMotion = 'MOVE_FUNDS_MOTION',
+  /** An action related to making multiple payments within a Colony */
+  MultiplePayment = 'MULTIPLE_PAYMENT',
+  /** An action related to making multiple payments within a Colony */
+  MultiplePaymentMotion = 'MULTIPLE_PAYMENT_MOTION',
   /** An motion action placeholder that should not be used */
   NullMotion = 'NULL_MOTION',
   /** An action related to a payment within a Colony */
@@ -877,7 +885,6 @@ export type CreateColonyActionInput = {
   colonyId: Scalars['ID'];
   createdAt?: InputMaybe<Scalars['AWSDateTime']>;
   fromDomainId?: InputMaybe<Scalars['ID']>;
-  fundamentalChainId?: InputMaybe<Scalars['Int']>;
   id?: InputMaybe<Scalars['ID']>;
   individualEvents?: InputMaybe<Scalars['String']>;
   initiatorAddress: Scalars['ID'];
@@ -885,6 +892,8 @@ export type CreateColonyActionInput = {
   motionDomainId?: InputMaybe<Scalars['Int']>;
   motionId?: InputMaybe<Scalars['ID']>;
   newColonyVersion?: InputMaybe<Scalars['Int']>;
+  paymentId?: InputMaybe<Scalars['Int']>;
+  payments?: InputMaybe<Array<PaymentInput>>;
   pendingColonyMetadataId?: InputMaybe<Scalars['ID']>;
   pendingDomainMetadataId?: InputMaybe<Scalars['ID']>;
   recipientAddress?: InputMaybe<Scalars['ID']>;
@@ -954,6 +963,7 @@ export type CreateColonyInput = {
   motionsWithUnclaimedStakes?: InputMaybe<Array<ColonyUnclaimedStakeInput>>;
   name: Scalars['String'];
   nativeTokenId: Scalars['ID'];
+  reputation?: InputMaybe<Scalars['String']>;
   status?: InputMaybe<ColonyStatusInput>;
   type?: InputMaybe<ColonyType>;
   version: Scalars['Int'];
@@ -1057,6 +1067,7 @@ export type CreateDomainInput = {
   nativeFundingPotId: Scalars['Int'];
   nativeId: Scalars['Int'];
   nativeSkillId: Scalars['Int'];
+  reputation?: InputMaybe<Scalars['String']>;
 };
 
 export type CreateDomainMetadataInput = {
@@ -1112,6 +1123,7 @@ export type CreateProfileInput = {
   avatar?: InputMaybe<Scalars['String']>;
   bio?: InputMaybe<Scalars['String']>;
   displayName?: InputMaybe<Scalars['String']>;
+  displayNameChanged?: InputMaybe<Scalars['AWSDateTime']>;
   email?: InputMaybe<Scalars['AWSEmail']>;
   id?: InputMaybe<Scalars['ID']>;
   location?: InputMaybe<Scalars['String']>;
@@ -1177,15 +1189,12 @@ export type CreateUniqueColonyInput = {
 export type CreateUniqueUserInput = {
   /** Unique identifier for the user. This is the user's wallet address */
   id: Scalars['ID'];
-  /** The username */
-  name: Scalars['String'];
   /** Profile data for the user */
-  profile?: InputMaybe<ProfileInput>;
+  profile: ProfileInput;
 };
 
 export type CreateUserInput = {
   id?: InputMaybe<Scalars['ID']>;
-  name: Scalars['String'];
   profileId?: InputMaybe<Scalars['ID']>;
 };
 
@@ -1373,6 +1382,8 @@ export type Domain = {
    * The native skill ID is assigned to a domain from the contract on creation
    */
   nativeSkillId: Scalars['Int'];
+  /** The amount of reputation in the domain */
+  reputation?: Maybe<Scalars['String']>;
   updatedAt: Scalars['AWSDateTime'];
 };
 
@@ -1828,7 +1839,6 @@ export type ModelColonyActionConditionInput = {
   colonyId?: InputMaybe<ModelIdInput>;
   createdAt?: InputMaybe<ModelStringInput>;
   fromDomainId?: InputMaybe<ModelIdInput>;
-  fundamentalChainId?: InputMaybe<ModelIntInput>;
   individualEvents?: InputMaybe<ModelStringInput>;
   initiatorAddress?: InputMaybe<ModelIdInput>;
   isMotion?: InputMaybe<ModelBooleanInput>;
@@ -1837,6 +1847,7 @@ export type ModelColonyActionConditionInput = {
   newColonyVersion?: InputMaybe<ModelIntInput>;
   not?: InputMaybe<ModelColonyActionConditionInput>;
   or?: InputMaybe<Array<InputMaybe<ModelColonyActionConditionInput>>>;
+  paymentId?: InputMaybe<ModelIntInput>;
   pendingColonyMetadataId?: InputMaybe<ModelIdInput>;
   pendingDomainMetadataId?: InputMaybe<ModelIdInput>;
   recipientAddress?: InputMaybe<ModelIdInput>;
@@ -1862,7 +1873,6 @@ export type ModelColonyActionFilterInput = {
   colonyId?: InputMaybe<ModelIdInput>;
   createdAt?: InputMaybe<ModelStringInput>;
   fromDomainId?: InputMaybe<ModelIdInput>;
-  fundamentalChainId?: InputMaybe<ModelIntInput>;
   id?: InputMaybe<ModelIdInput>;
   individualEvents?: InputMaybe<ModelStringInput>;
   initiatorAddress?: InputMaybe<ModelIdInput>;
@@ -1872,6 +1882,7 @@ export type ModelColonyActionFilterInput = {
   newColonyVersion?: InputMaybe<ModelIntInput>;
   not?: InputMaybe<ModelColonyActionFilterInput>;
   or?: InputMaybe<Array<InputMaybe<ModelColonyActionFilterInput>>>;
+  paymentId?: InputMaybe<ModelIntInput>;
   pendingColonyMetadataId?: InputMaybe<ModelIdInput>;
   pendingDomainMetadataId?: InputMaybe<ModelIdInput>;
   recipientAddress?: InputMaybe<ModelIdInput>;
@@ -1893,6 +1904,7 @@ export type ModelColonyConditionInput = {
   nativeTokenId?: InputMaybe<ModelIdInput>;
   not?: InputMaybe<ModelColonyConditionInput>;
   or?: InputMaybe<Array<InputMaybe<ModelColonyConditionInput>>>;
+  reputation?: InputMaybe<ModelStringInput>;
   type?: InputMaybe<ModelColonyTypeInput>;
   version?: InputMaybe<ModelIntInput>;
 };
@@ -1981,6 +1993,7 @@ export type ModelColonyFilterInput = {
   nativeTokenId?: InputMaybe<ModelIdInput>;
   not?: InputMaybe<ModelColonyFilterInput>;
   or?: InputMaybe<Array<InputMaybe<ModelColonyFilterInput>>>;
+  reputation?: InputMaybe<ModelStringInput>;
   type?: InputMaybe<ModelColonyTypeInput>;
   version?: InputMaybe<ModelIntInput>;
 };
@@ -2330,6 +2343,7 @@ export type ModelDomainConditionInput = {
   nativeSkillId?: InputMaybe<ModelIntInput>;
   not?: InputMaybe<ModelDomainConditionInput>;
   or?: InputMaybe<Array<InputMaybe<ModelDomainConditionInput>>>;
+  reputation?: InputMaybe<ModelStringInput>;
 };
 
 export type ModelDomainConnection = {
@@ -2348,6 +2362,7 @@ export type ModelDomainFilterInput = {
   nativeSkillId?: InputMaybe<ModelIntInput>;
   not?: InputMaybe<ModelDomainFilterInput>;
   or?: InputMaybe<Array<InputMaybe<ModelDomainFilterInput>>>;
+  reputation?: InputMaybe<ModelStringInput>;
 };
 
 export type ModelDomainMetadataConditionInput = {
@@ -2559,6 +2574,7 @@ export type ModelProfileConditionInput = {
   avatar?: InputMaybe<ModelStringInput>;
   bio?: InputMaybe<ModelStringInput>;
   displayName?: InputMaybe<ModelStringInput>;
+  displayNameChanged?: InputMaybe<ModelStringInput>;
   email?: InputMaybe<ModelStringInput>;
   location?: InputMaybe<ModelStringInput>;
   not?: InputMaybe<ModelProfileConditionInput>;
@@ -2578,6 +2594,7 @@ export type ModelProfileFilterInput = {
   avatar?: InputMaybe<ModelStringInput>;
   bio?: InputMaybe<ModelStringInput>;
   displayName?: InputMaybe<ModelStringInput>;
+  displayNameChanged?: InputMaybe<ModelStringInput>;
   email?: InputMaybe<ModelStringInput>;
   id?: InputMaybe<ModelIdInput>;
   location?: InputMaybe<ModelStringInput>;
@@ -2712,7 +2729,6 @@ export type ModelSubscriptionColonyActionFilterInput = {
   colonyId?: InputMaybe<ModelSubscriptionIdInput>;
   createdAt?: InputMaybe<ModelSubscriptionStringInput>;
   fromDomainId?: InputMaybe<ModelSubscriptionIdInput>;
-  fundamentalChainId?: InputMaybe<ModelSubscriptionIntInput>;
   id?: InputMaybe<ModelSubscriptionIdInput>;
   individualEvents?: InputMaybe<ModelSubscriptionStringInput>;
   initiatorAddress?: InputMaybe<ModelSubscriptionIdInput>;
@@ -2721,6 +2737,7 @@ export type ModelSubscriptionColonyActionFilterInput = {
   motionId?: InputMaybe<ModelSubscriptionIdInput>;
   newColonyVersion?: InputMaybe<ModelSubscriptionIntInput>;
   or?: InputMaybe<Array<InputMaybe<ModelSubscriptionColonyActionFilterInput>>>;
+  paymentId?: InputMaybe<ModelSubscriptionIntInput>;
   pendingColonyMetadataId?: InputMaybe<ModelSubscriptionIdInput>;
   pendingDomainMetadataId?: InputMaybe<ModelSubscriptionIdInput>;
   recipientAddress?: InputMaybe<ModelSubscriptionIdInput>;
@@ -2773,6 +2790,7 @@ export type ModelSubscriptionColonyFilterInput = {
   name?: InputMaybe<ModelSubscriptionStringInput>;
   nativeTokenId?: InputMaybe<ModelSubscriptionIdInput>;
   or?: InputMaybe<Array<InputMaybe<ModelSubscriptionColonyFilterInput>>>;
+  reputation?: InputMaybe<ModelSubscriptionStringInput>;
   type?: InputMaybe<ModelSubscriptionStringInput>;
   version?: InputMaybe<ModelSubscriptionIntInput>;
 };
@@ -2927,6 +2945,7 @@ export type ModelSubscriptionDomainFilterInput = {
   nativeId?: InputMaybe<ModelSubscriptionIntInput>;
   nativeSkillId?: InputMaybe<ModelSubscriptionIntInput>;
   or?: InputMaybe<Array<InputMaybe<ModelSubscriptionDomainFilterInput>>>;
+  reputation?: InputMaybe<ModelSubscriptionStringInput>;
 };
 
 export type ModelSubscriptionDomainMetadataFilterInput = {
@@ -3039,6 +3058,7 @@ export type ModelSubscriptionProfileFilterInput = {
   avatar?: InputMaybe<ModelSubscriptionStringInput>;
   bio?: InputMaybe<ModelSubscriptionStringInput>;
   displayName?: InputMaybe<ModelSubscriptionStringInput>;
+  displayNameChanged?: InputMaybe<ModelSubscriptionStringInput>;
   email?: InputMaybe<ModelSubscriptionStringInput>;
   id?: InputMaybe<ModelSubscriptionIdInput>;
   location?: InputMaybe<ModelSubscriptionStringInput>;
@@ -3107,7 +3127,6 @@ export type ModelSubscriptionTokenFilterInput = {
 export type ModelSubscriptionUserFilterInput = {
   and?: InputMaybe<Array<InputMaybe<ModelSubscriptionUserFilterInput>>>;
   id?: InputMaybe<ModelSubscriptionIdInput>;
-  name?: InputMaybe<ModelSubscriptionStringInput>;
   or?: InputMaybe<Array<InputMaybe<ModelSubscriptionUserFilterInput>>>;
   profileId?: InputMaybe<ModelSubscriptionIdInput>;
 };
@@ -3172,7 +3191,6 @@ export type ModelTokenTypeInput = {
 
 export type ModelUserConditionInput = {
   and?: InputMaybe<Array<InputMaybe<ModelUserConditionInput>>>;
-  name?: InputMaybe<ModelStringInput>;
   not?: InputMaybe<ModelUserConditionInput>;
   or?: InputMaybe<Array<InputMaybe<ModelUserConditionInput>>>;
   profileId?: InputMaybe<ModelIdInput>;
@@ -3187,7 +3205,6 @@ export type ModelUserConnection = {
 export type ModelUserFilterInput = {
   and?: InputMaybe<Array<InputMaybe<ModelUserFilterInput>>>;
   id?: InputMaybe<ModelIdInput>;
-  name?: InputMaybe<ModelStringInput>;
   not?: InputMaybe<ModelUserFilterInput>;
   or?: InputMaybe<Array<InputMaybe<ModelUserFilterInput>>>;
   profileId?: InputMaybe<ModelIdInput>;
@@ -4048,6 +4065,19 @@ export enum Network {
   Mainnet = 'MAINNET',
 }
 
+export type Payment = {
+  __typename?: 'Payment';
+  amount: Scalars['String'];
+  recipientAddress: Scalars['String'];
+  tokenAddress: Scalars['String'];
+};
+
+export type PaymentInput = {
+  amount: Scalars['String'];
+  recipientAddress: Scalars['String'];
+  tokenAddress: Scalars['String'];
+};
+
 /** Colony token modifications that are stored temporarily and commited to the database once the corresponding motion passes */
 export type PendingModifiedTokenAddresses = {
   __typename?: 'PendingModifiedTokenAddresses';
@@ -4072,6 +4102,8 @@ export type Profile = {
   createdAt: Scalars['AWSDateTime'];
   /** Display name of the user */
   displayName?: Maybe<Scalars['String']>;
+  /** Date displayName was changed */
+  displayNameChanged?: Maybe<Scalars['AWSDateTime']>;
   /** User's email address */
   email?: Maybe<Scalars['AWSEmail']>;
   /** Unique identifier for the user's profile */
@@ -4083,6 +4115,8 @@ export type Profile = {
   /** URL of the user's thumbnail image */
   thumbnail?: Maybe<Scalars['String']>;
   updatedAt: Scalars['AWSDateTime'];
+  /** The user associated with this profile */
+  user: User;
   /** URL of the user's website */
   website?: Maybe<Scalars['AWSURL']>;
 };
@@ -4184,6 +4218,7 @@ export type Query = {
   getMotionTimeoutPeriods?: Maybe<GetMotionTimeoutPeriodsReturn>;
   getProfile?: Maybe<Profile>;
   getProfileByEmail?: Maybe<ModelProfileConnection>;
+  getProfileByUsername?: Maybe<ModelProfileConnection>;
   /** Retrieve a user's reputation within the top domains of a Colony */
   getReputationForTopDomains?: Maybe<GetReputationForTopDomainsReturn>;
   getSafeTransaction?: Maybe<SafeTransaction>;
@@ -4196,7 +4231,6 @@ export type Query = {
   getTokensByType?: Maybe<ModelTokenConnection>;
   getUser?: Maybe<User>;
   getUserByAddress?: Maybe<ModelUserConnection>;
-  getUserByName?: Maybe<ModelUserConnection>;
   /** Retrieve a user's reputation within a specific domain in a Colony */
   getUserReputation?: Maybe<Scalars['String']>;
   /** Retrieve a user's token balance for a specific token */
@@ -4540,6 +4574,15 @@ export type QueryGetProfileByEmailArgs = {
 };
 
 /** Root query type */
+export type QueryGetProfileByUsernameArgs = {
+  displayName: Scalars['String'];
+  filter?: InputMaybe<ModelProfileFilterInput>;
+  limit?: InputMaybe<Scalars['Int']>;
+  nextToken?: InputMaybe<Scalars['String']>;
+  sortDirection?: InputMaybe<ModelSortDirection>;
+};
+
+/** Root query type */
 export type QueryGetReputationForTopDomainsArgs = {
   input?: InputMaybe<GetReputationForTopDomainsInput>;
 };
@@ -4597,15 +4640,6 @@ export type QueryGetUserByAddressArgs = {
   filter?: InputMaybe<ModelUserFilterInput>;
   id: Scalars['ID'];
   limit?: InputMaybe<Scalars['Int']>;
-  nextToken?: InputMaybe<Scalars['String']>;
-  sortDirection?: InputMaybe<ModelSortDirection>;
-};
-
-/** Root query type */
-export type QueryGetUserByNameArgs = {
-  filter?: InputMaybe<ModelUserFilterInput>;
-  limit?: InputMaybe<Scalars['Int']>;
-  name: Scalars['String'];
   nextToken?: InputMaybe<Scalars['String']>;
   sortDirection?: InputMaybe<ModelSortDirection>;
 };
@@ -5485,7 +5519,6 @@ export type UpdateColonyActionInput = {
   colonyId?: InputMaybe<Scalars['ID']>;
   createdAt?: InputMaybe<Scalars['AWSDateTime']>;
   fromDomainId?: InputMaybe<Scalars['ID']>;
-  fundamentalChainId?: InputMaybe<Scalars['Int']>;
   id: Scalars['ID'];
   individualEvents?: InputMaybe<Scalars['String']>;
   initiatorAddress?: InputMaybe<Scalars['ID']>;
@@ -5493,6 +5526,8 @@ export type UpdateColonyActionInput = {
   motionDomainId?: InputMaybe<Scalars['Int']>;
   motionId?: InputMaybe<Scalars['ID']>;
   newColonyVersion?: InputMaybe<Scalars['Int']>;
+  paymentId?: InputMaybe<Scalars['Int']>;
+  payments?: InputMaybe<Array<PaymentInput>>;
   pendingColonyMetadataId?: InputMaybe<Scalars['ID']>;
   pendingDomainMetadataId?: InputMaybe<Scalars['ID']>;
   recipientAddress?: InputMaybe<Scalars['ID']>;
@@ -5562,6 +5597,7 @@ export type UpdateColonyInput = {
   motionsWithUnclaimedStakes?: InputMaybe<Array<ColonyUnclaimedStakeInput>>;
   name?: InputMaybe<Scalars['String']>;
   nativeTokenId?: InputMaybe<Scalars['ID']>;
+  reputation?: InputMaybe<Scalars['String']>;
   status?: InputMaybe<ColonyStatusInput>;
   type?: InputMaybe<ColonyType>;
   version?: InputMaybe<Scalars['Int']>;
@@ -5665,6 +5701,7 @@ export type UpdateDomainInput = {
   nativeFundingPotId?: InputMaybe<Scalars['Int']>;
   nativeId?: InputMaybe<Scalars['Int']>;
   nativeSkillId?: InputMaybe<Scalars['Int']>;
+  reputation?: InputMaybe<Scalars['String']>;
 };
 
 export type UpdateDomainMetadataInput = {
@@ -5743,6 +5780,7 @@ export type UpdateProfileInput = {
   avatar?: InputMaybe<Scalars['String']>;
   bio?: InputMaybe<Scalars['String']>;
   displayName?: InputMaybe<Scalars['String']>;
+  displayNameChanged?: InputMaybe<Scalars['AWSDateTime']>;
   email?: InputMaybe<Scalars['AWSEmail']>;
   id: Scalars['ID'];
   location?: InputMaybe<Scalars['String']>;
@@ -5788,7 +5826,6 @@ export type UpdateTokenInput = {
 
 export type UpdateUserInput = {
   id: Scalars['ID'];
-  name?: InputMaybe<Scalars['String']>;
   profileId?: InputMaybe<Scalars['ID']>;
 };
 
@@ -5810,8 +5847,6 @@ export type User = {
   createdAt: Scalars['AWSDateTime'];
   /** Unique identifier for the user (wallet address) */
   id: Scalars['ID'];
-  /** (Short) name of the user */
-  name: Scalars['String'];
   /** Profile information of the user */
   profile?: Maybe<Profile>;
   /** Profile ID associated with the user */

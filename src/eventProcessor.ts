@@ -7,7 +7,6 @@ import {
   handleColonyVersionAdded,
   handleTransfer,
   handleMintTokensAction,
-  handlePaymentAction,
   handleExtensionInstalled,
   handleExtensionAddedToNetwork,
   handleExtensionUninstalled,
@@ -47,6 +46,7 @@ import {
   handleExpenditureStakerPunished,
   handleMakeAbitraryTransactionAction,
   handleReputationMiningCycleComplete,
+  handleOneTxPaymentAction,
 } from './handlers';
 
 dotenv.config();
@@ -174,8 +174,8 @@ export default async (event: ContractEvent): Promise<void> => {
       return;
     }
 
-    case ContractEventsSignatures.PaymentAdded: {
-      await handlePaymentAction(event);
+    case ContractEventsSignatures.OneTxPaymentMade: {
+      await handleOneTxPaymentAction(event);
       return;
     }
 
