@@ -11,6 +11,7 @@ import { ContractEvent } from '~types';
 export const updateCancelledExpenditure = async (
   colonyAddress: string,
   event: ContractEvent,
+  isStakeForfeited?: boolean,
 ): Promise<void> => {
   const { expenditureId } = event.args;
   const convertedExpenditureId = toNumber(expenditureId);
@@ -28,6 +29,7 @@ export const updateCancelledExpenditure = async (
       input: {
         id: getExpenditureDatabaseId(colonyAddress, convertedExpenditureId),
         status: ExpenditureStatus.Cancelled,
+        isStakeForfeited,
       },
     },
   );
