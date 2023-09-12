@@ -1,6 +1,6 @@
 import { BigNumber } from 'ethers';
 import { TransactionDescription } from 'ethers/lib/utils';
-import { AnyVotingReputationClient } from '@colony/colony-js';
+import { AnyVotingReputationClient, Extension } from '@colony/colony-js';
 
 import { ColonyOperations, MotionVote } from '~types';
 import {
@@ -10,7 +10,6 @@ import {
   getExistingTokenAddresses,
   output,
   updateColonyTokens,
-  verbose,
 } from '~utils';
 import { query, mutate } from '~amplifyClient';
 import {
@@ -32,6 +31,7 @@ import {
   UpdateColonyMetadataDocument,
   UpdateDomainMetadataDocument,
 } from '~graphql';
+import { parseAction } from '../motionCreated/helpers';
 
 export const getStakerReward = async (
   motionId: string,
@@ -76,27 +76,6 @@ export const getStakerReward = async (
     },
     isClaimed: false,
   };
-};
-
-const getParsedActionFromMotion = async (
-  action: string,
-  colonyAddress: string,
-): Promise<TransactionDescription | undefined> => {
-  const colonyClient = await getCachedColonyClient(colonyAddress);
-
-  if (!colonyClient) {
-    return;
-  }
-
-  // We are only parsing this action in order to know if it's a add/edit domain motion. Therefore, we shouldn't need to try with any other client.
-  try {
-    return colonyClient.interface.parseTransaction({
-      data: action,
-    });
-  } catch {
-    verbose(`Unable to parse ${action} using colony client`);
-    return undefined;
-  }
 };
 
 const linkPendingDomainMetadataWithDomain = async (
@@ -290,7 +269,16 @@ export const linkPendingMetadata = async (
   colonyAddress: string,
   finalizedMotion: ColonyMotion,
 ): Promise<void> => {
-  const parsedAction = await getParsedActionFromMotion(action, colonyAddress);
+  const colonyClient = await getCachedColonyClient(colonyAddress);
+  const oneTxPaymentClient = await colonyClient?.getExtensionClient(
+    Extension.OneTxPayment,
+  );
+
+  if (!colonyClient || !oneTxPaymentClient) {
+    return;
+  }
+
+  const parsedAction = parseAction(action, [colonyClient, oneTxPaymentClient]);
 
   const isMotionAddingADomain =
     parsedAction?.name === ColonyOperations.AddDomain;
