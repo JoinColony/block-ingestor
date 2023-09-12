@@ -1056,6 +1056,7 @@ export type CreateExpenditureInput = {
   hasReclaimedStake?: InputMaybe<Scalars['Boolean']>;
   id?: InputMaybe<Scalars['ID']>;
   isStaged: Scalars['Boolean'];
+  isStakeForfeited?: InputMaybe<Scalars['Boolean']>;
   nativeDomainId: Scalars['Int'];
   nativeFundingPotId: Scalars['Int'];
   nativeId: Scalars['Int'];
@@ -1068,6 +1069,7 @@ export type CreateExpenditureMetadataInput = {
   fundFromDomainNativeId: Scalars['Int'];
   id?: InputMaybe<Scalars['ID']>;
   stages?: InputMaybe<Array<ExpenditureStageInput>>;
+  stakeAmount?: InputMaybe<Scalars['String']>;
   type: ExpenditureType;
 };
 
@@ -1434,6 +1436,8 @@ export type Expenditure = {
   hasReclaimedStake?: Maybe<Scalars['Boolean']>;
   id: Scalars['ID'];
   isStaged: Scalars['Boolean'];
+  /** Indicates if the creator's stake was forfeited when staked expenditure was cancelled */
+  isStakeForfeited?: Maybe<Scalars['Boolean']>;
   metadata?: Maybe<ExpenditureMetadata>;
   nativeDomainId: Scalars['Int'];
   nativeFundingPotId: Scalars['Int'];
@@ -1470,6 +1474,7 @@ export type ExpenditureMetadata = {
   fundFromDomainNativeId: Scalars['Int'];
   id: Scalars['ID'];
   stages?: Maybe<Array<ExpenditureStage>>;
+  stakeAmount?: Maybe<Scalars['String']>;
   type: ExpenditureType;
   updatedAt: Scalars['AWSDateTime'];
 };
@@ -2309,6 +2314,7 @@ export type ModelExpenditureConditionInput = {
   finalizedAt?: InputMaybe<ModelIntInput>;
   hasReclaimedStake?: InputMaybe<ModelBooleanInput>;
   isStaged?: InputMaybe<ModelBooleanInput>;
+  isStakeForfeited?: InputMaybe<ModelBooleanInput>;
   nativeDomainId?: InputMaybe<ModelIntInput>;
   nativeFundingPotId?: InputMaybe<ModelIntInput>;
   nativeId?: InputMaybe<ModelIntInput>;
@@ -2332,6 +2338,7 @@ export type ModelExpenditureFilterInput = {
   hasReclaimedStake?: InputMaybe<ModelBooleanInput>;
   id?: InputMaybe<ModelIdInput>;
   isStaged?: InputMaybe<ModelBooleanInput>;
+  isStakeForfeited?: InputMaybe<ModelBooleanInput>;
   nativeDomainId?: InputMaybe<ModelIntInput>;
   nativeFundingPotId?: InputMaybe<ModelIntInput>;
   nativeId?: InputMaybe<ModelIntInput>;
@@ -2346,6 +2353,7 @@ export type ModelExpenditureMetadataConditionInput = {
   fundFromDomainNativeId?: InputMaybe<ModelIntInput>;
   not?: InputMaybe<ModelExpenditureMetadataConditionInput>;
   or?: InputMaybe<Array<InputMaybe<ModelExpenditureMetadataConditionInput>>>;
+  stakeAmount?: InputMaybe<ModelStringInput>;
   type?: InputMaybe<ModelExpenditureTypeInput>;
 };
 
@@ -2361,6 +2369,7 @@ export type ModelExpenditureMetadataFilterInput = {
   id?: InputMaybe<ModelIdInput>;
   not?: InputMaybe<ModelExpenditureMetadataFilterInput>;
   or?: InputMaybe<Array<InputMaybe<ModelExpenditureMetadataFilterInput>>>;
+  stakeAmount?: InputMaybe<ModelStringInput>;
   type?: InputMaybe<ModelExpenditureTypeInput>;
 };
 
@@ -2812,6 +2821,7 @@ export type ModelSubscriptionExpenditureFilterInput = {
   hasReclaimedStake?: InputMaybe<ModelSubscriptionBooleanInput>;
   id?: InputMaybe<ModelSubscriptionIdInput>;
   isStaged?: InputMaybe<ModelSubscriptionBooleanInput>;
+  isStakeForfeited?: InputMaybe<ModelSubscriptionBooleanInput>;
   nativeDomainId?: InputMaybe<ModelSubscriptionIntInput>;
   nativeFundingPotId?: InputMaybe<ModelSubscriptionIntInput>;
   nativeId?: InputMaybe<ModelSubscriptionIntInput>;
@@ -2829,6 +2839,7 @@ export type ModelSubscriptionExpenditureMetadataFilterInput = {
   or?: InputMaybe<
     Array<InputMaybe<ModelSubscriptionExpenditureMetadataFilterInput>>
   >;
+  stakeAmount?: InputMaybe<ModelSubscriptionStringInput>;
   type?: InputMaybe<ModelSubscriptionStringInput>;
 };
 
@@ -5272,6 +5283,7 @@ export type UpdateExpenditureInput = {
   hasReclaimedStake?: InputMaybe<Scalars['Boolean']>;
   id: Scalars['ID'];
   isStaged?: InputMaybe<Scalars['Boolean']>;
+  isStakeForfeited?: InputMaybe<Scalars['Boolean']>;
   nativeDomainId?: InputMaybe<Scalars['Int']>;
   nativeFundingPotId?: InputMaybe<Scalars['Int']>;
   nativeId?: InputMaybe<Scalars['Int']>;
@@ -5284,6 +5296,7 @@ export type UpdateExpenditureMetadataInput = {
   fundFromDomainNativeId?: InputMaybe<Scalars['Int']>;
   id: Scalars['ID'];
   stages?: InputMaybe<Array<ExpenditureStageInput>>;
+  stakeAmount?: InputMaybe<Scalars['String']>;
   type?: InputMaybe<ExpenditureType>;
 };
 
