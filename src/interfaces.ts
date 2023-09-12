@@ -5,6 +5,7 @@ import {
   StakedExpenditureEvents__factory as StakedExpenditureEventsFactory,
   TokenEvents__factory as TokenEventsFactory,
   StagedExpenditureEvents__factory as StagedExpenditureEventsFactory,
+  OneTxPaymentEvents__factory as OneTxPaymentEventsFactory,
 } from '@colony/colony-js/events';
 import { Extension, getExtensionHash } from '@colony/colony-js';
 
@@ -63,6 +64,10 @@ const getInterfaceByExtensionHash = (
         constants.AddressZero,
         provider,
       ).interface;
+    }
+    case EventListenerType.OneTxPayment: {
+      return OneTxPaymentEventsFactory.connect(constants.AddressZero, provider)
+        .interface;
     }
     default: {
       return null;

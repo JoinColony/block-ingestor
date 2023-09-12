@@ -4,6 +4,7 @@ import {
   setupListenersForVotingReputation,
   setupListenersForStakedExpenditure,
   setupListenersForStagedExpenditure,
+  setupListenerForOneTxPayment,
 } from '~eventListeners';
 import networkClient from '~networkClient';
 import { ContractEvent } from '~types';
@@ -24,5 +25,7 @@ export default async (event: ContractEvent): Promise<void> => {
     setupListenersForStakedExpenditure(extensionAddress, colony, false);
   } else if (extensionHash === getExtensionHash(Extension.StagedExpenditure)) {
     setupListenersForStagedExpenditure(extensionAddress, colony);
+  } else if (extensionHash === getExtensionHash(Extension.OneTxPayment)) {
+    setupListenerForOneTxPayment(extensionAddress, colony);
   }
 };

@@ -14,13 +14,13 @@ import { ColonyActionType } from '~graphql';
 
 export default async (event: ContractEvent): Promise<void> => {
   const receipt = await provider.getTransactionReceipt(event.transactionHash);
-  const hasPaymentAddedEvent = receipt.logs.some((log) =>
-    log.topics.includes(utils.id(ContractEventsSignatures.PaymentAdded)),
+  const oneTxPaymentEvent = receipt.logs.some((log) =>
+    log.topics.includes(utils.id(ContractEventsSignatures.OneTxPaymentMade)),
   );
 
-  if (hasPaymentAddedEvent) {
+  if (oneTxPaymentEvent) {
     verbose(
-      'Not acting upon the ColonyFundsMovedBetweenFundingPots event as a PaymentAdded event was present in the same transaction',
+      'Not acting upon the ColonyFundsMovedBetweenFundingPots event as a OneTxPayment event was present in the same transaction',
     );
     return;
   }
