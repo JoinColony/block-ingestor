@@ -12,7 +12,10 @@ import {
   addVotingReputationParamsToDB,
   addStakedExpenditureParamsToDB,
 } from '~utils';
-import { setupMotionsListeners } from '~eventListeners';
+import {
+  setupListenersForStakedExpenditure,
+  setupMotionsListeners,
+} from '~eventListeners';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { contractAddress: extensionAddress } = event;
@@ -43,7 +46,7 @@ export default async (event: ContractEvent): Promise<void> => {
     setupMotionsListeners(extensionAddress, colonyAddress);
     await addVotingReputationParamsToDB(extensionAddress, colonyAddress);
   } else if (getExtensionHash(Extension.StakedExpenditure) === extensionHash) {
-    /* Store Staked Expenditure params in the DB */
+    setupListenersForStakedExpenditure(extensionAddress, colonyAddress, true);
     await addStakedExpenditureParamsToDB(extensionAddress, colonyAddress);
   }
 };
