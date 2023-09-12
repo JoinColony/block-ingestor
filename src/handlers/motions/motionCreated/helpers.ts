@@ -38,12 +38,10 @@ export interface SimpleTransactionDescription {
   name: ColonyOperations.SimpleDecision;
 }
 
-export const getParsedActionFromMotion = async (
+export const parseAction = (
   action: string,
-  clients: [AnyColonyClient, AnyOneTxPaymentClient],
-): Promise<
-  TransactionDescription | SimpleTransactionDescription | undefined
-> => {
+  clients: Array<AnyColonyClient | AnyOneTxPaymentClient>,
+): TransactionDescription | SimpleTransactionDescription | undefined => {
   if (action === SIMPLE_DECISIONS_ACTION_CODE) {
     return {
       name: ColonyOperations.SimpleDecision,

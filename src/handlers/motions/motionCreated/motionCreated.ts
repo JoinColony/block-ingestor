@@ -3,10 +3,7 @@ import { BigNumber, constants } from 'ethers';
 
 import { ColonyOperations, ContractEvent } from '~types';
 import { getCachedColonyClient, getVotingClient, verbose } from '~utils';
-import {
-  SimpleTransactionDescription,
-  getParsedActionFromMotion,
-} from './helpers';
+import { SimpleTransactionDescription, parseAction } from './helpers';
 import {
   handleManageDomainMotion,
   handleMintTokensMotion,
@@ -44,7 +41,7 @@ export default async (event: ContractEvent): Promise<void> => {
   );
 
   const motion = await votingReputationClient.getMotion(motionId);
-  const parsedAction = await getParsedActionFromMotion(motion.action, [
+  const parsedAction = parseAction(motion.action, [
     colonyClient,
     oneTxPaymentClient,
   ]);
