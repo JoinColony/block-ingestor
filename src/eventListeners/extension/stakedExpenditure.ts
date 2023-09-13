@@ -33,7 +33,7 @@ export const setupListenersForStakedExpenditure = (
       colonyAddress,
     );
     addExtensionEventListener(
-      ContractEventsSignatures.StakedExpenditureCancelled,
+      ContractEventsSignatures.ExpenditureCancelled,
       Extension.StakedExpenditure,
       stakedExpenditureAddress,
       colonyAddress,
