@@ -132,7 +132,10 @@ const createOrUpdateColonyExtension = async (
       CreateColonyExtensionMutation,
       CreateColonyExtensionMutationVariables
     >(CreateColonyExtensionDocument, {
-      input,
+      input: {
+        ...input,
+        id: extensionAddress,
+      },
     });
   } else {
     // Otherwise, update the exising extension
