@@ -6009,6 +6009,30 @@ export type ListExtensionsQuery = {
   } | null;
 };
 
+export type GetColonyExtensionByHashAndColonyQueryVariables = Exact<{
+  extensionHash: Scalars['String'];
+  colonyAddress: Scalars['ID'];
+}>;
+
+export type GetColonyExtensionByHashAndColonyQuery = {
+  __typename?: 'Query';
+  listColonyExtensions?: {
+    __typename?: 'ModelColonyExtensionConnection';
+    items: Array<{
+      __typename?: 'ColonyExtension';
+      id: string;
+      hash: string;
+      colonyId: string;
+      installedAt: any;
+      installedBy: string;
+      isDeleted: boolean;
+      isDeprecated: boolean;
+      isInitialized: boolean;
+      version: number;
+    } | null>;
+  } | null;
+};
+
 export type GetColonyUnclaimedFundsQueryVariables = Exact<{
   colonyAddress: Scalars['ID'];
   tokenAddress: Scalars['ID'];
@@ -6822,6 +6846,28 @@ export const ListExtensionsDocument = gql`
     }
   }
   ${Extension}
+`;
+export const GetColonyExtensionByHashAndColonyDocument = gql`
+  query GetColonyExtensionByHashAndColony(
+    $extensionHash: String!
+    $colonyAddress: ID!
+  ) {
+    listColonyExtensions(
+      filter: { hash: { eq: $extensionHash }, colonyId: { eq: $colonyAddress } }
+    ) {
+      items {
+        id
+        hash
+        colonyId
+        installedAt
+        installedBy
+        isDeleted
+        isDeprecated
+        isInitialized
+        version
+      }
+    }
+  }
 `;
 export const GetColonyUnclaimedFundsDocument = gql`
   query GetColonyUnclaimedFunds(

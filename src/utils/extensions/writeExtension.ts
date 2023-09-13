@@ -17,6 +17,9 @@ import {
   UpdateColonyExtensionByAddressDocument,
   UpdateColonyExtensionByAddressMutation,
   UpdateColonyExtensionByAddressMutationVariables,
+  GetColonyExtensionByHashAndColonyDocument,
+  GetColonyExtensionByHashAndColonyQuery,
+  GetColonyExtensionByHashAndColonyQueryVariables,
 } from '~graphql';
 
 /**
@@ -91,23 +94,32 @@ export const writeExtensionFromEvent = async (
 export const deleteExtensionFromEvent = async (
   event: ContractEvent,
 ): Promise<void> => {
-  const {
-    extensionId: extensionHash,
-    colony,
-    contractAddress: extensionAddress,
-  } = event.args;
+  const { extensionId: extensionHash, colony } = event.args;
 
   verbose('Extension:', extensionHash, 'uninstalled in Colony:', colony);
 
-  await mutate<
-    UpdateColonyExtensionByAddressMutation,
-    UpdateColonyExtensionByAddressMutationVariables
-  >(UpdateColonyExtensionByAddressDocument, {
-    input: {
-      id: extensionAddress,
-      isDeleted: true,
-    },
-  });
+  const { data } =
+    (await query<
+      GetColonyExtensionByHashAndColonyQuery,
+      GetColonyExtensionByHashAndColonyQueryVariables
+    >(GetColonyExtensionByHashAndColonyDocument, {
+      extensionHash,
+      colonyAddress: colony,
+    })) ?? {};
+
+  const extensionId = data?.listColonyExtensions?.items[0]?.id;
+
+  if (extensionId) {
+    await mutate<
+      UpdateColonyExtensionByAddressMutation,
+      UpdateColonyExtensionByAddressMutationVariables
+    >(UpdateColonyExtensionByAddressDocument, {
+      input: {
+        id: extensionId,
+        isDeleted: true,
+      },
+    });
+  }
 };
 
 const createOrUpdateColonyExtension = async (
