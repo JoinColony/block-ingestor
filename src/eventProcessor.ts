@@ -44,7 +44,6 @@ import {
   handleStakeReclaimed,
   handleExpenditureMadeStaged,
   handleStagedPaymentReleased,
-  handleStakedExpenditureCancelled,
   handleExpenditureStakerPunished,
 } from './handlers';
 
@@ -285,11 +284,6 @@ export default async (event: ContractEvent): Promise<void> => {
 
     case ContractEventsSignatures.StakeReclaimed: {
       await handleStakeReclaimed(event);
-      return;
-    }
-
-    case ContractEventsSignatures.StakedExpenditureCancelled: {
-      await handleStakedExpenditureCancelled(event);
       return;
     }
 
