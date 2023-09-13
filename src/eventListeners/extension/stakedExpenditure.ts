@@ -38,6 +38,12 @@ export const setupListenersForStakedExpenditure = (
       stakedExpenditureAddress,
       colonyAddress,
     );
+    addExtensionEventListener(
+      ContractEventsSignatures.ExpenditureStakerPunished,
+      Extension.StakedExpenditure,
+      stakedExpenditureAddress,
+      colonyAddress,
+    );
   } else {
     addExtensionEventListener(
       ContractEventsSignatures.ExtensionInitialised,
