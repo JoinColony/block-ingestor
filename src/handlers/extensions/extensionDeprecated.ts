@@ -30,7 +30,7 @@ export default async (event: ContractEvent): Promise<void> => {
       colonyAddress: colony,
     })) ?? {};
 
-  const extensionId = data?.listColonyExtensions?.items[0]?.id;
+  const extensionId = data?.getExtensionByColonyAndHash?.items[0]?.id;
 
   if (extensionId) {
     await mutate<
@@ -39,8 +39,6 @@ export default async (event: ContractEvent): Promise<void> => {
     >(UpdateColonyExtensionByAddressDocument, {
       input: {
         id: extensionId,
-        colonyId: colony,
-        hash: extensionHash,
         isDeprecated: deprecated,
       },
     });

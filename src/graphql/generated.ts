@@ -6010,26 +6010,15 @@ export type ListExtensionsQuery = {
 };
 
 export type GetColonyExtensionByHashAndColonyQueryVariables = Exact<{
-  extensionHash: Scalars['String'];
   colonyAddress: Scalars['ID'];
+  extensionHash: Scalars['String'];
 }>;
 
 export type GetColonyExtensionByHashAndColonyQuery = {
   __typename?: 'Query';
-  listColonyExtensions?: {
+  getExtensionByColonyAndHash?: {
     __typename?: 'ModelColonyExtensionConnection';
-    items: Array<{
-      __typename?: 'ColonyExtension';
-      id: string;
-      hash: string;
-      colonyId: string;
-      installedAt: any;
-      installedBy: string;
-      isDeleted: boolean;
-      isDeprecated: boolean;
-      isInitialized: boolean;
-      version: number;
-    } | null>;
+    items: Array<{ __typename?: 'ColonyExtension'; id: string } | null>;
   } | null;
 };
 
@@ -6849,22 +6838,15 @@ export const ListExtensionsDocument = gql`
 `;
 export const GetColonyExtensionByHashAndColonyDocument = gql`
   query GetColonyExtensionByHashAndColony(
-    $extensionHash: String!
     $colonyAddress: ID!
+    $extensionHash: String!
   ) {
-    listColonyExtensions(
-      filter: { hash: { eq: $extensionHash }, colonyId: { eq: $colonyAddress } }
+    getExtensionByColonyAndHash(
+      colonyId: $colonyAddress
+      hash: { eq: $extensionHash }
     ) {
       items {
         id
-        hash
-        colonyId
-        installedAt
-        installedBy
-        isDeleted
-        isDeprecated
-        isInitialized
-        version
       }
     }
   }

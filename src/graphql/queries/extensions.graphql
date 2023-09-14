@@ -37,18 +37,13 @@ query ListExtensions($hash: String!, $nextToken: String) {
   }
 }
 
-query GetColonyExtensionByHashAndColony($extensionHash: String!, $colonyAddress: ID!) {
-  listColonyExtensions(filter: {hash: {eq: $extensionHash}, colonyId: {eq: $colonyAddress}}) {
+query GetColonyExtensionByHashAndColony($colonyAddress: ID!, $extensionHash: String!) {
+  getExtensionByColonyAndHash(
+    colonyId: $colonyAddress
+    hash: { eq: $extensionHash }
+  ) {
     items {
       id
-      hash
-      colonyId
-      installedAt
-      installedBy
-      isDeleted
-      isDeprecated
-      isInitialized
-      version
     }
   }
 }

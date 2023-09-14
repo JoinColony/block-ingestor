@@ -20,6 +20,7 @@ import {
   GetColonyExtensionByHashAndColonyDocument,
   GetColonyExtensionByHashAndColonyQuery,
   GetColonyExtensionByHashAndColonyQueryVariables,
+  CreateColonyExtensionInput,
 } from '~graphql';
 
 /**
@@ -107,7 +108,7 @@ export const deleteExtensionFromEvent = async (
       colonyAddress: colony,
     })) ?? {};
 
-  const extensionId = data?.listColonyExtensions?.items[0]?.id;
+  const extensionId = data?.getExtensionByColonyAndHash?.items[0]?.id;
 
   if (extensionId) {
     await mutate<
@@ -123,7 +124,7 @@ export const deleteExtensionFromEvent = async (
 };
 
 const createOrUpdateColonyExtension = async (
-  input: CreateColonyExtensionMutationVariables['input'],
+  input: CreateColonyExtensionInput,
   extensionAddress: string,
 ): Promise<void> => {
   const { isDeprecated, isDeleted, isInitialized, version } = input;
@@ -150,7 +151,7 @@ const createOrUpdateColonyExtension = async (
       },
     });
   } else {
-    // Otherwise, update the exising extension
+    // Otherwise, update the existing extension
     await mutate<
       UpdateColonyExtensionByAddressMutation,
       UpdateColonyExtensionByAddressMutationVariables
