@@ -36,3 +36,14 @@ query ListExtensions($hash: String!, $nextToken: String) {
     }
   }
 }
+
+query GetColonyExtensionByHashAndColony($colonyAddress: ID!, $extensionHash: String!) {
+  getExtensionByColonyAndHash(
+    colonyId: $colonyAddress
+    hash: { eq: $extensionHash }
+  ) {
+    items {
+      id
+    }
+  }
+}

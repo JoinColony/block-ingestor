@@ -1,8 +1,11 @@
-import { mutate } from '~amplifyClient';
+import { mutate, query } from '~amplifyClient';
 import {
-  UpdateColonyExtensionByColonyAndHashDocument,
-  UpdateColonyExtensionByColonyAndHashMutation,
-  UpdateColonyExtensionByColonyAndHashMutationVariables,
+  GetColonyExtensionByHashAndColonyDocument,
+  GetColonyExtensionByHashAndColonyQuery,
+  GetColonyExtensionByHashAndColonyQueryVariables,
+  UpdateColonyExtensionByAddressDocument,
+  UpdateColonyExtensionByAddressMutation,
+  UpdateColonyExtensionByAddressMutationVariables,
 } from '~graphql';
 import { ContractEvent } from '~types';
 import { verbose } from '~utils';
@@ -18,14 +21,26 @@ export default async (event: ContractEvent): Promise<void> => {
     colony,
   );
 
-  await mutate<
-    UpdateColonyExtensionByColonyAndHashMutation,
-    UpdateColonyExtensionByColonyAndHashMutationVariables
-  >(UpdateColonyExtensionByColonyAndHashDocument, {
-    input: {
-      colonyId: colony,
-      hash: extensionHash,
-      isDeprecated: deprecated,
-    },
-  });
+  const { data } =
+    (await query<
+      GetColonyExtensionByHashAndColonyQuery,
+      GetColonyExtensionByHashAndColonyQueryVariables
+    >(GetColonyExtensionByHashAndColonyDocument, {
+      extensionHash,
+      colonyAddress: colony,
+    })) ?? {};
+
+  const extensionId = data?.getExtensionByColonyAndHash?.items[0]?.id;
+
+  if (extensionId) {
+    await mutate<
+      UpdateColonyExtensionByAddressMutation,
+      UpdateColonyExtensionByAddressMutationVariables
+    >(UpdateColonyExtensionByAddressDocument, {
+      input: {
+        id: extensionId,
+        isDeprecated: deprecated,
+      },
+    });
+  }
 };

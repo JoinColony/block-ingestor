@@ -1,19 +1,26 @@
 import { constants } from 'ethers';
 
 import networkClient from '~networkClient';
-import { mutate } from '~amplifyClient';
+import { mutate, query } from '~amplifyClient';
 import { ContractEvent } from '~types';
 import { verbose, toNumber } from '~utils';
 import {
   CreateColonyExtensionDocument,
   CreateColonyExtensionMutation,
   CreateColonyExtensionMutationVariables,
+  GetColonyExtensionQuery,
+  GetColonyExtensionQueryVariables,
+  GetColonyExtensionDocument,
   SetCurrentVersionDocument,
   SetCurrentVersionMutation,
   SetCurrentVersionMutationVariables,
-  UpdateColonyExtensionByColonyAndHashDocument,
-  UpdateColonyExtensionByColonyAndHashMutation,
-  UpdateColonyExtensionByColonyAndHashMutationVariables,
+  UpdateColonyExtensionByAddressDocument,
+  UpdateColonyExtensionByAddressMutation,
+  UpdateColonyExtensionByAddressMutationVariables,
+  GetColonyExtensionByHashAndColonyDocument,
+  GetColonyExtensionByHashAndColonyQuery,
+  GetColonyExtensionByHashAndColonyQueryVariables,
+  CreateColonyExtensionInput,
 } from '~graphql';
 
 /**
@@ -46,8 +53,6 @@ export const writeExtensionVersionFromEvent = async (
 /**
  * Function extracting installed extension details from the event and writing it to the database
  * @param overrideVersion If set, it will be used instead of the version in the event arguments
- * @param shouldUpsert If true, the function will call updateExtensionByColonyAndHash mutation
- * instead of createColonyExtension
  */
 export const writeExtensionFromEvent = async (
   event: ContractEvent,
@@ -55,7 +60,6 @@ export const writeExtensionFromEvent = async (
   overrideVersion?: number,
   isDeprecated?: boolean,
   isInitialised?: boolean,
-  shouldUpsert?: boolean,
 ): Promise<void> => {
   const { transactionHash, timestamp } = event;
   const { extensionId: extensionHash, colony, version } = event.args;
@@ -85,24 +89,7 @@ export const writeExtensionFromEvent = async (
     isInitialized: !!isInitialised,
   };
 
-  if (shouldUpsert) {
-    await mutate<
-      UpdateColonyExtensionByColonyAndHashMutation,
-      UpdateColonyExtensionByColonyAndHashMutationVariables
-    >(UpdateColonyExtensionByColonyAndHashDocument, {
-      input,
-    });
-  } else {
-    await mutate<
-      CreateColonyExtensionMutation,
-      CreateColonyExtensionMutationVariables
-    >(CreateColonyExtensionDocument, {
-      input: {
-        id: extensionAddress,
-        ...input,
-      },
-    });
-  }
+  await createOrUpdateColonyExtension(input, extensionAddress);
 };
 
 export const deleteExtensionFromEvent = async (
@@ -112,14 +99,70 @@ export const deleteExtensionFromEvent = async (
 
   verbose('Extension:', extensionHash, 'uninstalled in Colony:', colony);
 
-  await mutate<
-    UpdateColonyExtensionByColonyAndHashMutation,
-    UpdateColonyExtensionByColonyAndHashMutationVariables
-  >(UpdateColonyExtensionByColonyAndHashDocument, {
-    input: {
-      colonyId: colony,
-      hash: extensionHash,
-      isDeleted: true,
-    },
-  });
+  const { data } =
+    (await query<
+      GetColonyExtensionByHashAndColonyQuery,
+      GetColonyExtensionByHashAndColonyQueryVariables
+    >(GetColonyExtensionByHashAndColonyDocument, {
+      extensionHash,
+      colonyAddress: colony,
+    })) ?? {};
+
+  const extensionId = data?.getExtensionByColonyAndHash?.items[0]?.id;
+
+  if (extensionId) {
+    await mutate<
+      UpdateColonyExtensionByAddressMutation,
+      UpdateColonyExtensionByAddressMutationVariables
+    >(UpdateColonyExtensionByAddressDocument, {
+      input: {
+        id: extensionId,
+        isDeleted: true,
+      },
+    });
+  }
+};
+
+const createOrUpdateColonyExtension = async (
+  input: CreateColonyExtensionInput,
+  extensionAddress: string,
+): Promise<void> => {
+  const { isDeprecated, isDeleted, isInitialized, version } = input;
+
+  const { data } =
+    (await query<GetColonyExtensionQuery, GetColonyExtensionQueryVariables>(
+      GetColonyExtensionDocument,
+      {
+        id: extensionAddress,
+      },
+    )) ?? {};
+
+  const extension = data?.getColonyExtension?.colonyId;
+
+  // If extension record doesn't exist, try to create one
+  if (!extension) {
+    await mutate<
+      CreateColonyExtensionMutation,
+      CreateColonyExtensionMutationVariables
+    >(CreateColonyExtensionDocument, {
+      input: {
+        ...input,
+        id: extensionAddress,
+      },
+    });
+  } else {
+    // Otherwise, update the existing extension
+    await mutate<
+      UpdateColonyExtensionByAddressMutation,
+      UpdateColonyExtensionByAddressMutationVariables
+    >(UpdateColonyExtensionByAddressDocument, {
+      input: {
+        id: extensionAddress,
+        isDeprecated,
+        isDeleted,
+        isInitialized,
+        version,
+      },
+    });
+  }
 };

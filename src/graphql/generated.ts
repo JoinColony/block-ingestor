@@ -40,18 +40,8 @@ export type Annotation = {
   ipfsHash?: Maybe<Scalars['String']>;
   /** The actual annotation message */
   message: Scalars['String'];
-  /** The type of annotation, i.e. whether it's following a particular format (e.g. HTML) */
-  type: AnnotationType;
   updatedAt: Scalars['AWSDateTime'];
 };
-
-/** Specifies the type of annotation */
-export enum AnnotationType {
-  /** Annotation is an HTML string */
-  Html = 'html',
-  /** Annotation is a plain string */
-  Plain = 'plain',
-}
 
 /**
  * Represents metadata related to a blockchain event
@@ -846,7 +836,6 @@ export type CreateAnnotationInput = {
   id?: InputMaybe<Scalars['ID']>;
   ipfsHash?: InputMaybe<Scalars['String']>;
   message: Scalars['String'];
-  type: AnnotationType;
 };
 
 export type CreateColonyActionInput = {
@@ -1624,7 +1613,6 @@ export type ModelAnnotationConditionInput = {
   message?: InputMaybe<ModelStringInput>;
   not?: InputMaybe<ModelAnnotationConditionInput>;
   or?: InputMaybe<Array<InputMaybe<ModelAnnotationConditionInput>>>;
-  type?: InputMaybe<ModelAnnotationTypeInput>;
 };
 
 export type ModelAnnotationConnection = {
@@ -1641,12 +1629,6 @@ export type ModelAnnotationFilterInput = {
   message?: InputMaybe<ModelStringInput>;
   not?: InputMaybe<ModelAnnotationFilterInput>;
   or?: InputMaybe<Array<InputMaybe<ModelAnnotationFilterInput>>>;
-  type?: InputMaybe<ModelAnnotationTypeInput>;
-};
-
-export type ModelAnnotationTypeInput = {
-  eq?: InputMaybe<AnnotationType>;
-  ne?: InputMaybe<AnnotationType>;
 };
 
 export enum ModelAttributeTypes {
@@ -2438,7 +2420,6 @@ export type ModelSubscriptionAnnotationFilterInput = {
   ipfsHash?: InputMaybe<ModelSubscriptionStringInput>;
   message?: InputMaybe<ModelSubscriptionStringInput>;
   or?: InputMaybe<Array<InputMaybe<ModelSubscriptionAnnotationFilterInput>>>;
-  type?: InputMaybe<ModelSubscriptionStringInput>;
 };
 
 export type ModelSubscriptionBooleanInput = {
@@ -3113,11 +3094,6 @@ export type Mutation = {
   updateDomain?: Maybe<Domain>;
   updateDomainMetadata?: Maybe<DomainMetadata>;
   updateExpenditure?: Maybe<Expenditure>;
-  /**
-   * Update an extension's details for a specific Colony
-   * The extension hash is generated like so: `keccak256(toUtf8Bytes(extensionName))`, where `extensionName` is the name of the extension contract file in the Colony Network (e.g. `VotingReputation`)
-   */
-  updateExtensionByColonyAndHash?: Maybe<ColonyExtension>;
   updateIngestorStats?: Maybe<IngestorStats>;
   updateMotionMessage?: Maybe<MotionMessage>;
   updateProfile?: Maybe<Profile>;
@@ -3548,11 +3524,6 @@ export type MutationUpdateDomainMetadataArgs = {
 export type MutationUpdateExpenditureArgs = {
   condition?: InputMaybe<ModelExpenditureConditionInput>;
   input: UpdateExpenditureInput;
-};
-
-/** Root mutation type */
-export type MutationUpdateExtensionByColonyAndHashArgs = {
-  input?: InputMaybe<UpdateExtensionByColonyAndHashInput>;
 };
 
 /** Root mutation type */
@@ -4846,7 +4817,6 @@ export type UpdateAnnotationInput = {
   id: Scalars['ID'];
   ipfsHash?: InputMaybe<Scalars['String']>;
   message?: InputMaybe<Scalars['String']>;
-  type?: InputMaybe<AnnotationType>;
 };
 
 export type UpdateColonyActionInput = {
@@ -5611,18 +5581,6 @@ export type CreateColonyExtensionMutation = {
   createColonyExtension?: { __typename?: 'ColonyExtension'; id: string } | null;
 };
 
-export type UpdateColonyExtensionByColonyAndHashMutationVariables = Exact<{
-  input: UpdateExtensionByColonyAndHashInput;
-}>;
-
-export type UpdateColonyExtensionByColonyAndHashMutation = {
-  __typename?: 'Mutation';
-  updateExtensionByColonyAndHash?: {
-    __typename?: 'ColonyExtension';
-    id: string;
-  } | null;
-};
-
 export type UpdateColonyExtensionByAddressMutationVariables = Exact<{
   input: UpdateColonyExtensionInput;
 }>;
@@ -6048,6 +6006,19 @@ export type ListExtensionsQuery = {
       colonyId: string;
       isInitialized: boolean;
     } | null>;
+  } | null;
+};
+
+export type GetColonyExtensionByHashAndColonyQueryVariables = Exact<{
+  colonyAddress: Scalars['ID'];
+  extensionHash: Scalars['String'];
+}>;
+
+export type GetColonyExtensionByHashAndColonyQuery = {
+  __typename?: 'Query';
+  getExtensionByColonyAndHash?: {
+    __typename?: 'ModelColonyExtensionConnection';
+    items: Array<{ __typename?: 'ColonyExtension'; id: string } | null>;
   } | null;
 };
 
@@ -6537,15 +6508,6 @@ export const CreateColonyExtensionDocument = gql`
     }
   }
 `;
-export const UpdateColonyExtensionByColonyAndHashDocument = gql`
-  mutation UpdateColonyExtensionByColonyAndHash(
-    $input: UpdateExtensionByColonyAndHashInput!
-  ) {
-    updateExtensionByColonyAndHash(input: $input) {
-      id
-    }
-  }
-`;
 export const UpdateColonyExtensionByAddressDocument = gql`
   mutation UpdateColonyExtensionByAddress($input: UpdateColonyExtensionInput!) {
     updateColonyExtension(input: $input) {
@@ -6873,6 +6835,21 @@ export const ListExtensionsDocument = gql`
     }
   }
   ${Extension}
+`;
+export const GetColonyExtensionByHashAndColonyDocument = gql`
+  query GetColonyExtensionByHashAndColony(
+    $colonyAddress: ID!
+    $extensionHash: String!
+  ) {
+    getExtensionByColonyAndHash(
+      colonyId: $colonyAddress
+      hash: { eq: $extensionHash }
+    ) {
+      items {
+        id
+      }
+    }
+  }
 `;
 export const GetColonyUnclaimedFundsDocument = gql`
   query GetColonyUnclaimedFunds(
