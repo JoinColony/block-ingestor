@@ -1,10 +1,14 @@
+import { BigNumber } from 'ethers';
+
 import { ContractEvent, motionNameMapping } from '~types';
-import { SimpleTransactionDescription, createMotionInDB } from '../helpers';
 import { getColonyDecisionId } from '~utils/decisions';
+
+import { SimpleTransactionDescription, createMotionInDB } from '../helpers';
 
 export const handleSimpleDecisionMotion = async (
   event: ContractEvent,
   parsedAction: SimpleTransactionDescription,
+  gasEstimate: BigNumber,
 ): Promise<void> => {
   const { colonyAddress, transactionHash } = event;
   if (!colonyAddress) {
@@ -16,5 +20,6 @@ export const handleSimpleDecisionMotion = async (
   await createMotionInDB(event, {
     type: motionNameMapping[name],
     colonyDecisionId: getColonyDecisionId(colonyAddress, transactionHash),
+    gasEstimate: gasEstimate.toString(),
   });
 };

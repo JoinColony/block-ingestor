@@ -149,6 +149,7 @@ export default async (event: ContractEvent): Promise<void> => {
         await handleSimpleDecisionMotion(
           event,
           parsedAction as SimpleTransactionDescription,
+          gasEstimate,
         );
         break;
       }
