@@ -3267,11 +3267,6 @@ export type Mutation = {
   updateDomainMetadata?: Maybe<DomainMetadata>;
   updateExpenditure?: Maybe<Expenditure>;
   updateExpenditureMetadata?: Maybe<ExpenditureMetadata>;
-  /**
-   * Update an extension's details for a specific Colony
-   * The extension hash is generated like so: `keccak256(toUtf8Bytes(extensionName))`, where `extensionName` is the name of the extension contract file in the Colony Network (e.g. `VotingReputation`)
-   */
-  updateExtensionByColonyAndHash?: Maybe<ColonyExtension>;
   updateIngestorStats?: Maybe<IngestorStats>;
   updateMotionMessage?: Maybe<MotionMessage>;
   updateProfile?: Maybe<Profile>;
@@ -3723,11 +3718,6 @@ export type MutationUpdateExpenditureMetadataArgs = {
 };
 
 /** Root mutation type */
-export type MutationUpdateExtensionByColonyAndHashArgs = {
-  input?: InputMaybe<UpdateExtensionByColonyAndHashInput>;
-};
-
-/** Root mutation type */
 export type MutationUpdateIngestorStatsArgs = {
   condition?: InputMaybe<ModelIngestorStatsConditionInput>;
   input: UpdateIngestorStatsInput;
@@ -3875,14 +3865,26 @@ export type ProfileInput = {
 /** Represents metadata for a user's profile. Mostly user specific settings */
 export type ProfileMetadata = {
   __typename?: 'ProfileMetadata';
+  /** The URL of the user's custom RPC node */
+  customRpc?: Maybe<Scalars['String']>;
+  /** A flag to indicate whether the user has enabled the decentralized mode */
+  decentralizedModeEnabled?: Maybe<Scalars['Boolean']>;
   /** List of email permissions for the user */
   emailPermissions: Array<Scalars['String']>;
+  /** A flag to indicate whether the user has enabled metatransactions */
+  metatransactionsEnabled?: Maybe<Scalars['Boolean']>;
 };
 
 /** Input data for a user's profile metadata */
 export type ProfileMetadataInput = {
+  /** The URL of the user's custom RPC node */
+  customRpc?: InputMaybe<Scalars['String']>;
+  /** A flag to indicate whether the user has enabled the decentralized mode */
+  decentralizedModeEnabled?: InputMaybe<Scalars['Boolean']>;
   /** List of email permissions for the user */
   emailPermissions: Array<Scalars['String']>;
+  /** A flag to indicate whether the user has enabled metatransactions */
+  metatransactionsEnabled?: InputMaybe<Scalars['Boolean']>;
 };
 
 /** Root query type */
