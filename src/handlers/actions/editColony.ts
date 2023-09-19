@@ -8,6 +8,7 @@ export default async (event: ContractEvent): Promise<void> => {
   const { contractAddress: colonyAddress } = event;
   const { agent: initiatorAddress } = event.args;
 
+  console.log('EDITING COLONY');
   await writeActionFromEvent(event, colonyAddress, {
     type: ColonyActionType.ColonyEdit,
     initiatorAddress,
