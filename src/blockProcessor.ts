@@ -32,7 +32,8 @@ export const processNextBlock = async (): Promise<void> => {
 
     const block = blocksMap.get(currentBlockNumber);
     if (!block) {
-      return;
+      output(`Could not find block ${currentBlockNumber} in the queue.`);
+      break;
     }
 
     // Get logs contained in the current block
@@ -73,6 +74,7 @@ export const processNextBlock = async (): Promise<void> => {
       }
 
       // Call the processor in a blocking way to ensure events get processed sequentially
+      console.log({ event });
       await eventProcessor(event);
     }
 
