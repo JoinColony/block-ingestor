@@ -4,6 +4,7 @@ import { TransactionDescription } from 'ethers/lib/utils';
 import {
   AnyColonyClient,
   AnyOneTxPaymentClient,
+  AnyStakedExpenditureClient,
   AnyVotingReputationClient,
 } from '@colony/colony-js';
 
@@ -38,9 +39,15 @@ export interface SimpleTransactionDescription {
   name: ColonyOperations.SimpleDecision;
 }
 
+type MotionActionClients = [
+  AnyColonyClient,
+  AnyOneTxPaymentClient,
+  AnyStakedExpenditureClient,
+];
+
 export const getParsedActionFromMotion = async (
   action: string,
-  clients: [AnyColonyClient, AnyOneTxPaymentClient],
+  clients: MotionActionClients,
 ): Promise<
   TransactionDescription | SimpleTransactionDescription | undefined
 > => {
@@ -64,6 +71,7 @@ export const getParsedActionFromMotion = async (
   verbose(`Unable to parse ${action}`);
   return undefined;
 };
+
 interface GetMotionDataArgs {
   transactionHash: string;
   motionId: BigNumber;
