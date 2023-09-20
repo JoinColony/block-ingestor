@@ -10,3 +10,4 @@ export { handleSetUserRolesMotion } from './setUserRoles';
 export { handleSimpleDecisionMotion } from './simpleDecision';
 export { handleMulticallMotion } from './multicall';
 export { handleMakeArbitraryTransactionsMotion } from './makeArbitraryTransactions';
+export * from './expenditures';

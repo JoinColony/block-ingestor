@@ -1,9 +1,9 @@
 import { BigNumber } from 'ethers';
 import { TransactionDescription } from 'ethers/lib/utils';
-
 import {
   AnyColonyClient,
   AnyOneTxPaymentClient,
+  AnyStakedExpenditureClient,
   AnyVotingReputationClient,
 } from '@colony/colony-js';
 
@@ -38,9 +38,15 @@ export interface SimpleTransactionDescription {
   name: ColonyOperations.SimpleDecision;
 }
 
+type MotionActionClients = [
+  AnyColonyClient,
+  AnyOneTxPaymentClient,
+  AnyStakedExpenditureClient,
+];
+
 export const parseAction = (
   action: string,
-  clients: Array<AnyColonyClient | AnyOneTxPaymentClient>,
+  clients: MotionActionClients,
 ): TransactionDescription | SimpleTransactionDescription | undefined => {
   if (action === SIMPLE_DECISIONS_ACTION_CODE) {
     return {
@@ -62,6 +68,7 @@ export const parseAction = (
   verbose(`Unable to parse ${action}`);
   return undefined;
 };
+
 interface GetMotionDataArgs {
   transactionHash: string;
   motionId: BigNumber;
@@ -198,6 +205,7 @@ const createMotionMessage = async (
     },
   });
 };
+
 const createColonyAction = async (
   actionData: CreateColonyActionInput,
 ): Promise<void> => {
