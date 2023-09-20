@@ -49,8 +49,11 @@ export const moveFundsBetweenPotsMulti = async ({
    * associated a funding motion with the expenditure, we don't need to do it again.
    */
   const existingFundMotions = new Set(
-    expenditure?.fundingMotions?.items
+    expenditure?.motions?.items
       ?.filter(notNull)
+      .filter(
+        ({ action }) => action?.type === ColonyActionType.FundExpenditureMotion,
+      )
       .map(({ transactionHash }) => transactionHash) ?? [],
   );
 
