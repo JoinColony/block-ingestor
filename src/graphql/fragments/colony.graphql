@@ -17,4 +17,12 @@ fragment Colony on Colony {
       isClaimed
     }
   }
+  # Idea is to get all domains in one query, but we'll take the nextToken just in case
+  domains(limit: 1000, nextToken: $nextToken) {
+    items {
+      id
+      nativeSkillId
+    }
+    nextToken
+  }
 }
