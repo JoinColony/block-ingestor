@@ -20,11 +20,11 @@ import {
   UpdateColonyRoleDocument,
   ColonyActionType,
 } from '~graphql';
+import provider from '~provider';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { args, contractAddress, blockNumber, transactionHash } = event;
   const {
-    agent,
     user: targetAddress,
     /*
      * RecoveryRoleSet doesn't have a `domainId` value inside the it's event args
@@ -33,6 +33,7 @@ export default async (event: ContractEvent): Promise<void> => {
      */
     domainId = BigNumber.from(1),
   } = args;
+  let { agent } = args;
 
   const id = getColonyRolesDatabaseId(
     contractAddress,
@@ -76,6 +77,15 @@ export default async (event: ContractEvent): Promise<void> => {
      * but it just adds more travel time which is wasted)
      */
     if (blockNumber > existingColonyRoleLatestBlock) {
+      // No agent means the recovery role was set and is the first to be processed in the block.
+      // We can get the msg.sender from the transaction receipt.
+
+      if (!agent) {
+        const { from = '' } = await provider.getTransactionReceipt(
+          transactionHash,
+        );
+        agent = from;
+      }
       const allRoleEventsUpdates = await getAllRoleEventsFromTransaction(
         transactionHash,
         contractAddress,
