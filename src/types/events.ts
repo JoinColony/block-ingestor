@@ -81,6 +81,7 @@ export enum ContractEventsSignatures {
   // Staked Expenditures
   StakeReclaimed = 'StakeReclaimed(uint256)',
   ExpenditureStakerPunished = 'ExpenditureStakerPunished(address,uint256,bool)',
+  ExpenditureMadeViaStake = 'ExpenditureMadeViaStake(address,uint256,uint256)',
 
   // Staged Expenditures
   ExpenditureMadeStaged = 'ExpenditureMadeStaged(uint256,bool)',

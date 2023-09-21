@@ -26,23 +26,20 @@ export const setupListenersForStakedExpenditure = (
   isInitialized: boolean,
 ): void => {
   if (isInitialized) {
-    addExtensionEventListener(
+    const events = [
       ContractEventsSignatures.StakeReclaimed,
-      Extension.StakedExpenditure,
-      stakedExpenditureAddress,
-      colonyAddress,
-    );
-    addExtensionEventListener(
       ContractEventsSignatures.ExpenditureCancelled,
-      Extension.StakedExpenditure,
-      stakedExpenditureAddress,
-      colonyAddress,
-    );
-    addExtensionEventListener(
       ContractEventsSignatures.ExpenditureStakerPunished,
-      Extension.StakedExpenditure,
-      stakedExpenditureAddress,
-      colonyAddress,
+      ContractEventsSignatures.ExpenditureMadeViaStake,
+    ];
+
+    events.forEach((eventSignature) =>
+      addExtensionEventListener(
+        eventSignature,
+        Extension.StakedExpenditure,
+        stakedExpenditureAddress,
+        colonyAddress,
+      ),
     );
   } else {
     addExtensionEventListener(
