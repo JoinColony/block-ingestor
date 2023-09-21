@@ -4,6 +4,7 @@ import {
   CreateExpenditureMutation,
   CreateExpenditureMutationVariables,
   ExpenditureStatus,
+  ExpenditureType,
 } from '~graphql';
 import { ContractEvent } from '~types';
 import { getExpenditureDatabaseId, output, toNumber, verbose } from '~utils';
@@ -41,6 +42,7 @@ export default async (event: ContractEvent): Promise<void> => {
     {
       input: {
         id: getExpenditureDatabaseId(colonyAddress, convertedExpenditureId),
+        type: ExpenditureType.PaymentBuilder,
         colonyId: colonyAddress,
         nativeId: convertedExpenditureId,
         ownerAddress,
@@ -48,7 +50,6 @@ export default async (event: ContractEvent): Promise<void> => {
         slots: [],
         nativeFundingPotId: fundingPotId,
         nativeDomainId: domainId,
-        isStaged: false,
         isStaked: false,
       },
     },

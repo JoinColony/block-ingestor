@@ -1,5 +1,6 @@
 import { mutate } from '~amplifyClient';
 import {
+  ExpenditureType,
   UpdateExpenditureDocument,
   UpdateExpenditureMutation,
   UpdateExpenditureMutationVariables,
@@ -28,7 +29,7 @@ export default async (event: ContractEvent): Promise<void> => {
     {
       input: {
         id: getExpenditureDatabaseId(colonyAddress, convertedExpenditureId),
-        isStaged: staged,
+        type: ExpenditureType.Staged,
       },
     },
   );
