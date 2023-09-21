@@ -6,6 +6,7 @@ import {
   setupListenersForStagedExpenditure,
   setupListenerForOneTxPayment,
 } from '~eventListeners';
+import { setupListenersForStreamingPayments } from '~eventListeners/extension/streamingPayments';
 import networkClient from '~networkClient';
 import { ContractEvent } from '~types';
 import { writeExtensionFromEvent } from '~utils';
@@ -27,5 +28,7 @@ export default async (event: ContractEvent): Promise<void> => {
     setupListenersForStagedExpenditure(extensionAddress, colony);
   } else if (extensionHash === getExtensionHash(Extension.OneTxPayment)) {
     setupListenerForOneTxPayment(extensionAddress, colony);
+  } else if (extensionHash === getExtensionHash(Extension.StreamingPayments)) {
+    setupListenersForStreamingPayments(extensionAddress, colony);
   }
 };
