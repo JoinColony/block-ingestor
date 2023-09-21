@@ -1,30 +1,14 @@
 import { BigNumber } from 'ethers';
-import { AnyColonyClient, getEvents } from '@colony/colony-js';
-import { LogDescription } from 'ethers/lib/utils';
 
 import { ContractEvent } from '~types';
+import { writeActionFromEvent, verbose, notNull } from '~utils';
 import {
-  writeActionFromEvent,
-  getDomainDatabaseId,
-  verbose,
-  getCachedColonyClient,
-} from '~utils';
-import { ColonyActionType } from '~graphql';
-
-const getChangeDomainId = async (
-  domainAddedEvents: LogDescription[],
-  colonyClient: AnyColonyClient,
-  skillId: number,
-): Promise<number | null> => {
-  for (const event of domainAddedEvents) {
-    const domainId = event.args.domainId.toString();
-    const { skillId: domainSkillId } = await colonyClient.getDomain(domainId);
-    if (domainSkillId.eq(skillId)) {
-      return domainId;
-    }
-  }
-  return null;
-};
+  ColonyActionType,
+  GetColonyDocument,
+  GetColonyQuery,
+  GetColonyQueryVariables,
+} from '~graphql';
+import { query } from '~amplifyClient';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { contractAddress: colonyAddress } = event;
@@ -41,23 +25,30 @@ export default async (event: ContractEvent): Promise<void> => {
     ? ColonyActionType.EmitDomainReputationReward
     : ColonyActionType.EmitDomainReputationPenalty;
 
-  const colonyClient = await getCachedColonyClient(colonyAddress);
+  let domain;
+  let nextToken: string | undefined;
+  do {
+    const { data } =
+      (await query<GetColonyQuery, GetColonyQueryVariables>(GetColonyDocument, {
+        id: colonyAddress,
+        nextToken,
+      })) ?? {};
+    domain = data?.getColony?.domains?.items
+      .filter(notNull)
+      .find(
+        ({ nativeSkillId }) => nativeSkillId.toString() === skillId.toString(),
+      );
 
-  if (!colonyClient) {
-    return;
-  }
+    nextToken = data?.getColony?.domains?.nextToken ?? '';
 
-  const domainAddedFilter = colonyClient.filters.DomainAdded(null, null);
-  const domainAddedEvents = await getEvents(colonyClient, domainAddedFilter);
-  const changeDomainId = await getChangeDomainId(
-    domainAddedEvents,
-    colonyClient,
-    skillId,
-  );
+    if (domain ?? (!domain && !nextToken)) {
+      break;
+    }
+  } while (true);
 
-  if (!changeDomainId) {
+  if (!domain) {
     verbose(
-      'Not acting upon the ArbitraryReputationUpdate event as a domain matching the skillId was not found',
+      'Not acting upon the ArbitraryReputationUpdate event as a domain with the skillId was not found',
     );
     return;
   }
@@ -67,6 +58,6 @@ export default async (event: ContractEvent): Promise<void> => {
     initiatorAddress,
     recipientAddress: userAddress,
     amount: amount.toString(),
-    fromDomainId: getDomainDatabaseId(colonyAddress, changeDomainId),
+    fromDomainId: domain.id,
   });
 };

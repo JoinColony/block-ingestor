@@ -4,7 +4,7 @@ query GetColonyMetadata($id: ID!) {
   }
 }
 
-query GetColony($id: ID!) {
+query GetColony($id: ID!, $nextToken: String) {
   getColony(id: $id) {
     ...Colony
   }

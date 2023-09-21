@@ -74,7 +74,6 @@ export const processNextBlock = async (): Promise<void> => {
       }
 
       // Call the processor in a blocking way to ensure events get processed sequentially
-      console.log({ event });
       await eventProcessor(event);
     }
 

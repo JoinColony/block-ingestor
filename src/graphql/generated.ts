@@ -1192,6 +1192,7 @@ export type CreateDomainInput = {
   nativeId: Scalars['Int'];
   nativeSkillId: Scalars['Int'];
   reputation?: InputMaybe<Scalars['String']>;
+  reputationPercentage?: InputMaybe<Scalars['String']>;
 };
 
 export type CreateDomainMetadataInput = {
@@ -1528,6 +1529,8 @@ export type Domain = {
   nativeSkillId: Scalars['Int'];
   /** The amount of reputation in the domain */
   reputation?: Maybe<Scalars['String']>;
+  /** The amount of reputation in the domain, as a percentage of the total in the colony */
+  reputationPercentage?: Maybe<Scalars['String']>;
   updatedAt: Scalars['AWSDateTime'];
 };
 
@@ -2596,6 +2599,7 @@ export type ModelDomainConditionInput = {
   not?: InputMaybe<ModelDomainConditionInput>;
   or?: InputMaybe<Array<InputMaybe<ModelDomainConditionInput>>>;
   reputation?: InputMaybe<ModelStringInput>;
+  reputationPercentage?: InputMaybe<ModelStringInput>;
 };
 
 export type ModelDomainConnection = {
@@ -2615,6 +2619,7 @@ export type ModelDomainFilterInput = {
   not?: InputMaybe<ModelDomainFilterInput>;
   or?: InputMaybe<Array<InputMaybe<ModelDomainFilterInput>>>;
   reputation?: InputMaybe<ModelStringInput>;
+  reputationPercentage?: InputMaybe<ModelStringInput>;
 };
 
 export type ModelDomainMetadataConditionInput = {
@@ -3220,6 +3225,7 @@ export type ModelSubscriptionDomainFilterInput = {
   nativeSkillId?: InputMaybe<ModelSubscriptionIntInput>;
   or?: InputMaybe<Array<InputMaybe<ModelSubscriptionDomainFilterInput>>>;
   reputation?: InputMaybe<ModelSubscriptionStringInput>;
+  reputationPercentage?: InputMaybe<ModelSubscriptionStringInput>;
 };
 
 export type ModelSubscriptionDomainMetadataFilterInput = {
@@ -6259,6 +6265,7 @@ export type UpdateDomainInput = {
   nativeId?: InputMaybe<Scalars['Int']>;
   nativeSkillId?: InputMaybe<Scalars['Int']>;
   reputation?: InputMaybe<Scalars['String']>;
+  reputationPercentage?: InputMaybe<Scalars['String']>;
 };
 
 export type UpdateDomainMetadataInput = {
@@ -6635,6 +6642,15 @@ export type ColonyFragment = {
       rewards: { __typename?: 'MotionStakeValues'; yay: string; nay: string };
     }>;
   }> | null;
+  domains?: {
+    __typename?: 'ModelDomainConnection';
+    nextToken?: string | null;
+    items: Array<{
+      __typename?: 'Domain';
+      id: string;
+      nativeSkillId: number;
+    } | null>;
+  } | null;
 };
 
 export type ColonyMetadataFragment = {
@@ -7205,6 +7221,7 @@ export type GetColonyMetadataQuery = {
 
 export type GetColonyQueryVariables = Exact<{
   id: Scalars['ID'];
+  nextToken?: InputMaybe<Scalars['String']>;
 }>;
 
 export type GetColonyQuery = {
@@ -7230,6 +7247,15 @@ export type GetColonyQuery = {
         rewards: { __typename?: 'MotionStakeValues'; yay: string; nay: string };
       }>;
     }> | null;
+    domains?: {
+      __typename?: 'ModelDomainConnection';
+      nextToken?: string | null;
+      items: Array<{
+        __typename?: 'Domain';
+        id: string;
+        nativeSkillId: number;
+      } | null>;
+    } | null;
   } | null;
 };
 
@@ -7758,6 +7784,13 @@ export const Colony = gql`
         isClaimed
       }
     }
+    domains(limit: 1000, nextToken: $nextToken) {
+      items {
+        id
+        nativeSkillId
+      }
+      nextToken
+    }
   }
 `;
 export const ColonyMetadata = gql`
@@ -8212,7 +8245,7 @@ export const GetColonyMetadataDocument = gql`
   ${ColonyMetadata}
 `;
 export const GetColonyDocument = gql`
-  query GetColony($id: ID!) {
+  query GetColony($id: ID!, $nextToken: String) {
     getColony(id: $id) {
       ...Colony
     }
