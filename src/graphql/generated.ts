@@ -1090,6 +1090,7 @@ export type CreateExpenditureInput = {
   id?: InputMaybe<Scalars['ID']>;
   isStaged: Scalars['Boolean'];
   isStakeForfeited?: InputMaybe<Scalars['Boolean']>;
+  isStaked: Scalars['Boolean'];
   nativeDomainId: Scalars['Int'];
   nativeFundingPotId: Scalars['Int'];
   nativeId: Scalars['Int'];
@@ -1103,7 +1104,6 @@ export type CreateExpenditureMetadataInput = {
   id?: InputMaybe<Scalars['ID']>;
   stages?: InputMaybe<Array<ExpenditureStageInput>>;
   stakeAmount?: InputMaybe<Scalars['String']>;
-  type: ExpenditureType;
 };
 
 export type CreateIngestorStatsInput = {
@@ -1501,6 +1501,7 @@ export type Expenditure = {
   isStaged: Scalars['Boolean'];
   /** Indicates if the creator's stake was forfeited when staked expenditure was cancelled */
   isStakeForfeited?: Maybe<Scalars['Boolean']>;
+  isStaked: Scalars['Boolean'];
   metadata?: Maybe<ExpenditureMetadata>;
   motions?: Maybe<ModelColonyMotionConnection>;
   nativeDomainId: Scalars['Int'];
@@ -1539,7 +1540,6 @@ export type ExpenditureMetadata = {
   id: Scalars['ID'];
   stages?: Maybe<Array<ExpenditureStage>>;
   stakeAmount?: Maybe<Scalars['String']>;
-  type: ExpenditureType;
   updatedAt: Scalars['AWSDateTime'];
 };
 
@@ -1591,14 +1591,6 @@ export enum ExpenditureStatus {
   Draft = 'DRAFT',
   Finalized = 'FINALIZED',
   Locked = 'LOCKED',
-}
-
-/** Describes the type of an expenditure */
-export enum ExpenditureType {
-  /** Expenditure created by user with Administration role */
-  Forced = 'FORCED',
-  /** Expenditure created by Staked Expenditure extension */
-  Staked = 'STAKED',
 }
 
 /** Map of parameters that extensions are initialised with */
@@ -2401,6 +2393,7 @@ export type ModelExpenditureConditionInput = {
   hasReclaimedStake?: InputMaybe<ModelBooleanInput>;
   isStaged?: InputMaybe<ModelBooleanInput>;
   isStakeForfeited?: InputMaybe<ModelBooleanInput>;
+  isStaked?: InputMaybe<ModelBooleanInput>;
   nativeDomainId?: InputMaybe<ModelIntInput>;
   nativeFundingPotId?: InputMaybe<ModelIntInput>;
   nativeId?: InputMaybe<ModelIntInput>;
@@ -2425,6 +2418,7 @@ export type ModelExpenditureFilterInput = {
   id?: InputMaybe<ModelIdInput>;
   isStaged?: InputMaybe<ModelBooleanInput>;
   isStakeForfeited?: InputMaybe<ModelBooleanInput>;
+  isStaked?: InputMaybe<ModelBooleanInput>;
   nativeDomainId?: InputMaybe<ModelIntInput>;
   nativeFundingPotId?: InputMaybe<ModelIntInput>;
   nativeId?: InputMaybe<ModelIntInput>;
@@ -2440,7 +2434,6 @@ export type ModelExpenditureMetadataConditionInput = {
   not?: InputMaybe<ModelExpenditureMetadataConditionInput>;
   or?: InputMaybe<Array<InputMaybe<ModelExpenditureMetadataConditionInput>>>;
   stakeAmount?: InputMaybe<ModelStringInput>;
-  type?: InputMaybe<ModelExpenditureTypeInput>;
 };
 
 export type ModelExpenditureMetadataConnection = {
@@ -2456,17 +2449,11 @@ export type ModelExpenditureMetadataFilterInput = {
   not?: InputMaybe<ModelExpenditureMetadataFilterInput>;
   or?: InputMaybe<Array<InputMaybe<ModelExpenditureMetadataFilterInput>>>;
   stakeAmount?: InputMaybe<ModelStringInput>;
-  type?: InputMaybe<ModelExpenditureTypeInput>;
 };
 
 export type ModelExpenditureStatusInput = {
   eq?: InputMaybe<ExpenditureStatus>;
   ne?: InputMaybe<ExpenditureStatus>;
-};
-
-export type ModelExpenditureTypeInput = {
-  eq?: InputMaybe<ExpenditureType>;
-  ne?: InputMaybe<ExpenditureType>;
 };
 
 export type ModelFloatInput = {
@@ -2973,6 +2960,7 @@ export type ModelSubscriptionExpenditureFilterInput = {
   id?: InputMaybe<ModelSubscriptionIdInput>;
   isStaged?: InputMaybe<ModelSubscriptionBooleanInput>;
   isStakeForfeited?: InputMaybe<ModelSubscriptionBooleanInput>;
+  isStaked?: InputMaybe<ModelSubscriptionBooleanInput>;
   nativeDomainId?: InputMaybe<ModelSubscriptionIntInput>;
   nativeFundingPotId?: InputMaybe<ModelSubscriptionIntInput>;
   nativeId?: InputMaybe<ModelSubscriptionIntInput>;
@@ -2991,7 +2979,6 @@ export type ModelSubscriptionExpenditureMetadataFilterInput = {
     Array<InputMaybe<ModelSubscriptionExpenditureMetadataFilterInput>>
   >;
   stakeAmount?: InputMaybe<ModelSubscriptionStringInput>;
-  type?: InputMaybe<ModelSubscriptionStringInput>;
 };
 
 export type ModelSubscriptionFloatInput = {
@@ -5724,6 +5711,7 @@ export type UpdateExpenditureInput = {
   id: Scalars['ID'];
   isStaged?: InputMaybe<Scalars['Boolean']>;
   isStakeForfeited?: InputMaybe<Scalars['Boolean']>;
+  isStaked?: InputMaybe<Scalars['Boolean']>;
   nativeDomainId?: InputMaybe<Scalars['Int']>;
   nativeFundingPotId?: InputMaybe<Scalars['Int']>;
   nativeId?: InputMaybe<Scalars['Int']>;
@@ -5737,7 +5725,6 @@ export type UpdateExpenditureMetadataInput = {
   id: Scalars['ID'];
   stages?: InputMaybe<Array<ExpenditureStageInput>>;
   stakeAmount?: InputMaybe<Scalars['String']>;
-  type?: InputMaybe<ExpenditureType>;
 };
 
 /**
