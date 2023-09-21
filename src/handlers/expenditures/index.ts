@@ -14,3 +14,4 @@ export { default as handleExpenditureMadeStaged } from './expenditureMadeStaged'
 export { default as handleStagedPaymentReleased } from './stagedPaymentReleased';
 export { default as handleStakedExpenditureCancelled } from './stakedExpenditureCancelled';
 export { default as handleExpenditureStakerPunished } from './expenditureStakerPunished';
+export { default as handleStreamingPaymentCreated } from './streamingPaymentCreated';
