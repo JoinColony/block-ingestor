@@ -49,7 +49,7 @@ export default async (event: ContractEvent): Promise<void> => {
 
   if (!domain) {
     verbose(
-      'Not acting upon the ArbitraryReputationUpdate event as a domain with the skillId was not found',
+      `Not acting upon the ArbitraryReputationUpdate event as a domain with the skillId ${skillId} was not found`,
     );
     return;
   }
