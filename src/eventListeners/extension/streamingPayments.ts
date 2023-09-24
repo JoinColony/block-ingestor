@@ -1,8 +1,9 @@
 import { Extension, getExtensionHash } from '@colony/colony-js';
 
 import { ContractEventsSignatures } from '~types';
-import { addExtensionEventListener, fetchExistingExtensions } from './index';
 import { output } from '~utils';
+
+import { addExtensionEventListener, fetchExistingExtensions } from './index';
 
 export const setupListenersForStreamingPaymentsExtensions =
   async (): Promise<void> => {
@@ -19,10 +20,17 @@ export const setupListenersForStreamingPayments = (
   streamingPaymentsAddress: string,
   colonyAddress: string,
 ): void => {
-  addExtensionEventListener(
+  const events = [
     ContractEventsSignatures.StreamingPaymentCreated,
-    Extension.StreamingPayments,
-    streamingPaymentsAddress,
-    colonyAddress,
+    ContractEventsSignatures.PaymentTokenUpdated,
+  ];
+
+  events.forEach((eventSignature) =>
+    addExtensionEventListener(
+      eventSignature,
+      Extension.StreamingPayments,
+      streamingPaymentsAddress,
+      colonyAddress,
+    ),
   );
 };

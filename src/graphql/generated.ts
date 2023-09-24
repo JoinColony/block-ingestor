@@ -1111,6 +1111,7 @@ export type CreateStreamingPaymentInput = {
   interval: Scalars['String'];
   nativeDomainId: Scalars['Int'];
   nativeId: Scalars['Int'];
+  payouts?: InputMaybe<Array<ExpenditurePayoutInput>>;
   recipientAddress: Scalars['String'];
   startTime: Scalars['AWSTimestamp'];
 };
@@ -1550,7 +1551,6 @@ export enum ExpenditureStatus {
 export enum ExpenditureType {
   PaymentBuilder = 'PAYMENT_BUILDER',
   Staged = 'STAGED',
-  Streaming = 'STREAMING',
 }
 
 /** Map of parameters that extensions are initialised with */
@@ -4713,6 +4713,7 @@ export type StreamingPayment = {
   interval: Scalars['String'];
   nativeDomainId: Scalars['Int'];
   nativeId: Scalars['Int'];
+  payouts?: Maybe<Array<ExpenditurePayout>>;
   recipientAddress: Scalars['String'];
   startTime: Scalars['AWSTimestamp'];
   updatedAt: Scalars['AWSDateTime'];
@@ -5489,6 +5490,7 @@ export type UpdateStreamingPaymentInput = {
   interval?: InputMaybe<Scalars['String']>;
   nativeDomainId?: InputMaybe<Scalars['Int']>;
   nativeId?: InputMaybe<Scalars['Int']>;
+  payouts?: InputMaybe<Array<ExpenditurePayoutInput>>;
   recipientAddress?: InputMaybe<Scalars['String']>;
   startTime?: InputMaybe<Scalars['AWSTimestamp']>;
 };
@@ -6015,6 +6017,18 @@ export type CreateStreamingPaymentMutation = {
   } | null;
 };
 
+export type UpdateStreamingPaymentMutationVariables = Exact<{
+  input: UpdateStreamingPaymentInput;
+}>;
+
+export type UpdateStreamingPaymentMutation = {
+  __typename?: 'Mutation';
+  updateStreamingPayment?: {
+    __typename?: 'StreamingPayment';
+    id: string;
+  } | null;
+};
+
 export type CreateColonyExtensionMutationVariables = Exact<{
   input: CreateColonyExtensionInput;
 }>;
@@ -6437,6 +6451,24 @@ export type GetExpenditureMetadataQuery = {
       name: string;
       slotId: number;
       isReleased: boolean;
+    }> | null;
+  } | null;
+};
+
+export type GetStreamingPaymentQueryVariables = Exact<{
+  id: Scalars['ID'];
+}>;
+
+export type GetStreamingPaymentQuery = {
+  __typename?: 'Query';
+  getStreamingPayment?: {
+    __typename?: 'StreamingPayment';
+    id: string;
+    payouts?: Array<{
+      __typename?: 'ExpenditurePayout';
+      amount: string;
+      tokenAddress: string;
+      isClaimed: boolean;
     }> | null;
   } | null;
 };
@@ -7005,6 +7037,13 @@ export const CreateStreamingPaymentDocument = gql`
     }
   }
 `;
+export const UpdateStreamingPaymentDocument = gql`
+  mutation UpdateStreamingPayment($input: UpdateStreamingPaymentInput!) {
+    updateStreamingPayment(input: $input) {
+      id
+    }
+  }
+`;
 export const CreateColonyExtensionDocument = gql`
   mutation CreateColonyExtension($input: CreateColonyExtensionInput!) {
     createColonyExtension(input: $input) {
@@ -7324,6 +7363,18 @@ export const GetExpenditureMetadataDocument = gql`
         name
         slotId
         isReleased
+      }
+    }
+  }
+`;
+export const GetStreamingPaymentDocument = gql`
+  query GetStreamingPayment($id: ID!) {
+    getStreamingPayment(id: $id) {
+      id
+      payouts {
+        amount
+        tokenAddress
+        isClaimed
       }
     }
   }
