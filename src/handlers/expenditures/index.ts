@@ -16,3 +16,4 @@ export { default as handleStakedExpenditureCancelled } from './stakedExpenditure
 export { default as handleExpenditureStakerPunished } from './expenditureStakerPunished';
 export { default as handleStreamingPaymentCreated } from './streamingPaymentCreated';
 export { default as handleExpenditureMadeViaStake } from './expenditureMadeViaStake';
+export { default as handlePaymentTokenUpdated } from './paymentTokenUpdated';

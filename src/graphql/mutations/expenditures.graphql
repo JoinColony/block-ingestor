@@ -21,3 +21,9 @@ mutation CreateStreamingPayment($input: CreateStreamingPaymentInput!) {
     id
   }
 }
+
+mutation UpdateStreamingPayment($input: UpdateStreamingPaymentInput!) {
+  updateStreamingPayment(input: $input) {
+    id
+  }
+}
