@@ -47,7 +47,7 @@ export default async (event: ContractEvent): Promise<void> => {
 
   verbose(`Streaming payment with ID ${databaseId} created`);
 
-  mutate<
+  await mutate<
     CreateStreamingPaymentMutation,
     CreateStreamingPaymentMutationVariables
   >(CreateStreamingPaymentDocument, {
