@@ -48,6 +48,7 @@ import {
   handleOneTxPaymentAction,
   handleStreamingPaymentCreated,
   handleExpenditureMadeViaStake,
+  handlePaymentTokenUpdated,
 } from './handlers';
 
 dotenv.config();
@@ -312,6 +313,11 @@ export default async (event: ContractEvent): Promise<void> => {
 
     case ContractEventsSignatures.StreamingPaymentCreated: {
       await handleStreamingPaymentCreated(event);
+      return;
+    }
+
+    case ContractEventsSignatures.PaymentTokenUpdated: {
+      await handlePaymentTokenUpdated(event);
       return;
     }
 

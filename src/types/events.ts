@@ -89,6 +89,7 @@ export enum ContractEventsSignatures {
 
   // Streaming Payments
   StreamingPaymentCreated = 'StreamingPaymentCreated(address,uint256)',
+  PaymentTokenUpdated = 'PaymentTokenUpdated(address,uint256,address,uint256)',
 
   // Annotations
   AnnotateTransaction = 'Annotation(address,bytes32,string)',

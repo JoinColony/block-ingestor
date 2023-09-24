@@ -10,6 +10,9 @@ import {
   GetExpenditureDocument,
   GetExpenditureQuery,
   GetExpenditureQueryVariables,
+  GetStreamingPaymentDocument,
+  GetStreamingPaymentQuery,
+  GetStreamingPaymentQueryVariables,
 } from '~graphql';
 import { getCachedColonyClient } from '~utils';
 
@@ -58,4 +61,21 @@ export const getExpenditure = async (
   } catch {
     return null;
   }
+};
+
+export const getStreamingPaymentFromDB = async (
+  paymentDatabaseId: string,
+): Promise<GetStreamingPaymentQuery['getStreamingPayment']> => {
+  const response = await query<
+    GetStreamingPaymentQuery,
+    GetStreamingPaymentQueryVariables
+  >(GetStreamingPaymentDocument, {
+    id: paymentDatabaseId,
+  });
+
+  console.log({ response, paymentDatabaseId });
+
+  const streamingPayment = response?.data?.getStreamingPayment;
+
+  return streamingPayment;
 };
