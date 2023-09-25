@@ -84,7 +84,7 @@ export enum ContractEventsSignatures {
 
   // Staged Expenditures
   ExpenditureMadeStaged = 'ExpenditureMadeStaged(uint256,bool)',
-  StagedPaymentReleased = 'StagedPaymentReleased(uint256,uin256)',
+  StagedPaymentReleased = 'StagedPaymentReleased(uint256,uint256)',
 
   // Annotations
   AnnotateTransaction = 'Annotation(address,bytes32,string)',
