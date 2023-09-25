@@ -18,6 +18,7 @@ import {
   handleEditColonyMotion,
   handleSetUserRolesMotion,
   handleSimpleDecisionMotion,
+  handleMulticallMotion,
 } from './handlers';
 
 export default async (event: ContractEvent): Promise<void> => {
@@ -140,10 +141,10 @@ export default async (event: ContractEvent): Promise<void> => {
         break;
       }
 
-      // case ColonyOperations.Multicall: {
-      //   await handleMulticallMotion(event, parsedAction, gasEstimate);
-      //   break;
-      // }
+      case ColonyOperations.Multicall: {
+        await handleMulticallMotion(event, parsedAction, gasEstimate);
+        break;
+      }
 
       case ColonyOperations.SimpleDecision: {
         await handleSimpleDecisionMotion(
