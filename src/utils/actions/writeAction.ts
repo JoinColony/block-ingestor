@@ -11,9 +11,6 @@ import {
   GetExpenditureByNativeFundingPotIdAndColonyDocument,
   GetExpenditureByNativeFundingPotIdAndColonyQuery,
   GetExpenditureByNativeFundingPotIdAndColonyQueryVariables,
-  GetSafeTransactionByTransactionHashQuery,
-  GetSafeTransactionByTransactionHashQueryVariables,
-  GetSafeTransactionByTransactionHashDocument,
 } from '~graphql';
 import { ContractEvent } from '~types';
 import { notNull, toNumber, verbose } from '~utils';
@@ -37,7 +34,6 @@ export const writeActionFromEvent = async (
     event,
     colonyAddress,
     actionFields,
-    transactionHash,
   );
 
   verbose('Action', actionType, 'took place in Colony:', colonyAddress);
@@ -60,7 +56,6 @@ const showActionInActionsList = async (
   { args }: ContractEvent,
   colonyAddress: string,
   { type, initiatorAddress, recipientAddress }: ActionFields,
-  transactionHash: string,
 ): Promise<boolean> => {
   if (type === ColonyActionType.MoveFunds) {
     const [, , toPot] = args;
@@ -99,20 +94,6 @@ const showActionInActionsList = async (
 
   const isAddressInitiatorOrRecipient = (address: string): boolean =>
     address === initiatorAddress || address === recipientAddress;
-
-  if (type === ColonyActionType.MakeArbitraryTransaction) {
-    const { data } =
-      (await query<
-        GetSafeTransactionByTransactionHashQuery,
-        GetSafeTransactionByTransactionHashQueryVariables
-      >(GetSafeTransactionByTransactionHashDocument, {
-        transactionHash,
-      })) ?? {};
-
-    if (!data?.getSafeTransaction?.id) {
-      return false;
-    }
-  }
 
   // @NOTE: If the action's initiator or recipient is an extension/network client or the colony itself, then we shouldn't show it in the action list.
   return !(
