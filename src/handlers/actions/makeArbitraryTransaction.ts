@@ -13,7 +13,6 @@ import { query } from '~amplifyClient';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { contractAddress: colonyAddress, transactionHash } = event;
-  const { target: recipientAddress } = event.args;
   const receipt = await provider.getTransactionReceipt(event.transactionHash);
 
   const { data } =
@@ -30,7 +29,7 @@ export default async (event: ContractEvent): Promise<void> => {
   await writeActionFromEvent(event, colonyAddress, {
     type: ColonyActionType.MakeArbitraryTransaction,
     initiatorAddress: receipt.from,
-    recipientAddress,
+    recipientAddress: receipt.to,
     fromDomainId: getDomainDatabaseId(colonyAddress, Id.RootDomain),
   });
 };
