@@ -1,5 +1,6 @@
 import { BigNumber } from 'ethers';
 import { TransactionDescription } from 'ethers/lib/utils';
+
 import {
   AnyColonyClient,
   AnyOneTxPaymentClient,
@@ -8,7 +9,7 @@ import {
 
 import { ColonyOperations, ContractEvent, MotionEvents } from '~types';
 import { getDomainDatabaseId, getVotingClient, verbose } from '~utils';
-import { mutate } from '~amplifyClient';
+import { GraphQLFnReturn, mutate } from '~amplifyClient';
 import {
   ColonyMotion,
   CreateColonyActionDocument,
@@ -24,6 +25,7 @@ import {
   CreateMotionMessageMutation,
   CreateMotionMessageMutationVariables,
 } from '~graphql';
+import { SIMPLE_DECISIONS_ACTION_CODE } from '~constants';
 
 import {
   getMotionDatabaseId,
@@ -31,28 +33,17 @@ import {
   getUserMinStake,
   getMessageKey,
 } from '../helpers';
-import { SIMPLE_DECISIONS_ACTION_CODE } from '~constants';
 
 export interface SimpleTransactionDescription {
   name: ColonyOperations.SimpleDecision;
 }
 
 export const getParsedActionFromMotion = async (
-  motionId: string,
-  colonyAddress: string,
+  action: string,
   clients: [AnyColonyClient, AnyOneTxPaymentClient],
 ): Promise<
   TransactionDescription | SimpleTransactionDescription | undefined
 > => {
-  const votingClient = await getVotingClient(colonyAddress);
-
-  if (!votingClient) {
-    return;
-  }
-
-  const motion = await votingClient.getMotion(motionId);
-  const { action } = motion;
-
   if (action === SIMPLE_DECISIONS_ACTION_CODE) {
     return {
       name: ColonyOperations.SimpleDecision,
@@ -70,11 +61,11 @@ export const getParsedActionFromMotion = async (
     }
   }
 
-  verbose(`Unable to parse ${motion.action}`);
+  verbose(`Unable to parse ${action}`);
   return undefined;
 };
-
-interface Props {
+interface GetMotionDataArgs {
+  transactionHash: string;
   motionId: BigNumber;
   domainId: BigNumber;
   votingClient: AnyVotingReputationClient;
@@ -82,13 +73,14 @@ interface Props {
   isDecision?: boolean;
 }
 
-const getMotionData = async ({
+export const getMotionData = async ({
+  transactionHash,
   motionId,
   domainId,
   votingClient,
   colonyAddress,
   isDecision = false,
-}: Props): Promise<ColonyMotion> => {
+}: GetMotionDataArgs): Promise<ColonyMotion> => {
   const { skillRep, rootHash, repSubmitted } = await votingClient.getMotion(
     motionId,
   );
@@ -157,6 +149,7 @@ const getMotionData = async ({
       inRevealPhase: false,
     },
     isDecision,
+    transactionHash,
   };
 };
 
@@ -182,10 +175,8 @@ const getInitialMotionMessage = async (
   };
 };
 
-const createActionWithMotion = async (
-  actionData: CreateColonyActionInput,
+const createColonyMotion = async (
   motionData: CreateColonyMotionInput,
-  initialMotionMessage: CreateMotionMessageInput,
 ): Promise<void> => {
   await mutate<CreateColonyMotionMutation, CreateColonyMotionMutationVariables>(
     CreateColonyMotionDocument,
@@ -195,7 +186,11 @@ const createActionWithMotion = async (
       },
     },
   );
+};
 
+const createMotionMessage = async (
+  initialMotionMessage: CreateMotionMessageInput,
+): Promise<void> => {
   await mutate<
     CreateMotionMessageMutation,
     CreateMotionMessageMutationVariables
@@ -204,7 +199,10 @@ const createActionWithMotion = async (
       ...initialMotionMessage,
     },
   });
-
+};
+const createColonyAction = async (
+  actionData: CreateColonyActionInput,
+): Promise<void> => {
   await mutate<CreateColonyActionMutation, CreateColonyActionMutationVariables>(
     CreateColonyActionDocument,
     {
@@ -223,7 +221,11 @@ export const createMotionInDB = async (
     colonyAddress,
     args: { motionId, creator: creatorAddress, domainId },
   }: ContractEvent,
-  input: Omit<
+  {
+    gasEstimate,
+    expenditureId,
+    ...input
+  }: Omit<
     CreateColonyActionInput,
     | 'id'
     | 'colonyId'
@@ -232,8 +234,8 @@ export const createMotionInDB = async (
     | 'motionId'
     | 'initiatorAddress'
     | 'blockNumber'
-  >,
-): Promise<void> => {
+  > & { gasEstimate: string; expenditureId?: string },
+): Promise<GraphQLFnReturn<CreateColonyMotionMutation> | undefined> => {
   if (!colonyAddress) {
     return;
   }
@@ -245,6 +247,7 @@ export const createMotionInDB = async (
   }
 
   const motionData = await getMotionData({
+    transactionHash,
     votingClient,
     motionId,
     domainId,
@@ -271,5 +274,9 @@ export const createMotionInDB = async (
     ...input,
   };
 
-  await createActionWithMotion(actionData, motionData, initialMotionMessage);
+  await Promise.all([
+    createColonyMotion({ ...motionData, gasEstimate, expenditureId }),
+    createMotionMessage(initialMotionMessage),
+    createColonyAction(actionData),
+  ]);
 };

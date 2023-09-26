@@ -1,11 +1,14 @@
 import { ClientType } from '@colony/colony-js';
+
 import networkClient from '~networkClient';
 import { NetworkClients } from '~types';
+
 import { getCachedColonyClient } from './colony';
 import { getVotingClient } from './voting';
 
 export * from './colony';
 export * from './voting';
+export * from './stakedExpenditure';
 
 /**
  * Function returning a (hopefully) cached client for the given type and colony address

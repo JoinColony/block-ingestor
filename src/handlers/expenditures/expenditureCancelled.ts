@@ -1,32 +1,20 @@
-import { mutate } from '~amplifyClient';
-import {
-  ExpenditureStatus,
-  UpdateExpenditureDocument,
-  UpdateExpenditureMutation,
-  UpdateExpenditureMutationVariables,
-} from '~graphql';
 import { ContractEvent } from '~types';
-import { getExpenditureDatabaseId, toNumber, verbose } from '~utils';
+
+import { updateCancelledExpenditure } from './helpers';
+import { handleStakedExpenditureCancelled } from '.';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { contractAddress: colonyAddress } = event;
-  const { expenditureId } = event.args;
-  const convertedExpenditureId = toNumber(expenditureId);
 
-  verbose(
-    'Expenditure with ID',
-    convertedExpenditureId,
-    'cancelled in Colony:',
-    colonyAddress,
-  );
+  /**
+   * TEMP: If colonyAddress is present on the event object, the event was emitted
+   * by the Staked Expenditure extension
+   * @TODO: Refactor eventProcessor switch to link handlers with their respective listeners
+   */
+  if (event.colonyAddress) {
+    await handleStakedExpenditureCancelled(event);
+    return;
+  }
 
-  await mutate<UpdateExpenditureMutation, UpdateExpenditureMutationVariables>(
-    UpdateExpenditureDocument,
-    {
-      input: {
-        id: getExpenditureDatabaseId(colonyAddress, convertedExpenditureId),
-        status: ExpenditureStatus.Cancelled,
-      },
-    },
-  );
+  await updateCancelledExpenditure(colonyAddress, event);
 };

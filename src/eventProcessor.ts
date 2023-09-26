@@ -40,6 +40,11 @@ import {
   handleExpenditureClaimDelaySet,
   handleExpenditurePayoutModifierSet,
   handleAnnotateTransaction,
+  handleExpenditurePayoutClaimed,
+  handleStakeReclaimed,
+  handleExpenditureMadeStaged,
+  handleStagedPaymentReleased,
+  handleExpenditureStakerPunished,
 } from './handlers';
 
 dotenv.config();
@@ -269,6 +274,31 @@ export default async (event: ContractEvent): Promise<void> => {
 
     case ContractEventsSignatures.ExpenditurePayoutModifierSet: {
       await handleExpenditurePayoutModifierSet(event);
+      return;
+    }
+
+    case ContractEventsSignatures.ExpenditurePayoutClaimed: {
+      await handleExpenditurePayoutClaimed(event);
+      return;
+    }
+
+    case ContractEventsSignatures.StakeReclaimed: {
+      await handleStakeReclaimed(event);
+      return;
+    }
+
+    case ContractEventsSignatures.ExpenditureStakerPunished: {
+      await handleExpenditureStakerPunished(event);
+      return;
+    }
+
+    case ContractEventsSignatures.ExpenditureMadeStaged: {
+      await handleExpenditureMadeStaged(event);
+      return;
+    }
+
+    case ContractEventsSignatures.StagedPaymentReleased: {
+      await handleStagedPaymentReleased(event);
       return;
     }
 

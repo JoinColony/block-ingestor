@@ -1,5 +1,6 @@
 import { mutate, query } from '~amplifyClient';
 import {
+  ColonyActionType,
   CreateColonyActionDocument,
   CreateColonyActionInput,
   CreateColonyActionMutation,
@@ -7,9 +8,12 @@ import {
   GetColonyExtensionsByColonyAddressDocument,
   GetColonyExtensionsByColonyAddressQuery,
   GetColonyExtensionsByColonyAddressQueryVariables,
+  GetExpenditureByNativeFundingPotIdAndColonyDocument,
+  GetExpenditureByNativeFundingPotIdAndColonyQuery,
+  GetExpenditureByNativeFundingPotIdAndColonyQueryVariables,
 } from '~graphql';
 import { ContractEvent } from '~types';
-import { notNull, verbose } from '~utils';
+import { notNull, toNumber, verbose } from '~utils';
 import networkClient from '~networkClient';
 
 type ActionFields = Omit<
@@ -25,7 +29,9 @@ export const writeActionFromEvent = async (
   const { transactionHash, blockNumber, timestamp } = event;
 
   const actionType = actionFields.type ?? 'UNKNOWN';
+
   const showInActionsList = await showActionInActionsList(
+    event,
     colonyAddress,
     actionFields,
   );
@@ -47,10 +53,32 @@ export const writeActionFromEvent = async (
 };
 
 const showActionInActionsList = async (
+  { args }: ContractEvent,
   colonyAddress: string,
-  actionFields: ActionFields,
+  { type, initiatorAddress, recipientAddress }: ActionFields,
 ): Promise<boolean> => {
-  const { initiatorAddress, recipientAddress } = actionFields;
+  if (type === ColonyActionType.MoveFunds) {
+    const [, , toPot] = args;
+
+    const { data } =
+      (await query<
+        GetExpenditureByNativeFundingPotIdAndColonyQuery,
+        GetExpenditureByNativeFundingPotIdAndColonyQueryVariables
+      >(GetExpenditureByNativeFundingPotIdAndColonyDocument, {
+        nativeFundingPotId: toNumber(toPot),
+        colonyAddress,
+      })) ?? {};
+
+    // if there's an expenditure in the db with this funding pot id, it means we're funding an expenditure
+    const isFundingExpenditure =
+      !!data?.getExpendituresByNativeFundingPotIdAndColony?.items.length;
+
+    // if we're funding an expenditure, we don't want to show it in the action list
+    // else, we still want to check if the action's initiator or recipient is an extension/network client
+    if (isFundingExpenditure) {
+      return false;
+    }
+  }
 
   const { data } =
     (await query<

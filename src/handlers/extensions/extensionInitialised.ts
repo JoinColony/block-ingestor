@@ -7,8 +7,15 @@ import {
   UpdateColonyExtensionByAddressMutationVariables,
 } from '~graphql';
 import { ContractEvent } from '~types';
-import { verbose, addVotingReputationParamsToDB } from '~utils';
-import { setupMotionsListeners } from '~eventListeners';
+import {
+  verbose,
+  addVotingReputationParamsToDB,
+  addStakedExpenditureParamsToDB,
+} from '~utils';
+import {
+  setupListenersForStakedExpenditure,
+  setupMotionsListeners,
+} from '~eventListeners';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { contractAddress: extensionAddress } = event;
@@ -30,12 +37,16 @@ export default async (event: ContractEvent): Promise<void> => {
   const colonyAddress =
     mutationResult?.data?.updateColonyExtension?.colonyAddress;
 
-  /* Listen for motions once Voting Reputation is enabled. */
-  if (
-    colonyAddress &&
-    getExtensionHash(Extension.VotingReputation) === extensionHash
-  ) {
+  if (!colonyAddress) {
+    return;
+  }
+
+  if (getExtensionHash(Extension.VotingReputation) === extensionHash) {
+    /* Listen for motions once Voting Reputation is enabled. */
     setupMotionsListeners(extensionAddress, colonyAddress);
     await addVotingReputationParamsToDB(extensionAddress, colonyAddress);
+  } else if (getExtensionHash(Extension.StakedExpenditure) === extensionHash) {
+    setupListenersForStakedExpenditure(extensionAddress, colonyAddress, true);
+    await addStakedExpenditureParamsToDB(extensionAddress, colonyAddress);
   }
 };

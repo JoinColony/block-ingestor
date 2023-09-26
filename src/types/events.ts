@@ -32,6 +32,7 @@ export enum ContractEventsSignatures {
   ColonyVersionAdded = 'ColonyVersionAdded(uint256,address)',
   ColonyUpgraded = 'ColonyUpgraded(address,uint256,uint256)',
   NetworkFeeInverseSet = 'NetworkFeeInverseSet(uint256)',
+  FundingPotAdded = 'FundingPotAdded(uint256)',
 
   // Extensions
   ExtensionAddedToNetwork = 'ExtensionAddedToNetwork(bytes32,uint256)',
@@ -75,6 +76,15 @@ export enum ContractEventsSignatures {
   ExpenditureRecipientSet = 'ExpenditureRecipientSet(address,uint256,uint256,address)',
   ExpenditurePayoutSet = 'ExpenditurePayoutSet(address,uint256,uint256,address,uint256)',
   ExpenditurePayoutModifierSet = 'ExpenditurePayoutModifierSet(address,uint256,uint256,int256)',
+  ExpenditurePayoutClaimed = 'PayoutClaimed(address,uint256,uint256,address,uint256)',
+
+  // Staked Expenditures
+  StakeReclaimed = 'StakeReclaimed(uint256)',
+  ExpenditureStakerPunished = 'ExpenditureStakerPunished(address,uint256,bool)',
+
+  // Staged Expenditures
+  ExpenditureMadeStaged = 'ExpenditureMadeStaged(uint256,bool)',
+  StagedPaymentReleased = 'StagedPaymentReleased(uint256,uint256)',
 
   // Annotations
   AnnotateTransaction = 'Annotation(address,bytes32,string)',

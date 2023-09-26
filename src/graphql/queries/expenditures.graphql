@@ -9,7 +9,37 @@ query GetExpenditure($id: ID!) {
       payouts {
         tokenAddress
         amount
+        isClaimed
       }
+    }
+  }
+}
+
+query GetExpenditureByNativeFundingPotIdAndColony(
+  $nativeFundingPotId: Int!
+  $colonyAddress: ID!
+) {
+  getExpendituresByNativeFundingPotIdAndColony(
+    nativeFundingPotId: $nativeFundingPotId
+    colonyId: { eq: $colonyAddress }
+  ) {
+    items {
+      id
+      fundingMotions {
+        items {
+          transactionHash
+        }
+      }
+    }
+  }
+}
+
+query GetExpenditureMetadata($id: ID!) {
+  getExpenditureMetadata(id: $id) {
+    stages {
+      name
+      slotId
+      isReleased
     }
   }
 }

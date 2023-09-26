@@ -4,7 +4,7 @@ import {
   getMatchingListener,
 } from '~eventListeners';
 import eventProcessor from '~eventProcessor';
-import { getInterfaceByListenerType } from '~interfaces';
+import { getInterfaceByListener } from '~interfaces';
 import provider from '~provider';
 import {
   getLastBlockNumber,
@@ -49,7 +49,7 @@ export const processNextBlock = async (): Promise<void> => {
       }
 
       // In order to parse the log, we need an ether's interface
-      const iface = getInterfaceByListenerType(listener.type);
+      const iface = getInterfaceByListener(listener);
       if (!iface) {
         output(
           `Failed to get an interface for a log with listener type ${listener.type}`,
@@ -67,7 +67,7 @@ export const processNextBlock = async (): Promise<void> => {
       );
       if (!event) {
         output(
-          `Failed to map log ${log.logIndex} from transaction ${log.transactionHash}`,
+          `Failed to map log describing event ${listener.eventSignature} in transaction ${log.transactionHash} `,
         );
         continue;
       }

@@ -8,3 +8,9 @@ export { default as handleExpenditureTransferred } from './expenditureTransferre
 export { default as handleExpenditureGlobalClaimDelaySet } from './expenditureGlobalClaimDelaySet';
 export { default as handleExpenditureClaimDelaySet } from './expenditureClaimDelaySet';
 export { default as handleExpenditurePayoutModifierSet } from './expenditurePayoutModifierSet';
+export { default as handleExpenditurePayoutClaimed } from './expenditurePayoutClaimed';
+export { default as handleStakeReclaimed } from './stakeReclaimed';
+export { default as handleExpenditureMadeStaged } from './expenditureMadeStaged';
+export { default as handleStagedPaymentReleased } from './stagedPaymentReleased';
+export { default as handleStakedExpenditureCancelled } from './stakedExpenditureCancelled';
+export { default as handleExpenditureStakerPunished } from './expenditureStakerPunished';

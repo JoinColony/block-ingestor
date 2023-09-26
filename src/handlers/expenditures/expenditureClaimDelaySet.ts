@@ -8,7 +8,7 @@ import {
 import { ContractEvent } from '~types';
 import { getExpenditureDatabaseId, output, toNumber, verbose } from '~utils';
 
-import { getExpenditure } from './helpers';
+import { getExpenditureFromDB } from './helpers';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { contractAddress: colonyAddress } = event;
@@ -22,10 +22,10 @@ export default async (event: ContractEvent): Promise<void> => {
     convertedExpenditureId,
   );
 
-  const expenditure = await getExpenditure(databaseId);
+  const expenditure = await getExpenditureFromDB(databaseId);
   if (!expenditure) {
     output(
-      `Could not find expenditure with ID: ${convertedExpenditureId} and colony address: ${colonyAddress} in the db. This is a bug and needs investigating.`,
+      `Could not find expenditure with ID: ${databaseId} in the db. This is a bug and needs investigating.`,
     );
     return;
   }

@@ -9,3 +9,9 @@ mutation UpdateExpenditure($input: UpdateExpenditureInput!) {
     id
   }
 }
+
+mutation UpdateExpenditureMetadata($input: UpdateExpenditureMetadataInput!) {
+  updateExpenditureMetadata(input: $input) {
+    id
+  }
+}
