@@ -3,6 +3,7 @@ import { TransactionDescription } from 'ethers/lib/utils';
 import {
   AnyColonyClient,
   AnyOneTxPaymentClient,
+  AnyStagedExpenditureClient,
   AnyStakedExpenditureClient,
   AnyStreamingPaymentsClient,
   AnyVotingReputationClient,
@@ -44,6 +45,7 @@ type MotionActionClients = [
   AnyOneTxPaymentClient | null,
   AnyStakedExpenditureClient | null,
   AnyStreamingPaymentsClient | null,
+  AnyStagedExpenditureClient | null,
 ];
 
 export const parseAction = (

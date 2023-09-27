@@ -8,6 +8,7 @@ import {
   getVotingClient,
   verbose,
   getStreamingPaymentsClient,
+  getStagedExpenditureClient,
 } from '~utils';
 import { SimpleTransactionDescription, parseAction } from './helpers';
 import {
@@ -52,12 +53,17 @@ export default async (event: ContractEvent): Promise<void> => {
 
   const streamingPaymentClient = await getStreamingPaymentsClient(colonyAddress);
 
+  const stagedExpenditureClient = await getStagedExpenditureClient(
+    colonyAddress,
+  );
+
   const motion = await votingReputationClient.getMotion(motionId);
   const parsedAction = parseAction(motion.action, [
     colonyClient,
     oneTxPaymentClient,
     stakedExpenditureClient,
     streamingPaymentClient,
+    stagedExpenditureClient,
   ]);
 
   let gasEstimate: BigNumber;

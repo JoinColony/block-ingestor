@@ -317,6 +317,7 @@ export const linkPendingMetadata = async (
     oneTxPaymentClient,
     stakedExpenditureClient,
     streamingPaymentClient,
+    null,
   ]);
 
   if (!parsedAction) {
