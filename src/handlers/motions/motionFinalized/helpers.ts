@@ -8,6 +8,7 @@ import {
   getColonyFromDB,
   getDomainDatabaseId,
   getExistingTokenAddresses,
+  getStakedExpenditureClient,
   output,
   updateColonyTokens,
 } from '~utils';
@@ -273,12 +274,19 @@ export const linkPendingMetadata = async (
   const oneTxPaymentClient = await colonyClient?.getExtensionClient(
     Extension.OneTxPayment,
   );
+  const stakedExpenditureClient = await getStakedExpenditureClient(
+    colonyAddress,
+  );
 
-  if (!colonyClient || !oneTxPaymentClient) {
+  if (!colonyClient || !oneTxPaymentClient || !stakedExpenditureClient) {
     return;
   }
 
-  const parsedAction = parseAction(action, [colonyClient, oneTxPaymentClient]);
+  const parsedAction = parseAction(action, [
+    colonyClient,
+    oneTxPaymentClient,
+    stakedExpenditureClient,
+  ]);
 
   const isMotionAddingADomain =
     parsedAction?.name === ColonyOperations.AddDomain;
