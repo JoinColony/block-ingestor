@@ -7,6 +7,7 @@ import {
   addEventListener,
   getEventListeners,
   setEventListeners,
+  setupListenerForOneTxPaymentExtensions,
   setupListenersForStagedExpenditureExtensions,
 } from '~eventListeners';
 import {
@@ -70,6 +71,7 @@ export const setupListenersForExtensions = async (): Promise<void> => {
     addNetworkEventListener(eventSignature),
   );
 
+  setupListenerForOneTxPaymentExtensions();
   setupListenersForVotingReputationExtensions();
   setupListenersForStakedExpenditureExtensions();
   setupListenersForStagedExpenditureExtensions();
