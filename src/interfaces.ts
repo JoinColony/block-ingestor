@@ -47,6 +47,10 @@ const getInterfaceByExtensionHash = (
   extensionHash: string,
 ): utils.Interface | null => {
   switch (extensionHash) {
+    case getExtensionHash(Extension.OneTxPayment): {
+      return OneTxPaymentEventsFactory.connect(constants.AddressZero, provider)
+        .interface;
+    }
     case getExtensionHash(Extension.VotingReputation): {
       return VotingReputationEventsFactory.connect(
         constants.AddressZero,
@@ -65,10 +69,7 @@ const getInterfaceByExtensionHash = (
         provider,
       ).interface;
     }
-    case EventListenerType.OneTxPayment: {
-      return OneTxPaymentEventsFactory.connect(constants.AddressZero, provider)
-        .interface;
-    }
+
     default: {
       return null;
     }
