@@ -24,6 +24,7 @@ import {
   handleMulticallMotion,
   handleCancelStakedExpenditureMotion,
   handleCreateStreamingPaymentMotion,
+  handleReleaseExpenditureStageMotion,
 } from './handlers';
 
 export default async (event: ContractEvent): Promise<void> => {
@@ -178,6 +179,15 @@ export default async (event: ContractEvent): Promise<void> => {
 
       case ColonyOperations.CreateStreamingPayment: {
         await handleCreateStreamingPaymentMotion(
+          event,
+          parsedAction,
+          gasEstimate,
+        );
+        break;
+      }
+
+      case ColonyOperations.ReleaseExpenditureStage: {
+        await handleReleaseExpenditureStageMotion(
           event,
           parsedAction,
           gasEstimate,

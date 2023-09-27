@@ -400,6 +400,8 @@ export enum ColonyActionType {
   PaymentMotion = 'PAYMENT_MOTION',
   /** An action related to the recovery functionality of a Colony */
   Recovery = 'RECOVERY',
+  /** An action related to creating a motion to release an expenditure stage */
+  ReleaseExpenditureStageMotion = 'RELEASE_EXPENDITURE_STAGE_MOTION',
   /** An action related to setting user roles within a Colony */
   SetUserRoles = 'SET_USER_ROLES',
   /** An action related to setting user roles within a Colony via a motion */
