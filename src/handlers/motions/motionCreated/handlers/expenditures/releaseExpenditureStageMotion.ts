@@ -7,12 +7,6 @@ import {
   getExpenditureDatabaseId,
   toNumber,
 } from '~utils';
-import { query } from '~amplifyClient';
-import {
-  GetExpenditureDocument,
-  GetExpenditureQuery,
-  GetExpenditureQueryVariables,
-} from '~graphql';
 
 import { createMotionInDB } from '../../helpers';
 
@@ -21,37 +15,24 @@ export default async (
   { name, args: actionArgs }: TransactionDescription,
   gasEstimate: BigNumber,
 ): Promise<void> => {
-  const { colonyAddress } = event;
+  const { colonyAddress, args } = event;
   const [, , expenditureId] = actionArgs;
-  const convertedExpenditureId = toNumber(expenditureId);
+
+  const [, , domainId] = args;
+  const [, , , slotId] = actionArgs;
 
   if (!colonyAddress) {
     return;
   }
 
-  const databaseId = getExpenditureDatabaseId(
-    colonyAddress,
-    convertedExpenditureId,
-  );
-
-  const response = await query<
-    GetExpenditureQuery,
-    GetExpenditureQueryVariables
-  >(GetExpenditureDocument, {
-    id: databaseId,
-  });
-  const domainId = response?.data?.getExpenditure?.nativeDomainId;
-
   await createMotionInDB(event, {
     type: motionNameMapping[name],
-    fromDomainId:
-      colonyAddress && domainId
-        ? getDomainDatabaseId(colonyAddress, domainId)
-        : undefined,
+    fromDomainId: getDomainDatabaseId(colonyAddress, domainId),
     gasEstimate: gasEstimate.toString(),
     expenditureId: getExpenditureDatabaseId(
       colonyAddress,
       toNumber(expenditureId),
     ),
+    expenditureSlotId: slotId.toNumber(),
   });
 };

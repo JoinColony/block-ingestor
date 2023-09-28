@@ -719,6 +719,8 @@ export type ColonyMotion = {
   createdBy: Scalars['String'];
   /** Expenditure associated with the motion, if any */
   expenditureId?: Maybe<Scalars['ID']>;
+  /** Expenditure stage associated with the motion */
+  expenditureSlotId?: Maybe<Scalars['Int']>;
   /**
    * An option to manually specify the amount of gas to estimate for the finalization of this motion.
    * Particularly useful for "heavy" actions, such as a multicall.
@@ -1127,6 +1129,7 @@ export type CreateColonyMetadataInput = {
 export type CreateColonyMotionInput = {
   createdBy: Scalars['String'];
   expenditureId?: InputMaybe<Scalars['ID']>;
+  expenditureSlotId?: InputMaybe<Scalars['Int']>;
   gasEstimate: Scalars['String'];
   hasObjection: Scalars['Boolean'];
   id?: InputMaybe<Scalars['ID']>;
@@ -2402,6 +2405,7 @@ export type ModelColonyMotionConditionInput = {
   and?: InputMaybe<Array<InputMaybe<ModelColonyMotionConditionInput>>>;
   createdBy?: InputMaybe<ModelStringInput>;
   expenditureId?: InputMaybe<ModelIdInput>;
+  expenditureSlotId?: InputMaybe<ModelIntInput>;
   gasEstimate?: InputMaybe<ModelStringInput>;
   hasObjection?: InputMaybe<ModelBooleanInput>;
   isDecision?: InputMaybe<ModelBooleanInput>;
@@ -2431,6 +2435,7 @@ export type ModelColonyMotionFilterInput = {
   and?: InputMaybe<Array<InputMaybe<ModelColonyMotionFilterInput>>>;
   createdBy?: InputMaybe<ModelStringInput>;
   expenditureId?: InputMaybe<ModelIdInput>;
+  expenditureSlotId?: InputMaybe<ModelIntInput>;
   gasEstimate?: InputMaybe<ModelStringInput>;
   hasObjection?: InputMaybe<ModelBooleanInput>;
   id?: InputMaybe<ModelIdInput>;
@@ -3220,6 +3225,7 @@ export type ModelSubscriptionColonyMotionFilterInput = {
   and?: InputMaybe<Array<InputMaybe<ModelSubscriptionColonyMotionFilterInput>>>;
   createdBy?: InputMaybe<ModelSubscriptionStringInput>;
   expenditureId?: InputMaybe<ModelSubscriptionIdInput>;
+  expenditureSlotId?: InputMaybe<ModelSubscriptionIntInput>;
   gasEstimate?: InputMaybe<ModelSubscriptionStringInput>;
   hasObjection?: InputMaybe<ModelSubscriptionBooleanInput>;
   id?: InputMaybe<ModelSubscriptionIdInput>;
@@ -6721,6 +6727,7 @@ export type UpdateColonyMetadataInput = {
 export type UpdateColonyMotionInput = {
   createdBy?: InputMaybe<Scalars['String']>;
   expenditureId?: InputMaybe<Scalars['ID']>;
+  expenditureSlotId?: InputMaybe<Scalars['Int']>;
   gasEstimate?: InputMaybe<Scalars['String']>;
   hasObjection?: InputMaybe<Scalars['Boolean']>;
   id: Scalars['ID'];

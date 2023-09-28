@@ -247,7 +247,11 @@ export const createMotionInDB = async (
     | 'motionId'
     | 'initiatorAddress'
     | 'blockNumber'
-  > & { gasEstimate: string; expenditureId?: string },
+  > & {
+    gasEstimate: string;
+    expenditureId?: string;
+    expenditureSlotId?: number;
+  },
 ): Promise<GraphQLFnReturn<CreateColonyMotionMutation> | undefined> => {
   if (!colonyAddress) {
     return;
