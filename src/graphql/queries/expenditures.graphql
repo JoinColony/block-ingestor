@@ -25,9 +25,12 @@ query GetExpenditureByNativeFundingPotIdAndColony(
   ) {
     items {
       id
-      fundingMotions {
+      motions {
         items {
           transactionHash
+          action {
+            type
+          }
         }
       }
     }
@@ -40,6 +43,17 @@ query GetExpenditureMetadata($id: ID!) {
       name
       slotId
       isReleased
+    }
+  }
+}
+
+query GetStreamingPayment($id: ID!) {
+  getStreamingPayment(id: $id) {
+    id
+    payouts {
+      amount
+      tokenAddress
+      isClaimed
     }
   }
 }

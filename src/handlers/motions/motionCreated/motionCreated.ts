@@ -16,6 +16,7 @@ import {
   handleSetUserRolesMotion,
   handleSimpleDecisionMotion,
   handleMulticallMotion,
+  handleCancelStakedExpenditureMotion,
 } from './handlers';
 
 export default async (event: ContractEvent): Promise<void> => {
@@ -39,10 +40,15 @@ export default async (event: ContractEvent): Promise<void> => {
     Extension.OneTxPayment,
   );
 
+  const stakedExpenditureClient = await colonyClient.getExtensionClient(
+    Extension.StakedExpenditure,
+  );
+
   const motion = await votingReputationClient.getMotion(motionId);
   const parsedAction = parseAction(motion.action, [
     colonyClient,
     oneTxPaymentClient,
+    stakedExpenditureClient,
   ]);
 
   let gasEstimate: BigNumber;
@@ -67,11 +73,12 @@ export default async (event: ContractEvent): Promise<void> => {
     try {
       gasEstimate = await estimateMotionGas();
     } catch {
+      const manualEstimate = 500_000;
       // If it fails again, let's just set it manually.
       console.error(
-        "Unable to estimate gas for motion's action. Manually setting to 500_000",
+        `Unable to estimate gas for motion's action. Manually setting to ${manualEstimate}`,
       );
-      gasEstimate = BigNumber.from(500_000);
+      gasEstimate = BigNumber.from(manualEstimate);
     }
   }
 
@@ -147,6 +154,15 @@ export default async (event: ContractEvent): Promise<void> => {
         await handleSimpleDecisionMotion(
           event,
           parsedAction as SimpleTransactionDescription,
+          gasEstimate,
+        );
+        break;
+      }
+
+      case ColonyOperations.CancelStakedExpenditure: {
+        await handleCancelStakedExpenditureMotion(
+          event,
+          parsedAction,
           gasEstimate,
         );
         break;

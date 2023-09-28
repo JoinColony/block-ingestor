@@ -46,6 +46,9 @@ import {
   handleExpenditureStakerPunished,
   handleReputationMiningCycleComplete,
   handleOneTxPaymentAction,
+  handleStreamingPaymentCreated,
+  handleExpenditureMadeViaStake,
+  handlePaymentTokenUpdated,
 } from './handlers';
 
 dotenv.config();
@@ -293,6 +296,11 @@ export default async (event: ContractEvent): Promise<void> => {
       return;
     }
 
+    case ContractEventsSignatures.ExpenditureMadeViaStake: {
+      await handleExpenditureMadeViaStake(event);
+      return;
+    }
+
     case ContractEventsSignatures.ExpenditureMadeStaged: {
       await handleExpenditureMadeStaged(event);
       return;
@@ -300,6 +308,16 @@ export default async (event: ContractEvent): Promise<void> => {
 
     case ContractEventsSignatures.StagedPaymentReleased: {
       await handleStagedPaymentReleased(event);
+      return;
+    }
+
+    case ContractEventsSignatures.StreamingPaymentCreated: {
+      await handleStreamingPaymentCreated(event);
+      return;
+    }
+
+    case ContractEventsSignatures.PaymentTokenUpdated: {
+      await handlePaymentTokenUpdated(event);
       return;
     }
 

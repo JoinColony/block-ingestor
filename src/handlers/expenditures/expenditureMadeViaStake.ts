@@ -1,35 +1,34 @@
 import { mutate } from '~amplifyClient';
 import {
-  ExpenditureType,
   UpdateExpenditureDocument,
   UpdateExpenditureMutation,
   UpdateExpenditureMutationVariables,
 } from '~graphql';
 import { ContractEvent } from '~types';
-import { getExpenditureDatabaseId, output, toNumber, verbose } from '~utils';
+import { getExpenditureDatabaseId, toNumber, verbose } from '~utils';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { colonyAddress } = event;
-  const { expenditureId, staged } = event.args;
+  const { expenditureId } = event.args;
   const convertedExpenditureId = toNumber(expenditureId);
 
   if (!colonyAddress) {
-    output('Colony address missing for ExpenditureMadeStaged event');
     return;
   }
 
-  verbose(
-    `Expenditure with ID ${convertedExpenditureId} in colony ${colonyAddress} ${
-      staged ? 'set' : 'unset'
-    } as staged`,
+  const databaseId = getExpenditureDatabaseId(
+    colonyAddress,
+    convertedExpenditureId,
   );
+
+  verbose(`Expenditure with ID ${databaseId} made via stake`);
 
   await mutate<UpdateExpenditureMutation, UpdateExpenditureMutationVariables>(
     UpdateExpenditureDocument,
     {
       input: {
-        id: getExpenditureDatabaseId(colonyAddress, convertedExpenditureId),
-        type: ExpenditureType.Staged,
+        id: databaseId,
+        isStaked: true,
       },
     },
   );

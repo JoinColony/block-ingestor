@@ -15,3 +15,15 @@ mutation UpdateExpenditureMetadata($input: UpdateExpenditureMetadataInput!) {
     id
   }
 }
+
+mutation CreateStreamingPayment($input: CreateStreamingPaymentInput!) {
+  createStreamingPayment(input: $input) {
+    id
+  }
+}
+
+mutation UpdateStreamingPayment($input: UpdateStreamingPaymentInput!) {
+  updateStreamingPayment(input: $input) {
+    id
+  }
+}

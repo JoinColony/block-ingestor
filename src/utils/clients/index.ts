@@ -9,6 +9,7 @@ import { getVotingClient } from './voting';
 export * from './colony';
 export * from './voting';
 export * from './stakedExpenditure';
+export * from './streamingPayments';
 
 /**
  * Function returning a (hopefully) cached client for the given type and colony address

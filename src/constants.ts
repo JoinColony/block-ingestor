@@ -9,6 +9,7 @@ export const SUPPORTED_EXTENSION_IDS = [
   Extension.VotingReputation,
   Extension.StakedExpenditure,
   Extension.StagedExpenditure,
+  Extension.StreamingPayments,
 ];
 
 export const SIMPLE_DECISIONS_ACTION_CODE = '0x12345678';
