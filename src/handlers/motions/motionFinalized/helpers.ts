@@ -9,6 +9,7 @@ import {
   getExpenditureDatabaseId,
   getDomainDatabaseId,
   getExistingTokenAddresses,
+  getStagedExpenditureClient,
   getStakedExpenditureClient,
   getStreamingPaymentsClient,
   output,
@@ -311,13 +312,16 @@ export const linkPendingMetadata = async (
   const streamingPaymentClient = await getStreamingPaymentsClient(
     colonyAddress,
   );
+  const stagedExpenditureClient = await getStagedExpenditureClient(
+    colonyAddress,
+  );
 
   const parsedAction = parseAction(action, [
     colonyClient,
     oneTxPaymentClient,
     stakedExpenditureClient,
     streamingPaymentClient,
-    null,
+    stagedExpenditureClient,
   ]);
 
   if (!parsedAction) {
