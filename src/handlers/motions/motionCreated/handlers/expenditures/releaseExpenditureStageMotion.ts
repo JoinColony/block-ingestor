@@ -33,6 +33,6 @@ export default async (
       colonyAddress,
       toNumber(expenditureId),
     ),
-    expenditureSlotId: slotId.toNumber(),
+    expenditureSlotId: toNumber(slotId),
   });
 };
