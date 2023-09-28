@@ -237,6 +237,7 @@ export const createMotionInDB = async (
   {
     gasEstimate,
     expenditureId,
+    expenditureSlotId,
     ...input
   }: Omit<
     CreateColonyActionInput,
@@ -292,7 +293,12 @@ export const createMotionInDB = async (
   };
 
   await Promise.all([
-    createColonyMotion({ ...motionData, gasEstimate, expenditureId }),
+    createColonyMotion({
+      ...motionData,
+      gasEstimate,
+      expenditureId,
+      expenditureSlotId,
+    }),
     createMotionMessage(initialMotionMessage),
     createColonyAction(actionData),
   ]);
