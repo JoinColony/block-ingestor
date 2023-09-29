@@ -5599,6 +5599,15 @@ export type ColonyFragment = {
       rewards: { __typename?: 'MotionStakeValues'; yay: string; nay: string };
     }>;
   }> | null;
+  domains?: {
+    __typename?: 'ModelDomainConnection';
+    nextToken?: string | null;
+    items: Array<{
+      __typename?: 'Domain';
+      id: string;
+      nativeSkillId: number;
+    } | null>;
+  } | null;
 };
 
 export type ExtensionFragment = {
@@ -6105,6 +6114,7 @@ export type GetColonyMetadataQuery = {
 
 export type GetColonyQueryVariables = Exact<{
   id: Scalars['ID'];
+  nextToken?: InputMaybe<Scalars['String']>;
 }>;
 
 export type GetColonyQuery = {
@@ -6130,6 +6140,15 @@ export type GetColonyQuery = {
         rewards: { __typename?: 'MotionStakeValues'; yay: string; nay: string };
       }>;
     }> | null;
+    domains?: {
+      __typename?: 'ModelDomainConnection';
+      nextToken?: string | null;
+      items: Array<{
+        __typename?: 'Domain';
+        id: string;
+        nativeSkillId: number;
+      } | null>;
+    } | null;
   } | null;
 };
 
@@ -6604,6 +6623,13 @@ export const Colony = gql`
         isClaimed
       }
     }
+    domains(limit: 1000, nextToken: $nextToken) {
+      items {
+        id
+        nativeSkillId
+      }
+      nextToken
+    }
   }
 `;
 export const Extension = gql`
@@ -7035,7 +7061,7 @@ export const GetColonyMetadataDocument = gql`
   }
 `;
 export const GetColonyDocument = gql`
-  query GetColony($id: ID!) {
+  query GetColony($id: ID!, $nextToken: String) {
     getColony(id: $id) {
       ...Colony
     }
