@@ -271,16 +271,11 @@ export const linkPendingMetadata = async (
   finalizedMotion: ColonyMotion,
 ): Promise<void> => {
   const colonyClient = await getCachedColonyClient(colonyAddress);
-  const oneTxPaymentClient = await colonyClient?.getExtensionClient(
-    Extension.OneTxPayment,
-  );
+  const oneTxPaymentClient =
+    (await colonyClient?.getExtensionClient(Extension.OneTxPayment)) ?? null;
   const stakedExpenditureClient = await getStakedExpenditureClient(
     colonyAddress,
   );
-
-  if (!colonyClient || !oneTxPaymentClient || !stakedExpenditureClient) {
-    return;
-  }
 
   const parsedAction = parseAction(action, [
     colonyClient,
@@ -288,12 +283,16 @@ export const linkPendingMetadata = async (
     stakedExpenditureClient,
   ]);
 
+  if (!parsedAction) {
+    return;
+  }
+
   const isMotionAddingADomain =
-    parsedAction?.name === ColonyOperations.AddDomain;
+    parsedAction.name === ColonyOperations.AddDomain;
   const isMotionEditingADomain =
-    parsedAction?.name === ColonyOperations.EditDomain;
+    parsedAction.name === ColonyOperations.EditDomain;
   const isMotionEditingAColony =
-    parsedAction?.name === ColonyOperations.EditColony;
+    parsedAction.name === ColonyOperations.EditColony;
 
   if (
     isMotionAddingADomain ||
