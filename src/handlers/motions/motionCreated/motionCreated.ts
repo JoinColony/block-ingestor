@@ -1,8 +1,13 @@
-import { Extension } from '@colony/colony-js';
 import { BigNumber, constants } from 'ethers';
 
 import { ColonyOperations, ContractEvent } from '~types';
-import { getCachedColonyClient, getVotingClient, verbose } from '~utils';
+import {
+  getCachedColonyClient,
+  getStakedExpenditureClient,
+  getOneTxPaymentClient,
+  getVotingClient,
+  verbose,
+} from '~utils';
 import { SimpleTransactionDescription, parseAction } from './helpers';
 import {
   handleManageDomainMotion,
@@ -36,12 +41,10 @@ export default async (event: ContractEvent): Promise<void> => {
     return;
   }
 
-  const oneTxPaymentClient = await colonyClient.getExtensionClient(
-    Extension.OneTxPayment,
-  );
+  const oneTxPaymentClient = await getOneTxPaymentClient(colonyAddress);
 
-  const stakedExpenditureClient = await colonyClient.getExtensionClient(
-    Extension.StakedExpenditure,
+  const stakedExpenditureClient = await getStakedExpenditureClient(
+    colonyAddress,
   );
 
   const motion = await votingReputationClient.getMotion(motionId);

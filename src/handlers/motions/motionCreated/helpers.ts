@@ -39,9 +39,9 @@ export interface SimpleTransactionDescription {
 }
 
 type MotionActionClients = [
-  AnyColonyClient,
-  AnyOneTxPaymentClient,
-  AnyStakedExpenditureClient,
+  AnyColonyClient | null,
+  AnyOneTxPaymentClient | null,
+  AnyStakedExpenditureClient | null,
 ];
 
 export const parseAction = (
@@ -55,6 +55,9 @@ export const parseAction = (
   }
 
   for (const client of clients) {
+    if (!client) {
+      continue;
+    }
     // Return the first time a client can successfully parse the motion
     try {
       return client.interface.parseTransaction({
