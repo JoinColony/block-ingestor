@@ -8,6 +8,9 @@ query GetColonyActionByMotionId($motionId: ID!) {
       pendingColonyMetadata {
         ...ColonyMetadata
       }
+      pendingStreamingPaymentMetadata {
+        ...StreamingPaymentMetadata
+      }
       colonyDecisionId
     }
   }
