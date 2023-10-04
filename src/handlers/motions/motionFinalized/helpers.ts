@@ -19,7 +19,7 @@ import {
   ColonyMetadata,
   ColonyMotion,
   CreateDomainMetadataDocument,
-  CreateStreamingPaymentDocument,
+  CreateStreamingPaymentMetadataDocument,
   DomainMetadata,
   GetColonyActionByMotionIdDocument,
   GetColonyActionByMotionIdQuery,
@@ -286,7 +286,7 @@ const linkPendingStreamingPaymentMetadataWithPayment = async (
   // The new domain should be created by now, so we just get the total of existing domains
   // and use that as an id to link the pending metadata.
 
-  await mutate(CreateStreamingPaymentDocument, {
+  await mutate(CreateStreamingPaymentMetadataDocument, {
     input: {
       ...pendingStreamingPaymentMetadata,
       id: getExpenditureDatabaseId(

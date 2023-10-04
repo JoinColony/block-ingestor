@@ -7291,6 +7291,18 @@ export type UpdateStreamingPaymentMutation = {
   } | null;
 };
 
+export type CreateStreamingPaymentMetadataMutationVariables = Exact<{
+  input: CreateStreamingPaymentMetadataInput;
+}>;
+
+export type CreateStreamingPaymentMetadataMutation = {
+  __typename?: 'Mutation';
+  createStreamingPaymentMetadata?: {
+    __typename?: 'StreamingPaymentMetadata';
+    id: string;
+  } | null;
+};
+
 export type CreateColonyExtensionMutationVariables = Exact<{
   input: CreateColonyExtensionInput;
 }>;
@@ -8437,6 +8449,15 @@ export const CreateStreamingPaymentDocument = gql`
 export const UpdateStreamingPaymentDocument = gql`
   mutation UpdateStreamingPayment($input: UpdateStreamingPaymentInput!) {
     updateStreamingPayment(input: $input) {
+      id
+    }
+  }
+`;
+export const CreateStreamingPaymentMetadataDocument = gql`
+  mutation CreateStreamingPaymentMetadata(
+    $input: CreateStreamingPaymentMetadataInput!
+  ) {
+    createStreamingPaymentMetadata(input: $input) {
       id
     }
   }
