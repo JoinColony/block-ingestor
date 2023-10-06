@@ -157,7 +157,11 @@ export default async (event: ContractEvent): Promise<void> => {
       }
 
       case ColonyOperations.MakeArbitraryTransactions: {
-        await handleMakeArbitraryTransactionsMotion(event, parsedAction);
+        await handleMakeArbitraryTransactionsMotion(
+          event,
+          parsedAction,
+          gasEstimate,
+        );
         break;
       }
 
