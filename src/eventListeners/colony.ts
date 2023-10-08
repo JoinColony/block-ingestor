@@ -88,6 +88,7 @@ export const setupListenersForColony = (colonyAddress: string): void => {
     ContractEventsSignatures.ExpenditureClaimDelaySet,
     ContractEventsSignatures.ExpenditurePayoutModifierSet,
     ContractEventsSignatures.ExpenditurePayoutClaimed,
+    ContractEventsSignatures.ExpenditureStateChanged,
     ContractEventsSignatures.AnnotateTransaction,
   ];
 
