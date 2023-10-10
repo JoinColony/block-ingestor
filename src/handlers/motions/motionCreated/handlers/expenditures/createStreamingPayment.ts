@@ -2,9 +2,9 @@ import { BigNumber } from 'ethers';
 import { TransactionDescription } from 'ethers/lib/utils';
 
 import { ContractEvent, motionNameMapping } from '~types';
+import { getPendingMetadataDatabaseId } from '~utils';
 
 import { createMotionInDB } from '../../helpers';
-import { getPendingMetadataDatabaseId } from '~utils';
 
 export default async (
   event: ContractEvent,
