@@ -1,0 +1,5 @@
+query GetColonyAction($transactionHash: ID!) {
+  getColonyAction(id: $transactionHash) {
+    id
+  }
+}

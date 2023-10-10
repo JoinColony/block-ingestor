@@ -1,0 +1,5 @@
+query GetSafeTransactionByTransactionHash($transactionHash: ID!) {
+  getSafeTransaction(id: $transactionHash) {
+    id
+  }
+}
