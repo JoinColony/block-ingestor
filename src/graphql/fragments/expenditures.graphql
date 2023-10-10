@@ -1,0 +1,4 @@
+fragment StreamingPaymentMetadata on StreamingPaymentMetadata {
+  endCondition
+  limitAmount
+}

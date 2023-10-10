@@ -6,9 +6,11 @@ import { ColonyOperations, MotionVote } from '~types';
 import {
   getCachedColonyClient,
   getColonyFromDB,
+  getExpenditureDatabaseId,
   getDomainDatabaseId,
   getExistingTokenAddresses,
   getStakedExpenditureClient,
+  getStreamingPaymentsClient,
   output,
   updateColonyTokens,
 } from '~utils';
@@ -17,6 +19,7 @@ import {
   ColonyMetadata,
   ColonyMotion,
   CreateDomainMetadataDocument,
+  CreateStreamingPaymentMetadataDocument,
   DomainMetadata,
   GetColonyActionByMotionIdDocument,
   GetColonyActionByMotionIdQuery,
@@ -28,6 +31,7 @@ import {
   GetDomainMetadataQuery,
   GetDomainMetadataQueryVariables,
   StakerReward,
+  StreamingPaymentMetadataFragment,
   UpdateColonyDocument,
   UpdateColonyMetadataDocument,
   UpdateDomainMetadataDocument,
@@ -265,6 +269,34 @@ const linkPendingColonyMetadataWithColony = async (
   });
 };
 
+const linkPendingStreamingPaymentMetadataWithPayment = async (
+  pendingStreamingPaymentMetadata: StreamingPaymentMetadataFragment,
+  colonyAddress: string,
+): Promise<void> => {
+  const streamingPaymentClient = await getStreamingPaymentsClient(
+    colonyAddress,
+  );
+
+  if (!streamingPaymentClient) {
+    return;
+  }
+
+  const streamingPaymentCount =
+    await streamingPaymentClient.getNumStreamingPayments();
+  // The new domain should be created by now, so we just get the total of existing domains
+  // and use that as an id to link the pending metadata.
+
+  await mutate(CreateStreamingPaymentMetadataDocument, {
+    input: {
+      ...pendingStreamingPaymentMetadata,
+      id: getExpenditureDatabaseId(
+        colonyAddress,
+        streamingPaymentCount.toNumber(),
+      ),
+    },
+  });
+};
+
 export const linkPendingMetadata = async (
   action: string,
   colonyAddress: string,
@@ -276,11 +308,15 @@ export const linkPendingMetadata = async (
   const stakedExpenditureClient = await getStakedExpenditureClient(
     colonyAddress,
   );
+  const streamingPaymentClient = await getStreamingPaymentsClient(
+    colonyAddress,
+  );
 
   const parsedAction = parseAction(action, [
     colonyClient,
     oneTxPaymentClient,
     stakedExpenditureClient,
+    streamingPaymentClient,
   ]);
 
   if (!parsedAction) {
@@ -293,11 +329,14 @@ export const linkPendingMetadata = async (
     parsedAction.name === ColonyOperations.EditDomain;
   const isMotionEditingAColony =
     parsedAction.name === ColonyOperations.EditColony;
+  const isMotionCreatingAStreamingPayment =
+    parsedAction.name === ColonyOperations.CreateStreamingPayment;
 
   if (
     isMotionAddingADomain ||
     isMotionEditingADomain ||
-    isMotionEditingAColony
+    isMotionEditingAColony ||
+    isMotionCreatingAStreamingPayment
   ) {
     const { data } =
       (await query<
@@ -330,6 +369,14 @@ export const linkPendingMetadata = async (
     ) {
       await linkPendingColonyMetadataWithColony(
         colonyAction[0].pendingColonyMetadata,
+        colonyAddress,
+      );
+    } else if (
+      isMotionCreatingAStreamingPayment &&
+      colonyAction?.[0]?.pendingStreamingPaymentMetadata
+    ) {
+      await linkPendingStreamingPaymentMetadataWithPayment(
+        colonyAction[0].pendingStreamingPaymentMetadata,
         colonyAddress,
       );
     }

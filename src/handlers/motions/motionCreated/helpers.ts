@@ -4,6 +4,7 @@ import {
   AnyColonyClient,
   AnyOneTxPaymentClient,
   AnyStakedExpenditureClient,
+  AnyStreamingPaymentsClient,
   AnyVotingReputationClient,
 } from '@colony/colony-js';
 
@@ -42,6 +43,7 @@ type MotionActionClients = [
   AnyColonyClient | null,
   AnyOneTxPaymentClient | null,
   AnyStakedExpenditureClient | null,
+  AnyStreamingPaymentsClient | null,
 ];
 
 export const parseAction = (

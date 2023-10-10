@@ -271,6 +271,10 @@ export type ColonyAction = {
   pendingDomainMetadata?: Maybe<DomainMetadata>;
   /** Identifier of domain metadata that is stored temporarily and commited to the database once the corresponding motion passes */
   pendingDomainMetadataId?: Maybe<Scalars['ID']>;
+  /** Streaming Payment metadata that is stored temporarily and commited to the database once the corresponding motion passes */
+  pendingStreamingPaymentMetadata?: Maybe<StreamingPaymentMetadata>;
+  /** Identifier of Streaming Payment metadata that is stored temporarily and commited to the database once the corresponding motion passes */
+  pendingStreamingPaymentMetadataId?: Maybe<Scalars['ID']>;
   /** The address of the action recipient, if applicable */
   recipientAddress?: Maybe<Scalars['ID']>;
   /** The corresponding Colony which was involved the action, if applicable */
@@ -345,6 +349,8 @@ export enum ColonyActionType {
   CreateDomain = 'CREATE_DOMAIN',
   /** An action related to creating a domain within a Colony via a motion */
   CreateDomainMotion = 'CREATE_DOMAIN_MOTION',
+  /** An action related to the creation of a motion to start a streaming payment.  */
+  CreateStreamingPaymentMotion = 'CREATE_STREAMING_PAYMENT_MOTION',
   /** An action related to editing a domain's details */
   EditDomain = 'EDIT_DOMAIN',
   /** An action related to editing a domain's details via a motion */
@@ -1000,6 +1006,7 @@ export type CreateColonyActionInput = {
   payments?: InputMaybe<Array<PaymentInput>>;
   pendingColonyMetadataId?: InputMaybe<Scalars['ID']>;
   pendingDomainMetadataId?: InputMaybe<Scalars['ID']>;
+  pendingStreamingPaymentMetadataId?: InputMaybe<Scalars['ID']>;
   recipientAddress?: InputMaybe<Scalars['ID']>;
   roles?: InputMaybe<ColonyActionRolesInput>;
   showInActionsList: Scalars['Boolean'];
@@ -2081,6 +2088,7 @@ export type ModelColonyActionConditionInput = {
   paymentId?: InputMaybe<ModelIntInput>;
   pendingColonyMetadataId?: InputMaybe<ModelIdInput>;
   pendingDomainMetadataId?: InputMaybe<ModelIdInput>;
+  pendingStreamingPaymentMetadataId?: InputMaybe<ModelIdInput>;
   recipientAddress?: InputMaybe<ModelIdInput>;
   showInActionsList?: InputMaybe<ModelBooleanInput>;
   toDomainId?: InputMaybe<ModelIdInput>;
@@ -2116,6 +2124,7 @@ export type ModelColonyActionFilterInput = {
   paymentId?: InputMaybe<ModelIntInput>;
   pendingColonyMetadataId?: InputMaybe<ModelIdInput>;
   pendingDomainMetadataId?: InputMaybe<ModelIdInput>;
+  pendingStreamingPaymentMetadataId?: InputMaybe<ModelIdInput>;
   recipientAddress?: InputMaybe<ModelIdInput>;
   showInActionsList?: InputMaybe<ModelBooleanInput>;
   toDomainId?: InputMaybe<ModelIdInput>;
@@ -3099,6 +3108,7 @@ export type ModelSubscriptionColonyActionFilterInput = {
   paymentId?: InputMaybe<ModelSubscriptionIntInput>;
   pendingColonyMetadataId?: InputMaybe<ModelSubscriptionIdInput>;
   pendingDomainMetadataId?: InputMaybe<ModelSubscriptionIdInput>;
+  pendingStreamingPaymentMetadataId?: InputMaybe<ModelSubscriptionIdInput>;
   recipientAddress?: InputMaybe<ModelSubscriptionIdInput>;
   showInActionsList?: InputMaybe<ModelSubscriptionBooleanInput>;
   toDomainId?: InputMaybe<ModelSubscriptionIdInput>;
@@ -4730,6 +4740,7 @@ export type Query = {
   getColony?: Maybe<Colony>;
   getColonyAction?: Maybe<ColonyAction>;
   getColonyActionByMotionId?: Maybe<ModelColonyActionConnection>;
+  getColonyActionsByType?: Maybe<ModelColonyActionConnection>;
   getColonyByAddress?: Maybe<ModelColonyConnection>;
   getColonyByName?: Maybe<ModelColonyConnection>;
   getColonyByType?: Maybe<ModelColonyConnection>;
@@ -4878,6 +4889,15 @@ export type QueryGetColonyActionByMotionIdArgs = {
   motionId: Scalars['ID'];
   nextToken?: InputMaybe<Scalars['String']>;
   sortDirection?: InputMaybe<ModelSortDirection>;
+};
+
+/** Root query type */
+export type QueryGetColonyActionsByTypeArgs = {
+  filter?: InputMaybe<ModelColonyActionFilterInput>;
+  limit?: InputMaybe<Scalars['Int']>;
+  nextToken?: InputMaybe<Scalars['String']>;
+  sortDirection?: InputMaybe<ModelSortDirection>;
+  type: ColonyActionType;
 };
 
 /** Root query type */
@@ -6339,6 +6359,7 @@ export type UpdateColonyActionInput = {
   payments?: InputMaybe<Array<PaymentInput>>;
   pendingColonyMetadataId?: InputMaybe<Scalars['ID']>;
   pendingDomainMetadataId?: InputMaybe<Scalars['ID']>;
+  pendingStreamingPaymentMetadataId?: InputMaybe<Scalars['ID']>;
   recipientAddress?: InputMaybe<Scalars['ID']>;
   roles?: InputMaybe<ColonyActionRolesInput>;
   showInActionsList?: InputMaybe<Scalars['Boolean']>;
@@ -6978,6 +6999,12 @@ export type ColonyMetadataFragment = {
   } | null;
 };
 
+export type StreamingPaymentMetadataFragment = {
+  __typename?: 'StreamingPaymentMetadata';
+  endCondition: StreamingPaymentEndCondition;
+  limitAmount?: string | null;
+};
+
 export type ExtensionFragment = {
   __typename?: 'ColonyExtension';
   id: string;
@@ -7260,6 +7287,18 @@ export type UpdateStreamingPaymentMutation = {
   __typename?: 'Mutation';
   updateStreamingPayment?: {
     __typename?: 'StreamingPayment';
+    id: string;
+  } | null;
+};
+
+export type CreateStreamingPaymentMetadataMutationVariables = Exact<{
+  input: CreateStreamingPaymentMetadataInput;
+}>;
+
+export type CreateStreamingPaymentMetadataMutation = {
+  __typename?: 'Mutation';
+  createStreamingPaymentMetadata?: {
+    __typename?: 'StreamingPaymentMetadata';
     id: string;
   } | null;
 };
@@ -7929,6 +7968,11 @@ export type GetColonyActionByMotionIdQuery = {
           removed?: Array<string> | null;
         } | null;
       } | null;
+      pendingStreamingPaymentMetadata?: {
+        __typename?: 'StreamingPaymentMetadata';
+        endCondition: StreamingPaymentEndCondition;
+        limitAmount?: string | null;
+      } | null;
     } | null>;
   } | null;
 };
@@ -8159,6 +8203,12 @@ export const ColonyMetadata = gql`
       added
       removed
     }
+  }
+`;
+export const StreamingPaymentMetadata = gql`
+  fragment StreamingPaymentMetadata on StreamingPaymentMetadata {
+    endCondition
+    limitAmount
   }
 `;
 export const Extension = gql`
@@ -8399,6 +8449,15 @@ export const CreateStreamingPaymentDocument = gql`
 export const UpdateStreamingPaymentDocument = gql`
   mutation UpdateStreamingPayment($input: UpdateStreamingPaymentInput!) {
     updateStreamingPayment(input: $input) {
+      id
+    }
+  }
+`;
+export const CreateStreamingPaymentMetadataDocument = gql`
+  mutation CreateStreamingPaymentMetadata(
+    $input: CreateStreamingPaymentMetadataInput!
+  ) {
+    createStreamingPaymentMetadata(input: $input) {
       id
     }
   }
@@ -8856,12 +8915,16 @@ export const GetColonyActionByMotionIdDocument = gql`
         pendingColonyMetadata {
           ...ColonyMetadata
         }
+        pendingStreamingPaymentMetadata {
+          ...StreamingPaymentMetadata
+        }
         colonyDecisionId
       }
     }
   }
   ${DomainMetadata}
   ${ColonyMetadata}
+  ${StreamingPaymentMetadata}
 `;
 export const GetColonyMotionDocument = gql`
   query GetColonyMotion($id: ID!) {

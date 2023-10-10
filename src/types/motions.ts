@@ -18,6 +18,7 @@ export enum ColonyOperations {
   SimpleDecision = 'simpleDecision',
   Multicall = 'multicall',
   CancelStakedExpenditure = 'cancelAndPunish',
+  CreateStreamingPayment = 'create',
 }
 
 export enum MotionEvents {
@@ -53,6 +54,8 @@ export const motionNameMapping: { [key: string]: ColonyActionType } = {
   [ColonyOperations.SimpleDecision]: ColonyActionType.CreateDecisionMotion,
   [ColonyOperations.CancelStakedExpenditure]:
     ColonyActionType.CancelStakedExpenditureMotion,
+  [ColonyOperations.CreateStreamingPayment]:
+    ColonyActionType.CreateStreamingPaymentMotion,
 };
 
 export enum MotionSide {

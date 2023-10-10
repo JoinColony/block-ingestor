@@ -7,6 +7,7 @@ import {
   getOneTxPaymentClient,
   getVotingClient,
   verbose,
+  getStreamingPaymentsClient,
 } from '~utils';
 import { SimpleTransactionDescription, parseAction } from './helpers';
 import {
@@ -22,6 +23,7 @@ import {
   handleSimpleDecisionMotion,
   handleMulticallMotion,
   handleCancelStakedExpenditureMotion,
+  handleCreateStreamingPaymentMotion,
 } from './handlers';
 
 export default async (event: ContractEvent): Promise<void> => {
@@ -47,11 +49,14 @@ export default async (event: ContractEvent): Promise<void> => {
     colonyAddress,
   );
 
+  const streamingPaymentClient = await getStreamingPaymentsClient(colonyAddress);
+
   const motion = await votingReputationClient.getMotion(motionId);
   const parsedAction = parseAction(motion.action, [
     colonyClient,
     oneTxPaymentClient,
     stakedExpenditureClient,
+    streamingPaymentClient,
   ]);
 
   let gasEstimate: BigNumber;
@@ -164,6 +169,15 @@ export default async (event: ContractEvent): Promise<void> => {
 
       case ColonyOperations.CancelStakedExpenditure: {
         await handleCancelStakedExpenditureMotion(
+          event,
+          parsedAction,
+          gasEstimate,
+        );
+        break;
+      }
+
+      case ColonyOperations.CreateStreamingPayment: {
+        await handleCreateStreamingPaymentMotion(
           event,
           parsedAction,
           gasEstimate,
