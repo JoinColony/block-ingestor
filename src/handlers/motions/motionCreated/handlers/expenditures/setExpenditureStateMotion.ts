@@ -16,10 +16,9 @@ export default async (
   gasEstimate: BigNumber,
 ): Promise<void> => {
   const { colonyAddress, args } = event;
-  const [, , expenditureId] = actionArgs;
-
+  const [, , expenditureId, , , keys] = actionArgs;
   const [, , domainId] = args;
-  const [, , , slotId] = actionArgs;
+  const [slotId] = keys;
 
   if (!colonyAddress) {
     return;

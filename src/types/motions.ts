@@ -19,7 +19,7 @@ export enum ColonyOperations {
   Multicall = 'multicall',
   CancelStakedExpenditure = 'cancelAndPunish',
   CreateStreamingPayment = 'create',
-  ReleaseExpenditureStage = 'releaseStagedPayment',
+  SetExpenditureState = 'setExpenditureState',
 }
 
 export enum MotionEvents {
@@ -57,8 +57,8 @@ export const motionNameMapping: { [key: string]: ColonyActionType } = {
     ColonyActionType.CancelStakedExpenditureMotion,
   [ColonyOperations.CreateStreamingPayment]:
     ColonyActionType.CreateStreamingPaymentMotion,
-  [ColonyOperations.ReleaseExpenditureStage]:
-    ColonyActionType.ReleaseExpenditureStageMotion,
+  [ColonyOperations.SetExpenditureState]:
+    ColonyActionType.SetExpenditureStateMotion,
 };
 
 export enum MotionSide {

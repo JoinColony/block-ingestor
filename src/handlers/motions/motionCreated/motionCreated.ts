@@ -25,7 +25,7 @@ import {
   handleMulticallMotion,
   handleCancelStakedExpenditureMotion,
   handleCreateStreamingPaymentMotion,
-  handleReleaseExpenditureStageMotion,
+  handleSetExpenditureStateMotion,
 } from './handlers';
 
 export default async (event: ContractEvent): Promise<void> => {
@@ -51,7 +51,9 @@ export default async (event: ContractEvent): Promise<void> => {
     colonyAddress,
   );
 
-  const streamingPaymentClient = await getStreamingPaymentsClient(colonyAddress);
+  const streamingPaymentClient = await getStreamingPaymentsClient(
+    colonyAddress,
+  );
 
   const stagedExpenditureClient = await getStagedExpenditureClient(
     colonyAddress,
@@ -192,12 +194,8 @@ export default async (event: ContractEvent): Promise<void> => {
         break;
       }
 
-      case ColonyOperations.ReleaseExpenditureStage: {
-        await handleReleaseExpenditureStageMotion(
-          event,
-          parsedAction,
-          gasEstimate,
-        );
+      case ColonyOperations.SetExpenditureState: {
+        await handleSetExpenditureStateMotion(event, parsedAction, gasEstimate);
         break;
       }
 
