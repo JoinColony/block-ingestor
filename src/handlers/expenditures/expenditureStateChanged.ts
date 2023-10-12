@@ -1,6 +1,5 @@
 import { BigNumber, BigNumberish, ethers } from 'ethers';
 import { ContractEvent } from '~types';
-import { getExpenditureFromDB } from './helpers';
 import { getExpenditureDatabaseId, output, toNumber } from '~utils';
 import { mutate } from '~amplifyClient';
 import {
@@ -9,6 +8,8 @@ import {
   UpdateExpenditureMutation,
   UpdateExpenditureMutationVariables,
 } from '~graphql';
+
+import { getExpenditureFromDB, getSlotsWithUpdatedRecipient } from './helpers';
 
 const toB32 = (input: BigNumberish): string =>
   ethers.utils.hexZeroPad(ethers.utils.hexlify(input), 32);
@@ -46,16 +47,11 @@ export default async (event: ContractEvent): Promise<void> => {
         .decode(['address'], value)
         .toString();
 
-      const existingSlot = expenditure.slots.find((slot) => slot.id === slotId);
-      const updatedSlot: ExpenditureSlot = {
-        ...existingSlot,
-        id: slotId,
+      updatedSlots = getSlotsWithUpdatedRecipient(
+        expenditure,
+        slotId,
         recipientAddress,
-      };
-      updatedSlots = [
-        ...expenditure.slots.filter((slot) => slot.id !== slotId),
-        updatedSlot,
-      ];
+      );
     }
   }
 
