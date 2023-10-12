@@ -12,6 +12,7 @@ import {
 import {
   getExpenditureFromDB,
   getSlotsWithUpdatedClaimDelay,
+  getSlotsWithUpdatedPayoutModifier,
   getSlotsWithUpdatedRecipient,
 } from './helpers';
 
@@ -22,6 +23,7 @@ const EXPENDITURESLOTS_SLOT = BigNumber.from(26);
 
 const EXPENDITURESLOT_RECIPIENT = toB32(ethers.BigNumber.from(0));
 const EXPENDITURESLOT_CLAIMDELAY = toB32(ethers.BigNumber.from(1));
+const EXPENDITURESLOT_PAYOUTMODIFIER = toB32(ethers.BigNumber.from(2));
 
 export default async (event: ContractEvent): Promise<void> => {
   const { contractAddress: colonyAddress } = event;
@@ -65,6 +67,14 @@ export default async (event: ContractEvent): Promise<void> => {
         expenditure,
         slotId,
         claimDelay,
+      );
+    } else if (keys[1] === EXPENDITURESLOT_PAYOUTMODIFIER) {
+      const payoutModifier = ethers.BigNumber.from(value).toNumber();
+
+      updatedSlots = getSlotsWithUpdatedPayoutModifier(
+        expenditure,
+        slotId,
+        payoutModifier,
       );
     }
   }

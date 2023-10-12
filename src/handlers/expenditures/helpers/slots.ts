@@ -41,3 +41,22 @@ export const getSlotsWithUpdatedClaimDelay = (
 
   return updatedSlots;
 };
+
+export const getSlotsWithUpdatedPayoutModifier = (
+  expenditure: ExpenditureFragment,
+  slotId: number,
+  payoutModifier: number,
+): ExpenditureSlot[] => {
+  const existingSlot = expenditure.slots.find((slot) => slot.id === slotId);
+  const updatedSlot: ExpenditureSlot = {
+    ...existingSlot,
+    id: slotId,
+    payoutModifier,
+  };
+  const updatedSlots = [
+    ...expenditure.slots.filter((slot) => slot.id !== slotId),
+    updatedSlot,
+  ];
+
+  return updatedSlots;
+};
