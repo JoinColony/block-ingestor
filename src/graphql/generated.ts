@@ -533,7 +533,7 @@ export type ColonyDecision = {
   walletAddress: Scalars['String'];
 };
 
-/** Represents a single extension installed on a Colony */
+/** Represents a single extension installation in a Colony */
 export type ColonyExtension = {
   __typename?: 'ColonyExtension';
   /** The Colony that the extension belongs to */
@@ -1269,6 +1269,15 @@ export type CreateExpenditureMetadataInput = {
   stakeAmount?: InputMaybe<Scalars['String']>;
 };
 
+export type CreateExtensionInstallationsCountInput = {
+  id?: InputMaybe<Scalars['ID']>;
+  oneTxPayment: Scalars['Int'];
+  reputationWeighted: Scalars['Int'];
+  stagedExpenditure: Scalars['Int'];
+  stakedExpenditure: Scalars['Int'];
+  streamingPayments: Scalars['Int'];
+};
+
 export type CreateIngestorStatsInput = {
   id?: InputMaybe<Scalars['ID']>;
   value: Scalars['String'];
@@ -1543,6 +1552,10 @@ export type DeleteExpenditureInput = {
 };
 
 export type DeleteExpenditureMetadataInput = {
+  id: Scalars['ID'];
+};
+
+export type DeleteExtensionInstallationsCountInput = {
   id: Scalars['ID'];
 };
 
@@ -1873,6 +1886,19 @@ export enum ExpenditureType {
   PaymentBuilder = 'PAYMENT_BUILDER',
   Staged = 'STAGED',
 }
+
+export type ExtensionInstallationsCount = {
+  __typename?: 'ExtensionInstallationsCount';
+  createdAt: Scalars['AWSDateTime'];
+  /** The model id. It's the chain id the of the colony the extension belongs to */
+  id: Scalars['ID'];
+  oneTxPayment: Scalars['Int'];
+  reputationWeighted: Scalars['Int'];
+  stagedExpenditure: Scalars['Int'];
+  stakedExpenditure: Scalars['Int'];
+  streamingPayments: Scalars['Int'];
+  updatedAt: Scalars['AWSDateTime'];
+};
 
 /** Map of parameters that extensions are initialised with */
 export type ExtensionParams = {
@@ -2872,6 +2898,43 @@ export type ModelExpenditureTypeInput = {
   ne?: InputMaybe<ExpenditureType>;
 };
 
+export type ModelExtensionInstallationsCountConditionInput = {
+  and?: InputMaybe<
+    Array<InputMaybe<ModelExtensionInstallationsCountConditionInput>>
+  >;
+  not?: InputMaybe<ModelExtensionInstallationsCountConditionInput>;
+  oneTxPayment?: InputMaybe<ModelIntInput>;
+  or?: InputMaybe<
+    Array<InputMaybe<ModelExtensionInstallationsCountConditionInput>>
+  >;
+  reputationWeighted?: InputMaybe<ModelIntInput>;
+  stagedExpenditure?: InputMaybe<ModelIntInput>;
+  stakedExpenditure?: InputMaybe<ModelIntInput>;
+  streamingPayments?: InputMaybe<ModelIntInput>;
+};
+
+export type ModelExtensionInstallationsCountConnection = {
+  __typename?: 'ModelExtensionInstallationsCountConnection';
+  items: Array<Maybe<ExtensionInstallationsCount>>;
+  nextToken?: Maybe<Scalars['String']>;
+};
+
+export type ModelExtensionInstallationsCountFilterInput = {
+  and?: InputMaybe<
+    Array<InputMaybe<ModelExtensionInstallationsCountFilterInput>>
+  >;
+  id?: InputMaybe<ModelIdInput>;
+  not?: InputMaybe<ModelExtensionInstallationsCountFilterInput>;
+  oneTxPayment?: InputMaybe<ModelIntInput>;
+  or?: InputMaybe<
+    Array<InputMaybe<ModelExtensionInstallationsCountFilterInput>>
+  >;
+  reputationWeighted?: InputMaybe<ModelIntInput>;
+  stagedExpenditure?: InputMaybe<ModelIntInput>;
+  stakedExpenditure?: InputMaybe<ModelIntInput>;
+  streamingPayments?: InputMaybe<ModelIntInput>;
+};
+
 export type ModelFloatInput = {
   attributeExists?: InputMaybe<Scalars['Boolean']>;
   attributeType?: InputMaybe<ModelAttributeTypes>;
@@ -3570,6 +3633,21 @@ export type ModelSubscriptionExpenditureMetadataFilterInput = {
   stakeAmount?: InputMaybe<ModelSubscriptionStringInput>;
 };
 
+export type ModelSubscriptionExtensionInstallationsCountFilterInput = {
+  and?: InputMaybe<
+    Array<InputMaybe<ModelSubscriptionExtensionInstallationsCountFilterInput>>
+  >;
+  id?: InputMaybe<ModelSubscriptionIdInput>;
+  oneTxPayment?: InputMaybe<ModelSubscriptionIntInput>;
+  or?: InputMaybe<
+    Array<InputMaybe<ModelSubscriptionExtensionInstallationsCountFilterInput>>
+  >;
+  reputationWeighted?: InputMaybe<ModelSubscriptionIntInput>;
+  stagedExpenditure?: InputMaybe<ModelSubscriptionIntInput>;
+  stakedExpenditure?: InputMaybe<ModelSubscriptionIntInput>;
+  streamingPayments?: InputMaybe<ModelSubscriptionIntInput>;
+};
+
 export type ModelSubscriptionFloatInput = {
   between?: InputMaybe<Array<InputMaybe<Scalars['Float']>>>;
   eq?: InputMaybe<Scalars['Float']>;
@@ -4119,6 +4197,7 @@ export type Mutation = {
   createDomainMetadata?: Maybe<DomainMetadata>;
   createExpenditure?: Maybe<Expenditure>;
   createExpenditureMetadata?: Maybe<ExpenditureMetadata>;
+  createExtensionInstallationsCount?: Maybe<ExtensionInstallationsCount>;
   createIngestorStats?: Maybe<IngestorStats>;
   createMotionMessage?: Maybe<MotionMessage>;
   createPrivateBetaInviteCode?: Maybe<PrivateBetaInviteCode>;
@@ -4158,6 +4237,7 @@ export type Mutation = {
   deleteDomainMetadata?: Maybe<DomainMetadata>;
   deleteExpenditure?: Maybe<Expenditure>;
   deleteExpenditureMetadata?: Maybe<ExpenditureMetadata>;
+  deleteExtensionInstallationsCount?: Maybe<ExtensionInstallationsCount>;
   deleteIngestorStats?: Maybe<IngestorStats>;
   deleteMotionMessage?: Maybe<MotionMessage>;
   deletePrivateBetaInviteCode?: Maybe<PrivateBetaInviteCode>;
@@ -4197,6 +4277,7 @@ export type Mutation = {
   updateDomainMetadata?: Maybe<DomainMetadata>;
   updateExpenditure?: Maybe<Expenditure>;
   updateExpenditureMetadata?: Maybe<ExpenditureMetadata>;
+  updateExtensionInstallationsCount?: Maybe<ExtensionInstallationsCount>;
   updateIngestorStats?: Maybe<IngestorStats>;
   updateMotionMessage?: Maybe<MotionMessage>;
   updatePrivateBetaInviteCode?: Maybe<PrivateBetaInviteCode>;
@@ -4337,6 +4418,12 @@ export type MutationCreateExpenditureArgs = {
 export type MutationCreateExpenditureMetadataArgs = {
   condition?: InputMaybe<ModelExpenditureMetadataConditionInput>;
   input: CreateExpenditureMetadataInput;
+};
+
+/** Root mutation type */
+export type MutationCreateExtensionInstallationsCountArgs = {
+  condition?: InputMaybe<ModelExtensionInstallationsCountConditionInput>;
+  input: CreateExtensionInstallationsCountInput;
 };
 
 /** Root mutation type */
@@ -4560,6 +4647,12 @@ export type MutationDeleteExpenditureMetadataArgs = {
 };
 
 /** Root mutation type */
+export type MutationDeleteExtensionInstallationsCountArgs = {
+  condition?: InputMaybe<ModelExtensionInstallationsCountConditionInput>;
+  input: DeleteExtensionInstallationsCountInput;
+};
+
+/** Root mutation type */
 export type MutationDeleteIngestorStatsArgs = {
   condition?: InputMaybe<ModelIngestorStatsConditionInput>;
   input: DeleteIngestorStatsInput;
@@ -4777,6 +4870,12 @@ export type MutationUpdateExpenditureArgs = {
 export type MutationUpdateExpenditureMetadataArgs = {
   condition?: InputMaybe<ModelExpenditureMetadataConditionInput>;
   input: UpdateExpenditureMetadataInput;
+};
+
+/** Root mutation type */
+export type MutationUpdateExtensionInstallationsCountArgs = {
+  condition?: InputMaybe<ModelExtensionInstallationsCountConditionInput>;
+  input: UpdateExtensionInstallationsCountInput;
 };
 
 /** Root mutation type */
@@ -5107,6 +5206,7 @@ export type Query = {
   getExpendituresByColony?: Maybe<ModelExpenditureConnection>;
   getExpendituresByNativeFundingPotIdAndColony?: Maybe<ModelExpenditureConnection>;
   getExtensionByColonyAndHash?: Maybe<ModelColonyExtensionConnection>;
+  getExtensionInstallationsCount?: Maybe<ExtensionInstallationsCount>;
   getExtensionsByHash?: Maybe<ModelColonyExtensionConnection>;
   getIngestorStats?: Maybe<IngestorStats>;
   /** Fetch the list of members for a specific Colony */
@@ -5174,6 +5274,7 @@ export type Query = {
   listDomains?: Maybe<ModelDomainConnection>;
   listExpenditureMetadata?: Maybe<ModelExpenditureMetadataConnection>;
   listExpenditures?: Maybe<ModelExpenditureConnection>;
+  listExtensionInstallationsCounts?: Maybe<ModelExtensionInstallationsCountConnection>;
   listIngestorStats?: Maybe<ModelIngestorStatsConnection>;
   listMotionMessages?: Maybe<ModelMotionMessageConnection>;
   listPrivateBetaInviteCodes?: Maybe<ModelPrivateBetaInviteCodeConnection>;
@@ -5446,6 +5547,11 @@ export type QueryGetExtensionByColonyAndHashArgs = {
   limit?: InputMaybe<Scalars['Int']>;
   nextToken?: InputMaybe<Scalars['String']>;
   sortDirection?: InputMaybe<ModelSortDirection>;
+};
+
+/** Root query type */
+export type QueryGetExtensionInstallationsCountArgs = {
+  id: Scalars['ID'];
 };
 
 /** Root query type */
@@ -5848,6 +5954,13 @@ export type QueryListExpendituresArgs = {
 };
 
 /** Root query type */
+export type QueryListExtensionInstallationsCountsArgs = {
+  filter?: InputMaybe<ModelExtensionInstallationsCountFilterInput>;
+  limit?: InputMaybe<Scalars['Int']>;
+  nextToken?: InputMaybe<Scalars['String']>;
+};
+
+/** Root query type */
 export type QueryListIngestorStatsArgs = {
   filter?: InputMaybe<ModelIngestorStatsFilterInput>;
   limit?: InputMaybe<Scalars['Int']>;
@@ -6146,6 +6259,7 @@ export type Subscription = {
   onCreateDomainMetadata?: Maybe<DomainMetadata>;
   onCreateExpenditure?: Maybe<Expenditure>;
   onCreateExpenditureMetadata?: Maybe<ExpenditureMetadata>;
+  onCreateExtensionInstallationsCount?: Maybe<ExtensionInstallationsCount>;
   onCreateIngestorStats?: Maybe<IngestorStats>;
   onCreateMotionMessage?: Maybe<MotionMessage>;
   onCreatePrivateBetaInviteCode?: Maybe<PrivateBetaInviteCode>;
@@ -6181,6 +6295,7 @@ export type Subscription = {
   onDeleteDomainMetadata?: Maybe<DomainMetadata>;
   onDeleteExpenditure?: Maybe<Expenditure>;
   onDeleteExpenditureMetadata?: Maybe<ExpenditureMetadata>;
+  onDeleteExtensionInstallationsCount?: Maybe<ExtensionInstallationsCount>;
   onDeleteIngestorStats?: Maybe<IngestorStats>;
   onDeleteMotionMessage?: Maybe<MotionMessage>;
   onDeletePrivateBetaInviteCode?: Maybe<PrivateBetaInviteCode>;
@@ -6216,6 +6331,7 @@ export type Subscription = {
   onUpdateDomainMetadata?: Maybe<DomainMetadata>;
   onUpdateExpenditure?: Maybe<Expenditure>;
   onUpdateExpenditureMetadata?: Maybe<ExpenditureMetadata>;
+  onUpdateExtensionInstallationsCount?: Maybe<ExtensionInstallationsCount>;
   onUpdateIngestorStats?: Maybe<IngestorStats>;
   onUpdateMotionMessage?: Maybe<MotionMessage>;
   onUpdatePrivateBetaInviteCode?: Maybe<PrivateBetaInviteCode>;
@@ -6314,6 +6430,10 @@ export type SubscriptionOnCreateExpenditureArgs = {
 
 export type SubscriptionOnCreateExpenditureMetadataArgs = {
   filter?: InputMaybe<ModelSubscriptionExpenditureMetadataFilterInput>;
+};
+
+export type SubscriptionOnCreateExtensionInstallationsCountArgs = {
+  filter?: InputMaybe<ModelSubscriptionExtensionInstallationsCountFilterInput>;
 };
 
 export type SubscriptionOnCreateIngestorStatsArgs = {
@@ -6456,6 +6576,10 @@ export type SubscriptionOnDeleteExpenditureMetadataArgs = {
   filter?: InputMaybe<ModelSubscriptionExpenditureMetadataFilterInput>;
 };
 
+export type SubscriptionOnDeleteExtensionInstallationsCountArgs = {
+  filter?: InputMaybe<ModelSubscriptionExtensionInstallationsCountFilterInput>;
+};
+
 export type SubscriptionOnDeleteIngestorStatsArgs = {
   filter?: InputMaybe<ModelSubscriptionIngestorStatsFilterInput>;
 };
@@ -6594,6 +6718,10 @@ export type SubscriptionOnUpdateExpenditureArgs = {
 
 export type SubscriptionOnUpdateExpenditureMetadataArgs = {
   filter?: InputMaybe<ModelSubscriptionExpenditureMetadataFilterInput>;
+};
+
+export type SubscriptionOnUpdateExtensionInstallationsCountArgs = {
+  filter?: InputMaybe<ModelSubscriptionExtensionInstallationsCountFilterInput>;
 };
 
 export type SubscriptionOnUpdateIngestorStatsArgs = {
@@ -7125,6 +7253,15 @@ export type UpdateExtensionByColonyAndHashInput = {
   isInitialized?: InputMaybe<Scalars['Boolean']>;
   /** The version of the extension */
   version?: InputMaybe<Scalars['Int']>;
+};
+
+export type UpdateExtensionInstallationsCountInput = {
+  id: Scalars['ID'];
+  oneTxPayment?: InputMaybe<Scalars['Int']>;
+  reputationWeighted?: InputMaybe<Scalars['Int']>;
+  stagedExpenditure?: InputMaybe<Scalars['Int']>;
+  stakedExpenditure?: InputMaybe<Scalars['Int']>;
+  streamingPayments?: InputMaybe<Scalars['Int']>;
 };
 
 export type UpdateIngestorStatsInput = {
@@ -7844,6 +7981,30 @@ export type UpdateColonyExtensionByAddressMutation = {
   } | null;
 };
 
+export type CreateExtensionInstallationsCountMutationVariables = Exact<{
+  input: CreateExtensionInstallationsCountInput;
+}>;
+
+export type CreateExtensionInstallationsCountMutation = {
+  __typename?: 'Mutation';
+  createExtensionInstallationsCount?: {
+    __typename?: 'ExtensionInstallationsCount';
+    id: string;
+  } | null;
+};
+
+export type UpdateExtensionInstallationsCountMutationVariables = Exact<{
+  input: UpdateExtensionInstallationsCountInput;
+}>;
+
+export type UpdateExtensionInstallationsCountMutation = {
+  __typename?: 'Mutation';
+  updateExtensionInstallationsCount?: {
+    __typename?: 'ExtensionInstallationsCount';
+    id: string;
+  } | null;
+};
+
 export type CreateColonyFundsClaimMutationVariables = Exact<{
   input: CreateColonyFundsClaimInput;
   condition?: InputMaybe<ModelColonyFundsClaimConditionInput>;
@@ -8394,6 +8555,22 @@ export type GetColonyExtensionByHashAndColonyQuery = {
   getExtensionByColonyAndHash?: {
     __typename?: 'ModelColonyExtensionConnection';
     items: Array<{ __typename?: 'ColonyExtension'; id: string } | null>;
+  } | null;
+};
+
+export type GetExtensionInstallationsCountQueryVariables = Exact<{
+  id: Scalars['ID'];
+}>;
+
+export type GetExtensionInstallationsCountQuery = {
+  __typename?: 'Query';
+  getExtensionInstallationsCount?: {
+    __typename?: 'ExtensionInstallationsCount';
+    oneTxPayment: number;
+    stakedExpenditure: number;
+    stagedExpenditure: number;
+    streamingPayments: number;
+    reputationWeighted: number;
   } | null;
 };
 
@@ -8994,6 +9171,24 @@ export const UpdateColonyExtensionByAddressDocument = gql`
     }
   }
 `;
+export const CreateExtensionInstallationsCountDocument = gql`
+  mutation CreateExtensionInstallationsCount(
+    $input: CreateExtensionInstallationsCountInput!
+  ) {
+    createExtensionInstallationsCount(input: $input) {
+      id
+    }
+  }
+`;
+export const UpdateExtensionInstallationsCountDocument = gql`
+  mutation UpdateExtensionInstallationsCount(
+    $input: UpdateExtensionInstallationsCountInput!
+  ) {
+    updateExtensionInstallationsCount(input: $input) {
+      id
+    }
+  }
+`;
 export const CreateColonyFundsClaimDocument = gql`
   mutation CreateColonyFundsClaim(
     $input: CreateColonyFundsClaimInput!
@@ -9389,6 +9584,17 @@ export const GetColonyExtensionByHashAndColonyDocument = gql`
       items {
         id
       }
+    }
+  }
+`;
+export const GetExtensionInstallationsCountDocument = gql`
+  query GetExtensionInstallationsCount($id: ID!) {
+    getExtensionInstallationsCount(id: $id) {
+      oneTxPayment
+      stakedExpenditure
+      stagedExpenditure
+      streamingPayments
+      reputationWeighted
     }
   }
 `;

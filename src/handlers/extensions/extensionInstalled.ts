@@ -10,6 +10,7 @@ import { setupListenersForStreamingPayments } from '~eventListeners/extension/st
 import networkClient from '~networkClient';
 import { ContractEvent } from '~types';
 import { writeExtensionFromEvent } from '~utils';
+import { updateExtensionCount } from '~utils/extensions';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { extensionId: extensionHash, colony } = event.args;
@@ -31,4 +32,6 @@ export default async (event: ContractEvent): Promise<void> => {
   } else if (extensionHash === getExtensionHash(Extension.StreamingPayments)) {
     setupListenersForStreamingPayments(extensionAddress, colony);
   }
+
+  await updateExtensionCount(extensionHash);
 };
