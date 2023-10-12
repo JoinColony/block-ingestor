@@ -14,6 +14,9 @@ import {
   getStreamingPaymentsClient,
   output,
   updateColonyTokens,
+  toNumber,
+  insertAtIndex,
+  checkColonyClientExpenditureCompatibility,
 } from '~utils';
 import { query, mutate } from '~amplifyClient';
 import {
@@ -31,11 +34,20 @@ import {
   GetDomainMetadataDocument,
   GetDomainMetadataQuery,
   GetDomainMetadataQueryVariables,
+  GetExpenditureDocument,
+  GetExpenditureMetadataDocument,
+  GetExpenditureMetadataQuery,
+  GetExpenditureMetadataQueryVariables,
+  GetExpenditureQuery,
+  GetExpenditureQueryVariables,
   StakerReward,
   StreamingPaymentMetadataFragment,
   UpdateColonyDocument,
   UpdateColonyMetadataDocument,
   UpdateDomainMetadataDocument,
+  UpdateExpenditureDocument,
+  UpdateExpenditureMetadataInput,
+  UpdateExpenditureMetadataMutationVariables,
 } from '~graphql';
 import { parseAction } from '../motionCreated/helpers';
 
@@ -422,4 +434,134 @@ export const updateColonyUnclaimedStakes = async (
       },
     });
   }
+};
+
+export const claimExpenditurePayouts = async (
+  action: string,
+  colonyAddress: string,
+): Promise<void> => {
+  const colonyClient = await getCachedColonyClient(colonyAddress);
+
+  const parsedAction = parseAction(action, [
+    colonyClient,
+    null,
+    null,
+    null,
+    null,
+  ]) as TransactionDescription | undefined;
+
+  if (
+    !parsedAction ||
+    parsedAction.name !== ColonyOperations.SetExpenditureState
+  ) {
+    return;
+  }
+
+  const { args } = parsedAction;
+  const [, expenditureId, storageSlot, keys, value] = args;
+  const [slotId] = keys;
+
+  const convertedSlotId = toNumber(slotId);
+  const convertedExpenditureId = toNumber(expenditureId);
+  const convertedValue = toNumber(value);
+
+  console.log(convertedSlotId);
+  console.log(convertedExpenditureId);
+  console.log(convertedValue);
+  if (!colonyAddress) {
+    output('Colony address missing for ExpenditureStateChanged event');
+    return;
+  }
+
+  // @NOTE: If:
+  // - The value is not 0
+  // - The storage slot is not 26
+  // Then we can assume this state change ain't a stage release
+  if (storageSlot !== 26 || convertedValue !== 0) {
+    return;
+  }
+
+  const databaseId = getExpenditureDatabaseId(
+    colonyAddress,
+    convertedExpenditureId,
+  );
+
+  const expenditureMetadataResponse = await query<
+    GetExpenditureMetadataQuery,
+    GetExpenditureMetadataQueryVariables
+  >(GetExpenditureMetadataDocument, {
+    id: databaseId,
+  });
+
+  const metadata = expenditureMetadataResponse?.data?.getExpenditureMetadata;
+
+  if (!metadata || !metadata.stages) {
+    output(
+      `Could not find stages data for expenditure with ID: ${databaseId}. This is a bug and needs investigating.`,
+    );
+    return;
+  }
+
+  const existingStageIndex = metadata.stages.findIndex(
+    (stage) => stage.slotId === convertedSlotId,
+  );
+  const existingStage = metadata.stages[existingStageIndex];
+
+  // If the stage doesn't exist or it's been already set to released, we don't need to do anything
+  if (!existingStage || existingStage.isReleased) {
+    return;
+  }
+
+  const updatedStage = {
+    ...existingStage,
+    isReleased: true,
+  };
+
+  const updatedStages = insertAtIndex(
+    metadata.stages,
+    existingStageIndex,
+    updatedStage,
+  );
+
+  const compatibleColonyClient =
+    checkColonyClientExpenditureCompatibility(colonyClient);
+
+  const expenditureResponse = await query<
+    GetExpenditureQuery,
+    GetExpenditureQueryVariables
+  >(GetExpenditureDocument, {
+    id: databaseId,
+  });
+  const expenditureSlot = expenditureResponse?.data?.getExpenditure?.slots.find(
+    (slot) => slot.id === convertedSlotId,
+  );
+  const nonZeroPayouts = expenditureSlot?.payouts?.filter((payout) =>
+    BigNumber.from(payout.amount).gt(0),
+  );
+  const payoutTokens = nonZeroPayouts?.map((payout) => payout.tokenAddress);
+  console.log(payoutTokens);
+  if (!compatibleColonyClient || !payoutTokens) {
+    return;
+  }
+
+  for (const payoutToken of payoutTokens) {
+    const transaction = await compatibleColonyClient.claimExpenditurePayout(
+      convertedExpenditureId,
+      convertedSlotId,
+      payoutToken,
+    );
+    console.log(transaction);
+  }
+
+  output(`Stage released in expenditure with ID: ${databaseId}`);
+
+  await mutate<
+    UpdateExpenditureMetadataInput,
+    UpdateExpenditureMetadataMutationVariables
+  >(UpdateExpenditureDocument, {
+    input: {
+      id: databaseId,
+      stages: updatedStages,
+    },
+  });
 };

@@ -11,6 +11,7 @@ import {
 } from '../helpers';
 
 import {
+  claimExpenditurePayouts,
   getStakerReward,
   linkPendingMetadata,
   updateColonyUnclaimedStakes,
@@ -58,6 +59,7 @@ export default async (event: ContractEvent): Promise<void> => {
 
     if (yayWon) {
       await linkPendingMetadata(action, colonyAddress, finalizedMotion);
+      await claimExpenditurePayouts(action, colonyAddress);
     }
 
     const updatedStakerRewards = await Promise.all(
