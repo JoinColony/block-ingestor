@@ -22,3 +22,22 @@ export const getSlotsWithUpdatedRecipient = (
 
   return updatedSlots;
 };
+
+export const getSlotsWithUpdatedClaimDelay = (
+  expenditure: ExpenditureFragment,
+  slotId: number,
+  claimDelay: number,
+): ExpenditureSlot[] => {
+  const existingSlot = expenditure.slots.find((slot) => slot.id === slotId);
+  const updatedSlot: ExpenditureSlot = {
+    ...existingSlot,
+    id: slotId,
+    claimDelay,
+  };
+  const updatedSlots = [
+    ...expenditure.slots.filter((slot) => slot.id !== slotId),
+    updatedSlot,
+  ];
+
+  return updatedSlots;
+};

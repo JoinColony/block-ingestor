@@ -9,7 +9,11 @@ import {
   UpdateExpenditureMutationVariables,
 } from '~graphql';
 
-import { getExpenditureFromDB, getSlotsWithUpdatedRecipient } from './helpers';
+import {
+  getExpenditureFromDB,
+  getSlotsWithUpdatedClaimDelay,
+  getSlotsWithUpdatedRecipient,
+} from './helpers';
 
 const toB32 = (input: BigNumberish): string =>
   ethers.utils.hexZeroPad(ethers.utils.hexlify(input), 32);
@@ -17,6 +21,7 @@ const toB32 = (input: BigNumberish): string =>
 const EXPENDITURESLOTS_SLOT = BigNumber.from(26);
 
 const EXPENDITURESLOT_RECIPIENT = toB32(ethers.BigNumber.from(0));
+const EXPENDITURESLOT_CLAIMDELAY = toB32(ethers.BigNumber.from(1));
 
 export default async (event: ContractEvent): Promise<void> => {
   const { contractAddress: colonyAddress } = event;
@@ -41,8 +46,9 @@ export default async (event: ContractEvent): Promise<void> => {
   let updatedSlots: ExpenditureSlot[] | undefined;
 
   if (storageSlot.eq(EXPENDITURESLOTS_SLOT)) {
+    const slotId = ethers.BigNumber.from(keys[0]).toNumber();
+
     if (keys[1] === EXPENDITURESLOT_RECIPIENT) {
-      const slotId = ethers.BigNumber.from(keys[0]).toNumber();
       const recipientAddress = ethers.utils.defaultAbiCoder
         .decode(['address'], value)
         .toString();
@@ -51,6 +57,14 @@ export default async (event: ContractEvent): Promise<void> => {
         expenditure,
         slotId,
         recipientAddress,
+      );
+    } else if (keys[1] === EXPENDITURESLOT_CLAIMDELAY) {
+      const claimDelay = ethers.BigNumber.from(value).toNumber();
+
+      updatedSlots = getSlotsWithUpdatedClaimDelay(
+        expenditure,
+        slotId,
+        claimDelay,
       );
     }
   }

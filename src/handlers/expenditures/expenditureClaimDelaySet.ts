@@ -1,6 +1,5 @@
 import { mutate } from '~amplifyClient';
 import {
-  ExpenditureSlot,
   UpdateExpenditureDocument,
   UpdateExpenditureMutation,
   UpdateExpenditureMutationVariables,
@@ -8,7 +7,7 @@ import {
 import { ContractEvent } from '~types';
 import { getExpenditureDatabaseId, output, toNumber, verbose } from '~utils';
 
-import { getExpenditureFromDB } from './helpers';
+import { getExpenditureFromDB, getSlotsWithUpdatedClaimDelay } from './helpers';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { contractAddress: colonyAddress } = event;
@@ -30,18 +29,11 @@ export default async (event: ContractEvent): Promise<void> => {
     return;
   }
 
-  const existingSlot = expenditure.slots.find(
-    (slot) => slot.id === convertedSlot,
+  const updatedSlots = getSlotsWithUpdatedClaimDelay(
+    expenditure,
+    convertedSlot,
+    convertedClaimDelay,
   );
-  const updatedSlot: ExpenditureSlot = {
-    ...existingSlot,
-    id: convertedSlot,
-    claimDelay: convertedClaimDelay,
-  };
-  const updatedSlots = [
-    ...expenditure.slots.filter((slot) => slot.id !== convertedSlot),
-    updatedSlot,
-  ];
 
   verbose(
     `Claim delay set for expenditure with ID ${convertedExpenditureId} in colony ${colonyAddress}`,
