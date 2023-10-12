@@ -458,7 +458,7 @@ export const claimExpenditurePayouts = async (
   }
 
   const { args } = parsedAction;
-  const [, expenditureId, storageSlot, keys, value] = args;
+  const [, , expenditureId, storageSlot, , keys, value] = args;
   const [slotId] = keys;
 
   const convertedSlotId = toNumber(slotId);
