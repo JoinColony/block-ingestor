@@ -34,9 +34,9 @@ export default async (event: ContractEvent): Promise<void> => {
 
   const updatedSlots = decodeExpenditureStateChangedSlots(
     expenditure,
+    storageSlot,
     keys,
     value,
-    storageSlot,
   );
 
   verbose(`State of expenditure with ID ${databaseId} updated`);
