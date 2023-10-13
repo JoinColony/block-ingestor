@@ -4,7 +4,7 @@ import { ExpenditureFragment, ExpenditureSlot } from '~graphql';
  * Function that updates an expenditure slot with a given ID and fields
  * It returns an array of expenditure slots containing the updated slot
  */
-export const getUpdatedSlots = (
+export const getUpdatedExpenditureSlots = (
   expenditure: ExpenditureFragment,
   slotId: number,
   fieldsToUpdate: Partial<

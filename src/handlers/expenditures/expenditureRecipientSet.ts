@@ -7,7 +7,7 @@ import {
 import { ContractEvent } from '~types';
 import { getExpenditureDatabaseId, output, toNumber, verbose } from '~utils';
 
-import { getExpenditureFromDB, getUpdatedSlots } from './helpers';
+import { getExpenditureFromDB, getUpdatedExpenditureSlots } from './helpers';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { contractAddress: colonyAddress } = event;
@@ -28,7 +28,7 @@ export default async (event: ContractEvent): Promise<void> => {
     return;
   }
 
-  const updatedSlots = getUpdatedSlots(expenditure, convertedSlot, {
+  const updatedSlots = getUpdatedExpenditureSlots(expenditure, convertedSlot, {
     recipientAddress,
   });
 

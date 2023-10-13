@@ -2,7 +2,7 @@ import { BigNumber, BigNumberish, utils } from 'ethers';
 
 import { ExpenditureFragment, ExpenditureSlot } from '~graphql';
 
-import { getUpdatedSlots } from './getUpdatedSlots';
+import { getUpdatedExpenditureSlots } from './getUpdatedSlots';
 
 const toB32 = (input: BigNumberish): string =>
   utils.hexZeroPad(utils.hexlify(input), 32);
@@ -38,19 +38,19 @@ export const decodeExpenditureStateChangedSlots = (
         .decode(['address'], value)
         .toString();
 
-      updatedSlots = getUpdatedSlots(expenditure, slotId, {
+      updatedSlots = getUpdatedExpenditureSlots(expenditure, slotId, {
         recipientAddress,
       });
     } else if (keys[1] === EXPENDITURESLOT_CLAIMDELAY) {
       const claimDelay = BigNumber.from(value).toNumber();
 
-      updatedSlots = getUpdatedSlots(expenditure, slotId, {
+      updatedSlots = getUpdatedExpenditureSlots(expenditure, slotId, {
         claimDelay,
       });
     } else if (keys[1] === EXPENDITURESLOT_PAYOUTMODIFIER) {
       const payoutModifier = BigNumber.from(value).toNumber();
 
-      updatedSlots = getUpdatedSlots(expenditure, slotId, {
+      updatedSlots = getUpdatedExpenditureSlots(expenditure, slotId, {
         payoutModifier,
       });
     }
