@@ -7,10 +7,7 @@ import {
 } from '~graphql';
 import { mutate } from '~amplifyClient';
 
-import {
-  getExpenditureFromDB,
-  getSlotsWithUpdatedPayoutModifier,
-} from './helpers';
+import { getExpenditureFromDB, getUpdatedExpenditureSlots } from './helpers';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { contractAddress: colonyAddress } = event;
@@ -29,11 +26,9 @@ export default async (event: ContractEvent): Promise<void> => {
     return;
   }
 
-  const updatedSlots = getSlotsWithUpdatedPayoutModifier(
-    expenditure,
-    convertedSlot,
-    convertedPayoutModifier,
-  );
+  const updatedSlots = getUpdatedExpenditureSlots(expenditure, convertedSlot, {
+    payoutModifier: convertedPayoutModifier,
+  });
 
   verbose(
     `Payout modifier set for expenditure with ID ${convertedExpenditureId} in colony ${colonyAddress}`,
