@@ -1,3 +1,4 @@
 export * from './getExpenditure';
 export * from './updateCancelledExpenditure';
-export * from './slots';
+export * from './getUpdatedSlots';
+export * from './decodeExpenditureStateChangedSlots';

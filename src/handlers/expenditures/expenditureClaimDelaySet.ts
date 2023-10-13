@@ -7,7 +7,7 @@ import {
 import { ContractEvent } from '~types';
 import { getExpenditureDatabaseId, output, toNumber, verbose } from '~utils';
 
-import { getExpenditureFromDB, getSlotsWithUpdatedClaimDelay } from './helpers';
+import { getExpenditureFromDB, getUpdatedSlots } from './helpers';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { contractAddress: colonyAddress } = event;
@@ -29,11 +29,9 @@ export default async (event: ContractEvent): Promise<void> => {
     return;
   }
 
-  const updatedSlots = getSlotsWithUpdatedClaimDelay(
-    expenditure,
-    convertedSlot,
-    convertedClaimDelay,
-  );
+  const updatedSlots = getUpdatedSlots(expenditure, convertedSlot, {
+    claimDelay: convertedClaimDelay,
+  });
 
   verbose(
     `Claim delay set for expenditure with ID ${convertedExpenditureId} in colony ${colonyAddress}`,

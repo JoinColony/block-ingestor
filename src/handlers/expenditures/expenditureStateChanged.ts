@@ -1,29 +1,16 @@
-import { BigNumber, BigNumberish, ethers } from 'ethers';
 import { ContractEvent } from '~types';
-import { getExpenditureDatabaseId, output, toNumber } from '~utils';
+import { getExpenditureDatabaseId, output, toNumber, verbose } from '~utils';
 import { mutate } from '~amplifyClient';
 import {
-  ExpenditureSlot,
   UpdateExpenditureDocument,
   UpdateExpenditureMutation,
   UpdateExpenditureMutationVariables,
 } from '~graphql';
 
 import {
+  decodeExpenditureStateChangedSlots,
   getExpenditureFromDB,
-  getSlotsWithUpdatedClaimDelay,
-  getSlotsWithUpdatedPayoutModifier,
-  getSlotsWithUpdatedRecipient,
 } from './helpers';
-
-const toB32 = (input: BigNumberish): string =>
-  ethers.utils.hexZeroPad(ethers.utils.hexlify(input), 32);
-
-const EXPENDITURESLOTS_SLOT = BigNumber.from(26);
-
-const EXPENDITURESLOT_RECIPIENT = toB32(ethers.BigNumber.from(0));
-const EXPENDITURESLOT_CLAIMDELAY = toB32(ethers.BigNumber.from(1));
-const EXPENDITURESLOT_PAYOUTMODIFIER = toB32(ethers.BigNumber.from(2));
 
 export default async (event: ContractEvent): Promise<void> => {
   const { contractAddress: colonyAddress } = event;
@@ -45,39 +32,14 @@ export default async (event: ContractEvent): Promise<void> => {
     return;
   }
 
-  let updatedSlots: ExpenditureSlot[] | undefined;
+  const updatedSlots = decodeExpenditureStateChangedSlots(
+    expenditure,
+    keys,
+    value,
+    storageSlot,
+  );
 
-  if (storageSlot.eq(EXPENDITURESLOTS_SLOT)) {
-    const slotId = ethers.BigNumber.from(keys[0]).toNumber();
-
-    if (keys[1] === EXPENDITURESLOT_RECIPIENT) {
-      const recipientAddress = ethers.utils.defaultAbiCoder
-        .decode(['address'], value)
-        .toString();
-
-      updatedSlots = getSlotsWithUpdatedRecipient(
-        expenditure,
-        slotId,
-        recipientAddress,
-      );
-    } else if (keys[1] === EXPENDITURESLOT_CLAIMDELAY) {
-      const claimDelay = ethers.BigNumber.from(value).toNumber();
-
-      updatedSlots = getSlotsWithUpdatedClaimDelay(
-        expenditure,
-        slotId,
-        claimDelay,
-      );
-    } else if (keys[1] === EXPENDITURESLOT_PAYOUTMODIFIER) {
-      const payoutModifier = ethers.BigNumber.from(value).toNumber();
-
-      updatedSlots = getSlotsWithUpdatedPayoutModifier(
-        expenditure,
-        slotId,
-        payoutModifier,
-      );
-    }
-  }
+  verbose(`State of expenditure with ID ${databaseId} updated`);
 
   await mutate<UpdateExpenditureMutation, UpdateExpenditureMutationVariables>(
     UpdateExpenditureDocument,
