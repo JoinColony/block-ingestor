@@ -464,6 +464,7 @@ export const claimExpenditurePayouts = async (
   const convertedSlotId = toNumber(slotId);
   const convertedExpenditureId = toNumber(expenditureId);
   const convertedValue = toNumber(value);
+  const convertedStorageSlot = toNumber(storageSlot);
 
   console.log(convertedSlotId);
   console.log(convertedExpenditureId);
@@ -477,7 +478,7 @@ export const claimExpenditurePayouts = async (
   // - The value is not 0
   // - The storage slot is not 26
   // Then we can assume this state change ain't a stage release
-  if (storageSlot !== 26 || convertedValue !== 0) {
+  if (convertedStorageSlot !== 26 || convertedValue !== 0) {
     return;
   }
 
