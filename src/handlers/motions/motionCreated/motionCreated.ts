@@ -25,7 +25,6 @@ import {
   handleMulticallMotion,
   handleCancelStakedExpenditureMotion,
   handleCreateStreamingPaymentMotion,
-  handleSetExpenditureStateMotion,
 } from './handlers';
 
 export default async (event: ContractEvent): Promise<void> => {
@@ -107,7 +106,7 @@ export default async (event: ContractEvent): Promise<void> => {
    * no reason to account for it just yet
    */
   gasEstimate = gasEstimate.add(100_000);
-
+  console.log(parsedAction);
   if (parsedAction) {
     const contractOperation = parsedAction.name;
     /* Handle the action type-specific mutation here */
@@ -191,11 +190,6 @@ export default async (event: ContractEvent): Promise<void> => {
           parsedAction,
           gasEstimate,
         );
-        break;
-      }
-
-      case ColonyOperations.SetExpenditureState: {
-        await handleSetExpenditureStateMotion(event, parsedAction, gasEstimate);
         break;
       }
 
