@@ -456,21 +456,20 @@ export const claimExpenditurePayouts = async (
 
   const firstAction = parsedAction.args[0][0];
   console.log(firstAction);
-  let decodedSetExpenditureStateAction;
+  let decodedSetExpenditureStateArgs;
 
   try {
-    decodedSetExpenditureStateAction =
-      colonyClient.interface.decodeFunctionData(
-        'setExpenditureState',
-        firstAction,
-      );
+    decodedSetExpenditureStateArgs = colonyClient.interface.decodeFunctionData(
+      'setExpenditureState',
+      firstAction,
+    );
   } catch (error) {
     return;
   }
-  console.log(decodedSetExpenditureStateAction);
+  console.log(decodedSetExpenditureStateArgs);
 
-  const { args } = decodedSetExpenditureStateAction;
-  const [, , expenditureId, storageSlot, , keys, value] = args;
+  const [, , expenditureId, storageSlot, , keys, value] =
+    decodedSetExpenditureStateArgs;
   const [slotId] = keys;
 
   const convertedSlotId = toNumber(slotId);
