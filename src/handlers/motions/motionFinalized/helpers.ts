@@ -16,7 +16,6 @@ import {
   updateColonyTokens,
   toNumber,
   insertAtIndex,
-  checkColonyClientExpenditureCompatibility,
 } from '~utils';
 import { query, mutate } from '~amplifyClient';
 import {
@@ -34,12 +33,9 @@ import {
   GetDomainMetadataDocument,
   GetDomainMetadataQuery,
   GetDomainMetadataQueryVariables,
-  GetExpenditureDocument,
   GetExpenditureMetadataDocument,
   GetExpenditureMetadataQuery,
   GetExpenditureMetadataQueryVariables,
-  GetExpenditureQuery,
-  GetExpenditureQueryVariables,
   StakerReward,
   StreamingPaymentMetadataFragment,
   UpdateColonyDocument,
@@ -449,15 +445,31 @@ export const claimExpenditurePayouts = async (
     null,
     null,
   ]) as TransactionDescription | undefined;
-
+  console.log(parsedAction);
   if (
+    !colonyClient ||
     !parsedAction ||
-    parsedAction.name !== ColonyOperations.SetExpenditureState
+    parsedAction.name !== ColonyOperations.Multicall
   ) {
     return;
   }
 
-  const { args } = parsedAction;
+  const firstAction = parsedAction.args[0][0];
+  console.log(firstAction);
+  let decodedSetExpenditureStateAction;
+
+  try {
+    decodedSetExpenditureStateAction =
+      colonyClient.interface.decodeFunctionData(
+        'setExpenditureState',
+        firstAction,
+      );
+  } catch (error) {
+    return;
+  }
+  console.log(decodedSetExpenditureStateAction);
+
+  const { args } = decodedSetExpenditureStateAction;
   const [, , expenditureId, storageSlot, , keys, value] = args;
   const [slotId] = keys;
 
@@ -523,36 +535,6 @@ export const claimExpenditurePayouts = async (
     existingStageIndex,
     updatedStage,
   );
-
-  const compatibleColonyClient =
-    checkColonyClientExpenditureCompatibility(colonyClient);
-
-  const expenditureResponse = await query<
-    GetExpenditureQuery,
-    GetExpenditureQueryVariables
-  >(GetExpenditureDocument, {
-    id: databaseId,
-  });
-  const expenditureSlot = expenditureResponse?.data?.getExpenditure?.slots.find(
-    (slot) => slot.id === convertedSlotId,
-  );
-  const nonZeroPayouts = expenditureSlot?.payouts?.filter((payout) =>
-    BigNumber.from(payout.amount).gt(0),
-  );
-  const payoutTokens = nonZeroPayouts?.map((payout) => payout.tokenAddress);
-  console.log(payoutTokens);
-  if (!compatibleColonyClient || !payoutTokens) {
-    return;
-  }
-
-  for (const payoutToken of payoutTokens) {
-    const transaction = await compatibleColonyClient.claimExpenditurePayout(
-      convertedExpenditureId,
-      convertedSlotId,
-      payoutToken,
-    );
-    console.log(transaction);
-  }
 
   output(`Stage released in expenditure with ID: ${databaseId}`);
 
