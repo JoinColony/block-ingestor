@@ -23,7 +23,7 @@ export default async ({
   console.log(args);
   const { colonyAddress } = event;
   const [, , expenditureId, , , keys] = args;
-  const [, , domainId] = args;
+  const [, , domainId] = event.args;
   const [slotId] = keys;
 
   if (!colonyAddress) {
