@@ -1,19 +1,23 @@
+import { ContractEvent } from '~types';
+import { getExpenditureDatabaseId, output, toNumber, verbose } from '~utils';
 import { mutate } from '~amplifyClient';
 import {
   UpdateExpenditureDocument,
   UpdateExpenditureMutation,
   UpdateExpenditureMutationVariables,
 } from '~graphql';
-import { ContractEvent } from '~types';
-import { getExpenditureDatabaseId, output, toNumber, verbose } from '~utils';
 
-import { getExpenditureFromDB, getUpdatedExpenditureSlots } from './helpers';
+import {
+  decodeExpenditureStateChangedSlots,
+  getExpenditureFromDB,
+} from './helpers';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { contractAddress: colonyAddress } = event;
-  const { expenditureId, slot, recipient: recipientAddress } = event.args;
+  const { storageSlot, value, expenditureId } = event.args;
+  // The unfortunate naming of the `keys` property means we have to access it like so
+  const keys = event.args[4];
   const convertedExpenditureId = toNumber(expenditureId);
-  const convertedSlot = toNumber(slot);
 
   const databaseId = getExpenditureDatabaseId(
     colonyAddress,
@@ -28,13 +32,14 @@ export default async (event: ContractEvent): Promise<void> => {
     return;
   }
 
-  const updatedSlots = getUpdatedExpenditureSlots(expenditure, convertedSlot, {
-    recipientAddress,
-  });
-
-  verbose(
-    `Recipient set for expenditure with ID ${convertedExpenditureId} in colony ${colonyAddress}`,
+  const updatedSlots = decodeExpenditureStateChangedSlots(
+    expenditure,
+    storageSlot,
+    keys,
+    value,
   );
+
+  verbose(`State of expenditure with ID ${databaseId} updated`);
 
   await mutate<UpdateExpenditureMutation, UpdateExpenditureMutationVariables>(
     UpdateExpenditureDocument,

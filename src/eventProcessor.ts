@@ -49,6 +49,7 @@ import {
   handleStreamingPaymentCreated,
   handleExpenditureMadeViaStake,
   handlePaymentTokenUpdated,
+  handleExpenditureStateChange,
 } from './handlers';
 
 dotenv.config();
@@ -318,6 +319,11 @@ export default async (event: ContractEvent): Promise<void> => {
 
     case ContractEventsSignatures.PaymentTokenUpdated: {
       await handlePaymentTokenUpdated(event);
+      return;
+    }
+
+    case ContractEventsSignatures.ExpenditureStateChanged: {
+      await handleExpenditureStateChange(event);
       return;
     }
 
