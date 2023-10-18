@@ -27,8 +27,8 @@ export const decodeExpenditureStateChangedSlots = (
   storageSlot: BigNumber,
   keys: string[],
   value: string,
-): ExpenditureSlot[] | null => {
-  let updatedSlots: ExpenditureSlot[] | null = null;
+): ExpenditureSlot[] | undefined => {
+  let updatedSlots: ExpenditureSlot[] | undefined;
 
   if (storageSlot.eq(EXPENDITURESLOTS_SLOT)) {
     const slotId = BigNumber.from(keys[0]).toNumber();
