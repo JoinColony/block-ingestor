@@ -19,8 +19,6 @@ export default async ({
   args: Result;
   gasEstimate: string;
 }): Promise<void> => {
-  console.log(event);
-  console.log(args);
   const { colonyAddress } = event;
   const [, , expenditureId, , , keys] = args;
   const [, , domainId] = event.args;

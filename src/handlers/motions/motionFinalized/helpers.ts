@@ -445,7 +445,7 @@ export const claimExpenditurePayouts = async (
     null,
     null,
   ]) as TransactionDescription | undefined;
-  console.log(parsedAction);
+
   if (
     !colonyClient ||
     !parsedAction ||
@@ -455,7 +455,7 @@ export const claimExpenditurePayouts = async (
   }
 
   const firstAction = parsedAction.args[0][0];
-  console.log(firstAction);
+
   let decodedSetExpenditureStateArgs;
 
   try {
@@ -466,7 +466,6 @@ export const claimExpenditurePayouts = async (
   } catch (error) {
     return;
   }
-  console.log(decodedSetExpenditureStateArgs);
 
   const [, , expenditureId, storageSlot, , keys, value] =
     decodedSetExpenditureStateArgs;
@@ -477,9 +476,6 @@ export const claimExpenditurePayouts = async (
   const convertedValue = toNumber(value);
   const convertedStorageSlot = toNumber(storageSlot);
 
-  console.log(convertedSlotId);
-  console.log(convertedExpenditureId);
-  console.log(convertedValue);
   if (!colonyAddress) {
     output('Colony address missing for ExpenditureStateChanged event');
     return;
