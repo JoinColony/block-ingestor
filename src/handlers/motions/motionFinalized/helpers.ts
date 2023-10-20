@@ -41,8 +41,8 @@ import {
   UpdateColonyDocument,
   UpdateColonyMetadataDocument,
   UpdateDomainMetadataDocument,
-  UpdateExpenditureDocument,
-  UpdateExpenditureMetadataInput,
+  UpdateExpenditureMetadataDocument,
+  UpdateExpenditureMetadataMutation,
   UpdateExpenditureMetadataMutationVariables,
 } from '~graphql';
 import { parseAction } from '../motionCreated/helpers';
@@ -534,9 +534,9 @@ export const claimExpenditurePayouts = async (
   output(`Stage released in expenditure with ID: ${databaseId}`);
 
   await mutate<
-    UpdateExpenditureMetadataInput,
+    UpdateExpenditureMetadataMutation,
     UpdateExpenditureMetadataMutationVariables
-  >(UpdateExpenditureDocument, {
+  >(UpdateExpenditureMetadataDocument, {
     input: {
       id: databaseId,
       stages: updatedStages,
