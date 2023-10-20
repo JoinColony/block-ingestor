@@ -10,7 +10,8 @@ import {
 } from '~utils';
 import { SimpleTransactionDescription, parseAction } from './helpers';
 import {
-  handleManageDomainMotion,
+  handleEditDomainMotion,
+  handleAddDomainMotion,
   handleMintTokensMotion,
   handleNetworkUpgradeMotion,
   handleUnlockTokenMotion,
@@ -103,9 +104,13 @@ export default async (event: ContractEvent): Promise<void> => {
         await handleMintTokensMotion(event, parsedAction, gasEstimate);
         break;
       }
-      case ColonyOperations.AddDomain:
+      case ColonyOperations.AddDomain: {
+        await handleAddDomainMotion(event, parsedAction, gasEstimate);
+        break;
+      }
+
       case ColonyOperations.EditDomain: {
-        await handleManageDomainMotion(event, parsedAction, gasEstimate);
+        await handleEditDomainMotion(event, parsedAction, gasEstimate);
         break;
       }
 
