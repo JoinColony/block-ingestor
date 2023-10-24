@@ -53,6 +53,7 @@ export default async (event: ContractEvent): Promise<void> => {
   >(CreateStreamingPaymentDocument, {
     input: {
       id: databaseId,
+      colonyId: colonyAddress,
       nativeId: convertedNativeId,
       recipientAddress,
       nativeDomainId: toNumber(domainId),
