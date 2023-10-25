@@ -3,6 +3,7 @@ import { TransactionDescription } from 'ethers/lib/utils';
 import {
   AnyColonyClient,
   AnyOneTxPaymentClient,
+  AnyStagedExpenditureClient,
   AnyStakedExpenditureClient,
   AnyStreamingPaymentsClient,
   AnyVotingReputationClient,
@@ -44,6 +45,7 @@ type MotionActionClients = [
   AnyOneTxPaymentClient | null,
   AnyStakedExpenditureClient | null,
   AnyStreamingPaymentsClient | null,
+  AnyStagedExpenditureClient | null,
 ];
 
 export const parseAction = (
@@ -235,6 +237,7 @@ export const createMotionInDB = async (
   {
     gasEstimate,
     expenditureId,
+    expenditureSlotId,
     ...input
   }: Omit<
     CreateColonyActionInput,
@@ -245,7 +248,11 @@ export const createMotionInDB = async (
     | 'motionId'
     | 'initiatorAddress'
     | 'blockNumber'
-  > & { gasEstimate: string; expenditureId?: string },
+  > & {
+    gasEstimate: string;
+    expenditureId?: string;
+    expenditureSlotId?: number;
+  },
 ): Promise<GraphQLFnReturn<CreateColonyMotionMutation> | undefined> => {
   if (!colonyAddress) {
     return;
@@ -286,7 +293,12 @@ export const createMotionInDB = async (
   };
 
   await Promise.all([
-    createColonyMotion({ ...motionData, gasEstimate, expenditureId }),
+    createColonyMotion({
+      ...motionData,
+      gasEstimate,
+      expenditureId,
+      expenditureSlotId,
+    }),
     createMotionMessage(initialMotionMessage),
     createColonyAction(actionData),
   ]);
