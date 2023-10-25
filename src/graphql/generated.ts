@@ -203,7 +203,6 @@ export type ColonyStreamingPaymentsArgs = {
   sortDirection?: InputMaybe<ModelSortDirection>;
 };
 
-
 /** Represents a Colony within the Colony Network */
 export type ColonyTokensArgs = {
   filter?: InputMaybe<ModelColonyTokensFilterInput>;
@@ -3507,7 +3506,9 @@ export type ModelSubscriptionReputationMiningCycleMetadataFilterInput = {
 };
 
 export type ModelSubscriptionStreamingPaymentFilterInput = {
-  and?: InputMaybe<Array<InputMaybe<ModelSubscriptionStreamingPaymentFilterInput>>>;
+  and?: InputMaybe<
+    Array<InputMaybe<ModelSubscriptionStreamingPaymentFilterInput>>
+  >;
   colonyId?: InputMaybe<ModelSubscriptionIdInput>;
   createdAt?: InputMaybe<ModelSubscriptionStringInput>;
   endTime?: InputMaybe<ModelSubscriptionIntInput>;
@@ -5271,7 +5272,6 @@ export type QueryGetStreamingPaymentsByColonyArgs = {
   nextToken?: InputMaybe<Scalars['String']>;
   sortDirection?: InputMaybe<ModelSortDirection>;
 };
-
 
 /** Root query type */
 export type QueryGetTokenArgs = {
