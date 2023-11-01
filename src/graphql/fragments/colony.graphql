@@ -26,3 +26,31 @@ fragment Colony on Colony {
     nextToken
   }
 }
+
+fragment ColonyMetadata on ColonyMetadata {
+  id
+  displayName
+  avatar
+  thumbnail
+  description
+  externalLinks {
+    name
+    link
+  }
+  changelog {
+    transactionHash
+    oldDisplayName
+    newDisplayName
+    hasAvatarChanged
+    hasWhitelistChanged
+    haveTokensChanged
+    hasDescriptionChanged
+    haveExternalLinksChanged
+  }
+  isWhitelistActivated
+  whitelistedAddresses
+  modifiedTokenAddresses {
+    added
+    removed
+  }
+}

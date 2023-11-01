@@ -1,0 +1,11 @@
+mutation CreateColonyContributor($input: CreateColonyContributorInput!) {
+  createColonyContributor(input: $input) {
+    id
+  }
+}
+
+mutation UpdateColonyContributor($input: UpdateColonyContributorInput!) {
+  updateColonyContributor(input: $input) {
+    id
+  }
+}

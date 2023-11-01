@@ -7,6 +7,7 @@ import {
   addEventListener,
   getEventListeners,
   setEventListeners,
+  setupListenerForOneTxPaymentExtensions,
   setupListenersForStagedExpenditureExtensions,
 } from '~eventListeners';
 import {
@@ -21,10 +22,12 @@ import { notNull } from '~utils';
 import { addNetworkEventListener } from '../network';
 import { setupListenersForVotingReputationExtensions } from './votingReputation';
 import { setupListenersForStakedExpenditureExtensions } from './stakedExpenditure';
+import { setupListenersForStreamingPaymentsExtensions } from './streamingPayments';
 
 export * from './stakedExpenditure';
 export * from './stagedExpenditure';
 export * from './votingReputation';
+export * from './oneTxPayment';
 
 export const addExtensionEventListener = (
   eventSignature: ContractEventsSignatures,
@@ -69,9 +72,11 @@ export const setupListenersForExtensions = async (): Promise<void> => {
     addNetworkEventListener(eventSignature),
   );
 
+  setupListenerForOneTxPaymentExtensions();
   setupListenersForVotingReputationExtensions();
   setupListenersForStakedExpenditureExtensions();
   setupListenersForStagedExpenditureExtensions();
+  setupListenersForStreamingPaymentsExtensions();
 };
 
 export const fetchExistingExtensions = async (

@@ -1,6 +1,6 @@
 import { BigNumber } from 'ethers';
 import { TransactionDescription } from 'ethers/lib/utils';
-import { AnyVotingReputationClient } from '@colony/colony-js';
+import { AnyVotingReputationClient, Extension } from '@colony/colony-js';
 
 import { ColonyOperations, MotionVote } from '~types';
 import {
@@ -8,9 +8,9 @@ import {
   getColonyFromDB,
   getDomainDatabaseId,
   getExistingTokenAddresses,
+  getStakedExpenditureClient,
   output,
   updateColonyTokens,
-  verbose,
 } from '~utils';
 import { query, mutate } from '~amplifyClient';
 import {
@@ -32,6 +32,7 @@ import {
   UpdateColonyMetadataDocument,
   UpdateDomainMetadataDocument,
 } from '~graphql';
+import { parseAction } from '../motionCreated/helpers';
 
 export const getStakerReward = async (
   motionId: string,
@@ -76,27 +77,6 @@ export const getStakerReward = async (
     },
     isClaimed: false,
   };
-};
-
-const getParsedActionFromMotion = async (
-  action: string,
-  colonyAddress: string,
-): Promise<TransactionDescription | undefined> => {
-  const colonyClient = await getCachedColonyClient(colonyAddress);
-
-  if (!colonyClient) {
-    return;
-  }
-
-  // We are only parsing this action in order to know if it's a add/edit domain motion. Therefore, we shouldn't need to try with any other client.
-  try {
-    return colonyClient.interface.parseTransaction({
-      data: action,
-    });
-  } catch {
-    verbose(`Unable to parse ${action} using colony client`);
-    return undefined;
-  }
 };
 
 const linkPendingDomainMetadataWithDomain = async (
@@ -218,6 +198,8 @@ const linkPendingColonyMetadataWithColony = async (
     hasWhitelistChanged,
     newDisplayName,
     oldDisplayName,
+    hasDescriptionChanged,
+    haveExternalLinksChanged,
   } = pendingColonyMetadata.changelog?.[0] ?? {};
 
   const updatedMetadata = {
@@ -247,6 +229,14 @@ const linkPendingColonyMetadataWithColony = async (
   if (newDisplayName !== oldDisplayName) {
     // If displayName has changed, update displayName
     updatedMetadata.displayName = pendingColonyMetadata.displayName;
+  }
+
+  if (hasDescriptionChanged) {
+    updatedMetadata.description = pendingColonyMetadata.description;
+  }
+
+  if (haveExternalLinksChanged) {
+    updatedMetadata.externalLinks = pendingColonyMetadata.externalLinks;
   }
 
   if (haveTokensChanged && pendingColonyMetadata.modifiedTokenAddresses) {
@@ -280,14 +270,29 @@ export const linkPendingMetadata = async (
   colonyAddress: string,
   finalizedMotion: ColonyMotion,
 ): Promise<void> => {
-  const parsedAction = await getParsedActionFromMotion(action, colonyAddress);
+  const colonyClient = await getCachedColonyClient(colonyAddress);
+  const oneTxPaymentClient =
+    (await colonyClient?.getExtensionClient(Extension.OneTxPayment)) ?? null;
+  const stakedExpenditureClient = await getStakedExpenditureClient(
+    colonyAddress,
+  );
+
+  const parsedAction = parseAction(action, [
+    colonyClient,
+    oneTxPaymentClient,
+    stakedExpenditureClient,
+  ]);
+
+  if (!parsedAction) {
+    return;
+  }
 
   const isMotionAddingADomain =
-    parsedAction?.name === ColonyOperations.AddDomain;
+    parsedAction.name === ColonyOperations.AddDomain;
   const isMotionEditingADomain =
-    parsedAction?.name === ColonyOperations.EditDomain;
+    parsedAction.name === ColonyOperations.EditDomain;
   const isMotionEditingAColony =
-    parsedAction?.name === ColonyOperations.EditColony;
+    parsedAction.name === ColonyOperations.EditColony;
 
   if (
     isMotionAddingADomain ||

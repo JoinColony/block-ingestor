@@ -55,6 +55,9 @@ export const setupListenersForColonies = async (): Promise<void> => {
   });
 
   addNetworkEventListener(ContractEventsSignatures.ColonyAdded);
+  addNetworkEventListener(
+    ContractEventsSignatures.ReputationMiningCycleComplete,
+  );
 };
 
 export const setupListenersForColony = (colonyAddress: string): void => {

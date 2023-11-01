@@ -82,13 +82,21 @@ export enum ContractEventsSignatures {
   // Staked Expenditures
   StakeReclaimed = 'StakeReclaimed(uint256)',
   ExpenditureStakerPunished = 'ExpenditureStakerPunished(address,uint256,bool)',
+  ExpenditureMadeViaStake = 'ExpenditureMadeViaStake(address,uint256,uint256)',
 
   // Staged Expenditures
   ExpenditureMadeStaged = 'ExpenditureMadeStaged(uint256,bool)',
   StagedPaymentReleased = 'StagedPaymentReleased(uint256,uint256)',
 
+  // Streaming Payments
+  StreamingPaymentCreated = 'StreamingPaymentCreated(address,uint256)',
+  PaymentTokenUpdated = 'PaymentTokenUpdated(address,uint256,address,uint256)',
+
   // Annotations
   AnnotateTransaction = 'Annotation(address,bytes32,string)',
+
+  // Reputation
+  ReputationMiningCycleComplete = 'ReputationMiningCycleComplete(bytes32,uint256)',
 }
 
 /*

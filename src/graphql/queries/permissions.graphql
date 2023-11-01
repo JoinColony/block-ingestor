@@ -11,6 +11,23 @@ query GetColonyRole($id: ID!) {
   }
 }
 
+query GetAllColonyRoles($targetAddress: ID!, $colonyAddress: ID!) {
+  getRoleByTargetAddressAndColony(
+    targetAddress: $targetAddress
+    colonyAddress: { eq: $colonyAddress }
+  ) {
+    items {
+      id
+      role_0
+      role_1
+      role_2
+      role_3
+      role_5
+      role_6
+    }
+  }
+}
+
 query GetColonyHistoricRole($id: ID!) {
   getColonyHistoricRole(id: $id) {
     id

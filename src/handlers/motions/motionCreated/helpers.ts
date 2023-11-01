@@ -1,9 +1,9 @@
 import { BigNumber } from 'ethers';
 import { TransactionDescription } from 'ethers/lib/utils';
-
 import {
   AnyColonyClient,
   AnyOneTxPaymentClient,
+  AnyStakedExpenditureClient,
   AnyVotingReputationClient,
 } from '@colony/colony-js';
 
@@ -38,12 +38,16 @@ export interface SimpleTransactionDescription {
   name: ColonyOperations.SimpleDecision;
 }
 
-export const getParsedActionFromMotion = async (
+type MotionActionClients = [
+  AnyColonyClient | null,
+  AnyOneTxPaymentClient | null,
+  AnyStakedExpenditureClient | null,
+];
+
+export const parseAction = (
   action: string,
-  clients: [AnyColonyClient, AnyOneTxPaymentClient],
-): Promise<
-  TransactionDescription | SimpleTransactionDescription | undefined
-> => {
+  clients: MotionActionClients,
+): TransactionDescription | SimpleTransactionDescription | undefined => {
   if (action === SIMPLE_DECISIONS_ACTION_CODE) {
     return {
       name: ColonyOperations.SimpleDecision,
@@ -51,6 +55,9 @@ export const getParsedActionFromMotion = async (
   }
 
   for (const client of clients) {
+    if (!client) {
+      continue;
+    }
     // Return the first time a client can successfully parse the motion
     try {
       return client.interface.parseTransaction({
@@ -64,6 +71,7 @@ export const getParsedActionFromMotion = async (
   verbose(`Unable to parse ${action}`);
   return undefined;
 };
+
 interface GetMotionDataArgs {
   transactionHash: string;
   motionId: BigNumber;
@@ -200,6 +208,7 @@ const createMotionMessage = async (
     },
   });
 };
+
 const createColonyAction = async (
   actionData: CreateColonyActionInput,
 ): Promise<void> => {

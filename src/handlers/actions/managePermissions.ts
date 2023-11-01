@@ -1,4 +1,5 @@
 import { BigNumber } from 'ethers';
+import { Id } from '@colony/colony-js';
 import { mutate, query } from '~amplifyClient';
 import { ContractEvent } from '~types';
 import {
@@ -10,6 +11,7 @@ import {
   getRolesMapFromEvents,
   verbose,
   writeActionFromEvent,
+  getExtensionInstallations,
 } from '~utils';
 import {
   GetColonyRoleQuery,
@@ -21,9 +23,15 @@ import {
   ColonyActionType,
 } from '~graphql';
 import provider from '~provider';
+import { updateColonyContributor } from '~utils/contributors';
 
 export default async (event: ContractEvent): Promise<void> => {
-  const { args, contractAddress, blockNumber, transactionHash } = event;
+  const {
+    args,
+    contractAddress: colonyAddress,
+    blockNumber,
+    transactionHash,
+  } = event;
   const {
     user: targetAddress,
     /*
@@ -31,17 +39,17 @@ export default async (event: ContractEvent): Promise<void> => {
      * since it can only be emmitted in the Root domain, so for such cases, we
      * default to the Root Domain
      */
-    domainId = BigNumber.from(1),
+    domainId = BigNumber.from(Id.RootDomain),
   } = args;
   let { agent } = args;
 
   const id = getColonyRolesDatabaseId(
-    contractAddress,
+    colonyAddress,
     domainId.toString(),
     targetAddress,
   );
   const domainDatabaseId = getDomainDatabaseId(
-    contractAddress,
+    colonyAddress,
     domainId.toString(),
   );
 
@@ -88,7 +96,7 @@ export default async (event: ContractEvent): Promise<void> => {
       }
       const allRoleEventsUpdates = await getAllRoleEventsFromTransaction(
         transactionHash,
-        contractAddress,
+        colonyAddress,
       );
       const rolesFromAllUpdateEvents =
         getRolesMapFromEvents(allRoleEventsUpdates);
@@ -109,14 +117,14 @@ export default async (event: ContractEvent): Promise<void> => {
       );
 
       verbose(
-        `Update the Roles entry for ${targetAddress} in colony ${contractAddress}, under domain ${domainId.toNumber()}`,
+        `Update the Roles entry for ${targetAddress} in colony ${colonyAddress}, under domain ${domainId.toNumber()}`,
       );
 
       /*
        * Create the historic role entry
        */
       await createColonyHistoricRoleDatabaseEntry(
-        contractAddress,
+        colonyAddress,
         domainId.toNumber(),
         targetAddress,
         blockNumber,
@@ -129,7 +137,7 @@ export default async (event: ContractEvent): Promise<void> => {
       /*
        * Create the action
        */
-      await writeActionFromEvent(event, contractAddress, {
+      await writeActionFromEvent(event, colonyAddress, {
         type: ColonyActionType.SetUserRoles,
         fromDomainId: domainDatabaseId,
         initiatorAddress: agent,
@@ -167,10 +175,25 @@ export default async (event: ContractEvent): Promise<void> => {
      */
 
     await createInitialColonyRolesDatabaseEntry(
-      contractAddress,
+      colonyAddress,
       domainId.toNumber(),
       targetAddress,
       transactionHash,
     );
   }
+
+  /*
+   * Whenever a permission is added/removed, confirm that the target address still has at least one permission in the colony
+   */
+
+  const installedExtensions = new Set(
+    await getExtensionInstallations(colonyAddress),
+  );
+
+  // We don't create contributor entries for extensions
+  if (!installedExtensions.has(targetAddress))
+    await updateColonyContributor({
+      colonyAddress,
+      contributorAddress: targetAddress,
+    });
 };

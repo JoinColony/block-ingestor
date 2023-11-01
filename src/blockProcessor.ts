@@ -32,7 +32,8 @@ export const processNextBlock = async (): Promise<void> => {
 
     const block = blocksMap.get(currentBlockNumber);
     if (!block) {
-      return;
+      output(`Could not find block ${currentBlockNumber} in the queue.`);
+      break;
     }
 
     // Get logs contained in the current block

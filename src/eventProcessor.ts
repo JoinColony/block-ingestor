@@ -7,7 +7,6 @@ import {
   handleColonyVersionAdded,
   handleTransfer,
   handleMintTokensAction,
-  handlePaymentAction,
   handleExtensionInstalled,
   handleExtensionAddedToNetwork,
   handleExtensionUninstalled,
@@ -46,6 +45,11 @@ import {
   handleStagedPaymentReleased,
   handleExpenditureStakerPunished,
   handleMakeAbitraryTransactionAction,
+  handleReputationMiningCycleComplete,
+  handleOneTxPaymentAction,
+  handleStreamingPaymentCreated,
+  handleExpenditureMadeViaStake,
+  handlePaymentTokenUpdated,
 } from './handlers';
 
 dotenv.config();
@@ -173,8 +177,8 @@ export default async (event: ContractEvent): Promise<void> => {
       return;
     }
 
-    case ContractEventsSignatures.PaymentAdded: {
-      await handlePaymentAction(event);
+    case ContractEventsSignatures.OneTxPaymentMade: {
+      await handleOneTxPaymentAction(event);
       return;
     }
 
@@ -293,6 +297,11 @@ export default async (event: ContractEvent): Promise<void> => {
       return;
     }
 
+    case ContractEventsSignatures.ExpenditureMadeViaStake: {
+      await handleExpenditureMadeViaStake(event);
+      return;
+    }
+
     case ContractEventsSignatures.ExpenditureMadeStaged: {
       await handleExpenditureMadeStaged(event);
       return;
@@ -303,6 +312,16 @@ export default async (event: ContractEvent): Promise<void> => {
       return;
     }
 
+    case ContractEventsSignatures.StreamingPaymentCreated: {
+      await handleStreamingPaymentCreated(event);
+      return;
+    }
+
+    case ContractEventsSignatures.PaymentTokenUpdated: {
+      await handlePaymentTokenUpdated(event);
+      return;
+    }
+
     case ContractEventsSignatures.AnnotateTransaction: {
       await handleAnnotateTransaction(event);
       return;
@@ -310,6 +329,10 @@ export default async (event: ContractEvent): Promise<void> => {
 
     case ContractEventsSignatures.ArbitraryTransaction: {
       await handleMakeAbitraryTransactionAction(event);
+    }
+
+    case ContractEventsSignatures.ReputationMiningCycleComplete: {
+      await handleReputationMiningCycleComplete(event);
       return;
     }
 

@@ -4,7 +4,7 @@ import { ContractEvent, motionNameMapping } from '~types';
 import { getPendingMetadataDatabaseId } from '~utils';
 import { createMotionInDB } from '../helpers';
 
-export const handleManageDomainMotion = async (
+export const handleAddDomainMotion = async (
   event: ContractEvent,
   parsedAction: TransactionDescription,
   gasEstimate: BigNumber,
@@ -15,6 +15,7 @@ export const handleManageDomainMotion = async (
   }
 
   const { name } = parsedAction;
+
   const pendingDomainMetadataId = getPendingMetadataDatabaseId(
     colonyAddress,
     transactionHash,

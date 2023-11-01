@@ -1,15 +1,23 @@
+import { mutate } from '~amplifyClient';
 import { setupListenersForColony } from '~eventListeners';
+import {
+  UpdateColonyContributorDocument,
+  UpdateColonyContributorMutation,
+  UpdateColonyContributorMutationVariables,
+} from '~graphql';
 import { coloniesSet } from '~stats';
-import { ContractEvent } from '~types';
+import { ContractEvent, ContractEventsSignatures } from '~types';
 import {
   output,
   updateStats,
   createColonyFounderInitialRoleEntry,
+  getAllRoleEventsFromTransaction,
 } from '~utils';
+import { getColonyContributorId } from '~utils/contributors';
 
 export default async (event: ContractEvent): Promise<void> => {
-  const { colonyAddress, token: tokenAddress } = event.args ?? {};
-
+  const { transactionHash, args } = event;
+  const { colonyAddress, token: tokenAddress } = args ?? {};
   /*
    * Add it to the Set
    */
@@ -22,6 +30,22 @@ export default async (event: ContractEvent): Promise<void> => {
     'Total tracked colonies:',
     coloniesSet.size,
   );
+
+  const events = await getAllRoleEventsFromTransaction(
+    transactionHash,
+    colonyAddress,
+  );
+
+  const ColonyRoleSetEventName = ContractEventsSignatures.ColonyRoleSet.slice(
+    0,
+    ContractEventsSignatures.ColonyRoleSet.indexOf('('),
+  );
+
+  const {
+    args: { user: colonyFounderAddress },
+  } = events.find((event) => event?.name === ColonyRoleSetEventName) ?? {
+    args: { user: '' },
+  };
 
   /*
    * @NOTE This needs to called manually in here, as opposed to the handler
@@ -39,7 +63,24 @@ export default async (event: ContractEvent): Promise<void> => {
    * (from a permissions standpoint) until the block ingestor restarts, which,
    * if all goes well, might be a while...
    */
-  await createColonyFounderInitialRoleEntry(event);
+
+  await createColonyFounderInitialRoleEntry(event, colonyFounderAddress);
+
+  /*
+   * A new contributor is created when assigned permissions, so just update the watched status of the colony founder.
+   * I'm doing this here to avoid a race condition with the front end. It's simpler to perform an update here than to
+   * check whether the contributor has already been created in the front end, and perform an update or a create mutation
+   * accordingly.
+   */
+  await mutate<
+    UpdateColonyContributorMutation,
+    UpdateColonyContributorMutationVariables
+  >(UpdateColonyContributorDocument, {
+    input: {
+      id: getColonyContributorId(colonyAddress, colonyFounderAddress),
+      isWatching: true,
+    },
+  });
 
   /*
    * Setup all Colony specific listeners for it
