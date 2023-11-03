@@ -11,7 +11,7 @@ import {
   UpdateColonyStakeDocument,
   UpdateColonyStakeMutation,
   UpdateColonyStakeMutationVariables,
-  UserStakes,
+  UserMotionStakes,
 } from '~graphql';
 import { getColonyFromDB, output } from '~utils';
 
@@ -139,7 +139,7 @@ export const reclaimUserStake = async (
 };
 
 export const getUserStake = (
-  usersStakes: UserStakes[],
+  usersStakes: UserMotionStakes[],
   userAddress: string,
 ): BigNumber => {
   const userStakes = usersStakes.find(({ address }) => address === userAddress);

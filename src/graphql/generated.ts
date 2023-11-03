@@ -801,7 +801,7 @@ export type ColonyMotion = {
   /** The minimum stake that a user has to provide for it to be accepted */
   userMinStake: Scalars['String'];
   /** List of stakes that users have made for a motion */
-  usersStakes: Array<UserStakes>;
+  usersStakes: Array<UserMotionStakes>;
   /** A list of all of the votes cast within in the motion */
   voterRecord: Array<VoterRecord>;
 };
@@ -1193,7 +1193,7 @@ export type CreateColonyMotionInput = {
   stakerRewards: Array<StakerRewardsInput>;
   transactionHash: Scalars['ID'];
   userMinStake: Scalars['String'];
-  usersStakes: Array<UserStakesInput>;
+  usersStakes: Array<UserMotionStakesInput>;
   voterRecord: Array<VoterRecordInput>;
 };
 
@@ -7465,7 +7465,7 @@ export type UpdateColonyMotionInput = {
   stakerRewards?: InputMaybe<Array<StakerRewardsInput>>;
   transactionHash?: InputMaybe<Scalars['ID']>;
   userMinStake?: InputMaybe<Scalars['String']>;
-  usersStakes?: InputMaybe<Array<UserStakesInput>>;
+  usersStakes?: InputMaybe<Array<UserMotionStakesInput>>;
   voterRecord?: InputMaybe<Array<VoterRecordInput>>;
 };
 
@@ -7826,8 +7826,8 @@ export type UserDomainReputation = {
 };
 
 /** Stakes that a user has made for a motion */
-export type UserStakes = {
-  __typename?: 'UserStakes';
+export type UserMotionStakes = {
+  __typename?: 'UserMotionStakes';
   /** The user's wallet address */
   address: Scalars['String'];
   /** Stake values */
@@ -7835,7 +7835,7 @@ export type UserStakes = {
 };
 
 /** Input used to modify the stakes of a user for a motion */
-export type UserStakesInput = {
+export type UserMotionStakesInput = {
   /** The user's wallet address */
   address: Scalars['String'];
   /** Stake values */
@@ -8053,7 +8053,7 @@ export type ColonyMotionFragment = {
     percentage: { __typename?: 'MotionStakeValues'; nay: string; yay: string };
   };
   usersStakes: Array<{
-    __typename?: 'UserStakes';
+    __typename?: 'UserMotionStakes';
     address: string;
     stakes: {
       __typename?: 'MotionStakes';
@@ -8112,8 +8112,8 @@ export type MotionStakesFragment = {
   percentage: { __typename?: 'MotionStakeValues'; nay: string; yay: string };
 };
 
-export type UserStakesFragment = {
-  __typename?: 'UserStakes';
+export type UserMotionStakesFragment = {
+  __typename?: 'UserMotionStakes';
   address: string;
   stakes: {
     __typename?: 'MotionStakes';
@@ -9061,7 +9061,7 @@ export type GetColonyMotionQuery = {
       };
     };
     usersStakes: Array<{
-      __typename?: 'UserStakes';
+      __typename?: 'UserMotionStakes';
       address: string;
       stakes: {
         __typename?: 'MotionStakes';
@@ -9284,8 +9284,8 @@ export const MotionStakes = gql`
     }
   }
 `;
-export const UserStakes = gql`
-  fragment UserStakes on UserStakes {
+export const UserMotionStakes = gql`
+  fragment UserMotionStakes on UserMotionStakes {
     address
     stakes {
       raw {
@@ -9326,7 +9326,7 @@ export const ColonyMotion = gql`
     requiredStake
     remainingStakes
     usersStakes {
-      ...UserStakes
+      ...UserMotionStakes
     }
     userMinStake
     rootHash
@@ -9365,7 +9365,7 @@ export const ColonyMotion = gql`
     transactionHash
   }
   ${MotionStakes}
-  ${UserStakes}
+  ${UserMotionStakes}
   ${StakerReward}
   ${VoterRecord}
 `;

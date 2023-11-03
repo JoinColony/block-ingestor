@@ -7,7 +7,7 @@ fragment ColonyMotion on ColonyMotion {
   requiredStake
   remainingStakes
   usersStakes {
-    ...UserStakes
+    ...UserMotionStakes
   }
   userMinStake
   rootHash
@@ -72,7 +72,7 @@ fragment MotionStakes on MotionStakes {
   }
 }
 
-fragment UserStakes on UserStakes {
+fragment UserMotionStakes on UserMotionStakes {
   address
   stakes {
     raw {

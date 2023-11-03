@@ -13,7 +13,7 @@ import {
   UpdateColonyStakeDocument,
   UpdateColonyStakeMutation,
   UpdateColonyStakeMutationVariables,
-  UserStakes,
+  UserMotionStakes,
 } from '~graphql';
 import { mutate, query } from '~amplifyClient';
 import { getMotionSide, getColonyStakeId } from '../helpers';
@@ -84,7 +84,7 @@ const getNewUserStakes = (
   vote: BigNumber,
   amount: BigNumber,
   requiredStake: BigNumber,
-): UserStakes => {
+): UserMotionStakes => {
   const invertedVote = BigNumber.from(1).sub(vote);
   const stakedSide = getMotionSide(vote);
   const unstakedSide = getMotionSide(invertedVote);
@@ -103,23 +103,23 @@ const getNewUserStakes = (
         [unstakedSide]: '0',
       },
     }, // TS doesn't like the computed keys, but we know they're correct
-  } as unknown as UserStakes;
+  } as unknown as UserMotionStakes;
 };
 
 /**
  * Given staking data, add stakes to existing stakes and return new, updated UserStakes object
  */
 const getUpdatedUserStakes = (
-  existingUserStakes: UserStakes,
+  existingUserStakes: UserMotionStakes,
   amount: BigNumber,
   vote: BigNumber,
   requiredStake: BigNumber,
-): UserStakes => {
+): UserMotionStakes => {
   const stakedSide = getMotionSide(vote);
   const existingRawStake = existingUserStakes.stakes.raw[stakedSide];
   const updatedRawStake = amount.add(existingRawStake);
   const updatedPercentage = getStakePercentage(updatedRawStake, requiredStake);
-  const updatedUserStakes: UserStakes = {
+  const updatedUserStakes: UserMotionStakes = {
     ...existingUserStakes,
     stakes: {
       raw: {
@@ -136,7 +136,7 @@ const getUpdatedUserStakes = (
   return updatedUserStakes;
 };
 
-type UserStakesMapFn = (usersStakes: UserStakes) => UserStakes;
+type UserStakesMapFn = (usersStakes: UserMotionStakes) => UserMotionStakes;
 
 const getUserStakesMapFn =
   (
@@ -145,7 +145,7 @@ const getUserStakesMapFn =
     amount: BigNumber,
     requiredStake: BigNumber,
   ): UserStakesMapFn =>
-  (userStakes: UserStakes): UserStakes => {
+  (userStakes: UserMotionStakes): UserMotionStakes => {
     const { address } = userStakes;
 
     if (address === staker) {
@@ -159,12 +159,12 @@ const getUserStakesMapFn =
  * Takes existing usersStakes and updates the entry with the latest stake data
  */
 export const getUpdatedUsersStakes = (
-  usersStakes: UserStakes[],
+  usersStakes: UserMotionStakes[],
   staker: string,
   vote: BigNumber,
   amount: BigNumber,
   requiredStake: BigNumber,
-): UserStakes[] => {
+): UserMotionStakes[] => {
   const isExistingStaker = usersStakes.some(
     ({ address }) => address === staker,
   );
