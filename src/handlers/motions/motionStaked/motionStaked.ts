@@ -11,6 +11,7 @@ import {
   getUpdatedMessages,
   updateMotionInDB,
   getMessageKey,
+  updateUserColonyStake,
   updateUserStake,
 } from '../helpers';
 
@@ -20,13 +21,14 @@ export default async (event: ContractEvent): Promise<void> => {
     logIndex,
     transactionHash,
     args: { vote, amount, staker, motionId },
+    timestamp,
   } = event;
 
   if (!colonyAddress) {
     return;
   }
 
-  await updateUserStake(staker, colonyAddress, amount);
+  await updateUserColonyStake(staker, colonyAddress, amount);
 
   const votingClient = await getVotingClient(colonyAddress);
 
@@ -80,6 +82,13 @@ export default async (event: ContractEvent): Promise<void> => {
       },
       newMotionMessages,
       showInActionsList,
+    );
+
+    await updateUserStake(
+      stakedMotion.transactionHash,
+      staker,
+      amount,
+      timestamp,
     );
 
     verbose(

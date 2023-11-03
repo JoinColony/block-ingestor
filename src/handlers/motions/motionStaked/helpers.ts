@@ -6,6 +6,9 @@ import {
   CreateColonyStakeMutation,
   CreateColonyStakeMutationVariables,
   CreateMotionMessageInput,
+  CreateUserStakeDocument,
+  CreateUserStakeMutation,
+  CreateUserStakeMutationVariables,
   GetColonyStakeDocument,
   GetColonyStakeQuery,
   GetColonyStakeQueryVariables,
@@ -291,7 +294,7 @@ export const getUpdatedMessages = ({
  * If it's the first time a user has staked in a colony, we create a Colony Stake record for the user,
  * else we update the amount they've currently got staked in the colony.
  */
-export const updateUserStake = async (
+export const updateUserColonyStake = async (
   userAddress: string,
   colonyAddress: string,
   stakeAmount: BigNumber,
@@ -327,4 +330,25 @@ export const updateUserStake = async (
       },
     );
   }
+};
+
+export const updateUserStake = async (
+  transactionHash: string,
+  userAddress: string,
+  amount: string,
+  timestamp: number,
+): Promise<void> => {
+  await mutate<CreateUserStakeMutation, CreateUserStakeMutationVariables>(
+    CreateUserStakeDocument,
+    {
+      input: {
+        id: `${transactionHash}_${userAddress}`,
+        userAddress,
+        actionId: transactionHash,
+        amount: amount.toString(),
+        isClaimed: false,
+        createdAt: new Date(timestamp * 1000).toISOString(),
+      },
+    },
+  );
 };
