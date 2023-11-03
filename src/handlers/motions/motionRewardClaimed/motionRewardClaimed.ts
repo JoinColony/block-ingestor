@@ -12,7 +12,13 @@ import {
   getUpdatedStakerRewards,
   getUserStake,
 } from './helpers';
-import { ColonyMotion } from '~graphql';
+import {
+  ColonyMotion,
+  UpdateUserStakeDocument,
+  UpdateUserStakeMutation,
+  UpdateUserStakeMutationVariables,
+} from '~graphql';
+import { mutate } from '~amplifyClient';
 
 export default async (event: ContractEvent): Promise<void> => {
   const {
@@ -67,5 +73,16 @@ export default async (event: ContractEvent): Promise<void> => {
       updatedStakerRewards,
     );
     await reclaimUserStake(staker, colonyAddress, userStake);
+
+    // TODO: Export to helper function
+    await mutate<UpdateUserStakeMutation, UpdateUserStakeMutationVariables>(
+      UpdateUserStakeDocument,
+      {
+        input: {
+          id: `${claimedMotion.transactionHash}_${staker}`,
+          isClaimed: true,
+        },
+      },
+    );
   }
 };
