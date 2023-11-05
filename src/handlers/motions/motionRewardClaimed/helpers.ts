@@ -11,9 +11,13 @@ import {
   UpdateColonyStakeDocument,
   UpdateColonyStakeMutation,
   UpdateColonyStakeMutationVariables,
+  UpdateUserStakeDocument,
+  UpdateUserStakeMutation,
+  UpdateUserStakeMutationVariables,
   UserMotionStakes,
 } from '~graphql';
 import { getColonyFromDB, output } from '~utils';
+import { getUserStakeDatabaseId } from '~utils/stakes';
 
 import { getColonyStakeId } from '../helpers';
 
@@ -104,6 +108,7 @@ export const reclaimUserStake = async (
   userAddress: string,
   colonyAddress: string,
   reclaimAmount: BigNumber,
+  motionTransactionHash: string,
 ): Promise<void> => {
   const colonyStakeId = getColonyStakeId(userAddress, colonyAddress);
   const { data } =
@@ -136,9 +141,19 @@ export const reclaimUserStake = async (
       totalAmount: updatedAmount.toString(),
     },
   );
+
+  // Update user stake status
+  await mutate<UpdateUserStakeMutation, UpdateUserStakeMutationVariables>(
+    UpdateUserStakeDocument,
+    {
+      input: {
+        id: getUserStakeDatabaseId(userAddress, motionTransactionHash),
+      },
+    },
+  );
 };
 
-export const getUserStake = (
+export const getMotionUserStake = (
   usersStakes: UserMotionStakes[],
   userAddress: string,
 ): BigNumber => {

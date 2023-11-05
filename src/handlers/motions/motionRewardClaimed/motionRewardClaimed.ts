@@ -10,16 +10,9 @@ import {
   updateColonyUnclaimedStakes,
   reclaimUserStake,
   getUpdatedStakerRewards,
-  getUserStake,
+  getMotionUserStake,
 } from './helpers';
-import {
-  ColonyMotion,
-  UpdateUserStakeDocument,
-  UpdateUserStakeMutation,
-  UpdateUserStakeMutationVariables,
-} from '~graphql';
-import { mutate } from '~amplifyClient';
-import { getUserStakeDatabaseId } from '~utils/stakes';
+import { ColonyMotion } from '~graphql';
 
 export default async (event: ContractEvent): Promise<void> => {
   const {
@@ -50,7 +43,7 @@ export default async (event: ContractEvent): Promise<void> => {
   if (claimedMotion) {
     const { stakerRewards, usersStakes } = claimedMotion;
 
-    const userStake = getUserStake(usersStakes, staker);
+    const userStake = getMotionUserStake(usersStakes, staker);
     const updatedStakerRewards = getUpdatedStakerRewards(stakerRewards, staker);
 
     const newMotionMessages = [
@@ -73,17 +66,11 @@ export default async (event: ContractEvent): Promise<void> => {
       motionDatabaseId,
       updatedStakerRewards,
     );
-    await reclaimUserStake(staker, colonyAddress, userStake);
-
-    // TODO: Export to helper function
-    await mutate<UpdateUserStakeMutation, UpdateUserStakeMutationVariables>(
-      UpdateUserStakeDocument,
-      {
-        input: {
-          id: getUserStakeDatabaseId(staker, claimedMotion.transactionHash),
-          isClaimed: true,
-        },
-      },
+    await reclaimUserStake(
+      staker,
+      colonyAddress,
+      userStake,
+      updatedMotionData.transactionHash,
     );
   }
 };
