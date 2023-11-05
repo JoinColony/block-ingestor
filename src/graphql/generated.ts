@@ -7970,6 +7970,7 @@ export type UserStake = {
   actionId: Scalars['ID'];
   amount: Scalars['String'];
   createdAt: Scalars['AWSDateTime'];
+  /** Self-managed, formatted as userAddress_transactionHash, where transactionHash is the hash of the transaction that is being staked for */
   id: Scalars['ID'];
   isClaimed: Scalars['Boolean'];
   updatedAt: Scalars['AWSDateTime'];
@@ -9332,6 +9333,19 @@ export type GetSafeTransactionByTransactionHashQuery = {
   getSafeTransaction?: { __typename?: 'SafeTransaction'; id: string } | null;
 };
 
+export type GetUserStakeQueryVariables = Exact<{
+  id: Scalars['ID'];
+}>;
+
+export type GetUserStakeQuery = {
+  __typename?: 'Query';
+  getUserStake?: {
+    __typename?: 'UserStake';
+    id: string;
+    amount: string;
+  } | null;
+};
+
 export type GetStatsQueryVariables = Exact<{ [key: string]: never }>;
 
 export type GetStatsQuery = {
@@ -10230,6 +10244,14 @@ export const GetSafeTransactionByTransactionHashDocument = gql`
   query GetSafeTransactionByTransactionHash($transactionHash: ID!) {
     getSafeTransaction(id: $transactionHash) {
       id
+    }
+  }
+`;
+export const GetUserStakeDocument = gql`
+  query GetUserStake($id: ID!) {
+    getUserStake(id: $id) {
+      id
+      amount
     }
   }
 `;

@@ -12,13 +12,20 @@ import {
   GetColonyStakeDocument,
   GetColonyStakeQuery,
   GetColonyStakeQueryVariables,
+  GetUserStakeDocument,
+  GetUserStakeQuery,
+  GetUserStakeQueryVariables,
   MotionStakes,
   UpdateColonyStakeDocument,
   UpdateColonyStakeMutation,
   UpdateColonyStakeMutationVariables,
+  UpdateUserStakeDocument,
+  UpdateUserStakeMutation,
+  UpdateUserStakeMutationVariables,
   UserMotionStakes,
 } from '~graphql';
 import { mutate, query } from '~amplifyClient';
+import { getUserStakeDatabaseId } from '~utils/stakes';
 import { getMotionSide, getColonyStakeId } from '../helpers';
 
 export const getRequiredStake = (
@@ -332,23 +339,50 @@ export const updateUserColonyStake = async (
   }
 };
 
+/**
+ * Function to update the user stake following staking on a motion
+ */
 export const updateUserStake = async (
   transactionHash: string,
   userAddress: string,
   amount: string,
   timestamp: number,
 ): Promise<void> => {
-  await mutate<CreateUserStakeMutation, CreateUserStakeMutationVariables>(
-    CreateUserStakeDocument,
-    {
-      input: {
-        id: `${transactionHash}_${userAddress}`,
-        userAddress,
-        actionId: transactionHash,
-        amount: amount.toString(),
-        isClaimed: false,
-        createdAt: new Date(timestamp * 1000).toISOString(),
+  const userStakeId = getUserStakeDatabaseId(userAddress, transactionHash);
+  const { data } =
+    (await query<GetUserStakeQuery, GetUserStakeQueryVariables>(
+      GetUserStakeDocument,
+      {
+        id: userStakeId,
       },
-    },
-  );
+    )) ?? {};
+  const existingUserStake = data?.getUserStake;
+
+  if (existingUserStake) {
+    const { amount: existingAmount } = existingUserStake;
+
+    await mutate<UpdateUserStakeMutation, UpdateUserStakeMutationVariables>(
+      UpdateUserStakeDocument,
+      {
+        input: {
+          id: userStakeId,
+          amount: BigNumber.from(existingAmount).add(amount).toString(),
+        },
+      },
+    );
+  } else {
+    await mutate<CreateUserStakeMutation, CreateUserStakeMutationVariables>(
+      CreateUserStakeDocument,
+      {
+        input: {
+          id: userStakeId,
+          userAddress,
+          actionId: transactionHash,
+          amount: amount.toString(),
+          isClaimed: false,
+          createdAt: new Date(timestamp * 1000).toISOString(),
+        },
+      },
+    );
+  }
 };

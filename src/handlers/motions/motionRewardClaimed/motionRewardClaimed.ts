@@ -19,6 +19,7 @@ import {
   UpdateUserStakeMutationVariables,
 } from '~graphql';
 import { mutate } from '~amplifyClient';
+import { getUserStakeDatabaseId } from '~utils/stakes';
 
 export default async (event: ContractEvent): Promise<void> => {
   const {
@@ -79,7 +80,7 @@ export default async (event: ContractEvent): Promise<void> => {
       UpdateUserStakeDocument,
       {
         input: {
-          id: `${claimedMotion.transactionHash}_${staker}`,
+          id: getUserStakeDatabaseId(staker, claimedMotion.transactionHash),
           isClaimed: true,
         },
       },
