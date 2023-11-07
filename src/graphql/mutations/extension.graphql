@@ -11,3 +11,19 @@ mutation UpdateColonyExtensionByAddress($input: UpdateColonyExtensionInput!) {
     colonyAddress: colonyId
   }
 }
+
+mutation CreateExtensionInstallationsCount(
+  $input: CreateExtensionInstallationsCountInput!
+) {
+  createExtensionInstallationsCount(input: $input) {
+    id
+  }
+}
+
+mutation UpdateExtensionInstallationsCount(
+  $input: UpdateExtensionInstallationsCountInput!
+) {
+  updateExtensionInstallationsCount(input: $input) {
+    id
+  }
+}
