@@ -345,6 +345,7 @@ export const updateUserColonyStake = async (
 export const updateUserStake = async (
   transactionHash: string,
   userAddress: string,
+  colonyAddress: string,
   amount: string,
   timestamp: number,
 ): Promise<void> => {
@@ -377,6 +378,7 @@ export const updateUserStake = async (
         input: {
           id: userStakeId,
           userAddress,
+          colonyAddress,
           actionId: transactionHash,
           amount: amount.toString(),
           isClaimed: false,

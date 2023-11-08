@@ -153,7 +153,7 @@ export const reclaimUserStake = async (
   );
 };
 
-export const getMotionUserStake = (
+export const getUserMotionStake = (
   usersStakes: UserMotionStakes[],
   userAddress: string,
 ): BigNumber => {

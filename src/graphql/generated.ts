@@ -1473,6 +1473,7 @@ export type CreateUserInput = {
 export type CreateUserStakeInput = {
   actionId: Scalars['ID'];
   amount: Scalars['String'];
+  colonyAddress: Scalars['ID'];
   createdAt?: InputMaybe<Scalars['AWSDateTime']>;
   id?: InputMaybe<Scalars['ID']>;
   isClaimed: Scalars['Boolean'];
@@ -3958,6 +3959,7 @@ export type ModelSubscriptionUserStakeFilterInput = {
   actionId?: InputMaybe<ModelSubscriptionIdInput>;
   amount?: InputMaybe<ModelSubscriptionStringInput>;
   and?: InputMaybe<Array<InputMaybe<ModelSubscriptionUserStakeFilterInput>>>;
+  colonyAddress?: InputMaybe<ModelSubscriptionIdInput>;
   createdAt?: InputMaybe<ModelSubscriptionStringInput>;
   id?: InputMaybe<ModelSubscriptionIdInput>;
   isClaimed?: InputMaybe<ModelSubscriptionBooleanInput>;
@@ -4122,6 +4124,7 @@ export type ModelUserStakeConditionInput = {
   actionId?: InputMaybe<ModelIdInput>;
   amount?: InputMaybe<ModelStringInput>;
   and?: InputMaybe<Array<InputMaybe<ModelUserStakeConditionInput>>>;
+  colonyAddress?: InputMaybe<ModelIdInput>;
   createdAt?: InputMaybe<ModelStringInput>;
   isClaimed?: InputMaybe<ModelBooleanInput>;
   not?: InputMaybe<ModelUserStakeConditionInput>;
@@ -4139,6 +4142,7 @@ export type ModelUserStakeFilterInput = {
   actionId?: InputMaybe<ModelIdInput>;
   amount?: InputMaybe<ModelStringInput>;
   and?: InputMaybe<Array<InputMaybe<ModelUserStakeFilterInput>>>;
+  colonyAddress?: InputMaybe<ModelIdInput>;
   createdAt?: InputMaybe<ModelStringInput>;
   id?: InputMaybe<ModelIdInput>;
   isClaimed?: InputMaybe<ModelBooleanInput>;
@@ -7856,6 +7860,7 @@ export type UpdateUserInput = {
 export type UpdateUserStakeInput = {
   actionId?: InputMaybe<Scalars['ID']>;
   amount?: InputMaybe<Scalars['String']>;
+  colonyAddress?: InputMaybe<Scalars['ID']>;
   createdAt?: InputMaybe<Scalars['AWSDateTime']>;
   id: Scalars['ID'];
   isClaimed?: InputMaybe<Scalars['Boolean']>;
@@ -7969,6 +7974,7 @@ export type UserStake = {
   action?: Maybe<ColonyAction>;
   actionId: Scalars['ID'];
   amount: Scalars['String'];
+  colonyAddress: Scalars['ID'];
   createdAt: Scalars['AWSDateTime'];
   /** Self-managed, formatted as userAddress_transactionHash, where transactionHash is the hash of the transaction that is being staked for */
   id: Scalars['ID'];

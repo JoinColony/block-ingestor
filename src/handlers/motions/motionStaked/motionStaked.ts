@@ -87,6 +87,7 @@ export default async (event: ContractEvent): Promise<void> => {
     await updateUserStake(
       stakedMotion.transactionHash,
       staker,
+      colonyAddress,
       amount,
       timestamp,
     );
