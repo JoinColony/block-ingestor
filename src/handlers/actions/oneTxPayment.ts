@@ -9,12 +9,12 @@ import {
   GetColonyExtensionQuery,
   GetColonyExtensionQueryVariables,
 } from '~graphql';
-import networkClient from '~networkClient';
 import provider, { getChainId } from '~provider';
 import { ContractEvent, ContractEventsSignatures } from '~types';
 import {
   getCachedColonyClient,
   getDomainDatabaseId,
+  isColonyAddress,
   mapLogToContractEvent,
   notNull,
   toNumber,
@@ -102,7 +102,7 @@ export default async (oneTxPaymentEvent: ContractEvent): Promise<void> => {
     const { recipient: recipientAddress, domainId } =
       await colonyClient.getPayment(paymentId);
 
-    const recipientIsColony = await networkClient.isColony(recipientAddress);
+    const recipientIsColony = await isColonyAddress(recipientAddress);
 
     const { token: tokenAddress, amount } = payoutClaimedEvent.args;
 
