@@ -1,15 +1,12 @@
 import { BigNumber, utils } from 'ethers';
-import { mutate, query } from '~amplifyClient';
+import { query } from '~amplifyClient';
 import {
   ColonyActionType,
-  CreateColonyFundsClaimDocument,
-  CreateColonyFundsClaimMutation,
-  CreateColonyFundsClaimMutationVariables,
   GetColonyExtensionDocument,
   GetColonyExtensionQuery,
   GetColonyExtensionQueryVariables,
 } from '~graphql';
-import provider, { getChainId } from '~provider';
+import provider from '~provider';
 import { ContractEvent, ContractEventsSignatures } from '~types';
 import {
   getCachedColonyClient,
@@ -19,6 +16,7 @@ import {
   notNull,
   toNumber,
   writeActionFromEvent,
+  createFundsClaim,
 } from '~utils';
 
 const PAYOUT_CLAIMED_SIGNATURE_HASH = utils.id(
@@ -62,8 +60,7 @@ export default async (oneTxPaymentEvent: ContractEvent): Promise<void> => {
   const {
     contractAddress: extensionAddress,
     transactionHash,
-    logIndex,
-    blockNumber,
+
     args,
   } = oneTxPaymentEvent;
 
@@ -107,20 +104,11 @@ export default async (oneTxPaymentEvent: ContractEvent): Promise<void> => {
     const { token: tokenAddress, amount } = payoutClaimedEvent.args;
 
     if (recipientIsColony) {
-      const chainId = getChainId();
-      const claimId = `${chainId}_${transactionHash}_${logIndex}`;
-
-      await mutate<
-        CreateColonyFundsClaimMutation,
-        CreateColonyFundsClaimMutationVariables
-      >(CreateColonyFundsClaimDocument, {
-        input: {
-          id: claimId,
-          colonyFundsClaimsId: recipientAddress,
-          colonyFundsClaimTokenId: tokenAddress,
-          createdAtBlock: blockNumber,
-          amount: amount.toString(),
-        },
+      await createFundsClaim({
+        colonyAddress: recipientAddress,
+        tokenAddress,
+        amount: amount.toString(),
+        event: oneTxPaymentEvent,
       });
     }
 

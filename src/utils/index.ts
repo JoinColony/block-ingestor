@@ -14,3 +14,4 @@ export * from './clients';
 export * from './seedDB';
 export * from './expenditures';
 export * from './isColonyAddress';
+export * from './fundsClaims';
