@@ -11,17 +11,12 @@ import { ContractEvent, ContractEventsSignatures } from '~types';
 import {
   getCachedColonyClient,
   getDomainDatabaseId,
-  isColonyAddress,
   mapLogToContractEvent,
   notNull,
   toNumber,
   writeActionFromEvent,
-  createFundsClaim,
+  ActionFields,
 } from '~utils';
-
-const PAYOUT_CLAIMED_SIGNATURE_HASH = utils.id(
-  ContractEventsSignatures.PayoutClaimed,
-);
 
 const EXPENDITURE_PAYOUT_SET = utils.id(
   ContractEventsSignatures.ExpenditurePayoutSet,
@@ -71,99 +66,75 @@ export default async (oneTxPaymentEvent: ContractEvent): Promise<void> => {
     )) ?? {};
 
   const colonyAddress = data?.getColonyExtension?.colonyId ?? '';
-
   const colonyClient = await getCachedColonyClient(colonyAddress);
 
   if (!colonyClient) {
     return;
   }
 
-  const [initiatorAddress, , nPayments] = args;
+  const [initiatorAddress, expenditureId] = args;
   const receipt = await provider.getTransactionReceipt(transactionHash);
 
-  if ((nPayments as BigNumber).eq(1)) {
-    const [, paymentId] = args;
-    const [payoutClaimedLog] = receipt.logs.filter(
-      (log) => PAYOUT_CLAIMED_SIGNATURE_HASH === log.topics[0],
-    );
+  // multiple OneTxPayments use expenditures at the contract level
+  // @ts-expect-error
+  const expenditure: Expenditure = await colonyClient.getExpenditure(
+    expenditureId,
+  );
 
-    const payoutClaimedEvent = await mapLogToContractEvent(
-      payoutClaimedLog,
-      colonyClient.interface,
-    );
+  const expenditurePayoutLogs = receipt.logs.filter((log) =>
+    log.topics.includes(EXPENDITURE_PAYOUT_SET),
+  );
 
-    if (!payoutClaimedEvent) {
-      return;
-    }
+  const expenditurePayoutEvents = await Promise.all(
+    expenditurePayoutLogs.map((log) =>
+      mapLogToContractEvent(log, colonyClient.interface),
+    ),
+  );
 
-    const { recipient: recipientAddress, domainId } =
-      await colonyClient.getPayment(paymentId);
+  const payments: MultiPayment[] = await Promise.all(
+    expenditurePayoutEvents.filter(notNull).map(async ({ args }) => {
+      const [, expenditureId, slotId, tokenAddress, amount] = args;
+      const expenditureSlot: ExpenditureSlot =
+        // @ts-expect-error
+        await colonyClient.getExpenditureSlot(expenditureId, slotId);
 
-    const recipientIsColony = await isColonyAddress(recipientAddress);
-
-    const { token: tokenAddress, amount } = payoutClaimedEvent.args;
-
-    if (recipientIsColony) {
-      await createFundsClaim({
-        colonyAddress: recipientAddress,
-        tokenAddress,
+      const payment: MultiPayment = {
         amount: amount.toString(),
-        event: oneTxPaymentEvent,
-      });
-    }
+        tokenAddress,
+        recipientAddress: expenditureSlot.recipient,
+      };
+      return payment;
+    }),
+  );
 
-    await writeActionFromEvent(oneTxPaymentEvent, colonyAddress, {
-      type: ColonyActionType.Payment,
-      fromDomainId: getDomainDatabaseId(colonyAddress, toNumber(domainId)),
+  const hasMultiplePayments = payments.length > 1;
+  let actionFields: ActionFields = {
+    type: hasMultiplePayments
+      ? ColonyActionType.MultiplePayment
+      : ColonyActionType.Payment,
+    fromDomainId: getDomainDatabaseId(
+      colonyAddress,
+      toNumber(expenditure.domainId),
+    ),
+    initiatorAddress,
+  };
+
+  if (payments.length === 1) {
+    const { tokenAddress, amount, recipientAddress } = payments[0];
+    actionFields = {
+      ...actionFields,
       tokenAddress,
-      amount: amount.toString(),
-      initiatorAddress,
+      amount,
       recipientAddress,
-      paymentId: toNumber(paymentId),
-    });
+      paymentId: toNumber(expenditureId),
+    };
   } else {
-    // multiple OneTxPayments use expenditures at the contract level
-    const [, expenditureId] = args;
-    // @ts-expect-error
-    const expenditure: Expenditure = await colonyClient.getExpenditure(
-      expenditureId,
-    );
-
-    const expenditurePayoutLogs = receipt.logs.filter((log) =>
-      log.topics.includes(EXPENDITURE_PAYOUT_SET),
-    );
-
-    const expenditurePayoutEvents = await Promise.all(
-      expenditurePayoutLogs.map((log) =>
-        mapLogToContractEvent(log, colonyClient.interface),
-      ),
-    );
-
-    const payments: MultiPayment[] = await Promise.all(
-      expenditurePayoutEvents.filter(notNull).map(async ({ args }) => {
-        const [, expenditureId, slotId, tokenAddress, amount] = args;
-        const expenditureSlot: ExpenditureSlot =
-          // @ts-expect-error
-          await colonyClient.getExpenditureSlot(expenditureId, slotId);
-
-        const payment: MultiPayment = {
-          amount: amount.toString(),
-          tokenAddress,
-          recipientAddress: expenditureSlot.recipient,
-        };
-        return payment;
-      }),
-    );
-
-    await writeActionFromEvent(oneTxPaymentEvent, colonyAddress, {
-      type: ColonyActionType.MultiplePayment,
-      fromDomainId: getDomainDatabaseId(
-        colonyAddress,
-        toNumber(expenditure.domainId),
-      ),
-      initiatorAddress,
+    actionFields = {
+      ...actionFields,
       paymentId: toNumber(expenditureId),
       payments,
-    });
+    };
   }
+
+  await writeActionFromEvent(oneTxPaymentEvent, colonyAddress, actionFields);
 };
