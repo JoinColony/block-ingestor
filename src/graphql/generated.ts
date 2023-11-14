@@ -254,6 +254,8 @@ export type ColonyAction = {
   initiatorUser?: Maybe<User>;
   /** Will be true if the action is a motion */
   isMotion?: Maybe<Scalars['Boolean']>;
+  /** Metadata associated with the action (Eg. Custom action title) */
+  metadata?: Maybe<ColonyActionMetadata>;
   /** Expanded `ColonyMotion` for the corresponding `motionId` */
   motionData?: Maybe<ColonyMotion>;
   /** Corresponding domainId of the motion */
@@ -303,6 +305,14 @@ export type ColonyAction = {
   tokenAddress?: Maybe<Scalars['ID']>;
   /** The type of action performed */
   type: ColonyActionType;
+  updatedAt: Scalars['AWSDateTime'];
+};
+
+export type ColonyActionMetadata = {
+  __typename?: 'ColonyActionMetadata';
+  createdAt: Scalars['AWSDateTime'];
+  customTitle: Scalars['String'];
+  id: Scalars['ID'];
   updatedAt: Scalars['AWSDateTime'];
 };
 
@@ -666,6 +676,8 @@ export type ColonyMetadata = {
    * Only present on pendingColonyMetadata for consumption in block ingestor
    */
   modifiedTokenAddresses?: Maybe<PendingModifiedTokenAddresses>;
+  /** Colony Objective */
+  objective?: Maybe<ColonyObjective>;
   /** List of safes that are used within the Colony */
   safes?: Maybe<Array<Safe>>;
   /** URL of the Colony's thumbnail image */
@@ -685,6 +697,8 @@ export type ColonyMetadataChangelog = {
   hasAvatarChanged: Scalars['Boolean'];
   /** Whether the colony description has changed */
   hasDescriptionChanged?: Maybe<Scalars['Boolean']>;
+  /** Whether the colony's objective has changed */
+  hasObjectiveChanged?: Maybe<Scalars['Boolean']>;
   /** Whether entries in the address book (whitelist) have changed */
   hasWhitelistChanged: Scalars['Boolean'];
   /** Whether the colony's external links have changed */
@@ -693,10 +707,7 @@ export type ColonyMetadataChangelog = {
   haveTokensChanged: Scalars['Boolean'];
   /** Display name of the Colony after the change */
   newDisplayName: Scalars['String'];
-  /**
-   * "
-   * Whether safes have been added or removed from the Colony's safe list
-   */
+  /** Whether safes have been added or removed from the Colony's safe list */
   newSafes?: Maybe<Array<Safe>>;
   /** Display name of the Colony before the change */
   oldDisplayName: Scalars['String'];
@@ -708,6 +719,7 @@ export type ColonyMetadataChangelog = {
 export type ColonyMetadataChangelogInput = {
   hasAvatarChanged: Scalars['Boolean'];
   hasDescriptionChanged?: InputMaybe<Scalars['Boolean']>;
+  hasObjectiveChanged?: InputMaybe<Scalars['Boolean']>;
   hasWhitelistChanged: Scalars['Boolean'];
   haveExternalLinksChanged?: InputMaybe<Scalars['Boolean']>;
   haveTokensChanged: Scalars['Boolean'];
@@ -801,6 +813,22 @@ export type ColonyMotionMessagesArgs = {
   limit?: InputMaybe<Scalars['Int']>;
   nextToken?: InputMaybe<Scalars['String']>;
   sortDirection?: InputMaybe<ModelSortDirection>;
+};
+
+export type ColonyObjective = {
+  __typename?: 'ColonyObjective';
+  /** Description of the objective with a limit of 120 characters */
+  description: Scalars['String'];
+  /** Number representing how complete the objective is, must be between 0 and 100 */
+  progress: Scalars['Int'];
+  /** Title of the objective */
+  title: Scalars['String'];
+};
+
+export type ColonyObjectiveInput = {
+  description: Scalars['String'];
+  progress: Scalars['Int'];
+  title: Scalars['String'];
 };
 
 /** A snapshot of the current set of permissions a given address has in a given domain within a Colony */
@@ -1042,6 +1070,11 @@ export type CreateColonyActionInput = {
   type: ColonyActionType;
 };
 
+export type CreateColonyActionMetadataInput = {
+  customTitle: Scalars['String'];
+  id?: InputMaybe<Scalars['ID']>;
+};
+
 export type CreateColonyContributorInput = {
   colonyAddress: Scalars['ID'];
   colonyReputationPercentage: Scalars['Float'];
@@ -1131,6 +1164,7 @@ export type CreateColonyMetadataInput = {
   id?: InputMaybe<Scalars['ID']>;
   isWhitelistActivated?: InputMaybe<Scalars['Boolean']>;
   modifiedTokenAddresses?: InputMaybe<PendingModifiedTokenAddressesInput>;
+  objective?: InputMaybe<ColonyObjectiveInput>;
   safes?: InputMaybe<Array<SafeInput>>;
   thumbnail?: InputMaybe<Scalars['String']>;
   whitelistedAddresses?: InputMaybe<Array<Scalars['String']>>;
@@ -1297,7 +1331,7 @@ export type CreateMotionMessageInput = {
 export type CreatePrivateBetaInviteCodeInput = {
   id?: InputMaybe<Scalars['ID']>;
   shareableInvites?: InputMaybe<Scalars['Int']>;
-  valid?: InputMaybe<Scalars['Boolean']>;
+  userId?: InputMaybe<Scalars['ID']>;
 };
 
 export type CreateProfileInput = {
@@ -1338,7 +1372,6 @@ export type CreateSafeTransactionDataInput = {
 export type CreateSafeTransactionInput = {
   id?: InputMaybe<Scalars['ID']>;
   safe: SafeInput;
-  title: Scalars['String'];
 };
 
 export type CreateStreamingPaymentInput = {
@@ -1409,12 +1442,16 @@ export type CreateUniqueColonyInput = {
   colonyNativeTokenId: Scalars['ID'];
   /** Unique identifier for the Colony. This is the Colony's contract address */
   id: Scalars['ID'];
+  /** Invite Code to create Colony */
+  inviteCode: Scalars['ID'];
   /** Display name of the Colony */
   name: Scalars['String'];
   /** Status information for the Colony */
   status?: InputMaybe<ColonyStatusInput>;
   /** Type of the Colony (regular or MetaColony) */
   type?: InputMaybe<ColonyType>;
+  /** User id of creator to associate with further invite codes */
+  userId: Scalars['ID'];
   /** Version of the currently deployed Colony contract */
   version: Scalars['Int'];
 };
@@ -1430,6 +1467,7 @@ export type CreateUniqueUserInput = {
 export type CreateUserInput = {
   id?: InputMaybe<Scalars['ID']>;
   profileId?: InputMaybe<Scalars['ID']>;
+  userPrivateBetaInviteCodeId?: InputMaybe<Scalars['ID']>;
 };
 
 export type CreateUserTokensInput = {
@@ -1476,6 +1514,10 @@ export type DeleteAnnotationInput = {
 };
 
 export type DeleteColonyActionInput = {
+  id: Scalars['ID'];
+};
+
+export type DeleteColonyActionMetadataInput = {
   id: Scalars['ID'];
 };
 
@@ -2243,6 +2285,27 @@ export type ModelColonyActionFilterInput = {
   toDomainId?: InputMaybe<ModelIdInput>;
   tokenAddress?: InputMaybe<ModelIdInput>;
   type?: InputMaybe<ModelColonyActionTypeInput>;
+};
+
+export type ModelColonyActionMetadataConditionInput = {
+  and?: InputMaybe<Array<InputMaybe<ModelColonyActionMetadataConditionInput>>>;
+  customTitle?: InputMaybe<ModelStringInput>;
+  not?: InputMaybe<ModelColonyActionMetadataConditionInput>;
+  or?: InputMaybe<Array<InputMaybe<ModelColonyActionMetadataConditionInput>>>;
+};
+
+export type ModelColonyActionMetadataConnection = {
+  __typename?: 'ModelColonyActionMetadataConnection';
+  items: Array<Maybe<ColonyActionMetadata>>;
+  nextToken?: Maybe<Scalars['String']>;
+};
+
+export type ModelColonyActionMetadataFilterInput = {
+  and?: InputMaybe<Array<InputMaybe<ModelColonyActionMetadataFilterInput>>>;
+  customTitle?: InputMaybe<ModelStringInput>;
+  id?: InputMaybe<ModelIdInput>;
+  not?: InputMaybe<ModelColonyActionMetadataFilterInput>;
+  or?: InputMaybe<Array<InputMaybe<ModelColonyActionMetadataFilterInput>>>;
 };
 
 export type ModelColonyActionTypeInput = {
@@ -3061,7 +3124,7 @@ export type ModelPrivateBetaInviteCodeConditionInput = {
   not?: InputMaybe<ModelPrivateBetaInviteCodeConditionInput>;
   or?: InputMaybe<Array<InputMaybe<ModelPrivateBetaInviteCodeConditionInput>>>;
   shareableInvites?: InputMaybe<ModelIntInput>;
-  valid?: InputMaybe<ModelBooleanInput>;
+  userId?: InputMaybe<ModelIdInput>;
 };
 
 export type ModelPrivateBetaInviteCodeConnection = {
@@ -3076,7 +3139,7 @@ export type ModelPrivateBetaInviteCodeFilterInput = {
   not?: InputMaybe<ModelPrivateBetaInviteCodeFilterInput>;
   or?: InputMaybe<Array<InputMaybe<ModelPrivateBetaInviteCodeFilterInput>>>;
   shareableInvites?: InputMaybe<ModelIntInput>;
-  valid?: InputMaybe<ModelBooleanInput>;
+  userId?: InputMaybe<ModelIdInput>;
 };
 
 export type ModelProfileConditionInput = {
@@ -3147,7 +3210,6 @@ export type ModelSafeTransactionConditionInput = {
   and?: InputMaybe<Array<InputMaybe<ModelSafeTransactionConditionInput>>>;
   not?: InputMaybe<ModelSafeTransactionConditionInput>;
   or?: InputMaybe<Array<InputMaybe<ModelSafeTransactionConditionInput>>>;
-  title?: InputMaybe<ModelStringInput>;
 };
 
 export type ModelSafeTransactionConnection = {
@@ -3196,7 +3258,6 @@ export type ModelSafeTransactionFilterInput = {
   id?: InputMaybe<ModelIdInput>;
   not?: InputMaybe<ModelSafeTransactionFilterInput>;
   or?: InputMaybe<Array<InputMaybe<ModelSafeTransactionFilterInput>>>;
-  title?: InputMaybe<ModelStringInput>;
 };
 
 export type ModelSafeTransactionTypeInput = {
@@ -3349,6 +3410,17 @@ export type ModelSubscriptionColonyActionFilterInput = {
   toDomainId?: InputMaybe<ModelSubscriptionIdInput>;
   tokenAddress?: InputMaybe<ModelSubscriptionIdInput>;
   type?: InputMaybe<ModelSubscriptionStringInput>;
+};
+
+export type ModelSubscriptionColonyActionMetadataFilterInput = {
+  and?: InputMaybe<
+    Array<InputMaybe<ModelSubscriptionColonyActionMetadataFilterInput>>
+  >;
+  customTitle?: InputMaybe<ModelSubscriptionStringInput>;
+  id?: InputMaybe<ModelSubscriptionIdInput>;
+  or?: InputMaybe<
+    Array<InputMaybe<ModelSubscriptionColonyActionMetadataFilterInput>>
+  >;
 };
 
 export type ModelSubscriptionColonyContributorFilterInput = {
@@ -3719,7 +3791,7 @@ export type ModelSubscriptionPrivateBetaInviteCodeFilterInput = {
     Array<InputMaybe<ModelSubscriptionPrivateBetaInviteCodeFilterInput>>
   >;
   shareableInvites?: InputMaybe<ModelSubscriptionIntInput>;
-  valid?: InputMaybe<ModelSubscriptionBooleanInput>;
+  userId?: InputMaybe<ModelSubscriptionIdInput>;
 };
 
 export type ModelSubscriptionProfileFilterInput = {
@@ -3773,7 +3845,6 @@ export type ModelSubscriptionSafeTransactionFilterInput = {
   or?: InputMaybe<
     Array<InputMaybe<ModelSubscriptionSafeTransactionFilterInput>>
   >;
-  title?: InputMaybe<ModelSubscriptionStringInput>;
 };
 
 export type ModelSubscriptionStreamingPaymentFilterInput = {
@@ -4005,6 +4076,7 @@ export type ModelUserConditionInput = {
   not?: InputMaybe<ModelUserConditionInput>;
   or?: InputMaybe<Array<InputMaybe<ModelUserConditionInput>>>;
   profileId?: InputMaybe<ModelIdInput>;
+  userPrivateBetaInviteCodeId?: InputMaybe<ModelIdInput>;
 };
 
 export type ModelUserConnection = {
@@ -4019,6 +4091,7 @@ export type ModelUserFilterInput = {
   not?: InputMaybe<ModelUserFilterInput>;
   or?: InputMaybe<Array<InputMaybe<ModelUserFilterInput>>>;
   profileId?: InputMaybe<ModelIdInput>;
+  userPrivateBetaInviteCodeId?: InputMaybe<ModelIdInput>;
 };
 
 export type ModelUserTokensConditionInput = {
@@ -4179,6 +4252,7 @@ export type Mutation = {
   createAnnotation?: Maybe<Annotation>;
   createColony?: Maybe<Colony>;
   createColonyAction?: Maybe<ColonyAction>;
+  createColonyActionMetadata?: Maybe<ColonyActionMetadata>;
   createColonyContributor?: Maybe<ColonyContributor>;
   createColonyDecision?: Maybe<ColonyDecision>;
   createColonyExtension?: Maybe<ColonyExtension>;
@@ -4219,6 +4293,7 @@ export type Mutation = {
   deleteAnnotation?: Maybe<Annotation>;
   deleteColony?: Maybe<Colony>;
   deleteColonyAction?: Maybe<ColonyAction>;
+  deleteColonyActionMetadata?: Maybe<ColonyActionMetadata>;
   deleteColonyContributor?: Maybe<ColonyContributor>;
   deleteColonyDecision?: Maybe<ColonyDecision>;
   deleteColonyExtension?: Maybe<ColonyExtension>;
@@ -4257,6 +4332,7 @@ export type Mutation = {
   updateAnnotation?: Maybe<Annotation>;
   updateColony?: Maybe<Colony>;
   updateColonyAction?: Maybe<ColonyAction>;
+  updateColonyActionMetadata?: Maybe<ColonyActionMetadata>;
   updateColonyContributor?: Maybe<ColonyContributor>;
   updateColonyDecision?: Maybe<ColonyDecision>;
   updateColonyExtension?: Maybe<ColonyExtension>;
@@ -4310,6 +4386,12 @@ export type MutationCreateColonyArgs = {
 export type MutationCreateColonyActionArgs = {
   condition?: InputMaybe<ModelColonyActionConditionInput>;
   input: CreateColonyActionInput;
+};
+
+/** Root mutation type */
+export type MutationCreateColonyActionMetadataArgs = {
+  condition?: InputMaybe<ModelColonyActionMetadataConditionInput>;
+  input: CreateColonyActionMetadataInput;
 };
 
 /** Root mutation type */
@@ -4539,6 +4621,12 @@ export type MutationDeleteColonyActionArgs = {
 };
 
 /** Root mutation type */
+export type MutationDeleteColonyActionMetadataArgs = {
+  condition?: InputMaybe<ModelColonyActionMetadataConditionInput>;
+  input: DeleteColonyActionMetadataInput;
+};
+
+/** Root mutation type */
 export type MutationDeleteColonyContributorArgs = {
   condition?: InputMaybe<ModelColonyContributorConditionInput>;
   input: DeleteColonyContributorInput;
@@ -4757,6 +4845,12 @@ export type MutationUpdateColonyArgs = {
 export type MutationUpdateColonyActionArgs = {
   condition?: InputMaybe<ModelColonyActionConditionInput>;
   input: UpdateColonyActionInput;
+};
+
+/** Root mutation type */
+export type MutationUpdateColonyActionMetadataArgs = {
+  condition?: InputMaybe<ModelColonyActionMetadataConditionInput>;
+  input: UpdateColonyActionMetadataInput;
 };
 
 /** Root mutation type */
@@ -5083,11 +5177,14 @@ export type PrivateBetaInviteCode = {
   createdAt: Scalars['AWSDateTime'];
   /** The id functions as the invite code */
   id: Scalars['ID'];
-  /** This tracks the amount of invites this invite code is also allowed to generate */
+  /**
+   * This tracks the amount of invites this invite code is also allowed to generate
+   * The default value relates to the initial user and their subsequent invitee
+   */
   shareableInvites?: Maybe<Scalars['Int']>;
   updatedAt: Scalars['AWSDateTime'];
-  /** The invite code is a use once only affair */
-  valid?: Maybe<Scalars['Boolean']>;
+  /** User ID associated with the Invite */
+  userId?: Maybe<Scalars['ID']>;
 };
 
 /** Represents a user's profile within the Colony Network */
@@ -5175,6 +5272,7 @@ export type Query = {
   getColony?: Maybe<Colony>;
   getColonyAction?: Maybe<ColonyAction>;
   getColonyActionByMotionId?: Maybe<ModelColonyActionConnection>;
+  getColonyActionMetadata?: Maybe<ColonyActionMetadata>;
   getColonyByAddress?: Maybe<ModelColonyConnection>;
   getColonyByName?: Maybe<ModelColonyConnection>;
   getColonyByType?: Maybe<ModelColonyConnection>;
@@ -5255,6 +5353,7 @@ export type Query = {
   getWatchedColonies?: Maybe<WatchedColonies>;
   listAnnotations?: Maybe<ModelAnnotationConnection>;
   listColonies?: Maybe<ModelColonyConnection>;
+  listColonyActionMetadata?: Maybe<ModelColonyActionMetadataConnection>;
   listColonyActions?: Maybe<ModelColonyActionConnection>;
   listColonyContributors?: Maybe<ModelColonyContributorConnection>;
   listColonyDecisions?: Maybe<ModelColonyDecisionConnection>;
@@ -5289,6 +5388,7 @@ export type Query = {
   listUserTokens?: Maybe<ModelUserTokensConnection>;
   listUsers?: Maybe<ModelUserConnection>;
   listWatchedColonies?: Maybe<ModelWatchedColoniesConnection>;
+  searchColonyActions?: Maybe<SearchableColonyActionConnection>;
 };
 
 /** Root query type */
@@ -5332,6 +5432,11 @@ export type QueryGetColonyActionByMotionIdArgs = {
   motionId: Scalars['ID'];
   nextToken?: InputMaybe<Scalars['String']>;
   sortDirection?: InputMaybe<ModelSortDirection>;
+};
+
+/** Root query type */
+export type QueryGetColonyActionMetadataArgs = {
+  id: Scalars['ID'];
 };
 
 /** Root query type */
@@ -5821,6 +5926,13 @@ export type QueryListColoniesArgs = {
 };
 
 /** Root query type */
+export type QueryListColonyActionMetadataArgs = {
+  filter?: InputMaybe<ModelColonyActionMetadataFilterInput>;
+  limit?: InputMaybe<Scalars['Int']>;
+  nextToken?: InputMaybe<Scalars['String']>;
+};
+
+/** Root query type */
 export type QueryListColonyActionsArgs = {
   filter?: InputMaybe<ModelColonyActionFilterInput>;
   limit?: InputMaybe<Scalars['Int']>;
@@ -6058,6 +6170,18 @@ export type QueryListWatchedColoniesArgs = {
   nextToken?: InputMaybe<Scalars['String']>;
 };
 
+/** Root query type */
+export type QuerySearchColonyActionsArgs = {
+  aggregates?: InputMaybe<
+    Array<InputMaybe<SearchableColonyActionAggregationInput>>
+  >;
+  filter?: InputMaybe<SearchableColonyActionFilterInput>;
+  from?: InputMaybe<Scalars['Int']>;
+  limit?: InputMaybe<Scalars['Int']>;
+  nextToken?: InputMaybe<Scalars['String']>;
+  sort?: InputMaybe<Array<InputMaybe<SearchableColonyActionSortInput>>>;
+};
+
 export type ReputationMiningCycleMetadata = {
   __typename?: 'ReputationMiningCycleMetadata';
   createdAt: Scalars['AWSDateTime'];
@@ -6087,7 +6211,6 @@ export type SafeTransaction = {
   createdAt: Scalars['AWSDateTime'];
   id: Scalars['ID'];
   safe: Safe;
-  title: Scalars['String'];
   transactions?: Maybe<ModelSafeTransactionDataConnection>;
   updatedAt: Scalars['AWSDateTime'];
 };
@@ -6127,6 +6250,206 @@ export enum SafeTransactionType {
   TransferFunds = 'TRANSFER_FUNDS',
   TransferNft = 'TRANSFER_NFT',
 }
+
+export type SearchableAggregateBucketResult = {
+  __typename?: 'SearchableAggregateBucketResult';
+  buckets?: Maybe<Array<Maybe<SearchableAggregateBucketResultItem>>>;
+};
+
+export type SearchableAggregateBucketResultItem = {
+  __typename?: 'SearchableAggregateBucketResultItem';
+  doc_count: Scalars['Int'];
+  key: Scalars['String'];
+};
+
+export type SearchableAggregateGenericResult =
+  | SearchableAggregateBucketResult
+  | SearchableAggregateScalarResult;
+
+export type SearchableAggregateResult = {
+  __typename?: 'SearchableAggregateResult';
+  name: Scalars['String'];
+  result?: Maybe<SearchableAggregateGenericResult>;
+};
+
+export type SearchableAggregateScalarResult = {
+  __typename?: 'SearchableAggregateScalarResult';
+  value: Scalars['Float'];
+};
+
+export enum SearchableAggregateType {
+  Avg = 'avg',
+  Max = 'max',
+  Min = 'min',
+  Sum = 'sum',
+  Terms = 'terms',
+}
+
+export type SearchableBooleanFilterInput = {
+  eq?: InputMaybe<Scalars['Boolean']>;
+  ne?: InputMaybe<Scalars['Boolean']>;
+};
+
+export enum SearchableColonyActionAggregateField {
+  Amount = 'amount',
+  AnnotationId = 'annotationId',
+  BlockNumber = 'blockNumber',
+  ColonyActionsId = 'colonyActionsId',
+  ColonyDecisionId = 'colonyDecisionId',
+  ColonyId = 'colonyId',
+  CreatedAt = 'createdAt',
+  FromDomainId = 'fromDomainId',
+  Id = 'id',
+  IndividualEvents = 'individualEvents',
+  InitiatorAddress = 'initiatorAddress',
+  IsMotion = 'isMotion',
+  MotionDomainId = 'motionDomainId',
+  MotionId = 'motionId',
+  NewColonyVersion = 'newColonyVersion',
+  PaymentId = 'paymentId',
+  PendingColonyMetadataId = 'pendingColonyMetadataId',
+  PendingDomainMetadataId = 'pendingDomainMetadataId',
+  RecipientAddress = 'recipientAddress',
+  ShowInActionsList = 'showInActionsList',
+  ToDomainId = 'toDomainId',
+  TokenAddress = 'tokenAddress',
+  Type = 'type',
+  UpdatedAt = 'updatedAt',
+}
+
+export type SearchableColonyActionAggregationInput = {
+  field: SearchableColonyActionAggregateField;
+  name: Scalars['String'];
+  type: SearchableAggregateType;
+};
+
+export type SearchableColonyActionConnection = {
+  __typename?: 'SearchableColonyActionConnection';
+  aggregateItems: Array<Maybe<SearchableAggregateResult>>;
+  items: Array<Maybe<ColonyAction>>;
+  nextToken?: Maybe<Scalars['String']>;
+  total?: Maybe<Scalars['Int']>;
+};
+
+export type SearchableColonyActionFilterInput = {
+  amount?: InputMaybe<SearchableStringFilterInput>;
+  and?: InputMaybe<Array<InputMaybe<SearchableColonyActionFilterInput>>>;
+  annotationId?: InputMaybe<SearchableIdFilterInput>;
+  blockNumber?: InputMaybe<SearchableIntFilterInput>;
+  colonyActionsId?: InputMaybe<SearchableIdFilterInput>;
+  colonyDecisionId?: InputMaybe<SearchableIdFilterInput>;
+  colonyId?: InputMaybe<SearchableIdFilterInput>;
+  createdAt?: InputMaybe<SearchableStringFilterInput>;
+  fromDomainId?: InputMaybe<SearchableIdFilterInput>;
+  id?: InputMaybe<SearchableIdFilterInput>;
+  individualEvents?: InputMaybe<SearchableStringFilterInput>;
+  initiatorAddress?: InputMaybe<SearchableIdFilterInput>;
+  isMotion?: InputMaybe<SearchableBooleanFilterInput>;
+  motionDomainId?: InputMaybe<SearchableIntFilterInput>;
+  motionId?: InputMaybe<SearchableIdFilterInput>;
+  newColonyVersion?: InputMaybe<SearchableIntFilterInput>;
+  not?: InputMaybe<SearchableColonyActionFilterInput>;
+  or?: InputMaybe<Array<InputMaybe<SearchableColonyActionFilterInput>>>;
+  paymentId?: InputMaybe<SearchableIntFilterInput>;
+  pendingColonyMetadataId?: InputMaybe<SearchableIdFilterInput>;
+  pendingDomainMetadataId?: InputMaybe<SearchableIdFilterInput>;
+  recipientAddress?: InputMaybe<SearchableIdFilterInput>;
+  showInActionsList?: InputMaybe<SearchableBooleanFilterInput>;
+  toDomainId?: InputMaybe<SearchableIdFilterInput>;
+  tokenAddress?: InputMaybe<SearchableIdFilterInput>;
+  type?: InputMaybe<SearchableStringFilterInput>;
+  updatedAt?: InputMaybe<SearchableStringFilterInput>;
+};
+
+export type SearchableColonyActionSortInput = {
+  direction?: InputMaybe<SearchableSortDirection>;
+  field?: InputMaybe<SearchableColonyActionSortableFields>;
+};
+
+export enum SearchableColonyActionSortableFields {
+  Amount = 'amount',
+  AnnotationId = 'annotationId',
+  BlockNumber = 'blockNumber',
+  ColonyActionsId = 'colonyActionsId',
+  ColonyDecisionId = 'colonyDecisionId',
+  ColonyId = 'colonyId',
+  CreatedAt = 'createdAt',
+  FromDomainId = 'fromDomainId',
+  Id = 'id',
+  IndividualEvents = 'individualEvents',
+  InitiatorAddress = 'initiatorAddress',
+  IsMotion = 'isMotion',
+  MotionDomainId = 'motionDomainId',
+  MotionId = 'motionId',
+  NewColonyVersion = 'newColonyVersion',
+  PaymentId = 'paymentId',
+  PendingColonyMetadataId = 'pendingColonyMetadataId',
+  PendingDomainMetadataId = 'pendingDomainMetadataId',
+  RecipientAddress = 'recipientAddress',
+  ShowInActionsList = 'showInActionsList',
+  ToDomainId = 'toDomainId',
+  TokenAddress = 'tokenAddress',
+  UpdatedAt = 'updatedAt',
+}
+
+export type SearchableFloatFilterInput = {
+  eq?: InputMaybe<Scalars['Float']>;
+  gt?: InputMaybe<Scalars['Float']>;
+  gte?: InputMaybe<Scalars['Float']>;
+  lt?: InputMaybe<Scalars['Float']>;
+  lte?: InputMaybe<Scalars['Float']>;
+  ne?: InputMaybe<Scalars['Float']>;
+  range?: InputMaybe<Array<InputMaybe<Scalars['Float']>>>;
+};
+
+export type SearchableIdFilterInput = {
+  eq?: InputMaybe<Scalars['ID']>;
+  exists?: InputMaybe<Scalars['Boolean']>;
+  gt?: InputMaybe<Scalars['ID']>;
+  gte?: InputMaybe<Scalars['ID']>;
+  lt?: InputMaybe<Scalars['ID']>;
+  lte?: InputMaybe<Scalars['ID']>;
+  match?: InputMaybe<Scalars['ID']>;
+  matchPhrase?: InputMaybe<Scalars['ID']>;
+  matchPhrasePrefix?: InputMaybe<Scalars['ID']>;
+  multiMatch?: InputMaybe<Scalars['ID']>;
+  ne?: InputMaybe<Scalars['ID']>;
+  range?: InputMaybe<Array<InputMaybe<Scalars['ID']>>>;
+  regexp?: InputMaybe<Scalars['ID']>;
+  wildcard?: InputMaybe<Scalars['ID']>;
+};
+
+export type SearchableIntFilterInput = {
+  eq?: InputMaybe<Scalars['Int']>;
+  gt?: InputMaybe<Scalars['Int']>;
+  gte?: InputMaybe<Scalars['Int']>;
+  lt?: InputMaybe<Scalars['Int']>;
+  lte?: InputMaybe<Scalars['Int']>;
+  ne?: InputMaybe<Scalars['Int']>;
+  range?: InputMaybe<Array<InputMaybe<Scalars['Int']>>>;
+};
+
+export enum SearchableSortDirection {
+  Asc = 'asc',
+  Desc = 'desc',
+}
+
+export type SearchableStringFilterInput = {
+  eq?: InputMaybe<Scalars['String']>;
+  exists?: InputMaybe<Scalars['Boolean']>;
+  gt?: InputMaybe<Scalars['String']>;
+  gte?: InputMaybe<Scalars['String']>;
+  lt?: InputMaybe<Scalars['String']>;
+  lte?: InputMaybe<Scalars['String']>;
+  match?: InputMaybe<Scalars['String']>;
+  matchPhrase?: InputMaybe<Scalars['String']>;
+  matchPhrasePrefix?: InputMaybe<Scalars['String']>;
+  multiMatch?: InputMaybe<Scalars['String']>;
+  ne?: InputMaybe<Scalars['String']>;
+  range?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;
+  regexp?: InputMaybe<Scalars['String']>;
+  wildcard?: InputMaybe<Scalars['String']>;
+};
 
 /**
  * Input data to store the latest available version of the core Colony contract and available extensions
@@ -6241,6 +6564,7 @@ export type Subscription = {
   onCreateAnnotation?: Maybe<Annotation>;
   onCreateColony?: Maybe<Colony>;
   onCreateColonyAction?: Maybe<ColonyAction>;
+  onCreateColonyActionMetadata?: Maybe<ColonyActionMetadata>;
   onCreateColonyContributor?: Maybe<ColonyContributor>;
   onCreateColonyDecision?: Maybe<ColonyDecision>;
   onCreateColonyExtension?: Maybe<ColonyExtension>;
@@ -6277,6 +6601,7 @@ export type Subscription = {
   onDeleteAnnotation?: Maybe<Annotation>;
   onDeleteColony?: Maybe<Colony>;
   onDeleteColonyAction?: Maybe<ColonyAction>;
+  onDeleteColonyActionMetadata?: Maybe<ColonyActionMetadata>;
   onDeleteColonyContributor?: Maybe<ColonyContributor>;
   onDeleteColonyDecision?: Maybe<ColonyDecision>;
   onDeleteColonyExtension?: Maybe<ColonyExtension>;
@@ -6313,6 +6638,7 @@ export type Subscription = {
   onUpdateAnnotation?: Maybe<Annotation>;
   onUpdateColony?: Maybe<Colony>;
   onUpdateColonyAction?: Maybe<ColonyAction>;
+  onUpdateColonyActionMetadata?: Maybe<ColonyActionMetadata>;
   onUpdateColonyContributor?: Maybe<ColonyContributor>;
   onUpdateColonyDecision?: Maybe<ColonyDecision>;
   onUpdateColonyExtension?: Maybe<ColonyExtension>;
@@ -6358,6 +6684,10 @@ export type SubscriptionOnCreateColonyArgs = {
 
 export type SubscriptionOnCreateColonyActionArgs = {
   filter?: InputMaybe<ModelSubscriptionColonyActionFilterInput>;
+};
+
+export type SubscriptionOnCreateColonyActionMetadataArgs = {
+  filter?: InputMaybe<ModelSubscriptionColonyActionMetadataFilterInput>;
 };
 
 export type SubscriptionOnCreateColonyContributorArgs = {
@@ -6504,6 +6834,10 @@ export type SubscriptionOnDeleteColonyActionArgs = {
   filter?: InputMaybe<ModelSubscriptionColonyActionFilterInput>;
 };
 
+export type SubscriptionOnDeleteColonyActionMetadataArgs = {
+  filter?: InputMaybe<ModelSubscriptionColonyActionMetadataFilterInput>;
+};
+
 export type SubscriptionOnDeleteColonyContributorArgs = {
   filter?: InputMaybe<ModelSubscriptionColonyContributorFilterInput>;
 };
@@ -6646,6 +6980,10 @@ export type SubscriptionOnUpdateColonyArgs = {
 
 export type SubscriptionOnUpdateColonyActionArgs = {
   filter?: InputMaybe<ModelSubscriptionColonyActionFilterInput>;
+};
+
+export type SubscriptionOnUpdateColonyActionMetadataArgs = {
+  filter?: InputMaybe<ModelSubscriptionColonyActionMetadataFilterInput>;
 };
 
 export type SubscriptionOnUpdateColonyContributorArgs = {
@@ -6824,7 +7162,11 @@ export type TokenUsersArgs = {
 
 /** Input data for fetching a token's information from DB or chain */
 export type TokenFromEverywhereArguments = {
+  /** The URL of the token image */
+  avatar?: InputMaybe<Scalars['String']>;
   network?: InputMaybe<Scalars['String']>;
+  /** The URL of the token thumbnail image */
+  thumbnail?: InputMaybe<Scalars['String']>;
   /** Address of the token on the blockchain */
   tokenAddress: Scalars['String'];
 };
@@ -7000,6 +7342,11 @@ export type UpdateColonyActionInput = {
   type?: InputMaybe<ColonyActionType>;
 };
 
+export type UpdateColonyActionMetadataInput = {
+  customTitle?: InputMaybe<Scalars['String']>;
+  id: Scalars['ID'];
+};
+
 export type UpdateColonyContributorInput = {
   colonyAddress?: InputMaybe<Scalars['ID']>;
   colonyReputationPercentage?: InputMaybe<Scalars['Float']>;
@@ -7089,6 +7436,7 @@ export type UpdateColonyMetadataInput = {
   id: Scalars['ID'];
   isWhitelistActivated?: InputMaybe<Scalars['Boolean']>;
   modifiedTokenAddresses?: InputMaybe<PendingModifiedTokenAddressesInput>;
+  objective?: InputMaybe<ColonyObjectiveInput>;
   safes?: InputMaybe<Array<SafeInput>>;
   thumbnail?: InputMaybe<Scalars['String']>;
   whitelistedAddresses?: InputMaybe<Array<Scalars['String']>>;
@@ -7283,7 +7631,7 @@ export type UpdateMotionMessageInput = {
 export type UpdatePrivateBetaInviteCodeInput = {
   id: Scalars['ID'];
   shareableInvites?: InputMaybe<Scalars['Int']>;
-  valid?: InputMaybe<Scalars['Boolean']>;
+  userId?: InputMaybe<Scalars['ID']>;
 };
 
 export type UpdateProfileInput = {
@@ -7324,7 +7672,6 @@ export type UpdateSafeTransactionDataInput = {
 export type UpdateSafeTransactionInput = {
   id: Scalars['ID'];
   safe?: InputMaybe<SafeInput>;
-  title?: InputMaybe<Scalars['String']>;
 };
 
 export type UpdateStreamingPaymentInput = {
@@ -7390,6 +7737,7 @@ export type UpdateTransactionInput = {
 export type UpdateUserInput = {
   id: Scalars['ID'];
   profileId?: InputMaybe<Scalars['ID']>;
+  userPrivateBetaInviteCodeId?: InputMaybe<Scalars['ID']>;
 };
 
 export type UpdateUserTokensInput = {
@@ -7410,6 +7758,8 @@ export type User = {
   createdAt: Scalars['AWSDateTime'];
   /** Unique identifier for the user (wallet address) */
   id: Scalars['ID'];
+  /** A user who has been invited by colony will be able to pass on the private beta invite */
+  privateBetaInviteCode?: Maybe<PrivateBetaInviteCode>;
   /** Profile information of the user */
   profile?: Maybe<Profile>;
   /** Profile ID associated with the user */
@@ -7419,6 +7769,7 @@ export type User = {
   tokens?: Maybe<ModelUserTokensConnection>;
   transactionHistory?: Maybe<ModelTransactionConnection>;
   updatedAt: Scalars['AWSDateTime'];
+  userPrivateBetaInviteCodeId?: Maybe<Scalars['ID']>;
   watchlist?: Maybe<ModelWatchedColoniesConnection>;
 };
 
@@ -8498,6 +8849,7 @@ export type GetColonyExtensionQuery = {
   getColonyExtension?: {
     __typename?: 'ColonyExtension';
     colonyId: string;
+    version: number;
   } | null;
 };
 
@@ -9528,6 +9880,7 @@ export const GetColonyExtensionDocument = gql`
   query GetColonyExtension($id: ID!) {
     getColonyExtension(id: $id) {
       colonyId
+      version
     }
   }
 `;

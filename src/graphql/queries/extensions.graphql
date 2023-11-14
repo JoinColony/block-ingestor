@@ -1,6 +1,7 @@
 query GetColonyExtension($id: ID!) {
   getColonyExtension(id: $id) {
     colonyId
+    version
   }
 }
 
