@@ -148,6 +148,7 @@ export const reclaimUserStake = async (
     {
       input: {
         id: getUserStakeDatabaseId(userAddress, motionTransactionHash),
+        isClaimed: true,
       },
     },
   );
