@@ -1,0 +1,6 @@
+query GetUserStake($id: ID!) {
+  getUserStake(id: $id) {
+    id
+    amount
+  }
+}

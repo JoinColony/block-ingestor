@@ -6,16 +6,26 @@ import {
   CreateColonyStakeMutation,
   CreateColonyStakeMutationVariables,
   CreateMotionMessageInput,
+  CreateUserStakeDocument,
+  CreateUserStakeMutation,
+  CreateUserStakeMutationVariables,
   GetColonyStakeDocument,
   GetColonyStakeQuery,
   GetColonyStakeQueryVariables,
+  GetUserStakeDocument,
+  GetUserStakeQuery,
+  GetUserStakeQueryVariables,
   MotionStakes,
   UpdateColonyStakeDocument,
   UpdateColonyStakeMutation,
   UpdateColonyStakeMutationVariables,
-  UserStakes,
+  UpdateUserStakeDocument,
+  UpdateUserStakeMutation,
+  UpdateUserStakeMutationVariables,
+  UserMotionStakes,
 } from '~graphql';
 import { mutate, query } from '~amplifyClient';
+import { getUserStakeDatabaseId } from '~utils/stakes';
 import { getMotionSide, getColonyStakeId } from '../helpers';
 
 export const getRequiredStake = (
@@ -84,7 +94,7 @@ const getNewUserStakes = (
   vote: BigNumber,
   amount: BigNumber,
   requiredStake: BigNumber,
-): UserStakes => {
+): UserMotionStakes => {
   const invertedVote = BigNumber.from(1).sub(vote);
   const stakedSide = getMotionSide(vote);
   const unstakedSide = getMotionSide(invertedVote);
@@ -103,23 +113,23 @@ const getNewUserStakes = (
         [unstakedSide]: '0',
       },
     }, // TS doesn't like the computed keys, but we know they're correct
-  } as unknown as UserStakes;
+  } as unknown as UserMotionStakes;
 };
 
 /**
  * Given staking data, add stakes to existing stakes and return new, updated UserStakes object
  */
 const getUpdatedUserStakes = (
-  existingUserStakes: UserStakes,
+  existingUserStakes: UserMotionStakes,
   amount: BigNumber,
   vote: BigNumber,
   requiredStake: BigNumber,
-): UserStakes => {
+): UserMotionStakes => {
   const stakedSide = getMotionSide(vote);
   const existingRawStake = existingUserStakes.stakes.raw[stakedSide];
   const updatedRawStake = amount.add(existingRawStake);
   const updatedPercentage = getStakePercentage(updatedRawStake, requiredStake);
-  const updatedUserStakes: UserStakes = {
+  const updatedUserStakes: UserMotionStakes = {
     ...existingUserStakes,
     stakes: {
       raw: {
@@ -136,7 +146,7 @@ const getUpdatedUserStakes = (
   return updatedUserStakes;
 };
 
-type UserStakesMapFn = (usersStakes: UserStakes) => UserStakes;
+type UserStakesMapFn = (usersStakes: UserMotionStakes) => UserMotionStakes;
 
 const getUserStakesMapFn =
   (
@@ -145,7 +155,7 @@ const getUserStakesMapFn =
     amount: BigNumber,
     requiredStake: BigNumber,
   ): UserStakesMapFn =>
-  (userStakes: UserStakes): UserStakes => {
+  (userStakes: UserMotionStakes): UserMotionStakes => {
     const { address } = userStakes;
 
     if (address === staker) {
@@ -159,12 +169,12 @@ const getUserStakesMapFn =
  * Takes existing usersStakes and updates the entry with the latest stake data
  */
 export const getUpdatedUsersStakes = (
-  usersStakes: UserStakes[],
+  usersStakes: UserMotionStakes[],
   staker: string,
   vote: BigNumber,
   amount: BigNumber,
   requiredStake: BigNumber,
-): UserStakes[] => {
+): UserMotionStakes[] => {
   const isExistingStaker = usersStakes.some(
     ({ address }) => address === staker,
   );
@@ -291,7 +301,7 @@ export const getUpdatedMessages = ({
  * If it's the first time a user has staked in a colony, we create a Colony Stake record for the user,
  * else we update the amount they've currently got staked in the colony.
  */
-export const updateUserStake = async (
+export const updateUserColonyStake = async (
   userAddress: string,
   colonyAddress: string,
   stakeAmount: BigNumber,
@@ -324,6 +334,56 @@ export const updateUserStake = async (
         colonyStakeId,
         colonyAddress,
         userAddress,
+      },
+    );
+  }
+};
+
+/**
+ * Function to update the user stake following staking on a motion
+ */
+export const updateUserStake = async (
+  transactionHash: string,
+  userAddress: string,
+  colonyAddress: string,
+  amount: string,
+  timestamp: number,
+): Promise<void> => {
+  const userStakeId = getUserStakeDatabaseId(userAddress, transactionHash);
+  const { data } =
+    (await query<GetUserStakeQuery, GetUserStakeQueryVariables>(
+      GetUserStakeDocument,
+      {
+        id: userStakeId,
+      },
+    )) ?? {};
+  const existingUserStake = data?.getUserStake;
+
+  if (existingUserStake) {
+    const { amount: existingAmount } = existingUserStake;
+
+    await mutate<UpdateUserStakeMutation, UpdateUserStakeMutationVariables>(
+      UpdateUserStakeDocument,
+      {
+        input: {
+          id: userStakeId,
+          amount: BigNumber.from(existingAmount).add(amount).toString(),
+        },
+      },
+    );
+  } else {
+    await mutate<CreateUserStakeMutation, CreateUserStakeMutationVariables>(
+      CreateUserStakeDocument,
+      {
+        input: {
+          id: userStakeId,
+          userAddress,
+          colonyAddress,
+          actionId: transactionHash,
+          amount: amount.toString(),
+          isClaimed: false,
+          createdAt: new Date(timestamp * 1000).toISOString(),
+        },
       },
     );
   }

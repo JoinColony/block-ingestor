@@ -6,7 +6,7 @@ import {
   ExtensionFragment,
   MotionStakesFragment,
   StakerRewardFragment,
-  UserStakesFragment,
+  UserMotionStakesFragment,
   VoterRecordFragment,
 } from './generated';
 export * from './generated';
@@ -17,6 +17,6 @@ export type DomainMetadata = DomainMetadataFragment;
 export type ColonyMetadata = ColonyMetadataFragment;
 export type Colony = ColonyFragment;
 export type MotionStakes = MotionStakesFragment;
-export type UserStakes = UserStakesFragment;
+export type UserMotionStakes = UserMotionStakesFragment;
 export type VoterRecord = VoterRecordFragment;
 export type Extension = ExtensionFragment;

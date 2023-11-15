@@ -1,0 +1,11 @@
+mutation CreateUserStake($input: CreateUserStakeInput!) {
+  createUserStake(input: $input) {
+    id
+  }
+}
+
+mutation UpdateUserStake($input: UpdateUserStakeInput!) {
+  updateUserStake(input: $input) {
+    id
+  }
+}

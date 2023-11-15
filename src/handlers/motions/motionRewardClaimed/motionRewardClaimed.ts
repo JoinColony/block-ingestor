@@ -10,7 +10,7 @@ import {
   updateColonyUnclaimedStakes,
   reclaimUserStake,
   getUpdatedStakerRewards,
-  getUserStake,
+  getUserMotionStake,
 } from './helpers';
 import { ColonyMotion } from '~graphql';
 
@@ -43,7 +43,7 @@ export default async (event: ContractEvent): Promise<void> => {
   if (claimedMotion) {
     const { stakerRewards, usersStakes } = claimedMotion;
 
-    const userStake = getUserStake(usersStakes, staker);
+    const userStake = getUserMotionStake(usersStakes, staker);
     const updatedStakerRewards = getUpdatedStakerRewards(stakerRewards, staker);
 
     const newMotionMessages = [
@@ -66,6 +66,11 @@ export default async (event: ContractEvent): Promise<void> => {
       motionDatabaseId,
       updatedStakerRewards,
     );
-    await reclaimUserStake(staker, colonyAddress, userStake);
+    await reclaimUserStake(
+      staker,
+      colonyAddress,
+      userStake,
+      updatedMotionData.transactionHash,
+    );
   }
 };
