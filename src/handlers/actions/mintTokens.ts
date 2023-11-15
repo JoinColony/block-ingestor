@@ -1,28 +1,17 @@
 import { Id } from '@colony/colony-js';
-import { mutate } from '~amplifyClient';
 
-import {
-  ColonyActionType,
-  CreateColonyFundsClaimDocument,
-  CreateColonyFundsClaimMutation,
-  CreateColonyFundsClaimMutationVariables,
-} from '~graphql';
-import { getChainId } from '~provider';
+import { ColonyActionType } from '~graphql';
 import { ContractEvent } from '~types';
 import {
   writeActionFromEvent,
   getColonyTokenAddress,
   getDomainDatabaseId,
   verbose,
+  createFundsClaim,
 } from '~utils';
 
 export default async (event: ContractEvent): Promise<void> => {
-  const {
-    contractAddress: colonyAddress,
-    transactionHash,
-    logIndex,
-    blockNumber,
-  } = event;
+  const { contractAddress: colonyAddress } = event;
   const { agent: initiatorAddress, who: recipientAddress, amount } = event.args;
 
   const tokenAddress = await getColonyTokenAddress(colonyAddress);
@@ -42,20 +31,11 @@ export default async (event: ContractEvent): Promise<void> => {
       fromDomainId: getDomainDatabaseId(colonyAddress, Id.RootDomain),
     });
 
-    const chainId = getChainId();
-    const claimId = `${chainId}_${transactionHash}_${logIndex}`;
-
-    await mutate<
-      CreateColonyFundsClaimMutation,
-      CreateColonyFundsClaimMutationVariables
-    >(CreateColonyFundsClaimDocument, {
-      input: {
-        id: claimId,
-        colonyFundsClaimsId: colonyAddress,
-        colonyFundsClaimTokenId: tokenAddress,
-        createdAtBlock: blockNumber,
-        amount: amount.toString(),
-      },
+    await createFundsClaim({
+      colonyAddress,
+      tokenAddress,
+      amount: amount.toString(),
+      event,
     });
   } else {
     verbose(

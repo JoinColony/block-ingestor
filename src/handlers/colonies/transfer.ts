@@ -1,19 +1,16 @@
-import { mutate, query } from '~amplifyClient';
+import { query } from '~amplifyClient';
 import networkClient from '~networkClient';
 import { getChainId } from '~provider';
 import { ContractEvent } from '~types';
 import {
-  CreateColonyFundsClaimDocument,
-  CreateColonyFundsClaimMutation,
-  CreateColonyFundsClaimMutationVariables,
   GetColonyUnclaimedFundDocument,
   GetColonyUnclaimedFundQuery,
   GetColonyUnclaimedFundQueryVariables,
 } from '~graphql';
-import { output } from '~utils';
+import { output, createFundsClaim } from '~utils';
 
 export default async (event: ContractEvent): Promise<void> => {
-  const { contractAddress, logIndex, blockNumber, transactionHash } = event;
+  const { contractAddress, logIndex, transactionHash } = event;
   const chainId = getChainId();
   /*
    * @NOTE Take the values from the "array" rather than from the named properties
@@ -84,17 +81,11 @@ export default async (event: ContractEvent): Promise<void> => {
 
     // Don't add zero transfer claims in the database
     if (!existingClaim && amount !== '0') {
-      await mutate<
-        CreateColonyFundsClaimMutation,
-        CreateColonyFundsClaimMutationVariables
-      >(CreateColonyFundsClaimDocument, {
-        input: {
-          id: claimId,
-          colonyFundsClaimsId: dst,
-          colonyFundsClaimTokenId: contractAddress,
-          createdAtBlock: blockNumber,
-          amount,
-        },
+      createFundsClaim({
+        colonyAddress: dst,
+        tokenAddress: contractAddress,
+        amount,
+        event,
       });
     }
   }

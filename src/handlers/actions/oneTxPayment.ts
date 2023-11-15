@@ -1,16 +1,14 @@
+import { AnyColonyClient } from '@colony/colony-js';
 import { BigNumber, utils } from 'ethers';
-import { mutate, query } from '~amplifyClient';
+
+import { query } from '~amplifyClient';
 import {
   ColonyActionType,
-  CreateColonyFundsClaimDocument,
-  CreateColonyFundsClaimMutation,
-  CreateColonyFundsClaimMutationVariables,
   GetColonyExtensionDocument,
   GetColonyExtensionQuery,
   GetColonyExtensionQueryVariables,
 } from '~graphql';
-import networkClient from '~networkClient';
-import provider, { getChainId } from '~provider';
+import provider from '~provider';
 import { ContractEvent, ContractEventsSignatures } from '~types';
 import {
   getCachedColonyClient,
@@ -19,6 +17,9 @@ import {
   notNull,
   toNumber,
   writeActionFromEvent,
+  ActionFields,
+  isColonyAddress,
+  createFundsClaim,
 } from '~utils';
 
 const PAYOUT_CLAIMED_SIGNATURE_HASH = utils.id(
@@ -59,33 +60,44 @@ export interface MultiPayment {
 }
 
 export default async (oneTxPaymentEvent: ContractEvent): Promise<void> => {
-  const {
-    contractAddress: extensionAddress,
-    transactionHash,
-    logIndex,
-    blockNumber,
-    args,
-  } = oneTxPaymentEvent;
+  const { contractAddress: extensionAddress } = oneTxPaymentEvent;
 
   const { data } =
     (await query<GetColonyExtensionQuery, GetColonyExtensionQueryVariables>(
       GetColonyExtensionDocument,
       { id: extensionAddress },
     )) ?? {};
-
-  const colonyAddress = data?.getColonyExtension?.colonyId ?? '';
+  const { colonyId: colonyAddress = '', version } =
+    data?.getColonyExtension ?? {};
 
   const colonyClient = await getCachedColonyClient(colonyAddress);
-
   if (!colonyClient) {
     return;
   }
 
-  const [initiatorAddress, , nPayments] = args;
-  const receipt = await provider.getTransactionReceipt(transactionHash);
+  switch (version) {
+    case 1:
+    case 2:
+    case 3:
+    case 4:
+    case 5:
+      handlerV1ToV5(oneTxPaymentEvent, colonyAddress, colonyClient);
+      break;
+    case 6:
+      handlerV6(oneTxPaymentEvent, colonyAddress, colonyClient);
+      break;
+  }
+};
+
+const handlerV1ToV5 = async (
+  event: ContractEvent,
+  colonyAddress: string,
+  colonyClient: AnyColonyClient,
+): Promise<void> => {
+  const [initiatorAddress, paymentOrExpenditureId, nPayments] = event.args;
+  const receipt = await provider.getTransactionReceipt(event.transactionHash);
 
   if ((nPayments as BigNumber).eq(1)) {
-    const [, paymentId] = args;
     const [payoutClaimedLog] = receipt.logs.filter(
       (log) => PAYOUT_CLAIMED_SIGNATURE_HASH === log.topics[0],
     );
@@ -100,45 +112,34 @@ export default async (oneTxPaymentEvent: ContractEvent): Promise<void> => {
     }
 
     const { recipient: recipientAddress, domainId } =
-      await colonyClient.getPayment(paymentId);
+      await colonyClient.getPayment(paymentOrExpenditureId);
 
-    const recipientIsColony = await networkClient.isColony(recipientAddress);
+    const recipientIsColony = await isColonyAddress(recipientAddress);
 
     const { token: tokenAddress, amount } = payoutClaimedEvent.args;
 
     if (recipientIsColony) {
-      const chainId = getChainId();
-      const claimId = `${chainId}_${transactionHash}_${logIndex}`;
-
-      await mutate<
-        CreateColonyFundsClaimMutation,
-        CreateColonyFundsClaimMutationVariables
-      >(CreateColonyFundsClaimDocument, {
-        input: {
-          id: claimId,
-          colonyFundsClaimsId: recipientAddress,
-          colonyFundsClaimTokenId: tokenAddress,
-          createdAtBlock: blockNumber,
-          amount: amount.toString(),
-        },
+      await createFundsClaim({
+        colonyAddress: recipientAddress,
+        tokenAddress,
+        amount: amount.toString(),
+        event,
       });
     }
 
-    await writeActionFromEvent(oneTxPaymentEvent, colonyAddress, {
+    await writeActionFromEvent(event, colonyAddress, {
       type: ColonyActionType.Payment,
       fromDomainId: getDomainDatabaseId(colonyAddress, toNumber(domainId)),
       tokenAddress,
       amount: amount.toString(),
       initiatorAddress,
       recipientAddress,
-      paymentId: toNumber(paymentId),
+      paymentId: toNumber(paymentOrExpenditureId),
     });
   } else {
-    // multiple OneTxPayments use expenditures at the contract level
-    const [, expenditureId] = args;
     // @ts-expect-error
     const expenditure: Expenditure = await colonyClient.getExpenditure(
-      expenditureId,
+      paymentOrExpenditureId,
     );
 
     const expenditurePayoutLogs = receipt.logs.filter((log) =>
@@ -167,15 +168,87 @@ export default async (oneTxPaymentEvent: ContractEvent): Promise<void> => {
       }),
     );
 
-    await writeActionFromEvent(oneTxPaymentEvent, colonyAddress, {
+    await writeActionFromEvent(event, colonyAddress, {
       type: ColonyActionType.MultiplePayment,
       fromDomainId: getDomainDatabaseId(
         colonyAddress,
         toNumber(expenditure.domainId),
       ),
       initiatorAddress,
-      paymentId: toNumber(expenditureId),
+      paymentId: toNumber(paymentOrExpenditureId),
       payments,
     });
   }
+};
+
+const handlerV6 = async (
+  event: ContractEvent,
+  colonyAddress: string,
+  colonyClient: AnyColonyClient,
+): Promise<void> => {
+  const [initiatorAddress, expenditureId] = event.args;
+  const receipt = await provider.getTransactionReceipt(event.transactionHash);
+
+  // multiple OneTxPayments use expenditures at the contract level
+  // @ts-expect-error
+  const expenditure: Expenditure = await colonyClient.getExpenditure(
+    expenditureId,
+  );
+
+  const expenditurePayoutLogs = receipt.logs.filter((log) =>
+    log.topics.includes(EXPENDITURE_PAYOUT_SET),
+  );
+
+  const expenditurePayoutEvents = await Promise.all(
+    expenditurePayoutLogs.map((log) =>
+      mapLogToContractEvent(log, colonyClient.interface),
+    ),
+  );
+
+  const payments: MultiPayment[] = await Promise.all(
+    expenditurePayoutEvents.filter(notNull).map(async ({ args }) => {
+      const [, expenditureId, slotId, tokenAddress, amount] = args;
+      const expenditureSlot: ExpenditureSlot =
+        // @ts-expect-error
+        await colonyClient.getExpenditureSlot(expenditureId, slotId);
+
+      const payment: MultiPayment = {
+        amount: amount.toString(),
+        tokenAddress,
+        recipientAddress: expenditureSlot.recipient,
+      };
+      return payment;
+    }),
+  );
+
+  const hasMultiplePayments = payments.length > 1;
+  let actionFields: ActionFields = {
+    type: hasMultiplePayments
+      ? ColonyActionType.MultiplePayment
+      : ColonyActionType.Payment,
+    fromDomainId: getDomainDatabaseId(
+      colonyAddress,
+      toNumber(expenditure.domainId),
+    ),
+    initiatorAddress,
+  };
+
+  if (payments.length === 1) {
+    const { tokenAddress, amount, recipientAddress } = payments[0];
+    actionFields = {
+      ...actionFields,
+      tokenAddress,
+      amount,
+      recipientAddress,
+      paymentId: toNumber(expenditureId),
+    };
+  } else {
+    actionFields = {
+      ...actionFields,
+      paymentId: toNumber(expenditureId),
+      payments,
+    };
+  }
+
+  await writeActionFromEvent(event, colonyAddress, actionFields);
 };

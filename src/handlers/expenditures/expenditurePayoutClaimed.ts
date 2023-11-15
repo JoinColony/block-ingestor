@@ -1,7 +1,9 @@
 import { ContractEvent } from '~types';
 import {
+  createFundsClaim,
   getExpenditureDatabaseId,
   insertAtIndex,
+  isColonyAddress,
   output,
   toNumber,
   verbose,
@@ -74,4 +76,19 @@ export default async (event: ContractEvent): Promise<void> => {
       },
     },
   );
+
+  /**
+   * If a payout is claimed by a colony, we need to create a funds claim in the database
+   * @NOTE: After contracts update, OneTxPayment payments emit this event too
+   */
+  const { recipientAddress } = existingSlot;
+  const isColony = await isColonyAddress(recipientAddress ?? '');
+  if (recipientAddress && isColony) {
+    await createFundsClaim({
+      colonyAddress: recipientAddress,
+      tokenAddress,
+      amount: existingPayout.amount.toString(),
+      event,
+    });
+  }
 };

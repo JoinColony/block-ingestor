@@ -13,7 +13,7 @@ import { toNumber, verbose, getExtensionInstallations } from '~utils';
 import { ContractEvent } from '~types';
 import networkClient from '~networkClient';
 
-type ActionFields = Omit<
+export type ActionFields = Omit<
   CreateColonyActionInput,
   'blockNumber' | 'colonyId' | 'colonyActionsId' | 'showInActionsList'
 >;
