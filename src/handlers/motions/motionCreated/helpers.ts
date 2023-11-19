@@ -211,12 +211,14 @@ const createMotionMessage = async (
 
 const createColonyAction = async (
   actionData: CreateColonyActionInput,
+  blockTimestamp: number,
 ): Promise<void> => {
   await mutate<CreateColonyActionMutation, CreateColonyActionMutationVariables>(
     CreateColonyActionDocument,
     {
       input: {
         ...actionData,
+        createdAt: new Date(blockTimestamp * 1000).toISOString(),
       },
     },
   );
@@ -229,6 +231,7 @@ export const createMotionInDB = async (
     logIndex,
     colonyAddress,
     args: { motionId, creator: creatorAddress, domainId },
+    timestamp,
   }: ContractEvent,
   {
     gasEstimate,
@@ -286,6 +289,6 @@ export const createMotionInDB = async (
   await Promise.all([
     createColonyMotion({ ...motionData, gasEstimate, expenditureId }),
     createMotionMessage(initialMotionMessage),
-    createColonyAction(actionData),
+    createColonyAction(actionData, timestamp),
   ]);
 };
