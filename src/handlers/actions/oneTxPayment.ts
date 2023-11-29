@@ -7,6 +7,9 @@ import {
   GetColonyExtensionDocument,
   GetColonyExtensionQuery,
   GetColonyExtensionQueryVariables,
+  GetCurrentNetworkInverseFeeDocument,
+  GetCurrentNetworkInverseFeeQuery,
+  GetCurrentNetworkInverseFeeQueryVariables,
 } from '~graphql';
 import provider from '~provider';
 import { ContractEvent, ContractEventsSignatures } from '~types';
@@ -21,6 +24,7 @@ import {
   isColonyAddress,
   createFundsClaim,
 } from '~utils';
+import { getAmountLessFee } from '~utils/networkFee';
 
 const PAYOUT_CLAIMED_SIGNATURE_HASH = utils.id(
   ContractEventsSignatures.PayoutClaimed,
@@ -55,6 +59,7 @@ interface ExpenditureSlot {
 
 export interface MultiPayment {
   amount: string;
+  networkFee?: string;
   tokenAddress: string;
   recipientAddress: string;
 }
@@ -75,16 +80,27 @@ export default async (oneTxPaymentEvent: ContractEvent): Promise<void> => {
     return;
   }
 
+  const { data: networkFeeData } =
+    (await query<
+      GetCurrentNetworkInverseFeeQuery,
+      GetCurrentNetworkInverseFeeQueryVariables
+    >(GetCurrentNetworkInverseFeeDocument)) ?? {};
+  const networkFee =
+    networkFeeData?.listCurrentNetworkInverseFees?.items?.[0]?.inverseFee;
+  if (!networkFee) {
+    return;
+  }
+
   switch (version) {
     case 1:
     case 2:
     case 3:
     case 4:
     case 5:
-      handlerV1ToV5(oneTxPaymentEvent, colonyAddress, colonyClient);
+      handlerV1ToV5(oneTxPaymentEvent, colonyAddress, colonyClient, networkFee);
       break;
     case 6:
-      handlerV6(oneTxPaymentEvent, colonyAddress, colonyClient);
+      handlerV6(oneTxPaymentEvent, colonyAddress, colonyClient, networkFee);
       break;
   }
 };
@@ -93,6 +109,7 @@ const handlerV1ToV5 = async (
   event: ContractEvent,
   colonyAddress: string,
   colonyClient: AnyColonyClient,
+  networkFee: string,
 ): Promise<void> => {
   const [initiatorAddress, paymentOrExpenditureId, nPayments] = event.args;
   const receipt = await provider.getTransactionReceipt(event.transactionHash);
@@ -118,6 +135,9 @@ const handlerV1ToV5 = async (
 
     const { token: tokenAddress, amount } = payoutClaimedEvent.args;
 
+    const amountLessFee = getAmountLessFee(amount, networkFee);
+    const fee = BigNumber.from(amount).sub(amountLessFee);
+
     if (recipientIsColony) {
       await createFundsClaim({
         colonyAddress: recipientAddress,
@@ -131,7 +151,8 @@ const handlerV1ToV5 = async (
       type: ColonyActionType.Payment,
       fromDomainId: getDomainDatabaseId(colonyAddress, toNumber(domainId)),
       tokenAddress,
-      amount: amount.toString(),
+      amount: amountLessFee.toString(),
+      networkFee: fee.toString(),
       initiatorAddress,
       recipientAddress,
       paymentId: toNumber(paymentOrExpenditureId),
@@ -159,8 +180,12 @@ const handlerV1ToV5 = async (
           // @ts-expect-error
           await colonyClient.getExpenditureSlot(expenditureId, slotId);
 
+        const amountLessFee = getAmountLessFee(amount, networkFee);
+        const fee = BigNumber.from(amount).sub(amountLessFee);
+
         const payment: MultiPayment = {
           amount: amount.toString(),
+          networkFee: fee.toString(),
           tokenAddress,
           recipientAddress: expenditureSlot.recipient,
         };
@@ -185,6 +210,7 @@ const handlerV6 = async (
   event: ContractEvent,
   colonyAddress: string,
   colonyClient: AnyColonyClient,
+  networkFee: string,
 ): Promise<void> => {
   const [initiatorAddress, expenditureId] = event.args;
   const receipt = await provider.getTransactionReceipt(event.transactionHash);
@@ -212,8 +238,12 @@ const handlerV6 = async (
         // @ts-expect-error
         await colonyClient.getExpenditureSlot(expenditureId, slotId);
 
+      const amountLessFee = getAmountLessFee(amount, networkFee);
+      const fee = BigNumber.from(amount).sub(amountLessFee);
+
       const payment: MultiPayment = {
-        amount: amount.toString(),
+        amount: amountLessFee.toString(),
+        networkFee: fee.toString(),
         tokenAddress,
         recipientAddress: expenditureSlot.recipient,
       };
@@ -234,11 +264,12 @@ const handlerV6 = async (
   };
 
   if (payments.length === 1) {
-    const { tokenAddress, amount, recipientAddress } = payments[0];
+    const { tokenAddress, amount, recipientAddress, networkFee } = payments[0];
     actionFields = {
       ...actionFields,
       tokenAddress,
       amount,
+      networkFee,
       recipientAddress,
       paymentId: toNumber(expenditureId),
     };
