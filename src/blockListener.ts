@@ -19,8 +19,10 @@ export const startBlockListener = (): void => {
       output(`Block ${blockNumber} added to the queue`);
 
       processNextBlock();
-    } catch {
-      output(`Observed block ${blockNumber} but failed to get its data`);
+    } catch (error) {
+      throw new Error(
+        `Observed block ${blockNumber} but failed to get its data: ${error}`,
+      );
     }
   });
 
