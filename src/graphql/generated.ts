@@ -218,10 +218,7 @@ export type ColonyTokensArgs = {
 /** Represents an action performed within a Colony */
 export type ColonyAction = {
   __typename?: 'ColonyAction';
-  /**
-   * The amount involved in the action, if applicable
-   * In any case where network fee is involved, this amount excludes it
-   */
+  /** The amount involved in the action, if applicable */
   amount?: Maybe<Scalars['String']>;
   /** The annotation associated with the action, if there is one */
   annotation?: Maybe<Annotation>;
@@ -270,8 +267,6 @@ export type ColonyAction = {
   motionDomainId?: Maybe<Scalars['Int']>;
   /** The internal database id of the motion */
   motionId?: Maybe<Scalars['ID']>;
-  /** The network fee amount, if applicable */
-  networkFee?: Maybe<Scalars['String']>;
   /** The resulting new Colony version, if applicable */
   newColonyVersion?: Maybe<Scalars['Int']>;
   /** The native id of the payment */
@@ -1081,7 +1076,6 @@ export type CreateColonyActionInput = {
   members?: InputMaybe<Array<Scalars['ID']>>;
   motionDomainId?: InputMaybe<Scalars['Int']>;
   motionId?: InputMaybe<Scalars['ID']>;
-  networkFee?: InputMaybe<Scalars['String']>;
   newColonyVersion?: InputMaybe<Scalars['Int']>;
   paymentId?: InputMaybe<Scalars['Int']>;
   payments?: InputMaybe<Array<PaymentInput>>;
@@ -2231,7 +2225,6 @@ export type ModelColonyActionConditionInput = {
   members?: InputMaybe<ModelIdInput>;
   motionDomainId?: InputMaybe<ModelIntInput>;
   motionId?: InputMaybe<ModelIdInput>;
-  networkFee?: InputMaybe<ModelStringInput>;
   newColonyVersion?: InputMaybe<ModelIntInput>;
   not?: InputMaybe<ModelColonyActionConditionInput>;
   or?: InputMaybe<Array<InputMaybe<ModelColonyActionConditionInput>>>;
@@ -2269,7 +2262,6 @@ export type ModelColonyActionFilterInput = {
   members?: InputMaybe<ModelIdInput>;
   motionDomainId?: InputMaybe<ModelIntInput>;
   motionId?: InputMaybe<ModelIdInput>;
-  networkFee?: InputMaybe<ModelStringInput>;
   newColonyVersion?: InputMaybe<ModelIntInput>;
   not?: InputMaybe<ModelColonyActionFilterInput>;
   or?: InputMaybe<Array<InputMaybe<ModelColonyActionFilterInput>>>;
@@ -3425,7 +3417,6 @@ export type ModelSubscriptionColonyActionFilterInput = {
   members?: InputMaybe<ModelSubscriptionIdInput>;
   motionDomainId?: InputMaybe<ModelSubscriptionIntInput>;
   motionId?: InputMaybe<ModelSubscriptionIdInput>;
-  networkFee?: InputMaybe<ModelSubscriptionStringInput>;
   newColonyVersion?: InputMaybe<ModelSubscriptionIntInput>;
   or?: InputMaybe<Array<InputMaybe<ModelSubscriptionColonyActionFilterInput>>>;
   paymentId?: InputMaybe<ModelSubscriptionIntInput>;
@@ -4277,6 +4268,8 @@ export type MotionStakesInput = {
 /** Quick access flages to check the current state of a motion in its lifecycle */
 export type MotionStateHistory = {
   __typename?: 'MotionStateHistory';
+  /** Timestamp at which the motion was fully staked on both sides */
+  bothSidesFullyStakedAt?: Maybe<Scalars['AWSDateTime']>;
   /** Whether the motion has failed */
   hasFailed: Scalars['Boolean'];
   /** Whether the motion has failed and cannot be finalized (e.g. if it doesn't get staked) */
@@ -4291,6 +4284,8 @@ export type MotionStateHistory = {
 
 /** Input used to change the current state of a motion */
 export type MotionStateHistoryInput = {
+  /** Timestamp at which the motion was fully staked on both sides */
+  bothSidesFullyStakedAt?: InputMaybe<Scalars['AWSDateTime']>;
   /** Whether the motion has failed */
   hasFailed: Scalars['Boolean'];
   /** Whether the motion has failed and cannot be finalized (e.g. if it doesn't get staked) */
@@ -5249,17 +5244,13 @@ export enum Network {
 
 export type Payment = {
   __typename?: 'Payment';
-  /** Payment amount, excluding network fee */
   amount: Scalars['String'];
-  /** Network fee amount */
-  networkFee?: Maybe<Scalars['String']>;
   recipientAddress: Scalars['String'];
   tokenAddress: Scalars['String'];
 };
 
 export type PaymentInput = {
   amount: Scalars['String'];
-  networkFee?: InputMaybe<Scalars['String']>;
   recipientAddress: Scalars['String'];
   tokenAddress: Scalars['String'];
 };
@@ -6422,7 +6413,6 @@ export enum SearchableColonyActionAggregateField {
   Members = 'members',
   MotionDomainId = 'motionDomainId',
   MotionId = 'motionId',
-  NetworkFee = 'networkFee',
   NewColonyVersion = 'newColonyVersion',
   PaymentId = 'paymentId',
   PendingColonyMetadataId = 'pendingColonyMetadataId',
@@ -6467,7 +6457,6 @@ export type SearchableColonyActionFilterInput = {
   members?: InputMaybe<SearchableIdFilterInput>;
   motionDomainId?: InputMaybe<SearchableIntFilterInput>;
   motionId?: InputMaybe<SearchableIdFilterInput>;
-  networkFee?: InputMaybe<SearchableStringFilterInput>;
   newColonyVersion?: InputMaybe<SearchableIntFilterInput>;
   not?: InputMaybe<SearchableColonyActionFilterInput>;
   or?: InputMaybe<Array<InputMaybe<SearchableColonyActionFilterInput>>>;
@@ -6504,7 +6493,6 @@ export enum SearchableColonyActionSortableFields {
   Members = 'members',
   MotionDomainId = 'motionDomainId',
   MotionId = 'motionId',
-  NetworkFee = 'networkFee',
   NewColonyVersion = 'newColonyVersion',
   PaymentId = 'paymentId',
   PendingColonyMetadataId = 'pendingColonyMetadataId',
@@ -7484,7 +7472,6 @@ export type UpdateColonyActionInput = {
   members?: InputMaybe<Array<Scalars['ID']>>;
   motionDomainId?: InputMaybe<Scalars['Int']>;
   motionId?: InputMaybe<Scalars['ID']>;
-  networkFee?: InputMaybe<Scalars['String']>;
   newColonyVersion?: InputMaybe<Scalars['Int']>;
   paymentId?: InputMaybe<Scalars['Int']>;
   payments?: InputMaybe<Array<PaymentInput>>;

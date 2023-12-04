@@ -78,12 +78,22 @@ export default async (event: ContractEvent): Promise<void> => {
       amount,
     });
 
+    const bothSidesFullyStaked =
+      requiredStake.eq(motionStakes.raw.yay) &&
+      requiredStake.eq(motionStakes.raw.nay);
+
     await updateMotionInDB(
       {
         ...stakedMotion,
         usersStakes: updatedUserStakes,
         motionStakes,
         remainingStakes,
+        motionStateHistory: {
+          ...stakedMotion.motionStateHistory,
+          bothSidesFullyStakedAt: bothSidesFullyStaked
+            ? new Date(timestamp * 1000).toISOString()
+            : undefined,
+        },
       },
       newMotionMessages,
       showInActionsList,
