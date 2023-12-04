@@ -8220,6 +8220,7 @@ export type ColonyMotionFragment = {
     hasFailed: boolean;
     hasFailedNotFinalizable: boolean;
     inRevealPhase: boolean;
+    bothSidesFullyStakedAt?: string | null;
   };
 };
 
@@ -9268,6 +9269,7 @@ export type GetColonyMotionQuery = {
       hasFailed: boolean;
       hasFailedNotFinalizable: boolean;
       inRevealPhase: boolean;
+      bothSidesFullyStakedAt?: string | null;
     };
   } | null;
 };
@@ -9546,6 +9548,7 @@ export const ColonyMotion = gql`
       hasFailed
       hasFailedNotFinalizable
       inRevealPhase
+      bothSidesFullyStakedAt
     }
     isDecision
     transactionHash

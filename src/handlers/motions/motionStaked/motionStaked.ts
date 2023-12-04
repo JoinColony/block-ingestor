@@ -92,7 +92,7 @@ export default async (event: ContractEvent): Promise<void> => {
           ...stakedMotion.motionStateHistory,
           bothSidesFullyStakedAt: bothSidesFullyStaked
             ? new Date(timestamp * 1000).toISOString()
-            : undefined,
+            : null,
         },
       },
       newMotionMessages,
