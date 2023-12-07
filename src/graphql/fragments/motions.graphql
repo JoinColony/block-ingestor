@@ -40,7 +40,8 @@ fragment ColonyMotion on ColonyMotion {
     hasFailed
     hasFailedNotFinalizable
     inRevealPhase
-    bothSidesFullyStakedAt
+    yaySideFullyStakedAt
+    naySideFullyStakedAt
   }
   isDecision
   transactionHash
