@@ -195,7 +195,6 @@ const linkPendingColonyMetadataWithColony = async (
   const {
     haveTokensChanged,
     hasAvatarChanged,
-    hasWhitelistChanged,
     newDisplayName,
     oldDisplayName,
     hasDescriptionChanged,
@@ -215,15 +214,6 @@ const linkPendingColonyMetadataWithColony = async (
     // If avatar has changed, update avatar and thumbnail
     updatedMetadata.avatar = pendingColonyMetadata.avatar;
     updatedMetadata.thumbnail = pendingColonyMetadata.thumbnail;
-  }
-
-  if (hasWhitelistChanged) {
-    // If whitelist has changed, update whitelistedAddresses and isWhitelistActivated
-    updatedMetadata.isWhitelistActivated =
-      pendingColonyMetadata.isWhitelistActivated;
-
-    updatedMetadata.whitelistedAddresses =
-      pendingColonyMetadata.whitelistedAddresses;
   }
 
   if (newDisplayName !== oldDisplayName) {
