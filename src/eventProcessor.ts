@@ -329,6 +329,7 @@ export default async (event: ContractEvent): Promise<void> => {
 
     case ContractEventsSignatures.ArbitraryTransaction: {
       await handleMakeAbitraryTransactionAction(event);
+      return;
     }
 
     case ContractEventsSignatures.ReputationMiningCycleComplete: {
