@@ -79,6 +79,8 @@ export default async (event: ContractEvent): Promise<void> => {
     input: {
       id: getColonyContributorId(colonyAddress, colonyFounderAddress),
       isWatching: true,
+      // @ts-expect-error
+      isWhitelisted: true,
     },
   });
 
