@@ -1,9 +1,14 @@
+import { utils } from 'ethers';
+
 import { mutate } from '~amplifyClient';
 import { setupListenersForColony } from '~eventListeners';
 import {
   UpdateColonyContributorDocument,
   UpdateColonyContributorMutation,
   UpdateColonyContributorMutationVariables,
+  CreateUniqueColonyDocument,
+  CreateUniqueColonyMutation,
+  CreateUniqueColonyMutationVariables,
 } from '~graphql';
 import { coloniesSet } from '~stats';
 import { ContractEvent, ContractEventsSignatures } from '~types';
@@ -81,6 +86,27 @@ export default async (event: ContractEvent): Promise<void> => {
       isWatching: true,
     },
   });
+
+  /*
+   * Create the colony entry in the database
+   *
+   * @TODO Move the logic from create unique colony in here, that way we can
+   * more granularly control the creation of the colony
+   *
+   * We can also do cool stuff like if there's an error creating the colony,
+   * tell the ingestor to stop watching it
+   */
+  await mutate<CreateUniqueColonyMutation, CreateUniqueColonyMutationVariables>(
+    CreateUniqueColonyDocument,
+    {
+      input: {
+        colonyAddress: utils.getAddress(colonyAddress),
+        tokenAddress: utils.getAddress(tokenAddress),
+        transactionHash,
+        initiatorAddress: utils.getAddress(colonyFounderAddress),
+      },
+    },
+  );
 
   /*
    * Setup all Colony specific listeners for it

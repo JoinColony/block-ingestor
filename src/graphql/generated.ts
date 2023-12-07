@@ -145,7 +145,6 @@ export type Colony = {
   updatedAt: Scalars['AWSDateTime'];
   /** Version of the Colony */
   version: Scalars['Int'];
-  watchers?: Maybe<ModelWatchedColoniesConnection>;
   /** An array of all whitelisted wallet addresses */
   whitelist: Array<Scalars['ID']>;
 };
@@ -204,14 +203,6 @@ export type ColonyRolesArgs = {
 /** Represents a Colony within the Colony Network */
 export type ColonyTokensArgs = {
   filter?: InputMaybe<ModelColonyTokensFilterInput>;
-  limit?: InputMaybe<Scalars['Int']>;
-  nextToken?: InputMaybe<Scalars['String']>;
-  sortDirection?: InputMaybe<ModelSortDirection>;
-};
-
-/** Represents a Colony within the Colony Network */
-export type ColonyWatchersArgs = {
-  filter?: InputMaybe<ModelWatchedColoniesFilterInput>;
   limit?: InputMaybe<Scalars['Int']>;
   nextToken?: InputMaybe<Scalars['String']>;
   sortDirection?: InputMaybe<ModelSortDirection>;
@@ -491,6 +482,8 @@ export type ColonyChainFundsClaimInput = {
 /** The ColonyContributor model represents a contributor to the Colony. */
 export type ColonyContributor = {
   __typename?: 'ColonyContributor';
+  /** Associated colony */
+  colony?: Maybe<Colony>;
   /** Address of the colony the contributor is under */
   colonyAddress: Scalars['ID'];
   /** The contributor's reputation percentage in the colony */
@@ -678,6 +671,8 @@ export type ColonyMetadata = {
   description?: Maybe<Scalars['String']>;
   /** Display name of the Colony */
   displayName: Scalars['String'];
+  /** Temporary data to store while the colony is being created (via the block ingestor) */
+  etherealData?: Maybe<ColonyMetadataEtherealData>;
   /** An array of external links to related pages */
   externalLinks?: Maybe<Array<ExternalLink>>;
   /** Unique identifier for the Colony (contract address) */
@@ -741,6 +736,27 @@ export type ColonyMetadataChangelogInput = {
   oldDisplayName: Scalars['String'];
   oldSafes?: InputMaybe<Array<SafeInput>>;
   transactionHash: Scalars['String'];
+};
+
+export type ColonyMetadataEtherealData = {
+  __typename?: 'ColonyMetadataEtherealData';
+  colonyAvatar?: Maybe<Scalars['String']>;
+  colonyDisplayName: Scalars['String'];
+  colonyName: Scalars['String'];
+  colonyThumbnail?: Maybe<Scalars['String']>;
+  initiatorAddress: Scalars['ID'];
+  tokenAvatar?: Maybe<Scalars['String']>;
+  tokenThumbnail?: Maybe<Scalars['String']>;
+};
+
+export type ColonyMetadataEtherealDataInput = {
+  colonyAvatar?: InputMaybe<Scalars['String']>;
+  colonyDisplayName: Scalars['String'];
+  colonyName: Scalars['String'];
+  colonyThumbnail?: InputMaybe<Scalars['String']>;
+  initiatorAddress: Scalars['ID'];
+  tokenAvatar?: InputMaybe<Scalars['String']>;
+  tokenThumbnail?: InputMaybe<Scalars['String']>;
 };
 
 /** Represents a Motion within a Colony */
@@ -999,23 +1015,6 @@ export type ContractEvent = {
   user?: Maybe<User>;
 };
 
-/**
- * Represents a contributor within the Colony Network
- *
- * A contributor is a Colony member who has reputation
- */
-export type Contributor = {
-  __typename?: 'Contributor';
-  /** Wallet address of the contributor */
-  address: Scalars['String'];
-  /** Reputation amount of the contributor (as an absolute number) */
-  reputationAmount?: Maybe<Scalars['String']>;
-  /** Reputation percentage of the contributor (of all reputation within the Colony) */
-  reputationPercentage?: Maybe<Scalars['String']>;
-  /** User data associated with the contributor */
-  user?: Maybe<User>;
-};
-
 export type ContributorReputation = {
   __typename?: 'ContributorReputation';
   /** The colony the reputation was earned in */
@@ -1113,6 +1112,28 @@ export type CreateColonyDecisionInput = {
   walletAddress: Scalars['String'];
 };
 
+/** Input data for creating a temporary colony metadata entry */
+export type CreateColonyEtherealMetadataInput = {
+  /** Colony avatar/thumbnail */
+  colonyAvatar?: InputMaybe<Scalars['String']>;
+  /** Colony name */
+  colonyDisplayName: Scalars['String'];
+  /** Colony slug */
+  colonyName: Scalars['String'];
+  /** Colony avatar/thumbnail */
+  colonyThumbnail?: InputMaybe<Scalars['String']>;
+  /** User id of creator to associate with further invite codes */
+  initiatorAddress: Scalars['ID'];
+  /** Invite Code to create Colony */
+  inviteCode: Scalars['ID'];
+  /** Token avatar/thumbnail */
+  tokenAvatar?: InputMaybe<Scalars['String']>;
+  /** Token avatar/thumbnail */
+  tokenThumbnail?: InputMaybe<Scalars['String']>;
+  /** The transaction hash of colony creation transaction */
+  transactionHash: Scalars['String'];
+};
+
 export type CreateColonyExtensionInput = {
   colonyId: Scalars['ID'];
   hash: Scalars['String'];
@@ -1182,6 +1203,7 @@ export type CreateColonyMetadataInput = {
   changelog?: InputMaybe<Array<ColonyMetadataChangelogInput>>;
   description?: InputMaybe<Scalars['String']>;
   displayName: Scalars['String'];
+  etherealData?: InputMaybe<ColonyMetadataEtherealDataInput>;
   externalLinks?: InputMaybe<Array<ExternalLinkInput>>;
   id?: InputMaybe<Scalars['ID']>;
   isWhitelistActivated?: InputMaybe<Scalars['Boolean']>;
@@ -1458,24 +1480,16 @@ export type CreateTransactionInput = {
 
 /** Input data for creating a unique Colony within the Colony Network. Use this instead of the automatically generated `CreateColonyInput` input type */
 export type CreateUniqueColonyInput = {
-  /** Metadata related to the Colony's creation on the blockchain */
-  chainMetadata: ChainMetadataInput;
-  /** Unique identifier for the Colony's native token (this is its address) */
-  colonyNativeTokenId: Scalars['ID'];
   /** Unique identifier for the Colony. This is the Colony's contract address */
-  id: Scalars['ID'];
-  /** Invite Code to create Colony */
-  inviteCode: Scalars['ID'];
-  /** Display name of the Colony */
-  name: Scalars['String'];
-  /** Status information for the Colony */
-  status?: InputMaybe<ColonyStatusInput>;
+  colonyAddress: Scalars['ID'];
+  /** User id of creator to associate with further invite codes */
+  initiatorAddress: Scalars['ID'];
+  /** Unique identifier for the Colony's native token (this is its address) */
+  tokenAddress: Scalars['ID'];
+  /** The transaction hash of colony creation transaction */
+  transactionHash: Scalars['String'];
   /** Type of the Colony (regular or MetaColony) */
   type?: InputMaybe<ColonyType>;
-  /** User id of creator to associate with further invite codes */
-  userId: Scalars['ID'];
-  /** Version of the currently deployed Colony contract */
-  version: Scalars['Int'];
 };
 
 /** Input data for creating a unique user within the Colony Network Use this instead of the automatically generated `CreateUserInput` input type */
@@ -1505,12 +1519,6 @@ export type CreateUserStakeInput = {
 export type CreateUserTokensInput = {
   id?: InputMaybe<Scalars['ID']>;
   tokenID: Scalars['ID'];
-  userID: Scalars['ID'];
-};
-
-export type CreateWatchedColoniesInput = {
-  colonyID: Scalars['ID'];
-  id?: InputMaybe<Scalars['ID']>;
   userID: Scalars['ID'];
 };
 
@@ -1690,10 +1698,6 @@ export type DeleteUserStakeInput = {
 };
 
 export type DeleteUserTokensInput = {
-  id: Scalars['ID'];
-};
-
-export type DeleteWatchedColoniesInput = {
   id: Scalars['ID'];
 };
 
@@ -2085,18 +2089,6 @@ export type GetSafeTransactionStatusInput = {
   transactionHash: Scalars['String'];
 };
 
-/** The type of input of the getTotalMemberCount lambda */
-export type GetTotalMemberCountInput = {
-  colonyAddress: Scalars['ID'];
-};
-
-/** The return type of the getTotalMemberCount lambda */
-export type GetTotalMemberCountReturn = {
-  __typename?: 'GetTotalMemberCountReturn';
-  contributorCount: Scalars['Int'];
-  memberCount: Scalars['Int'];
-};
-
 /**
  * Input data for a user's reputation within a Domain in a Colony. If no `domainId` is passed, the Root Domain is used
  * A `rootHash` can be provided, to get reputation at a certain point in the past
@@ -2172,39 +2164,6 @@ export type IngestorStats = {
   updatedAt: Scalars['AWSDateTime'];
   /** JSON string to pass custom, dynamic values */
   value: Scalars['String'];
-};
-
-export enum MemberTotalType {
-  All = 'ALL',
-  Contributors = 'CONTRIBUTORS',
-}
-
-/** Input data for fetching the list of members for a specific Colony */
-export type MembersForColonyInput = {
-  /** Address of the Colony */
-  colonyAddress: Scalars['String'];
-  /** ID of the domain within the Colony */
-  domainId?: InputMaybe<Scalars['Int']>;
-  /** Root hash for the reputation state */
-  rootHash?: InputMaybe<Scalars['String']>;
-  /** Sorting method to apply to the member list */
-  sortingMethod?: InputMaybe<SortingMethod>;
-};
-
-/**
- * A return type representing the members of a Colony
- *
- * Definitions:
- * * Member = User watching a Colony, with or without reputation
- * * Contributor = User watching a Colony WITH reputation
- * * Watcher = User watching a Colony WITHOUT reputation
- */
-export type MembersForColonyReturn = {
-  __typename?: 'MembersForColonyReturn';
-  /** User watching a Colony WITH reputation */
-  contributors?: Maybe<Array<Contributor>>;
-  /** User watching a Colony WITHOUT reputation */
-  watchers?: Maybe<Array<Watcher>>;
 };
 
 export type ModelAnnotationConditionInput = {
@@ -4041,18 +4000,6 @@ export type ModelSubscriptionUserTokensFilterInput = {
   userID?: InputMaybe<ModelSubscriptionIdInput>;
 };
 
-export type ModelSubscriptionWatchedColoniesFilterInput = {
-  and?: InputMaybe<
-    Array<InputMaybe<ModelSubscriptionWatchedColoniesFilterInput>>
-  >;
-  colonyID?: InputMaybe<ModelSubscriptionIdInput>;
-  id?: InputMaybe<ModelSubscriptionIdInput>;
-  or?: InputMaybe<
-    Array<InputMaybe<ModelSubscriptionWatchedColoniesFilterInput>>
-  >;
-  userID?: InputMaybe<ModelSubscriptionIdInput>;
-};
-
 export type ModelTokenConditionInput = {
   and?: InputMaybe<Array<InputMaybe<ModelTokenConditionInput>>>;
   avatar?: InputMaybe<ModelStringInput>;
@@ -4240,29 +4187,6 @@ export type ModelUserTokensFilterInput = {
   userID?: InputMaybe<ModelIdInput>;
 };
 
-export type ModelWatchedColoniesConditionInput = {
-  and?: InputMaybe<Array<InputMaybe<ModelWatchedColoniesConditionInput>>>;
-  colonyID?: InputMaybe<ModelIdInput>;
-  not?: InputMaybe<ModelWatchedColoniesConditionInput>;
-  or?: InputMaybe<Array<InputMaybe<ModelWatchedColoniesConditionInput>>>;
-  userID?: InputMaybe<ModelIdInput>;
-};
-
-export type ModelWatchedColoniesConnection = {
-  __typename?: 'ModelWatchedColoniesConnection';
-  items: Array<Maybe<WatchedColonies>>;
-  nextToken?: Maybe<Scalars['String']>;
-};
-
-export type ModelWatchedColoniesFilterInput = {
-  and?: InputMaybe<Array<InputMaybe<ModelWatchedColoniesFilterInput>>>;
-  colonyID?: InputMaybe<ModelIdInput>;
-  id?: InputMaybe<ModelIdInput>;
-  not?: InputMaybe<ModelWatchedColoniesFilterInput>;
-  or?: InputMaybe<Array<InputMaybe<ModelWatchedColoniesFilterInput>>>;
-  userID?: InputMaybe<ModelIdInput>;
-};
-
 /** A status update message for a motion (will appear in the motion's timeline) */
 export type MotionMessage = {
   __typename?: 'MotionMessage';
@@ -4378,6 +4302,8 @@ export type Mutation = {
   createColonyActionMetadata?: Maybe<ColonyActionMetadata>;
   createColonyContributor?: Maybe<ColonyContributor>;
   createColonyDecision?: Maybe<ColonyDecision>;
+  /** Create temporary metadata entry for an upcoming colony (that will be created by the ingestor) */
+  createColonyEtherealMetadata?: Maybe<ColonyMetadata>;
   createColonyExtension?: Maybe<ColonyExtension>;
   createColonyFundsClaim?: Maybe<ColonyFundsClaim>;
   createColonyHistoricRole?: Maybe<ColonyHistoricRole>;
@@ -4414,7 +4340,6 @@ export type Mutation = {
   createUser?: Maybe<User>;
   createUserStake?: Maybe<UserStake>;
   createUserTokens?: Maybe<UserTokens>;
-  createWatchedColonies?: Maybe<WatchedColonies>;
   deleteAnnotation?: Maybe<Annotation>;
   deleteColony?: Maybe<Colony>;
   deleteColonyAction?: Maybe<ColonyAction>;
@@ -4453,7 +4378,6 @@ export type Mutation = {
   deleteUser?: Maybe<User>;
   deleteUserStake?: Maybe<UserStake>;
   deleteUserTokens?: Maybe<UserTokens>;
-  deleteWatchedColonies?: Maybe<WatchedColonies>;
   /** Updates the latest available version of a Colony or an extension */
   setCurrentVersion?: Maybe<Scalars['Boolean']>;
   updateAnnotation?: Maybe<Annotation>;
@@ -4496,7 +4420,6 @@ export type Mutation = {
   updateUser?: Maybe<User>;
   updateUserStake?: Maybe<UserStake>;
   updateUserTokens?: Maybe<UserTokens>;
-  updateWatchedColonies?: Maybe<WatchedColonies>;
   /**
    * Validates the user invite code and adds the user to the colony whitelist
    * and as a colony contributor
@@ -4538,6 +4461,11 @@ export type MutationCreateColonyContributorArgs = {
 export type MutationCreateColonyDecisionArgs = {
   condition?: InputMaybe<ModelColonyDecisionConditionInput>;
   input: CreateColonyDecisionInput;
+};
+
+/** Root mutation type */
+export type MutationCreateColonyEtherealMetadataArgs = {
+  input: CreateColonyEtherealMetadataInput;
 };
 
 /** Root mutation type */
@@ -4740,12 +4668,6 @@ export type MutationCreateUserStakeArgs = {
 export type MutationCreateUserTokensArgs = {
   condition?: InputMaybe<ModelUserTokensConditionInput>;
   input: CreateUserTokensInput;
-};
-
-/** Root mutation type */
-export type MutationCreateWatchedColoniesArgs = {
-  condition?: InputMaybe<ModelWatchedColoniesConditionInput>;
-  input: CreateWatchedColoniesInput;
 };
 
 /** Root mutation type */
@@ -4974,12 +4896,6 @@ export type MutationDeleteUserStakeArgs = {
 export type MutationDeleteUserTokensArgs = {
   condition?: InputMaybe<ModelUserTokensConditionInput>;
   input: DeleteUserTokensInput;
-};
-
-/** Root mutation type */
-export type MutationDeleteWatchedColoniesArgs = {
-  condition?: InputMaybe<ModelWatchedColoniesConditionInput>;
-  input: DeleteWatchedColoniesInput;
 };
 
 /** Root mutation type */
@@ -5218,12 +5134,6 @@ export type MutationUpdateUserStakeArgs = {
 export type MutationUpdateUserTokensArgs = {
   condition?: InputMaybe<ModelUserTokensConditionInput>;
   input: UpdateUserTokensInput;
-};
-
-/** Root mutation type */
-export type MutationUpdateWatchedColoniesArgs = {
-  condition?: InputMaybe<ModelWatchedColoniesConditionInput>;
-  input: UpdateWatchedColoniesInput;
 };
 
 /** Root mutation type */
@@ -5467,8 +5377,8 @@ export type Query = {
   getColonyStakeByUserAddress?: Maybe<ModelColonyStakeConnection>;
   getColonyTokens?: Maybe<ColonyTokens>;
   getContractEvent?: Maybe<ContractEvent>;
-  getContributorByAddress?: Maybe<ModelColonyContributorConnection>;
   getContributorReputation?: Maybe<ContributorReputation>;
+  getContributorsByAddress?: Maybe<ModelColonyContributorConnection>;
   getContributorsByColony?: Maybe<ModelColonyContributorConnection>;
   getCurrentNetworkInverseFee?: Maybe<CurrentNetworkInverseFee>;
   getCurrentVersion?: Maybe<CurrentVersion>;
@@ -5483,8 +5393,6 @@ export type Query = {
   getExtensionInstallationsCount?: Maybe<ExtensionInstallationsCount>;
   getExtensionsByHash?: Maybe<ModelColonyExtensionConnection>;
   getIngestorStats?: Maybe<IngestorStats>;
-  /** Fetch the list of members for a specific Colony */
-  getMembersForColony?: Maybe<MembersForColonyReturn>;
   getMotionByExpenditureId?: Maybe<ModelColonyMotionConnection>;
   getMotionByTransactionHash?: Maybe<ModelColonyMotionConnection>;
   getMotionMessage?: Maybe<MotionMessage>;
@@ -5512,7 +5420,6 @@ export type Query = {
   /** Fetch a token's information. Tries to get the data from the DB first, if that fails, resolves to get data from chain */
   getTokenFromEverywhere?: Maybe<TokenFromEverywhereReturn>;
   getTokensByType?: Maybe<ModelTokenConnection>;
-  getTotalMemberCount: GetTotalMemberCountReturn;
   getTransaction?: Maybe<Transaction>;
   getTransactionsByUser?: Maybe<ModelTransactionConnection>;
   getTransactionsByUserAndGroup?: Maybe<ModelTransactionConnection>;
@@ -5528,7 +5435,6 @@ export type Query = {
   getUserTokens?: Maybe<UserTokens>;
   /** Get the voting reward for a user and a motion */
   getVoterRewards?: Maybe<VoterRewardsReturn>;
-  getWatchedColonies?: Maybe<WatchedColonies>;
   listAnnotations?: Maybe<ModelAnnotationConnection>;
   listColonies?: Maybe<ModelColonyConnection>;
   listColonyActionMetadata?: Maybe<ModelColonyActionMetadataConnection>;
@@ -5567,7 +5473,6 @@ export type Query = {
   listUserStakes?: Maybe<ModelUserStakeConnection>;
   listUserTokens?: Maybe<ModelUserTokensConnection>;
   listUsers?: Maybe<ModelUserConnection>;
-  listWatchedColonies?: Maybe<ModelWatchedColoniesConnection>;
   searchColonyActions?: Maybe<SearchableColonyActionConnection>;
 };
 
@@ -5746,18 +5651,18 @@ export type QueryGetContractEventArgs = {
 };
 
 /** Root query type */
-export type QueryGetContributorByAddressArgs = {
+export type QueryGetContributorReputationArgs = {
+  id: Scalars['ID'];
+};
+
+/** Root query type */
+export type QueryGetContributorsByAddressArgs = {
   colonyReputationPercentage?: InputMaybe<ModelFloatKeyConditionInput>;
   contributorAddress: Scalars['ID'];
   filter?: InputMaybe<ModelColonyContributorFilterInput>;
   limit?: InputMaybe<Scalars['Int']>;
   nextToken?: InputMaybe<Scalars['String']>;
   sortDirection?: InputMaybe<ModelSortDirection>;
-};
-
-/** Root query type */
-export type QueryGetContributorReputationArgs = {
-  id: Scalars['ID'];
 };
 
 /** Root query type */
@@ -5856,11 +5761,6 @@ export type QueryGetExtensionsByHashArgs = {
 /** Root query type */
 export type QueryGetIngestorStatsArgs = {
   id: Scalars['ID'];
-};
-
-/** Root query type */
-export type QueryGetMembersForColonyArgs = {
-  input?: InputMaybe<MembersForColonyInput>;
 };
 
 /** Root query type */
@@ -6018,11 +5918,6 @@ export type QueryGetTokensByTypeArgs = {
 };
 
 /** Root query type */
-export type QueryGetTotalMemberCountArgs = {
-  input: GetTotalMemberCountInput;
-};
-
-/** Root query type */
 export type QueryGetTransactionArgs = {
   id: Scalars['ID'];
 };
@@ -6104,11 +5999,6 @@ export type QueryGetUserTokensArgs = {
 /** Root query type */
 export type QueryGetVoterRewardsArgs = {
   input?: InputMaybe<GetVoterRewardsInput>;
-};
-
-/** Root query type */
-export type QueryGetWatchedColoniesArgs = {
-  id: Scalars['ID'];
 };
 
 /** Root query type */
@@ -6373,13 +6263,6 @@ export type QueryListUserTokensArgs = {
 /** Root query type */
 export type QueryListUsersArgs = {
   filter?: InputMaybe<ModelUserFilterInput>;
-  limit?: InputMaybe<Scalars['Int']>;
-  nextToken?: InputMaybe<Scalars['String']>;
-};
-
-/** Root query type */
-export type QueryListWatchedColoniesArgs = {
-  filter?: InputMaybe<ModelWatchedColoniesFilterInput>;
   limit?: InputMaybe<Scalars['Int']>;
   nextToken?: InputMaybe<Scalars['String']>;
 };
@@ -6816,7 +6699,6 @@ export type Subscription = {
   onCreateUser?: Maybe<User>;
   onCreateUserStake?: Maybe<UserStake>;
   onCreateUserTokens?: Maybe<UserTokens>;
-  onCreateWatchedColonies?: Maybe<WatchedColonies>;
   onDeleteAnnotation?: Maybe<Annotation>;
   onDeleteColony?: Maybe<Colony>;
   onDeleteColonyAction?: Maybe<ColonyAction>;
@@ -6855,7 +6737,6 @@ export type Subscription = {
   onDeleteUser?: Maybe<User>;
   onDeleteUserStake?: Maybe<UserStake>;
   onDeleteUserTokens?: Maybe<UserTokens>;
-  onDeleteWatchedColonies?: Maybe<WatchedColonies>;
   onUpdateAnnotation?: Maybe<Annotation>;
   onUpdateColony?: Maybe<Colony>;
   onUpdateColonyAction?: Maybe<ColonyAction>;
@@ -6894,7 +6775,6 @@ export type Subscription = {
   onUpdateUser?: Maybe<User>;
   onUpdateUserStake?: Maybe<UserStake>;
   onUpdateUserTokens?: Maybe<UserTokens>;
-  onUpdateWatchedColonies?: Maybe<WatchedColonies>;
 };
 
 export type SubscriptionOnCreateAnnotationArgs = {
@@ -7049,10 +6929,6 @@ export type SubscriptionOnCreateUserTokensArgs = {
   filter?: InputMaybe<ModelSubscriptionUserTokensFilterInput>;
 };
 
-export type SubscriptionOnCreateWatchedColoniesArgs = {
-  filter?: InputMaybe<ModelSubscriptionWatchedColoniesFilterInput>;
-};
-
 export type SubscriptionOnDeleteAnnotationArgs = {
   filter?: InputMaybe<ModelSubscriptionAnnotationFilterInput>;
 };
@@ -7205,10 +7081,6 @@ export type SubscriptionOnDeleteUserTokensArgs = {
   filter?: InputMaybe<ModelSubscriptionUserTokensFilterInput>;
 };
 
-export type SubscriptionOnDeleteWatchedColoniesArgs = {
-  filter?: InputMaybe<ModelSubscriptionWatchedColoniesFilterInput>;
-};
-
 export type SubscriptionOnUpdateAnnotationArgs = {
   filter?: InputMaybe<ModelSubscriptionAnnotationFilterInput>;
 };
@@ -7359,10 +7231,6 @@ export type SubscriptionOnUpdateUserStakeArgs = {
 
 export type SubscriptionOnUpdateUserTokensArgs = {
   filter?: InputMaybe<ModelSubscriptionUserTokensFilterInput>;
-};
-
-export type SubscriptionOnUpdateWatchedColoniesArgs = {
-  filter?: InputMaybe<ModelSubscriptionWatchedColoniesFilterInput>;
 };
 
 /** Represents an ERC20-compatible token that is used by Colonies and users */
@@ -7688,6 +7556,7 @@ export type UpdateColonyMetadataInput = {
   changelog?: InputMaybe<Array<ColonyMetadataChangelogInput>>;
   description?: InputMaybe<Scalars['String']>;
   displayName?: InputMaybe<Scalars['String']>;
+  etherealData?: InputMaybe<ColonyMetadataEtherealDataInput>;
   externalLinks?: InputMaybe<Array<ExternalLinkInput>>;
   id: Scalars['ID'];
   isWhitelistActivated?: InputMaybe<Scalars['Boolean']>;
@@ -8012,12 +7881,6 @@ export type UpdateUserTokensInput = {
   userID?: InputMaybe<Scalars['ID']>;
 };
 
-export type UpdateWatchedColoniesInput = {
-  colonyID?: InputMaybe<Scalars['ID']>;
-  id: Scalars['ID'];
-  userID?: InputMaybe<Scalars['ID']>;
-};
-
 /** Represents a User within the Colony Network */
 export type User = {
   __typename?: 'User';
@@ -8036,7 +7899,6 @@ export type User = {
   transactionHistory?: Maybe<ModelTransactionConnection>;
   updatedAt: Scalars['AWSDateTime'];
   userPrivateBetaInviteCodeId?: Maybe<Scalars['ID']>;
-  watchlist?: Maybe<ModelWatchedColoniesConnection>;
 };
 
 /** Represents a User within the Colony Network */
@@ -8069,14 +7931,6 @@ export type UserTokensArgs = {
 export type UserTransactionHistoryArgs = {
   createdAt?: InputMaybe<ModelStringKeyConditionInput>;
   filter?: InputMaybe<ModelTransactionFilterInput>;
-  limit?: InputMaybe<Scalars['Int']>;
-  nextToken?: InputMaybe<Scalars['String']>;
-  sortDirection?: InputMaybe<ModelSortDirection>;
-};
-
-/** Represents a User within the Colony Network */
-export type UserWatchlistArgs = {
-  filter?: InputMaybe<ModelWatchedColoniesFilterInput>;
   limit?: InputMaybe<Scalars['Int']>;
   nextToken?: InputMaybe<Scalars['String']>;
   sortDirection?: InputMaybe<ModelSortDirection>;
@@ -8223,30 +8077,6 @@ export type VotingReputationParamsInput = {
   totalStakeFraction: Scalars['String'];
   userMinStakeFraction: Scalars['String'];
   voterRewardFraction: Scalars['String'];
-};
-
-export type WatchedColonies = {
-  __typename?: 'WatchedColonies';
-  colony: Colony;
-  colonyID: Scalars['ID'];
-  createdAt: Scalars['AWSDateTime'];
-  id: Scalars['ID'];
-  updatedAt: Scalars['AWSDateTime'];
-  user: User;
-  userID: Scalars['ID'];
-};
-
-/**
- * Represents a watcher within the Colony Network
- *
- * A watcher is a Colony member who doesn't have reputation or permissions
- */
-export type Watcher = {
-  __typename?: 'Watcher';
-  /** Wallet address of the watcher */
-  address: Scalars['String'];
-  /** User data associated with the watcher */
-  user?: Maybe<User>;
 };
 
 export type ColonyFragment = {
@@ -8463,6 +8293,15 @@ export type UpdateColonyMetadataMutationVariables = Exact<{
 export type UpdateColonyMetadataMutation = {
   __typename?: 'Mutation';
   updateColonyMetadata?: { __typename?: 'ColonyMetadata'; id: string } | null;
+};
+
+export type CreateUniqueColonyMutationVariables = Exact<{
+  input: CreateUniqueColonyInput;
+}>;
+
+export type CreateUniqueColonyMutation = {
+  __typename?: 'Mutation';
+  createUniqueColony?: { __typename?: 'Colony'; id: string } | null;
 };
 
 export type CreateColonyContributorMutationVariables = Exact<{
@@ -9730,6 +9569,13 @@ export const UpdateColonyDocument = gql`
 export const UpdateColonyMetadataDocument = gql`
   mutation UpdateColonyMetadata($input: UpdateColonyMetadataInput!) {
     updateColonyMetadata(input: $input) {
+      id
+    }
+  }
+`;
+export const CreateUniqueColonyDocument = gql`
+  mutation CreateUniqueColony($input: CreateUniqueColonyInput!) {
+    createUniqueColony(input: $input) {
       id
     }
   }
