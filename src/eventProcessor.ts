@@ -72,6 +72,8 @@ export default async (event: ContractEvent): Promise<void> => {
     );
   }
 
+  console.log(event.signature);
+
   switch (event.signature) {
     /*
      * New Colony Added
@@ -334,6 +336,14 @@ export default async (event: ContractEvent): Promise<void> => {
 
     case ContractEventsSignatures.ReputationMiningCycleComplete: {
       await handleReputationMiningCycleComplete(event);
+      return;
+    }
+
+    case ContractEventsSignatures.LogSetAuthority: {
+      console.log('------------------');
+      console.log('saw LogSetAuthority event');
+      console.log(event);
+      console.log('----------------->');
       return;
     }
 

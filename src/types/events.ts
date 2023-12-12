@@ -27,12 +27,15 @@ export interface ContractEvent extends LogDescription {
 export enum ContractEventsSignatures {
   UnknownEvent = 'UnknownEvent()',
   ColonyAdded = 'ColonyAdded(uint256,address,address)',
-  Transfer = 'Transfer(address,address,uint256)',
   ColonyFundsClaimed = 'ColonyFundsClaimed(address,address,uint256,uint256)',
   ColonyVersionAdded = 'ColonyVersionAdded(uint256,address)',
   ColonyUpgraded = 'ColonyUpgraded(address,uint256,uint256)',
   NetworkFeeInverseSet = 'NetworkFeeInverseSet(uint256)',
   FundingPotAdded = 'FundingPotAdded(uint256)',
+
+  // Tokens
+  Transfer = 'Transfer(address,address,uint256)',
+  LogSetAuthority = 'LogSetAuthority(address)',
 
   // Extensions
   ExtensionAddedToNetwork = 'ExtensionAddedToNetwork(bytes32,uint256)',

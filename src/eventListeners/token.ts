@@ -6,7 +6,7 @@ import { utils } from 'ethers';
 /**
  * @NOTE: Currently, token event listeners only support filtering on the recipient address
  */
-export const addTokenEventListener = (
+export const addTokenTransferEventListener = (
   eventSignature: ContractEventsSignatures,
   recipientAddress: string,
 ): void => {
@@ -14,5 +14,17 @@ export const addTokenEventListener = (
     type: EventListenerType.Token,
     eventSignature,
     topics: [utils.id(eventSignature), null, recipientAddress],
+  });
+};
+
+export const addTokenEventListener = (
+  eventSignature: ContractEventsSignatures,
+  address: string,
+): void => {
+  addEventListener({
+    type: EventListenerType.Token,
+    address,
+    eventSignature,
+    topics: [utils.id(eventSignature)],
   });
 };

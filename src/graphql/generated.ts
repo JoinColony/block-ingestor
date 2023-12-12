@@ -8838,7 +8838,11 @@ export type ListColoniesQuery = {
   listColonies?: {
     __typename?: 'ModelColonyConnection';
     nextToken?: string | null;
-    items: Array<{ __typename?: 'Colony'; id: string } | null>;
+    items: Array<{
+      __typename?: 'Colony';
+      id: string;
+      nativeTokenId: string;
+    } | null>;
   } | null;
 };
 
@@ -9947,6 +9951,7 @@ export const ListColoniesDocument = gql`
       nextToken
       items {
         id
+        nativeTokenId
       }
     }
   }

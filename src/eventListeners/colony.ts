@@ -11,6 +11,7 @@ import { notNull, output } from '~utils';
 import {
   addEventListener,
   addNetworkEventListener,
+  addTokenTransferEventListener,
   addTokenEventListener,
 } from '~eventListeners';
 
@@ -28,7 +29,12 @@ const addColonyEventListener = (
   });
 };
 
-const fetchColoniesAddresses = async (): Promise<string[]> => {
+const fetchColoniesAddresses = async (): Promise<
+  Array<{
+    colonyAddress: string;
+    tokenAddress: string;
+  }>
+> => {
   const colonies = [];
   let nextToken: string | undefined;
 
@@ -45,13 +51,16 @@ const fetchColoniesAddresses = async (): Promise<string[]> => {
     nextToken = data?.listColonies?.nextToken ?? '';
   } while (nextToken);
 
-  return colonies.filter(notNull).map((colony) => colony.id);
+  return colonies.filter(notNull).map((colony) => ({
+    colonyAddress: colony.id,
+    tokenAddress: colony.nativeTokenId,
+  }));
 };
 
 export const setupListenersForColonies = async (): Promise<void> => {
   const addresses = await fetchColoniesAddresses();
-  addresses.forEach((colonyAddress) => {
-    setupListenersForColony(colonyAddress);
+  addresses.forEach(({ colonyAddress, tokenAddress }) => {
+    setupListenersForColony(colonyAddress, tokenAddress);
   });
 
   addNetworkEventListener(ContractEventsSignatures.ColonyAdded);
@@ -60,7 +69,10 @@ export const setupListenersForColonies = async (): Promise<void> => {
   );
 };
 
-export const setupListenersForColony = (colonyAddress: string): void => {
+export const setupListenersForColony = (
+  colonyAddress: string,
+  tokenAddress: string,
+): void => {
   output(`Setting up listeners for colony ${colonyAddress}`);
 
   const colonyEvents = [
@@ -96,5 +108,23 @@ export const setupListenersForColony = (colonyAddress: string): void => {
     addColonyEventListener(eventSignature, colonyAddress),
   );
 
-  addTokenEventListener(ContractEventsSignatures.Transfer, colonyAddress);
+  const tokenEvents = [
+    ContractEventsSignatures.Transfer,
+    ContractEventsSignatures.LogSetAuthority,
+  ];
+
+  /*
+   * @TODO once there are more relevant events in this list, we should extract this
+   * listener separately and run it for each token we see within our network
+   *
+   * Currently it works as we only care about one specific event which only happens
+   * on colony creation (Transfer doesn't count as it's being handled differently)
+   */
+  tokenEvents.forEach((eventSignature) => {
+    // This needs to be handled individually because transfer events are frequent and heavy
+    if (eventSignature === ContractEventsSignatures.Transfer) {
+      return addTokenTransferEventListener(eventSignature, colonyAddress);
+    }
+    return addTokenEventListener(eventSignature, tokenAddress);
+  });
 };

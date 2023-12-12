@@ -38,8 +38,16 @@ interface OneTxPaymentEventListener extends BaseEventListener {
   colonyAddress: string;
 }
 
+// Special listener just for Token transfers
+// Due to the volume of these events, we can't process them in the same way
+// as the normal events
+interface TokenTransferEventListener extends BaseEventListener {
+  type: EventListenerType.Token;
+}
+
 interface TokenEventListener extends BaseEventListener {
   type: EventListenerType.Token;
+  address: string;
 }
 
 interface ExtensionEventListener extends BaseEventListener {
@@ -53,6 +61,7 @@ export type EventListener =
   | ColonyEventListener
   | NetworkEventListener
   | TokenEventListener
+  | TokenTransferEventListener
   | ExtensionEventListener
   | VotingReputationEventListener
   | OneTxPaymentEventListener;

@@ -123,5 +123,5 @@ export default async (event: ContractEvent): Promise<void> => {
   /*
    * Setup all Colony specific listeners for it
    */
-  setupListenersForColony(colonyAddress);
+  setupListenersForColony(colonyAddress, tokenAddress);
 };
