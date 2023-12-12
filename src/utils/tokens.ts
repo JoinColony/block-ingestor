@@ -14,6 +14,13 @@ import {
   GetTokenFromEverywhereQuery,
   GetTokenFromEverywhereQueryVariables,
   PendingModifiedTokenAddresses,
+  GetColonyByNativeTokenIdDocument,
+  GetColonyByNativeTokenIdQuery,
+  GetColonyByNativeTokenIdQueryVariables,
+  UpdateColonyDocument,
+  UpdateColonyMutation,
+  UpdateColonyMutationVariables,
+  NativeTokenStatus,
 } from '~graphql';
 
 export const getColonyTokenAddress = async (
@@ -91,5 +98,61 @@ export const updateColonyTokens = async (
         },
       });
     }
+  });
+};
+
+/*
+ * Update all colonies native token statuses based on all colonies
+ * that have the token address as their native token
+ */
+export const updateColoniesNativeTokenStatuses = async (
+  tokenAddress: string,
+  nativeTokenStatus: Omit<NativeTokenStatus, '__typename'>,
+): Promise<void> => {
+  const queryVariables: GetColonyByNativeTokenIdQueryVariables = {
+    nativeTokenId: tokenAddress,
+    limit: 1000,
+  };
+
+  const { data } =
+    (await query<
+      GetColonyByNativeTokenIdQuery,
+      GetColonyByNativeTokenIdQueryVariables
+    >(GetColonyByNativeTokenIdDocument, queryVariables)) ?? {};
+
+  const colonies =
+    data?.getColoniesByNativeTokenId?.items.filter(notNull) ?? [];
+  queryVariables.nextToken = data?.getColoniesByNativeTokenId?.nextToken;
+
+  while (queryVariables.nextToken) {
+    const { data: nextData } =
+      (await query<
+        GetColonyByNativeTokenIdQuery,
+        GetColonyByNativeTokenIdQueryVariables
+      >(GetColonyByNativeTokenIdDocument, queryVariables)) ?? {};
+
+    colonies.push(
+      ...(nextData?.getColoniesByNativeTokenId?.items.filter(notNull) ?? []),
+    );
+
+    queryVariables.nextToken = nextData?.getColoniesByNativeTokenId?.nextToken;
+  }
+
+  colonies.forEach(async (colony) => {
+    await mutate<UpdateColonyMutation, UpdateColonyMutationVariables>(
+      UpdateColonyDocument,
+      {
+        input: {
+          id: colony.id,
+          status: {
+            ...colony.status,
+            nativeToken: {
+              ...colony.status?.nativeToken,
+              ...nativeTokenStatus,
+            },
+          },
+        },
+      },
+    );
   });
 };
