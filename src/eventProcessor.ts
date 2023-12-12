@@ -50,6 +50,7 @@ import {
   handleStreamingPaymentCreated,
   handleExpenditureMadeViaStake,
   handlePaymentTokenUpdated,
+  handleSetTokenAuthority,
 } from './handlers';
 
 dotenv.config();
@@ -71,8 +72,6 @@ export default async (event: ContractEvent): Promise<void> => {
       'Event does not have a signature. Possibly bad event data. Refusing the process!',
     );
   }
-
-  console.log(event.signature);
 
   switch (event.signature) {
     /*
@@ -340,10 +339,7 @@ export default async (event: ContractEvent): Promise<void> => {
     }
 
     case ContractEventsSignatures.LogSetAuthority: {
-      console.log('------------------');
-      console.log('saw LogSetAuthority event');
-      console.log(event);
-      console.log('----------------->');
+      await handleSetTokenAuthority(event);
       return;
     }
 
