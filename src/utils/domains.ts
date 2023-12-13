@@ -1,10 +1,4 @@
-import {
-  AnyColonyClient,
-  ColonyClientV1,
-  ColonyClientV2,
-  ColonyClientV3,
-  ColonyClientV4,
-} from '@colony/colony-js';
+import { AnyColonyClient } from '@colony/colony-js';
 
 export const getDomainDatabaseId = (
   colonyAddress: string,
@@ -21,11 +15,8 @@ export const getPendingMetadataDatabaseId = (
  * available on ColonyClientV5 and above. The following type predicate allows to check
  * we're dealing with a client that supports this method.
  */
-type SupportedColonyClient = Exclude<
-  AnyColonyClient,
-  ColonyClientV1 | ColonyClientV2 | ColonyClientV3 | ColonyClientV4
->;
+type SupportedColonyClient = AnyColonyClient;
 export const isDomainFromFundingPotSupported = (
   colonyClient: AnyColonyClient,
 ): colonyClient is SupportedColonyClient =>
-  (colonyClient as SupportedColonyClient).getDomainFromFundingPot !== undefined;
+  colonyClient.getDomainFromFundingPot !== undefined;
