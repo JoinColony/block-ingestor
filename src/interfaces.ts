@@ -7,7 +7,7 @@ import {
   StagedExpenditureEvents__factory as StagedExpenditureEventsFactory,
   OneTxPaymentEvents__factory as OneTxPaymentEventsFactory,
   StreamingPaymentsEvents__factory as StreamingPaymentsEventsFactory,
-} from '@colony/colony-js/events';
+} from '@colony/events';
 import { Extension, getExtensionHash } from '@colony/colony-js';
 
 import networkClient from '~networkClient';
