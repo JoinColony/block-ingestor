@@ -105,7 +105,15 @@ export const updateColonyTokens = async (
 // Fetch all colonies that share the same native token
 export const fetchColoniesByNativeToken = async (
   tokenAddress: string,
-): Promise<Array<Pick<FullColony, 'id' | 'status'>>> => {
+): Promise<
+  Array<
+    NonNullable<
+      NonNullable<
+        GetColonyByNativeTokenIdQuery['getColoniesByNativeTokenId']
+      >['items'][number]
+    >
+  >
+> => {
   const queryVariables: GetColonyByNativeTokenIdQueryVariables = {
     nativeTokenId: tokenAddress,
     limit: 1000,
