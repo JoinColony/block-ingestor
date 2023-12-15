@@ -1,30 +1,26 @@
 import { ContractEventsSignatures } from '~types';
 import { addEventListener } from '~eventListeners';
-import { EventListenerType } from './types';
+import { EventListenerType, EventListener } from './types';
 import { utils } from 'ethers';
-
-/**
- * @NOTE: Currently, token event listeners only support filtering on the recipient address
- */
-export const addTokenTransferEventListener = (
-  eventSignature: ContractEventsSignatures,
-  recipientAddress: string,
-): void => {
-  addEventListener({
-    type: EventListenerType.Token,
-    eventSignature,
-    topics: [utils.id(eventSignature), null, recipientAddress],
-  });
-};
 
 export const addTokenEventListener = (
   eventSignature: ContractEventsSignatures,
-  address: string,
+  recipientAddress: string,
 ): void => {
-  addEventListener({
+  const tokenListener: EventListener = {
     type: EventListenerType.Token,
-    address,
     eventSignature,
+    address: recipientAddress,
     topics: [utils.id(eventSignature)],
-  });
+  };
+
+  if (eventSignature === ContractEventsSignatures.Transfer) {
+    /*
+     * Filter transfer events for the recipient address
+     */
+    tokenListener.topics.push(null, recipientAddress);
+    delete tokenListener.address;
+  }
+
+  return addEventListener(tokenListener);
 };

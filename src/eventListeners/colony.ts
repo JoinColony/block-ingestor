@@ -11,7 +11,6 @@ import { notNull, output } from '~utils';
 import {
   addEventListener,
   addNetworkEventListener,
-  addTokenTransferEventListener,
   addTokenEventListener,
 } from '~eventListeners';
 
@@ -108,23 +107,12 @@ export const setupListenersForColony = (
     addColonyEventListener(eventSignature, colonyAddress),
   );
 
-  const tokenEvents = [
-    ContractEventsSignatures.Transfer,
-    ContractEventsSignatures.LogSetAuthority,
-  ];
-
   /*
-   * @TODO once there are more relevant events in this list, we should extract this
-   * listener separately and run it for each token we see within our network
+   * @NOTE Setup both token event listners
    *
-   * Currently it works as we only care about one specific event which only happens
-   * on colony creation (Transfer doesn't count as it's being handled differently)
+   * Once we have more we might want to do a similar pattern like the above,
+   * as well as probably move them to their own setup function
    */
-  tokenEvents.forEach((eventSignature) => {
-    // This needs to be handled individually because transfer events are frequent and heavy
-    if (eventSignature === ContractEventsSignatures.Transfer) {
-      return addTokenTransferEventListener(eventSignature, colonyAddress);
-    }
-    return addTokenEventListener(eventSignature, tokenAddress);
-  });
+  addTokenEventListener(ContractEventsSignatures.Transfer, colonyAddress);
+  addTokenEventListener(ContractEventsSignatures.LogSetAuthority, tokenAddress);
 };
