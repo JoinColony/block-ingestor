@@ -170,8 +170,7 @@ export const updateColoniesNativeTokenStatuses = async (
 ): Promise<void> => {
   const colonies = await fetchColoniesByNativeToken(tokenAddress);
 
-  colonies.forEach(
-    async (colony) =>
-      await updateSingleColonyNativeTokenStatuses(colony, nativeTokenStatus),
-  );
+  for (const colony of colonies) {
+    await updateSingleColonyNativeTokenStatuses(colony, nativeTokenStatus);
+  }
 };

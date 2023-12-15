@@ -18,7 +18,7 @@ export default async (event: ContractEvent): Promise<void> => {
 
   const colonies = await fetchColoniesByNativeToken(contractAddress);
 
-  colonies.forEach(async (colony) => {
+  for (const colony of colonies) {
     const { id: colonyAddress } = colony;
     let unlockable = false;
     let mintable = false;
@@ -58,5 +58,5 @@ export default async (event: ContractEvent): Promise<void> => {
       unlockable,
       mintable,
     });
-  });
+  }
 };
