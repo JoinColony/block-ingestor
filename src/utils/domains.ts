@@ -15,8 +15,6 @@ export const getPendingMetadataDatabaseId = (
  * available on ColonyClientV5 and above. The following type predicate allows to check
  * we're dealing with a client that supports this method.
  */
-type SupportedColonyClient = AnyColonyClient;
 export const isDomainFromFundingPotSupported = (
   colonyClient: AnyColonyClient,
-): colonyClient is SupportedColonyClient =>
-  colonyClient.getDomainFromFundingPot !== undefined;
+): boolean => colonyClient.getDomainFromFundingPot !== undefined;
