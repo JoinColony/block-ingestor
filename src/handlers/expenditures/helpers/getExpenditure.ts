@@ -29,18 +29,13 @@ export const getExpenditureFromDB = async (
 /**
  * Utility checking if `getExpenditure` function exists on the given colony client
  */
-type GetExpenditureSupportedColonyClient = AnyColonyClient;
-const isGetExpenditureSupported = (
-  colonyClient: AnyColonyClient,
-): colonyClient is GetExpenditureSupportedColonyClient =>
+const isGetExpenditureSupported = (colonyClient: AnyColonyClient): boolean =>
   colonyClient.getExpenditure !== undefined;
 
 export const getExpenditure = async (
   colonyAddress: string,
   expenditureId: number,
-): Promise<ReturnType<
-  GetExpenditureSupportedColonyClient['getExpenditure']
-> | null> => {
+): Promise<ReturnType<AnyColonyClient['getExpenditure']> | null> => {
   const colonyClient = await getCachedColonyClient(colonyAddress);
   if (!colonyClient || !isGetExpenditureSupported(colonyClient)) {
     return null;
