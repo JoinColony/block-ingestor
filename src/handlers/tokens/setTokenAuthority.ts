@@ -8,14 +8,12 @@ import {
 } from '~utils';
 
 export default async (event: ContractEvent): Promise<void> => {
-  const { contractAddress, signature } = event;
+  const { contractAddress } = event;
 
   const client = await getCachedTokenClient(contractAddress);
 
   if (!client) {
-    throw new Error(
-      `Cannot get token client for ${contractAddress} when handling ${signature}`,
-    );
+    return;
   }
 
   const colonies = await fetchColoniesByNativeToken(contractAddress);
