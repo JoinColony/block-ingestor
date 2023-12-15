@@ -1,5 +1,5 @@
 import { ContractEventsSignatures } from '~types';
-import { addEventListener } from '~eventListeners';
+import { addEventListener, getEventListeners } from '~eventListeners';
 import { EventListenerType, EventListener } from './types';
 import { utils } from 'ethers';
 
@@ -7,6 +7,19 @@ export const addTokenEventListener = (
   eventSignature: ContractEventsSignatures,
   recipientAddress: string,
 ): void => {
+  /*
+   * @NOTE This only applies to contract listeners
+   *
+   * Ie: any listener that has and address property.
+   * As a general rule, this will only *NOT* apply to the token Transfer event
+   * as that's the only one treated differently.
+   */
+  const listenerExists = getEventListeners().some(
+    (listener) =>
+      listener.type === EventListenerType.Token &&
+      listener.address === recipientAddress,
+  );
+
   const tokenListener: EventListener = {
     type: EventListenerType.Token,
     eventSignature,
@@ -22,5 +35,7 @@ export const addTokenEventListener = (
     delete tokenListener.address;
   }
 
-  return addEventListener(tokenListener);
+  if (!listenerExists) {
+    return addEventListener(tokenListener);
+  }
 };
