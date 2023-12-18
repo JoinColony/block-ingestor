@@ -113,6 +113,10 @@ export const setupListenersForColony = (
    * Once we have more we might want to do a similar pattern like the above,
    * as well as probably move them to their own setup function
    */
-  addTokenEventListener(ContractEventsSignatures.Transfer, colonyAddress);
+  addTokenEventListener(
+    ContractEventsSignatures.Transfer,
+    undefined,
+    colonyAddress,
+  );
   addTokenEventListener(ContractEventsSignatures.LogSetAuthority, tokenAddress);
 };

@@ -5,7 +5,8 @@ import { utils } from 'ethers';
 
 export const addTokenEventListener = (
   eventSignature: ContractEventsSignatures,
-  recipientAddress: string,
+  tokenAddress?: string,
+  recipientAddress?: string,
 ): void => {
   /*
    * @NOTE This only applies to contract listeners
@@ -17,17 +18,21 @@ export const addTokenEventListener = (
   const listenerExists = getEventListeners().some(
     (listener) =>
       listener.type === EventListenerType.Token &&
-      listener.address === recipientAddress,
+      listener.address === tokenAddress,
   );
+
+  if (listenerExists) {
+    return;
+  }
 
   const tokenListener: EventListener = {
     type: EventListenerType.Token,
     eventSignature,
-    address: recipientAddress,
+    address: tokenAddress,
     topics: [utils.id(eventSignature)],
   };
 
-  if (eventSignature === ContractEventsSignatures.Transfer) {
+  if (recipientAddress) {
     /*
      * Filter transfer events for the recipient address
      */
@@ -35,7 +40,5 @@ export const addTokenEventListener = (
     delete tokenListener.address;
   }
 
-  if (!listenerExists) {
-    return addEventListener(tokenListener);
-  }
+  return addEventListener(tokenListener);
 };
