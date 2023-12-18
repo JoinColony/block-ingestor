@@ -1,3 +1,5 @@
+import 'cross-fetch/polyfill';
+
 import dotenv from 'dotenv';
 import { utils } from 'ethers';
 

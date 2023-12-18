@@ -11,6 +11,7 @@ export * from './voting';
 export * from './stakedExpenditure';
 export * from './streamingPayments';
 export * from './oneTxPayment';
+export * from './token';
 
 /**
  * Function returning a (hopefully) cached client for the given type and colony address

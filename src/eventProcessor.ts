@@ -50,6 +50,7 @@ import {
   handleStreamingPaymentCreated,
   handleExpenditureMadeViaStake,
   handlePaymentTokenUpdated,
+  handleSetTokenAuthority,
 } from './handlers';
 
 dotenv.config();
@@ -329,10 +330,16 @@ export default async (event: ContractEvent): Promise<void> => {
 
     case ContractEventsSignatures.ArbitraryTransaction: {
       await handleMakeAbitraryTransactionAction(event);
+      return;
     }
 
     case ContractEventsSignatures.ReputationMiningCycleComplete: {
       await handleReputationMiningCycleComplete(event);
+      return;
+    }
+
+    case ContractEventsSignatures.LogSetAuthority: {
+      await handleSetTokenAuthority(event);
       return;
     }
 

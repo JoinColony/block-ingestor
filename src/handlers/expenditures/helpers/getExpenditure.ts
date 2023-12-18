@@ -1,9 +1,4 @@
-import {
-  AnyColonyClient,
-  ColonyClientV1,
-  ColonyClientV2,
-  ColonyClientV3,
-} from '@colony/colony-js';
+import { AnyColonyClient } from '@colony/colony-js';
 
 import { query } from '~amplifyClient';
 import {
@@ -34,22 +29,13 @@ export const getExpenditureFromDB = async (
 /**
  * Utility checking if `getExpenditure` function exists on the given colony client
  */
-type GetExpenditureSupportedColonyClient = Exclude<
-  AnyColonyClient,
-  ColonyClientV1 | ColonyClientV2 | ColonyClientV3
->;
-const isGetExpenditureSupported = (
-  colonyClient: AnyColonyClient,
-): colonyClient is GetExpenditureSupportedColonyClient =>
-  (colonyClient as GetExpenditureSupportedColonyClient).getExpenditure !==
-  undefined;
+const isGetExpenditureSupported = (colonyClient: AnyColonyClient): boolean =>
+  colonyClient.getExpenditure !== undefined;
 
 export const getExpenditure = async (
   colonyAddress: string,
   expenditureId: number,
-): Promise<ReturnType<
-  GetExpenditureSupportedColonyClient['getExpenditure']
-> | null> => {
+): Promise<ReturnType<AnyColonyClient['getExpenditure']> | null> => {
   const colonyClient = await getCachedColonyClient(colonyAddress);
   if (!colonyClient || !isGetExpenditureSupported(colonyClient)) {
     return null;

@@ -14,7 +14,15 @@ import {
   GetTokenFromEverywhereQuery,
   GetTokenFromEverywhereQueryVariables,
   PendingModifiedTokenAddresses,
+  GetColonyByNativeTokenIdDocument,
+  GetColonyByNativeTokenIdQuery,
+  GetColonyByNativeTokenIdQueryVariables,
+  UpdateColonyDocument,
+  UpdateColonyMutation,
+  UpdateColonyMutationVariables,
+  NativeTokenStatus,
 } from '~graphql';
+import { Colony as FullColony } from '~graphql/generated';
 
 export const getColonyTokenAddress = async (
   colonyAddress: string,
@@ -92,4 +100,85 @@ export const updateColonyTokens = async (
       });
     }
   });
+};
+
+// Fetch all colonies that share the same native token
+export const fetchColoniesByNativeToken = async (
+  tokenAddress: string,
+): Promise<
+  Array<
+    NonNullable<
+      NonNullable<
+        GetColonyByNativeTokenIdQuery['getColoniesByNativeTokenId']
+      >['items'][number]
+    >
+  >
+> => {
+  const queryVariables: GetColonyByNativeTokenIdQueryVariables = {
+    nativeTokenId: tokenAddress,
+    limit: 1000,
+  };
+
+  const { data } =
+    (await query<
+      GetColonyByNativeTokenIdQuery,
+      GetColonyByNativeTokenIdQueryVariables
+    >(GetColonyByNativeTokenIdDocument, queryVariables)) ?? {};
+
+  const colonies =
+    data?.getColoniesByNativeTokenId?.items.filter(notNull) ?? [];
+  queryVariables.nextToken = data?.getColoniesByNativeTokenId?.nextToken;
+
+  while (queryVariables.nextToken) {
+    const { data: nextData } =
+      (await query<
+        GetColonyByNativeTokenIdQuery,
+        GetColonyByNativeTokenIdQueryVariables
+      >(GetColonyByNativeTokenIdDocument, queryVariables)) ?? {};
+
+    colonies.push(
+      ...(nextData?.getColoniesByNativeTokenId?.items.filter(notNull) ?? []),
+    );
+
+    queryVariables.nextToken = nextData?.getColoniesByNativeTokenId?.nextToken;
+  }
+
+  return colonies;
+};
+
+// Update a colony's native token status
+export const updateSingleColonyNativeTokenStatuses = async (
+  colony: Pick<FullColony, 'id' | 'status'>,
+  nativeTokenStatus: Omit<NativeTokenStatus, '__typename'>,
+): Promise<void> => {
+  await mutate<UpdateColonyMutation, UpdateColonyMutationVariables>(
+    UpdateColonyDocument,
+    {
+      input: {
+        id: colony.id,
+        status: {
+          ...colony.status,
+          nativeToken: {
+            ...colony.status?.nativeToken,
+            ...nativeTokenStatus,
+          },
+        },
+      },
+    },
+  );
+};
+
+/*
+ * Update all colonies native token statuses based on all colonies
+ * that have the token address as their native token
+ */
+export const updateColoniesNativeTokenStatuses = async (
+  tokenAddress: string,
+  nativeTokenStatus: Omit<NativeTokenStatus, '__typename'>,
+): Promise<void> => {
+  const colonies = await fetchColoniesByNativeToken(tokenAddress);
+
+  for (const colony of colonies) {
+    await updateSingleColonyNativeTokenStatuses(colony, nativeTokenStatus);
+  }
 };

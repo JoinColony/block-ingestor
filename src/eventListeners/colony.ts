@@ -28,7 +28,12 @@ const addColonyEventListener = (
   });
 };
 
-const fetchColoniesAddresses = async (): Promise<string[]> => {
+const fetchColoniesAddresses = async (): Promise<
+  Array<{
+    colonyAddress: string;
+    tokenAddress: string;
+  }>
+> => {
   const colonies = [];
   let nextToken: string | undefined;
 
@@ -45,13 +50,16 @@ const fetchColoniesAddresses = async (): Promise<string[]> => {
     nextToken = data?.listColonies?.nextToken ?? '';
   } while (nextToken);
 
-  return colonies.filter(notNull).map((colony) => colony.id);
+  return colonies.filter(notNull).map((colony) => ({
+    colonyAddress: colony.id,
+    tokenAddress: colony.nativeTokenId,
+  }));
 };
 
 export const setupListenersForColonies = async (): Promise<void> => {
   const addresses = await fetchColoniesAddresses();
-  addresses.forEach((colonyAddress) => {
-    setupListenersForColony(colonyAddress);
+  addresses.forEach(({ colonyAddress, tokenAddress }) => {
+    setupListenersForColony(colonyAddress, tokenAddress);
   });
 
   addNetworkEventListener(ContractEventsSignatures.ColonyAdded);
@@ -60,7 +68,10 @@ export const setupListenersForColonies = async (): Promise<void> => {
   );
 };
 
-export const setupListenersForColony = (colonyAddress: string): void => {
+export const setupListenersForColony = (
+  colonyAddress: string,
+  tokenAddress: string,
+): void => {
   output(`Setting up listeners for colony ${colonyAddress}`);
 
   const colonyEvents = [
@@ -96,5 +107,16 @@ export const setupListenersForColony = (colonyAddress: string): void => {
     addColonyEventListener(eventSignature, colonyAddress),
   );
 
-  addTokenEventListener(ContractEventsSignatures.Transfer, colonyAddress);
+  /*
+   * @NOTE Setup both token event listners
+   *
+   * Once we have more we might want to do a similar pattern like the above,
+   * as well as probably move them to their own setup function
+   */
+  addTokenEventListener(
+    ContractEventsSignatures.Transfer,
+    undefined,
+    colonyAddress,
+  );
+  addTokenEventListener(ContractEventsSignatures.LogSetAuthority, tokenAddress);
 };

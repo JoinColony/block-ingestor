@@ -158,7 +158,6 @@ const handlerV1ToV5 = async (
       paymentId: toNumber(paymentOrExpenditureId),
     });
   } else {
-    // @ts-expect-error
     const expenditure: Expenditure = await colonyClient.getExpenditure(
       paymentOrExpenditureId,
     );
@@ -177,7 +176,6 @@ const handlerV1ToV5 = async (
       expenditurePayoutEvents.filter(notNull).map(async ({ args }) => {
         const [, expenditureId, slotId, tokenAddress, amount] = args;
         const expenditureSlot: ExpenditureSlot =
-          // @ts-expect-error
           await colonyClient.getExpenditureSlot(expenditureId, slotId);
 
         const amountLessFee = getAmountLessFee(amount, networkFee);
@@ -216,7 +214,6 @@ const handlerV6 = async (
   const receipt = await provider.getTransactionReceipt(event.transactionHash);
 
   // multiple OneTxPayments use expenditures at the contract level
-  // @ts-expect-error
   const expenditure: Expenditure = await colonyClient.getExpenditure(
     expenditureId,
   );
@@ -235,7 +232,6 @@ const handlerV6 = async (
     expenditurePayoutEvents.filter(notNull).map(async ({ args }) => {
       const [, expenditureId, slotId, tokenAddress, amount] = args;
       const expenditureSlot: ExpenditureSlot =
-        // @ts-expect-error
         await colonyClient.getExpenditureSlot(expenditureId, slotId);
 
       const amountLessFee = getAmountLessFee(amount, networkFee);
