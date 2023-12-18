@@ -25,6 +25,24 @@ import { tryFetchGraphqlQuery } from '~utils/graphql';
 export default async (event: ContractEvent): Promise<void> => {
   const { transactionHash, args } = event;
   const { colonyAddress, token: tokenAddress } = args ?? {};
+
+  /*
+   * Determine if the colony metadata was created from the client side
+   * by trying to fetch/refetch it up to a number of 3 blocks
+   */
+  const colonyMetadata = await tryFetchGraphqlQuery(GetColonyMetadataDocument, {
+    id: `etherealcolonymetadata-${transactionHash}`,
+  });
+
+  /**
+   * If colony metadata doesn't exist, log it and do not create anything in the DB
+   * In dev, this will be the case for Metacolony
+   */
+  if (!colonyMetadata?.getColonyMetadata) {
+    output(`Could not find metadata for colony ${colonyAddress}. Skipping...`);
+    return;
+  }
+
   /*
    * Add it to the Set
    */
@@ -90,35 +108,25 @@ export default async (event: ContractEvent): Promise<void> => {
   });
 
   /*
-   * Determine if the colony metadata was created from the client side
-   * by trying to fetch/refetch it up to a number of 3 blocks
+   * Create the colony entry in the database
+   *
+   * @TODO Move the logic from create unique colony in here, that way we can
+   * more granularly control the creation of the colony
+   *
+   * We can also do cool stuff like if there's an error creating the colony,
+   * tell the ingestor to stop watching it
    */
-  const colonyMetadata = await tryFetchGraphqlQuery(GetColonyMetadataDocument, {
-    id: `etherealcolonymetadata-${transactionHash}`,
-  });
-
-  if (colonyMetadata?.getColonyMetadata) {
-    /*
-     * Create the colony entry in the database
-     *
-     * @TODO Move the logic from create unique colony in here, that way we can
-     * more granularly control the creation of the colony
-     *
-     * We can also do cool stuff like if there's an error creating the colony,
-     * tell the ingestor to stop watching it
-     */
-    await mutate<
-      CreateUniqueColonyMutation,
-      CreateUniqueColonyMutationVariables
-    >(CreateUniqueColonyDocument, {
+  await mutate<CreateUniqueColonyMutation, CreateUniqueColonyMutationVariables>(
+    CreateUniqueColonyDocument,
+    {
       input: {
         colonyAddress: utils.getAddress(colonyAddress),
         tokenAddress: utils.getAddress(tokenAddress),
         transactionHash,
         initiatorAddress: utils.getAddress(colonyFounderAddress),
       },
-    });
-  }
+    },
+  );
 
   /*
    * Setup all Colony specific listeners for it
