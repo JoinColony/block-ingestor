@@ -1,4 +1,5 @@
 import { BigNumber, constants } from 'ethers';
+import { JsonRpcProvider } from '@ethersproject/providers';
 
 import { ColonyOperations, ContractEvent } from '~types';
 import {
@@ -30,6 +31,7 @@ export default async (event: ContractEvent): Promise<void> => {
   const {
     args: { motionId },
     colonyAddress,
+    blockNumber,
   } = event;
 
   if (!colonyAddress) {
@@ -49,7 +51,9 @@ export default async (event: ContractEvent): Promise<void> => {
     colonyAddress,
   );
 
-  const motion = await votingReputationClient.getMotion(motionId);
+  const motion = await votingReputationClient.getMotion(motionId, {
+    blockTag: blockNumber,
+  });
   const parsedAction = parseAction(motion.action, [
     colonyClient,
     oneTxPaymentClient,
@@ -58,25 +62,30 @@ export default async (event: ContractEvent): Promise<void> => {
 
   let gasEstimate: BigNumber;
 
-  const estimateMotionGas = async (): Promise<BigNumber> =>
-    await colonyClient.provider.estimateGas({
-      from: votingReputationClient.address,
-      to:
-        /*
-         * If the motion target is 0x000... then we pass in the colony's address
-         */
-        motion.altTarget === constants.AddressZero
-          ? colonyClient.address
-          : motion.altTarget,
-      data: motion.action,
-    });
+  const estimateMotionGas = async (): Promise<string> =>
+    await (colonyClient.provider as JsonRpcProvider).send('eth_estimateGas', [
+      {
+        from: votingReputationClient.address,
+        to:
+          /*
+           * If the motion target is 0x000... then we pass in the colony's address
+           */
+          motion.altTarget === constants.AddressZero
+            ? colonyClient.address
+            : motion.altTarget,
+        data: motion.action,
+      },
+      blockNumber,
+    ]);
 
   try {
-    gasEstimate = await estimateMotionGas();
+    const estimatedGasHexString = await estimateMotionGas();
+    gasEstimate = BigNumber.from(estimatedGasHexString);
   } catch {
     // Sometimes the call to estimate gas fails. Let's try one more time...
     try {
-      gasEstimate = await estimateMotionGas();
+      const estimatedGasHexString = await estimateMotionGas();
+      gasEstimate = BigNumber.from(estimatedGasHexString);
     } catch {
       const manualEstimate = 500_000;
       // If it fails again, let's just set it manually.

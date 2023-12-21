@@ -10,7 +10,7 @@ import {
 } from '~utils';
 
 export default async (event: ContractEvent): Promise<void> => {
-  const { contractAddress: colonyAddress } = event;
+  const { contractAddress: colonyAddress, blockNumber } = event;
   const { agent: initiatorAddress } = event.args;
 
   const colonyClient = await getCachedColonyClient(colonyAddress);
@@ -19,7 +19,7 @@ export default async (event: ContractEvent): Promise<void> => {
     return;
   }
 
-  const tokenAddress = await colonyClient.getToken();
+  const tokenAddress = await colonyClient.getToken({ blockTag: blockNumber });
 
   // update all colonies that have this token as their native token
   await updateColoniesNativeTokenStatuses(tokenAddress, { unlocked: true });

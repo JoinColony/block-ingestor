@@ -16,7 +16,7 @@ export const handleMoveFundsMotion = async (
   parsedAction: TransactionDescription,
   gasEstimate: BigNumber,
 ): Promise<void> => {
-  const { colonyAddress } = event;
+  const { colonyAddress, blockNumber } = event;
 
   if (!colonyAddress) {
     return;
@@ -30,7 +30,7 @@ export const handleMoveFundsMotion = async (
     return;
   }
 
-  const colonyVersion = await colonyClient.version();
+  const colonyVersion = await colonyClient.version({ blockTag: blockNumber });
 
   // There are two moveFundsBetweenPots actions, one pre colony version 7 and one post.
   let fromPot: BigNumber,
@@ -49,8 +49,12 @@ export const handleMoveFundsMotion = async (
   let toDomainId: BigNumber | undefined;
 
   if (isDomainFromFundingPotSupported(colonyClient)) {
-    fromDomainId = await colonyClient.getDomainFromFundingPot(fromPot);
-    toDomainId = await colonyClient.getDomainFromFundingPot(toPot);
+    fromDomainId = await colonyClient.getDomainFromFundingPot(fromPot, {
+      blockTag: blockNumber,
+    });
+    toDomainId = await colonyClient.getDomainFromFundingPot(toPot, {
+      blockTag: blockNumber,
+    });
   }
 
   await createMotionInDB(event, {

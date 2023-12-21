@@ -14,7 +14,7 @@ import {
 } from '~utils';
 
 export default async (event: ContractEvent): Promise<void> => {
-  const { contractAddress: colonyAddress } = event;
+  const { contractAddress: colonyAddress, blockNumber } = event;
   const { domainId, agent: initiatorAddress } = event.args;
   const nativeDomainId = toNumber(domainId);
   const databaseDomainId = getDomainDatabaseId(colonyAddress, nativeDomainId);
@@ -25,7 +25,9 @@ export default async (event: ContractEvent): Promise<void> => {
     return;
   }
 
-  const [skillId, fundingPotId] = await colonyClient.getDomain(nativeDomainId);
+  const [skillId, fundingPotId] = await colonyClient.getDomain(nativeDomainId, {
+    blockTag: blockNumber,
+  });
 
   await mutate<CreateDomainMutation, CreateDomainMutationVariables>(
     CreateDomainDocument,

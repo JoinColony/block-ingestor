@@ -25,7 +25,7 @@ export default async (event: ContractEvent): Promise<void> => {
     return;
   }
 
-  const { contractAddress: colonyAddress } = event;
+  const { contractAddress: colonyAddress, blockNumber } = event;
   const {
     agent: initiatorAddress,
     token: tokenAddress,
@@ -43,8 +43,12 @@ export default async (event: ContractEvent): Promise<void> => {
   }
 
   if (isDomainFromFundingPotSupported(colonyClient)) {
-    fromDomainId = await colonyClient.getDomainFromFundingPot(fromPot);
-    toDomainId = await colonyClient.getDomainFromFundingPot(toPot);
+    fromDomainId = await colonyClient.getDomainFromFundingPot(fromPot, {
+      blockTag: blockNumber,
+    });
+    toDomainId = await colonyClient.getDomainFromFundingPot(toPot, {
+      blockTag: blockNumber,
+    });
   }
 
   await writeActionFromEvent(event, colonyAddress, {
