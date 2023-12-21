@@ -10,7 +10,6 @@ import {
 import { getStreamingPaymentFromDB } from './helpers';
 
 export default async (event: ContractEvent): Promise<void> => {
-  console.log(event);
   const { colonyAddress } = event;
   const { streamingPaymentId, token: tokenAddress, amount } = event.args;
   const convertedNativeId = toNumber(streamingPaymentId);

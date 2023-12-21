@@ -8,7 +8,7 @@ import {
 } from '~utils';
 
 export default async (event: ContractEvent): Promise<void> => {
-  const { contractAddress } = event;
+  const { contractAddress, blockNumber } = event;
 
   const client = await getCachedTokenClient(contractAddress);
 
@@ -29,14 +29,28 @@ export default async (event: ContractEvent): Promise<void> => {
       client.tokenClientType === TokenClientType.ColonyLegacy
     ) {
       try {
-        await client.estimateGas.unlock({ from: colonyAddress });
+        await client.provider.call(
+          {
+            from: colonyAddress,
+            to: client.address,
+            data: client.interface.encodeFunctionData('unlock()'),
+          },
+          blockNumber,
+        );
         unlockable = true;
       } catch (error) {
         // silent
       }
 
       try {
-        await client.estimateGas['mint(uint256)'](1, { from: colonyAddress });
+        await client.provider.call(
+          {
+            from: colonyAddress,
+            to: client.address,
+            data: client.interface.encodeFunctionData('mint(uint256)', [1]),
+          },
+          blockNumber,
+        );
         mintable = true;
       } catch (error) {
         // silent

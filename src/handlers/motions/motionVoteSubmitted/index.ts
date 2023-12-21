@@ -11,6 +11,7 @@ export default async (event: ContractEvent): Promise<void> => {
   const {
     colonyAddress,
     args: { motionId, voter },
+    blockNumber,
   } = event;
 
   if (!colonyAddress) {
@@ -23,7 +24,9 @@ export default async (event: ContractEvent): Promise<void> => {
     return;
   }
 
-  const { repSubmitted } = await votingClient.getMotion(motionId);
+  const { repSubmitted } = await votingClient.getMotion(motionId, {
+    blockTag: blockNumber,
+  });
   const { chainId } = await votingClient.provider.getNetwork();
   const motionDatabaseId = getMotionDatabaseId(
     chainId,

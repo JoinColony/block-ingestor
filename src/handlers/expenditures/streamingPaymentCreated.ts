@@ -13,7 +13,7 @@ import {
 } from '~utils';
 
 export default async (event: ContractEvent): Promise<void> => {
-  const { colonyAddress } = event;
+  const { colonyAddress, blockNumber } = event;
   const { streamingPaymentId } = event.args;
   const convertedNativeId = toNumber(streamingPaymentId);
 
@@ -30,6 +30,7 @@ export default async (event: ContractEvent): Promise<void> => {
 
   const streamingPayment = await streamingPaymentsClient.getStreamingPayment(
     streamingPaymentId,
+    { blockTag: blockNumber },
   );
   if (!streamingPayment) {
     return;
