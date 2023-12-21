@@ -18,6 +18,7 @@ export const addTokenEventListener = (
   const listenerExists = getEventListeners().some(
     (listener) =>
       listener.type === EventListenerType.Token &&
+      listener.eventSignature === eventSignature &&
       listener.address === tokenAddress,
   );
 
