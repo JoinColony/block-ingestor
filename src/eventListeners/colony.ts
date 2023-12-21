@@ -119,4 +119,5 @@ export const setupListenersForColony = (
     colonyAddress,
   );
   addTokenEventListener(ContractEventsSignatures.LogSetAuthority, tokenAddress);
+  addTokenEventListener(ContractEventsSignatures.LogSetOwner, tokenAddress);
 };

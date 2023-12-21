@@ -36,6 +36,7 @@ export enum ContractEventsSignatures {
   // Tokens
   Transfer = 'Transfer(address,address,uint256)',
   LogSetAuthority = 'LogSetAuthority(address)',
+  LogSetOwner = 'LogSetOwner(address)',
 
   // Extensions
   ExtensionAddedToNetwork = 'ExtensionAddedToNetwork(bytes32,uint256)',

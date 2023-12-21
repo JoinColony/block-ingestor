@@ -343,6 +343,12 @@ export default async (event: ContractEvent): Promise<void> => {
       return;
     }
 
+    case ContractEventsSignatures.LogSetOwner: {
+      // We have to execute exactly the same logic as for LogSetAuthority
+      await handleSetTokenAuthority(event);
+      return;
+    }
+
     default: {
       return;
     }
