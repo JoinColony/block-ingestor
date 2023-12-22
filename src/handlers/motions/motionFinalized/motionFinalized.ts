@@ -24,6 +24,7 @@ export default async (event: ContractEvent): Promise<void> => {
     transactionHash,
     args: { motionId, action },
     blockNumber,
+    timestamp,
   } = event;
 
   if (!colonyAddress) {
@@ -88,6 +89,10 @@ export default async (event: ContractEvent): Promise<void> => {
       ...finalizedMotion,
       stakerRewards: updatedStakerRewards,
       isFinalized: true,
+      motionStateHistory: {
+        ...finalizedMotion.motionStateHistory,
+        finalizedAt: new Date(timestamp * 1000).toISOString(),
+      },
     };
 
     await updateMotionInDB(updatedMotionData, newMotionMessages);
