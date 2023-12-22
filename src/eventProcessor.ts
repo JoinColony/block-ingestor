@@ -51,6 +51,7 @@ import {
   handleExpenditureMadeViaStake,
   handlePaymentTokenUpdated,
   handleSetTokenAuthority,
+  handleMotionEventSet,
 } from './handlers';
 
 dotenv.config();
@@ -170,6 +171,11 @@ export default async (event: ContractEvent): Promise<void> => {
 
     case ContractEventsSignatures.MotionVoteRevealed: {
       await handleMotionVoteRevealed(event);
+      return;
+    }
+
+    case ContractEventsSignatures.MotionEventSet: {
+      await handleMotionEventSet(event);
       return;
     }
 

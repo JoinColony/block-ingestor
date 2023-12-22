@@ -4268,6 +4268,9 @@ export type MotionStakesInput = {
 /** Quick access flages to check the current state of a motion in its lifecycle */
 export type MotionStateHistory = {
   __typename?: 'MotionStateHistory';
+  allVotesRevealedAt: Scalars['AWSDateTime'];
+  allVotesSubmittedAt: Scalars['AWSDateTime'];
+  finalizedAt: Scalars['AWSDateTime'];
   /** Whether the motion has failed */
   hasFailed: Scalars['Boolean'];
   /** Whether the motion has failed and cannot be finalized (e.g. if it doesn't get staked) */
@@ -4278,14 +4281,15 @@ export type MotionStateHistory = {
   hasVoted: Scalars['Boolean'];
   /** Motion is in reveal phase (votes are being revealed) */
   inRevealPhase: Scalars['Boolean'];
-  /** Timestamp of when the NAY side was fully staked */
-  naySideFullyStakedAt?: Maybe<Scalars['AWSDateTime']>;
-  /** Timestamp of when the YAY side was fully staked */
-  yaySideFullyStakedAt?: Maybe<Scalars['AWSDateTime']>;
+  naySideFullyStakedAt: Scalars['AWSDateTime'];
+  yaySideFullyStakedAt: Scalars['AWSDateTime'];
 };
 
 /** Input used to change the current state of a motion */
 export type MotionStateHistoryInput = {
+  allVotesRevealedAt: Scalars['AWSDateTime'];
+  allVotesSubmittedAt: Scalars['AWSDateTime'];
+  finalizedAt: Scalars['AWSDateTime'];
   /** Whether the motion has failed */
   hasFailed: Scalars['Boolean'];
   /** Whether the motion has failed and cannot be finalized (e.g. if it doesn't get staked) */
@@ -4296,10 +4300,8 @@ export type MotionStateHistoryInput = {
   hasVoted: Scalars['Boolean'];
   /** Motion is in reveal phase (votes are being revealed) */
   inRevealPhase: Scalars['Boolean'];
-  /** Timestamp of when the NAY side was fully staked */
-  naySideFullyStakedAt?: InputMaybe<Scalars['AWSDateTime']>;
-  /** Timestamp of when the YAY side was fully staked */
-  yaySideFullyStakedAt?: InputMaybe<Scalars['AWSDateTime']>;
+  naySideFullyStakedAt: Scalars['AWSDateTime'];
+  yaySideFullyStakedAt: Scalars['AWSDateTime'];
 };
 
 /** Root mutation type */
@@ -8241,8 +8243,8 @@ export type ColonyMotionFragment = {
     hasFailed: boolean;
     hasFailedNotFinalizable: boolean;
     inRevealPhase: boolean;
-    yaySideFullyStakedAt?: string | null;
-    naySideFullyStakedAt?: string | null;
+    yaySideFullyStakedAt: string;
+    naySideFullyStakedAt: string;
   };
 };
 
@@ -9291,8 +9293,8 @@ export type GetColonyMotionQuery = {
       hasFailed: boolean;
       hasFailedNotFinalizable: boolean;
       inRevealPhase: boolean;
-      yaySideFullyStakedAt?: string | null;
-      naySideFullyStakedAt?: string | null;
+      yaySideFullyStakedAt: string;
+      naySideFullyStakedAt: string;
     };
   } | null;
 };
