@@ -12,7 +12,6 @@ export default async (event: ContractEvent): Promise<void> => {
     colonyAddress,
     args: { motionId, voter, vote },
     blockNumber,
-    timestamp,
   } = event;
 
   if (!colonyAddress) {
@@ -67,13 +66,6 @@ export default async (event: ContractEvent): Promise<void> => {
           [MotionSide.NAY]: nayVotePercentage.toString(),
           [MotionSide.YAY]: yayVotePercentage.toString(),
         },
-      },
-      motionStateHistory: {
-        ...revealedMotion.motionStateHistory,
-        allVotesRevealedAt:
-          nayVotePercentage.eq(100) && yayVotePercentage.eq(100)
-            ? new Date(timestamp * 1000).toISOString()
-            : null,
       },
     });
 
