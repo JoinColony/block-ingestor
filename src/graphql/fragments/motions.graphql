@@ -42,6 +42,8 @@ fragment ColonyMotion on ColonyMotion {
     inRevealPhase
     yaySideFullyStakedAt
     naySideFullyStakedAt
+    allVotesRevealedAt
+    finalizedAt
   }
   isDecision
   transactionHash
