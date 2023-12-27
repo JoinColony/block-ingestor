@@ -4270,6 +4270,11 @@ export type MotionStateHistory = {
   __typename?: 'MotionStateHistory';
   /** Whether the motion is a Simple Decision */
   allVotesRevealedAt?: Maybe<Scalars['AWSDateTime']>;
+  /**
+   * "
+   * Whether the motion is a Simple Decision
+   */
+  allVotesSubmittedAt?: Maybe<Scalars['AWSDateTime']>;
   /** Whether the motion is a Simple Decision */
   finalizedAt?: Maybe<Scalars['AWSDateTime']>;
   /** Whether the motion has failed */
@@ -4292,6 +4297,11 @@ export type MotionStateHistory = {
 export type MotionStateHistoryInput = {
   /** Whether the motion is a Simple Decision */
   allVotesRevealedAt?: InputMaybe<Scalars['AWSDateTime']>;
+  /**
+   * "
+   * Whether the motion is a Simple Decision
+   */
+  allVotesSubmittedAt?: InputMaybe<Scalars['AWSDateTime']>;
   /** Whether the motion is a Simple Decision */
   finalizedAt?: InputMaybe<Scalars['AWSDateTime']>;
   /** Whether the motion has failed */
@@ -8251,6 +8261,7 @@ export type ColonyMotionFragment = {
     inRevealPhase: boolean;
     yaySideFullyStakedAt?: string | null;
     naySideFullyStakedAt?: string | null;
+    allVotesSubmittedAt?: string | null;
     allVotesRevealedAt?: string | null;
     finalizedAt?: string | null;
   };
@@ -9303,6 +9314,7 @@ export type GetColonyMotionQuery = {
       inRevealPhase: boolean;
       yaySideFullyStakedAt?: string | null;
       naySideFullyStakedAt?: string | null;
+      allVotesSubmittedAt?: string | null;
       allVotesRevealedAt?: string | null;
       finalizedAt?: string | null;
     };
@@ -9585,6 +9597,7 @@ export const ColonyMotion = gql`
       inRevealPhase
       yaySideFullyStakedAt
       naySideFullyStakedAt
+      allVotesSubmittedAt
       allVotesRevealedAt
       finalizedAt
     }
