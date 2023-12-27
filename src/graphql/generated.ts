@@ -4277,9 +4277,10 @@ export type MotionStakesInput = {
 /** Quick access flages to check the current state of a motion in its lifecycle */
 export type MotionStateHistory = {
   __typename?: 'MotionStateHistory';
-  allVotesRevealedAt: Scalars['AWSDateTime'];
-  allVotesSubmittedAt: Scalars['AWSDateTime'];
-  finalizedAt: Scalars['AWSDateTime'];
+  /** Whether the motion is a Simple Decision */
+  allVotesRevealedAt?: Maybe<Scalars['AWSDateTime']>;
+  /** Whether the motion is a Simple Decision */
+  finalizedAt?: Maybe<Scalars['AWSDateTime']>;
   /** Whether the motion has failed */
   hasFailed: Scalars['Boolean'];
   /** Whether the motion has failed and cannot be finalized (e.g. if it doesn't get staked) */
@@ -4290,15 +4291,18 @@ export type MotionStateHistory = {
   hasVoted: Scalars['Boolean'];
   /** Motion is in reveal phase (votes are being revealed) */
   inRevealPhase: Scalars['Boolean'];
-  naySideFullyStakedAt: Scalars['AWSDateTime'];
-  yaySideFullyStakedAt: Scalars['AWSDateTime'];
+  /** Whether the motion is a Simple Decision */
+  naySideFullyStakedAt?: Maybe<Scalars['AWSDateTime']>;
+  /** Whether the motion is a Simple Decision */
+  yaySideFullyStakedAt?: Maybe<Scalars['AWSDateTime']>;
 };
 
 /** Input used to change the current state of a motion */
 export type MotionStateHistoryInput = {
-  allVotesRevealedAt: Scalars['AWSDateTime'];
-  allVotesSubmittedAt: Scalars['AWSDateTime'];
-  finalizedAt: Scalars['AWSDateTime'];
+  /** Whether the motion is a Simple Decision */
+  allVotesRevealedAt?: InputMaybe<Scalars['AWSDateTime']>;
+  /** Whether the motion is a Simple Decision */
+  finalizedAt?: InputMaybe<Scalars['AWSDateTime']>;
   /** Whether the motion has failed */
   hasFailed: Scalars['Boolean'];
   /** Whether the motion has failed and cannot be finalized (e.g. if it doesn't get staked) */
@@ -4309,8 +4313,10 @@ export type MotionStateHistoryInput = {
   hasVoted: Scalars['Boolean'];
   /** Motion is in reveal phase (votes are being revealed) */
   inRevealPhase: Scalars['Boolean'];
-  naySideFullyStakedAt: Scalars['AWSDateTime'];
-  yaySideFullyStakedAt: Scalars['AWSDateTime'];
+  /** Whether the motion is a Simple Decision */
+  naySideFullyStakedAt?: InputMaybe<Scalars['AWSDateTime']>;
+  /** Whether the motion is a Simple Decision */
+  yaySideFullyStakedAt?: InputMaybe<Scalars['AWSDateTime']>;
 };
 
 /** Root mutation type */
@@ -8258,8 +8264,8 @@ export type ColonyMotionFragment = {
     hasFailed: boolean;
     hasFailedNotFinalizable: boolean;
     inRevealPhase: boolean;
-    yaySideFullyStakedAt: string;
-    naySideFullyStakedAt: string;
+    yaySideFullyStakedAt?: string | null;
+    naySideFullyStakedAt?: string | null;
   };
 };
 
@@ -9308,8 +9314,8 @@ export type GetColonyMotionQuery = {
       hasFailed: boolean;
       hasFailedNotFinalizable: boolean;
       inRevealPhase: boolean;
-      yaySideFullyStakedAt: string;
-      naySideFullyStakedAt: string;
+      yaySideFullyStakedAt?: string | null;
+      naySideFullyStakedAt?: string | null;
     };
   } | null;
 };
