@@ -8251,6 +8251,8 @@ export type ColonyMotionFragment = {
     inRevealPhase: boolean;
     yaySideFullyStakedAt?: string | null;
     naySideFullyStakedAt?: string | null;
+    allVotesRevealedAt?: string | null;
+    finalizedAt?: string | null;
   };
 };
 
@@ -9301,6 +9303,8 @@ export type GetColonyMotionQuery = {
       inRevealPhase: boolean;
       yaySideFullyStakedAt?: string | null;
       naySideFullyStakedAt?: string | null;
+      allVotesRevealedAt?: string | null;
+      finalizedAt?: string | null;
     };
   } | null;
 };
@@ -9581,6 +9585,8 @@ export const ColonyMotion = gql`
       inRevealPhase
       yaySideFullyStakedAt
       naySideFullyStakedAt
+      allVotesRevealedAt
+      finalizedAt
     }
     isDecision
     transactionHash
