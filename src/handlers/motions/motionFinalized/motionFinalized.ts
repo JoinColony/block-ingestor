@@ -22,6 +22,7 @@ export default async (event: ContractEvent): Promise<void> => {
     logIndex,
     transactionHash,
     args: { motionId, action },
+    blockNumber,
   } = event;
 
   if (!colonyAddress) {
@@ -63,7 +64,12 @@ export default async (event: ContractEvent): Promise<void> => {
     const updatedStakerRewards = await Promise.all(
       usersStakes.map(
         async ({ address: userAddress }) =>
-          await getStakerReward(motionId, userAddress, votingClient),
+          await getStakerReward(
+            motionId,
+            userAddress,
+            votingClient,
+            blockNumber,
+          ),
       ),
     );
 

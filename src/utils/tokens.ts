@@ -1,3 +1,5 @@
+import { BlockTag } from '@ethersproject/abstract-provider';
+
 import { mutate, query } from '~amplifyClient';
 
 import { getCachedColonyClient } from './clients';
@@ -26,11 +28,12 @@ import { Colony as FullColony } from '~graphql/generated';
 
 export const getColonyTokenAddress = async (
   colonyAddress: string,
+  blockNumber: BlockTag = 'latest',
 ): Promise<string | undefined> => {
   const colonyClient = await getCachedColonyClient(colonyAddress);
 
   if (colonyClient) {
-    const tokenAddress = await colonyClient.getToken();
+    const tokenAddress = await colonyClient.getToken({ blockTag: blockNumber });
     return tokenAddress;
   }
 };

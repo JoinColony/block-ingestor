@@ -13,10 +13,12 @@ import { writeExtensionFromEvent } from '~utils';
 import { updateExtensionCount } from '~utils/extensions';
 
 export default async (event: ContractEvent): Promise<void> => {
+  const { blockNumber } = event;
   const { extensionId: extensionHash, colony } = event.args;
   const extensionAddress = await networkClient.getExtensionInstallation(
     extensionHash,
     colony,
+    { blockTag: blockNumber },
   );
 
   await writeExtensionFromEvent(event, extensionAddress);

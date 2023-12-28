@@ -12,6 +12,7 @@ export const handleMintTokensMotion = async (
   const {
     colonyAddress,
     args: { domainId },
+    blockNumber,
   } = event;
   if (!colonyAddress) {
     return;
@@ -19,7 +20,7 @@ export const handleMintTokensMotion = async (
 
   const { name, args: actionArgs } = parsedAction;
   const amount = actionArgs[0].toString();
-  const tokenAddress = await getColonyTokenAddress(colonyAddress);
+  const tokenAddress = await getColonyTokenAddress(colonyAddress, blockNumber);
   await createMotionInDB(event, {
     type: motionNameMapping[name],
     tokenAddress,

@@ -10,13 +10,13 @@ export const handleUnlockTokenMotion = async (
   parsedAction: TransactionDescription,
   gasEstimate: BigNumber,
 ): Promise<void> => {
-  const { colonyAddress } = event;
+  const { colonyAddress, blockNumber } = event;
   if (!colonyAddress) {
     return;
   }
 
   const { name } = parsedAction;
-  const tokenAddress = await getColonyTokenAddress(colonyAddress);
+  const tokenAddress = await getColonyTokenAddress(colonyAddress, blockNumber);
 
   await createMotionInDB(event, {
     type: motionNameMapping[name],

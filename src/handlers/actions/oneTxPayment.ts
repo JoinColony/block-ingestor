@@ -111,6 +111,7 @@ const handlerV1ToV5 = async (
   colonyClient: AnyColonyClient,
   networkFee: string,
 ): Promise<void> => {
+  const { blockNumber } = event;
   const [initiatorAddress, paymentOrExpenditureId, nPayments] = event.args;
   const receipt = await provider.getTransactionReceipt(event.transactionHash);
 
@@ -129,7 +130,9 @@ const handlerV1ToV5 = async (
     }
 
     const { recipient: recipientAddress, domainId } =
-      await colonyClient.getPayment(paymentOrExpenditureId);
+      await colonyClient.getPayment(paymentOrExpenditureId, {
+        blockTag: blockNumber,
+      });
 
     const recipientIsColony = await isColonyAddress(recipientAddress);
 
@@ -160,6 +163,7 @@ const handlerV1ToV5 = async (
   } else {
     const expenditure: Expenditure = await colonyClient.getExpenditure(
       paymentOrExpenditureId,
+      { blockTag: blockNumber },
     );
 
     const expenditurePayoutLogs = receipt.logs.filter((log) =>
@@ -176,7 +180,9 @@ const handlerV1ToV5 = async (
       expenditurePayoutEvents.filter(notNull).map(async ({ args }) => {
         const [, expenditureId, slotId, tokenAddress, amount] = args;
         const expenditureSlot: ExpenditureSlot =
-          await colonyClient.getExpenditureSlot(expenditureId, slotId);
+          await colonyClient.getExpenditureSlot(expenditureId, slotId, {
+            blockTag: blockNumber,
+          });
 
         const amountLessFee = getAmountLessFee(amount, networkFee);
         const fee = BigNumber.from(amount).sub(amountLessFee);
@@ -210,12 +216,14 @@ const handlerV6 = async (
   colonyClient: AnyColonyClient,
   networkFee: string,
 ): Promise<void> => {
+  const { blockNumber } = event;
   const [initiatorAddress, expenditureId] = event.args;
   const receipt = await provider.getTransactionReceipt(event.transactionHash);
 
   // multiple OneTxPayments use expenditures at the contract level
   const expenditure: Expenditure = await colonyClient.getExpenditure(
     expenditureId,
+    { blockTag: blockNumber },
   );
 
   const expenditurePayoutLogs = receipt.logs.filter((log) =>
@@ -232,7 +240,9 @@ const handlerV6 = async (
     expenditurePayoutEvents.filter(notNull).map(async ({ args }) => {
       const [, expenditureId, slotId, tokenAddress, amount] = args;
       const expenditureSlot: ExpenditureSlot =
-        await colonyClient.getExpenditureSlot(expenditureId, slotId);
+        await colonyClient.getExpenditureSlot(expenditureId, slotId, {
+          blockTag: blockNumber,
+        });
 
       const amountLessFee = getAmountLessFee(amount, networkFee);
       const fee = BigNumber.from(amount).sub(amountLessFee);

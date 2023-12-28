@@ -22,6 +22,7 @@ export default async (event: ContractEvent): Promise<void> => {
     transactionHash,
     args: { vote, amount, staker, motionId },
     timestamp,
+    blockNumber,
   } = event;
 
   if (!colonyAddress) {
@@ -36,8 +37,12 @@ export default async (event: ContractEvent): Promise<void> => {
     return;
   }
 
-  const totalStakeFraction = await votingClient.getTotalStakeFraction();
-  const { skillRep, stakes } = await votingClient.getMotion(motionId);
+  const totalStakeFraction = await votingClient.getTotalStakeFraction({
+    blockTag: blockNumber,
+  });
+  const { skillRep, stakes } = await votingClient.getMotion(motionId, {
+    blockTag: blockNumber,
+  });
 
   const requiredStake = getRequiredStake(skillRep, totalStakeFraction);
   const motionStakes = getMotionStakes(requiredStake, stakes, vote);

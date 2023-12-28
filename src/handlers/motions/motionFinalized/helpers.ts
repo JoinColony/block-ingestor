@@ -1,5 +1,6 @@
 import { BigNumber } from 'ethers';
 import { TransactionDescription } from 'ethers/lib/utils';
+import { BlockTag } from '@ethersproject/abstract-provider';
 import { AnyVotingReputationClient, Extension } from '@colony/colony-js';
 
 import { ColonyOperations, MotionVote } from '~types';
@@ -38,6 +39,7 @@ export const getStakerReward = async (
   motionId: string,
   userAddress: string,
   votingReputationClient: AnyVotingReputationClient,
+  blockNumber: BlockTag = 'latest',
 ): Promise<StakerReward> => {
   /*
    * If **anyone** staked on a side, calling the rewards function returns 0 if there's no reward (even for
@@ -55,6 +57,7 @@ export const getStakerReward = async (
       motionId,
       userAddress,
       MotionVote.YAY,
+      { blockTag: blockNumber },
     );
   } catch (error) {
     // We don't care to catch the error since we fallback to it's initial value
@@ -64,6 +67,7 @@ export const getStakerReward = async (
       motionId,
       userAddress,
       MotionVote.NAY,
+      { blockTag: blockNumber },
     );
   } catch (error) {
     // silent error
