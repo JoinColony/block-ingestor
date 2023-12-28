@@ -36,14 +36,12 @@ export default async (event: ContractEvent): Promise<void> => {
       ...motion,
       motionStateHistory: {
         ...motion.motionStateHistory,
-        allVotesSubmittedAt:
-          eventIndex === '1'
-            ? new Date(timestamp * 1000).toISOString()
-            : motion.motionStateHistory.allVotesSubmittedAt,
-        allVotesRevealedAt:
-          eventIndex === '2'
-            ? new Date(timestamp * 1000).toISOString()
-            : motion.motionStateHistory.allVotesRevealedAt,
+        allVotesSubmittedAt: eventIndex.eq(1)
+          ? new Date(timestamp * 1000).toISOString()
+          : motion.motionStateHistory.allVotesSubmittedAt,
+        allVotesRevealedAt: eventIndex.eq(2)
+          ? new Date(timestamp * 1000).toISOString()
+          : motion.motionStateHistory.allVotesRevealedAt,
       },
     });
   }
