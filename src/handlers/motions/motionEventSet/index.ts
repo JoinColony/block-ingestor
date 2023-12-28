@@ -10,7 +10,8 @@ import {
 export default async (event: ContractEvent): Promise<void> => {
   const {
     colonyAddress,
-    args: { motionId, eventIndex, timestamp },
+    args: { motionId, eventIndex },
+    timestamp,
   } = event;
 
   if (!colonyAddress) {
