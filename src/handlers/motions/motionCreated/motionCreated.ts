@@ -63,6 +63,16 @@ export default async (event: ContractEvent): Promise<void> => {
   let gasEstimate: BigNumber;
 
   const estimateMotionGas = async (): Promise<string> =>
+    /*
+     * @NOTE Express casting required here since colonyJS forces it's own types internally
+     * Even though we instantiate the initial network client with a JsonRpcProvider, colonyJS
+     * will internally cast it to a BaseProvider which is a generic type that doesn't declare
+     * all the methods actually available on the provider
+     *
+     * Alternatively, we could just import our provider directly and use that instead
+     *
+     * Ultimately it's the same thing as the provider instance is the same
+     */
     await (colonyClient.provider as JsonRpcProvider).send('eth_estimateGas', [
       {
         from: votingReputationClient.address,
