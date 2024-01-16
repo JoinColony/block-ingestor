@@ -53,8 +53,19 @@ export const updateStats = async (
 // This exists as a function to prevent accidental overwriting of the `stats` variable
 export const getStats = (): typeof stats => ({ ...stats });
 
-export const getLastBlockNumber = (): number =>
-  Number.isInteger(stats.lastBlockNumber) ? Number(stats.lastBlockNumber) : 1;
+export const getLastBlockNumber = (): number => {
+  if (Number.isInteger(stats.lastBlockNumber)) {
+    return Number(stats.lastBlockNumber);
+  }
+  /*
+   * @NOTE This prevents accidental database stats overwriting if the API / GraphQL
+   * endpoint is not accessible
+   *
+   * It will throw the block ingestor (the pod that it's running on) into an restart
+   * loop until the API is accessible again
+   */
+  throw new Error('Could not get last block number from stats. Aborting.');
+};
 
 export const setLastBlockNumber = (lastBlockNumber: number): void => {
   updateStats({ lastBlockNumber });
