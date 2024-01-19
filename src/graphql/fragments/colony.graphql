@@ -46,11 +46,11 @@ fragment ColonyMetadata on ColonyMetadata {
     haveTokensChanged
     hasDescriptionChanged
     haveExternalLinksChanged
+    modifiedTokenAddresses {
+      added
+      removed
+    }
   }
   isWhitelistActivated
   whitelistedAddresses
-  modifiedTokenAddresses {
-    added
-    removed
-  }
 }

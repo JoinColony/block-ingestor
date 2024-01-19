@@ -204,6 +204,7 @@ const linkPendingColonyMetadataWithColony = async (
     oldDisplayName,
     hasDescriptionChanged,
     haveExternalLinksChanged,
+    modifiedTokenAddresses,
   } = pendingColonyMetadata.changelog?.[0] ?? {};
 
   const updatedMetadata = {
@@ -243,7 +244,7 @@ const linkPendingColonyMetadataWithColony = async (
     updatedMetadata.externalLinks = pendingColonyMetadata.externalLinks;
   }
 
-  if (haveTokensChanged && pendingColonyMetadata.modifiedTokenAddresses) {
+  if (haveTokensChanged && modifiedTokenAddresses) {
     // If tokens have changed, update colony tokens
     const colony = await getColonyFromDB(colonyAddress);
 
@@ -253,7 +254,7 @@ const linkPendingColonyMetadataWithColony = async (
       await updateColonyTokens(
         colony,
         existingTokenAddresses,
-        pendingColonyMetadata.modifiedTokenAddresses,
+        modifiedTokenAddresses,
       );
     }
   }

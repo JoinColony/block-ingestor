@@ -483,7 +483,7 @@ export type ColonyChainFundsClaimInput = {
 export type ColonyContributor = {
   __typename?: 'ColonyContributor';
   /** Associated colony */
-  colony?: Maybe<Colony>;
+  colony: Colony;
   /** Address of the colony the contributor is under */
   colonyAddress: Scalars['ID'];
   /** The contributor's reputation percentage in the colony */
@@ -679,11 +679,6 @@ export type ColonyMetadata = {
   id: Scalars['ID'];
   /** The address book feature (aka Whitelist is active for this Colony) */
   isWhitelistActivated?: Maybe<Scalars['Boolean']>;
-  /**
-   * Token addresses that were modified in a previous action (motion)
-   * Only present on pendingColonyMetadata for consumption in block ingestor
-   */
-  modifiedTokenAddresses?: Maybe<PendingModifiedTokenAddresses>;
   /** Colony Objective */
   objective?: Maybe<ColonyObjective>;
   /** List of safes that are used within the Colony */
@@ -713,6 +708,8 @@ export type ColonyMetadataChangelog = {
   haveExternalLinksChanged?: Maybe<Scalars['Boolean']>;
   /** Whether tokens have been added or removed from the Colony's token list */
   haveTokensChanged: Scalars['Boolean'];
+  /** The colony's token addresses that were modified */
+  modifiedTokenAddresses?: Maybe<PendingModifiedTokenAddresses>;
   /** Display name of the Colony after the change */
   newDisplayName: Scalars['String'];
   /** Whether safes have been added or removed from the Colony's safe list */
@@ -731,6 +728,7 @@ export type ColonyMetadataChangelogInput = {
   hasWhitelistChanged: Scalars['Boolean'];
   haveExternalLinksChanged?: InputMaybe<Scalars['Boolean']>;
   haveTokensChanged: Scalars['Boolean'];
+  modifiedTokenAddresses?: InputMaybe<PendingModifiedTokenAddressesInput>;
   newDisplayName: Scalars['String'];
   newSafes?: InputMaybe<Array<SafeInput>>;
   oldDisplayName: Scalars['String'];
@@ -1207,7 +1205,6 @@ export type CreateColonyMetadataInput = {
   externalLinks?: InputMaybe<Array<ExternalLinkInput>>;
   id?: InputMaybe<Scalars['ID']>;
   isWhitelistActivated?: InputMaybe<Scalars['Boolean']>;
-  modifiedTokenAddresses?: InputMaybe<PendingModifiedTokenAddressesInput>;
   objective?: InputMaybe<ColonyObjectiveInput>;
   safes?: InputMaybe<Array<SafeInput>>;
   thumbnail?: InputMaybe<Scalars['String']>;
@@ -1387,6 +1384,7 @@ export type CreateProfileInput = {
   id?: InputMaybe<Scalars['ID']>;
   location?: InputMaybe<Scalars['String']>;
   meta?: InputMaybe<ProfileMetadataInput>;
+  preferredCurrency?: InputMaybe<SupportedCurrencies>;
   thumbnail?: InputMaybe<Scalars['String']>;
   website?: InputMaybe<Scalars['AWSURL']>;
 };
@@ -2065,23 +2063,6 @@ export type GetMotionTimeoutPeriodsReturn = {
   timeLeftToStake: Scalars['String'];
   /** Time left in voting period */
   timeLeftToVote: Scalars['String'];
-};
-
-/** Input data for retrieving a user's reputation within the top domains of a Colony */
-export type GetReputationForTopDomainsInput = {
-  /** The address of the Colony */
-  colonyAddress: Scalars['String'];
-  /** The root hash of the reputation tree at a specific point in time */
-  rootHash?: InputMaybe<Scalars['String']>;
-  /** The wallet address of the user */
-  walletAddress: Scalars['String'];
-};
-
-/** A return type that contains an array of UserDomainReputation items */
-export type GetReputationForTopDomainsReturn = {
-  __typename?: 'GetReputationForTopDomainsReturn';
-  /** An array of UserDomainReputation items */
-  items?: Maybe<Array<UserDomainReputation>>;
 };
 
 export type GetSafeTransactionStatusInput = {
@@ -3175,6 +3156,7 @@ export type ModelProfileConditionInput = {
   location?: InputMaybe<ModelStringInput>;
   not?: InputMaybe<ModelProfileConditionInput>;
   or?: InputMaybe<Array<InputMaybe<ModelProfileConditionInput>>>;
+  preferredCurrency?: InputMaybe<ModelSupportedCurrenciesInput>;
   thumbnail?: InputMaybe<ModelStringInput>;
   website?: InputMaybe<ModelStringInput>;
 };
@@ -3196,6 +3178,7 @@ export type ModelProfileFilterInput = {
   location?: InputMaybe<ModelStringInput>;
   not?: InputMaybe<ModelProfileFilterInput>;
   or?: InputMaybe<Array<InputMaybe<ModelProfileFilterInput>>>;
+  preferredCurrency?: InputMaybe<ModelSupportedCurrenciesInput>;
   thumbnail?: InputMaybe<ModelStringInput>;
   website?: InputMaybe<ModelStringInput>;
 };
@@ -3843,6 +3826,7 @@ export type ModelSubscriptionProfileFilterInput = {
   id?: InputMaybe<ModelSubscriptionIdInput>;
   location?: InputMaybe<ModelSubscriptionStringInput>;
   or?: InputMaybe<Array<InputMaybe<ModelSubscriptionProfileFilterInput>>>;
+  preferredCurrency?: InputMaybe<ModelSubscriptionStringInput>;
   thumbnail?: InputMaybe<ModelSubscriptionStringInput>;
   website?: InputMaybe<ModelSubscriptionStringInput>;
 };
@@ -3998,6 +3982,11 @@ export type ModelSubscriptionUserTokensFilterInput = {
   or?: InputMaybe<Array<InputMaybe<ModelSubscriptionUserTokensFilterInput>>>;
   tokenID?: InputMaybe<ModelSubscriptionIdInput>;
   userID?: InputMaybe<ModelSubscriptionIdInput>;
+};
+
+export type ModelSupportedCurrenciesInput = {
+  eq?: InputMaybe<SupportedCurrencies>;
+  ne?: InputMaybe<SupportedCurrencies>;
 };
 
 export type ModelTokenConditionInput = {
@@ -5296,6 +5285,8 @@ export type Profile = {
   location?: Maybe<Scalars['String']>;
   /** Metadata associated with the user's profile */
   meta?: Maybe<ProfileMetadata>;
+  /** A user's prefered currency, for conversion purposes */
+  preferredCurrency?: Maybe<SupportedCurrencies>;
   /** URL of the user's thumbnail image */
   thumbnail?: Maybe<Scalars['String']>;
   updatedAt: Scalars['AWSDateTime'];
@@ -5405,8 +5396,6 @@ export type Query = {
   getProfile?: Maybe<Profile>;
   getProfileByEmail?: Maybe<ModelProfileConnection>;
   getProfileByUsername?: Maybe<ModelProfileConnection>;
-  /** Retrieve a user's reputation within the top domains of a Colony */
-  getReputationForTopDomains?: Maybe<GetReputationForTopDomainsReturn>;
   getReputationMiningCycleMetadata?: Maybe<ReputationMiningCycleMetadata>;
   getRoleByDomainAndColony?: Maybe<ModelColonyRoleConnection>;
   getRoleByTargetAddressAndColony?: Maybe<ModelColonyRoleConnection>;
@@ -5832,11 +5821,6 @@ export type QueryGetProfileByUsernameArgs = {
   limit?: InputMaybe<Scalars['Int']>;
   nextToken?: InputMaybe<Scalars['String']>;
   sortDirection?: InputMaybe<ModelSortDirection>;
-};
-
-/** Root query type */
-export type QueryGetReputationForTopDomainsArgs = {
-  input?: InputMaybe<GetReputationForTopDomainsInput>;
 };
 
 /** Root query type */
@@ -7233,6 +7217,20 @@ export type SubscriptionOnUpdateUserTokensArgs = {
   filter?: InputMaybe<ModelSubscriptionUserTokensFilterInput>;
 };
 
+/** Represents the currencies/tokens that users' balances can be converted to (for display purposes) */
+export enum SupportedCurrencies {
+  Brl = 'BRL',
+  Cad = 'CAD',
+  Clny = 'CLNY',
+  Eth = 'ETH',
+  Eur = 'EUR',
+  Gbp = 'GBP',
+  Inr = 'INR',
+  Jpy = 'JPY',
+  Krw = 'KRW',
+  Usd = 'USD',
+}
+
 /** Represents an ERC20-compatible token that is used by Colonies and users */
 export type Token = {
   __typename?: 'Token';
@@ -7560,7 +7558,6 @@ export type UpdateColonyMetadataInput = {
   externalLinks?: InputMaybe<Array<ExternalLinkInput>>;
   id: Scalars['ID'];
   isWhitelistActivated?: InputMaybe<Scalars['Boolean']>;
-  modifiedTokenAddresses?: InputMaybe<PendingModifiedTokenAddressesInput>;
   objective?: InputMaybe<ColonyObjectiveInput>;
   safes?: InputMaybe<Array<SafeInput>>;
   thumbnail?: InputMaybe<Scalars['String']>;
@@ -7768,6 +7765,7 @@ export type UpdateProfileInput = {
   id: Scalars['ID'];
   location?: InputMaybe<Scalars['String']>;
   meta?: InputMaybe<ProfileMetadataInput>;
+  preferredCurrency?: InputMaybe<SupportedCurrencies>;
   thumbnail?: InputMaybe<Scalars['String']>;
   website?: InputMaybe<Scalars['AWSURL']>;
 };
@@ -7934,15 +7932,6 @@ export type UserTransactionHistoryArgs = {
   limit?: InputMaybe<Scalars['Int']>;
   nextToken?: InputMaybe<Scalars['String']>;
   sortDirection?: InputMaybe<ModelSortDirection>;
-};
-
-/** A type representing a user's reputation within a domain */
-export type UserDomainReputation = {
-  __typename?: 'UserDomainReputation';
-  /** The integer ID of the Domain within the Colony */
-  domainId: Scalars['Int'];
-  /** The user's reputation within the domain, represented as a percentage */
-  reputationPercentage: Scalars['String'];
 };
 
 /** Stakes that a user has made for a motion */
@@ -8135,12 +8124,12 @@ export type ColonyMetadataFragment = {
     haveTokensChanged: boolean;
     hasDescriptionChanged?: boolean | null;
     haveExternalLinksChanged?: boolean | null;
+    modifiedTokenAddresses?: {
+      __typename?: 'PendingModifiedTokenAddresses';
+      added?: Array<string> | null;
+      removed?: Array<string> | null;
+    } | null;
   }> | null;
-  modifiedTokenAddresses?: {
-    __typename?: 'PendingModifiedTokenAddresses';
-    added?: Array<string> | null;
-    removed?: Array<string> | null;
-  } | null;
 };
 
 export type ExtensionFragment = {
@@ -8752,12 +8741,12 @@ export type GetColonyMetadataQuery = {
       haveTokensChanged: boolean;
       hasDescriptionChanged?: boolean | null;
       haveExternalLinksChanged?: boolean | null;
+      modifiedTokenAddresses?: {
+        __typename?: 'PendingModifiedTokenAddresses';
+        added?: Array<string> | null;
+        removed?: Array<string> | null;
+      } | null;
     }> | null;
-    modifiedTokenAddresses?: {
-      __typename?: 'PendingModifiedTokenAddresses';
-      added?: Array<string> | null;
-      removed?: Array<string> | null;
-    } | null;
   } | null;
 };
 
@@ -9168,12 +9157,12 @@ export type GetColonyActionByMotionIdQuery = {
           haveTokensChanged: boolean;
           hasDescriptionChanged?: boolean | null;
           haveExternalLinksChanged?: boolean | null;
+          modifiedTokenAddresses?: {
+            __typename?: 'PendingModifiedTokenAddresses';
+            added?: Array<string> | null;
+            removed?: Array<string> | null;
+          } | null;
         }> | null;
-        modifiedTokenAddresses?: {
-          __typename?: 'PendingModifiedTokenAddresses';
-          added?: Array<string> | null;
-          removed?: Array<string> | null;
-        } | null;
       } | null;
     } | null>;
   } | null;
@@ -9420,13 +9409,13 @@ export const ColonyMetadata = gql`
       haveTokensChanged
       hasDescriptionChanged
       haveExternalLinksChanged
+      modifiedTokenAddresses {
+        added
+        removed
+      }
     }
     isWhitelistActivated
     whitelistedAddresses
-    modifiedTokenAddresses {
-      added
-      removed
-    }
   }
 `;
 export const Extension = gql`
