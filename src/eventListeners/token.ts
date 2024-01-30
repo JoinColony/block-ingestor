@@ -2,30 +2,13 @@ import { ContractEventsSignatures } from '~types';
 import { addEventListener, getEventListeners } from '~eventListeners';
 import { EventListenerType, EventListener } from './types';
 import { utils } from 'ethers';
+import isEqual from 'lodash/isEqual';
 
 export const addTokenEventListener = (
   eventSignature: ContractEventsSignatures,
   tokenAddress?: string,
   recipientAddress?: string,
 ): void => {
-  /*
-   * @NOTE This only applies to contract listeners
-   *
-   * Ie: any listener that has and address property.
-   * As a general rule, this will only *NOT* apply to the token Transfer event
-   * as that's the only one treated differently.
-   */
-  const listenerExists = getEventListeners().some(
-    (listener) =>
-      listener.type === EventListenerType.Token &&
-      listener.eventSignature === eventSignature &&
-      listener.address === tokenAddress,
-  );
-
-  if (listenerExists) {
-    return;
-  }
-
   const tokenListener: EventListener = {
     type: EventListenerType.Token,
     eventSignature,
@@ -38,7 +21,20 @@ export const addTokenEventListener = (
      * Filter transfer events for the recipient address
      */
     tokenListener.topics.push(null, utils.hexZeroPad(recipientAddress, 32));
-    delete tokenListener.address;
+  }
+
+  /*
+   * @NOTE This only applies to contract listeners
+   *
+   * Ie: any listener that has and address property.
+   * As a general rule, this will only *NOT* apply to the token Transfer event
+   * as that's the only one treated differently.
+   */
+  const listenerExists = getEventListeners().some((existingListener) =>
+    isEqual(existingListener, tokenListener),
+  );
+  if (listenerExists) {
+    return;
   }
 
   return addEventListener(tokenListener);
