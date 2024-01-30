@@ -37,7 +37,7 @@ export const addTokenEventListener = (
     /*
      * Filter transfer events for the recipient address
      */
-    tokenListener.topics.push(null, recipientAddress);
+    tokenListener.topics.push(null, utils.hexZeroPad(recipientAddress, 32));
     delete tokenListener.address;
   }
 
