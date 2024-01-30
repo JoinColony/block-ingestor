@@ -6,11 +6,14 @@ import {
   GetColonyUnclaimedFundDocument,
   GetColonyUnclaimedFundQuery,
   GetColonyUnclaimedFundQueryVariables,
+  GetTokenFromEverywhereDocument,
+  GetTokenFromEverywhereQuery,
+  GetTokenFromEverywhereQueryVariables,
 } from '~graphql';
 import { output, createFundsClaim } from '~utils';
 
 export default async (event: ContractEvent): Promise<void> => {
-  const { contractAddress, logIndex, transactionHash } = event;
+  const { contractAddress: tokenAddress, logIndex, transactionHash } = event;
   const chainId = getChainId();
   /*
    * @NOTE Take the values from the "array" rather than from the named properties
@@ -79,11 +82,32 @@ export default async (event: ContractEvent): Promise<void> => {
         : '',
     );
 
+    /**
+     * Call the GetTokenFromEverywhere query to ensure the token
+     * gets added to the DB if it doesn't already exist
+     */
+    const { data } =
+      (await query<
+        GetTokenFromEverywhereQuery,
+        GetTokenFromEverywhereQueryVariables
+      >(GetTokenFromEverywhereDocument, {
+        input: {
+          tokenAddress,
+        },
+      })) ?? {};
+
+    const response = data?.getTokenFromEverywhere;
+    if (!response?.items?.length) {
+      output(
+        `Token ${tokenAddress} not found in the database while handling Transfer event to colony ${dst}`,
+      );
+    }
+
     // Don't add zero transfer claims in the database
     if (!existingClaim && amount !== '0') {
       createFundsClaim({
         colonyAddress: dst,
-        tokenAddress: contractAddress,
+        tokenAddress,
         amount,
         event,
       });
