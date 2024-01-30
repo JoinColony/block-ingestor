@@ -34,7 +34,7 @@ export const getMatchingListener = (
           return true;
         }
 
-        return topic === logTopics[index];
+        return topic.toLowerCase() === logTopics[index].toLowerCase();
       });
     }) ?? null
   );
