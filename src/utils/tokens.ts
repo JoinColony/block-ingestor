@@ -51,26 +51,24 @@ export const updateColonyTokens = async (
   const currentAddresses = new Set(existingTokenAddresses);
   added?.forEach(async (tokenAddress) => {
     if (!currentAddresses.has(tokenAddress)) {
-      /**
-       * Call the GetTokenFromEverywhere query to ensure the token
-       * gets added to the DB if it doesn't already exist
-       */
-      const { data } =
-        (await query<
+      try {
+        /**
+         * Call the GetTokenFromEverywhere query to ensure the token
+         * gets added to the DB if it doesn't already exist
+         */
+        await query<
           GetTokenFromEverywhereQuery,
           GetTokenFromEverywhereQueryVariables
         >(GetTokenFromEverywhereDocument, {
           input: {
             tokenAddress,
           },
-        })) ?? {};
+        });
 
-      const response = data?.getTokenFromEverywhere;
-      /**
-       * Only create colony/token entry in the DB if the token data was returned by the GetTokenFromEverywhereQuery.
-       * Otherwise, it will cause any query referencing it to fail
-       */
-      if (response?.items?.length) {
+        /**
+         * Only create colony/token entry in the DB if the token data was returned by the GetTokenFromEverywhereQuery.
+         * Otherwise, it will cause any query referencing it to fail
+         */
         await mutate<
           CreateColonyTokensMutation,
           CreateColonyTokensMutationVariables
@@ -80,7 +78,7 @@ export const updateColonyTokens = async (
             tokenID: tokenAddress,
           },
         });
-      }
+      } catch {}
     }
   });
 

@@ -86,20 +86,18 @@ export default async (event: ContractEvent): Promise<void> => {
      * Call the GetTokenFromEverywhere query to ensure the token
      * gets added to the DB if it doesn't already exist
      */
-    const { data } =
-      (await query<
+    try {
+      await query<
         GetTokenFromEverywhereQuery,
         GetTokenFromEverywhereQueryVariables
       >(GetTokenFromEverywhereDocument, {
         input: {
           tokenAddress,
         },
-      })) ?? {};
-
-    const response = data?.getTokenFromEverywhere;
-    if (!response?.items?.length) {
+      });
+    } catch {
       output(
-        `Token ${tokenAddress} not found in the database while handling Transfer event to colony ${dst}`,
+        `Token ${tokenAddress} not found on chain while handling Transfer event to colony ${dst}`,
       );
     }
 
