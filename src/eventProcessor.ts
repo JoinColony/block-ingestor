@@ -51,6 +51,7 @@ import {
   handleExpenditureMadeViaStake,
   handlePaymentTokenUpdated,
   handleSetTokenAuthority,
+  handleColonyMetadataDelta,
 } from './handlers';
 
 dotenv.config();
@@ -348,6 +349,11 @@ export default async (event: ContractEvent): Promise<void> => {
       await handleSetTokenAuthority(event);
       return;
     }
+
+    // All ColonyMetadataDelta events
+    case ContractEventsSignatures.ColonyMetadataDelta:
+      await handleColonyMetadataDelta(event);
+      return;
 
     default: {
       return;

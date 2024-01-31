@@ -6,3 +6,4 @@ export * from './motions';
 export * from './expenditures';
 export * from './reputationMiningCycle';
 export * from './tokens';
+export * from './metadataDelta';
