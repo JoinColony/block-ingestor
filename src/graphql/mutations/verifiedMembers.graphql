@@ -1,0 +1,13 @@
+query GetVerifiedMember($colonyAddress: ID!, $userAddress: ID!) {
+  getVerifiedMember(colonyAddress: $colonyAddress, userAddress: $userAddress) {
+    userAddress
+    colonyAddress
+  }
+}
+
+mutation CreateVerifiedMember($input: CreateVerifiedMemberInput!) {
+  createVerifiedMember(input: $input) {
+    userAddress
+    colonyAddress
+  }
+}
