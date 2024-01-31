@@ -102,6 +102,7 @@ export const setupListenersForColony = (
     ContractEventsSignatures.ExpenditurePayoutClaimed,
     ContractEventsSignatures.AnnotateTransaction,
     ContractEventsSignatures.ArbitraryTransaction,
+    ContractEventsSignatures.ColonyMetadataDelta,
   ];
 
   colonyEvents.forEach((eventSignature) =>
