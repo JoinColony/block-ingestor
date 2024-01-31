@@ -81,10 +81,14 @@ export const initStats = async (): Promise<void> => {
       ?.data?.getIngestorStats ?? {};
 
   if (!jsonStats) {
+    stats = {
+      lastBlockNumber: 1,
+    };
+
     await mutate<CreateStatsMutation, CreateStatsMutationVariables>(
       CreateStatsDocument,
       {
-        value: JSON.stringify({}),
+        value: JSON.stringify(stats),
       },
     );
   } else {
