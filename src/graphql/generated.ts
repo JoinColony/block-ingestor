@@ -411,8 +411,13 @@ export enum ColonyActionType {
   PaymentMotion = 'PAYMENT_MOTION',
   /** An action related to the recovery functionality of a Colony */
   Recovery = 'RECOVERY',
+<<<<<<< HEAD
   /** An action related to creating a motion to release an expenditure stage */
   SetExpenditureStateMotion = 'SET_EXPENDITURE_STATE_MOTION',
+=======
+  /** An action related to removing verified members */
+  RemoveVerifiedMembers = 'REMOVE_VERIFIED_MEMBERS',
+>>>>>>> 2b9a514 (Add: Remove Verified Member)
   /** An action related to setting user roles within a Colony */
   SetUserRoles = 'SET_USER_ROLES',
   /** An action related to setting user roles within a Colony via a motion */
@@ -8894,6 +8899,19 @@ export type CreateVerifiedMemberMutation = {
   } | null;
 };
 
+export type DeleteVerifiedMemberMutationVariables = Exact<{
+  input: DeleteVerifiedMemberInput;
+}>;
+
+export type DeleteVerifiedMemberMutation = {
+  __typename?: 'Mutation';
+  deleteVerifiedMember?: {
+    __typename?: 'VerifiedMember';
+    userAddress: string;
+    colonyAddress: string;
+  } | null;
+};
+
 export type GetColonyActionQueryVariables = Exact<{
   transactionHash: Scalars['ID'];
 }>;
@@ -10104,6 +10122,14 @@ export const GetVerifiedMemberDocument = gql`
 export const CreateVerifiedMemberDocument = gql`
   mutation CreateVerifiedMember($input: CreateVerifiedMemberInput!) {
     createVerifiedMember(input: $input) {
+      userAddress
+      colonyAddress
+    }
+  }
+`;
+export const DeleteVerifiedMemberDocument = gql`
+  mutation DeleteVerifiedMember($input: DeleteVerifiedMemberInput!) {
+    deleteVerifiedMember(input: $input) {
       userAddress
       colonyAddress
     }
