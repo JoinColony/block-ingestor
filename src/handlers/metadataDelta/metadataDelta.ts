@@ -1,10 +1,5 @@
 import { ContractEvent } from '~types';
-import { verbose } from '~utils';
-import {
-  isAddVerifiedMembersOperation,
-  isRemoveVerifiedMembersOperation,
-  parseOperation,
-} from './utils';
+import { isAddVerifiedMembersOperation, isRemoveVerifiedMembersOperation, parseOperation, verbose } from '~utils';
 import { handleAddVerifiedMembers } from './handlers/addVerifiedMembers';
 import { handleRemoveVerifiedMembers } from './handlers/removeVerifiedMembers';
 
