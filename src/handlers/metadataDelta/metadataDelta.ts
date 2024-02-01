@@ -1,7 +1,12 @@
 import { ContractEvent } from '~types';
 import { verbose } from '~utils';
-import { isAddVerifiedMembersOperation, parseOperation } from './utils';
+import {
+  isAddVerifiedMembersOperation,
+  isRemoveVerifiedMembersOperation,
+  parseOperation,
+} from './utils';
 import { handleAddVerifiedMembers } from './handlers/addVerifiedMembers';
+import { handleRemoveVerifiedMembers } from './handlers/removeVerifiedMembers';
 
 export default async (event: ContractEvent): Promise<void> => {
   const operationString = event.args.metadata;
@@ -14,6 +19,11 @@ export default async (event: ContractEvent): Promise<void> => {
 
   if (isAddVerifiedMembersOperation(operation)) {
     await handleAddVerifiedMembers(event, operation);
+    return;
+  }
+
+  if (isRemoveVerifiedMembersOperation(operation)) {
+    await handleRemoveVerifiedMembers(event, operation);
     return;
   }
 
