@@ -1,15 +1,6 @@
 import { BigNumber } from 'ethers';
 import { TransactionDescription } from 'ethers/lib/utils';
-import { mutate, query } from '~amplifyClient';
-import {
-  ColonyActionType,
-  CreateVerifiedMemberDocument,
-  CreateVerifiedMemberMutation,
-  CreateVerifiedMemberMutationVariables,
-  GetVerifiedMemberDocument,
-  GetVerifiedMemberQuery,
-  GetVerifiedMemberQueryVariables,
-} from '~graphql';
+import { ColonyActionType } from '~graphql';
 import { ContractEvent } from '~types';
 import {
   getPendingMetadataDatabaseId,
@@ -22,64 +13,46 @@ import { createMotionInDB } from '../helpers';
 
 export const handleMetadataDeltaMotion = async (
   event: ContractEvent,
-  _desc: TransactionDescription,
+  desc: TransactionDescription,
   gasEstimate: BigNumber,
 ): Promise<void> => {
   const { transactionHash, colonyAddress } = event;
   if (!colonyAddress) {
     return;
   }
-  const operationString = event.args[0];
 
-  if (!operationString) {
-    verbose('Unable to get operation for ColonyMetadataDelta motion event');
-  }
+  try {
+    const operationString = desc.args[0];
 
-  const operation = parseOperation(operationString);
+    if (!operationString) {
+      verbose('Unable to get operation for ColonyMetadataDelta motion event');
+      return;
+    }
 
-  if (!isMetadataDeltaOperation(operation)) {
-    verbose(
-      'Operation does not conform to MetadataDeltaOperation type: ',
-      operation,
-    );
-    throw new Error('Unknown operation format');
-  }
+    const operation = parseOperation(operationString);
 
-  const pendingColonyMetadataId = getPendingMetadataDatabaseId(
-    colonyAddress,
-    transactionHash,
-  );
+    if (!isMetadataDeltaOperation(operation)) {
+      verbose(
+        'Operation does not conform to MetadataDeltaOperation type: ',
+        operation,
+      );
+      return;
+    }
 
-  if (isAddVerifiedMembersOperation(operation)) {
-    await Promise.all(
-      operation.members.map(async (userAddress) => {
-        const item = await query<
-          GetVerifiedMemberQuery,
-          GetVerifiedMemberQueryVariables
-        >(GetVerifiedMemberDocument, { colonyAddress, userAddress });
-
-        const verifiedMemberData = item?.data?.getVerifiedMember;
-
-        if (verifiedMemberData !== undefined && verifiedMemberData !== null) {
-          throw new Error(
-            `User ${userAddress} already a verified member of the colony ${colonyAddress}`,
-          );
-        }
-
-        await mutate<
-          CreateVerifiedMemberMutation,
-          CreateVerifiedMemberMutationVariables
-        >(CreateVerifiedMemberDocument, {
-          input: { colonyAddress, userAddress },
-        });
-      }),
+    const pendingColonyMetadataId = getPendingMetadataDatabaseId(
+      colonyAddress,
+      transactionHash,
     );
 
-    await createMotionInDB(event, {
-      type: ColonyActionType.AddVerifiedMembersMotion,
-      members: operation.members,
-      pendingColonyMetadataId,
-      gasEstimate: gasEstimate.toString(),
-    });
+    if (isAddVerifiedMembersOperation(operation)) {
+      await createMotionInDB(event, {
+        type: ColonyActionType.AddVerifiedMembersMotion,
+        members: operation.members,
+        pendingColonyMetadataId,
+        gasEstimate: gasEstimate.toString(),
+      });
+    }
+  } catch (error) {
+    verbose('Error while handling metadata delta motion created', error);
   }
 };
