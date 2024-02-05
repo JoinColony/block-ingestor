@@ -1,24 +1,10 @@
-import {
-  ColonyActionType,
-  CreateVerifiedMemberDocument,
-  CreateVerifiedMemberMutation,
-  CreateVerifiedMemberMutationVariables,
-  GetVerifiedMemberDocument,
-  GetVerifiedMemberQuery,
-  GetVerifiedMemberQueryVariables,
-} from '~graphql';
 import { ContractEvent } from '~types';
-import { verbose, writeActionFromEvent } from '~utils';
-import {
-  isAddVerifiedMembersOperation,
-  isMetadataDeltaOperation,
-  parseOperation,
-} from './utils';
-import { mutate, query } from '~amplifyClient';
+import { verbose } from '~utils';
+import { isMetadataDeltaOperation, parseOperation } from './utils';
+import { MetadataDeltaActionType } from './types';
+import { handleAddVerifiedMembers } from './handlers/addVerifiedMembers';
 
 export default async (event: ContractEvent): Promise<void> => {
-  const { contractAddress: colonyAddress } = event;
-  const { agent: initiatorAddress } = event.args;
   const operationString = event.args[1];
 
   if (!operationString) {
@@ -27,45 +13,17 @@ export default async (event: ContractEvent): Promise<void> => {
 
   const operation = parseOperation(operationString);
 
-  if (!isMetadataDeltaOperation(operation)) {
+  if (operation === null || !isMetadataDeltaOperation(operation)) {
     verbose(
       'Operation does not conform to MetadataDeltaOperation type: ',
       operation,
     );
-    throw new Error('Unknown operation format');
+    return;
   }
 
-  if (isAddVerifiedMembersOperation(operation)) {
-    await Promise.all(
-      operation.members.map(async (userAddress) => {
-        const item = await query<
-          GetVerifiedMemberQuery,
-          GetVerifiedMemberQueryVariables
-        >(GetVerifiedMemberDocument, { colonyAddress, userAddress });
-
-        const verifiedMemberData = item?.data?.getVerifiedMember;
-
-        if (verifiedMemberData !== undefined && verifiedMemberData !== null) {
-          throw new Error(
-            `User ${userAddress} already a verified member of the colony ${colonyAddress}`,
-          );
-        }
-
-        await mutate<
-          CreateVerifiedMemberMutation,
-          CreateVerifiedMemberMutationVariables
-        >(CreateVerifiedMemberDocument, {
-          input: { colonyAddress, userAddress },
-        });
-      }),
-    );
-
-    await writeActionFromEvent(event, colonyAddress, {
-      type: ColonyActionType.AddVerifiedMembers,
-      initiatorAddress,
-      members: operation.members,
-    });
-
-    return;
+  switch (operation.type) {
+    case MetadataDeltaActionType.ADD_VERIFIED_MEMBERS:
+      await handleAddVerifiedMembers(event, operation);
+      break;
   }
 };
