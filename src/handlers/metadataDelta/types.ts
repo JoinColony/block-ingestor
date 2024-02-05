@@ -1,17 +1,11 @@
-export enum OperationType {
-  ADD = 'ADD',
-  REMOVE = 'REMOVE',
-}
-
-export enum Entity {
-  VERIFIED_MEMBERS = 'verifiedMembers',
+export enum MetadataDeltaActionType {
+  ADD_VERIFIED_MEMBERS = 'ADD_VERIFIED_MEMBERS ',
+  REMOVE_VERIFIED_MEMBERS = 'REMOVE_VERIFIED_MEMBERS ',
 }
 
 export interface AddVerifiedMembersOperation {
-  type: OperationType.ADD;
-  entity: Entity.VERIFIED_MEMBERS;
-  colonyAddress: string;
-  members: string[];
+  type: MetadataDeltaActionType.ADD_VERIFIED_MEMBERS;
+  payload: string[];
 }
 
 export type MetadataDeltaOperation = AddVerifiedMembersOperation;

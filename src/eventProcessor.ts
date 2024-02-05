@@ -350,7 +350,6 @@ export default async (event: ContractEvent): Promise<void> => {
       return;
     }
 
-    // All ColonyMetadataDelta events
     case ContractEventsSignatures.ColonyMetadataDelta:
       await handleColonyMetadataDelta(event);
       return;
