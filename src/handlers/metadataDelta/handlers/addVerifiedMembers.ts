@@ -10,8 +10,7 @@ import {
   GetVerifiedMemberQueryVariables,
 } from '~graphql';
 import { ContractEvent } from '~types';
-import { writeActionFromEvent } from '~utils';
-import { AddVerifiedMembersOperation } from '../types';
+import { AddVerifiedMembersOperation, writeActionFromEvent } from '~utils';
 
 export const handleAddVerifiedMembers = async (
   event: ContractEvent,
