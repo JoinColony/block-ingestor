@@ -47,7 +47,7 @@ export const handleMetadataDeltaMotion = async (
     if (isAddVerifiedMembersOperation(operation)) {
       await createMotionInDB(event, {
         type: ColonyActionType.AddVerifiedMembersMotion,
-        members: operation.members,
+        members: operation.payload,
         pendingColonyMetadataId,
         gasEstimate: gasEstimate.toString(),
       });
