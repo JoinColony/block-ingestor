@@ -1,19 +1,5 @@
 import { verbose } from '~utils';
-import {
-  AddVerifiedMembersOperation,
-  Entity,
-  OperationType,
-  MetadataDeltaOperation,
-} from './types';
-
-export const isAddVerifiedMembersOperation = (
-  operation: MetadataDeltaOperation,
-): operation is AddVerifiedMembersOperation => {
-  return (
-    operation.entity === Entity.VERIFIED_MEMBERS &&
-    operation.type === OperationType.ADD
-  );
-};
+import { MetadataDeltaOperation, MetadataDeltaActionType } from './types';
 
 export const isMetadataDeltaOperation = (
   operation: any,
@@ -22,20 +8,16 @@ export const isMetadataDeltaOperation = (
     typeof operation === 'object' &&
     operation !== null &&
     operation.type !== undefined &&
-    operation.entity !== undefined &&
-    operation.colonyAddress !== undefined &&
-    typeof operation.colonyAddress === 'string' &&
-    operation.members !== undefined &&
-    Array.isArray(operation.members)
+    Object.values(MetadataDeltaActionType).includes(operation.type)
   );
 };
 
-export const parseOperation = (operationString: string): object => {
+export const parseOperation = (operationString: string): object | null => {
   const operation = JSON.parse(operationString);
 
   if (typeof operation !== 'object') {
     verbose('Operation not an object: ', operation);
-    throw new Error('Operation not an object');
+    return null;
   }
 
   return operation;
