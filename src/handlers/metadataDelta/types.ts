@@ -9,7 +9,7 @@ export interface AddVerifiedMembersOperation {
 }
 
 export interface RemoveVerifiedMembersOperation {
-  type: MetadataDeltaActionType.REMOVE_VERIFIED_MEMBERS;
+  type: MetadataDeltaOperationType.REMOVE_VERIFIED_MEMBERS;
   payload: string[];
 }
 
