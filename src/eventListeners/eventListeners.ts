@@ -28,6 +28,10 @@ export const getMatchingListener = (
         return false;
       }
 
+      if (listener.topics.length > logTopics.length) {
+        return false;
+      }
+
       return listener.topics.every((topic, index) => {
         if (topic === null) {
           // if listener topic is null, skip the check
