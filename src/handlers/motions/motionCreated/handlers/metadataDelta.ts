@@ -5,7 +5,6 @@ import { ContractEvent } from '~types';
 import {
   getPendingMetadataDatabaseId,
   isAddVerifiedMembersOperation,
-  isMetadataDeltaOperation,
   parseOperation,
   verbose,
 } from '~utils';
@@ -22,7 +21,7 @@ export const handleMetadataDeltaMotion = async (
   }
 
   try {
-    const operationString = desc.args[0];
+    const operationString = desc.args.metadata;
 
     if (!operationString) {
       verbose('Unable to get operation for ColonyMetadataDelta motion event');
@@ -31,11 +30,7 @@ export const handleMetadataDeltaMotion = async (
 
     const operation = parseOperation(operationString);
 
-    if (!isMetadataDeltaOperation(operation)) {
-      verbose(
-        'Operation does not conform to MetadataDeltaOperation type: ',
-        operation,
-      );
+    if (operation === null) {
       return;
     }
 
