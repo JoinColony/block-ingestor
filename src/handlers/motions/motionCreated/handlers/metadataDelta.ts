@@ -21,7 +21,7 @@ export const handleMetadataDeltaMotion = async (
   }
 
   try {
-    const operationString = desc.args.metadata;
+    const operationString = desc.args[0];
 
     if (!operationString) {
       verbose('Unable to get operation for ColonyMetadataDelta motion event');
