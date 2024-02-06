@@ -1,10 +1,10 @@
-export enum MetadataDeltaActionType {
-  ADD_VERIFIED_MEMBERS = 'ADD_VERIFIED_MEMBERS ',
-  REMOVE_VERIFIED_MEMBERS = 'REMOVE_VERIFIED_MEMBERS ',
+export enum MetadataDeltaOperationType {
+  ADD_VERIFIED_MEMBERS = 'ADD_VERIFIED_MEMBERS',
+  REMOVE_VERIFIED_MEMBERS = 'REMOVE_VERIFIED_MEMBERS',
 }
 
 export interface AddVerifiedMembersOperation {
-  type: MetadataDeltaActionType.ADD_VERIFIED_MEMBERS;
+  type: MetadataDeltaOperationType.ADD_VERIFIED_MEMBERS;
   payload: string[];
 }
 
