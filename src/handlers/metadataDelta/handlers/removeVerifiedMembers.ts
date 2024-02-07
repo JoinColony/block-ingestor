@@ -1,3 +1,4 @@
+import { utils } from 'ethers';
 import { mutate, query } from '~amplifyClient';
 import {
   ColonyActionType,
@@ -9,37 +10,26 @@ import {
   GetVerifiedMemberQueryVariables,
 } from '~graphql';
 import { ContractEvent } from '~types';
-import { verbose, writeActionFromEvent } from '~utils';
-import {
-  MetadataDeltaOperationType,
-  MetadataDeltaOperation,
-  RemoveVerifiedMembersOperation,
-} from '../types';
-
-export const isRemoveVerifiedMembersOperation = (
-  operation: MetadataDeltaOperation,
-): operation is RemoveVerifiedMembersOperation => {
-  return (
-    operation.type === MetadataDeltaOperationType.REMOVE_VERIFIED_MEMBERS &&
-    operation.payload !== undefined &&
-    Array.isArray(operation.payload)
-  );
-};
+import { writeActionFromEvent } from '~utils';
+import { RemoveVerifiedMembersOperation } from '../types';
 
 export const handleRemoveVerifiedMembers = async (
   event: ContractEvent,
-  operation: MetadataDeltaOperation,
+  operation: RemoveVerifiedMembersOperation,
 ): Promise<void> => {
-  if (!isRemoveVerifiedMembersOperation(operation)) {
-    verbose('Malformed RemoveVerifiedMembers operation: ', operation);
-    return;
-  }
-
   const { contractAddress: colonyAddress } = event;
   const { agent: initiatorAddress } = event.args;
 
-  await Promise.all(
-    operation.payload.map(async (userAddress) => {
+  await Promise.allSettled(
+    operation.payload.map(async (address) => {
+      let userAddress;
+      try {
+        userAddress = utils.getAddress(address);
+      } catch (error) {
+        // Bail if it's not an address
+        return;
+      }
+
       const item = await query<
         GetVerifiedMemberQuery,
         GetVerifiedMemberQueryVariables
@@ -47,10 +37,9 @@ export const handleRemoveVerifiedMembers = async (
 
       const verifiedMemberData = item?.data?.getVerifiedMember;
 
+      // If user is already unverified, don't unverify them again
       if (verifiedMemberData === null || verifiedMemberData === undefined) {
-        throw new Error(
-          `User ${userAddress} is not a verified member of the colony ${colonyAddress}`,
-        );
+        return;
       }
 
       await mutate<
