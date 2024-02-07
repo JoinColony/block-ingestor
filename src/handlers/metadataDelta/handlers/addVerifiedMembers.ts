@@ -1,3 +1,4 @@
+import { utils } from 'ethers';
 import { mutate, query } from '~amplifyClient';
 import {
   ColonyActionType,
@@ -9,37 +10,26 @@ import {
   GetVerifiedMemberQueryVariables,
 } from '~graphql';
 import { ContractEvent } from '~types';
-import { verbose, writeActionFromEvent } from '~utils';
-import {
-  AddVerifiedMembersOperation,
-  MetadataDeltaOperationType,
-  MetadataDeltaOperation,
-} from '../types';
-
-const isAddVerifiedMembersOperation = (
-  operation: MetadataDeltaOperation,
-): operation is AddVerifiedMembersOperation => {
-  return (
-    operation.type === MetadataDeltaOperationType.ADD_VERIFIED_MEMBERS &&
-    operation.payload !== undefined &&
-    Array.isArray(operation.payload)
-  );
-};
+import { writeActionFromEvent } from '~utils';
+import { AddVerifiedMembersOperation } from '../types';
 
 export const handleAddVerifiedMembers = async (
   event: ContractEvent,
-  operation: MetadataDeltaOperation,
+  operation: AddVerifiedMembersOperation,
 ): Promise<void> => {
-  if (!isAddVerifiedMembersOperation(operation)) {
-    verbose('Malformed AddVerifiedMembers operation: ', operation);
-    return;
-  }
-
   const { contractAddress: colonyAddress } = event;
   const { agent: initiatorAddress } = event.args;
 
-  await Promise.all(
-    operation.payload.map(async (userAddress) => {
+  await Promise.allSettled(
+    operation.payload.map(async (address) => {
+      let userAddress;
+      try {
+        userAddress = utils.getAddress(address);
+      } catch (error) {
+        // Bail if it's not an address
+        return;
+      }
+
       const item = await query<
         GetVerifiedMemberQuery,
         GetVerifiedMemberQueryVariables
@@ -47,10 +37,9 @@ export const handleAddVerifiedMembers = async (
 
       const verifiedMemberData = item?.data?.getVerifiedMember;
 
+      // If user is already verified, don't verify them again
       if (verifiedMemberData !== undefined && verifiedMemberData !== null) {
-        throw new Error(
-          `User ${userAddress} already a verified member of the colony ${colonyAddress}`,
-        );
+        return;
       }
 
       await mutate<

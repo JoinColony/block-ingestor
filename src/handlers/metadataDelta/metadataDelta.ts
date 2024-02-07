@@ -1,16 +1,10 @@
 import { ContractEvent } from '~types';
 import { verbose } from '~utils';
-import { parseOperation } from './utils';
-import { MetadataDeltaOperationType } from './types';
+import { isAddVerifiedMembersOperation, parseOperation } from './utils';
 import { handleAddVerifiedMembers } from './handlers/addVerifiedMembers';
 
 export default async (event: ContractEvent): Promise<void> => {
   const operationString = event.args.metadata;
-
-  if (!operationString) {
-    verbose('Unable to get operation for ColonyMetadataDelta event');
-    return;
-  }
 
   const operation = parseOperation(operationString);
 
@@ -18,9 +12,10 @@ export default async (event: ContractEvent): Promise<void> => {
     return;
   }
 
-  switch (operation.type) {
-    case MetadataDeltaOperationType.ADD_VERIFIED_MEMBERS:
-      await handleAddVerifiedMembers(event, operation);
-      break;
+  if (isAddVerifiedMembersOperation(operation)) {
+    await handleAddVerifiedMembers(event, operation);
+    return;
   }
+
+  verbose('Unknown operation type: ', operation);
 };
