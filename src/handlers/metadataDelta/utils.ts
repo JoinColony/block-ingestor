@@ -1,5 +1,20 @@
 import { verbose } from '~utils';
-import { MetadataDeltaOperation, MetadataDeltaOperationType } from './types';
+import {
+  AddVerifiedMembersOperation,
+  MetadataDeltaOperation,
+  MetadataDeltaOperationType,
+} from './types';
+
+export const isAddVerifiedMembersOperation = (
+  operation: MetadataDeltaOperation,
+): operation is AddVerifiedMembersOperation => {
+  return (
+    operation.type === MetadataDeltaOperationType.ADD_VERIFIED_MEMBERS &&
+    operation.payload !== undefined &&
+    Array.isArray(operation.payload) &&
+    operation.payload.every((item) => typeof item === 'string')
+  );
+};
 
 const isMetadataDeltaOperation = (
   operation: any,
