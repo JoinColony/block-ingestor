@@ -1,6 +1,7 @@
 import { verbose } from '~utils';
 import {
   AddVerifiedMembersOperation,
+  RemoveVerifiedMembersOperation,
   MetadataDeltaOperation,
   MetadataDeltaOperationType,
 } from './types';
@@ -10,6 +11,17 @@ export const isAddVerifiedMembersOperation = (
 ): operation is AddVerifiedMembersOperation => {
   return (
     operation.type === MetadataDeltaOperationType.ADD_VERIFIED_MEMBERS &&
+    operation.payload !== undefined &&
+    Array.isArray(operation.payload) &&
+    operation.payload.every((item) => typeof item === 'string')
+  );
+};
+
+export const isRemoveVerifiedMembersOperation = (
+  operation: MetadataDeltaOperation,
+): operation is RemoveVerifiedMembersOperation => {
+  return (
+    operation.type === MetadataDeltaOperationType.REMOVE_VERIFIED_MEMBERS &&
     operation.payload !== undefined &&
     Array.isArray(operation.payload) &&
     operation.payload.every((item) => typeof item === 'string')

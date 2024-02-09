@@ -8,4 +8,11 @@ export interface AddVerifiedMembersOperation {
   payload: string[];
 }
 
-export type MetadataDeltaOperation = AddVerifiedMembersOperation;
+export interface RemoveVerifiedMembersOperation {
+  type: MetadataDeltaOperationType.REMOVE_VERIFIED_MEMBERS;
+  payload: string[];
+}
+
+export type MetadataDeltaOperation =
+  | AddVerifiedMembersOperation
+  | RemoveVerifiedMembersOperation;

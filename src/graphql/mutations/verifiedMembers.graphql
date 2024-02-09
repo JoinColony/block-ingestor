@@ -11,3 +11,10 @@ mutation CreateVerifiedMember($input: CreateVerifiedMemberInput!) {
     colonyAddress
   }
 }
+
+mutation DeleteVerifiedMember($input: DeleteVerifiedMemberInput!) {
+  deleteVerifiedMember(input: $input) {
+    userAddress
+    colonyAddress
+  }
+}
