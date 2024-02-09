@@ -10,7 +10,6 @@ import { handleRemoveVerifiedMembers } from './handlers/removeVerifiedMembers';
 
 export default async (event: ContractEvent): Promise<void> => {
   const operationString = event.args.metadata;
-
   const operation = parseOperation(operationString);
 
   if (operation === null) {
