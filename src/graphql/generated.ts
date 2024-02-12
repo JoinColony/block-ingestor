@@ -418,7 +418,12 @@ export enum ColonyActionType {
 =======
   /** An action related to removing verified members */
   RemoveVerifiedMembers = 'REMOVE_VERIFIED_MEMBERS',
+<<<<<<< HEAD
 >>>>>>> 2b9a514 (Add: Remove Verified Member)
+=======
+  /** An action related to removing verified members via a motion */
+  RemoveVerifiedMembersMotion = 'REMOVE_VERIFIED_MEMBERS_MOTION',
+>>>>>>> 172272c (Feat: Implement remove verified members motion handling)
   /** An action related to setting user roles within a Colony */
   SetUserRoles = 'SET_USER_ROLES',
   /** An action related to setting user roles within a Colony via a motion */
