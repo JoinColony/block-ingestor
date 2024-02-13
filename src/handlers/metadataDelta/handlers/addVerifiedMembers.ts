@@ -8,9 +8,14 @@ import {
   GetVerifiedMemberDocument,
   GetVerifiedMemberQuery,
   GetVerifiedMemberQueryVariables,
+  UpdateColonyContributorDocument,
+  UpdateColonyContributorMutation,
+  UpdateColonyContributorMutationVariables,
 } from '~graphql';
 import { ContractEvent } from '~types';
 import { AddVerifiedMembersOperation, writeActionFromEvent } from '~utils';
+
+import { getColonyContributorId } from '~utils/contributors';
 
 export const handleAddVerifiedMembers = async (
   event: ContractEvent,
@@ -46,6 +51,16 @@ export const handleAddVerifiedMembers = async (
         CreateVerifiedMemberMutationVariables
       >(CreateVerifiedMemberDocument, {
         input: { colonyAddress, userAddress },
+      });
+
+      await mutate<
+        UpdateColonyContributorMutation,
+        UpdateColonyContributorMutationVariables
+      >(UpdateColonyContributorDocument, {
+        input: {
+          id: getColonyContributorId(colonyAddress, userAddress),
+          isVerified: true,
+        },
       });
     }),
   );
