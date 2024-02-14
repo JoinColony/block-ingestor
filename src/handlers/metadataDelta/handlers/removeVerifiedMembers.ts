@@ -2,12 +2,9 @@ import { utils } from 'ethers';
 import { mutate, query } from '~amplifyClient';
 import {
   ColonyActionType,
-  DeleteVerifiedMemberDocument,
-  DeleteVerifiedMemberMutation,
-  DeleteVerifiedMemberMutationVariables,
-  GetVerifiedMemberDocument,
-  GetVerifiedMemberQuery,
-  GetVerifiedMemberQueryVariables,
+  GetColonyContributorDocument,
+  GetColonyContributorQuery,
+  GetColonyContributorQueryVariables,
   UpdateColonyContributorDocument,
   UpdateColonyContributorMutation,
   UpdateColonyContributorMutationVariables,
@@ -35,23 +32,16 @@ export const handleRemoveVerifiedMembers = async (
       }
 
       const item = await query<
-        GetVerifiedMemberQuery,
-        GetVerifiedMemberQueryVariables
-      >(GetVerifiedMemberDocument, { colonyAddress, userAddress });
-
-      const verifiedMemberData = item?.data?.getVerifiedMember;
+        GetColonyContributorQuery,
+        GetColonyContributorQueryVariables
+      >(GetColonyContributorDocument, {
+        id: getColonyContributorId(colonyAddress, userAddress),
+      });
 
       // If user is already unverified, don't unverify them again
-      if (verifiedMemberData === null || verifiedMemberData === undefined) {
+      if (!item?.data?.getColonyContributor?.isVerified) {
         return;
       }
-
-      await mutate<
-        DeleteVerifiedMemberMutation,
-        DeleteVerifiedMemberMutationVariables
-      >(DeleteVerifiedMemberDocument, {
-        input: { colonyAddress, userAddress },
-      });
 
       await mutate<
         UpdateColonyContributorMutation,
