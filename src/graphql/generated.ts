@@ -104,13 +104,20 @@ export type Colony = {
   actions?: Maybe<ModelColonyActionConnection>;
   /** Returns a list token balances for each domain and each token that the colony has */
   balances?: Maybe<ColonyBalances>;
-  /** List of native chain token claims (e.g., Token 0x0000...0000: ETH, xDAI, etc.) */
+  /**
+   * Native chain token claim (e.g., Token 0x0000...0000: ETH, xDAI, etc.)
+   * This is not an array since only a single token type can be returned
+   */
   chainFundsClaim?: Maybe<ColonyChainFundsClaim>;
   /** Metadata related to the chain of the Colony */
   chainMetadata: ChainMetadata;
-  /** Colony MemberInvite */
+  /**
+   * The main member invite object
+   * It is possible to create multiple member invites for a given colony
+   * but only one of them is considered the `main` one
+   */
   colonyMemberInvite?: Maybe<ColonyMemberInvite>;
-  /** Invite code ID associated with the invite */
+  /** ID of the main member invite object */
   colonyMemberInviteCode?: Maybe<Scalars['ID']>;
   createdAt: Scalars['AWSDateTime'];
   domains?: Maybe<ModelDomainConnection>;
@@ -483,7 +490,7 @@ export type ColonyChainFundsClaimInput = {
 export type ColonyContributor = {
   __typename?: 'ColonyContributor';
   /** Associated colony */
-  colony?: Maybe<Colony>;
+  colony: Colony;
   /** Address of the colony the contributor is under */
   colonyAddress: Scalars['ID'];
   /** The contributor's reputation percentage in the colony */
@@ -650,13 +657,11 @@ export type ColonyMemberInvite = {
   /** Colony ID associated with the ColonyMemberInvite */
   colonyId: Scalars['ID'];
   createdAt: Scalars['AWSDateTime'];
-  /** The uuid invite code generated automatically by amplify */
+  /** Self-managed id which is used as the invite code */
   id: Scalars['ID'];
   /** Decrementing count of how many times this invite has been used */
   invitesRemaining: Scalars['Int'];
   updatedAt: Scalars['AWSDateTime'];
-  /** Whether the invite is still valid or not */
-  valid: Scalars['Boolean'];
 };
 
 /** Represents metadata for a Colony */
@@ -1195,7 +1200,6 @@ export type CreateColonyMemberInviteInput = {
   colonyId: Scalars['ID'];
   id?: InputMaybe<Scalars['ID']>;
   invitesRemaining: Scalars['Int'];
-  valid: Scalars['Boolean'];
 };
 
 export type CreateColonyMetadataInput = {
@@ -1387,6 +1391,7 @@ export type CreateProfileInput = {
   id?: InputMaybe<Scalars['ID']>;
   location?: InputMaybe<Scalars['String']>;
   meta?: InputMaybe<ProfileMetadataInput>;
+  preferredCurrency?: InputMaybe<SupportedCurrencies>;
   thumbnail?: InputMaybe<Scalars['String']>;
   website?: InputMaybe<Scalars['AWSURL']>;
 };
@@ -1908,14 +1913,21 @@ export type ExpenditureMetadata = {
 
 export type ExpenditurePayout = {
   __typename?: 'ExpenditurePayout';
+  /** Payout amount, excluding network fee */
   amount: Scalars['String'];
   isClaimed: Scalars['Boolean'];
+  /**
+   * Network fee amount
+   * @TODO: Make this a non-nullable field once existing data is updated
+   */
+  networkFee?: Maybe<Scalars['String']>;
   tokenAddress: Scalars['ID'];
 };
 
 export type ExpenditurePayoutInput = {
   amount: Scalars['String'];
   isClaimed: Scalars['Boolean'];
+  networkFee?: InputMaybe<Scalars['String']>;
   tokenAddress: Scalars['ID'];
 };
 
@@ -2065,23 +2077,6 @@ export type GetMotionTimeoutPeriodsReturn = {
   timeLeftToStake: Scalars['String'];
   /** Time left in voting period */
   timeLeftToVote: Scalars['String'];
-};
-
-/** Input data for retrieving a user's reputation within the top domains of a Colony */
-export type GetReputationForTopDomainsInput = {
-  /** The address of the Colony */
-  colonyAddress: Scalars['String'];
-  /** The root hash of the reputation tree at a specific point in time */
-  rootHash?: InputMaybe<Scalars['String']>;
-  /** The wallet address of the user */
-  walletAddress: Scalars['String'];
-};
-
-/** A return type that contains an array of UserDomainReputation items */
-export type GetReputationForTopDomainsReturn = {
-  __typename?: 'GetReputationForTopDomainsReturn';
-  /** An array of UserDomainReputation items */
-  items?: Maybe<Array<UserDomainReputation>>;
 };
 
 export type GetSafeTransactionStatusInput = {
@@ -2529,7 +2524,6 @@ export type ModelColonyMemberInviteConditionInput = {
   invitesRemaining?: InputMaybe<ModelIntInput>;
   not?: InputMaybe<ModelColonyMemberInviteConditionInput>;
   or?: InputMaybe<Array<InputMaybe<ModelColonyMemberInviteConditionInput>>>;
-  valid?: InputMaybe<ModelBooleanInput>;
 };
 
 export type ModelColonyMemberInviteConnection = {
@@ -2545,7 +2539,6 @@ export type ModelColonyMemberInviteFilterInput = {
   invitesRemaining?: InputMaybe<ModelIntInput>;
   not?: InputMaybe<ModelColonyMemberInviteFilterInput>;
   or?: InputMaybe<Array<InputMaybe<ModelColonyMemberInviteFilterInput>>>;
-  valid?: InputMaybe<ModelBooleanInput>;
 };
 
 export type ModelColonyMetadataConditionInput = {
@@ -3175,6 +3168,7 @@ export type ModelProfileConditionInput = {
   location?: InputMaybe<ModelStringInput>;
   not?: InputMaybe<ModelProfileConditionInput>;
   or?: InputMaybe<Array<InputMaybe<ModelProfileConditionInput>>>;
+  preferredCurrency?: InputMaybe<ModelSupportedCurrenciesInput>;
   thumbnail?: InputMaybe<ModelStringInput>;
   website?: InputMaybe<ModelStringInput>;
 };
@@ -3196,6 +3190,7 @@ export type ModelProfileFilterInput = {
   location?: InputMaybe<ModelStringInput>;
   not?: InputMaybe<ModelProfileFilterInput>;
   or?: InputMaybe<Array<InputMaybe<ModelProfileFilterInput>>>;
+  preferredCurrency?: InputMaybe<ModelSupportedCurrenciesInput>;
   thumbnail?: InputMaybe<ModelStringInput>;
   website?: InputMaybe<ModelStringInput>;
 };
@@ -3562,7 +3557,6 @@ export type ModelSubscriptionColonyMemberInviteFilterInput = {
   or?: InputMaybe<
     Array<InputMaybe<ModelSubscriptionColonyMemberInviteFilterInput>>
   >;
-  valid?: InputMaybe<ModelSubscriptionBooleanInput>;
 };
 
 export type ModelSubscriptionColonyMetadataFilterInput = {
@@ -3843,6 +3837,7 @@ export type ModelSubscriptionProfileFilterInput = {
   id?: InputMaybe<ModelSubscriptionIdInput>;
   location?: InputMaybe<ModelSubscriptionStringInput>;
   or?: InputMaybe<Array<InputMaybe<ModelSubscriptionProfileFilterInput>>>;
+  preferredCurrency?: InputMaybe<ModelSubscriptionStringInput>;
   thumbnail?: InputMaybe<ModelSubscriptionStringInput>;
   website?: InputMaybe<ModelSubscriptionStringInput>;
 };
@@ -3998,6 +3993,11 @@ export type ModelSubscriptionUserTokensFilterInput = {
   or?: InputMaybe<Array<InputMaybe<ModelSubscriptionUserTokensFilterInput>>>;
   tokenID?: InputMaybe<ModelSubscriptionIdInput>;
   userID?: InputMaybe<ModelSubscriptionIdInput>;
+};
+
+export type ModelSupportedCurrenciesInput = {
+  eq?: InputMaybe<SupportedCurrencies>;
+  ne?: InputMaybe<SupportedCurrencies>;
 };
 
 export type ModelTokenConditionInput = {
@@ -5296,6 +5296,8 @@ export type Profile = {
   location?: Maybe<Scalars['String']>;
   /** Metadata associated with the user's profile */
   meta?: Maybe<ProfileMetadata>;
+  /** A user's prefered currency, for conversion purposes */
+  preferredCurrency?: Maybe<SupportedCurrencies>;
   /** URL of the user's thumbnail image */
   thumbnail?: Maybe<Scalars['String']>;
   updatedAt: Scalars['AWSDateTime'];
@@ -5405,8 +5407,6 @@ export type Query = {
   getProfile?: Maybe<Profile>;
   getProfileByEmail?: Maybe<ModelProfileConnection>;
   getProfileByUsername?: Maybe<ModelProfileConnection>;
-  /** Retrieve a user's reputation within the top domains of a Colony */
-  getReputationForTopDomains?: Maybe<GetReputationForTopDomainsReturn>;
   getReputationMiningCycleMetadata?: Maybe<ReputationMiningCycleMetadata>;
   getRoleByDomainAndColony?: Maybe<ModelColonyRoleConnection>;
   getRoleByTargetAddressAndColony?: Maybe<ModelColonyRoleConnection>;
@@ -5832,11 +5832,6 @@ export type QueryGetProfileByUsernameArgs = {
   limit?: InputMaybe<Scalars['Int']>;
   nextToken?: InputMaybe<Scalars['String']>;
   sortDirection?: InputMaybe<ModelSortDirection>;
-};
-
-/** Root query type */
-export type QueryGetReputationForTopDomainsArgs = {
-  input?: InputMaybe<GetReputationForTopDomainsInput>;
 };
 
 /** Root query type */
@@ -7233,6 +7228,20 @@ export type SubscriptionOnUpdateUserTokensArgs = {
   filter?: InputMaybe<ModelSubscriptionUserTokensFilterInput>;
 };
 
+/** Represents the currencies/tokens that users' balances can be converted to (for display purposes) */
+export enum SupportedCurrencies {
+  Brl = 'BRL',
+  Cad = 'CAD',
+  Clny = 'CLNY',
+  Eth = 'ETH',
+  Eur = 'EUR',
+  Gbp = 'GBP',
+  Inr = 'INR',
+  Jpy = 'JPY',
+  Krw = 'KRW',
+  Usd = 'USD',
+}
+
 /** Represents an ERC20-compatible token that is used by Colonies and users */
 export type Token = {
   __typename?: 'Token';
@@ -7548,7 +7557,6 @@ export type UpdateColonyMemberInviteInput = {
   colonyId?: InputMaybe<Scalars['ID']>;
   id: Scalars['ID'];
   invitesRemaining?: InputMaybe<Scalars['Int']>;
-  valid?: InputMaybe<Scalars['Boolean']>;
 };
 
 export type UpdateColonyMetadataInput = {
@@ -7768,6 +7776,7 @@ export type UpdateProfileInput = {
   id: Scalars['ID'];
   location?: InputMaybe<Scalars['String']>;
   meta?: InputMaybe<ProfileMetadataInput>;
+  preferredCurrency?: InputMaybe<SupportedCurrencies>;
   thumbnail?: InputMaybe<Scalars['String']>;
   website?: InputMaybe<Scalars['AWSURL']>;
 };
@@ -7934,15 +7943,6 @@ export type UserTransactionHistoryArgs = {
   limit?: InputMaybe<Scalars['Int']>;
   nextToken?: InputMaybe<Scalars['String']>;
   sortDirection?: InputMaybe<ModelSortDirection>;
-};
-
-/** A type representing a user's reputation within a domain */
-export type UserDomainReputation = {
-  __typename?: 'UserDomainReputation';
-  /** The integer ID of the Domain within the Colony */
-  domainId: Scalars['Int'];
-  /** The user's reputation within the domain, represented as a percentage */
-  reputationPercentage: Scalars['String'];
 };
 
 /** Stakes that a user has made for a motion */
