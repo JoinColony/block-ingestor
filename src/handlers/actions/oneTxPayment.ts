@@ -7,9 +7,6 @@ import {
   GetColonyExtensionDocument,
   GetColonyExtensionQuery,
   GetColonyExtensionQueryVariables,
-  GetCurrentNetworkInverseFeeDocument,
-  GetCurrentNetworkInverseFeeQuery,
-  GetCurrentNetworkInverseFeeQueryVariables,
 } from '~graphql';
 import provider from '~provider';
 import { ContractEvent, ContractEventsSignatures } from '~types';
@@ -24,7 +21,7 @@ import {
   isColonyAddress,
   createFundsClaim,
 } from '~utils';
-import { getAmountLessFee } from '~utils/networkFee';
+import { getAmountLessFee, getNetworkInverseFee } from '~utils/networkFee';
 
 const PAYOUT_CLAIMED_SIGNATURE_HASH = utils.id(
   ContractEventsSignatures.PayoutClaimed,
@@ -80,14 +77,8 @@ export default async (oneTxPaymentEvent: ContractEvent): Promise<void> => {
     return;
   }
 
-  const { data: networkFeeData } =
-    (await query<
-      GetCurrentNetworkInverseFeeQuery,
-      GetCurrentNetworkInverseFeeQueryVariables
-    >(GetCurrentNetworkInverseFeeDocument)) ?? {};
-  const networkFee =
-    networkFeeData?.listCurrentNetworkInverseFees?.items?.[0]?.inverseFee;
-  if (!networkFee) {
+  const networkInverseFee = await getNetworkInverseFee();
+  if (!networkInverseFee) {
     return;
   }
 
@@ -97,10 +88,20 @@ export default async (oneTxPaymentEvent: ContractEvent): Promise<void> => {
     case 3:
     case 4:
     case 5:
-      handlerV1ToV5(oneTxPaymentEvent, colonyAddress, colonyClient, networkFee);
+      handlerV1ToV5(
+        oneTxPaymentEvent,
+        colonyAddress,
+        colonyClient,
+        networkInverseFee,
+      );
       break;
     case 6:
-      handlerV6(oneTxPaymentEvent, colonyAddress, colonyClient, networkFee);
+      handlerV6(
+        oneTxPaymentEvent,
+        colonyAddress,
+        colonyClient,
+        networkInverseFee,
+      );
       break;
   }
 };
