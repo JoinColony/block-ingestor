@@ -1839,7 +1839,7 @@ export type DomainMetadataChangelogInput = {
 
 export type Expenditure = {
   __typename?: 'Expenditure';
-  /** Array containing expenditure balances */
+  /** Array containing balances of tokens in the expenditure */
   balances?: Maybe<Array<ExpenditureBalance>>;
   /** The Colony to which the expenditure belongs */
   colony: Colony;
@@ -1891,13 +1891,11 @@ export type ExpenditureMotionsArgs = {
 export type ExpenditureBalance = {
   __typename?: 'ExpenditureBalance';
   amount: Scalars['String'];
-  requiredAmount: Scalars['String'];
   tokenAddress: Scalars['ID'];
 };
 
 export type ExpenditureBalanceInput = {
   amount: Scalars['String'];
-  requiredAmount: Scalars['String'];
   tokenAddress: Scalars['ID'];
 };
 
@@ -8941,6 +8939,11 @@ export type GetExpenditureByNativeFundingPotIdAndColonyQuery = {
     items: Array<{
       __typename?: 'Expenditure';
       id: string;
+      balances?: Array<{
+        __typename?: 'ExpenditureBalance';
+        tokenAddress: string;
+        amount: string;
+      }> | null;
       motions?: {
         __typename?: 'ModelColonyMotionConnection';
         items: Array<{
@@ -10027,6 +10030,10 @@ export const GetExpenditureByNativeFundingPotIdAndColonyDocument = gql`
     ) {
       items {
         id
+        balances {
+          tokenAddress
+          amount
+        }
         motions {
           items {
             transactionHash

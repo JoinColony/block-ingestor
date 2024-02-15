@@ -25,6 +25,10 @@ query GetExpenditureByNativeFundingPotIdAndColony(
   ) {
     items {
       id
+      balances {
+        tokenAddress
+        amount
+      }
       motions {
         items {
           transactionHash
