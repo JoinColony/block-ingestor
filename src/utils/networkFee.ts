@@ -1,4 +1,10 @@
 import { BigNumber, BigNumberish } from 'ethers';
+import { query } from '~amplifyClient';
+import {
+  GetCurrentNetworkInverseFeeDocument,
+  GetCurrentNetworkInverseFeeQuery,
+  GetCurrentNetworkInverseFeeQueryVariables,
+} from '~graphql';
 
 export const getAmountLessFee = (
   amount: BigNumberish,
@@ -14,4 +20,20 @@ export const getAmountLessFee = (
   return BigNumber.from(amount)
     .mul(BigNumber.from(100).sub(feePercentage))
     .div(100);
+};
+
+export const getNetworkInverseFee = async (): Promise<string | null> => {
+  const { data: networkFeeData } =
+    (await query<
+      GetCurrentNetworkInverseFeeQuery,
+      GetCurrentNetworkInverseFeeQueryVariables
+    >(GetCurrentNetworkInverseFeeDocument)) ?? {};
+  const networkInverseFee =
+    networkFeeData?.listCurrentNetworkInverseFees?.items?.[0]?.inverseFee;
+
+  if (!networkInverseFee) {
+    return null;
+  }
+
+  return networkInverseFee;
 };
