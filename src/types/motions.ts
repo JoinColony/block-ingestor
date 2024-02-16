@@ -19,6 +19,7 @@ export enum ColonyOperations {
   Multicall = 'multicall',
   MakeArbitraryTransactions = 'makeArbitraryTransactions',
   CancelStakedExpenditure = 'cancelAndPunish',
+  EditColonyByDelta = 'editColonyByDelta',
 }
 
 export enum MotionEvents {
