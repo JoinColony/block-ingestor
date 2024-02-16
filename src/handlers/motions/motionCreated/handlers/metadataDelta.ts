@@ -2,7 +2,12 @@ import { BigNumber } from 'ethers';
 import { TransactionDescription } from 'ethers/lib/utils';
 import { ColonyActionType } from '~graphql';
 import { ContractEvent } from '~types';
-import { isAddVerifiedMembersOperation, parseOperation, verbose } from '~utils';
+import {
+  isAddVerifiedMembersOperation,
+  isRemoveVerifiedMembersOperation,
+  parseOperation,
+  verbose,
+} from '~utils';
 import { createMotionInDB } from '../helpers';
 
 export const handleMetadataDeltaMotion = async (
@@ -27,6 +32,14 @@ export const handleMetadataDeltaMotion = async (
     if (isAddVerifiedMembersOperation(operation)) {
       await createMotionInDB(event, {
         type: ColonyActionType.AddVerifiedMembersMotion,
+        members: operation.payload,
+        gasEstimate: gasEstimate.toString(),
+      });
+    }
+
+    if (isRemoveVerifiedMembersOperation(operation)) {
+      await createMotionInDB(event, {
+        type: ColonyActionType.RemoveVerifiedMembersMotion,
         members: operation.payload,
         gasEstimate: gasEstimate.toString(),
       });
