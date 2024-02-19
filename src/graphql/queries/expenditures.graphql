@@ -12,6 +12,10 @@ query GetExpenditure($id: ID!) {
         isClaimed
       }
     }
+    balances {
+      tokenAddress
+      amount
+    }
   }
 }
 
