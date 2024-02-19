@@ -8924,6 +8924,11 @@ export type GetExpenditureQuery = {
         isClaimed: boolean;
       }> | null;
     }>;
+    balances?: Array<{
+      __typename?: 'ExpenditureBalance';
+      tokenAddress: string;
+      amount: string;
+    }> | null;
   } | null;
 };
 
@@ -10015,6 +10020,10 @@ export const GetExpenditureDocument = gql`
           amount
           isClaimed
         }
+      }
+      balances {
+        tokenAddress
+        amount
       }
     }
   }
