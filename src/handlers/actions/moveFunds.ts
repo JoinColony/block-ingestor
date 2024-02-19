@@ -8,9 +8,19 @@ import {
   verbose,
   getCachedColonyClient,
   isDomainFromFundingPotSupported,
+  insertAtIndex,
 } from '~utils';
 import provider from '~provider';
-import { ColonyActionType } from '~graphql';
+import {
+  ColonyActionType,
+  GetExpenditureByNativeFundingPotIdAndColonyDocument,
+  GetExpenditureByNativeFundingPotIdAndColonyQuery,
+  GetExpenditureByNativeFundingPotIdAndColonyQueryVariables,
+  UpdateExpenditureDocument,
+  UpdateExpenditureMutation,
+  UpdateExpenditureMutationVariables,
+} from '~graphql';
+import { mutate, query } from '~amplifyClient';
 
 export default async (event: ContractEvent): Promise<void> => {
   const receipt = await provider.getTransactionReceipt(event.transactionHash);
@@ -34,13 +44,64 @@ export default async (event: ContractEvent): Promise<void> => {
     toPot,
   } = event.args;
 
-  const colonyClient = await getCachedColonyClient(colonyAddress);
-  let fromDomainId: BigNumber | undefined;
-  let toDomainId: BigNumber | undefined;
+  const toQuery = await query<
+    GetExpenditureByNativeFundingPotIdAndColonyQuery,
+    GetExpenditureByNativeFundingPotIdAndColonyQueryVariables
+  >(GetExpenditureByNativeFundingPotIdAndColonyDocument, {
+    colonyAddress,
+    nativeFundingPotId: toNumber(toPot),
+  });
 
+  const toExpenditure =
+    toQuery?.data?.getExpendituresByNativeFundingPotIdAndColony?.items?.[0];
+
+  if (toExpenditure) {
+    const existingBalances = toExpenditure.balances ?? [];
+
+    const existingTokenBalanceIndex = existingBalances.findIndex(
+      (balance) => balance.tokenAddress === tokenAddress,
+    );
+    const existingTokenBalance =
+      existingTokenBalanceIndex !== -1
+        ? existingBalances[existingTokenBalanceIndex]
+        : undefined;
+
+    const updatedAmount = existingTokenBalance
+      ? BigNumber.from(existingTokenBalance.amount).add(amount).toString()
+      : BigNumber.from(amount).toString();
+    const updatedTokenBalance = {
+      tokenAddress,
+      amount: updatedAmount,
+    };
+    const updatedTokenBalanceIndex =
+      existingTokenBalanceIndex !== -1
+        ? existingTokenBalanceIndex
+        : existingBalances.length;
+
+    const updatedBalances = insertAtIndex(
+      existingBalances,
+      updatedTokenBalanceIndex,
+      updatedTokenBalance,
+    );
+
+    await mutate<UpdateExpenditureMutation, UpdateExpenditureMutationVariables>(
+      UpdateExpenditureDocument,
+      {
+        input: {
+          id: toExpenditure.id,
+          balances: updatedBalances,
+        },
+      },
+    );
+  }
+
+  const colonyClient = await getCachedColonyClient(colonyAddress);
   if (!colonyClient) {
     return;
   }
+
+  let fromDomainId: BigNumber | undefined;
+  let toDomainId: BigNumber | undefined;
 
   if (isDomainFromFundingPotSupported(colonyClient)) {
     fromDomainId = await colonyClient.getDomainFromFundingPot(fromPot, {
