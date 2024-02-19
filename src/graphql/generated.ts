@@ -8141,6 +8141,12 @@ export type ColonyMetadataFragment = {
   } | null;
 };
 
+export type ExpenditureBalanceFragment = {
+  __typename?: 'ExpenditureBalance';
+  tokenAddress: string;
+  amount: string;
+};
+
 export type ExtensionFragment = {
   __typename?: 'ColonyExtension';
   id: string;
@@ -9437,6 +9443,12 @@ export const ColonyMetadata = gql`
     }
   }
 `;
+export const ExpenditureBalance = gql`
+  fragment ExpenditureBalance on ExpenditureBalance {
+    tokenAddress
+    amount
+  }
+`;
 export const Extension = gql`
   fragment Extension on ColonyExtension {
     id
@@ -10022,11 +10034,11 @@ export const GetExpenditureDocument = gql`
         }
       }
       balances {
-        tokenAddress
-        amount
+        ...ExpenditureBalance
       }
     }
   }
+  ${ExpenditureBalance}
 `;
 export const GetExpenditureByNativeFundingPotIdAndColonyDocument = gql`
   query GetExpenditureByNativeFundingPotIdAndColony(
@@ -10040,8 +10052,7 @@ export const GetExpenditureByNativeFundingPotIdAndColonyDocument = gql`
       items {
         id
         balances {
-          tokenAddress
-          amount
+          ...ExpenditureBalance
         }
         motions {
           items {
@@ -10054,6 +10065,7 @@ export const GetExpenditureByNativeFundingPotIdAndColonyDocument = gql`
       }
     }
   }
+  ${ExpenditureBalance}
 `;
 export const GetExpenditureMetadataDocument = gql`
   query GetExpenditureMetadata($id: ID!) {
