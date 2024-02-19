@@ -8,7 +8,7 @@ import {
   verbose,
   getCachedColonyClient,
   isDomainFromFundingPotSupported,
-  insertAtIndex,
+  getUpdatedExpenditureBalances,
 } from '~utils';
 import provider from '~provider';
 import {
@@ -44,57 +44,6 @@ export default async (event: ContractEvent): Promise<void> => {
     toPot,
   } = event.args;
 
-  const toQuery = await query<
-    GetExpenditureByNativeFundingPotIdAndColonyQuery,
-    GetExpenditureByNativeFundingPotIdAndColonyQueryVariables
-  >(GetExpenditureByNativeFundingPotIdAndColonyDocument, {
-    colonyAddress,
-    nativeFundingPotId: toNumber(toPot),
-  });
-
-  const toExpenditure =
-    toQuery?.data?.getExpendituresByNativeFundingPotIdAndColony?.items?.[0];
-
-  if (toExpenditure) {
-    const existingBalances = toExpenditure.balances ?? [];
-
-    const existingTokenBalanceIndex = existingBalances.findIndex(
-      (balance) => balance.tokenAddress === tokenAddress,
-    );
-    const existingTokenBalance =
-      existingTokenBalanceIndex !== -1
-        ? existingBalances[existingTokenBalanceIndex]
-        : undefined;
-
-    const updatedAmount = existingTokenBalance
-      ? BigNumber.from(existingTokenBalance.amount).add(amount).toString()
-      : BigNumber.from(amount).toString();
-    const updatedTokenBalance = {
-      tokenAddress,
-      amount: updatedAmount,
-    };
-    const updatedTokenBalanceIndex =
-      existingTokenBalanceIndex !== -1
-        ? existingTokenBalanceIndex
-        : existingBalances.length;
-
-    const updatedBalances = insertAtIndex(
-      existingBalances,
-      updatedTokenBalanceIndex,
-      updatedTokenBalance,
-    );
-
-    await mutate<UpdateExpenditureMutation, UpdateExpenditureMutationVariables>(
-      UpdateExpenditureDocument,
-      {
-        input: {
-          id: toExpenditure.id,
-          balances: updatedBalances,
-        },
-      },
-    );
-  }
-
   const colonyClient = await getCachedColonyClient(colonyAddress);
   if (!colonyClient) {
     return;
@@ -124,4 +73,47 @@ export default async (event: ContractEvent): Promise<void> => {
       ? getDomainDatabaseId(colonyAddress, toNumber(toDomainId))
       : undefined,
   });
+
+  await updateExpenditureBalances(
+    colonyAddress,
+    toNumber(toPot),
+    tokenAddress,
+    amount,
+  );
+};
+
+const updateExpenditureBalances = async (
+  colonyAddress: string,
+  toPot: number,
+  tokenAddress: string,
+  amount: string,
+): Promise<void> => {
+  const response = await query<
+    GetExpenditureByNativeFundingPotIdAndColonyQuery,
+    GetExpenditureByNativeFundingPotIdAndColonyQueryVariables
+  >(GetExpenditureByNativeFundingPotIdAndColonyDocument, {
+    colonyAddress,
+    nativeFundingPotId: toPot,
+  });
+
+  const expenditure =
+    response?.data?.getExpendituresByNativeFundingPotIdAndColony?.items?.[0];
+
+  if (expenditure) {
+    const updatedBalances = getUpdatedExpenditureBalances(
+      expenditure.balances ?? [],
+      tokenAddress,
+      amount,
+    );
+
+    await mutate<UpdateExpenditureMutation, UpdateExpenditureMutationVariables>(
+      UpdateExpenditureDocument,
+      {
+        input: {
+          id: expenditure.id,
+          balances: updatedBalances,
+        },
+      },
+    );
+  }
 };

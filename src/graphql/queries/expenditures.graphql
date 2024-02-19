@@ -13,8 +13,7 @@ query GetExpenditure($id: ID!) {
       }
     }
     balances {
-      tokenAddress
-      amount
+      ...ExpenditureBalance
     }
   }
 }
@@ -30,8 +29,7 @@ query GetExpenditureByNativeFundingPotIdAndColony(
     items {
       id
       balances {
-        tokenAddress
-        amount
+        ...ExpenditureBalance
       }
       motions {
         items {
