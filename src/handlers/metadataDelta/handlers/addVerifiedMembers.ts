@@ -2,15 +2,17 @@ import { utils } from 'ethers';
 import { mutate, query } from '~amplifyClient';
 import {
   ColonyActionType,
-  CreateVerifiedMemberDocument,
-  CreateVerifiedMemberMutation,
-  CreateVerifiedMemberMutationVariables,
-  GetVerifiedMemberDocument,
-  GetVerifiedMemberQuery,
-  GetVerifiedMemberQueryVariables,
+  GetColonyContributorDocument,
+  GetColonyContributorQuery,
+  GetColonyContributorQueryVariables,
+  UpdateColonyContributorDocument,
+  UpdateColonyContributorMutation,
+  UpdateColonyContributorMutationVariables,
 } from '~graphql';
 import { ContractEvent } from '~types';
 import { AddVerifiedMembersOperation, writeActionFromEvent } from '~utils';
+
+import { getColonyContributorId } from '~utils/contributors';
 
 export const handleAddVerifiedMembers = async (
   event: ContractEvent,
@@ -30,22 +32,25 @@ export const handleAddVerifiedMembers = async (
       }
 
       const item = await query<
-        GetVerifiedMemberQuery,
-        GetVerifiedMemberQueryVariables
-      >(GetVerifiedMemberDocument, { colonyAddress, userAddress });
-
-      const verifiedMemberData = item?.data?.getVerifiedMember;
+        GetColonyContributorQuery,
+        GetColonyContributorQueryVariables
+      >(GetColonyContributorDocument, {
+        id: getColonyContributorId(colonyAddress, userAddress),
+      });
 
       // If user is already verified, don't verify them again
-      if (verifiedMemberData !== undefined && verifiedMemberData !== null) {
+      if (item?.data?.getColonyContributor?.isVerified) {
         return;
       }
 
       await mutate<
-        CreateVerifiedMemberMutation,
-        CreateVerifiedMemberMutationVariables
-      >(CreateVerifiedMemberDocument, {
-        input: { colonyAddress, userAddress },
+        UpdateColonyContributorMutation,
+        UpdateColonyContributorMutationVariables
+      >(UpdateColonyContributorDocument, {
+        input: {
+          id: getColonyContributorId(colonyAddress, userAddress),
+          isVerified: true,
+        },
       });
     }),
   );
