@@ -1340,11 +1340,13 @@ export type CreateExpenditureInput = {
   nativeId: Scalars['Int'];
   ownerAddress: Scalars['ID'];
   slots: Array<ExpenditureSlotInput>;
+  stakedTransactionHash?: InputMaybe<Scalars['ID']>;
   status: ExpenditureStatus;
   type: ExpenditureType;
 };
 
 export type CreateExpenditureMetadataInput = {
+  decisionMethod: ExpenditureDecisionMethod;
   fundFromDomainNativeId: Scalars['Int'];
   id?: InputMaybe<Scalars['ID']>;
   stages?: InputMaybe<Array<ExpenditureStageInput>>;
@@ -1875,6 +1877,8 @@ export type Expenditure = {
   ownerAddress: Scalars['ID'];
   /** Array containing expenditure slots */
   slots: Array<ExpenditureSlot>;
+  /** Hash of the `ExpenditureMadeViaStake` transaction, if applicable */
+  stakedTransactionHash?: Maybe<Scalars['ID']>;
   /** Status of the expenditure */
   status: ExpenditureStatus;
   type: ExpenditureType;
@@ -1899,9 +1903,15 @@ export type ExpenditureBalanceInput = {
   tokenAddress: Scalars['ID'];
 };
 
+export enum ExpenditureDecisionMethod {
+  Permissions = 'PERMISSIONS',
+  Reputation = 'REPUTATION',
+}
+
 export type ExpenditureMetadata = {
   __typename?: 'ExpenditureMetadata';
   createdAt: Scalars['AWSDateTime'];
+  decisionMethod: ExpenditureDecisionMethod;
   fundFromDomainNativeId: Scalars['Int'];
   id: Scalars['ID'];
   stages?: Maybe<Array<ExpenditureStage>>;
@@ -2913,6 +2923,7 @@ export type ModelExpenditureConditionInput = {
   not?: InputMaybe<ModelExpenditureConditionInput>;
   or?: InputMaybe<Array<InputMaybe<ModelExpenditureConditionInput>>>;
   ownerAddress?: InputMaybe<ModelIdInput>;
+  stakedTransactionHash?: InputMaybe<ModelIdInput>;
   status?: InputMaybe<ModelExpenditureStatusInput>;
   type?: InputMaybe<ModelExpenditureTypeInput>;
 };
@@ -2921,6 +2932,11 @@ export type ModelExpenditureConnection = {
   __typename?: 'ModelExpenditureConnection';
   items: Array<Maybe<Expenditure>>;
   nextToken?: Maybe<Scalars['String']>;
+};
+
+export type ModelExpenditureDecisionMethodInput = {
+  eq?: InputMaybe<ExpenditureDecisionMethod>;
+  ne?: InputMaybe<ExpenditureDecisionMethod>;
 };
 
 export type ModelExpenditureFilterInput = {
@@ -2938,12 +2954,14 @@ export type ModelExpenditureFilterInput = {
   not?: InputMaybe<ModelExpenditureFilterInput>;
   or?: InputMaybe<Array<InputMaybe<ModelExpenditureFilterInput>>>;
   ownerAddress?: InputMaybe<ModelIdInput>;
+  stakedTransactionHash?: InputMaybe<ModelIdInput>;
   status?: InputMaybe<ModelExpenditureStatusInput>;
   type?: InputMaybe<ModelExpenditureTypeInput>;
 };
 
 export type ModelExpenditureMetadataConditionInput = {
   and?: InputMaybe<Array<InputMaybe<ModelExpenditureMetadataConditionInput>>>;
+  decisionMethod?: InputMaybe<ModelExpenditureDecisionMethodInput>;
   fundFromDomainNativeId?: InputMaybe<ModelIntInput>;
   not?: InputMaybe<ModelExpenditureMetadataConditionInput>;
   or?: InputMaybe<Array<InputMaybe<ModelExpenditureMetadataConditionInput>>>;
@@ -2958,6 +2976,7 @@ export type ModelExpenditureMetadataConnection = {
 
 export type ModelExpenditureMetadataFilterInput = {
   and?: InputMaybe<Array<InputMaybe<ModelExpenditureMetadataFilterInput>>>;
+  decisionMethod?: InputMaybe<ModelExpenditureDecisionMethodInput>;
   fundFromDomainNativeId?: InputMaybe<ModelIntInput>;
   id?: InputMaybe<ModelIdInput>;
   not?: InputMaybe<ModelExpenditureMetadataFilterInput>;
@@ -3720,6 +3739,7 @@ export type ModelSubscriptionExpenditureFilterInput = {
   nativeId?: InputMaybe<ModelSubscriptionIntInput>;
   or?: InputMaybe<Array<InputMaybe<ModelSubscriptionExpenditureFilterInput>>>;
   ownerAddress?: InputMaybe<ModelSubscriptionIdInput>;
+  stakedTransactionHash?: InputMaybe<ModelSubscriptionIdInput>;
   status?: InputMaybe<ModelSubscriptionStringInput>;
   type?: InputMaybe<ModelSubscriptionStringInput>;
 };
@@ -3728,6 +3748,7 @@ export type ModelSubscriptionExpenditureMetadataFilterInput = {
   and?: InputMaybe<
     Array<InputMaybe<ModelSubscriptionExpenditureMetadataFilterInput>>
   >;
+  decisionMethod?: InputMaybe<ModelSubscriptionStringInput>;
   fundFromDomainNativeId?: InputMaybe<ModelSubscriptionIntInput>;
   id?: InputMaybe<ModelSubscriptionIdInput>;
   or?: InputMaybe<
@@ -7700,11 +7721,13 @@ export type UpdateExpenditureInput = {
   nativeId?: InputMaybe<Scalars['Int']>;
   ownerAddress?: InputMaybe<Scalars['ID']>;
   slots?: InputMaybe<Array<ExpenditureSlotInput>>;
+  stakedTransactionHash?: InputMaybe<Scalars['ID']>;
   status?: InputMaybe<ExpenditureStatus>;
   type?: InputMaybe<ExpenditureType>;
 };
 
 export type UpdateExpenditureMetadataInput = {
+  decisionMethod?: InputMaybe<ExpenditureDecisionMethod>;
   fundFromDomainNativeId?: InputMaybe<Scalars['Int']>;
   id: Scalars['ID'];
   stages?: InputMaybe<Array<ExpenditureStageInput>>;
@@ -8403,7 +8426,12 @@ export type UpdateExpenditureMutationVariables = Exact<{
 
 export type UpdateExpenditureMutation = {
   __typename?: 'Mutation';
-  updateExpenditure?: { __typename?: 'Expenditure'; id: string } | null;
+  updateExpenditure?: {
+    __typename?: 'Expenditure';
+    id: string;
+    ownerAddress: string;
+    stakedTransactionHash?: string | null;
+  } | null;
 };
 
 export type UpdateExpenditureMetadataMutationVariables = Exact<{
@@ -9674,6 +9702,8 @@ export const UpdateExpenditureDocument = gql`
   mutation UpdateExpenditure($input: UpdateExpenditureInput!) {
     updateExpenditure(input: $input) {
       id
+      ownerAddress
+      stakedTransactionHash
     }
   }
 `;

@@ -33,6 +33,7 @@ export default async (event: ContractEvent): Promise<void> => {
       input: {
         id: databaseId,
         isStaked: true,
+        stakedTransactionHash: transactionHash,
       },
     },
   );
