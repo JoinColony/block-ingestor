@@ -1,6 +1,6 @@
 export const getUserStakeDatabaseId = (
   userAddress: string,
-  motionTransactionHash: string,
+  transactionHash: string,
 ): string => {
-  return `${userAddress}_${motionTransactionHash}`;
+  return `${userAddress}_${transactionHash}`;
 };
