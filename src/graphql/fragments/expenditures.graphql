@@ -1,0 +1,4 @@
+fragment ExpenditureBalance on ExpenditureBalance {
+  tokenAddress
+  amount
+}

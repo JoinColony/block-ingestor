@@ -2,6 +2,7 @@ import { ContractEvent } from '~types';
 import {
   createFundsClaim,
   getExpenditureDatabaseId,
+  getUpdatedExpenditureBalances,
   insertAtIndex,
   isColonyAddress,
   output,
@@ -15,12 +16,18 @@ import {
   UpdateExpenditureMutationVariables,
 } from '~graphql';
 import { mutate } from '~amplifyClient';
+import { getAmountWithFee, getNetworkInverseFee } from '~utils/networkFee';
 
 import { getExpenditureFromDB } from './helpers';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { contractAddress: colonyAddress } = event;
-  const { id: expenditureId, slot, token: tokenAddress } = event.args;
+  const {
+    id: expenditureId,
+    slot,
+    token: tokenAddress,
+    tokenPayout: amountWithoutFee,
+  } = event.args;
   const convertedExpenditureId = toNumber(expenditureId);
   const convertedSlotId = toNumber(slot);
   const databaseId = getExpenditureDatabaseId(
@@ -65,6 +72,19 @@ export default async (event: ContractEvent): Promise<void> => {
     payouts: updatedPayouts,
   });
 
+  const networkInverseFee = (await getNetworkInverseFee()) ?? '0';
+  const amountWithFee = getAmountWithFee(
+    amountWithoutFee,
+    networkInverseFee,
+  ).toString();
+
+  const updatedBalances = getUpdatedExpenditureBalances(
+    expenditure.balances ?? [],
+    tokenAddress,
+    amountWithFee,
+    true,
+  );
+
   verbose(`Payout claimed in expenditure with ID ${databaseId}`);
 
   await mutate<UpdateExpenditureMutation, UpdateExpenditureMutationVariables>(
@@ -73,6 +93,7 @@ export default async (event: ContractEvent): Promise<void> => {
       input: {
         id: databaseId,
         slots: updatedSlots,
+        balances: updatedBalances,
       },
     },
   );

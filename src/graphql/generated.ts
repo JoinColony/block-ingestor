@@ -1839,7 +1839,7 @@ export type DomainMetadataChangelogInput = {
 
 export type Expenditure = {
   __typename?: 'Expenditure';
-  /** Array containing expenditure balances */
+  /** Array containing balances of tokens in the expenditure */
   balances?: Maybe<Array<ExpenditureBalance>>;
   /** The Colony to which the expenditure belongs */
   colony: Colony;
@@ -1891,13 +1891,11 @@ export type ExpenditureMotionsArgs = {
 export type ExpenditureBalance = {
   __typename?: 'ExpenditureBalance';
   amount: Scalars['String'];
-  requiredAmount: Scalars['String'];
   tokenAddress: Scalars['ID'];
 };
 
 export type ExpenditureBalanceInput = {
   amount: Scalars['String'];
-  requiredAmount: Scalars['String'];
   tokenAddress: Scalars['ID'];
 };
 
@@ -8143,6 +8141,12 @@ export type ColonyMetadataFragment = {
   } | null;
 };
 
+export type ExpenditureBalanceFragment = {
+  __typename?: 'ExpenditureBalance';
+  tokenAddress: string;
+  amount: string;
+};
+
 export type ExtensionFragment = {
   __typename?: 'ColonyExtension';
   id: string;
@@ -8926,6 +8930,11 @@ export type GetExpenditureQuery = {
         isClaimed: boolean;
       }> | null;
     }>;
+    balances?: Array<{
+      __typename?: 'ExpenditureBalance';
+      tokenAddress: string;
+      amount: string;
+    }> | null;
   } | null;
 };
 
@@ -8941,6 +8950,11 @@ export type GetExpenditureByNativeFundingPotIdAndColonyQuery = {
     items: Array<{
       __typename?: 'Expenditure';
       id: string;
+      balances?: Array<{
+        __typename?: 'ExpenditureBalance';
+        tokenAddress: string;
+        amount: string;
+      }> | null;
       motions?: {
         __typename?: 'ModelColonyMotionConnection';
         items: Array<{
@@ -9427,6 +9441,12 @@ export const ColonyMetadata = gql`
       added
       removed
     }
+  }
+`;
+export const ExpenditureBalance = gql`
+  fragment ExpenditureBalance on ExpenditureBalance {
+    tokenAddress
+    amount
   }
 `;
 export const Extension = gql`
@@ -10013,8 +10033,12 @@ export const GetExpenditureDocument = gql`
           isClaimed
         }
       }
+      balances {
+        ...ExpenditureBalance
+      }
     }
   }
+  ${ExpenditureBalance}
 `;
 export const GetExpenditureByNativeFundingPotIdAndColonyDocument = gql`
   query GetExpenditureByNativeFundingPotIdAndColony(
@@ -10027,6 +10051,9 @@ export const GetExpenditureByNativeFundingPotIdAndColonyDocument = gql`
     ) {
       items {
         id
+        balances {
+          ...ExpenditureBalance
+        }
         motions {
           items {
             transactionHash
@@ -10038,6 +10065,7 @@ export const GetExpenditureByNativeFundingPotIdAndColonyDocument = gql`
       }
     }
   }
+  ${ExpenditureBalance}
 `;
 export const GetExpenditureMetadataDocument = gql`
   query GetExpenditureMetadata($id: ID!) {

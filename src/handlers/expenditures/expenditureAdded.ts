@@ -51,6 +51,7 @@ export default async (event: ContractEvent): Promise<void> => {
         nativeFundingPotId: fundingPotId,
         nativeDomainId: domainId,
         isStaked: false,
+        balances: [],
       },
     },
   );
