@@ -1331,9 +1331,7 @@ export type CreateExpenditureInput = {
   colonyId: Scalars['ID'];
   createdAt?: InputMaybe<Scalars['AWSDateTime']>;
   finalizedAt?: InputMaybe<Scalars['AWSTimestamp']>;
-  hasReclaimedStake?: InputMaybe<Scalars['Boolean']>;
   id?: InputMaybe<Scalars['ID']>;
-  isStakeForfeited?: InputMaybe<Scalars['Boolean']>;
   isStaked: Scalars['Boolean'];
   nativeDomainId: Scalars['Int'];
   nativeFundingPotId: Scalars['Int'];
@@ -1851,15 +1849,11 @@ export type Expenditure = {
   createdAt: Scalars['AWSDateTime'];
   /** The timestamp at which the expenditure was finalized */
   finalizedAt?: Maybe<Scalars['AWSTimestamp']>;
-  /** Indicates whether the expenditure stake has been reclaimed */
-  hasReclaimedStake?: Maybe<Scalars['Boolean']>;
   /**
    * Unique identifier for the role snapshot
    * Self-managed, format: `colonyId_nativeExpenditureId`
    */
   id: Scalars['ID'];
-  /** Indicates if the creator's stake was forfeited when staked expenditure was cancelled */
-  isStakeForfeited?: Maybe<Scalars['Boolean']>;
   /** Indicates whether the expenditure was staked for */
   isStaked: Scalars['Boolean'];
   /**
@@ -2915,8 +2909,6 @@ export type ModelExpenditureConditionInput = {
   colonyId?: InputMaybe<ModelIdInput>;
   createdAt?: InputMaybe<ModelStringInput>;
   finalizedAt?: InputMaybe<ModelIntInput>;
-  hasReclaimedStake?: InputMaybe<ModelBooleanInput>;
-  isStakeForfeited?: InputMaybe<ModelBooleanInput>;
   isStaked?: InputMaybe<ModelBooleanInput>;
   nativeDomainId?: InputMaybe<ModelIntInput>;
   nativeFundingPotId?: InputMaybe<ModelIntInput>;
@@ -2945,9 +2937,7 @@ export type ModelExpenditureFilterInput = {
   colonyId?: InputMaybe<ModelIdInput>;
   createdAt?: InputMaybe<ModelStringInput>;
   finalizedAt?: InputMaybe<ModelIntInput>;
-  hasReclaimedStake?: InputMaybe<ModelBooleanInput>;
   id?: InputMaybe<ModelIdInput>;
-  isStakeForfeited?: InputMaybe<ModelBooleanInput>;
   isStaked?: InputMaybe<ModelBooleanInput>;
   nativeDomainId?: InputMaybe<ModelIntInput>;
   nativeFundingPotId?: InputMaybe<ModelIntInput>;
@@ -3731,9 +3721,7 @@ export type ModelSubscriptionExpenditureFilterInput = {
   colonyId?: InputMaybe<ModelSubscriptionIdInput>;
   createdAt?: InputMaybe<ModelSubscriptionStringInput>;
   finalizedAt?: InputMaybe<ModelSubscriptionIntInput>;
-  hasReclaimedStake?: InputMaybe<ModelSubscriptionBooleanInput>;
   id?: InputMaybe<ModelSubscriptionIdInput>;
-  isStakeForfeited?: InputMaybe<ModelSubscriptionBooleanInput>;
   isStaked?: InputMaybe<ModelSubscriptionBooleanInput>;
   nativeDomainId?: InputMaybe<ModelSubscriptionIntInput>;
   nativeFundingPotId?: InputMaybe<ModelSubscriptionIntInput>;
@@ -7716,9 +7704,7 @@ export type UpdateExpenditureInput = {
   colonyId?: InputMaybe<Scalars['ID']>;
   createdAt?: InputMaybe<Scalars['AWSDateTime']>;
   finalizedAt?: InputMaybe<Scalars['AWSTimestamp']>;
-  hasReclaimedStake?: InputMaybe<Scalars['Boolean']>;
   id: Scalars['ID'];
-  isStakeForfeited?: InputMaybe<Scalars['Boolean']>;
   isStaked?: InputMaybe<Scalars['Boolean']>;
   nativeDomainId?: InputMaybe<Scalars['Int']>;
   nativeFundingPotId?: InputMaybe<Scalars['Int']>;
@@ -8952,6 +8938,8 @@ export type GetExpenditureQuery = {
   getExpenditure?: {
     __typename?: 'Expenditure';
     id: string;
+    stakedTransactionHash?: string | null;
+    ownerAddress: string;
     slots: Array<{
       __typename?: 'ExpenditureSlot';
       id: number;
@@ -10073,6 +10061,8 @@ export const GetExpenditureDocument = gql`
       balances {
         ...ExpenditureBalance
       }
+      stakedTransactionHash
+      ownerAddress
     }
   }
   ${ExpenditureBalance}
