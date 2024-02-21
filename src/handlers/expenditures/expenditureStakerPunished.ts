@@ -1,14 +1,8 @@
-import { mutate } from '~amplifyClient';
-import {
-  UpdateUserStakeDocument,
-  UpdateUserStakeMutation,
-  UpdateUserStakeMutationVariables,
-} from '~graphql';
 import { ContractEvent } from '~types';
 import { getExpenditureDatabaseId, toNumber, verbose } from '~utils';
-import { getUserStakeDatabaseId } from '~utils/stakes';
+import {} from '~utils/stakes';
 
-import { getExpenditureFromDB } from './helpers';
+import { updateExpenditureStake } from './helpers';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { colonyAddress } = event;
@@ -30,19 +24,7 @@ export default async (event: ContractEvent): Promise<void> => {
     }punished`,
   );
 
-  const expenditure = await getExpenditureFromDB(databaseId);
-
-  if (expenditure?.stakedTransactionHash) {
-    const { ownerAddress, stakedTransactionHash } = expenditure;
-
-    await mutate<UpdateUserStakeMutation, UpdateUserStakeMutationVariables>(
-      UpdateUserStakeDocument,
-      {
-        input: {
-          id: getUserStakeDatabaseId(ownerAddress, stakedTransactionHash),
-          isForfeited: punished,
-        },
-      },
-    );
-  }
+  await updateExpenditureStake(databaseId, {
+    isForfeited: punished,
+  });
 };
