@@ -1,8 +1,5 @@
 import { mutate } from '~amplifyClient';
 import {
-  UpdateExpenditureDocument,
-  UpdateExpenditureMutation,
-  UpdateExpenditureMutationVariables,
   UpdateUserStakeDocument,
   UpdateUserStakeMutation,
   UpdateUserStakeMutationVariables,
@@ -10,6 +7,8 @@ import {
 import { ContractEvent } from '~types';
 import { getExpenditureDatabaseId, toNumber, verbose } from '~utils';
 import { getUserStakeDatabaseId } from '~utils/stakes';
+
+import { getExpenditureFromDB } from './helpers';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { colonyAddress } = event;
@@ -25,19 +24,10 @@ export default async (event: ContractEvent): Promise<void> => {
     convertedExpenditureId,
   );
 
-  const updateExpenditureResponse = await mutate<
-    UpdateExpenditureMutation,
-    UpdateExpenditureMutationVariables
-  >(UpdateExpenditureDocument, {
-    input: {
-      id: databaseId,
-      hasReclaimedStake: true,
-    },
-  });
-  const expenditureDetails = updateExpenditureResponse?.data?.updateExpenditure;
+  const expenditure = await getExpenditureFromDB(databaseId);
 
-  if (expenditureDetails?.stakedTransactionHash) {
-    const { ownerAddress, stakedTransactionHash } = expenditureDetails;
+  if (expenditure?.stakedTransactionHash) {
+    const { ownerAddress, stakedTransactionHash } = expenditure;
 
     await mutate<UpdateUserStakeMutation, UpdateUserStakeMutationVariables>(
       UpdateUserStakeDocument,
