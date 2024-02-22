@@ -62,6 +62,7 @@ export const removeExtensionEventListeners = (
 
 export const setupListenersForExtensions = async (): Promise<void> => {
   const extensionEvents = [
+    ContractEventsSignatures.ExtensionAddedToNetwork,
     ContractEventsSignatures.ExtensionInstalled,
     ContractEventsSignatures.ExtensionUninstalled,
     ContractEventsSignatures.ExtensionDeprecated,
