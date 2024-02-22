@@ -1,6 +1,5 @@
 import { ContractEvent } from '~types';
 import { getExpenditureDatabaseId, toNumber, verbose } from '~utils';
-import {} from '~utils/stakes';
 
 import { updateExpenditureStake } from './helpers';
 
