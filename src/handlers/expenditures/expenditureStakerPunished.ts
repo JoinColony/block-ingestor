@@ -1,11 +1,7 @@
-import { mutate } from '~amplifyClient';
-import {
-  UpdateExpenditureDocument,
-  UpdateExpenditureMutation,
-  UpdateExpenditureMutationVariables,
-} from '~graphql';
 import { ContractEvent } from '~types';
 import { getExpenditureDatabaseId, toNumber, verbose } from '~utils';
+
+import { updateExpenditureStake } from './helpers';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { colonyAddress } = event;
@@ -27,13 +23,7 @@ export default async (event: ContractEvent): Promise<void> => {
     }punished`,
   );
 
-  await mutate<UpdateExpenditureMutation, UpdateExpenditureMutationVariables>(
-    UpdateExpenditureDocument,
-    {
-      input: {
-        id: databaseId,
-        isStakeForfeited: punished,
-      },
-    },
-  );
+  await updateExpenditureStake(databaseId, {
+    isForfeited: punished,
+  });
 };
