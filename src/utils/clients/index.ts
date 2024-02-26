@@ -9,6 +9,7 @@ import { getVotingClient } from './voting';
 export * from './colony';
 export * from './voting';
 export * from './stakedExpenditure';
+export * from './stagedExpenditure';
 export * from './streamingPayments';
 export * from './oneTxPayment';
 export * from './token';
