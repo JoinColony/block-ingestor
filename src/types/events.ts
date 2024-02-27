@@ -82,6 +82,7 @@ export enum ContractEventsSignatures {
   ExpenditurePayoutSet = 'ExpenditurePayoutSet(address,uint256,uint256,address,uint256)',
   ExpenditurePayoutModifierSet = 'ExpenditurePayoutModifierSet(address,uint256,uint256,int256)',
   ExpenditurePayoutClaimed = 'PayoutClaimed(address,uint256,uint256,address,uint256)',
+  ExpenditureStateChanged = 'ExpenditureStateChanged(address,uint256,uint8)',
 
   // Staked Expenditures
   StakeReclaimed = 'StakeReclaimed(uint256)',
