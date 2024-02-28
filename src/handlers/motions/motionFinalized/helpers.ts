@@ -295,12 +295,12 @@ export const linkPendingMetadata = async (
     colonyAddress,
   );
 
-  const parsedAction = parseAction(action, [
+  const parsedAction = parseAction(action, {
     colonyClient,
     oneTxPaymentClient,
     stakedExpenditureClient,
     stagedExpenditureClient,
-  ]);
+  });
 
   if (!parsedAction) {
     return;
@@ -397,7 +397,7 @@ export const claimExpenditurePayouts = async (
 ): Promise<void> => {
   const colonyClient = await getCachedColonyClient(colonyAddress);
 
-  const parsedAction = parseAction(action, [colonyClient, null, null, null]) as
+  const parsedAction = parseAction(action, { colonyClient }) as
     | TransactionDescription
     | undefined;
 
