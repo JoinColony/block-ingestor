@@ -4,7 +4,6 @@ import { ContractEvent } from '~types';
 import { getExpenditureDatabaseId, output, toNumber, verbose } from '~utils';
 import {
   ExpenditurePayout,
-  ExpenditureSlot,
   UpdateExpenditureDocument,
   UpdateExpenditureMutation,
   UpdateExpenditureMutationVariables,
@@ -12,7 +11,7 @@ import {
 import { mutate } from '~amplifyClient';
 import { getAmountLessFee, getNetworkInverseFee } from '~utils/networkFee';
 
-import { getExpenditureFromDB } from './helpers';
+import { getExpenditureFromDB, getUpdatedExpenditureSlots } from './helpers';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { contractAddress: colonyAddress } = event;
@@ -37,14 +36,11 @@ export default async (event: ContractEvent): Promise<void> => {
     return;
   }
 
-  const existingSlot = expenditure.slots.find(
-    (slot) => slot.id === convertedSlot,
-  );
+  const existingPayouts =
+    expenditure.slots.find((slot) => slot.id === convertedSlot)?.payouts ?? [];
 
   const updatedPayouts: ExpenditurePayout[] = [
-    ...(existingSlot?.payouts?.filter(
-      (payout) => payout.tokenAddress !== tokenAddress,
-    ) ?? []),
+    ...existingPayouts.filter((payout) => payout.tokenAddress !== tokenAddress),
     {
       tokenAddress,
       amount: amountLessFee,
@@ -53,15 +49,9 @@ export default async (event: ContractEvent): Promise<void> => {
     },
   ];
 
-  const updatedSlot: ExpenditureSlot = {
-    ...existingSlot,
-    id: convertedSlot,
+  const updatedSlots = getUpdatedExpenditureSlots(expenditure, convertedSlot, {
     payouts: updatedPayouts,
-  };
-  const updatedSlots = [
-    ...expenditure.slots.filter((slot) => slot.id !== convertedSlot),
-    updatedSlot,
-  ];
+  });
 
   verbose(
     `Payout set for expenditure with ID ${convertedExpenditureId} in colony ${colonyAddress}`,
