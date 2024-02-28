@@ -39,12 +39,12 @@ export interface SimpleTransactionDescription {
   name: ColonyOperations.SimpleDecision;
 }
 
-type MotionActionClients = [
-  AnyColonyClient | null,
-  AnyOneTxPaymentClient | null,
-  AnyStakedExpenditureClient | null,
-  AnyStagedExpenditureClient | null,
-];
+interface MotionActionClients {
+  colonyClient?: AnyColonyClient | null;
+  oneTxPaymentClient?: AnyOneTxPaymentClient | null;
+  stakedExpenditureClient?: AnyStakedExpenditureClient | null;
+  stagedExpenditureClient?: AnyStagedExpenditureClient | null;
+}
 
 export const parseAction = (
   action: string,
@@ -56,7 +56,8 @@ export const parseAction = (
     };
   }
 
-  for (const client of clients) {
+  for (const key in clients) {
+    const client = clients[key as keyof MotionActionClients];
     if (!client) {
       continue;
     }

@@ -59,12 +59,12 @@ export default async (event: ContractEvent): Promise<void> => {
   const motion = await votingReputationClient.getMotion(motionId, {
     blockTag: blockNumber,
   });
-  const parsedAction = parseAction(motion.action, [
+  const parsedAction = parseAction(motion.action, {
     colonyClient,
     oneTxPaymentClient,
     stakedExpenditureClient,
     stagedExpenditureClient,
-  ]);
+  });
 
   let gasEstimate: BigNumber;
 
