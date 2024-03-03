@@ -1,13 +1,20 @@
 import { BigNumber, BigNumberish, utils } from 'ethers';
 
-import { ExpenditureFragment, ExpenditureSlot } from '~graphql';
+import {
+  ExpenditureFragment,
+  ExpenditureSlot,
+  ExpenditureStatus,
+} from '~graphql';
 
 import { getUpdatedExpenditureSlots } from './getUpdatedSlots';
 
 const toB32 = (input: BigNumberish): string =>
   utils.hexZeroPad(utils.hexlify(input), 32);
 
+const EXPENDITURES_SLOT = BigNumber.from(25);
 const EXPENDITURESLOTS_SLOT = BigNumber.from(26);
+
+const EXPENDITURESLOT_OWNER_AND_STATUS = toB32(BigNumber.from(0));
 
 const EXPENDITURESLOT_RECIPIENT = toB32(BigNumber.from(0));
 const EXPENDITURESLOT_CLAIMDELAY = toB32(BigNumber.from(1));
@@ -57,4 +64,29 @@ export const decodeUpdatedSlots = (
   }
 
   return updatedSlots;
+};
+
+const EXPENDITURE_CONTRACT_STATUS_TO_ENUM: Record<number, ExpenditureStatus> = {
+  0: ExpenditureStatus.Draft,
+  1: ExpenditureStatus.Cancelled,
+  2: ExpenditureStatus.Finalized,
+  3: ExpenditureStatus.Locked,
+};
+
+export const decodeUpdatedStatus = (
+  storageSlot: BigNumber,
+  keys: string[],
+  value: string,
+): ExpenditureStatus | undefined => {
+  let updatedStatus: ExpenditureStatus | undefined;
+
+  if (storageSlot.eq(EXPENDITURES_SLOT)) {
+    if (keys[0] === EXPENDITURESLOT_OWNER_AND_STATUS) {
+      const statusValue = BigNumber.from(value.slice(-2)).toNumber();
+      console.log(statusValue);
+      updatedStatus = EXPENDITURE_CONTRACT_STATUS_TO_ENUM[statusValue];
+    }
+  }
+
+  return updatedStatus;
 };
