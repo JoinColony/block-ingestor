@@ -13,7 +13,11 @@ import {
 } from '~graphql';
 import { mutate } from '~amplifyClient';
 
-import { getExpenditureFromDB, decodeUpdatedSlots } from './helpers';
+import {
+  getExpenditureFromDB,
+  decodeUpdatedSlots,
+  decodeUpdatedStatus,
+} from './helpers';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { contractAddress: colonyAddress } = event;
@@ -47,6 +51,8 @@ export default async (event: ContractEvent): Promise<void> => {
     value,
   );
 
+  const updatedStatus = decodeUpdatedStatus(storageSlot, keys, value);
+
   verbose(`State of expenditure with ID ${databaseId} updated`);
 
   await mutate<UpdateExpenditureMutation, UpdateExpenditureMutationVariables>(
@@ -55,6 +61,7 @@ export default async (event: ContractEvent): Promise<void> => {
       input: {
         id: databaseId,
         slots: updatedSlots,
+        status: updatedStatus,
       },
     },
   );
