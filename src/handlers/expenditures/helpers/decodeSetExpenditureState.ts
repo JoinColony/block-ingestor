@@ -5,6 +5,7 @@ import {
   ExpenditureSlot,
   ExpenditureStatus,
 } from '~graphql';
+import { toNumber } from '~utils';
 
 import { getUpdatedExpenditureSlots } from './getUpdatedSlots';
 
@@ -14,7 +15,7 @@ const toB32 = (input: BigNumberish): string =>
 const EXPENDITURES_SLOT = BigNumber.from(25);
 const EXPENDITURESLOTS_SLOT = BigNumber.from(26);
 
-const EXPENDITURESLOT_OWNER_AND_STATUS = toB32(BigNumber.from(0));
+const EXPENDITURE_OWNER_AND_STATUS = toB32(BigNumber.from(0));
 
 const EXPENDITURESLOT_RECIPIENT = toB32(BigNumber.from(0));
 const EXPENDITURESLOT_CLAIMDELAY = toB32(BigNumber.from(1));
@@ -38,7 +39,7 @@ export const decodeUpdatedSlots = (
   let updatedSlots: ExpenditureSlot[] | undefined;
 
   if (storageSlot.eq(EXPENDITURESLOTS_SLOT)) {
-    const slotId = BigNumber.from(keys[0]).toNumber();
+    const slotId = toNumber(keys[0]);
 
     if (keys[1] === EXPENDITURESLOT_RECIPIENT) {
       const recipientAddress = utils.defaultAbiCoder
@@ -49,13 +50,13 @@ export const decodeUpdatedSlots = (
         recipientAddress,
       });
     } else if (keys[1] === EXPENDITURESLOT_CLAIMDELAY) {
-      const claimDelay = BigNumber.from(value).toNumber();
+      const claimDelay = toNumber(value);
 
       updatedSlots = getUpdatedExpenditureSlots(expenditure, slotId, {
         claimDelay,
       });
     } else if (keys[1] === EXPENDITURESLOT_PAYOUTMODIFIER) {
-      const payoutModifier = BigNumber.from(value).toNumber();
+      const payoutModifier = toNumber(value);
 
       updatedSlots = getUpdatedExpenditureSlots(expenditure, slotId, {
         payoutModifier,
@@ -81,9 +82,9 @@ export const decodeUpdatedStatus = (
   let updatedStatus: ExpenditureStatus | undefined;
 
   if (storageSlot.eq(EXPENDITURES_SLOT)) {
-    if (keys[0] === EXPENDITURESLOT_OWNER_AND_STATUS) {
-      const statusValue = BigNumber.from(value.slice(-2)).toNumber();
-      console.log(statusValue);
+    if (keys[0] === EXPENDITURE_OWNER_AND_STATUS) {
+      // Status is encoded as the last byte (2 characters) of the value
+      const statusValue = toNumber(value.slice(-2));
       updatedStatus = EXPENDITURE_CONTRACT_STATUS_TO_ENUM[statusValue];
     }
   }
