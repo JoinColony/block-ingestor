@@ -8169,6 +8169,32 @@ export type ExpenditureBalanceFragment = {
   amount: string;
 };
 
+export type ExpenditureFragment = {
+  __typename?: 'Expenditure';
+  id: string;
+  stakedTransactionHash?: string | null;
+  ownerAddress: string;
+  slots: Array<{
+    __typename?: 'ExpenditureSlot';
+    id: number;
+    recipientAddress?: string | null;
+    claimDelay?: number | null;
+    payoutModifier?: number | null;
+    payouts?: Array<{
+      __typename?: 'ExpenditurePayout';
+      tokenAddress: string;
+      amount: string;
+      isClaimed: boolean;
+      networkFee?: string | null;
+    }> | null;
+  }>;
+  balances?: Array<{
+    __typename?: 'ExpenditureBalance';
+    tokenAddress: string;
+    amount: string;
+  }> | null;
+};
+
 export type ExtensionFragment = {
   __typename?: 'ColonyExtension';
   id: string;
@@ -8957,6 +8983,7 @@ export type GetExpenditureQuery = {
         tokenAddress: string;
         amount: string;
         isClaimed: boolean;
+        networkFee?: string | null;
       }> | null;
     }>;
     balances?: Array<{
@@ -9477,6 +9504,29 @@ export const ExpenditureBalance = gql`
     tokenAddress
     amount
   }
+`;
+export const Expenditure = gql`
+  fragment Expenditure on Expenditure {
+    id
+    slots {
+      id
+      recipientAddress
+      claimDelay
+      payoutModifier
+      payouts {
+        tokenAddress
+        amount
+        isClaimed
+        networkFee
+      }
+    }
+    balances {
+      ...ExpenditureBalance
+    }
+    stakedTransactionHash
+    ownerAddress
+  }
+  ${ExpenditureBalance}
 `;
 export const Extension = gql`
   fragment Extension on ColonyExtension {
@@ -10052,26 +10102,10 @@ export const GetContractEventDocument = gql`
 export const GetExpenditureDocument = gql`
   query GetExpenditure($id: ID!) {
     getExpenditure(id: $id) {
-      id
-      slots {
-        id
-        recipientAddress
-        claimDelay
-        payoutModifier
-        payouts {
-          tokenAddress
-          amount
-          isClaimed
-        }
-      }
-      balances {
-        ...ExpenditureBalance
-      }
-      stakedTransactionHash
-      ownerAddress
+      ...Expenditure
     }
   }
-  ${ExpenditureBalance}
+  ${Expenditure}
 `;
 export const GetExpenditureByNativeFundingPotIdAndColonyDocument = gql`
   query GetExpenditureByNativeFundingPotIdAndColony(

@@ -1,22 +1,6 @@
 query GetExpenditure($id: ID!) {
   getExpenditure(id: $id) {
-    id
-    slots {
-      id
-      recipientAddress
-      claimDelay
-      payoutModifier
-      payouts {
-        tokenAddress
-        amount
-        isClaimed
-      }
-    }
-    balances {
-      ...ExpenditureBalance
-    }
-    stakedTransactionHash
-    ownerAddress
+    ...Expenditure
   }
 }
 
