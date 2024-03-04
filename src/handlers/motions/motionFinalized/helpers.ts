@@ -391,6 +391,12 @@ export const updateColonyUnclaimedStakes = async (
   }
 };
 
+/**
+ * Index of expenditure slots storage slot in network contracts
+ * See: https://github.com/JoinColony/colonyNetwork/blob/develop/contracts/colony/ColonyStorage.sol
+ */
+const EXPENDITURESLOTS_SLOT = 26;
+
 export const claimExpenditurePayouts = async (
   action: string,
   colonyAddress: string,
@@ -440,7 +446,7 @@ export const claimExpenditurePayouts = async (
   // - The value is not 0
   // - The storage slot is not 26
   // Then we can assume this state change ain't a stage release
-  if (convertedStorageSlot !== 26 || convertedValue !== 0) {
+  if (convertedStorageSlot !== EXPENDITURESLOTS_SLOT || convertedValue !== 0) {
     return;
   }
 
