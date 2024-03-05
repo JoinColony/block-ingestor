@@ -7,7 +7,9 @@ import {
   verbose,
 } from '~utils';
 import {
+  ExpenditureStatus,
   UpdateExpenditureDocument,
+  UpdateExpenditureInput,
   UpdateExpenditureMutation,
   UpdateExpenditureMutationVariables,
 } from '~graphql';
@@ -53,16 +55,22 @@ export default async (event: ContractEvent): Promise<void> => {
 
   const updatedStatus = decodeUpdatedStatus(storageSlot, keys, value);
 
+  const updateExpenditureInput: UpdateExpenditureInput = {
+    id: databaseId,
+    slots: updatedSlots,
+    status: updatedStatus,
+  };
+
+  if (updatedStatus === ExpenditureStatus.Finalized) {
+    updateExpenditureInput.finalizedAt = event.timestamp;
+  }
+
   verbose(`State of expenditure with ID ${databaseId} updated`);
 
   await mutate<UpdateExpenditureMutation, UpdateExpenditureMutationVariables>(
     UpdateExpenditureDocument,
     {
-      input: {
-        id: databaseId,
-        slots: updatedSlots,
-        status: updatedStatus,
-      },
+      input: updateExpenditureInput,
     },
   );
 };
