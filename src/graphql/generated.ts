@@ -122,7 +122,8 @@ export type Colony = {
   createdAt: Scalars['AWSDateTime'];
   domains?: Maybe<ModelDomainConnection>;
   expenditures?: Maybe<ModelExpenditureConnection>;
-  expendituresGlobalClaimDelay?: Maybe<Scalars['Int']>;
+  /** Global claim delay for expenditures (in seconds) */
+  expendituresGlobalClaimDelay?: Maybe<Scalars['String']>;
   extensions?: Maybe<ModelColonyExtensionConnection>;
   fundsClaims?: Maybe<ModelColonyFundsClaimConnection>;
   /** Unique identifier for the Colony (contract address) */
@@ -1183,7 +1184,7 @@ export type CreateColonyInput = {
   chainFundsClaim?: InputMaybe<ColonyChainFundsClaimInput>;
   chainMetadata: ChainMetadataInput;
   colonyMemberInviteCode?: InputMaybe<Scalars['ID']>;
-  expendituresGlobalClaimDelay?: InputMaybe<Scalars['Int']>;
+  expendituresGlobalClaimDelay?: InputMaybe<Scalars['String']>;
   id?: InputMaybe<Scalars['ID']>;
   lastUpdatedContributorsWithReputation?: InputMaybe<Scalars['AWSDateTime']>;
   motionsWithUnclaimedStakes?: InputMaybe<Array<ColonyUnclaimedStakeInput>>;
@@ -1346,7 +1347,6 @@ export type CreateExpenditureInput = {
 };
 
 export type CreateExpenditureMetadataInput = {
-  decisionMethod: ExpenditureDecisionMethod;
   fundFromDomainNativeId: Scalars['Int'];
   id?: InputMaybe<Scalars['ID']>;
   stages?: InputMaybe<Array<ExpenditureStageInput>>;
@@ -1900,15 +1900,9 @@ export type ExpenditureBalanceInput = {
   tokenAddress: Scalars['ID'];
 };
 
-export enum ExpenditureDecisionMethod {
-  Permissions = 'PERMISSIONS',
-  Reputation = 'REPUTATION',
-}
-
 export type ExpenditureMetadata = {
   __typename?: 'ExpenditureMetadata';
   createdAt: Scalars['AWSDateTime'];
-  decisionMethod: ExpenditureDecisionMethod;
   fundFromDomainNativeId: Scalars['Int'];
   id: Scalars['ID'];
   stages?: Maybe<Array<ExpenditureStage>>;
@@ -1942,7 +1936,8 @@ export type ExpenditurePayoutInput = {
  */
 export type ExpenditureSlot = {
   __typename?: 'ExpenditureSlot';
-  claimDelay?: Maybe<Scalars['Int']>;
+  /** Slot claim delay (in seconds) */
+  claimDelay?: Maybe<Scalars['String']>;
   id: Scalars['Int'];
   payoutModifier?: Maybe<Scalars['Int']>;
   payouts?: Maybe<Array<ExpenditurePayout>>;
@@ -1950,7 +1945,7 @@ export type ExpenditureSlot = {
 };
 
 export type ExpenditureSlotInput = {
-  claimDelay?: InputMaybe<Scalars['Int']>;
+  claimDelay?: InputMaybe<Scalars['String']>;
   id: Scalars['Int'];
   payoutModifier?: InputMaybe<Scalars['Int']>;
   payouts?: InputMaybe<Array<ExpenditurePayoutInput>>;
@@ -2310,7 +2305,7 @@ export type ModelColonyActionTypeInput = {
 export type ModelColonyConditionInput = {
   and?: InputMaybe<Array<InputMaybe<ModelColonyConditionInput>>>;
   colonyMemberInviteCode?: InputMaybe<ModelIdInput>;
-  expendituresGlobalClaimDelay?: InputMaybe<ModelIntInput>;
+  expendituresGlobalClaimDelay?: InputMaybe<ModelStringInput>;
   lastUpdatedContributorsWithReputation?: InputMaybe<ModelStringInput>;
   name?: InputMaybe<ModelStringInput>;
   nativeTokenId?: InputMaybe<ModelIdInput>;
@@ -2437,7 +2432,7 @@ export type ModelColonyExtensionFilterInput = {
 export type ModelColonyFilterInput = {
   and?: InputMaybe<Array<InputMaybe<ModelColonyFilterInput>>>;
   colonyMemberInviteCode?: InputMaybe<ModelIdInput>;
-  expendituresGlobalClaimDelay?: InputMaybe<ModelIntInput>;
+  expendituresGlobalClaimDelay?: InputMaybe<ModelStringInput>;
   id?: InputMaybe<ModelIdInput>;
   lastUpdatedContributorsWithReputation?: InputMaybe<ModelStringInput>;
   name?: InputMaybe<ModelStringInput>;
@@ -2931,11 +2926,6 @@ export type ModelExpenditureConnection = {
   nextToken?: Maybe<Scalars['String']>;
 };
 
-export type ModelExpenditureDecisionMethodInput = {
-  eq?: InputMaybe<ExpenditureDecisionMethod>;
-  ne?: InputMaybe<ExpenditureDecisionMethod>;
-};
-
 export type ModelExpenditureFilterInput = {
   and?: InputMaybe<Array<InputMaybe<ModelExpenditureFilterInput>>>;
   colonyId?: InputMaybe<ModelIdInput>;
@@ -2956,7 +2946,6 @@ export type ModelExpenditureFilterInput = {
 
 export type ModelExpenditureMetadataConditionInput = {
   and?: InputMaybe<Array<InputMaybe<ModelExpenditureMetadataConditionInput>>>;
-  decisionMethod?: InputMaybe<ModelExpenditureDecisionMethodInput>;
   fundFromDomainNativeId?: InputMaybe<ModelIntInput>;
   not?: InputMaybe<ModelExpenditureMetadataConditionInput>;
   or?: InputMaybe<Array<InputMaybe<ModelExpenditureMetadataConditionInput>>>;
@@ -2971,7 +2960,6 @@ export type ModelExpenditureMetadataConnection = {
 
 export type ModelExpenditureMetadataFilterInput = {
   and?: InputMaybe<Array<InputMaybe<ModelExpenditureMetadataFilterInput>>>;
-  decisionMethod?: InputMaybe<ModelExpenditureDecisionMethodInput>;
   fundFromDomainNativeId?: InputMaybe<ModelIntInput>;
   id?: InputMaybe<ModelIdInput>;
   not?: InputMaybe<ModelExpenditureMetadataFilterInput>;
@@ -3511,7 +3499,7 @@ export type ModelSubscriptionColonyExtensionFilterInput = {
 export type ModelSubscriptionColonyFilterInput = {
   and?: InputMaybe<Array<InputMaybe<ModelSubscriptionColonyFilterInput>>>;
   colonyMemberInviteCode?: InputMaybe<ModelSubscriptionIdInput>;
-  expendituresGlobalClaimDelay?: InputMaybe<ModelSubscriptionIntInput>;
+  expendituresGlobalClaimDelay?: InputMaybe<ModelSubscriptionStringInput>;
   id?: InputMaybe<ModelSubscriptionIdInput>;
   lastUpdatedContributorsWithReputation?: InputMaybe<ModelSubscriptionStringInput>;
   name?: InputMaybe<ModelSubscriptionStringInput>;
@@ -3742,7 +3730,6 @@ export type ModelSubscriptionExpenditureMetadataFilterInput = {
   and?: InputMaybe<
     Array<InputMaybe<ModelSubscriptionExpenditureMetadataFilterInput>>
   >;
-  decisionMethod?: InputMaybe<ModelSubscriptionStringInput>;
   fundFromDomainNativeId?: InputMaybe<ModelSubscriptionIntInput>;
   id?: InputMaybe<ModelSubscriptionIdInput>;
   or?: InputMaybe<
@@ -7555,7 +7542,7 @@ export type UpdateColonyInput = {
   chainFundsClaim?: InputMaybe<ColonyChainFundsClaimInput>;
   chainMetadata?: InputMaybe<ChainMetadataInput>;
   colonyMemberInviteCode?: InputMaybe<Scalars['ID']>;
-  expendituresGlobalClaimDelay?: InputMaybe<Scalars['Int']>;
+  expendituresGlobalClaimDelay?: InputMaybe<Scalars['String']>;
   id: Scalars['ID'];
   lastUpdatedContributorsWithReputation?: InputMaybe<Scalars['AWSDateTime']>;
   motionsWithUnclaimedStakes?: InputMaybe<Array<ColonyUnclaimedStakeInput>>;
@@ -7723,7 +7710,6 @@ export type UpdateExpenditureInput = {
 };
 
 export type UpdateExpenditureMetadataInput = {
-  decisionMethod?: InputMaybe<ExpenditureDecisionMethod>;
   fundFromDomainNativeId?: InputMaybe<Scalars['Int']>;
   id: Scalars['ID'];
   stages?: InputMaybe<Array<ExpenditureStageInput>>;
@@ -8178,7 +8164,7 @@ export type ExpenditureFragment = {
     __typename?: 'ExpenditureSlot';
     id: number;
     recipientAddress?: string | null;
-    claimDelay?: number | null;
+    claimDelay?: string | null;
     payoutModifier?: number | null;
     payouts?: Array<{
       __typename?: 'ExpenditurePayout';
@@ -8976,7 +8962,7 @@ export type GetExpenditureQuery = {
       __typename?: 'ExpenditureSlot';
       id: number;
       recipientAddress?: string | null;
-      claimDelay?: number | null;
+      claimDelay?: string | null;
       payoutModifier?: number | null;
       payouts?: Array<{
         __typename?: 'ExpenditurePayout';
