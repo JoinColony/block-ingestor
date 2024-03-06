@@ -14,7 +14,7 @@ export default async (event: ContractEvent): Promise<void> => {
   const { expenditureId, slot, claimDelay } = event.args;
   const convertedExpenditureId = toNumber(expenditureId);
   const convertedSlot = toNumber(slot);
-  const convertedClaimDelay = toNumber(claimDelay);
+  const convertedClaimDelay = claimDelay.toString();
 
   const databaseId = getExpenditureDatabaseId(
     colonyAddress,
