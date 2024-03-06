@@ -1,3 +1,4 @@
+import { BigNumber } from 'ethers';
 import { mutate } from '~amplifyClient';
 import {
   UpdateColonyDocument,
@@ -9,7 +10,7 @@ import { ContractEvent } from '~types';
 export default async (event: ContractEvent): Promise<void> => {
   const { contractAddress: colonyAddress } = event;
   const { globalClaimDelay } = event.args;
-  const convertedGlobalClaimDelay = globalClaimDelay.toString();
+  const convertedGlobalClaimDelay = BigNumber.from(globalClaimDelay).toString();
 
   await mutate<UpdateColonyMutation, UpdateColonyMutationVariables>(
     UpdateColonyDocument,
