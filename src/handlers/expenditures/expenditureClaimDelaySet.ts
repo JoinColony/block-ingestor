@@ -1,3 +1,4 @@
+import { BigNumber } from 'ethers';
 import { mutate } from '~amplifyClient';
 import {
   UpdateExpenditureDocument,
@@ -14,7 +15,7 @@ export default async (event: ContractEvent): Promise<void> => {
   const { expenditureId, slot, claimDelay } = event.args;
   const convertedExpenditureId = toNumber(expenditureId);
   const convertedSlot = toNumber(slot);
-  const convertedClaimDelay = claimDelay.toString();
+  const convertedClaimDelay = BigNumber.from(claimDelay).toString();
 
   const databaseId = getExpenditureDatabaseId(
     colonyAddress,
