@@ -50,7 +50,7 @@ export const decodeUpdatedSlots = (
         recipientAddress,
       });
     } else if (keys[1] === EXPENDITURESLOT_CLAIMDELAY) {
-      const claimDelay = value.toString();
+      const claimDelay = BigNumber.from(value).toString();
 
       updatedSlots = getUpdatedExpenditureSlots(expenditure, slotId, {
         claimDelay,
