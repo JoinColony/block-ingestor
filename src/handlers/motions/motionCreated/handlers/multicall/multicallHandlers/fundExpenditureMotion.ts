@@ -9,8 +9,35 @@ import {
 import { createMotionInDB } from '~handlers/motions/motionCreated/helpers';
 import { ContractEvent } from '~types';
 import { getVotingClient, notNull, toNumber } from '~utils';
+import { DecodedFunctions } from '../multicall';
 
-export const moveFundsBetweenPotsMulti = async ({
+export const isFundExpenditureMotion = (
+  decodedFunctions: DecodedFunctions,
+): boolean => {
+  const fragmentsToMatch = [
+    'moveFundsBetweenPots(uint256,uint256,uint256,uint256,uint256,uint256,address)',
+    'moveFundsBetweenPots(uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,address)',
+  ];
+  return decodedFunctions.every((decodedFunction) =>
+    fragmentsToMatch.includes(decodedFunction.fragment),
+  );
+};
+
+export const fundExpenditureMotionHandler = (
+  event: ContractEvent,
+  decodedFunctions: DecodedFunctions,
+  gasEstimate: string,
+): void => {
+  decodedFunctions.forEach((decodedFunction) => {
+    moveFundsBetweenPotsMulti({
+      event,
+      args: decodedFunction.decodedAction,
+      gasEstimate,
+    });
+  });
+};
+
+const moveFundsBetweenPotsMulti = async ({
   event,
   args: moveFundsArgs,
   gasEstimate,
