@@ -20,6 +20,7 @@ import {
   decodeUpdatedSlots,
   decodeUpdatedStatus,
 } from './helpers';
+import { getCanFinalizeExpenditure } from './helpers/expenditureStateUpdate';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { contractAddress: colonyAddress } = event;
@@ -62,6 +63,16 @@ export default async (event: ContractEvent): Promise<void> => {
   };
 
   if (updatedStatus === ExpenditureStatus.Finalized) {
+    const canFinalize = await getCanFinalizeExpenditure(
+      expenditure.nativeFundingPotId,
+      colonyAddress,
+    );
+
+    if (!canFinalize) {
+      output(`Can not finalize expenditure with ID: ${databaseId}.`);
+      return;
+    }
+
     updateExpenditureInput.finalizedAt = event.timestamp;
   }
 

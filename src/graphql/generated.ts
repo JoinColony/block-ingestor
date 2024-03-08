@@ -8208,6 +8208,7 @@ export type ExpenditureFragment = {
   status: ExpenditureStatus;
   transactionHash?: string | null;
   ownerAddress: string;
+  nativeFundingPotId: number;
   slots: Array<{
     __typename?: 'ExpenditureSlot';
     id: number;
@@ -9015,6 +9016,7 @@ export type GetExpenditureQuery = {
     status: ExpenditureStatus;
     transactionHash?: string | null;
     ownerAddress: string;
+    nativeFundingPotId: number;
     slots: Array<{
       __typename?: 'ExpenditureSlot';
       id: number;
@@ -9585,6 +9587,7 @@ export const Expenditure = gql`
     status
     transactionHash
     ownerAddress
+    nativeFundingPotId
   }
   ${ExpenditureBalance}
 `;

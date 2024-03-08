@@ -31,4 +31,5 @@ fragment Expenditure on Expenditure {
   status
   transactionHash
   ownerAddress
+  nativeFundingPotId
 }
