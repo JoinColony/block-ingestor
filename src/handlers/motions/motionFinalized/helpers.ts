@@ -447,7 +447,7 @@ export const claimExpenditurePayouts = async (
   // Then we can assume this state change ain't a stage release
   if (
     convertedStorageSlot !== EXPENDITURESLOTS_SLOT ||
-    BigNumber.from(0).eq(value)
+    !BigNumber.from(0).eq(value)
   ) {
     return;
   }
