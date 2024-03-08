@@ -240,6 +240,10 @@ export type ColonyAction = {
   createdAt: Scalars['AWSDateTime'];
   /** Corresponding Decision data, if action is a Simple Decision */
   decisionData?: Maybe<ColonyDecision>;
+  /** Expenditure associated with the action, if any */
+  expenditure?: Maybe<Expenditure>;
+  /** ID of an expenditure associated with the action, if any */
+  expenditureId?: Maybe<Scalars['ID']>;
   /** The source Domain of the action, if applicable */
   fromDomain?: Maybe<Domain>;
   /** The source Domain identifier, if applicable */
@@ -413,6 +417,7 @@ export enum ColonyActionType {
   SetUserRoles = 'SET_USER_ROLES',
   /** An action related to setting user roles within a Colony via a motion */
   SetUserRolesMotion = 'SET_USER_ROLES_MOTION',
+  TempAdvancedPayment = 'TEMP_ADVANCED_PAYMENT',
   /** An action related to unlocking a token within a Colony */
   UnlockToken = 'UNLOCK_TOKEN',
   /** An action related to unlocking a token within a Colony via a motion */
@@ -1068,6 +1073,7 @@ export type CreateColonyActionInput = {
   colonyDecisionId?: InputMaybe<Scalars['ID']>;
   colonyId: Scalars['ID'];
   createdAt?: InputMaybe<Scalars['AWSDateTime']>;
+  expenditureId?: InputMaybe<Scalars['ID']>;
   fromDomainId?: InputMaybe<Scalars['ID']>;
   id?: InputMaybe<Scalars['ID']>;
   individualEvents?: InputMaybe<Scalars['String']>;
@@ -1346,7 +1352,6 @@ export type CreateExpenditureInput = {
 };
 
 export type CreateExpenditureMetadataInput = {
-  decisionMethod: ExpenditureDecisionMethod;
   fundFromDomainNativeId: Scalars['Int'];
   id?: InputMaybe<Scalars['ID']>;
   stages?: InputMaybe<Array<ExpenditureStageInput>>;
@@ -1900,15 +1905,9 @@ export type ExpenditureBalanceInput = {
   tokenAddress: Scalars['ID'];
 };
 
-export enum ExpenditureDecisionMethod {
-  Permissions = 'PERMISSIONS',
-  Reputation = 'REPUTATION',
-}
-
 export type ExpenditureMetadata = {
   __typename?: 'ExpenditureMetadata';
   createdAt: Scalars['AWSDateTime'];
-  decisionMethod: ExpenditureDecisionMethod;
   fundFromDomainNativeId: Scalars['Int'];
   id: Scalars['ID'];
   stages?: Maybe<Array<ExpenditureStage>>;
@@ -2225,6 +2224,7 @@ export type ModelColonyActionConditionInput = {
   colonyDecisionId?: InputMaybe<ModelIdInput>;
   colonyId?: InputMaybe<ModelIdInput>;
   createdAt?: InputMaybe<ModelStringInput>;
+  expenditureId?: InputMaybe<ModelIdInput>;
   fromDomainId?: InputMaybe<ModelIdInput>;
   individualEvents?: InputMaybe<ModelStringInput>;
   initiatorAddress?: InputMaybe<ModelIdInput>;
@@ -2260,6 +2260,7 @@ export type ModelColonyActionFilterInput = {
   colonyDecisionId?: InputMaybe<ModelIdInput>;
   colonyId?: InputMaybe<ModelIdInput>;
   createdAt?: InputMaybe<ModelStringInput>;
+  expenditureId?: InputMaybe<ModelIdInput>;
   fromDomainId?: InputMaybe<ModelIdInput>;
   id?: InputMaybe<ModelIdInput>;
   individualEvents?: InputMaybe<ModelStringInput>;
@@ -2931,11 +2932,6 @@ export type ModelExpenditureConnection = {
   nextToken?: Maybe<Scalars['String']>;
 };
 
-export type ModelExpenditureDecisionMethodInput = {
-  eq?: InputMaybe<ExpenditureDecisionMethod>;
-  ne?: InputMaybe<ExpenditureDecisionMethod>;
-};
-
 export type ModelExpenditureFilterInput = {
   and?: InputMaybe<Array<InputMaybe<ModelExpenditureFilterInput>>>;
   colonyId?: InputMaybe<ModelIdInput>;
@@ -2956,7 +2952,6 @@ export type ModelExpenditureFilterInput = {
 
 export type ModelExpenditureMetadataConditionInput = {
   and?: InputMaybe<Array<InputMaybe<ModelExpenditureMetadataConditionInput>>>;
-  decisionMethod?: InputMaybe<ModelExpenditureDecisionMethodInput>;
   fundFromDomainNativeId?: InputMaybe<ModelIntInput>;
   not?: InputMaybe<ModelExpenditureMetadataConditionInput>;
   or?: InputMaybe<Array<InputMaybe<ModelExpenditureMetadataConditionInput>>>;
@@ -2971,7 +2966,6 @@ export type ModelExpenditureMetadataConnection = {
 
 export type ModelExpenditureMetadataFilterInput = {
   and?: InputMaybe<Array<InputMaybe<ModelExpenditureMetadataFilterInput>>>;
-  decisionMethod?: InputMaybe<ModelExpenditureDecisionMethodInput>;
   fundFromDomainNativeId?: InputMaybe<ModelIntInput>;
   id?: InputMaybe<ModelIdInput>;
   not?: InputMaybe<ModelExpenditureMetadataFilterInput>;
@@ -3423,6 +3417,7 @@ export type ModelSubscriptionColonyActionFilterInput = {
   colonyDecisionId?: InputMaybe<ModelSubscriptionIdInput>;
   colonyId?: InputMaybe<ModelSubscriptionIdInput>;
   createdAt?: InputMaybe<ModelSubscriptionStringInput>;
+  expenditureId?: InputMaybe<ModelSubscriptionIdInput>;
   fromDomainId?: InputMaybe<ModelSubscriptionIdInput>;
   id?: InputMaybe<ModelSubscriptionIdInput>;
   individualEvents?: InputMaybe<ModelSubscriptionStringInput>;
@@ -3742,7 +3737,6 @@ export type ModelSubscriptionExpenditureMetadataFilterInput = {
   and?: InputMaybe<
     Array<InputMaybe<ModelSubscriptionExpenditureMetadataFilterInput>>
   >;
-  decisionMethod?: InputMaybe<ModelSubscriptionStringInput>;
   fundFromDomainNativeId?: InputMaybe<ModelSubscriptionIntInput>;
   id?: InputMaybe<ModelSubscriptionIdInput>;
   or?: InputMaybe<
@@ -6406,6 +6400,7 @@ export enum SearchableColonyActionAggregateField {
   ColonyDecisionId = 'colonyDecisionId',
   ColonyId = 'colonyId',
   CreatedAt = 'createdAt',
+  ExpenditureId = 'expenditureId',
   FromDomainId = 'fromDomainId',
   Id = 'id',
   IndividualEvents = 'individualEvents',
@@ -6449,6 +6444,7 @@ export type SearchableColonyActionFilterInput = {
   colonyDecisionId?: InputMaybe<SearchableIdFilterInput>;
   colonyId?: InputMaybe<SearchableIdFilterInput>;
   createdAt?: InputMaybe<SearchableStringFilterInput>;
+  expenditureId?: InputMaybe<SearchableIdFilterInput>;
   fromDomainId?: InputMaybe<SearchableIdFilterInput>;
   id?: InputMaybe<SearchableIdFilterInput>;
   individualEvents?: InputMaybe<SearchableStringFilterInput>;
@@ -6484,6 +6480,7 @@ export enum SearchableColonyActionSortableFields {
   ColonyDecisionId = 'colonyDecisionId',
   ColonyId = 'colonyId',
   CreatedAt = 'createdAt',
+  ExpenditureId = 'expenditureId',
   FromDomainId = 'fromDomainId',
   Id = 'id',
   IndividualEvents = 'individualEvents',
@@ -7462,6 +7459,7 @@ export type UpdateColonyActionInput = {
   colonyDecisionId?: InputMaybe<Scalars['ID']>;
   colonyId?: InputMaybe<Scalars['ID']>;
   createdAt?: InputMaybe<Scalars['AWSDateTime']>;
+  expenditureId?: InputMaybe<Scalars['ID']>;
   fromDomainId?: InputMaybe<Scalars['ID']>;
   id: Scalars['ID'];
   individualEvents?: InputMaybe<Scalars['String']>;
@@ -7723,7 +7721,6 @@ export type UpdateExpenditureInput = {
 };
 
 export type UpdateExpenditureMetadataInput = {
-  decisionMethod?: InputMaybe<ExpenditureDecisionMethod>;
   fundFromDomainNativeId?: InputMaybe<Scalars['Int']>;
   id: Scalars['ID'];
   stages?: InputMaybe<Array<ExpenditureStageInput>>;
