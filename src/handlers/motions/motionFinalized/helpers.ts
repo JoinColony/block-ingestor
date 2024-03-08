@@ -398,6 +398,8 @@ export const updateColonyUnclaimedStakes = async (
 const EXPENDITURESLOTS_SLOT = 26;
 
 export const claimExpenditurePayouts = async (
+  // @TODO: refactor and rename this function as it is called by setExpenditureState (even when editing)
+  // so it doesn't necessarily claim expenditure payouts or release stages
   action: string,
   colonyAddress: string,
 ): Promise<void> => {
@@ -465,6 +467,9 @@ export const claimExpenditurePayouts = async (
   });
 
   const metadata = expenditureMetadataResponse?.data?.getExpenditureMetadata;
+
+  // TODO: should only run past this stage if this function is being used to update release stages
+  // (which it is not if we are just updating the payouts as part of an edit for example)
 
   if (!metadata || !metadata.stages) {
     output(
