@@ -17,9 +17,18 @@ fragment Expenditure on Expenditure {
       networkFee
     }
   }
+  motions {
+    items {
+      transactionHash
+      action {
+        type
+      }
+    }
+  }
   balances {
     ...ExpenditureBalance
   }
+  status
   stakedTransactionHash
   ownerAddress
 }
