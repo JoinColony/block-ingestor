@@ -1,14 +1,13 @@
 import { ColonyActionType, ExpenditureStatus } from '~graphql';
 import { toNumber } from 'lodash';
 import { getDomainDatabaseId, getExpenditureDatabaseId } from '~utils';
-import { DecodedFunctions } from '../multicall';
-import { ContractEvent } from '~types';
 import { createMotionInDB } from '~handlers/motions/motionCreated/helpers';
+import { MulticallHandler, MulticallValidator } from '../fragments';
 
-export const isReleaseExpenditureStageMotion = (
-  decodedFunctions: DecodedFunctions,
-  expenditureStatus: ExpenditureStatus,
-): boolean => {
+export const isReleaseExpenditureStageMotion: MulticallValidator = ({
+  decodedFunctions,
+  expenditureStatus,
+}) => {
   const fragmentsToMatch = ['setExpenditureState'];
   return (
     expenditureStatus === ExpenditureStatus.Finalized &&
@@ -18,11 +17,11 @@ export const isReleaseExpenditureStageMotion = (
   );
 };
 
-export const releaseExpenditureStageMotionHandler = (
-  event: ContractEvent,
-  gasEstimate: string,
-  decodedFunctions: DecodedFunctions,
-): void => {
+export const releaseExpenditureStageMotionHandler: MulticallHandler = ({
+  event,
+  gasEstimate,
+  decodedFunctions,
+}) => {
   decodedFunctions.forEach(async (decodedFunction) => {
     const { colonyAddress } = event;
     const [, , expenditureId, , , keys] = decodedFunction.decodedAction;

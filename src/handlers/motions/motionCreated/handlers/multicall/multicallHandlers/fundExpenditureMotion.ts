@@ -10,12 +10,12 @@ import {
 import { createMotionInDB } from '~handlers/motions/motionCreated/helpers';
 import { ContractEvent } from '~types';
 import { getVotingClient, notNull, toNumber } from '~utils';
-import { DecodedFunctions } from '../multicall';
+import { MulticallHandler, MulticallValidator } from '../fragments';
 
-export const isFundExpenditureMotion = (
-  decodedFunctions: DecodedFunctions,
-  expenditureStatus: ExpenditureStatus,
-): boolean => {
+export const isFundExpenditureMotion: MulticallValidator = ({
+  decodedFunctions,
+  expenditureStatus,
+}) => {
   const fragmentsToMatch = [
     'moveFundsBetweenPots(uint256,uint256,uint256,uint256,uint256,uint256,address)',
     'moveFundsBetweenPots(uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,address)',
@@ -28,11 +28,11 @@ export const isFundExpenditureMotion = (
   );
 };
 
-export const fundExpenditureMotionHandler = (
-  event: ContractEvent,
-  decodedFunctions: DecodedFunctions,
-  gasEstimate: string,
-): void => {
+export const fundExpenditureMotionHandler: MulticallHandler = ({
+  event,
+  decodedFunctions,
+  gasEstimate,
+}) => {
   decodedFunctions.forEach((decodedFunction) => {
     moveFundsBetweenPotsMulti({
       event,
