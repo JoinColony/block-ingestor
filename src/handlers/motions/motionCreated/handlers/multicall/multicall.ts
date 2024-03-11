@@ -9,15 +9,7 @@ import {
 import { ContractEvent } from '~types';
 import { getExpenditureFromDB } from '~handlers/expenditures/helpers';
 import { AnyColonyClient } from '@colony/colony-js';
-import {
-  editLockedExpenditureMotionHandler,
-  fundExpenditureMotionHandler,
-  isEditLockedExpenditureMotion,
-  isFundExpenditureMotion,
-  isReleaseExpenditureStageMotion,
-  releaseExpenditureStageMotionHandler,
-} from './multicallHandlers';
-import { supportedMulticallFragments } from './fragments';
+import { multicallHandlers, supportedMulticallFragments } from './fragments';
 
 export type DecodedFunctions = Array<{
   fragment: string;
@@ -93,28 +85,16 @@ export const handleMulticallMotion = async (
     return;
   }
 
-  if (isFundExpenditureMotion(decodedFunctions, expenditure.status)) {
-    return fundExpenditureMotionHandler(
-      event,
-      decodedFunctions,
-      updatedGasEstimate,
-    );
-  }
-
-  if (isReleaseExpenditureStageMotion(decodedFunctions, expenditure.status)) {
-    return releaseExpenditureStageMotionHandler(
-      event,
-      updatedGasEstimate,
-      decodedFunctions,
-    );
-  }
-
-  if (isEditLockedExpenditureMotion(decodedFunctions, expenditure.status)) {
-    return await editLockedExpenditureMotionHandler(
-      event,
-      updatedGasEstimate,
-      decodedFunctions,
-      expenditure,
-    );
+  for (const [validator, handler] of multicallHandlers) {
+    if (
+      validator({ decodedFunctions, expenditureStatus: expenditure.status })
+    ) {
+      handler({
+        event,
+        decodedFunctions,
+        gasEstimate: updatedGasEstimate,
+        expenditure,
+      });
+    }
   }
 };
