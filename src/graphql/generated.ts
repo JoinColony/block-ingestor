@@ -298,6 +298,8 @@ export type ColonyAction = {
   recipientUser?: Maybe<User>;
   /** Colony roles that are associated with the action */
   roles?: Maybe<ColonyActionRoles>;
+  /** The reputation root hash at the time of the creation of the action */
+  rootHash: Scalars['String'];
   /** Safe transactions associated with the action */
   safeTransaction?: Maybe<SafeTransaction>;
   /**
@@ -829,11 +831,6 @@ export type ColonyMotion = {
   requiredStake: Scalars['String'];
   /** Total voting outcome for the motion (accumulated votes) */
   revealedVotes: MotionStakes;
-  /**
-   * The reputation root hash at the time of the creation of the motion
-   * Used for calculating a user's max stake in client
-   */
-  rootHash: Scalars['String'];
   /** The total amount of reputation (among all users) that can vote for this motion */
   skillRep: Scalars['String'];
   /** List of staker rewards users will be receiving for a motion */
@@ -1092,6 +1089,7 @@ export type CreateColonyActionInput = {
   pendingDomainMetadataId?: InputMaybe<Scalars['ID']>;
   recipientAddress?: InputMaybe<Scalars['ID']>;
   roles?: InputMaybe<ColonyActionRolesInput>;
+  rootHash: Scalars['String'];
   showInActionsList: Scalars['Boolean'];
   toDomainId?: InputMaybe<Scalars['ID']>;
   tokenAddress?: InputMaybe<Scalars['ID']>;
@@ -1247,7 +1245,6 @@ export type CreateColonyMotionInput = {
   repSubmitted: Scalars['String'];
   requiredStake: Scalars['String'];
   revealedVotes: MotionStakesInput;
-  rootHash: Scalars['String'];
   skillRep: Scalars['String'];
   stakerRewards: Array<StakerRewardsInput>;
   transactionHash: Scalars['ID'];
@@ -2242,6 +2239,7 @@ export type ModelColonyActionConditionInput = {
   pendingColonyMetadataId?: InputMaybe<ModelIdInput>;
   pendingDomainMetadataId?: InputMaybe<ModelIdInput>;
   recipientAddress?: InputMaybe<ModelIdInput>;
+  rootHash?: InputMaybe<ModelStringInput>;
   showInActionsList?: InputMaybe<ModelBooleanInput>;
   toDomainId?: InputMaybe<ModelIdInput>;
   tokenAddress?: InputMaybe<ModelIdInput>;
@@ -2279,6 +2277,7 @@ export type ModelColonyActionFilterInput = {
   pendingColonyMetadataId?: InputMaybe<ModelIdInput>;
   pendingDomainMetadataId?: InputMaybe<ModelIdInput>;
   recipientAddress?: InputMaybe<ModelIdInput>;
+  rootHash?: InputMaybe<ModelStringInput>;
   showInActionsList?: InputMaybe<ModelBooleanInput>;
   toDomainId?: InputMaybe<ModelIdInput>;
   tokenAddress?: InputMaybe<ModelIdInput>;
@@ -2599,7 +2598,6 @@ export type ModelColonyMotionConditionInput = {
   remainingStakes?: InputMaybe<ModelStringInput>;
   repSubmitted?: InputMaybe<ModelStringInput>;
   requiredStake?: InputMaybe<ModelStringInput>;
-  rootHash?: InputMaybe<ModelStringInput>;
   skillRep?: InputMaybe<ModelStringInput>;
   transactionHash?: InputMaybe<ModelIdInput>;
   userMinStake?: InputMaybe<ModelStringInput>;
@@ -2630,7 +2628,6 @@ export type ModelColonyMotionFilterInput = {
   remainingStakes?: InputMaybe<ModelStringInput>;
   repSubmitted?: InputMaybe<ModelStringInput>;
   requiredStake?: InputMaybe<ModelStringInput>;
-  rootHash?: InputMaybe<ModelStringInput>;
   skillRep?: InputMaybe<ModelStringInput>;
   transactionHash?: InputMaybe<ModelIdInput>;
   userMinStake?: InputMaybe<ModelStringInput>;
@@ -3435,6 +3432,7 @@ export type ModelSubscriptionColonyActionFilterInput = {
   pendingColonyMetadataId?: InputMaybe<ModelSubscriptionIdInput>;
   pendingDomainMetadataId?: InputMaybe<ModelSubscriptionIdInput>;
   recipientAddress?: InputMaybe<ModelSubscriptionIdInput>;
+  rootHash?: InputMaybe<ModelSubscriptionStringInput>;
   showInActionsList?: InputMaybe<ModelSubscriptionBooleanInput>;
   toDomainId?: InputMaybe<ModelSubscriptionIdInput>;
   tokenAddress?: InputMaybe<ModelSubscriptionIdInput>;
@@ -3603,7 +3601,6 @@ export type ModelSubscriptionColonyMotionFilterInput = {
   remainingStakes?: InputMaybe<ModelSubscriptionStringInput>;
   repSubmitted?: InputMaybe<ModelSubscriptionStringInput>;
   requiredStake?: InputMaybe<ModelSubscriptionStringInput>;
-  rootHash?: InputMaybe<ModelSubscriptionStringInput>;
   skillRep?: InputMaybe<ModelSubscriptionStringInput>;
   transactionHash?: InputMaybe<ModelSubscriptionIdInput>;
   userMinStake?: InputMaybe<ModelSubscriptionStringInput>;
@@ -6431,6 +6428,7 @@ export enum SearchableColonyActionAggregateField {
   PendingColonyMetadataId = 'pendingColonyMetadataId',
   PendingDomainMetadataId = 'pendingDomainMetadataId',
   RecipientAddress = 'recipientAddress',
+  RootHash = 'rootHash',
   ShowInActionsList = 'showInActionsList',
   ToDomainId = 'toDomainId',
   TokenAddress = 'tokenAddress',
@@ -6477,6 +6475,7 @@ export type SearchableColonyActionFilterInput = {
   pendingColonyMetadataId?: InputMaybe<SearchableIdFilterInput>;
   pendingDomainMetadataId?: InputMaybe<SearchableIdFilterInput>;
   recipientAddress?: InputMaybe<SearchableIdFilterInput>;
+  rootHash?: InputMaybe<SearchableStringFilterInput>;
   showInActionsList?: InputMaybe<SearchableBooleanFilterInput>;
   toDomainId?: InputMaybe<SearchableIdFilterInput>;
   tokenAddress?: InputMaybe<SearchableIdFilterInput>;
@@ -6511,6 +6510,7 @@ export enum SearchableColonyActionSortableFields {
   PendingColonyMetadataId = 'pendingColonyMetadataId',
   PendingDomainMetadataId = 'pendingDomainMetadataId',
   RecipientAddress = 'recipientAddress',
+  RootHash = 'rootHash',
   ShowInActionsList = 'showInActionsList',
   ToDomainId = 'toDomainId',
   TokenAddress = 'tokenAddress',
@@ -7492,6 +7492,7 @@ export type UpdateColonyActionInput = {
   pendingDomainMetadataId?: InputMaybe<Scalars['ID']>;
   recipientAddress?: InputMaybe<Scalars['ID']>;
   roles?: InputMaybe<ColonyActionRolesInput>;
+  rootHash?: InputMaybe<Scalars['String']>;
   showInActionsList?: InputMaybe<Scalars['Boolean']>;
   toDomainId?: InputMaybe<Scalars['ID']>;
   tokenAddress?: InputMaybe<Scalars['ID']>;
@@ -7625,7 +7626,6 @@ export type UpdateColonyMotionInput = {
   repSubmitted?: InputMaybe<Scalars['String']>;
   requiredStake?: InputMaybe<Scalars['String']>;
   revealedVotes?: InputMaybe<MotionStakesInput>;
-  rootHash?: InputMaybe<Scalars['String']>;
   skillRep?: InputMaybe<Scalars['String']>;
   stakerRewards?: InputMaybe<Array<StakerRewardsInput>>;
   transactionHash?: InputMaybe<Scalars['ID']>;
@@ -8197,7 +8197,6 @@ export type ColonyMotionFragment = {
   requiredStake: string;
   remainingStakes: Array<string>;
   userMinStake: string;
-  rootHash: string;
   nativeMotionDomainId: string;
   isFinalized: boolean;
   createdBy: string;
@@ -9238,7 +9237,6 @@ export type GetColonyMotionQuery = {
     requiredStake: string;
     remainingStakes: Array<string>;
     userMinStake: string;
-    rootHash: string;
     nativeMotionDomainId: string;
     isFinalized: boolean;
     createdBy: string;
@@ -9545,7 +9543,6 @@ export const ColonyMotion = gql`
       ...UserMotionStakes
     }
     userMinStake
-    rootHash
     nativeMotionDomainId
     stakerRewards {
       ...StakerReward
