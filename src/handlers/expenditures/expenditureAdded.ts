@@ -70,7 +70,7 @@ export default async (event: ContractEvent): Promise<void> => {
   );
 
   await writeActionFromEvent(event, colonyAddress, {
-    type: ColonyActionType.Generic,
+    type: ColonyActionType.TempAdvancedPayment,
     initiatorAddress: ownerAddress,
     expenditureId: databaseId,
     fromDomainId: getDomainDatabaseId(colonyAddress, domainId),
