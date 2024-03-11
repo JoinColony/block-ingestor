@@ -1,13 +1,11 @@
 import {
   ColonyActionType,
-  ExpenditureFragment,
   ExpenditurePayout,
   ExpenditureSlot,
   ExpenditureStatus,
 } from '~graphql';
 import { toNumber } from 'lodash';
 import { getUpdatedExpenditureSlots } from '~handlers/expenditures/helpers';
-import { DecodedFunctions } from '../multicall';
 import { getAmountLessFee, getNetworkInverseFee } from '~utils/networkFee';
 import { BigNumber, utils } from 'ethers';
 import {
@@ -16,12 +14,12 @@ import {
   EXPENDITURESLOT_RECIPIENT,
 } from '~constants';
 import { createMotionInDB } from '~handlers/motions/motionCreated/helpers';
-import { ContractEvent } from '~types';
+import { MulticallHandler, MulticallValidator } from '../fragments';
 
-export const isEditLockedExpenditureMotion = (
-  decodedFunctions: DecodedFunctions,
-  expenditureStatus: ExpenditureStatus,
-): boolean => {
+export const isEditLockedExpenditureMotion: MulticallValidator = ({
+  decodedFunctions,
+  expenditureStatus,
+}) => {
   const fragmentsToMatch = [
     'setExpenditurePayout(uint256,uint256,uint256,uint256,address,uint256)',
     'setExpenditureState',
@@ -34,13 +32,17 @@ export const isEditLockedExpenditureMotion = (
   );
 };
 
-export const editLockedExpenditureMotionHandler = async (
-  event: ContractEvent,
-  gasEstimate: string,
-  decodedFunctions: DecodedFunctions,
-  expenditure: ExpenditureFragment,
-): Promise<void> => {
+export const editLockedExpenditureMotionHandler: MulticallHandler = async ({
+  event,
+  gasEstimate,
+  decodedFunctions,
+  expenditure,
+}) => {
   let updatedSlots: ExpenditureSlot[] = [];
+
+  if (!expenditure) {
+    return;
+  }
 
   for (const decodedFunction of decodedFunctions) {
     if (
