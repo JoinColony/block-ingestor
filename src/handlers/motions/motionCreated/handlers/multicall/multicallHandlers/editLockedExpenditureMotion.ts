@@ -106,7 +106,7 @@ export const editLockedExpenditureMotionHandler: MulticallHandler = async ({
             updatedSlots,
           );
         } else if (slotType === EXPENDITURESLOT_CLAIMDELAY) {
-          const claimDelay = toNumber(value);
+          const claimDelay = toNumber(value).toString();
 
           updatedSlots = getUpdatedExpenditureSlots(
             expenditure,
