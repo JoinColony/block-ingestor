@@ -25,6 +25,7 @@ import {
   CreateMotionMessageInput,
   CreateMotionMessageMutation,
   CreateMotionMessageMutationVariables,
+  ExpenditureSlot,
 } from '~graphql';
 import { SIMPLE_DECISIONS_ACTION_CODE } from '~constants';
 import networkClient from '~networkClient';
@@ -238,6 +239,7 @@ export const createMotionInDB = async (
     gasEstimate,
     expenditureId,
     expenditureSlotId,
+    editedExpenditureSlots,
     ...input
   }: Omit<
     CreateColonyActionInput,
@@ -253,6 +255,7 @@ export const createMotionInDB = async (
     gasEstimate: string;
     expenditureId?: string;
     expenditureSlotId?: number;
+    editedExpenditureSlots?: ExpenditureSlot[];
   },
 ): Promise<GraphQLFnReturn<CreateColonyMotionMutation> | undefined> => {
   if (!colonyAddress) {
@@ -304,6 +307,7 @@ export const createMotionInDB = async (
       gasEstimate,
       expenditureId,
       expenditureSlotId,
+      editedExpenditureSlots,
     }),
     createMotionMessage(initialMotionMessage),
     createColonyAction(actionData, timestamp),
