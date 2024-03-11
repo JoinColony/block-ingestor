@@ -6,7 +6,6 @@ import {
   ExpenditureStatus,
 } from '~graphql';
 import { toNumber } from 'lodash';
-import { verbose } from '~utils';
 import { getUpdatedExpenditureSlots } from '~handlers/expenditures/helpers';
 import { DecodedFunctions } from '../multicall';
 import { getAmountLessFee, getNetworkInverseFee } from '~utils/networkFee';
@@ -35,15 +34,15 @@ export const isEditLockedExpenditureMotion = (
   );
 };
 
-export const editLockedExpenditureMotionHandler = (
+export const editLockedExpenditureMotionHandler = async (
   event: ContractEvent,
   gasEstimate: string,
   decodedFunctions: DecodedFunctions,
   expenditure: ExpenditureFragment,
-): void => {
+): Promise<void> => {
   let updatedSlots: ExpenditureSlot[] = [];
 
-  decodedFunctions.forEach(async (decodedFunction) => {
+  for (const decodedFunction of decodedFunctions) {
     if (
       decodedFunction.fragment ===
       'setExpenditurePayout(uint256,uint256,uint256,uint256,address,uint256)'
@@ -76,37 +75,54 @@ export const editLockedExpenditureMotionHandler = (
         },
       ];
 
-      updatedSlots = getUpdatedExpenditureSlots(expenditure, convertedSlot, {
-        payouts: updatedPayouts,
-      });
+      updatedSlots = getUpdatedExpenditureSlots(
+        expenditure,
+        convertedSlot,
+        {
+          payouts: updatedPayouts,
+        },
+        updatedSlots,
+      );
     } else if (decodedFunction.fragment === 'setExpenditureState') {
       const [, , , storageSlot, , keys, value] = decodedFunction.decodedAction;
       if (storageSlot.eq(EXPENDITURESLOTS_SLOT)) {
         const [slotId, slotType] = keys;
+
+        const convertedSlot = toNumber(slotId);
 
         if (slotType === EXPENDITURESLOT_RECIPIENT) {
           const recipientAddress = utils.defaultAbiCoder
             .decode(['address'], value)
             .toString();
 
-          updatedSlots = getUpdatedExpenditureSlots(expenditure, slotId, {
-            recipientAddress,
-          });
+          updatedSlots = getUpdatedExpenditureSlots(
+            expenditure,
+            convertedSlot,
+            {
+              recipientAddress,
+            },
+            updatedSlots,
+          );
         } else if (slotType === EXPENDITURESLOT_CLAIMDELAY) {
           const claimDelay = toNumber(value);
 
-          updatedSlots = getUpdatedExpenditureSlots(expenditure, slotId, {
-            claimDelay,
-          });
+          updatedSlots = getUpdatedExpenditureSlots(
+            expenditure,
+            convertedSlot,
+            {
+              claimDelay,
+            },
+            updatedSlots,
+          );
         }
       }
     }
-  });
-  verbose('updatedSlots', updatedSlots);
+  }
+
   createMotionInDB(event, {
     type: ColonyActionType.EditLockedExpenditureMotion,
     gasEstimate,
     expenditureId: expenditure.id,
-    // @TODO: create an optional field on the motion object to accept the updatedSlots here
+    editedExpenditureSlots: updatedSlots,
   });
 };
