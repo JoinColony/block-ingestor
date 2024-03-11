@@ -10,7 +10,6 @@ fragment ColonyMotion on ColonyMotion {
     ...UserMotionStakes
   }
   userMinStake
-  rootHash
   nativeMotionDomainId
   stakerRewards {
     ...StakerReward
