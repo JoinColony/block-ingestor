@@ -776,6 +776,8 @@ export type ColonyMotion = {
    * Useful to check if we're viewing a "read-only" motion
    */
   createdBy: Scalars['String'];
+  /** Edited expenditure slots associated with the motion, if any */
+  editedExpenditureSlots?: Maybe<Array<ExpenditureSlot>>;
   /** Expenditure associated with the motion, if any */
   expenditureId?: Maybe<Scalars['ID']>;
   /** Id of the expenditure stage payment to be released if the motion pass, if any */
@@ -1224,6 +1226,7 @@ export type CreateColonyMetadataInput = {
 
 export type CreateColonyMotionInput = {
   createdBy: Scalars['String'];
+  editedExpenditureSlots?: InputMaybe<Array<ExpenditureSlotInput>>;
   expenditureId?: InputMaybe<Scalars['ID']>;
   expenditureSlotId?: InputMaybe<Scalars['Int']>;
   gasEstimate: Scalars['String'];
@@ -7596,6 +7599,7 @@ export type UpdateColonyMetadataInput = {
 
 export type UpdateColonyMotionInput = {
   createdBy?: InputMaybe<Scalars['String']>;
+  editedExpenditureSlots?: InputMaybe<Array<ExpenditureSlotInput>>;
   expenditureId?: InputMaybe<Scalars['ID']>;
   expenditureSlotId?: InputMaybe<Scalars['Int']>;
   gasEstimate?: InputMaybe<Scalars['String']>;
