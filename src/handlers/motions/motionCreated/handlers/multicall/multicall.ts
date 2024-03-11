@@ -76,14 +76,6 @@ export const handleMulticallMotion = async (
     colonyClient,
   );
 
-  if (isFundExpenditureMotion(decodedFunctions)) {
-    return fundExpenditureMotionHandler(
-      event,
-      decodedFunctions,
-      updatedGasEstimate,
-    );
-  }
-
   const [, , expenditureId] = decodedFunctions[0].decodedAction;
 
   const convertedExpenditureId = toNumber(expenditureId);
@@ -101,6 +93,14 @@ export const handleMulticallMotion = async (
     return;
   }
 
+  if (isFundExpenditureMotion(decodedFunctions, expenditure.status)) {
+    return fundExpenditureMotionHandler(
+      event,
+      decodedFunctions,
+      updatedGasEstimate,
+    );
+  }
+
   if (isReleaseExpenditureStageMotion(decodedFunctions, expenditure.status)) {
     return releaseExpenditureStageMotionHandler(
       event,
@@ -110,7 +110,7 @@ export const handleMulticallMotion = async (
   }
 
   if (isEditLockedExpenditureMotion(decodedFunctions, expenditure.status)) {
-    return editLockedExpenditureMotionHandler(
+    return await editLockedExpenditureMotionHandler(
       event,
       updatedGasEstimate,
       decodedFunctions,
