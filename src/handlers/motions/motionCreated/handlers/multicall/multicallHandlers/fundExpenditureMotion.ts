@@ -2,6 +2,7 @@ import { Result } from 'ethers/lib/utils';
 import { query } from '~amplifyClient';
 import {
   ColonyActionType,
+  ExpenditureStatus,
   GetExpenditureByNativeFundingPotIdAndColonyDocument,
   GetExpenditureByNativeFundingPotIdAndColonyQuery,
   GetExpenditureByNativeFundingPotIdAndColonyQueryVariables,
@@ -13,13 +14,17 @@ import { DecodedFunctions } from '../multicall';
 
 export const isFundExpenditureMotion = (
   decodedFunctions: DecodedFunctions,
+  expenditureStatus: ExpenditureStatus,
 ): boolean => {
   const fragmentsToMatch = [
     'moveFundsBetweenPots(uint256,uint256,uint256,uint256,uint256,uint256,address)',
     'moveFundsBetweenPots(uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,address)',
   ];
-  return decodedFunctions.every((decodedFunction) =>
-    fragmentsToMatch.includes(decodedFunction.fragment),
+  return (
+    expenditureStatus === ExpenditureStatus.Locked &&
+    decodedFunctions.every((decodedFunction) =>
+      fragmentsToMatch.includes(decodedFunction.fragment),
+    )
   );
 };
 
