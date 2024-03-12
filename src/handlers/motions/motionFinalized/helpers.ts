@@ -415,7 +415,7 @@ export const claimExpenditurePayouts = async (
 
   try {
     decodedSetExpenditureStateArgs = colonyClient.interface.decodeFunctionData(
-      ContractMethodSignatures.setExpenditureState,
+      ContractMethodSignatures.SetExpenditureState,
       firstAction,
     );
   } catch (error) {
