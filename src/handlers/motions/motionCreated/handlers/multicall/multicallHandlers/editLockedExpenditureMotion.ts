@@ -78,7 +78,7 @@ export const editLockedExpenditureMotionHandler: MulticallHandler = async ({
       ];
 
       updatedSlots = getUpdatedExpenditureSlots(
-        expenditure,
+        expenditure.slots,
         convertedSlot,
         {
           payouts: updatedPayouts,
@@ -100,7 +100,7 @@ export const editLockedExpenditureMotionHandler: MulticallHandler = async ({
             .toString();
 
           updatedSlots = getUpdatedExpenditureSlots(
-            expenditure,
+            expenditure.slots,
             convertedSlot,
             {
               recipientAddress,
@@ -111,7 +111,7 @@ export const editLockedExpenditureMotionHandler: MulticallHandler = async ({
           const claimDelay = toNumber(value).toString();
 
           updatedSlots = getUpdatedExpenditureSlots(
-            expenditure,
+            expenditure.slots,
             convertedSlot,
             {
               claimDelay,
