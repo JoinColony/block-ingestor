@@ -6,13 +6,13 @@ import {
   output,
   toNumber,
 } from '~utils';
-import { ContractEvent } from '~types';
+import { ContractEvent, ContractMethodSignatures } from '~types';
 import { getExpenditureFromDB } from '~handlers/expenditures/helpers';
 import { AnyColonyClient } from '@colony/colony-js';
 import { multicallHandlers, supportedMulticallFragments } from './fragments';
 
 export type DecodedFunctions = Array<{
-  fragment: string;
+  fragment: ContractMethodSignatures;
   decodedAction: Result;
 }>;
 
@@ -29,7 +29,7 @@ const decodeFunctions = (
           action,
         );
         decodedFunctions.push({
-          fragment,
+          fragment: fragment as ContractMethodSignatures,
           decodedAction,
         });
       } catch {
