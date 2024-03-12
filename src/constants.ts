@@ -15,6 +15,8 @@ export const SUPPORTED_EXTENSION_IDS = [
 
 export const SIMPLE_DECISIONS_ACTION_CODE = '0x12345678';
 
+// These are indexes of data slots in contracts
+// For more information: https://github.com/JoinColony/colonyNetwork/blob/develop/contracts/colony/ColonyStorage.sol
 export const EXPENDITURES_SLOT = BigNumber.from(25);
 export const EXPENDITURESLOTS_SLOT = BigNumber.from(26);
 
