@@ -5,7 +5,7 @@ import { ExpenditureFragment, ExpenditureSlot } from '~graphql';
  * It returns an array of expenditure slots containing the updated slot
  */
 export const getUpdatedExpenditureSlots = (
-  expenditure: ExpenditureFragment,
+  expenditureSlots: ExpenditureFragment['slots'],
   slotId: number,
   fieldsToUpdate: Partial<Omit<ExpenditureSlot, 'id' | '__typename'>>,
   previouslyUpdatedSlots?: ExpenditureFragment['slots'],
@@ -18,7 +18,7 @@ export const getUpdatedExpenditureSlots = (
   if (previouslyUpdatedSlot) {
     existingSlot = previouslyUpdatedSlot;
   } else {
-    existingSlot = expenditure.slots.find((slot) => slot.id === slotId);
+    existingSlot = expenditureSlots.find((slot) => slot.id === slotId);
   }
   const updatedSlot: ExpenditureSlot = {
     ...existingSlot,
@@ -35,7 +35,7 @@ export const getUpdatedExpenditureSlots = (
     ];
   } else {
     updatedSlots = [
-      ...expenditure.slots.filter((slot) => slot.id !== slotId),
+      ...expenditureSlots.filter((slot) => slot.id !== slotId),
       updatedSlot,
     ];
   }

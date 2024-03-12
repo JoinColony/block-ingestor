@@ -30,9 +30,13 @@ export default async (event: ContractEvent): Promise<void> => {
     return;
   }
 
-  const updatedSlots = getUpdatedExpenditureSlots(expenditure, convertedSlot, {
-    claimDelay: convertedClaimDelay,
-  });
+  const updatedSlots = getUpdatedExpenditureSlots(
+    expenditure.slots,
+    convertedSlot,
+    {
+      claimDelay: convertedClaimDelay,
+    },
+  );
 
   verbose(
     `Claim delay set for expenditure with ID ${convertedExpenditureId} in colony ${colonyAddress}`,
