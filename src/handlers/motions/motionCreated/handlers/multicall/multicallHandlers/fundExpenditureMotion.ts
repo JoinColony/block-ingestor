@@ -8,7 +8,7 @@ import {
   GetExpenditureByNativeFundingPotIdAndColonyQueryVariables,
 } from '~graphql';
 import { createMotionInDB } from '~handlers/motions/motionCreated/helpers';
-import { ContractEvent } from '~types';
+import { ContractEvent, ContractMethodSignatures } from '~types';
 import { getVotingClient, notNull, toNumber } from '~utils';
 import { MulticallHandler, MulticallValidator } from '../fragments';
 
@@ -17,8 +17,8 @@ export const isFundExpenditureMotion: MulticallValidator = ({
   expenditureStatus,
 }) => {
   const fragmentsToMatch = [
-    'moveFundsBetweenPots(uint256,uint256,uint256,uint256,uint256,uint256,address)',
-    'moveFundsBetweenPots(uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,address)',
+    ContractMethodSignatures.MoveFundsBetweenPots,
+    ContractMethodSignatures.MoveFundsBetweenPots_OLD,
   ];
   return (
     expenditureStatus === ExpenditureStatus.Locked &&

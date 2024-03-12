@@ -3,12 +3,13 @@ import { toNumber } from 'lodash';
 import { getDomainDatabaseId, getExpenditureDatabaseId } from '~utils';
 import { createMotionInDB } from '~handlers/motions/motionCreated/helpers';
 import { MulticallHandler, MulticallValidator } from '../fragments';
+import { ContractMethodSignatures } from '~types';
 
 export const isReleaseExpenditureStageMotion: MulticallValidator = ({
   decodedFunctions,
   expenditureStatus,
 }) => {
-  const fragmentsToMatch = ['setExpenditureState'];
+  const fragmentsToMatch = [ContractMethodSignatures.setExpenditureState];
   return (
     expenditureStatus === ExpenditureStatus.Finalized &&
     decodedFunctions.every((decodedFunction) =>
