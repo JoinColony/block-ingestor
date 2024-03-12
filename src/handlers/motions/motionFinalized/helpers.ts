@@ -3,7 +3,7 @@ import { TransactionDescription } from 'ethers/lib/utils';
 import { BlockTag } from '@ethersproject/abstract-provider';
 import { AnyVotingReputationClient, Extension } from '@colony/colony-js';
 
-import { ColonyOperations, MotionVote } from '~types';
+import { ColonyOperations, ContractMethodSignatures, MotionVote } from '~types';
 import {
   getCachedColonyClient,
   getColonyFromDB,
@@ -421,7 +421,7 @@ export const claimExpenditurePayouts = async (
 
   try {
     decodedSetExpenditureStateArgs = colonyClient.interface.decodeFunctionData(
-      'setExpenditureState',
+      ContractMethodSignatures.setExpenditureState,
       firstAction,
     );
   } catch (error) {
