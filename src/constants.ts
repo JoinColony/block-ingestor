@@ -18,6 +18,8 @@ export const BLOCK_PAGING_SIZE = process.env.BLOCK_PAGING_SIZE
   ? parseInt(process.env.BLOCK_PAGING_SIZE, 10)
   : 1000;
 
+// These are indexes of data slots in contracts
+// For more information: https://github.com/JoinColony/colonyNetwork/blob/develop/contracts/colony/ColonyStorage.sol
 export const EXPENDITURES_SLOT = BigNumber.from(25);
 export const EXPENDITURESLOTS_SLOT = BigNumber.from(26);
 
