@@ -1,3 +1,4 @@
+import { Id } from '@colony/colony-js';
 import { utils } from 'ethers';
 import { mutate, query } from '~amplifyClient';
 import {
@@ -10,7 +11,11 @@ import {
   UpdateColonyContributorMutationVariables,
 } from '~graphql';
 import { ContractEvent } from '~types';
-import { AddVerifiedMembersOperation, writeActionFromEvent } from '~utils';
+import {
+  AddVerifiedMembersOperation,
+  getDomainDatabaseId,
+  writeActionFromEvent,
+} from '~utils';
 
 import { getColonyContributorId } from '~utils/contributors';
 
@@ -59,5 +64,6 @@ export const handleAddVerifiedMembers = async (
     type: ColonyActionType.AddVerifiedMembers,
     initiatorAddress,
     members: operation.payload,
+    fromDomainId: getDomainDatabaseId(colonyAddress, Id.RootDomain),
   });
 };
