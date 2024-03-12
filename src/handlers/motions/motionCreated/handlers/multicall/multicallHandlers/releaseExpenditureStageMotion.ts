@@ -9,7 +9,7 @@ export const isReleaseExpenditureStageMotion: MulticallValidator = ({
   decodedFunctions,
   expenditureStatus,
 }) => {
-  const fragmentsToMatch = [ContractMethodSignatures.setExpenditureState];
+  const fragmentsToMatch = [ContractMethodSignatures.SetExpenditureState];
   return (
     expenditureStatus === ExpenditureStatus.Finalized &&
     decodedFunctions.every((decodedFunction) =>
