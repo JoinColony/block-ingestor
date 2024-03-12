@@ -1,5 +1,3 @@
-import { BigNumber } from 'ethers';
-
 import { ContractEvent } from '~types';
 import { getExpenditureDatabaseId, output, toNumber, verbose } from '~utils';
 import {
@@ -9,7 +7,7 @@ import {
   UpdateExpenditureMutationVariables,
 } from '~graphql';
 import { mutate } from '~amplifyClient';
-import { getAmountLessFee, getNetworkInverseFee } from '~utils/networkFee';
+import { splitAmountAndFee } from '~utils/networkFee';
 
 import { getExpenditureFromDB, getUpdatedExpenditureSlots } from './helpers';
 
@@ -19,9 +17,7 @@ export default async (event: ContractEvent): Promise<void> => {
   const convertedExpenditureId = toNumber(expenditureId);
   const convertedSlot = toNumber(slot);
 
-  const networkInverseFee = (await getNetworkInverseFee()) ?? '0';
-  const amountLessFee = getAmountLessFee(amount, networkInverseFee).toString();
-  const feeAmount = BigNumber.from(amount).sub(amountLessFee).toString();
+  const [amountLessFee, feeAmount] = await splitAmountAndFee(amount);
 
   const databaseId = getExpenditureDatabaseId(
     colonyAddress,
