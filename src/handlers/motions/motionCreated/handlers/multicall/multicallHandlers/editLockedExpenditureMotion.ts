@@ -22,8 +22,8 @@ export const isEditLockedExpenditureMotion: MulticallValidator = ({
   expenditureStatus,
 }) => {
   const fragmentsToMatch = [
-    ContractMethodSignatures.setExpenditurePayout,
-    ContractMethodSignatures.setExpenditureState,
+    ContractMethodSignatures.SetExpenditurePayout,
+    ContractMethodSignatures.SetExpenditureState,
   ];
   return (
     expenditureStatus === ExpenditureStatus.Locked &&
@@ -47,7 +47,7 @@ export const editLockedExpenditureMotionHandler: MulticallHandler = async ({
 
   for (const decodedFunction of decodedFunctions) {
     if (
-      decodedFunction.fragment === ContractMethodSignatures.setExpenditurePayout
+      decodedFunction.fragment === ContractMethodSignatures.SetExpenditurePayout
     ) {
       const [, , , slotId, tokenAddress, amountWithFee] =
         decodedFunction.decodedAction;
@@ -79,7 +79,7 @@ export const editLockedExpenditureMotionHandler: MulticallHandler = async ({
         updatedSlots,
       );
     } else if (
-      decodedFunction.fragment === ContractMethodSignatures.setExpenditureState
+      decodedFunction.fragment === ContractMethodSignatures.SetExpenditureState
     ) {
       const [, , , storageSlot, , keys, value] = decodedFunction.decodedAction;
       if (storageSlot.eq(EXPENDITURESLOTS_SLOT)) {
