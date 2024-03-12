@@ -42,19 +42,19 @@ export const decodeUpdatedSlots = (
         .decode(['address'], value)
         .toString();
 
-      updatedSlots = getUpdatedExpenditureSlots(expenditure, slotId, {
+      updatedSlots = getUpdatedExpenditureSlots(expenditure.slots, slotId, {
         recipientAddress,
       });
     } else if (keys[1] === EXPENDITURESLOT_CLAIMDELAY) {
       const claimDelay = BigNumber.from(value).toString();
 
-      updatedSlots = getUpdatedExpenditureSlots(expenditure, slotId, {
+      updatedSlots = getUpdatedExpenditureSlots(expenditure.slots, slotId, {
         claimDelay,
       });
     } else if (keys[1] === EXPENDITURESLOT_PAYOUTMODIFIER) {
       const payoutModifier = toNumber(value);
 
-      updatedSlots = getUpdatedExpenditureSlots(expenditure, slotId, {
+      updatedSlots = getUpdatedExpenditureSlots(expenditure.slots, slotId, {
         payoutModifier,
       });
     }
