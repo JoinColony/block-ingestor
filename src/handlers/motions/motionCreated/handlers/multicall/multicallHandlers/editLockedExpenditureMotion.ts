@@ -6,8 +6,7 @@ import {
 } from '~graphql';
 import { toNumber } from 'lodash';
 import { getUpdatedExpenditureSlots } from '~handlers/expenditures/helpers';
-import { getAmountLessFee, getNetworkInverseFee } from '~utils/networkFee';
-import { BigNumber, utils } from 'ethers';
+import { utils } from 'ethers';
 import {
   EXPENDITURESLOTS_SLOT,
   EXPENDITURESLOT_CLAIMDELAY,
@@ -16,6 +15,7 @@ import {
 import { createMotionInDB } from '~handlers/motions/motionCreated/helpers';
 import { MulticallHandler, MulticallValidator } from '../fragments';
 import { ContractMethodSignatures } from '~types';
+import { splitAmountAndFee } from '~utils/networkFee';
 
 export const isEditLockedExpenditureMotion: MulticallValidator = ({
   decodedFunctions,
@@ -56,14 +56,7 @@ export const editLockedExpenditureMotionHandler: MulticallHandler = async ({
         expenditure.slots.find((slot) => slot.id === convertedSlot)?.payouts ??
         [];
 
-      const networkInverseFee = (await getNetworkInverseFee()) ?? '0';
-      const amountLessFee = getAmountLessFee(
-        amountWithFee,
-        networkInverseFee,
-      ).toString();
-      const feeAmount = BigNumber.from(amountWithFee)
-        .sub(amountLessFee)
-        .toString();
+      const [amountLessFee, feeAmount] = await splitAmountAndFee(amountWithFee);
 
       const updatedPayouts: ExpenditurePayout[] = [
         ...existingPayouts.filter(
