@@ -1,5 +1,6 @@
 query GetColonyContributor($id: ID!) {
   getColonyContributor(id: $id) {
     id
+    isVerified
   }
 }

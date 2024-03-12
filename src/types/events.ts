@@ -101,6 +101,8 @@ export enum ContractEventsSignatures {
 
   // Reputation
   ReputationMiningCycleComplete = 'ReputationMiningCycleComplete(bytes32,uint256)',
+  // Metadata delta
+  ColonyMetadataDelta = 'ColonyMetadataDelta(address,string)',
 }
 
 /*
