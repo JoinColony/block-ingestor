@@ -41,6 +41,6 @@ export const multicallHandlers: Array<[MulticallValidator, MulticallHandler]> =
 export const supportedMulticallFragments: string[] = [
   ContractMethodSignatures.MoveFundsBetweenPots,
   ContractMethodSignatures.MoveFundsBetweenPots_OLD,
-  ContractMethodSignatures.setExpenditureState,
-  ContractMethodSignatures.setExpenditurePayout,
+  ContractMethodSignatures.SetExpenditureState,
+  ContractMethodSignatures.SetExpenditurePayout,
 ];
