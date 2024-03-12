@@ -1,4 +1,4 @@
-import { ContractEvent } from '~types';
+import { ContractEvent, ContractMethodSignatures } from '~types';
 import { DecodedFunctions } from './multicall';
 import { ExpenditureFragment, ExpenditureStatus } from '~graphql';
 import {
@@ -39,8 +39,8 @@ export const multicallHandlers: Array<[MulticallValidator, MulticallHandler]> =
 
 // List all supported multicall fragments
 export const supportedMulticallFragments: string[] = [
-  'moveFundsBetweenPots(uint256,uint256,uint256,uint256,uint256,uint256,address)',
-  'moveFundsBetweenPots(uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,address)',
-  'setExpenditureState',
-  'setExpenditurePayout(uint256,uint256,uint256,uint256,address,uint256)',
+  ContractMethodSignatures.MoveFundsBetweenPots,
+  ContractMethodSignatures.MoveFundsBetweenPots_OLD,
+  ContractMethodSignatures.setExpenditureState,
+  ContractMethodSignatures.setExpenditurePayout,
 ];
