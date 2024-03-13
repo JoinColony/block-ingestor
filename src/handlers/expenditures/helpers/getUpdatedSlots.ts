@@ -8,11 +8,35 @@ export const getUpdatedExpenditureSlots = (
   expenditureSlots: ExpenditureFragment['slots'],
   slotId: number,
   fieldsToUpdate: Partial<Omit<ExpenditureSlot, 'id' | '__typename'>>,
-  previouslyUpdatedSlots?: ExpenditureFragment['slots'],
+): ExpenditureSlot[] => {
+  const existingSlot = expenditureSlots.find((slot) => slot.id === slotId);
+  const updatedSlot: ExpenditureSlot = {
+    ...existingSlot,
+    id: slotId,
+    ...fieldsToUpdate,
+  };
+  const updatedSlots = [
+    ...expenditureSlots.filter((slot) => slot.id !== slotId),
+    updatedSlot,
+  ];
+
+  return updatedSlots;
+};
+
+/**
+ * Function that updates an expenditure slot with a given ID and fields
+ * It returns an array of expenditure slots containing the updated slot
+ * Requires an array of previously updates slots and will check for matching slots here first
+ */
+export const getUpdatedExpenditureSlotsWithHistory = (
+  expenditureSlots: ExpenditureFragment['slots'],
+  slotId: number,
+  fieldsToUpdate: Partial<Omit<ExpenditureSlot, 'id' | '__typename'>>,
+  previouslyUpdatedSlots: ExpenditureFragment['slots'],
 ): ExpenditureSlot[] => {
   let existingSlot;
 
-  const previouslyUpdatedSlot = previouslyUpdatedSlots?.find(
+  const previouslyUpdatedSlot = previouslyUpdatedSlots.find(
     (slot) => slot.id === slotId,
   );
   if (previouslyUpdatedSlot) {
@@ -26,19 +50,10 @@ export const getUpdatedExpenditureSlots = (
     ...fieldsToUpdate,
   };
 
-  let updatedSlots;
-
-  if (previouslyUpdatedSlots) {
-    updatedSlots = [
-      ...previouslyUpdatedSlots.filter((slot) => slot.id !== slotId),
-      updatedSlot,
-    ];
-  } else {
-    updatedSlots = [
-      ...expenditureSlots.filter((slot) => slot.id !== slotId),
-      updatedSlot,
-    ];
-  }
+  const updatedSlots = [
+    ...previouslyUpdatedSlots.filter((slot) => slot.id !== slotId),
+    updatedSlot,
+  ];
 
   return updatedSlots;
 };
