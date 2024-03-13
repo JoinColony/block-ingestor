@@ -241,6 +241,10 @@ export type ColonyAction = {
   createdAt: Scalars['AWSDateTime'];
   /** Corresponding Decision data, if action is a Simple Decision */
   decisionData?: Maybe<ColonyDecision>;
+  /** Expenditure associated with the action, if any */
+  expenditure?: Maybe<Expenditure>;
+  /** ID of the associated expenditure, if any */
+  expenditureId?: Maybe<Scalars['ID']>;
   /** The source Domain of the action, if applicable */
   fromDomain?: Maybe<Domain>;
   /** The source Domain identifier, if applicable */
@@ -369,6 +373,8 @@ export enum ColonyActionType {
   CreateDomain = 'CREATE_DOMAIN',
   /** An action related to creating a domain within a Colony via a motion */
   CreateDomainMotion = 'CREATE_DOMAIN_MOTION',
+  /** An action related to creating expenditure (dvanced payment)  */
+  CreateExpenditure = 'CREATE_EXPENDITURE',
   /** An action related to editing a domain's details */
   EditDomain = 'EDIT_DOMAIN',
   /** An action related to editing a domain's details via a motion */
@@ -1073,6 +1079,7 @@ export type CreateColonyActionInput = {
   colonyDecisionId?: InputMaybe<Scalars['ID']>;
   colonyId: Scalars['ID'];
   createdAt?: InputMaybe<Scalars['AWSDateTime']>;
+  expenditureId?: InputMaybe<Scalars['ID']>;
   fromDomainId?: InputMaybe<Scalars['ID']>;
   id?: InputMaybe<Scalars['ID']>;
   individualEvents?: InputMaybe<Scalars['String']>;
@@ -1338,6 +1345,7 @@ export type CreateExpenditureInput = {
   balances?: InputMaybe<Array<ExpenditureBalanceInput>>;
   colonyId: Scalars['ID'];
   createdAt?: InputMaybe<Scalars['AWSDateTime']>;
+  createdTransactionHash?: InputMaybe<Scalars['ID']>;
   finalizedAt?: InputMaybe<Scalars['AWSTimestamp']>;
   id?: InputMaybe<Scalars['ID']>;
   isStaked: Scalars['Boolean'];
@@ -1847,6 +1855,7 @@ export type DomainMetadataChangelogInput = {
 
 export type Expenditure = {
   __typename?: 'Expenditure';
+  action?: Maybe<ColonyAction>;
   /** Array containing balances of tokens in the expenditure */
   balances?: Maybe<Array<ExpenditureBalance>>;
   /** The Colony to which the expenditure belongs */
@@ -1854,6 +1863,11 @@ export type Expenditure = {
   /** Colony ID (address) to which the expenditure belongs */
   colonyId: Scalars['ID'];
   createdAt: Scalars['AWSDateTime'];
+  /**
+   * Hash of the `ExpenditureAdded` event transaction
+   * @TODO: Make this a non-nullable field once existing data is updated
+   */
+  createdTransactionHash?: Maybe<Scalars['ID']>;
   /** The timestamp at which the expenditure was finalized */
   finalizedAt?: Maybe<Scalars['AWSTimestamp']>;
   /**
@@ -2225,6 +2239,7 @@ export type ModelColonyActionConditionInput = {
   colonyDecisionId?: InputMaybe<ModelIdInput>;
   colonyId?: InputMaybe<ModelIdInput>;
   createdAt?: InputMaybe<ModelStringInput>;
+  expenditureId?: InputMaybe<ModelIdInput>;
   fromDomainId?: InputMaybe<ModelIdInput>;
   individualEvents?: InputMaybe<ModelStringInput>;
   initiatorAddress?: InputMaybe<ModelIdInput>;
@@ -2260,6 +2275,7 @@ export type ModelColonyActionFilterInput = {
   colonyDecisionId?: InputMaybe<ModelIdInput>;
   colonyId?: InputMaybe<ModelIdInput>;
   createdAt?: InputMaybe<ModelStringInput>;
+  expenditureId?: InputMaybe<ModelIdInput>;
   fromDomainId?: InputMaybe<ModelIdInput>;
   id?: InputMaybe<ModelIdInput>;
   individualEvents?: InputMaybe<ModelStringInput>;
@@ -2912,6 +2928,7 @@ export type ModelExpenditureConditionInput = {
   and?: InputMaybe<Array<InputMaybe<ModelExpenditureConditionInput>>>;
   colonyId?: InputMaybe<ModelIdInput>;
   createdAt?: InputMaybe<ModelStringInput>;
+  createdTransactionHash?: InputMaybe<ModelIdInput>;
   finalizedAt?: InputMaybe<ModelIntInput>;
   isStaked?: InputMaybe<ModelBooleanInput>;
   nativeDomainId?: InputMaybe<ModelIntInput>;
@@ -2935,6 +2952,7 @@ export type ModelExpenditureFilterInput = {
   and?: InputMaybe<Array<InputMaybe<ModelExpenditureFilterInput>>>;
   colonyId?: InputMaybe<ModelIdInput>;
   createdAt?: InputMaybe<ModelStringInput>;
+  createdTransactionHash?: InputMaybe<ModelIdInput>;
   finalizedAt?: InputMaybe<ModelIntInput>;
   id?: InputMaybe<ModelIdInput>;
   isStaked?: InputMaybe<ModelBooleanInput>;
@@ -3416,6 +3434,7 @@ export type ModelSubscriptionColonyActionFilterInput = {
   colonyDecisionId?: InputMaybe<ModelSubscriptionIdInput>;
   colonyId?: InputMaybe<ModelSubscriptionIdInput>;
   createdAt?: InputMaybe<ModelSubscriptionStringInput>;
+  expenditureId?: InputMaybe<ModelSubscriptionIdInput>;
   fromDomainId?: InputMaybe<ModelSubscriptionIdInput>;
   id?: InputMaybe<ModelSubscriptionIdInput>;
   individualEvents?: InputMaybe<ModelSubscriptionStringInput>;
@@ -3718,6 +3737,7 @@ export type ModelSubscriptionExpenditureFilterInput = {
   and?: InputMaybe<Array<InputMaybe<ModelSubscriptionExpenditureFilterInput>>>;
   colonyId?: InputMaybe<ModelSubscriptionIdInput>;
   createdAt?: InputMaybe<ModelSubscriptionStringInput>;
+  createdTransactionHash?: InputMaybe<ModelSubscriptionIdInput>;
   finalizedAt?: InputMaybe<ModelSubscriptionIntInput>;
   id?: InputMaybe<ModelSubscriptionIdInput>;
   isStaked?: InputMaybe<ModelSubscriptionBooleanInput>;
@@ -4386,6 +4406,8 @@ export type Mutation = {
   deleteUser?: Maybe<User>;
   deleteUserStake?: Maybe<UserStake>;
   deleteUserTokens?: Maybe<UserTokens>;
+  /** Removes the user from the colony whitelist */
+  removeMemberFromColonyWhitelist?: Maybe<Scalars['Boolean']>;
   /** Updates the latest available version of a Colony or an extension */
   setCurrentVersion?: Maybe<Scalars['Boolean']>;
   updateAnnotation?: Maybe<Annotation>;
@@ -4904,6 +4926,11 @@ export type MutationDeleteUserStakeArgs = {
 export type MutationDeleteUserTokensArgs = {
   condition?: InputMaybe<ModelUserTokensConditionInput>;
   input: DeleteUserTokensInput;
+};
+
+/** Root mutation type */
+export type MutationRemoveMemberFromColonyWhitelistArgs = {
+  input: RemoveMemberFromColonyWhitelistInput;
 };
 
 /** Root mutation type */
@@ -6282,6 +6309,13 @@ export type QuerySearchColonyActionsArgs = {
   sort?: InputMaybe<Array<InputMaybe<SearchableColonyActionSortInput>>>;
 };
 
+export type RemoveMemberFromColonyWhitelistInput = {
+  /** The colony address */
+  colonyAddress: Scalars['ID'];
+  /** The user's wallet address */
+  userAddress: Scalars['ID'];
+};
+
 export type ReputationMiningCycleMetadata = {
   __typename?: 'ReputationMiningCycleMetadata';
   createdAt: Scalars['AWSDateTime'];
@@ -6398,6 +6432,7 @@ export enum SearchableColonyActionAggregateField {
   ColonyDecisionId = 'colonyDecisionId',
   ColonyId = 'colonyId',
   CreatedAt = 'createdAt',
+  ExpenditureId = 'expenditureId',
   FromDomainId = 'fromDomainId',
   Id = 'id',
   IndividualEvents = 'individualEvents',
@@ -6441,6 +6476,7 @@ export type SearchableColonyActionFilterInput = {
   colonyDecisionId?: InputMaybe<SearchableIdFilterInput>;
   colonyId?: InputMaybe<SearchableIdFilterInput>;
   createdAt?: InputMaybe<SearchableStringFilterInput>;
+  expenditureId?: InputMaybe<SearchableIdFilterInput>;
   fromDomainId?: InputMaybe<SearchableIdFilterInput>;
   id?: InputMaybe<SearchableIdFilterInput>;
   individualEvents?: InputMaybe<SearchableStringFilterInput>;
@@ -6476,6 +6512,7 @@ export enum SearchableColonyActionSortableFields {
   ColonyDecisionId = 'colonyDecisionId',
   ColonyId = 'colonyId',
   CreatedAt = 'createdAt',
+  ExpenditureId = 'expenditureId',
   FromDomainId = 'fromDomainId',
   Id = 'id',
   IndividualEvents = 'individualEvents',
@@ -7454,6 +7491,7 @@ export type UpdateColonyActionInput = {
   colonyDecisionId?: InputMaybe<Scalars['ID']>;
   colonyId?: InputMaybe<Scalars['ID']>;
   createdAt?: InputMaybe<Scalars['AWSDateTime']>;
+  expenditureId?: InputMaybe<Scalars['ID']>;
   fromDomainId?: InputMaybe<Scalars['ID']>;
   id: Scalars['ID'];
   individualEvents?: InputMaybe<Scalars['String']>;
@@ -7702,6 +7740,7 @@ export type UpdateExpenditureInput = {
   balances?: InputMaybe<Array<ExpenditureBalanceInput>>;
   colonyId?: InputMaybe<Scalars['ID']>;
   createdAt?: InputMaybe<Scalars['AWSDateTime']>;
+  createdTransactionHash?: InputMaybe<Scalars['ID']>;
   finalizedAt?: InputMaybe<Scalars['AWSTimestamp']>;
   id: Scalars['ID'];
   isStaked?: InputMaybe<Scalars['Boolean']>;

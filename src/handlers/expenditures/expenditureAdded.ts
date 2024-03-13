@@ -1,5 +1,6 @@
 import { mutate } from '~amplifyClient';
 import {
+  ColonyActionType,
   CreateExpenditureDocument,
   CreateExpenditureMutation,
   CreateExpenditureMutationVariables,
@@ -7,7 +8,14 @@ import {
   ExpenditureType,
 } from '~graphql';
 import { ContractEvent } from '~types';
-import { getExpenditureDatabaseId, output, toNumber, verbose } from '~utils';
+import {
+  getDomainDatabaseId,
+  getExpenditureDatabaseId,
+  output,
+  toNumber,
+  verbose,
+  writeActionFromEvent,
+} from '~utils';
 
 import { getExpenditure } from './helpers';
 
@@ -37,11 +45,16 @@ export default async (event: ContractEvent): Promise<void> => {
     colonyAddress,
   );
 
+  const databaseId = getExpenditureDatabaseId(
+    colonyAddress,
+    convertedExpenditureId,
+  );
+
   await mutate<CreateExpenditureMutation, CreateExpenditureMutationVariables>(
     CreateExpenditureDocument,
     {
       input: {
-        id: getExpenditureDatabaseId(colonyAddress, convertedExpenditureId),
+        id: databaseId,
         type: ExpenditureType.PaymentBuilder,
         colonyId: colonyAddress,
         nativeId: convertedExpenditureId,
@@ -52,7 +65,15 @@ export default async (event: ContractEvent): Promise<void> => {
         nativeDomainId: domainId,
         isStaked: false,
         balances: [],
+        createdTransactionHash: event.transactionHash,
       },
     },
   );
+
+  await writeActionFromEvent(event, colonyAddress, {
+    type: ColonyActionType.CreateExpenditure,
+    initiatorAddress: ownerAddress,
+    expenditureId: databaseId,
+    fromDomainId: getDomainDatabaseId(colonyAddress, domainId),
+  });
 };
