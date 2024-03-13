@@ -5,7 +5,7 @@ import {
   ExpenditureStatus,
 } from '~graphql';
 import { toNumber } from 'lodash';
-import { getUpdatedExpenditureSlots } from '~handlers/expenditures/helpers';
+import { getUpdatedExpenditureSlotsWithHistory } from '~handlers/expenditures/helpers';
 import { utils } from 'ethers';
 import {
   EXPENDITURESLOTS_SLOT,
@@ -70,7 +70,7 @@ export const editLockedExpenditureMotionHandler: MulticallHandler = async ({
         },
       ];
 
-      updatedSlots = getUpdatedExpenditureSlots(
+      updatedSlots = getUpdatedExpenditureSlotsWithHistory(
         expenditure.slots,
         convertedSlot,
         {
@@ -92,7 +92,7 @@ export const editLockedExpenditureMotionHandler: MulticallHandler = async ({
             .decode(['address'], value)
             .toString();
 
-          updatedSlots = getUpdatedExpenditureSlots(
+          updatedSlots = getUpdatedExpenditureSlotsWithHistory(
             expenditure.slots,
             convertedSlot,
             {
@@ -103,7 +103,7 @@ export const editLockedExpenditureMotionHandler: MulticallHandler = async ({
         } else if (slotType === EXPENDITURESLOT_CLAIMDELAY) {
           const claimDelay = toNumber(value).toString();
 
-          updatedSlots = getUpdatedExpenditureSlots(
+          updatedSlots = getUpdatedExpenditureSlotsWithHistory(
             expenditure.slots,
             convertedSlot,
             {
