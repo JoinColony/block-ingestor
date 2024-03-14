@@ -1,3 +1,4 @@
+import { utils } from 'ethers';
 import { mutate } from '~amplifyClient';
 import {
   ColonyActionType,
@@ -7,7 +8,7 @@ import {
   ExpenditureStatus,
   ExpenditureType,
 } from '~graphql';
-import { ContractEvent } from '~types';
+import { ContractEvent, ContractEventsSignatures } from '~types';
 import {
   getDomainDatabaseId,
   getExpenditureDatabaseId,
@@ -16,6 +17,7 @@ import {
   verbose,
   writeActionFromEvent,
 } from '~utils';
+import provider from '~provider';
 
 import { getExpenditure } from './helpers';
 
@@ -70,10 +72,17 @@ export default async (event: ContractEvent): Promise<void> => {
     },
   );
 
-  await writeActionFromEvent(event, colonyAddress, {
-    type: ColonyActionType.CreateExpenditure,
-    initiatorAddress: ownerAddress,
-    expenditureId: databaseId,
-    fromDomainId: getDomainDatabaseId(colonyAddress, domainId),
-  });
+  const receipt = await provider.getTransactionReceipt(event.transactionHash);
+  const hasOneTxPaymentEvent = receipt.logs.some((log) =>
+    log.topics.includes(utils.id(ContractEventsSignatures.OneTxPaymentMade)),
+  );
+
+  if (!hasOneTxPaymentEvent) {
+    await writeActionFromEvent(event, colonyAddress, {
+      type: ColonyActionType.CreateExpenditure,
+      initiatorAddress: ownerAddress,
+      expenditureId: databaseId,
+      fromDomainId: getDomainDatabaseId(colonyAddress, domainId),
+    });
+  }
 };
