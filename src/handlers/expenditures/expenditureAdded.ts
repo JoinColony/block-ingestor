@@ -1,4 +1,3 @@
-import { utils } from 'ethers';
 import { mutate } from '~amplifyClient';
 import {
   ColonyActionType,
@@ -10,6 +9,7 @@ import {
 } from '~graphql';
 import { ContractEvent, ContractEventsSignatures } from '~types';
 import {
+  transactionHasEvent,
   getDomainDatabaseId,
   getExpenditureDatabaseId,
   output,
@@ -17,7 +17,6 @@ import {
   verbose,
   writeActionFromEvent,
 } from '~utils';
-import provider from '~provider';
 
 import { getExpenditure } from './helpers';
 
@@ -72,9 +71,12 @@ export default async (event: ContractEvent): Promise<void> => {
     },
   );
 
-  const receipt = await provider.getTransactionReceipt(event.transactionHash);
-  const hasOneTxPaymentEvent = receipt.logs.some((log) =>
-    log.topics.includes(utils.id(ContractEventsSignatures.OneTxPaymentMade)),
+  /**
+   * @NOTE: Only create a `CREATE_EXPENDITURE` action if the expenditure was not created as part of a OneTxPayment
+   */
+  const hasOneTxPaymentEvent = await transactionHasEvent(
+    event.transactionHash,
+    ContractEventsSignatures.OneTxPaymentMade,
   );
 
   if (!hasOneTxPaymentEvent) {
