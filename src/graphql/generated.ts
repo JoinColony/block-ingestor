@@ -1345,7 +1345,6 @@ export type CreateExpenditureInput = {
   balances?: InputMaybe<Array<ExpenditureBalanceInput>>;
   colonyId: Scalars['ID'];
   createdAt?: InputMaybe<Scalars['AWSDateTime']>;
-  createdTransactionHash?: InputMaybe<Scalars['ID']>;
   finalizedAt?: InputMaybe<Scalars['AWSTimestamp']>;
   id?: InputMaybe<Scalars['ID']>;
   isStaked: Scalars['Boolean'];
@@ -1354,9 +1353,10 @@ export type CreateExpenditureInput = {
   nativeId: Scalars['Int'];
   ownerAddress: Scalars['ID'];
   slots: Array<ExpenditureSlotInput>;
-  stakedTransactionHash?: InputMaybe<Scalars['ID']>;
   status: ExpenditureStatus;
+  transactionHash?: InputMaybe<Scalars['ID']>;
   type: ExpenditureType;
+  userStakeId?: InputMaybe<Scalars['ID']>;
 };
 
 export type CreateExpenditureMetadataInput = {
@@ -1863,11 +1863,6 @@ export type Expenditure = {
   /** Colony ID (address) to which the expenditure belongs */
   colonyId: Scalars['ID'];
   createdAt: Scalars['AWSDateTime'];
-  /**
-   * Hash of the `ExpenditureAdded` event transaction
-   * @TODO: Make this a non-nullable field once existing data is updated
-   */
-  createdTransactionHash?: Maybe<Scalars['ID']>;
   /** The timestamp at which the expenditure was finalized */
   finalizedAt?: Maybe<Scalars['AWSTimestamp']>;
   /**
@@ -1893,12 +1888,19 @@ export type Expenditure = {
   ownerAddress: Scalars['ID'];
   /** Array containing expenditure slots */
   slots: Array<ExpenditureSlot>;
-  /** Hash of the `ExpenditureMadeViaStake` event transaction, if applicable */
-  stakedTransactionHash?: Maybe<Scalars['ID']>;
   /** Status of the expenditure */
   status: ExpenditureStatus;
+  /**
+   * Hash of the `ExpenditureAdded` event transaction
+   * @TODO: Make this a non-nullable field once existing data is updated
+   */
+  transactionHash?: Maybe<Scalars['ID']>;
   type: ExpenditureType;
   updatedAt: Scalars['AWSDateTime'];
+  /** User stake associated with the expenditure, if any */
+  userStake?: Maybe<UserStake>;
+  /** ID of the user stake associated with the expenditure, if any */
+  userStakeId?: Maybe<Scalars['ID']>;
 };
 
 export type ExpenditureMotionsArgs = {
@@ -2928,7 +2930,6 @@ export type ModelExpenditureConditionInput = {
   and?: InputMaybe<Array<InputMaybe<ModelExpenditureConditionInput>>>;
   colonyId?: InputMaybe<ModelIdInput>;
   createdAt?: InputMaybe<ModelStringInput>;
-  createdTransactionHash?: InputMaybe<ModelIdInput>;
   finalizedAt?: InputMaybe<ModelIntInput>;
   isStaked?: InputMaybe<ModelBooleanInput>;
   nativeDomainId?: InputMaybe<ModelIntInput>;
@@ -2937,9 +2938,10 @@ export type ModelExpenditureConditionInput = {
   not?: InputMaybe<ModelExpenditureConditionInput>;
   or?: InputMaybe<Array<InputMaybe<ModelExpenditureConditionInput>>>;
   ownerAddress?: InputMaybe<ModelIdInput>;
-  stakedTransactionHash?: InputMaybe<ModelIdInput>;
   status?: InputMaybe<ModelExpenditureStatusInput>;
+  transactionHash?: InputMaybe<ModelIdInput>;
   type?: InputMaybe<ModelExpenditureTypeInput>;
+  userStakeId?: InputMaybe<ModelIdInput>;
 };
 
 export type ModelExpenditureConnection = {
@@ -2952,7 +2954,6 @@ export type ModelExpenditureFilterInput = {
   and?: InputMaybe<Array<InputMaybe<ModelExpenditureFilterInput>>>;
   colonyId?: InputMaybe<ModelIdInput>;
   createdAt?: InputMaybe<ModelStringInput>;
-  createdTransactionHash?: InputMaybe<ModelIdInput>;
   finalizedAt?: InputMaybe<ModelIntInput>;
   id?: InputMaybe<ModelIdInput>;
   isStaked?: InputMaybe<ModelBooleanInput>;
@@ -2962,9 +2963,10 @@ export type ModelExpenditureFilterInput = {
   not?: InputMaybe<ModelExpenditureFilterInput>;
   or?: InputMaybe<Array<InputMaybe<ModelExpenditureFilterInput>>>;
   ownerAddress?: InputMaybe<ModelIdInput>;
-  stakedTransactionHash?: InputMaybe<ModelIdInput>;
   status?: InputMaybe<ModelExpenditureStatusInput>;
+  transactionHash?: InputMaybe<ModelIdInput>;
   type?: InputMaybe<ModelExpenditureTypeInput>;
+  userStakeId?: InputMaybe<ModelIdInput>;
 };
 
 export type ModelExpenditureMetadataConditionInput = {
@@ -3737,7 +3739,6 @@ export type ModelSubscriptionExpenditureFilterInput = {
   and?: InputMaybe<Array<InputMaybe<ModelSubscriptionExpenditureFilterInput>>>;
   colonyId?: InputMaybe<ModelSubscriptionIdInput>;
   createdAt?: InputMaybe<ModelSubscriptionStringInput>;
-  createdTransactionHash?: InputMaybe<ModelSubscriptionIdInput>;
   finalizedAt?: InputMaybe<ModelSubscriptionIntInput>;
   id?: InputMaybe<ModelSubscriptionIdInput>;
   isStaked?: InputMaybe<ModelSubscriptionBooleanInput>;
@@ -3746,9 +3747,10 @@ export type ModelSubscriptionExpenditureFilterInput = {
   nativeId?: InputMaybe<ModelSubscriptionIntInput>;
   or?: InputMaybe<Array<InputMaybe<ModelSubscriptionExpenditureFilterInput>>>;
   ownerAddress?: InputMaybe<ModelSubscriptionIdInput>;
-  stakedTransactionHash?: InputMaybe<ModelSubscriptionIdInput>;
   status?: InputMaybe<ModelSubscriptionStringInput>;
+  transactionHash?: InputMaybe<ModelSubscriptionIdInput>;
   type?: InputMaybe<ModelSubscriptionStringInput>;
+  userStakeId?: InputMaybe<ModelSubscriptionIdInput>;
 };
 
 export type ModelSubscriptionExpenditureMetadataFilterInput = {
@@ -7740,7 +7742,6 @@ export type UpdateExpenditureInput = {
   balances?: InputMaybe<Array<ExpenditureBalanceInput>>;
   colonyId?: InputMaybe<Scalars['ID']>;
   createdAt?: InputMaybe<Scalars['AWSDateTime']>;
-  createdTransactionHash?: InputMaybe<Scalars['ID']>;
   finalizedAt?: InputMaybe<Scalars['AWSTimestamp']>;
   id: Scalars['ID'];
   isStaked?: InputMaybe<Scalars['Boolean']>;
@@ -7749,9 +7750,10 @@ export type UpdateExpenditureInput = {
   nativeId?: InputMaybe<Scalars['Int']>;
   ownerAddress?: InputMaybe<Scalars['ID']>;
   slots?: InputMaybe<Array<ExpenditureSlotInput>>;
-  stakedTransactionHash?: InputMaybe<Scalars['ID']>;
   status?: InputMaybe<ExpenditureStatus>;
+  transactionHash?: InputMaybe<Scalars['ID']>;
   type?: InputMaybe<ExpenditureType>;
+  userStakeId?: InputMaybe<Scalars['ID']>;
 };
 
 export type UpdateExpenditureMetadataInput = {
@@ -8204,7 +8206,7 @@ export type ExpenditureFragment = {
   __typename?: 'Expenditure';
   id: string;
   status: ExpenditureStatus;
-  stakedTransactionHash?: string | null;
+  transactionHash?: string | null;
   ownerAddress: string;
   slots: Array<{
     __typename?: 'ExpenditureSlot';
@@ -8495,7 +8497,7 @@ export type UpdateExpenditureMutation = {
     __typename?: 'Expenditure';
     id: string;
     ownerAddress: string;
-    stakedTransactionHash?: string | null;
+    transactionHash?: string | null;
   } | null;
 };
 
@@ -9011,7 +9013,7 @@ export type GetExpenditureQuery = {
     __typename?: 'Expenditure';
     id: string;
     status: ExpenditureStatus;
-    stakedTransactionHash?: string | null;
+    transactionHash?: string | null;
     ownerAddress: string;
     slots: Array<{
       __typename?: 'ExpenditureSlot';
@@ -9581,7 +9583,7 @@ export const Expenditure = gql`
       ...ExpenditureBalance
     }
     status
-    stakedTransactionHash
+    transactionHash
     ownerAddress
   }
   ${ExpenditureBalance}
@@ -9812,7 +9814,7 @@ export const UpdateExpenditureDocument = gql`
     updateExpenditure(input: $input) {
       id
       ownerAddress
-      stakedTransactionHash
+      transactionHash
     }
   }
 `;
