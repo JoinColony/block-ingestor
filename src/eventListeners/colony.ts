@@ -79,7 +79,6 @@ export const setupListenersForColony = (
     ContractEventsSignatures.ColonyFundsClaimed,
     ContractEventsSignatures.ColonyUpgraded,
     ContractEventsSignatures.TokensMinted,
-    ContractEventsSignatures.PaymentAdded,
     ContractEventsSignatures.DomainAdded,
     ContractEventsSignatures.DomainMetadata,
     ContractEventsSignatures.TokenUnlocked,
