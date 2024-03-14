@@ -21,16 +21,16 @@ export const updateExpenditureStake = async (
     return;
   }
 
-  if (!expenditure.stakedTransactionHash) {
+  if (!expenditure.transactionHash) {
     output(
-      `Expenditure with ID ${expenditureDatabaseId} does not have a staked transaction hash`,
+      `Could not get transaction hash for expenditure with ID ${expenditureDatabaseId}`,
     );
     return;
   }
 
   const stakeDatabaseId = getUserStakeDatabaseId(
     expenditure.ownerAddress,
-    expenditure.stakedTransactionHash,
+    expenditure.transactionHash,
   );
 
   await mutate<UpdateUserStakeMutation, UpdateUserStakeMutationVariables>(
