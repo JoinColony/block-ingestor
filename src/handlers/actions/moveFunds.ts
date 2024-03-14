@@ -1,4 +1,4 @@
-import { BigNumber, utils } from 'ethers';
+import { BigNumber } from 'ethers';
 
 import { ContractEvent, ContractEventsSignatures } from '~types';
 import {
@@ -9,8 +9,8 @@ import {
   getCachedColonyClient,
   isDomainFromFundingPotSupported,
   getUpdatedExpenditureBalances,
+  transactionHasEvent,
 } from '~utils';
-import provider from '~provider';
 import {
   ColonyActionType,
   GetExpenditureByNativeFundingPotIdAndColonyDocument,
@@ -23,12 +23,12 @@ import {
 import { mutate, query } from '~amplifyClient';
 
 export default async (event: ContractEvent): Promise<void> => {
-  const receipt = await provider.getTransactionReceipt(event.transactionHash);
-  const oneTxPaymentEvent = receipt.logs.some((log) =>
-    log.topics.includes(utils.id(ContractEventsSignatures.OneTxPaymentMade)),
+  const hasOneTxPaymentEvent = await transactionHasEvent(
+    event.transactionHash,
+    ContractEventsSignatures.OneTxPaymentMade,
   );
 
-  if (oneTxPaymentEvent) {
+  if (hasOneTxPaymentEvent) {
     verbose(
       'Not acting upon the ColonyFundsMovedBetweenFundingPots event as a OneTxPayment event was present in the same transaction',
     );
