@@ -82,7 +82,7 @@ export const initStats = async (): Promise<void> => {
 
   if (!jsonStats) {
     stats = {
-      lastBlockNumber: 1,
+      lastBlockNumber: 0,
     };
 
     await mutate<CreateStatsMutation, CreateStatsMutationVariables>(
