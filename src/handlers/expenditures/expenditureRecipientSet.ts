@@ -28,9 +28,13 @@ export default async (event: ContractEvent): Promise<void> => {
     return;
   }
 
-  const updatedSlots = getUpdatedExpenditureSlots(expenditure, convertedSlot, {
-    recipientAddress,
-  });
+  const updatedSlots = getUpdatedExpenditureSlots(
+    expenditure.slots,
+    convertedSlot,
+    {
+      recipientAddress,
+    },
+  );
 
   verbose(
     `Recipient set for expenditure with ID ${convertedExpenditureId} in colony ${colonyAddress}`,

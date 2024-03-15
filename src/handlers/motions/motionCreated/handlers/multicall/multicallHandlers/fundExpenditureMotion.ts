@@ -2,15 +2,47 @@ import { Result } from 'ethers/lib/utils';
 import { query } from '~amplifyClient';
 import {
   ColonyActionType,
+  ExpenditureStatus,
   GetExpenditureByNativeFundingPotIdAndColonyDocument,
   GetExpenditureByNativeFundingPotIdAndColonyQuery,
   GetExpenditureByNativeFundingPotIdAndColonyQueryVariables,
 } from '~graphql';
 import { createMotionInDB } from '~handlers/motions/motionCreated/helpers';
-import { ContractEvent } from '~types';
+import { ContractEvent, ContractMethodSignatures } from '~types';
 import { getVotingClient, notNull, toNumber } from '~utils';
+import { MulticallHandler, MulticallValidator } from '../fragments';
 
-export const moveFundsBetweenPotsMulti = async ({
+export const isFundExpenditureMotion: MulticallValidator = ({
+  decodedFunctions,
+  expenditureStatus,
+}) => {
+  const fragmentsToMatch = [
+    ContractMethodSignatures.MoveFundsBetweenPots,
+    ContractMethodSignatures.MoveFundsBetweenPots_OLD,
+  ];
+  return (
+    expenditureStatus === ExpenditureStatus.Locked &&
+    decodedFunctions.every((decodedFunction) =>
+      fragmentsToMatch.includes(decodedFunction.fragment),
+    )
+  );
+};
+
+export const fundExpenditureMotionHandler: MulticallHandler = ({
+  event,
+  decodedFunctions,
+  gasEstimate,
+}) => {
+  decodedFunctions.forEach((decodedFunction) => {
+    moveFundsBetweenPotsMulti({
+      event,
+      args: decodedFunction.decodedAction,
+      gasEstimate,
+    });
+  });
+};
+
+const moveFundsBetweenPotsMulti = async ({
   event,
   args: moveFundsArgs,
   gasEstimate,

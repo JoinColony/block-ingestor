@@ -1,4 +1,4 @@
-import { BigNumber, BigNumberish, utils } from 'ethers';
+import { BigNumber, utils } from 'ethers';
 
 import {
   ExpenditureFragment,
@@ -8,18 +8,14 @@ import {
 import { toNumber } from '~utils';
 
 import { getUpdatedExpenditureSlots } from './getUpdatedSlots';
-
-const toB32 = (input: BigNumberish): string =>
-  utils.hexZeroPad(utils.hexlify(input), 32);
-
-const EXPENDITURES_SLOT = BigNumber.from(25);
-const EXPENDITURESLOTS_SLOT = BigNumber.from(26);
-
-const EXPENDITURE_OWNER_AND_STATUS = toB32(BigNumber.from(0));
-
-const EXPENDITURESLOT_RECIPIENT = toB32(BigNumber.from(0));
-const EXPENDITURESLOT_CLAIMDELAY = toB32(BigNumber.from(1));
-const EXPENDITURESLOT_PAYOUTMODIFIER = toB32(BigNumber.from(2));
+import {
+  EXPENDITURESLOTS_SLOT,
+  EXPENDITURESLOT_CLAIMDELAY,
+  EXPENDITURESLOT_PAYOUTMODIFIER,
+  EXPENDITURESLOT_RECIPIENT,
+  EXPENDITURES_SLOT,
+  EXPENDITURE_OWNER_AND_STATUS,
+} from '~constants';
 
 /**
  * Util function decoding the changes to the expenditure resulting from
@@ -46,19 +42,19 @@ export const decodeUpdatedSlots = (
         .decode(['address'], value)
         .toString();
 
-      updatedSlots = getUpdatedExpenditureSlots(expenditure, slotId, {
+      updatedSlots = getUpdatedExpenditureSlots(expenditure.slots, slotId, {
         recipientAddress,
       });
     } else if (keys[1] === EXPENDITURESLOT_CLAIMDELAY) {
       const claimDelay = BigNumber.from(value).toString();
 
-      updatedSlots = getUpdatedExpenditureSlots(expenditure, slotId, {
+      updatedSlots = getUpdatedExpenditureSlots(expenditure.slots, slotId, {
         claimDelay,
       });
     } else if (keys[1] === EXPENDITURESLOT_PAYOUTMODIFIER) {
       const payoutModifier = toNumber(value);
 
-      updatedSlots = getUpdatedExpenditureSlots(expenditure, slotId, {
+      updatedSlots = getUpdatedExpenditureSlots(expenditure.slots, slotId, {
         payoutModifier,
       });
     }

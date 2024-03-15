@@ -373,6 +373,8 @@ export enum ColonyActionType {
   EditDomain = 'EDIT_DOMAIN',
   /** An action related to editing a domain's details via a motion */
   EditDomainMotion = 'EDIT_DOMAIN_MOTION',
+  /** An action related to creating a motion to edit an expenditure */
+  EditLockedExpenditureMotion = 'EDIT_LOCKED_EXPENDITURE_MOTION',
   /** An action related to a domain reputation penalty within a Colony (smite) */
   EmitDomainReputationPenalty = 'EMIT_DOMAIN_REPUTATION_PENALTY',
   /** An action related to a domain reputation penalty within a Colony (smite) via a motion */
@@ -774,6 +776,8 @@ export type ColonyMotion = {
    * Useful to check if we're viewing a "read-only" motion
    */
   createdBy: Scalars['String'];
+  /** Edited expenditure slots associated with the motion, if any */
+  editedExpenditureSlots?: Maybe<Array<ExpenditureSlot>>;
   /** Expenditure associated with the motion, if any */
   expenditureId?: Maybe<Scalars['ID']>;
   /** Id of the expenditure stage payment to be released if the motion pass, if any */
@@ -1222,6 +1226,7 @@ export type CreateColonyMetadataInput = {
 
 export type CreateColonyMotionInput = {
   createdBy: Scalars['String'];
+  editedExpenditureSlots?: InputMaybe<Array<ExpenditureSlotInput>>;
   expenditureId?: InputMaybe<Scalars['ID']>;
   expenditureSlotId?: InputMaybe<Scalars['Int']>;
   gasEstimate: Scalars['String'];
@@ -7580,6 +7585,7 @@ export type UpdateColonyMetadataInput = {
 
 export type UpdateColonyMotionInput = {
   createdBy?: InputMaybe<Scalars['String']>;
+  editedExpenditureSlots?: InputMaybe<Array<ExpenditureSlotInput>>;
   expenditureId?: InputMaybe<Scalars['ID']>;
   expenditureSlotId?: InputMaybe<Scalars['Int']>;
   gasEstimate?: InputMaybe<Scalars['String']>;
@@ -8158,6 +8164,7 @@ export type ExpenditureBalanceFragment = {
 export type ExpenditureFragment = {
   __typename?: 'Expenditure';
   id: string;
+  status: ExpenditureStatus;
   stakedTransactionHash?: string | null;
   ownerAddress: string;
   slots: Array<{
@@ -8174,6 +8181,14 @@ export type ExpenditureFragment = {
       networkFee?: string | null;
     }> | null;
   }>;
+  motions?: {
+    __typename?: 'ModelColonyMotionConnection';
+    items: Array<{
+      __typename?: 'ColonyMotion';
+      transactionHash: string;
+      action?: { __typename?: 'ColonyAction'; type: ColonyActionType } | null;
+    } | null>;
+  } | null;
   balances?: Array<{
     __typename?: 'ExpenditureBalance';
     tokenAddress: string;
@@ -8956,6 +8971,7 @@ export type GetExpenditureQuery = {
   getExpenditure?: {
     __typename?: 'Expenditure';
     id: string;
+    status: ExpenditureStatus;
     stakedTransactionHash?: string | null;
     ownerAddress: string;
     slots: Array<{
@@ -8972,6 +8988,14 @@ export type GetExpenditureQuery = {
         networkFee?: string | null;
       }> | null;
     }>;
+    motions?: {
+      __typename?: 'ModelColonyMotionConnection';
+      items: Array<{
+        __typename?: 'ColonyMotion';
+        transactionHash: string;
+        action?: { __typename?: 'ColonyAction'; type: ColonyActionType } | null;
+      } | null>;
+    } | null;
     balances?: Array<{
       __typename?: 'ExpenditureBalance';
       tokenAddress: string;
@@ -9506,9 +9530,18 @@ export const Expenditure = gql`
         networkFee
       }
     }
+    motions {
+      items {
+        transactionHash
+        action {
+          type
+        }
+      }
+    }
     balances {
       ...ExpenditureBalance
     }
+    status
     stakedTransactionHash
     ownerAddress
   }
