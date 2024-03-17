@@ -1,13 +1,22 @@
 import { mutate } from '~amplifyClient';
 import {
+  ColonyActionType,
   CreateExpenditureDocument,
   CreateExpenditureMutation,
   CreateExpenditureMutationVariables,
   ExpenditureStatus,
   ExpenditureType,
 } from '~graphql';
-import { ContractEvent } from '~types';
-import { getExpenditureDatabaseId, output, toNumber, verbose } from '~utils';
+import { ContractEvent, ContractEventsSignatures } from '~types';
+import {
+  transactionHasEvent,
+  getDomainDatabaseId,
+  getExpenditureDatabaseId,
+  output,
+  toNumber,
+  verbose,
+  writeActionFromEvent,
+} from '~utils';
 
 import { getExpenditure } from './helpers';
 
@@ -37,11 +46,16 @@ export default async (event: ContractEvent): Promise<void> => {
     colonyAddress,
   );
 
+  const databaseId = getExpenditureDatabaseId(
+    colonyAddress,
+    convertedExpenditureId,
+  );
+
   await mutate<CreateExpenditureMutation, CreateExpenditureMutationVariables>(
     CreateExpenditureDocument,
     {
       input: {
-        id: getExpenditureDatabaseId(colonyAddress, convertedExpenditureId),
+        id: databaseId,
         type: ExpenditureType.PaymentBuilder,
         colonyId: colonyAddress,
         nativeId: convertedExpenditureId,
@@ -52,7 +66,25 @@ export default async (event: ContractEvent): Promise<void> => {
         nativeDomainId: domainId,
         isStaked: false,
         balances: [],
+        transactionHash: event.transactionHash,
       },
     },
   );
+
+  /**
+   * @NOTE: Only create a `CREATE_EXPENDITURE` action if the expenditure was not created as part of a OneTxPayment
+   */
+  const hasOneTxPaymentEvent = await transactionHasEvent(
+    event.transactionHash,
+    ContractEventsSignatures.OneTxPaymentMade,
+  );
+
+  if (!hasOneTxPaymentEvent) {
+    await writeActionFromEvent(event, colonyAddress, {
+      type: ColonyActionType.CreateExpenditure,
+      initiatorAddress: ownerAddress,
+      expenditureId: databaseId,
+      fromDomainId: getDomainDatabaseId(colonyAddress, domainId),
+    });
+  }
 };
