@@ -25,7 +25,6 @@ import {
   CreateMotionMessageInput,
   CreateMotionMessageMutation,
   CreateMotionMessageMutationVariables,
-  ExpenditureSlot,
 } from '~graphql';
 import { SIMPLE_DECISIONS_ACTION_CODE } from '~constants';
 import networkClient from '~networkClient';
@@ -226,44 +225,46 @@ const createColonyAction = async (
   );
 };
 
+type MotionFields = Omit<
+  CreateColonyActionInput,
+  | 'id'
+  | 'colonyId'
+  | 'showInActionsList'
+  | 'isMotion'
+  | 'motionId'
+  | 'initiatorAddress'
+  | 'blockNumber'
+  | 'rootHash'
+> &
+  Pick<
+    CreateColonyMotionInput,
+    'gasEstimate' | 'expenditureSlotId' | 'editedExpenditureSlots'
+  >;
+
 export const createMotionInDB = async (
-  {
+  event: ContractEvent,
+  motionFields: MotionFields,
+): Promise<GraphQLFnReturn<CreateColonyMotionMutation> | undefined> => {
+  const {
     transactionHash,
     blockNumber,
     logIndex,
     colonyAddress,
     args: { motionId, creator: creatorAddress, domainId },
     timestamp,
-  }: ContractEvent,
-  {
+  } = event;
+  const {
     gasEstimate,
-    expenditureId,
     expenditureSlotId,
     editedExpenditureSlots,
-    ...input
-  }: Omit<
-    CreateColonyActionInput,
-    | 'id'
-    | 'colonyId'
-    | 'showInActionsList'
-    | 'isMotion'
-    | 'motionId'
-    | 'initiatorAddress'
-    | 'blockNumber'
-    | 'rootHash'
-  > & {
-    gasEstimate: string;
-    expenditureId?: string;
-    expenditureSlotId?: number;
-    editedExpenditureSlots?: ExpenditureSlot[];
-  },
-): Promise<GraphQLFnReturn<CreateColonyMotionMutation> | undefined> => {
+    ...actionFields
+  } = motionFields;
+
   if (!colonyAddress) {
     return;
   }
 
   const votingClient = await getVotingClient(colonyAddress);
-
   if (!votingClient) {
     return;
   }
@@ -274,7 +275,7 @@ export const createMotionInDB = async (
     motionId,
     domainId,
     colonyAddress,
-    isDecision: !!input.colonyDecisionId,
+    isDecision: !!actionFields.colonyDecisionId,
   });
 
   const initialMotionMessage = await getInitialMotionMessage(
@@ -298,14 +299,14 @@ export const createMotionInDB = async (
     initiatorAddress: creatorAddress,
     blockNumber,
     rootHash,
-    ...input,
+    ...actionFields,
   };
 
   await Promise.all([
     createColonyMotion({
       ...motionData,
       gasEstimate,
-      expenditureId,
+      expenditureId: actionFields.expenditureId,
       expenditureSlotId,
       editedExpenditureSlots,
     }),
