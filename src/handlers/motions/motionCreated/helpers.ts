@@ -4,6 +4,7 @@ import {
   AnyColonyClient,
   AnyOneTxPaymentClient,
   AnyStakedExpenditureClient,
+  AnyStagedExpenditureClient,
   AnyVotingReputationClient,
 } from '@colony/colony-js';
 
@@ -38,11 +39,12 @@ export interface SimpleTransactionDescription {
   name: ColonyOperations.SimpleDecision;
 }
 
-type MotionActionClients = [
-  AnyColonyClient | null,
-  AnyOneTxPaymentClient | null,
-  AnyStakedExpenditureClient | null,
-];
+interface MotionActionClients {
+  colonyClient?: AnyColonyClient | null;
+  oneTxPaymentClient?: AnyOneTxPaymentClient | null;
+  stakedExpenditureClient?: AnyStakedExpenditureClient | null;
+  stagedExpenditureClient?: AnyStagedExpenditureClient | null;
+}
 
 export const parseAction = (
   action: string,
@@ -54,7 +56,8 @@ export const parseAction = (
     };
   }
 
-  for (const client of clients) {
+  for (const key in clients) {
+    const client = clients[key as keyof MotionActionClients];
     if (!client) {
       continue;
     }
@@ -236,6 +239,7 @@ export const createMotionInDB = async (
   {
     gasEstimate,
     expenditureId,
+    expenditureSlotId,
     ...input
   }: Omit<
     CreateColonyActionInput,
@@ -246,7 +250,11 @@ export const createMotionInDB = async (
     | 'motionId'
     | 'initiatorAddress'
     | 'blockNumber'
-  > & { gasEstimate: string; expenditureId?: string },
+  > & {
+    gasEstimate: string;
+    expenditureId?: string;
+    expenditureSlotId?: number;
+  },
 ): Promise<GraphQLFnReturn<CreateColonyMotionMutation> | undefined> => {
   if (!colonyAddress) {
     return;
@@ -287,7 +295,12 @@ export const createMotionInDB = async (
   };
 
   await Promise.all([
-    createColonyMotion({ ...motionData, gasEstimate, expenditureId }),
+    createColonyMotion({
+      ...motionData,
+      gasEstimate,
+      expenditureId,
+      expenditureSlotId,
+    }),
     createMotionMessage(initialMotionMessage),
     createColonyAction(actionData, timestamp),
   ]);

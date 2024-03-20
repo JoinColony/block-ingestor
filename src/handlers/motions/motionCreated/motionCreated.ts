@@ -5,6 +5,7 @@ import { ColonyOperations, ContractEvent } from '~types';
 import {
   getCachedColonyClient,
   getStakedExpenditureClient,
+  getStagedExpenditureClient,
   getOneTxPaymentClient,
   getVotingClient,
   verbose,
@@ -51,14 +52,19 @@ export default async (event: ContractEvent): Promise<void> => {
     colonyAddress,
   );
 
+  const stagedExpenditureClient = await getStagedExpenditureClient(
+    colonyAddress,
+  );
+
   const motion = await votingReputationClient.getMotion(motionId, {
     blockTag: blockNumber,
   });
-  const parsedAction = parseAction(motion.action, [
+  const parsedAction = parseAction(motion.action, {
     colonyClient,
     oneTxPaymentClient,
     stakedExpenditureClient,
-  ]);
+    stagedExpenditureClient,
+  });
 
   let gasEstimate: BigNumber;
 

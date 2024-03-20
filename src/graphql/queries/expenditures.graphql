@@ -10,8 +10,14 @@ query GetExpenditure($id: ID!) {
         tokenAddress
         amount
         isClaimed
+        networkFee
       }
     }
+    balances {
+      ...ExpenditureBalance
+    }
+    stakedTransactionHash
+    ownerAddress
   }
 }
 
@@ -25,6 +31,9 @@ query GetExpenditureByNativeFundingPotIdAndColony(
   ) {
     items {
       id
+      balances {
+        ...ExpenditureBalance
+      }
       motions {
         items {
           transactionHash
