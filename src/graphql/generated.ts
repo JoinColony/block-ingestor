@@ -1346,7 +1346,6 @@ export type CreateExpenditureInput = {
 };
 
 export type CreateExpenditureMetadataInput = {
-  decisionMethod: ExpenditureDecisionMethod;
   fundFromDomainNativeId: Scalars['Int'];
   id?: InputMaybe<Scalars['ID']>;
   stages?: InputMaybe<Array<ExpenditureStageInput>>;
@@ -1900,15 +1899,9 @@ export type ExpenditureBalanceInput = {
   tokenAddress: Scalars['ID'];
 };
 
-export enum ExpenditureDecisionMethod {
-  Permissions = 'PERMISSIONS',
-  Reputation = 'REPUTATION',
-}
-
 export type ExpenditureMetadata = {
   __typename?: 'ExpenditureMetadata';
   createdAt: Scalars['AWSDateTime'];
-  decisionMethod: ExpenditureDecisionMethod;
   fundFromDomainNativeId: Scalars['Int'];
   id: Scalars['ID'];
   stages?: Maybe<Array<ExpenditureStage>>;
@@ -2931,11 +2924,6 @@ export type ModelExpenditureConnection = {
   nextToken?: Maybe<Scalars['String']>;
 };
 
-export type ModelExpenditureDecisionMethodInput = {
-  eq?: InputMaybe<ExpenditureDecisionMethod>;
-  ne?: InputMaybe<ExpenditureDecisionMethod>;
-};
-
 export type ModelExpenditureFilterInput = {
   and?: InputMaybe<Array<InputMaybe<ModelExpenditureFilterInput>>>;
   colonyId?: InputMaybe<ModelIdInput>;
@@ -2956,7 +2944,6 @@ export type ModelExpenditureFilterInput = {
 
 export type ModelExpenditureMetadataConditionInput = {
   and?: InputMaybe<Array<InputMaybe<ModelExpenditureMetadataConditionInput>>>;
-  decisionMethod?: InputMaybe<ModelExpenditureDecisionMethodInput>;
   fundFromDomainNativeId?: InputMaybe<ModelIntInput>;
   not?: InputMaybe<ModelExpenditureMetadataConditionInput>;
   or?: InputMaybe<Array<InputMaybe<ModelExpenditureMetadataConditionInput>>>;
@@ -2971,7 +2958,6 @@ export type ModelExpenditureMetadataConnection = {
 
 export type ModelExpenditureMetadataFilterInput = {
   and?: InputMaybe<Array<InputMaybe<ModelExpenditureMetadataFilterInput>>>;
-  decisionMethod?: InputMaybe<ModelExpenditureDecisionMethodInput>;
   fundFromDomainNativeId?: InputMaybe<ModelIntInput>;
   id?: InputMaybe<ModelIdInput>;
   not?: InputMaybe<ModelExpenditureMetadataFilterInput>;
@@ -3742,7 +3728,6 @@ export type ModelSubscriptionExpenditureMetadataFilterInput = {
   and?: InputMaybe<
     Array<InputMaybe<ModelSubscriptionExpenditureMetadataFilterInput>>
   >;
-  decisionMethod?: InputMaybe<ModelSubscriptionStringInput>;
   fundFromDomainNativeId?: InputMaybe<ModelSubscriptionIntInput>;
   id?: InputMaybe<ModelSubscriptionIdInput>;
   or?: InputMaybe<
@@ -4394,6 +4379,8 @@ export type Mutation = {
   deleteUser?: Maybe<User>;
   deleteUserStake?: Maybe<UserStake>;
   deleteUserTokens?: Maybe<UserTokens>;
+  /** Removes the user from the colony whitelist */
+  removeMemberFromColonyWhitelist?: Maybe<Scalars['Boolean']>;
   /** Updates the latest available version of a Colony or an extension */
   setCurrentVersion?: Maybe<Scalars['Boolean']>;
   updateAnnotation?: Maybe<Annotation>;
@@ -4912,6 +4899,11 @@ export type MutationDeleteUserStakeArgs = {
 export type MutationDeleteUserTokensArgs = {
   condition?: InputMaybe<ModelUserTokensConditionInput>;
   input: DeleteUserTokensInput;
+};
+
+/** Root mutation type */
+export type MutationRemoveMemberFromColonyWhitelistArgs = {
+  input: RemoveMemberFromColonyWhitelistInput;
 };
 
 /** Root mutation type */
@@ -6288,6 +6280,13 @@ export type QuerySearchColonyActionsArgs = {
   limit?: InputMaybe<Scalars['Int']>;
   nextToken?: InputMaybe<Scalars['String']>;
   sort?: InputMaybe<Array<InputMaybe<SearchableColonyActionSortInput>>>;
+};
+
+export type RemoveMemberFromColonyWhitelistInput = {
+  /** The colony address */
+  colonyAddress: Scalars['ID'];
+  /** The user's wallet address */
+  userAddress: Scalars['ID'];
 };
 
 export type ReputationMiningCycleMetadata = {
@@ -7723,7 +7722,6 @@ export type UpdateExpenditureInput = {
 };
 
 export type UpdateExpenditureMetadataInput = {
-  decisionMethod?: InputMaybe<ExpenditureDecisionMethod>;
   fundFromDomainNativeId?: InputMaybe<Scalars['Int']>;
   id: Scalars['ID'];
   stages?: InputMaybe<Array<ExpenditureStageInput>>;
@@ -9047,19 +9045,6 @@ export type GetColonyExtensionQuery = {
   } | null;
 };
 
-export type GetVotingRepInstallationsQueryVariables = Exact<{
-  votingRepHash: Scalars['String'];
-  colonyAddress: Scalars['ID'];
-}>;
-
-export type GetVotingRepInstallationsQuery = {
-  __typename?: 'Query';
-  getExtensionByColonyAndHash?: {
-    __typename?: 'ModelColonyExtensionConnection';
-    items: Array<{ __typename?: 'ColonyExtension'; id: string } | null>;
-  } | null;
-};
-
 export type GetColonyExtensionsByColonyAddressQueryVariables = Exact<{
   colonyAddress: Scalars['ID'];
 }>;
@@ -10128,21 +10113,6 @@ export const GetColonyExtensionDocument = gql`
     getColonyExtension(id: $id) {
       colonyId
       version
-    }
-  }
-`;
-export const GetVotingRepInstallationsDocument = gql`
-  query GetVotingRepInstallations(
-    $votingRepHash: String!
-    $colonyAddress: ID!
-  ) {
-    getExtensionByColonyAndHash(
-      colonyId: $colonyAddress
-      hash: { eq: $votingRepHash }
-    ) {
-      items {
-        id
-      }
     }
   }
 `;
