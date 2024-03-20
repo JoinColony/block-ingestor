@@ -72,6 +72,7 @@ export default async (event: ContractEvent): Promise<void> => {
     payouts: updatedPayouts,
   });
 
+  // @TODO: Update the payout amount with the actual amount paid to the user (which may be different from the original amount due to network fee changing)
   const networkInverseFee = (await getNetworkInverseFee()) ?? '0';
   const amountWithFee = getAmountWithFee(
     amountWithoutFee,

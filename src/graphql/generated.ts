@@ -8955,6 +8955,7 @@ export type GetExpenditureQuery = {
         tokenAddress: string;
         amount: string;
         isClaimed: boolean;
+        networkFee?: string | null;
       }> | null;
     }>;
     balances?: Array<{
@@ -10047,6 +10048,7 @@ export const GetExpenditureDocument = gql`
           tokenAddress
           amount
           isClaimed
+          networkFee
         }
       }
       balances {
