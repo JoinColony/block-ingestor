@@ -13,18 +13,7 @@ query GetExpenditureByNativeFundingPotIdAndColony(
     colonyId: { eq: $colonyAddress }
   ) {
     items {
-      id
-      balances {
-        ...ExpenditureBalance
-      }
-      motions {
-        items {
-          transactionHash
-          action {
-            type
-          }
-        }
-      }
+      ...Expenditure
     }
   }
 }
