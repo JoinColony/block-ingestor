@@ -267,6 +267,11 @@ export type ColonyAction = {
   initiatorUser?: Maybe<User>;
   /** Will be true if the action is a motion */
   isMotion?: Maybe<Scalars['Boolean']>;
+  /**
+   * Indicates whether the action is a result of a motion being finalized
+   * @TODO: Make this field non-nullable
+   */
+  isMotionFinalization?: Maybe<Scalars['Boolean']>;
   /** Metadata associated with the action (Eg. Custom action title) */
   metadata?: Maybe<ColonyActionMetadata>;
   /** Expanded `ColonyMotion` for the corresponding `motionId` */
@@ -1090,6 +1095,7 @@ export type CreateColonyActionInput = {
   individualEvents?: InputMaybe<Scalars['String']>;
   initiatorAddress: Scalars['ID'];
   isMotion?: InputMaybe<Scalars['Boolean']>;
+  isMotionFinalization?: InputMaybe<Scalars['Boolean']>;
   motionDomainId?: InputMaybe<Scalars['Int']>;
   motionId?: InputMaybe<Scalars['ID']>;
   networkFee?: InputMaybe<Scalars['String']>;
@@ -2253,6 +2259,7 @@ export type ModelColonyActionConditionInput = {
   individualEvents?: InputMaybe<ModelStringInput>;
   initiatorAddress?: InputMaybe<ModelIdInput>;
   isMotion?: InputMaybe<ModelBooleanInput>;
+  isMotionFinalization?: InputMaybe<ModelBooleanInput>;
   motionDomainId?: InputMaybe<ModelIntInput>;
   motionId?: InputMaybe<ModelIdInput>;
   networkFee?: InputMaybe<ModelStringInput>;
@@ -2292,6 +2299,7 @@ export type ModelColonyActionFilterInput = {
   individualEvents?: InputMaybe<ModelStringInput>;
   initiatorAddress?: InputMaybe<ModelIdInput>;
   isMotion?: InputMaybe<ModelBooleanInput>;
+  isMotionFinalization?: InputMaybe<ModelBooleanInput>;
   motionDomainId?: InputMaybe<ModelIntInput>;
   motionId?: InputMaybe<ModelIdInput>;
   networkFee?: InputMaybe<ModelStringInput>;
@@ -3453,6 +3461,7 @@ export type ModelSubscriptionColonyActionFilterInput = {
   individualEvents?: InputMaybe<ModelSubscriptionStringInput>;
   initiatorAddress?: InputMaybe<ModelSubscriptionIdInput>;
   isMotion?: InputMaybe<ModelSubscriptionBooleanInput>;
+  isMotionFinalization?: InputMaybe<ModelSubscriptionBooleanInput>;
   motionDomainId?: InputMaybe<ModelSubscriptionIntInput>;
   motionId?: InputMaybe<ModelSubscriptionIdInput>;
   networkFee?: InputMaybe<ModelSubscriptionStringInput>;
@@ -6453,6 +6462,7 @@ export enum SearchableColonyActionAggregateField {
   IndividualEvents = 'individualEvents',
   InitiatorAddress = 'initiatorAddress',
   IsMotion = 'isMotion',
+  IsMotionFinalization = 'isMotionFinalization',
   MotionDomainId = 'motionDomainId',
   MotionId = 'motionId',
   NetworkFee = 'networkFee',
@@ -6499,6 +6509,7 @@ export type SearchableColonyActionFilterInput = {
   individualEvents?: InputMaybe<SearchableStringFilterInput>;
   initiatorAddress?: InputMaybe<SearchableIdFilterInput>;
   isMotion?: InputMaybe<SearchableBooleanFilterInput>;
+  isMotionFinalization?: InputMaybe<SearchableBooleanFilterInput>;
   motionDomainId?: InputMaybe<SearchableIntFilterInput>;
   motionId?: InputMaybe<SearchableIdFilterInput>;
   networkFee?: InputMaybe<SearchableStringFilterInput>;
@@ -6537,6 +6548,7 @@ export enum SearchableColonyActionSortableFields {
   IndividualEvents = 'individualEvents',
   InitiatorAddress = 'initiatorAddress',
   IsMotion = 'isMotion',
+  IsMotionFinalization = 'isMotionFinalization',
   MotionDomainId = 'motionDomainId',
   MotionId = 'motionId',
   NetworkFee = 'networkFee',
@@ -7518,6 +7530,7 @@ export type UpdateColonyActionInput = {
   individualEvents?: InputMaybe<Scalars['String']>;
   initiatorAddress?: InputMaybe<Scalars['ID']>;
   isMotion?: InputMaybe<Scalars['Boolean']>;
+  isMotionFinalization?: InputMaybe<Scalars['Boolean']>;
   motionDomainId?: InputMaybe<Scalars['Int']>;
   motionId?: InputMaybe<Scalars['ID']>;
   networkFee?: InputMaybe<Scalars['String']>;
@@ -8260,8 +8273,10 @@ export type ExpenditureFragment = {
 export type ExtensionFragment = {
   __typename?: 'ColonyExtension';
   id: string;
+  hash: string;
   colonyId: string;
   isInitialized: boolean;
+  version: number;
 };
 
 export type ColonyMotionFragment = {
@@ -9140,7 +9155,10 @@ export type GetColonyExtensionQuery = {
   __typename?: 'Query';
   getColonyExtension?: {
     __typename?: 'ColonyExtension';
+    id: string;
+    hash: string;
     colonyId: string;
+    isInitialized: boolean;
     version: number;
   } | null;
 };
@@ -9153,7 +9171,14 @@ export type GetColonyExtensionsByColonyAddressQuery = {
   __typename?: 'Query';
   getExtensionByColonyAndHash?: {
     __typename?: 'ModelColonyExtensionConnection';
-    items: Array<{ __typename?: 'ColonyExtension'; id: string } | null>;
+    items: Array<{
+      __typename?: 'ColonyExtension';
+      id: string;
+      hash: string;
+      colonyId: string;
+      isInitialized: boolean;
+      version: number;
+    } | null>;
   } | null;
 };
 
@@ -9170,8 +9195,10 @@ export type ListExtensionsQuery = {
     items: Array<{
       __typename?: 'ColonyExtension';
       id: string;
+      hash: string;
       colonyId: string;
       isInitialized: boolean;
+      version: number;
     } | null>;
   } | null;
 };
@@ -9598,8 +9625,10 @@ export const Expenditure = gql`
 export const Extension = gql`
   fragment Extension on ColonyExtension {
     id
+    hash
     colonyId
     isInitialized
+    version
   }
 `;
 export const MotionStakes = gql`
@@ -10227,19 +10256,20 @@ export const GetStreamingPaymentDocument = gql`
 export const GetColonyExtensionDocument = gql`
   query GetColonyExtension($id: ID!) {
     getColonyExtension(id: $id) {
-      colonyId
-      version
+      ...Extension
     }
   }
+  ${Extension}
 `;
 export const GetColonyExtensionsByColonyAddressDocument = gql`
   query GetColonyExtensionsByColonyAddress($colonyAddress: ID!) {
     getExtensionByColonyAndHash(colonyId: $colonyAddress) {
       items {
-        id
+        ...Extension
       }
     }
   }
+  ${Extension}
 `;
 export const ListExtensionsDocument = gql`
   query ListExtensions($hash: String!, $nextToken: String) {

@@ -5,11 +5,12 @@ import {
   CreateColonyActionInput,
   CreateColonyActionMutation,
   CreateColonyActionMutationVariables,
+  ExtensionFragment,
   GetExpenditureByNativeFundingPotIdAndColonyDocument,
   GetExpenditureByNativeFundingPotIdAndColonyQuery,
   GetExpenditureByNativeFundingPotIdAndColonyQueryVariables,
 } from '~graphql';
-import { toNumber, verbose, getExtensionInstallations } from '~utils';
+import { toNumber, verbose, getColonyExtensions } from '~utils';
 import { ContractEvent } from '~types';
 import networkClient from '~networkClient';
 
@@ -25,12 +26,15 @@ export const writeActionFromEvent = async (
 ): Promise<void> => {
   const { transactionHash, blockNumber, timestamp } = event;
 
-  const actionType = actionFields.type ?? 'UNKNOWN';
+  const actionType = actionFields.type;
+
+  const colonyExtensions = await getColonyExtensions(colonyAddress);
 
   const showInActionsList = await showActionInActionsList(
     event,
     colonyAddress,
     actionFields,
+    colonyExtensions,
   );
 
   verbose('Action', actionType, 'took place in Colony:', colonyAddress);
@@ -53,6 +57,7 @@ const showActionInActionsList = async (
   { args }: ContractEvent,
   colonyAddress: string,
   { type, initiatorAddress, recipientAddress }: ActionFields,
+  colonyExtensions: ExtensionFragment[],
 ): Promise<boolean> => {
   if (type === ColonyActionType.MoveFunds) {
     const [, , toPot] = args;
@@ -77,7 +82,7 @@ const showActionInActionsList = async (
     }
   }
 
-  const extensionAddresses = await getExtensionInstallations(colonyAddress);
+  const extensionAddresses = colonyExtensions.map((extension) => extension.id);
 
   const isAddressInitiatorOrRecipient = (address: string): boolean =>
     address === initiatorAddress || address === recipientAddress;
