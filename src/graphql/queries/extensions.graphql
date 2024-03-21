@@ -1,14 +1,13 @@
 query GetColonyExtension($id: ID!) {
   getColonyExtension(id: $id) {
-    colonyId
-    version
+    ...Extension
   }
 }
 
 query GetColonyExtensionsByColonyAddress($colonyAddress: ID!) {
   getExtensionByColonyAndHash(colonyId: $colonyAddress) {
     items {
-      id
+      ...Extension
     }
   }
 }

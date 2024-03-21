@@ -11,7 +11,7 @@ import {
   getRolesMapFromEvents,
   verbose,
   writeActionFromEvent,
-  getExtensionInstallations,
+  isAddressExtension,
 } from '~utils';
 import {
   GetColonyRoleQuery,
@@ -182,18 +182,13 @@ export default async (event: ContractEvent): Promise<void> => {
     );
   }
 
-  /*
-   * Whenever a permission is added/removed, confirm that the target address still has at least one permission in the colony
-   */
-
-  const installedExtensions = new Set(
-    await getExtensionInstallations(colonyAddress),
-  );
+  const isExtension = await isAddressExtension(targetAddress);
 
   // We don't create contributor entries for extensions
-  if (!installedExtensions.has(targetAddress))
+  if (!isExtension) {
     await updateColonyContributor({
       colonyAddress,
       contributorAddress: targetAddress,
     });
+  }
 };
