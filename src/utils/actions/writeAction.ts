@@ -1,3 +1,4 @@
+import { Extension, getExtensionHash } from '@colony/colony-js';
 import { mutate, query } from '~amplifyClient';
 import {
   ColonyActionType,
@@ -30,6 +31,11 @@ export const writeActionFromEvent = async (
 
   const colonyExtensions = await getColonyExtensions(colonyAddress);
 
+  const isMotionFinalization = await isActionMotionFinalization(
+    actionFields.initiatorAddress,
+    colonyExtensions,
+  );
+
   const showInActionsList = await showActionInActionsList(
     event,
     colonyAddress,
@@ -47,6 +53,7 @@ export const writeActionFromEvent = async (
         blockNumber,
         createdAt: new Date(timestamp * 1000).toISOString(),
         showInActionsList,
+        isMotionFinalization,
         ...actionFields,
       },
     },
@@ -92,5 +99,23 @@ const showActionInActionsList = async (
     !!extensionAddresses.find(isAddressInitiatorOrRecipient) ||
     isAddressInitiatorOrRecipient(networkClient.address) ||
     colonyAddress === initiatorAddress
+  );
+};
+
+/**
+ * Determines whether the action is a result of a motion being finalized
+ * by checking if its initiator was
+ */
+const isActionMotionFinalization = async (
+  initiatorAddress: string,
+  extensions: ExtensionFragment[],
+): Promise<boolean> => {
+  const initiatorExtension = extensions.find(
+    (extension) => extension.id === initiatorAddress,
+  );
+
+  return (
+    !!initiatorExtension &&
+    initiatorExtension.hash === getExtensionHash(Extension.VotingReputation)
   );
 };
