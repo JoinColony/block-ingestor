@@ -299,6 +299,7 @@ export const createMotionInDB = async (
     initiatorAddress: creatorAddress,
     blockNumber,
     rootHash,
+    isMotionFinalization: false,
     ...actionFields,
   };
 
