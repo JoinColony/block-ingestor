@@ -295,6 +295,7 @@ export const createMotionInDB = async (
     motionId: motionData.id,
     initiatorAddress: creatorAddress,
     blockNumber,
+    isMotionFinalization: false,
     ...actionFields,
   };
 
