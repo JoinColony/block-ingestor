@@ -35,6 +35,9 @@ export default async (event: ContractEvent): Promise<void> => {
     toPot,
   } = event.args;
 
+  const fromPotId = toNumber(fromPot);
+  const toPotId = toNumber(toPot);
+
   const colonyClient = await getCachedColonyClient(colonyAddress);
   if (!colonyClient) {
     return;
@@ -69,15 +72,12 @@ export default async (event: ContractEvent): Promise<void> => {
       toDomainId: toDomainId
         ? getDomainDatabaseId(colonyAddress, toNumber(toDomainId))
         : undefined,
+      fromPotId,
+      toPotId,
     });
   }
 
-  await updateExpenditureBalances(
-    colonyAddress,
-    toNumber(toPot),
-    tokenAddress,
-    amount,
-  );
+  await updateExpenditureBalances(colonyAddress, toPotId, tokenAddress, amount);
 };
 
 const updateExpenditureBalances = async (
