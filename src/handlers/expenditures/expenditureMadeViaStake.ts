@@ -29,14 +29,14 @@ export default async (event: ContractEvent): Promise<void> => {
   verbose(`Expenditure with ID ${databaseId} made via stake`);
 
   const expenditure = await getExpenditureFromDB(databaseId);
-  if (!expenditure || !expenditure.transactionHash) {
+  if (!expenditure) {
     output(`Expenditure with ID ${databaseId} was not found in the DB`);
     return;
   }
 
   const stakeDatabaseId = getUserStakeDatabaseId(
     creator,
-    expenditure.transactionHash,
+    event.transactionHash,
   );
 
   await mutate<UpdateExpenditureMutation, UpdateExpenditureMutationVariables>(
@@ -55,7 +55,7 @@ export default async (event: ContractEvent): Promise<void> => {
     {
       input: {
         id: stakeDatabaseId,
-        actionId: expenditure.transactionHash,
+        actionId: event.transactionHash,
         amount: stake.toString(),
         userAddress: creator,
         colonyAddress,
