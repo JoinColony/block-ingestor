@@ -113,7 +113,7 @@ const showActionInActionsList = async (
 
 /**
  * Determines whether the action is a result of a motion being finalized
- * by checking if its initiator was
+ * by checking if its initiator was the Voting Reputation extension
  */
 const isActionMotionFinalization = async (
   initiatorAddress: string,
