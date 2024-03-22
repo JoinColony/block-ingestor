@@ -29,6 +29,6 @@ fragment Expenditure on Expenditure {
     ...ExpenditureBalance
   }
   status
-  transactionHash
   ownerAddress
+  userStakeId
 }
