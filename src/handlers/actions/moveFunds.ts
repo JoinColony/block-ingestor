@@ -1,4 +1,4 @@
-import { BigNumber, utils } from 'ethers';
+import { BigNumber } from 'ethers';
 
 import { ContractEvent, ContractEventsSignatures } from '~types';
 import {
@@ -9,10 +9,11 @@ import {
   getCachedColonyClient,
   isDomainFromFundingPotSupported,
   getUpdatedExpenditureBalances,
+  transactionHasEvent,
 } from '~utils';
-import provider from '~provider';
 import {
   ColonyActionType,
+  ExpenditureFragment,
   GetExpenditureByNativeFundingPotIdAndColonyDocument,
   GetExpenditureByNativeFundingPotIdAndColonyQuery,
   GetExpenditureByNativeFundingPotIdAndColonyQueryVariables,
@@ -23,12 +24,12 @@ import {
 import { mutate, query } from '~amplifyClient';
 
 export default async (event: ContractEvent): Promise<void> => {
-  const receipt = await provider.getTransactionReceipt(event.transactionHash);
-  const oneTxPaymentEvent = receipt.logs.some((log) =>
-    log.topics.includes(utils.id(ContractEventsSignatures.OneTxPaymentMade)),
+  const hasOneTxPaymentEvent = await transactionHasEvent(
+    event.transactionHash,
+    ContractEventsSignatures.OneTxPaymentMade,
   );
 
-  if (oneTxPaymentEvent) {
+  if (hasOneTxPaymentEvent) {
     verbose(
       'Not acting upon the ColonyFundsMovedBetweenFundingPots event as a OneTxPayment event was present in the same transaction',
     );
@@ -43,6 +44,9 @@ export default async (event: ContractEvent): Promise<void> => {
     fromPot,
     toPot,
   } = event.args;
+
+  const fromPotId = toNumber(fromPot);
+  const toPotId = toNumber(toPot);
 
   const colonyClient = await getCachedColonyClient(colonyAddress);
   if (!colonyClient) {
@@ -61,6 +65,12 @@ export default async (event: ContractEvent): Promise<void> => {
     });
   }
 
+  // Check if the target pot belongs to an expenditure by trying to fetch it
+  const targetExpenditure = await getExpenditureByFundingPot(
+    colonyAddress,
+    toPotId,
+  );
+
   await writeActionFromEvent(event, colonyAddress, {
     type: ColonyActionType.MoveFunds,
     initiatorAddress,
@@ -72,48 +82,53 @@ export default async (event: ContractEvent): Promise<void> => {
     toDomainId: toDomainId
       ? getDomainDatabaseId(colonyAddress, toNumber(toDomainId))
       : undefined,
+    fromPotId,
+    toPotId,
+    expenditureId: targetExpenditure?.id,
   });
 
-  await updateExpenditureBalances(
-    colonyAddress,
-    toNumber(toPot),
-    tokenAddress,
-    amount,
-  );
+  if (targetExpenditure) {
+    await updateExpenditureBalances(targetExpenditure, tokenAddress, amount);
+  }
 };
 
-const updateExpenditureBalances = async (
+const getExpenditureByFundingPot = async (
   colonyAddress: string,
-  toPot: number,
-  tokenAddress: string,
-  amount: string,
-): Promise<void> => {
+  fundingPotId: number,
+): Promise<ExpenditureFragment | null> => {
   const response = await query<
     GetExpenditureByNativeFundingPotIdAndColonyQuery,
     GetExpenditureByNativeFundingPotIdAndColonyQueryVariables
   >(GetExpenditureByNativeFundingPotIdAndColonyDocument, {
     colonyAddress,
-    nativeFundingPotId: toPot,
+    nativeFundingPotId: fundingPotId,
   });
 
   const expenditure =
-    response?.data?.getExpendituresByNativeFundingPotIdAndColony?.items?.[0];
+    response?.data?.getExpendituresByNativeFundingPotIdAndColony?.items?.[0] ??
+    null;
 
-  if (expenditure) {
-    const updatedBalances = getUpdatedExpenditureBalances(
-      expenditure.balances ?? [],
-      tokenAddress,
-      amount,
-    );
+  return expenditure;
+};
 
-    await mutate<UpdateExpenditureMutation, UpdateExpenditureMutationVariables>(
-      UpdateExpenditureDocument,
-      {
-        input: {
-          id: expenditure.id,
-          balances: updatedBalances,
-        },
+const updateExpenditureBalances = async (
+  expenditure: ExpenditureFragment,
+  tokenAddress: string,
+  amount: string,
+): Promise<void> => {
+  const updatedBalances = getUpdatedExpenditureBalances(
+    expenditure.balances ?? [],
+    tokenAddress,
+    amount,
+  );
+
+  await mutate<UpdateExpenditureMutation, UpdateExpenditureMutationVariables>(
+    UpdateExpenditureDocument,
+    {
+      input: {
+        id: expenditure.id,
+        balances: updatedBalances,
       },
-    );
-  }
+    },
+  );
 };

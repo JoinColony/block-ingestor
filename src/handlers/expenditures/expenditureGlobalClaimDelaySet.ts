@@ -1,3 +1,4 @@
+import { BigNumber } from 'ethers';
 import { mutate } from '~amplifyClient';
 import {
   UpdateColonyDocument,
@@ -5,12 +6,11 @@ import {
   UpdateColonyMutationVariables,
 } from '~graphql';
 import { ContractEvent } from '~types';
-import { toNumber } from '~utils';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { contractAddress: colonyAddress } = event;
   const { globalClaimDelay } = event.args;
-  const convertedGlobalClaimDelay = toNumber(globalClaimDelay);
+  const convertedGlobalClaimDelay = BigNumber.from(globalClaimDelay).toString();
 
   await mutate<UpdateColonyMutation, UpdateColonyMutationVariables>(
     UpdateColonyDocument,

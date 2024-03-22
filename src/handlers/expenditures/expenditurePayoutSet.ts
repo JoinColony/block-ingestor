@@ -1,18 +1,15 @@
-import { BigNumber } from 'ethers';
-
 import { ContractEvent } from '~types';
 import { getExpenditureDatabaseId, output, toNumber, verbose } from '~utils';
 import {
   ExpenditurePayout,
-  ExpenditureSlot,
   UpdateExpenditureDocument,
   UpdateExpenditureMutation,
   UpdateExpenditureMutationVariables,
 } from '~graphql';
 import { mutate } from '~amplifyClient';
-import { getAmountLessFee, getNetworkInverseFee } from '~utils/networkFee';
+import { splitAmountAndFee } from '~utils/networkFee';
 
-import { getExpenditureFromDB } from './helpers';
+import { getExpenditureFromDB, getUpdatedExpenditureSlots } from './helpers';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { contractAddress: colonyAddress } = event;
@@ -20,9 +17,7 @@ export default async (event: ContractEvent): Promise<void> => {
   const convertedExpenditureId = toNumber(expenditureId);
   const convertedSlot = toNumber(slot);
 
-  const networkInverseFee = (await getNetworkInverseFee()) ?? '0';
-  const amountLessFee = getAmountLessFee(amount, networkInverseFee).toString();
-  const feeAmount = BigNumber.from(amount).sub(amountLessFee).toString();
+  const [amountLessFee, feeAmount] = await splitAmountAndFee(amount);
 
   const databaseId = getExpenditureDatabaseId(
     colonyAddress,
@@ -37,14 +32,11 @@ export default async (event: ContractEvent): Promise<void> => {
     return;
   }
 
-  const existingSlot = expenditure.slots.find(
-    (slot) => slot.id === convertedSlot,
-  );
+  const existingPayouts =
+    expenditure.slots.find((slot) => slot.id === convertedSlot)?.payouts ?? [];
 
   const updatedPayouts: ExpenditurePayout[] = [
-    ...(existingSlot?.payouts?.filter(
-      (payout) => payout.tokenAddress !== tokenAddress,
-    ) ?? []),
+    ...existingPayouts.filter((payout) => payout.tokenAddress !== tokenAddress),
     {
       tokenAddress,
       amount: amountLessFee,
@@ -53,15 +45,13 @@ export default async (event: ContractEvent): Promise<void> => {
     },
   ];
 
-  const updatedSlot: ExpenditureSlot = {
-    ...existingSlot,
-    id: convertedSlot,
-    payouts: updatedPayouts,
-  };
-  const updatedSlots = [
-    ...expenditure.slots.filter((slot) => slot.id !== convertedSlot),
-    updatedSlot,
-  ];
+  const updatedSlots = getUpdatedExpenditureSlots(
+    expenditure.slots,
+    convertedSlot,
+    {
+      payouts: updatedPayouts,
+    },
+  );
 
   verbose(
     `Payout set for expenditure with ID ${convertedExpenditureId} in colony ${colonyAddress}`,

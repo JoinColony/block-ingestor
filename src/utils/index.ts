@@ -15,3 +15,4 @@ export * from './seedDB';
 export * from './expenditures';
 export * from './isColonyAddress';
 export * from './fundsClaims';
+export * from './transactionHasEvent';

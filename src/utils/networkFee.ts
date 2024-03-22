@@ -54,3 +54,16 @@ export const getNetworkInverseFee = async (): Promise<string | null> => {
 
   return networkInverseFee;
 };
+
+export const splitAmountAndFee = async (
+  amountWithFee: BigNumberish,
+): Promise<[string, string]> => {
+  const networkInverseFee = (await getNetworkInverseFee()) ?? '0';
+  const amountLessFee = getAmountLessFee(
+    amountWithFee,
+    networkInverseFee,
+  ).toString();
+  const feeAmount = BigNumber.from(amountWithFee).sub(amountLessFee).toString();
+
+  return [amountLessFee, feeAmount];
+};

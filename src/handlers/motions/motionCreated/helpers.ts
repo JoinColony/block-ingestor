@@ -227,41 +227,45 @@ const createColonyAction = async (
   );
 };
 
+type MotionFields = Omit<
+  CreateColonyActionInput,
+  | 'id'
+  | 'colonyId'
+  | 'showInActionsList'
+  | 'isMotion'
+  | 'motionId'
+  | 'initiatorAddress'
+  | 'blockNumber'
+> &
+  Pick<
+    CreateColonyMotionInput,
+    'gasEstimate' | 'expenditureSlotId' | 'editedExpenditureSlots'
+  >;
+
 export const createMotionInDB = async (
-  {
+  event: ContractEvent,
+  motionFields: MotionFields,
+): Promise<GraphQLFnReturn<CreateColonyMotionMutation> | undefined> => {
+  const {
     transactionHash,
     blockNumber,
     logIndex,
     colonyAddress,
     args: { motionId, creator: creatorAddress, domainId },
     timestamp,
-  }: ContractEvent,
-  {
+  } = event;
+  const {
     gasEstimate,
-    expenditureId,
     expenditureSlotId,
-    ...input
-  }: Omit<
-    CreateColonyActionInput,
-    | 'id'
-    | 'colonyId'
-    | 'showInActionsList'
-    | 'isMotion'
-    | 'motionId'
-    | 'initiatorAddress'
-    | 'blockNumber'
-  > & {
-    gasEstimate: string;
-    expenditureId?: string;
-    expenditureSlotId?: number;
-  },
-): Promise<GraphQLFnReturn<CreateColonyMotionMutation> | undefined> => {
+    editedExpenditureSlots,
+    ...actionFields
+  } = motionFields;
+
   if (!colonyAddress) {
     return;
   }
 
   const votingClient = await getVotingClient(colonyAddress);
-
   if (!votingClient) {
     return;
   }
@@ -272,7 +276,7 @@ export const createMotionInDB = async (
     motionId,
     domainId,
     colonyAddress,
-    isDecision: !!input.colonyDecisionId,
+    isDecision: !!actionFields.colonyDecisionId,
   });
 
   const initialMotionMessage = await getInitialMotionMessage(
@@ -291,15 +295,17 @@ export const createMotionInDB = async (
     motionId: motionData.id,
     initiatorAddress: creatorAddress,
     blockNumber,
-    ...input,
+    isMotionFinalization: false,
+    ...actionFields,
   };
 
   await Promise.all([
     createColonyMotion({
       ...motionData,
       gasEstimate,
-      expenditureId,
+      expenditureId: actionFields.expenditureId,
       expenditureSlotId,
+      editedExpenditureSlots,
     }),
     createMotionMessage(initialMotionMessage),
     createColonyAction(actionData, timestamp),

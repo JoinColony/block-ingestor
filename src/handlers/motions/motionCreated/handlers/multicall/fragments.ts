@@ -1,29 +1,46 @@
-import { Result } from 'ethers/lib/utils';
-import { ContractEvent } from '~types';
+import { ContractEvent, ContractMethodSignatures } from '~types';
+import { DecodedFunctions } from './multicall';
+import { ExpenditureFragment, ExpenditureStatus } from '~graphql';
 import {
-  moveFundsBetweenPotsMulti,
-  setExpenditureStateMulti,
+  editLockedExpenditureMotionHandler,
+  fundExpenditureMotionHandler,
+  isEditLockedExpenditureMotion,
+  isFundExpenditureMotion,
+  isReleaseExpenditureStageMotion,
+  releaseExpenditureStageMotionHandler,
 } from './multicallHandlers';
 
-type MultiCallHandler = ({
-  args,
+export type MulticallHandler = ({
   event,
+  decodedFunctions,
   gasEstimate,
+  expenditure,
 }: {
   event: ContractEvent;
-  args: Result;
   gasEstimate: string;
-}) => Promise<void>;
-// Here we list tuples with the fragments that we are aware of that use multicall, and the corresponding handler
-// we want to fire if the fragment was included in the multicall event.
-export const multicallFragments: Array<[string, MultiCallHandler]> = [
+  decodedFunctions: DecodedFunctions;
+  expenditure?: ExpenditureFragment;
+}) => void | Promise<void>;
+
+export type MulticallValidator = ({
+  decodedFunctions,
+  expenditureStatus,
+}: {
+  decodedFunctions: DecodedFunctions;
+  expenditureStatus?: ExpenditureStatus;
+}) => boolean;
+
+export const multicallHandlers: Array<[MulticallValidator, MulticallHandler]> =
   [
-    'moveFundsBetweenPots(uint256,uint256,uint256,uint256,uint256,uint256,address)',
-    moveFundsBetweenPotsMulti,
-  ],
-  [
-    'moveFundsBetweenPots(uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,address)',
-    moveFundsBetweenPotsMulti,
-  ],
-  ['setExpenditureState', setExpenditureStateMulti],
+    [isFundExpenditureMotion, fundExpenditureMotionHandler],
+    [isReleaseExpenditureStageMotion, releaseExpenditureStageMotionHandler],
+    [isEditLockedExpenditureMotion, editLockedExpenditureMotionHandler],
+  ];
+
+// List all supported multicall fragments
+export const supportedMulticallFragments: string[] = [
+  ContractMethodSignatures.MoveFundsBetweenPots,
+  ContractMethodSignatures.MoveFundsBetweenPots_OLD,
+  ContractMethodSignatures.SetExpenditureState,
+  ContractMethodSignatures.SetExpenditurePayout,
 ];

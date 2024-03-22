@@ -3,7 +3,7 @@ import { TransactionDescription } from 'ethers/lib/utils';
 import { BlockTag } from '@ethersproject/abstract-provider';
 import { AnyVotingReputationClient, Extension } from '@colony/colony-js';
 
-import { ColonyOperations, MotionVote } from '~types';
+import { ColonyOperations, ContractMethodSignatures, MotionVote } from '~types';
 import {
   getCachedColonyClient,
   getColonyFromDB,
@@ -421,7 +421,7 @@ export const claimExpenditurePayouts = async (
 
   try {
     decodedSetExpenditureStateArgs = colonyClient.interface.decodeFunctionData(
-      'setExpenditureState',
+      ContractMethodSignatures.SetExpenditureState,
       firstAction,
     );
   } catch (error) {
@@ -434,7 +434,6 @@ export const claimExpenditurePayouts = async (
 
   const convertedSlotId = toNumber(slotId);
   const convertedExpenditureId = toNumber(expenditureId);
-  const convertedValue = toNumber(value);
   const convertedStorageSlot = toNumber(storageSlot);
 
   if (!colonyAddress) {
@@ -446,7 +445,10 @@ export const claimExpenditurePayouts = async (
   // - The value is not 0
   // - The storage slot is not 26
   // Then we can assume this state change ain't a stage release
-  if (convertedStorageSlot !== EXPENDITURESLOTS_SLOT || convertedValue !== 0) {
+  if (
+    convertedStorageSlot !== EXPENDITURESLOTS_SLOT ||
+    !BigNumber.from(0).eq(value)
+  ) {
     return;
   }
 
@@ -464,10 +466,8 @@ export const claimExpenditurePayouts = async (
 
   const metadata = expenditureMetadataResponse?.data?.getExpenditureMetadata;
 
+  // If the state doesn't exist, this is not a stage release and we don't need to do anything
   if (!metadata || !metadata.stages) {
-    output(
-      `Could not find stages data for expenditure with ID: ${databaseId}. This is a bug and needs investigating.`,
-    );
     return;
   }
 

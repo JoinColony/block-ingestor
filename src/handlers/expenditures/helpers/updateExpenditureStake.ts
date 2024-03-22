@@ -5,7 +5,6 @@ import {
   UpdateUserStakeMutationVariables,
   UpdateUserStakeInput,
 } from '~graphql';
-import { getUserStakeDatabaseId } from '~utils/stakes';
 import { getExpenditureFromDB } from './getExpenditure';
 import { output, verbose } from '~utils';
 
@@ -14,36 +13,25 @@ export const updateExpenditureStake = async (
   fieldsToUpdate: Pick<UpdateUserStakeInput, 'isClaimed' | 'isForfeited'>,
 ): Promise<void> => {
   const expenditure = await getExpenditureFromDB(expenditureDatabaseId);
-  if (!expenditure) {
+
+  if (!expenditure || !expenditure.userStakeId) {
     output(
-      `Expenditure with ID ${expenditureDatabaseId} not found when updating stake`,
+      `Could not get user stake ID for expenditure with ID ${expenditureDatabaseId}`,
     );
     return;
   }
-
-  if (!expenditure.stakedTransactionHash) {
-    output(
-      `Expenditure with ID ${expenditureDatabaseId} does not have a staked transaction hash`,
-    );
-    return;
-  }
-
-  const stakeDatabaseId = getUserStakeDatabaseId(
-    expenditure.ownerAddress,
-    expenditure.stakedTransactionHash,
-  );
 
   await mutate<UpdateUserStakeMutation, UpdateUserStakeMutationVariables>(
     UpdateUserStakeDocument,
     {
       input: {
-        id: stakeDatabaseId,
+        id: expenditure.userStakeId,
         ...fieldsToUpdate,
       },
     },
   );
 
   verbose(
-    `Updated stake with ID ${stakeDatabaseId} for expenditure ${expenditureDatabaseId}`,
+    `Updated stake with ID ${expenditure.userStakeId} for expenditure ${expenditureDatabaseId}`,
   );
 };

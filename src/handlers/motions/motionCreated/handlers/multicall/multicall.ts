@@ -1,8 +1,45 @@
-import { TransactionDescription } from 'ethers/lib/utils';
-import { BigNumber } from 'ethers';
-import { getCachedColonyClient } from '~utils';
-import { multicallFragments } from './fragments';
-import { ContractEvent } from '~types';
+import { Result, TransactionDescription } from 'ethers/lib/utils';
+import { BigNumber, utils } from 'ethers';
+import {
+  getCachedColonyClient,
+  getExpenditureDatabaseId,
+  output,
+  toNumber,
+} from '~utils';
+import { ContractEvent, ContractMethodSignatures } from '~types';
+import { getExpenditureFromDB } from '~handlers/expenditures/helpers';
+import { AnyColonyClient } from '@colony/colony-js';
+import { multicallHandlers, supportedMulticallFragments } from './fragments';
+
+export type DecodedFunctions = Array<{
+  fragment: ContractMethodSignatures;
+  decodedAction: Result;
+}>;
+
+const decodeFunctions = (
+  encodedActions: utils.Result,
+  colonyClient: AnyColonyClient,
+): DecodedFunctions => {
+  const decodedFunctions: DecodedFunctions = [];
+  for (const action of encodedActions) {
+    supportedMulticallFragments.forEach((fragment) => {
+      try {
+        const decodedAction = colonyClient.interface.decodeFunctionData(
+          fragment,
+          action,
+        );
+        decodedFunctions.push({
+          fragment: fragment as ContractMethodSignatures,
+          decodedAction,
+        });
+      } catch {
+        // silent. We are expecting all but one of the fragments to error for each arg.
+      }
+    });
+  }
+
+  return decodedFunctions;
+};
 
 export const handleMulticallMotion = async (
   event: ContractEvent,
@@ -25,27 +62,39 @@ export const handleMulticallMotion = async (
     .add(BigNumber.from(encodedActions.length ?? 0).mul(100000))
     .toString();
 
-  // For each encoded action, we need to decode it and execute the appropriate handler.
-  // This can only be done by trying to decode the action with each of the function signatures we know use multicall.
-  for (const arg of parsedAction.args[0]) {
-    for (const [fragment, handler] of multicallFragments) {
-      try {
-        // These are the arguments passed to the underlying action.
-        const decodedArgs = colonyClient.interface.decodeFunctionData(
-          fragment,
-          arg,
-        );
+  // We need to determine which multicallMotion this is and pass it to the appropriate handler
+  const decodedFunctions: DecodedFunctions = decodeFunctions(
+    encodedActions,
+    colonyClient,
+  );
 
-        await handler({
-          event,
-          args: decodedArgs,
-          gasEstimate: updatedGasEstimate,
-        });
-        // if decode is successful, we can move on to the next argument.
-        break;
-      } catch {
-        // silent. We are expecting all but one of the fragments to error for each arg.
-      }
+  const [, , expenditureId] = decodedFunctions[0].decodedAction;
+
+  const convertedExpenditureId = toNumber(expenditureId);
+
+  const databaseId = getExpenditureDatabaseId(
+    colonyAddress,
+    convertedExpenditureId,
+  );
+
+  const expenditure = await getExpenditureFromDB(databaseId);
+  if (!expenditure) {
+    output(
+      `Could not find expenditure with ID: ${databaseId} in the db when handling ExpenditureStateChanged event`,
+    );
+    return;
+  }
+
+  for (const [validator, handler] of multicallHandlers) {
+    if (
+      validator({ decodedFunctions, expenditureStatus: expenditure.status })
+    ) {
+      handler({
+        event,
+        decodedFunctions,
+        gasEstimate: updatedGasEstimate,
+        expenditure,
+      });
     }
   }
 };

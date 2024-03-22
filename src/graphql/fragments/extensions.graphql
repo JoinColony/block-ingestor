@@ -1,5 +1,7 @@
 fragment Extension on ColonyExtension {
   id
+  hash
   colonyId
   isInitialized
+  version
 }

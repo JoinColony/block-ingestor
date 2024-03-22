@@ -2,3 +2,33 @@ fragment ExpenditureBalance on ExpenditureBalance {
   tokenAddress
   amount
 }
+
+fragment Expenditure on Expenditure {
+  id
+  slots {
+    id
+    recipientAddress
+    claimDelay
+    payoutModifier
+    payouts {
+      tokenAddress
+      amount
+      isClaimed
+      networkFee
+    }
+  }
+  motions {
+    items {
+      transactionHash
+      action {
+        type
+      }
+    }
+  }
+  balances {
+    ...ExpenditureBalance
+  }
+  status
+  ownerAddress
+  userStakeId
+}

@@ -11,7 +11,7 @@ import {
   getDomainDatabaseId,
   mapLogToContractEvent,
   writeActionFromEvent,
-  getExtensionInstallations,
+  isAddressExtension,
 } from '~utils';
 import {
   GetColonyHistoricRoleQuery,
@@ -361,11 +361,9 @@ export const createInitialColonyRolesDatabaseEntry = async (
     contributorAddress: targetAddress,
   });
 
-  const installedExtensions = new Set(
-    await getExtensionInstallations(colonyAddress),
-  );
+  const isExtension = await isAddressExtension(targetAddress);
 
-  if (!isContributor && !installedExtensions.has(targetAddress)) {
+  if (!isContributor && !isExtension) {
     await createColonyContributor({
       colonyAddress,
       contributorAddress: targetAddress,
