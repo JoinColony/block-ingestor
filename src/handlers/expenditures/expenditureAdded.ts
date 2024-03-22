@@ -66,7 +66,6 @@ export default async (event: ContractEvent): Promise<void> => {
         nativeDomainId: domainId,
         isStaked: false,
         balances: [],
-        transactionHash: event.transactionHash,
       },
     },
   );
