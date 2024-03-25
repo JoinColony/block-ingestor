@@ -15,7 +15,11 @@ import networkClient from '~networkClient';
 
 export type ActionFields = Omit<
   CreateColonyActionInput,
-  'blockNumber' | 'colonyId' | 'colonyActionsId' | 'showInActionsList'
+  | 'blockNumber'
+  | 'colonyId'
+  | 'colonyActionsId'
+  | 'showInActionsList'
+  | 'rootHash'
 >;
 
 export const writeActionFromEvent = async (
@@ -33,6 +37,10 @@ export const writeActionFromEvent = async (
     actionFields,
   );
 
+  const rootHash = await networkClient.getReputationRootHash({
+    blockTag: blockNumber,
+  });
+
   verbose('Action', actionType, 'took place in Colony:', colonyAddress);
   await mutate<CreateColonyActionMutation, CreateColonyActionMutationVariables>(
     CreateColonyActionDocument,
@@ -43,6 +51,7 @@ export const writeActionFromEvent = async (
         blockNumber,
         createdAt: new Date(timestamp * 1000).toISOString(),
         showInActionsList,
+        rootHash,
         ...actionFields,
       },
     },
