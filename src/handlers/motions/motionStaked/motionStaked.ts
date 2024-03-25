@@ -1,4 +1,4 @@
-import { ContractEvent } from '~types';
+import { ContractEvent, MotionSide } from '~types';
 import { verbose, getVotingClient } from '~utils';
 import {
   getMotionDatabaseId,
@@ -78,12 +78,27 @@ export default async (event: ContractEvent): Promise<void> => {
       amount,
     });
 
+    const yaySideFullyStaked = requiredStake.eq(motionStakes.raw.yay);
+    const naySideFullyStaked = requiredStake.eq(motionStakes.raw.nay);
+    const stakerSide = getMotionSide(vote);
+
     await updateMotionInDB(
       {
         ...stakedMotion,
         usersStakes: updatedUserStakes,
         motionStakes,
         remainingStakes,
+        motionStateHistory: {
+          ...stakedMotion.motionStateHistory,
+          yaySideFullyStakedAt:
+            yaySideFullyStaked && stakerSide === MotionSide.YAY
+              ? new Date(timestamp * 1000).toISOString()
+              : stakedMotion.motionStateHistory.yaySideFullyStakedAt,
+          naySideFullyStakedAt:
+            naySideFullyStaked && stakerSide === MotionSide.NAY
+              ? new Date(timestamp * 1000).toISOString()
+              : stakedMotion.motionStateHistory.naySideFullyStakedAt,
+        },
       },
       newMotionMessages,
       showInActionsList,
@@ -98,9 +113,7 @@ export default async (event: ContractEvent): Promise<void> => {
     );
 
     verbose(
-      `User: ${staker} staked motion ${motionId.toString()} by ${amount.toString()} on side ${getMotionSide(
-        vote,
-      )}`,
+      `User: ${staker} staked motion ${motionId.toString()} by ${amount.toString()} on side ${stakerSide}`,
     );
   }
 };
