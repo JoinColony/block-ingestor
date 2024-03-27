@@ -400,6 +400,8 @@ export enum ColonyActionType {
   EmitDomainReputationReward = 'EMIT_DOMAIN_REPUTATION_REWARD',
   /** An action related to a domain reputation reward within a Colony via a motion */
   EmitDomainReputationRewardMotion = 'EMIT_DOMAIN_REPUTATION_REWARD_MOTION',
+  /** An action related to finalizing an expenditure via a motion */
+  FinalizeExpenditureMotion = 'FINALIZE_EXPENDITURE_MOTION',
   /** An action related to creating a motion for funding an expenditure */
   FundExpenditureMotion = 'FUND_EXPENDITURE_MOTION',
   /** A generic or unspecified Colony action */
