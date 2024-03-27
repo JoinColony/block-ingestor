@@ -28,6 +28,7 @@ import {
   handleCancelStakedExpenditureMotion,
   handleMetadataDeltaMotion,
   handleCancelExpenditureViaArbitrationMotion,
+  handleFinalizeExpenditureViaArbitrationMotion,
 } from './handlers';
 
 export default async (event: ContractEvent): Promise<void> => {
@@ -221,6 +222,15 @@ export default async (event: ContractEvent): Promise<void> => {
 
       case ColonyOperations.CancelExpenditureViaArbitration: {
         await handleCancelExpenditureViaArbitrationMotion(
+          event,
+          parsedAction,
+          gasEstimate,
+        );
+        break;
+      }
+
+      case ColonyOperations.FinalizeExpenditureViaArbitration: {
+        await handleFinalizeExpenditureViaArbitrationMotion(
           event,
           parsedAction,
           gasEstimate,
