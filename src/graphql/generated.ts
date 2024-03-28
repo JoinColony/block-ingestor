@@ -412,18 +412,11 @@ export enum ColonyActionType {
   PaymentMotion = 'PAYMENT_MOTION',
   /** An action related to the recovery functionality of a Colony */
   Recovery = 'RECOVERY',
-<<<<<<< HEAD
-  /** An action related to creating a motion to release an expenditure stage */
-  SetExpenditureStateMotion = 'SET_EXPENDITURE_STATE_MOTION',
-=======
   /** An action related to removing verified members */
   RemoveVerifiedMembers = 'REMOVE_VERIFIED_MEMBERS',
-<<<<<<< HEAD
->>>>>>> 2b9a514 (Add: Remove Verified Member)
-=======
-  /** An action related to removing verified members via a motion */
   RemoveVerifiedMembersMotion = 'REMOVE_VERIFIED_MEMBERS_MOTION',
->>>>>>> 172272c (Feat: Implement remove verified members motion handling)
+  /** An action related to creating a motion to release an expenditure stage */
+  SetExpenditureStateMotion = 'SET_EXPENDITURE_STATE_MOTION',
   /** An action related to setting user roles within a Colony */
   SetUserRoles = 'SET_USER_ROLES',
   /** An action related to setting user roles within a Colony via a motion */
@@ -4013,24 +4006,6 @@ export type ModelSubscriptionUserTokensFilterInput = {
   userID?: InputMaybe<ModelSubscriptionIdInput>;
 };
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-export type ModelSubscriptionVerifiedMemberFilterInput = {
-  and?: InputMaybe<
-    Array<InputMaybe<ModelSubscriptionVerifiedMemberFilterInput>>
-  >;
-  colonyAddress?: InputMaybe<ModelSubscriptionIdInput>;
-  createdAt?: InputMaybe<ModelSubscriptionStringInput>;
-  or?: InputMaybe<
-    Array<InputMaybe<ModelSubscriptionVerifiedMemberFilterInput>>
-  >;
-  userAddress?: InputMaybe<ModelSubscriptionIdInput>;
-};
-
->>>>>>> f13ddaf (feat: block ingestor can now catch MetadataDelta events and parse the operations)
-=======
->>>>>>> 06b0afb (Feat: Removed VerifiedMember model and refactored verify and unverify member functions to query ColonyContributor)
 export type ModelSupportedCurrenciesInput = {
   eq?: InputMaybe<SupportedCurrencies>;
   ne?: InputMaybe<SupportedCurrencies>;
@@ -4416,15 +4391,8 @@ export type Mutation = {
   deleteUser?: Maybe<User>;
   deleteUserStake?: Maybe<UserStake>;
   deleteUserTokens?: Maybe<UserTokens>;
-<<<<<<< HEAD
-<<<<<<< HEAD
   /** Removes the user from the colony whitelist */
   removeMemberFromColonyWhitelist?: Maybe<Scalars['Boolean']>;
-=======
-  deleteVerifiedMember?: Maybe<VerifiedMember>;
->>>>>>> f13ddaf (feat: block ingestor can now catch MetadataDelta events and parse the operations)
-=======
->>>>>>> 06b0afb (Feat: Removed VerifiedMember model and refactored verify and unverify member functions to query ColonyContributor)
   /** Updates the latest available version of a Colony or an extension */
   setCurrentVersion?: Maybe<Scalars['Boolean']>;
   updateAnnotation?: Maybe<Annotation>;
@@ -4946,20 +4914,11 @@ export type MutationDeleteUserTokensArgs = {
 };
 
 /** Root mutation type */
-<<<<<<< HEAD
-<<<<<<< HEAD
 export type MutationRemoveMemberFromColonyWhitelistArgs = {
   input: RemoveMemberFromColonyWhitelistInput;
-=======
-export type MutationDeleteVerifiedMemberArgs = {
-  condition?: InputMaybe<ModelVerifiedMemberConditionInput>;
-  input: DeleteVerifiedMemberInput;
->>>>>>> f13ddaf (feat: block ingestor can now catch MetadataDelta events and parse the operations)
 };
 
 /** Root mutation type */
-=======
->>>>>>> 06b0afb (Feat: Removed VerifiedMember model and refactored verify and unverify member functions to query ColonyContributor)
 export type MutationSetCurrentVersionArgs = {
   input?: InputMaybe<SetCurrentVersionInput>;
 };
@@ -7299,16 +7258,6 @@ export type SubscriptionOnUpdateUserTokensArgs = {
   filter?: InputMaybe<ModelSubscriptionUserTokensFilterInput>;
 };
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-export type SubscriptionOnUpdateVerifiedMemberArgs = {
-  filter?: InputMaybe<ModelSubscriptionVerifiedMemberFilterInput>;
-};
-
->>>>>>> f13ddaf (feat: block ingestor can now catch MetadataDelta events and parse the operations)
-=======
->>>>>>> 06b0afb (Feat: Removed VerifiedMember model and refactored verify and unverify member functions to query ColonyContributor)
 /** Represents the currencies/tokens that users' balances can be converted to (for display purposes) */
 export enum SupportedCurrencies {
   Brl = 'BRL',
