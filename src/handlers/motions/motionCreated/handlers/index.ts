@@ -11,4 +11,5 @@ export { handleSetUserRolesMotion } from './setUserRoles';
 export { handleSimpleDecisionMotion } from './simpleDecision';
 export { handleMulticallMotion } from './multicall';
 export { handleMakeArbitraryTransactionsMotion } from './makeArbitraryTransactions';
+export { handleMetadataDeltaMotion } from './metadataDelta';
 export * from './expenditures';

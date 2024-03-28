@@ -26,6 +26,7 @@ import {
   handleMulticallMotion,
   handleMakeArbitraryTransactionsMotion,
   handleCancelStakedExpenditureMotion,
+  handleMetadataDeltaMotion,
 } from './handlers';
 
 export default async (event: ContractEvent): Promise<void> => {
@@ -209,6 +210,11 @@ export default async (event: ContractEvent): Promise<void> => {
           parsedAction,
           gasEstimate,
         );
+        break;
+      }
+
+      case ColonyOperations.EditColonyByDelta: {
+        await handleMetadataDeltaMotion(event, parsedAction, gasEstimate);
         break;
       }
 

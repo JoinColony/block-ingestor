@@ -20,6 +20,7 @@ export enum ColonyOperations {
   MakeArbitraryTransactions = 'makeArbitraryTransactions',
   CancelStakedExpenditure = 'cancelAndPunish',
   SetExpenditureState = 'setExpenditureState',
+  EditColonyByDelta = 'editColonyByDelta',
 }
 
 export enum MotionEvents {
