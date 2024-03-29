@@ -15,7 +15,7 @@ on:
       - '**.md'
 
 concurrency:
-  group: cdapp-block-ingestor
+  group: ${{ github.ref }}-cdapp-block-ingestor
   cancel-in-progress: true
 
 # Set global env variables
