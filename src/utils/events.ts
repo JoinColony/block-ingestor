@@ -37,6 +37,7 @@ export const mapLogToContractEvent = async (
     let block = blocksMap.get(blockNumber);
     if (!block) {
       block = await provider.getBlock(blockNumber);
+      blocksMap.set(blockNumber, block);
     }
 
     const { hash: blockHash, timestamp } = block;

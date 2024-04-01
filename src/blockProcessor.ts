@@ -1,4 +1,5 @@
-import { blocksMap } from '~blockListener';
+import { Log } from '@ethersproject/abstract-provider';
+import { blocksMap, getLatestSeenBlockNumber } from '~blockListener';
 import {
   getAdditionalContractEventProperties,
   getMatchingListener,
@@ -12,8 +13,12 @@ import {
   output,
   setLastBlockNumber,
 } from '~utils';
+import { BLOCK_PAGING_SIZE } from '~constants';
 
 let isProcessing = false;
+const blockLogs = new Map<number, Log[]>();
+let timeNow = Date.now();
+let timePrev = 0;
 
 export const processNextBlock = async (): Promise<void> => {
   if (isProcessing) {
@@ -26,21 +31,88 @@ export const processNextBlock = async (): Promise<void> => {
   let lastBlockNumber = getLastBlockNumber();
 
   // Process as many blocks as are available sequentially
-  while (blocksMap.get(lastBlockNumber + 1)) {
+  while (lastBlockNumber < getLatestSeenBlockNumber()) {
     const currentBlockNumber = lastBlockNumber + 1;
-    output(`Processing block ${currentBlockNumber}`);
+    if (currentBlockNumber % BLOCK_PAGING_SIZE === 0) {
+      if (timePrev > 0) {
+        timePrev = timeNow;
+        timeNow = Date.now();
+        output(
+          `Time taken for last ${BLOCK_PAGING_SIZE} blocks: ${
+            timeNow - timePrev
+          }ms`,
+        );
+        output(
+          `Estimated time to sync: ${
+            ((timeNow - timePrev) *
+              (getLatestSeenBlockNumber() - getLastBlockNumber())) /
+            1000
+          }ms`,
+        );
+        output(
+          `Overall progress: ${currentBlockNumber} / ${getLatestSeenBlockNumber()}`,
+        );
+      } else {
+        timePrev = timeNow;
+      }
+    }
 
-    const block = blocksMap.get(currentBlockNumber);
-    if (!block) {
-      output(`Could not find block ${currentBlockNumber} in the queue.`);
-      break;
+    if (!blockLogs.get(currentBlockNumber)) {
+      // BLOCK_PAGING_SIZE - 1 thanks to fenceposts
+      const nMoreBlocks = Math.min(
+        getLatestSeenBlockNumber() - currentBlockNumber,
+        BLOCK_PAGING_SIZE - 1,
+      );
+      const logs = await provider.getLogs({
+        fromBlock: currentBlockNumber,
+        toBlock: currentBlockNumber + nMoreBlocks,
+      });
+
+      for (
+        let i = currentBlockNumber;
+        i <= currentBlockNumber + nMoreBlocks;
+        i++
+      ) {
+        blockLogs.set(i, []);
+      }
+
+      let logIndex = 0;
+      let pushingBlock = 0;
+      let pushingLogs: Log[] = [];
+
+      logs.forEach((log) => {
+        // As we push logs in to blockLogs, check they're in order
+        // (They should be...)
+        if (log.blockNumber !== pushingBlock) {
+          if (pushingBlock > log.blockNumber) {
+            output(
+              `Blocks (that logs from query are in) are not monotonically increasing`,
+            );
+            process.exit(1);
+          }
+          pushingBlock = log.blockNumber;
+          blockLogs.set(pushingBlock, [...pushingLogs]);
+          pushingLogs = [];
+          logIndex = 0;
+        }
+        if (log.logIndex !== logIndex) {
+          output(`Logs are out of order for block ${log.blockNumber}`);
+          process.exit(1);
+        }
+        pushingLogs.push(log);
+        logIndex += 1;
+      });
+      // Push the logs in the last block
+      blockLogs.set(pushingBlock, [...pushingLogs]);
     }
 
     // Get logs contained in the current block
-    const logs = await provider.getLogs({
-      fromBlock: block.number,
-      toBlock: block.number,
-    });
+    const logs = blockLogs.get(currentBlockNumber);
+    if (!logs) {
+      throw new Error(
+        `Could not find logs for block ${currentBlockNumber}, but should have been fetched`,
+      );
+    }
 
     for (const log of logs) {
       // For each log, try to find a matching listener to establish if we should handle or dismiss it
@@ -49,7 +121,7 @@ export const processNextBlock = async (): Promise<void> => {
         continue;
       }
 
-      // In order to parse the log, we need an ether's interface
+      // In order to parse the log, we need an ethers interface
       const iface = getInterfaceByListener(listener);
       if (!iface) {
         output(
@@ -79,6 +151,8 @@ export const processNextBlock = async (): Promise<void> => {
 
     lastBlockNumber = currentBlockNumber;
     setLastBlockNumber(currentBlockNumber);
+    blockLogs.delete(currentBlockNumber);
+    blocksMap.delete(currentBlockNumber);
   }
 
   isProcessing = false;
