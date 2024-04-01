@@ -12,3 +12,4 @@ export const SUPPORTED_EXTENSION_IDS = [
 ];
 
 export const SIMPLE_DECISIONS_ACTION_CODE = '0x12345678';
+export const BLOCK_PAGING_SIZE = 1000;
