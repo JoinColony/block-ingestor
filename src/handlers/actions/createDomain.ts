@@ -38,7 +38,7 @@ export default async (event: ContractEvent): Promise<void> => {
         nativeId: nativeDomainId,
         isRoot: false,
         nativeFundingPotId: toNumber(fundingPotId),
-        nativeSkillId: toNumber(skillId),
+        nativeSkillId: skillId.toString(),
       },
     },
   );
