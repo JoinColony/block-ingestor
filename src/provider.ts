@@ -7,7 +7,7 @@ dotenv.config();
 
 let chainId: ChainID;
 
-export const setChainId = (newChainId: number): void => {
+export const setChainId = (newChainId: ChainID): void => {
   chainId = newChainId;
 };
 export const getChainId = (): ChainID => chainId;
@@ -16,7 +16,7 @@ const provider = new providers.JsonRpcProvider(process.env.CHAIN_RPC_ENDPOINT);
 
 export const initialiseProvider = async (): Promise<void> => {
   const { chainId } = await provider.getNetwork();
-  setChainId(chainId);
+  setChainId(String(chainId));
 };
 
 export default provider;

@@ -12,7 +12,7 @@ import {
   GetContractEventDocument,
   GetContractEventQuery,
   GetContractEventQueryVariables,
-  ChainMetadataInput,
+  ChainMetadata,
 } from '~graphql';
 import { blocksMap } from '~blockListener';
 
@@ -101,7 +101,7 @@ export const saveEvent = async (event: ContractEvent): Promise<void> => {
   const contractEvent: {
     id: string;
     agent: string;
-    chainMetadata: ChainMetadataInput;
+    chainMetadata: ChainMetadata;
     name: string;
     signature: string;
     target: string;
