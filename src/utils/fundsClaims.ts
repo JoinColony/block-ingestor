@@ -37,7 +37,7 @@ export const createFundsClaim = async ({
 };
 
 export const getFundsClaimDatabaseId = (
-  chainId: number,
+  chainId: string,
   transactionHash: string,
   logIndex: number,
 ): string => `${chainId}_${transactionHash}_${logIndex}`;

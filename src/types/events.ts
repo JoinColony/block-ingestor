@@ -114,7 +114,7 @@ export enum EthersObserverEvents {
   Block = 'block',
 }
 
-export type ChainID = number;
+export type ChainID = string;
 
 export type Block = Awaited<ReturnType<typeof provider.getBlock>>;
 
