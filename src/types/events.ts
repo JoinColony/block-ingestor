@@ -116,6 +116,9 @@ export enum EthersObserverEvents {
 export type ChainID = string;
 
 export type Block = Awaited<ReturnType<typeof provider.getBlock>>;
+export type BlockWithTransactions = Awaited<
+  ReturnType<typeof provider.getBlockWithTransactions>
+>;
 
 export type NetworkClients =
   | ColonyNetworkClient

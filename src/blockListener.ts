@@ -1,5 +1,5 @@
 import { output, getLastBlockNumber } from '~utils';
-import { Block, EthersObserverEvents } from '~types';
+import { Block, BlockWithTransactions, EthersObserverEvents } from '~types';
 import provider from '~provider';
 import { processNextBlock } from '~blockProcessor';
 
@@ -8,7 +8,7 @@ import { processNextBlock } from '~blockProcessor';
  * or missed blocks tracking
  * Blocks are removed once processed by a call to .delete in the blockProcessor
  */
-export const blocksMap = new Map<number, Block>();
+export const blocksMap = new Map<number, Block | BlockWithTransactions>();
 let latestSeenBlockNumber = 0;
 
 export const getLatestSeenBlockNumber = (): number => latestSeenBlockNumber;
