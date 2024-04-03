@@ -239,6 +239,11 @@ export type ColonyAction = {
   expenditure?: Maybe<Expenditure>;
   /** ID of the associated expenditure, if any */
   expenditureId?: Maybe<Scalars['ID']>;
+  /**
+   * Changes to the expenditure slots associated with the action, if any
+   * Applicable to `EDIT_EXPENDITURE` action only
+   */
+  expenditureSlotChanges?: Maybe<ExpenditureSlotChanges>;
   /** The source Domain of the action, if applicable */
   fromDomain?: Maybe<Domain>;
   /** The source Domain identifier, if applicable */
@@ -261,13 +266,13 @@ export type ColonyAction = {
   initiatorUser?: Maybe<User>;
   /** Will be true if the action is a motion */
   isMotion?: Maybe<Scalars['Boolean']>;
-  /** Members impacted by the action (used for add/remove verified members) */
-  members?: Maybe<Array<Scalars['ID']>>;
   /**
    * Indicates whether the action is a result of a motion being finalized
    * @TODO: Make this field non-nullable
    */
   isMotionFinalization?: Maybe<Scalars['Boolean']>;
+  /** Members impacted by the action (used for add/remove verified members) */
+  members?: Maybe<Array<Scalars['ID']>>;
   /** Metadata associated with the action (Eg. Custom action title) */
   metadata?: Maybe<ColonyActionMetadata>;
   /** Expanded `ColonyMotion` for the corresponding `motionId` */
@@ -373,8 +378,8 @@ export enum ColonyActionType {
   /** An action related to adding verified members */
   AddVerifiedMembers = 'ADD_VERIFIED_MEMBERS',
   AddVerifiedMembersMotion = 'ADD_VERIFIED_MEMBERS_MOTION',
-  /** An action related to a motion to cancel a staked expenditure */
-  CancelStakedExpenditureMotion = 'CANCEL_STAKED_EXPENDITURE_MOTION',
+  /** An action related to canceling an expenditure */
+  CancelExpenditure = 'CANCEL_EXPENDITURE',
   /** An action related to a motion to cancel an expenditure */
   CancelExpenditureMotion = 'CANCEL_EXPENDITURE_MOTION',
   /** An action related to editing a Colony's details */
@@ -393,8 +398,10 @@ export enum ColonyActionType {
   EditDomain = 'EDIT_DOMAIN',
   /** An action related to editing a domain's details via a motion */
   EditDomainMotion = 'EDIT_DOMAIN_MOTION',
+  /** An action related to editing an expenditure */
+  EditExpenditure = 'EDIT_EXPENDITURE',
   /** An action related to creating a motion to edit an expenditure */
-  EditLockedExpenditureMotion = 'EDIT_LOCKED_EXPENDITURE_MOTION',
+  EditExpenditureMotion = 'EDIT_EXPENDITURE_MOTION',
   /** An action related to a domain reputation penalty within a Colony (smite) */
   EmitDomainReputationPenalty = 'EMIT_DOMAIN_REPUTATION_PENALTY',
   /** An action related to a domain reputation penalty within a Colony (smite) via a motion */
@@ -411,6 +418,8 @@ export enum ColonyActionType {
   FundExpenditureMotion = 'FUND_EXPENDITURE_MOTION',
   /** A generic or unspecified Colony action */
   Generic = 'GENERIC',
+  /** An action related to locking an expenditure */
+  LockExpenditure = 'LOCK_EXPENDITURE',
   /** An action related to the creation of safe transactions via Safe Control */
   MakeArbitraryTransaction = 'MAKE_ARBITRARY_TRANSACTION',
   MakeArbitraryTransactionsMotion = 'MAKE_ARBITRARY_TRANSACTIONS_MOTION',
@@ -805,6 +814,11 @@ export type ColonyMotion = {
   createdBy: Scalars['String'];
   /** Edited expenditure slots associated with the motion, if any */
   editedExpenditureSlots?: Maybe<Array<ExpenditureSlot>>;
+  /**
+   * In case of multicall motion funding an expenditure, array containing
+   * the details of tokens and amounts to be funded
+   */
+  expenditureFunding?: Maybe<Array<ExpenditureFundingItem>>;
   /** Expenditure associated with the motion, if any */
   expenditureId?: Maybe<Scalars['ID']>;
   /** Id of the expenditure stage payment to be released if the motion pass, if any */
@@ -1096,14 +1110,15 @@ export type CreateColonyActionInput = {
   colonyId: Scalars['ID'];
   createdAt?: InputMaybe<Scalars['AWSDateTime']>;
   expenditureId?: InputMaybe<Scalars['ID']>;
+  expenditureSlotChanges?: InputMaybe<ExpenditureSlotChangesInput>;
   fromDomainId?: InputMaybe<Scalars['ID']>;
   fromPotId?: InputMaybe<Scalars['Int']>;
   id?: InputMaybe<Scalars['ID']>;
   individualEvents?: InputMaybe<Scalars['String']>;
   initiatorAddress: Scalars['ID'];
   isMotion?: InputMaybe<Scalars['Boolean']>;
-  members?: InputMaybe<Array<Scalars['ID']>>;
   isMotionFinalization?: InputMaybe<Scalars['Boolean']>;
+  members?: InputMaybe<Array<Scalars['ID']>>;
   motionDomainId?: InputMaybe<Scalars['Int']>;
   motionId?: InputMaybe<Scalars['ID']>;
   networkFee?: InputMaybe<Scalars['String']>;
@@ -1255,6 +1270,7 @@ export type CreateColonyMetadataInput = {
 export type CreateColonyMotionInput = {
   createdBy: Scalars['String'];
   editedExpenditureSlots?: InputMaybe<Array<ExpenditureSlotInput>>;
+  expenditureFunding?: InputMaybe<Array<ExpenditureFundingItemInput>>;
   expenditureId?: InputMaybe<Scalars['ID']>;
   expenditureSlotId?: InputMaybe<Scalars['Int']>;
   gasEstimate: Scalars['String'];
@@ -1356,7 +1372,7 @@ export type CreateDomainInput = {
 export type CreateDomainMetadataInput = {
   changelog?: InputMaybe<Array<DomainMetadataChangelogInput>>;
   color: DomainColor;
-  description: Scalars['String'];
+  description?: InputMaybe<Scalars['String']>;
   id?: InputMaybe<Scalars['ID']>;
   name: Scalars['String'];
 };
@@ -1366,6 +1382,7 @@ export type CreateExpenditureInput = {
   colonyId: Scalars['ID'];
   createdAt?: InputMaybe<Scalars['AWSDateTime']>;
   finalizedAt?: InputMaybe<Scalars['AWSTimestamp']>;
+  firstEditTransactionHash?: InputMaybe<Scalars['String']>;
   id?: InputMaybe<Scalars['ID']>;
   isStaked: Scalars['Boolean'];
   nativeDomainId: Scalars['Int'];
@@ -1382,7 +1399,6 @@ export type CreateExpenditureMetadataInput = {
   fundFromDomainNativeId: Scalars['Int'];
   id?: InputMaybe<Scalars['ID']>;
   stages?: InputMaybe<Array<ExpenditureStageInput>>;
-  stakeAmount?: InputMaybe<Scalars['String']>;
 };
 
 export type CreateExtensionInstallationsCountInput = {
@@ -1820,7 +1836,7 @@ export type DomainMetadata = {
   color: DomainColor;
   createdAt: Scalars['AWSDateTime'];
   /** Description of the Domain */
-  description: Scalars['String'];
+  description?: Maybe<Scalars['String']>;
   /**
    * Unique identifier for the Domain metadata
    * This field is referenced by Domain id, so has to be in the same format: colonyAddress_nativeId
@@ -1837,13 +1853,13 @@ export type DomainMetadataChangelog = {
   /** Color of the Domain after the change */
   newColor: DomainColor;
   /** Description of the Domain after the change */
-  newDescription: Scalars['String'];
+  newDescription?: Maybe<Scalars['String']>;
   /** Name of the Domain after the change */
   newName: Scalars['String'];
   /** Color of the Domain before the change */
   oldColor: DomainColor;
   /** Description of the Domain before the change */
-  oldDescription: Scalars['String'];
+  oldDescription?: Maybe<Scalars['String']>;
   /** Name of the Domain before the change */
   oldName: Scalars['String'];
   /** Transaction hash associated with the changelog entry */
@@ -1852,10 +1868,10 @@ export type DomainMetadataChangelog = {
 
 export type DomainMetadataChangelogInput = {
   newColor: DomainColor;
-  newDescription: Scalars['String'];
+  newDescription?: InputMaybe<Scalars['String']>;
   newName: Scalars['String'];
   oldColor: DomainColor;
-  oldDescription: Scalars['String'];
+  oldDescription?: InputMaybe<Scalars['String']>;
   oldName: Scalars['String'];
   transactionHash: Scalars['String'];
 };
@@ -1872,6 +1888,8 @@ export type Expenditure = {
   createdAt: Scalars['AWSDateTime'];
   /** The timestamp at which the expenditure was finalized */
   finalizedAt?: Maybe<Scalars['AWSTimestamp']>;
+  /** Hash of the first transaction that contained ExpenditurePayoutSet event */
+  firstEditTransactionHash?: Maybe<Scalars['String']>;
   /**
    * Unique identifier for the role snapshot
    * Self-managed, format: `colonyId_nativeExpenditureId`
@@ -1930,13 +1948,25 @@ export type ExpenditureBalanceInput = {
   tokenAddress: Scalars['ID'];
 };
 
+export type ExpenditureFundingItem = {
+  __typename?: 'ExpenditureFundingItem';
+  /** The amount of the token to be funded */
+  amount: Scalars['String'];
+  /** The token address of the token to be funded */
+  tokenAddress: Scalars['String'];
+};
+
+export type ExpenditureFundingItemInput = {
+  amount: Scalars['String'];
+  tokenAddress: Scalars['String'];
+};
+
 export type ExpenditureMetadata = {
   __typename?: 'ExpenditureMetadata';
   createdAt: Scalars['AWSDateTime'];
   fundFromDomainNativeId: Scalars['Int'];
   id: Scalars['ID'];
   stages?: Maybe<Array<ExpenditureStage>>;
-  stakeAmount?: Maybe<Scalars['String']>;
   updatedAt: Scalars['AWSDateTime'];
 };
 
@@ -1972,6 +2002,17 @@ export type ExpenditureSlot = {
   payoutModifier?: Maybe<Scalars['Int']>;
   payouts?: Maybe<Array<ExpenditurePayout>>;
   recipientAddress?: Maybe<Scalars['String']>;
+};
+
+export type ExpenditureSlotChanges = {
+  __typename?: 'ExpenditureSlotChanges';
+  newSlots: Array<ExpenditureSlot>;
+  oldSlots: Array<ExpenditureSlot>;
+};
+
+export type ExpenditureSlotChangesInput = {
+  newSlots: Array<ExpenditureSlotInput>;
+  oldSlots: Array<ExpenditureSlotInput>;
 };
 
 export type ExpenditureSlotInput = {
@@ -2256,8 +2297,8 @@ export type ModelColonyActionConditionInput = {
   individualEvents?: InputMaybe<ModelStringInput>;
   initiatorAddress?: InputMaybe<ModelIdInput>;
   isMotion?: InputMaybe<ModelBooleanInput>;
-  members?: InputMaybe<ModelIdInput>;
   isMotionFinalization?: InputMaybe<ModelBooleanInput>;
+  members?: InputMaybe<ModelIdInput>;
   motionDomainId?: InputMaybe<ModelIntInput>;
   motionId?: InputMaybe<ModelIdInput>;
   networkFee?: InputMaybe<ModelStringInput>;
@@ -2298,8 +2339,8 @@ export type ModelColonyActionFilterInput = {
   individualEvents?: InputMaybe<ModelStringInput>;
   initiatorAddress?: InputMaybe<ModelIdInput>;
   isMotion?: InputMaybe<ModelBooleanInput>;
-  members?: InputMaybe<ModelIdInput>;
   isMotionFinalization?: InputMaybe<ModelBooleanInput>;
+  members?: InputMaybe<ModelIdInput>;
   motionDomainId?: InputMaybe<ModelIntInput>;
   motionId?: InputMaybe<ModelIdInput>;
   networkFee?: InputMaybe<ModelStringInput>;
@@ -2948,6 +2989,7 @@ export type ModelExpenditureConditionInput = {
   colonyId?: InputMaybe<ModelIdInput>;
   createdAt?: InputMaybe<ModelStringInput>;
   finalizedAt?: InputMaybe<ModelIntInput>;
+  firstEditTransactionHash?: InputMaybe<ModelStringInput>;
   isStaked?: InputMaybe<ModelBooleanInput>;
   nativeDomainId?: InputMaybe<ModelIntInput>;
   nativeFundingPotId?: InputMaybe<ModelIntInput>;
@@ -2971,6 +3013,7 @@ export type ModelExpenditureFilterInput = {
   colonyId?: InputMaybe<ModelIdInput>;
   createdAt?: InputMaybe<ModelStringInput>;
   finalizedAt?: InputMaybe<ModelIntInput>;
+  firstEditTransactionHash?: InputMaybe<ModelStringInput>;
   id?: InputMaybe<ModelIdInput>;
   isStaked?: InputMaybe<ModelBooleanInput>;
   nativeDomainId?: InputMaybe<ModelIntInput>;
@@ -2989,7 +3032,6 @@ export type ModelExpenditureMetadataConditionInput = {
   fundFromDomainNativeId?: InputMaybe<ModelIntInput>;
   not?: InputMaybe<ModelExpenditureMetadataConditionInput>;
   or?: InputMaybe<Array<InputMaybe<ModelExpenditureMetadataConditionInput>>>;
-  stakeAmount?: InputMaybe<ModelStringInput>;
 };
 
 export type ModelExpenditureMetadataConnection = {
@@ -3004,7 +3046,6 @@ export type ModelExpenditureMetadataFilterInput = {
   id?: InputMaybe<ModelIdInput>;
   not?: InputMaybe<ModelExpenditureMetadataFilterInput>;
   or?: InputMaybe<Array<InputMaybe<ModelExpenditureMetadataFilterInput>>>;
-  stakeAmount?: InputMaybe<ModelStringInput>;
 };
 
 export type ModelExpenditureStatusInput = {
@@ -3458,8 +3499,8 @@ export type ModelSubscriptionColonyActionFilterInput = {
   individualEvents?: InputMaybe<ModelSubscriptionStringInput>;
   initiatorAddress?: InputMaybe<ModelSubscriptionIdInput>;
   isMotion?: InputMaybe<ModelSubscriptionBooleanInput>;
-  members?: InputMaybe<ModelSubscriptionIdInput>;
   isMotionFinalization?: InputMaybe<ModelSubscriptionBooleanInput>;
+  members?: InputMaybe<ModelSubscriptionIdInput>;
   motionDomainId?: InputMaybe<ModelSubscriptionIntInput>;
   motionId?: InputMaybe<ModelSubscriptionIdInput>;
   networkFee?: InputMaybe<ModelSubscriptionStringInput>;
@@ -3759,6 +3800,7 @@ export type ModelSubscriptionExpenditureFilterInput = {
   colonyId?: InputMaybe<ModelSubscriptionIdInput>;
   createdAt?: InputMaybe<ModelSubscriptionStringInput>;
   finalizedAt?: InputMaybe<ModelSubscriptionIntInput>;
+  firstEditTransactionHash?: InputMaybe<ModelSubscriptionStringInput>;
   id?: InputMaybe<ModelSubscriptionIdInput>;
   isStaked?: InputMaybe<ModelSubscriptionBooleanInput>;
   nativeDomainId?: InputMaybe<ModelSubscriptionIntInput>;
@@ -3780,7 +3822,6 @@ export type ModelSubscriptionExpenditureMetadataFilterInput = {
   or?: InputMaybe<
     Array<InputMaybe<ModelSubscriptionExpenditureMetadataFilterInput>>
   >;
-  stakeAmount?: InputMaybe<ModelSubscriptionStringInput>;
 };
 
 export type ModelSubscriptionExtensionInstallationsCountFilterInput = {
@@ -5536,6 +5577,7 @@ export type Query = {
   listUserTokens?: Maybe<ModelUserTokensConnection>;
   listUsers?: Maybe<ModelUserConnection>;
   searchColonyActions?: Maybe<SearchableColonyActionConnection>;
+  searchColonyContributors?: Maybe<SearchableColonyContributorConnection>;
 };
 
 /** Root query type */
@@ -6345,6 +6387,18 @@ export type QuerySearchColonyActionsArgs = {
   sort?: InputMaybe<Array<InputMaybe<SearchableColonyActionSortInput>>>;
 };
 
+/** Root query type */
+export type QuerySearchColonyContributorsArgs = {
+  aggregates?: InputMaybe<
+    Array<InputMaybe<SearchableColonyContributorAggregationInput>>
+  >;
+  filter?: InputMaybe<SearchableColonyContributorFilterInput>;
+  from?: InputMaybe<Scalars['Int']>;
+  limit?: InputMaybe<Scalars['Int']>;
+  nextToken?: InputMaybe<Scalars['String']>;
+  sort?: InputMaybe<Array<InputMaybe<SearchableColonyContributorSortInput>>>;
+};
+
 export type RemoveMemberFromColonyWhitelistInput = {
   /** The colony address */
   colonyAddress: Scalars['ID'];
@@ -6475,8 +6529,8 @@ export enum SearchableColonyActionAggregateField {
   IndividualEvents = 'individualEvents',
   InitiatorAddress = 'initiatorAddress',
   IsMotion = 'isMotion',
-  Members = 'members',
   IsMotionFinalization = 'isMotionFinalization',
+  Members = 'members',
   MotionDomainId = 'motionDomainId',
   MotionId = 'motionId',
   NetworkFee = 'networkFee',
@@ -6524,8 +6578,8 @@ export type SearchableColonyActionFilterInput = {
   individualEvents?: InputMaybe<SearchableStringFilterInput>;
   initiatorAddress?: InputMaybe<SearchableIdFilterInput>;
   isMotion?: InputMaybe<SearchableBooleanFilterInput>;
-  members?: InputMaybe<SearchableIdFilterInput>;
   isMotionFinalization?: InputMaybe<SearchableBooleanFilterInput>;
+  members?: InputMaybe<SearchableIdFilterInput>;
   motionDomainId?: InputMaybe<SearchableIntFilterInput>;
   motionId?: InputMaybe<SearchableIdFilterInput>;
   networkFee?: InputMaybe<SearchableStringFilterInput>;
@@ -6565,8 +6619,8 @@ export enum SearchableColonyActionSortableFields {
   IndividualEvents = 'individualEvents',
   InitiatorAddress = 'initiatorAddress',
   IsMotion = 'isMotion',
-  Members = 'members',
   IsMotionFinalization = 'isMotionFinalization',
+  Members = 'members',
   MotionDomainId = 'motionDomainId',
   MotionId = 'motionId',
   NetworkFee = 'networkFee',
@@ -6580,6 +6634,69 @@ export enum SearchableColonyActionSortableFields {
   ToDomainId = 'toDomainId',
   ToPotId = 'toPotId',
   TokenAddress = 'tokenAddress',
+  UpdatedAt = 'updatedAt',
+}
+
+export enum SearchableColonyContributorAggregateField {
+  ColonyAddress = 'colonyAddress',
+  ColonyReputationPercentage = 'colonyReputationPercentage',
+  ContributorAddress = 'contributorAddress',
+  CreatedAt = 'createdAt',
+  HasPermissions = 'hasPermissions',
+  HasReputation = 'hasReputation',
+  Id = 'id',
+  IsVerified = 'isVerified',
+  IsWatching = 'isWatching',
+  Type = 'type',
+  UpdatedAt = 'updatedAt',
+}
+
+export type SearchableColonyContributorAggregationInput = {
+  field: SearchableColonyContributorAggregateField;
+  name: Scalars['String'];
+  type: SearchableAggregateType;
+};
+
+export type SearchableColonyContributorConnection = {
+  __typename?: 'SearchableColonyContributorConnection';
+  aggregateItems: Array<Maybe<SearchableAggregateResult>>;
+  items: Array<Maybe<ColonyContributor>>;
+  nextToken?: Maybe<Scalars['String']>;
+  total?: Maybe<Scalars['Int']>;
+};
+
+export type SearchableColonyContributorFilterInput = {
+  and?: InputMaybe<Array<InputMaybe<SearchableColonyContributorFilterInput>>>;
+  colonyAddress?: InputMaybe<SearchableIdFilterInput>;
+  colonyReputationPercentage?: InputMaybe<SearchableFloatFilterInput>;
+  contributorAddress?: InputMaybe<SearchableIdFilterInput>;
+  createdAt?: InputMaybe<SearchableStringFilterInput>;
+  hasPermissions?: InputMaybe<SearchableBooleanFilterInput>;
+  hasReputation?: InputMaybe<SearchableBooleanFilterInput>;
+  id?: InputMaybe<SearchableIdFilterInput>;
+  isVerified?: InputMaybe<SearchableBooleanFilterInput>;
+  isWatching?: InputMaybe<SearchableBooleanFilterInput>;
+  not?: InputMaybe<SearchableColonyContributorFilterInput>;
+  or?: InputMaybe<Array<InputMaybe<SearchableColonyContributorFilterInput>>>;
+  type?: InputMaybe<SearchableStringFilterInput>;
+  updatedAt?: InputMaybe<SearchableStringFilterInput>;
+};
+
+export type SearchableColonyContributorSortInput = {
+  direction?: InputMaybe<SearchableSortDirection>;
+  field?: InputMaybe<SearchableColonyContributorSortableFields>;
+};
+
+export enum SearchableColonyContributorSortableFields {
+  ColonyAddress = 'colonyAddress',
+  ColonyReputationPercentage = 'colonyReputationPercentage',
+  ContributorAddress = 'contributorAddress',
+  CreatedAt = 'createdAt',
+  HasPermissions = 'hasPermissions',
+  HasReputation = 'hasReputation',
+  Id = 'id',
+  IsVerified = 'isVerified',
+  IsWatching = 'isWatching',
   UpdatedAt = 'updatedAt',
 }
 
@@ -7531,14 +7648,15 @@ export type UpdateColonyActionInput = {
   colonyId?: InputMaybe<Scalars['ID']>;
   createdAt?: InputMaybe<Scalars['AWSDateTime']>;
   expenditureId?: InputMaybe<Scalars['ID']>;
+  expenditureSlotChanges?: InputMaybe<ExpenditureSlotChangesInput>;
   fromDomainId?: InputMaybe<Scalars['ID']>;
   fromPotId?: InputMaybe<Scalars['Int']>;
   id: Scalars['ID'];
   individualEvents?: InputMaybe<Scalars['String']>;
   initiatorAddress?: InputMaybe<Scalars['ID']>;
   isMotion?: InputMaybe<Scalars['Boolean']>;
-  members?: InputMaybe<Array<Scalars['ID']>>;
   isMotionFinalization?: InputMaybe<Scalars['Boolean']>;
+  members?: InputMaybe<Array<Scalars['ID']>>;
   motionDomainId?: InputMaybe<Scalars['Int']>;
   motionId?: InputMaybe<Scalars['ID']>;
   networkFee?: InputMaybe<Scalars['String']>;
@@ -7668,6 +7786,7 @@ export type UpdateColonyMetadataInput = {
 export type UpdateColonyMotionInput = {
   createdBy?: InputMaybe<Scalars['String']>;
   editedExpenditureSlots?: InputMaybe<Array<ExpenditureSlotInput>>;
+  expenditureFunding?: InputMaybe<Array<ExpenditureFundingItemInput>>;
   expenditureId?: InputMaybe<Scalars['ID']>;
   expenditureSlotId?: InputMaybe<Scalars['Int']>;
   gasEstimate?: InputMaybe<Scalars['String']>;
@@ -7784,6 +7903,7 @@ export type UpdateExpenditureInput = {
   colonyId?: InputMaybe<Scalars['ID']>;
   createdAt?: InputMaybe<Scalars['AWSDateTime']>;
   finalizedAt?: InputMaybe<Scalars['AWSTimestamp']>;
+  firstEditTransactionHash?: InputMaybe<Scalars['String']>;
   id: Scalars['ID'];
   isStaked?: InputMaybe<Scalars['Boolean']>;
   nativeDomainId?: InputMaybe<Scalars['Int']>;
@@ -7800,7 +7920,6 @@ export type UpdateExpenditureMetadataInput = {
   fundFromDomainNativeId?: InputMaybe<Scalars['Int']>;
   id: Scalars['ID'];
   stages?: InputMaybe<Array<ExpenditureStageInput>>;
-  stakeAmount?: InputMaybe<Scalars['String']>;
 };
 
 /**
@@ -8387,7 +8506,7 @@ export type DomainMetadataFragment = {
   __typename?: 'DomainMetadata';
   name: string;
   color: DomainColor;
-  description: string;
+  description?: string | null;
   changelog?: Array<{
     __typename?: 'DomainMetadataChangelog';
     transactionHash: string;
@@ -8395,8 +8514,8 @@ export type DomainMetadataFragment = {
     newName: string;
     oldColor: DomainColor;
     newColor: DomainColor;
-    oldDescription: string;
-    newDescription: string;
+    oldDescription?: string | null;
+    newDescription?: string | null;
   }> | null;
 };
 
@@ -9124,16 +9243,16 @@ export type GetDomainMetadataQuery = {
   getDomainMetadata?: {
     __typename?: 'DomainMetadata';
     color: DomainColor;
-    description: string;
+    description?: string | null;
     id: string;
     name: string;
     changelog?: Array<{
       __typename?: 'DomainMetadataChangelog';
       newColor: DomainColor;
-      newDescription: string;
+      newDescription?: string | null;
       newName: string;
       oldColor: DomainColor;
-      oldDescription: string;
+      oldDescription?: string | null;
       oldName: string;
       transactionHash: string;
     }> | null;
@@ -9415,7 +9534,7 @@ export type GetColonyActionByMotionIdQuery = {
         __typename?: 'DomainMetadata';
         name: string;
         color: DomainColor;
-        description: string;
+        description?: string | null;
         changelog?: Array<{
           __typename?: 'DomainMetadataChangelog';
           transactionHash: string;
@@ -9423,8 +9542,8 @@ export type GetColonyActionByMotionIdQuery = {
           newName: string;
           oldColor: DomainColor;
           newColor: DomainColor;
-          oldDescription: string;
-          newDescription: string;
+          oldDescription?: string | null;
+          newDescription?: string | null;
         }> | null;
       } | null;
       pendingColonyMetadata?: {

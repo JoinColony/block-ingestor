@@ -1,7 +1,13 @@
 import { ContractEvent } from '~types';
-import { getExpenditureDatabaseId, toNumber, verbose } from '~utils';
+import {
+  getExpenditureDatabaseId,
+  toNumber,
+  verbose,
+  writeActionFromEvent,
+} from '~utils';
 import { mutate } from '~amplifyClient';
 import {
+  ColonyActionType,
   ExpenditureStatus,
   UpdateExpenditureDocument,
   UpdateExpenditureMutation,
@@ -9,7 +15,8 @@ import {
 } from '~graphql';
 
 export default async (event: ContractEvent): Promise<void> => {
-  const { expenditureId } = event.args;
+  console.log(event);
+  const { expenditureId, agent: initiatorAddress } = event.args;
   const convertedExpenditureId = toNumber(expenditureId);
 
   /**
@@ -18,9 +25,14 @@ export default async (event: ContractEvent): Promise<void> => {
    */
   const colonyAddress = event.colonyAddress ?? event.contractAddress;
 
+  const databaseId = getExpenditureDatabaseId(
+    colonyAddress,
+    convertedExpenditureId,
+  );
+
   verbose(
     'Expenditure with ID',
-    convertedExpenditureId,
+    databaseId,
     'cancelled in Colony:',
     colonyAddress,
   );
@@ -29,9 +41,15 @@ export default async (event: ContractEvent): Promise<void> => {
     UpdateExpenditureDocument,
     {
       input: {
-        id: getExpenditureDatabaseId(colonyAddress, convertedExpenditureId),
+        id: databaseId,
         status: ExpenditureStatus.Cancelled,
       },
     },
   );
+
+  await writeActionFromEvent(event, colonyAddress, {
+    type: ColonyActionType.CancelExpenditure,
+    initiatorAddress,
+    expenditureId: databaseId,
+  });
 };
