@@ -11,6 +11,7 @@ import {
   getLastBlockNumber,
   mapLogToContractEvent,
   output,
+  verbose,
   setLastBlockNumber,
 } from '~utils';
 import { BLOCK_PAGING_SIZE } from '~constants';
@@ -63,15 +64,31 @@ export const processNextBlock = async (): Promise<void> => {
         getLatestSeenBlockNumber() - currentBlockNumber,
         BLOCK_PAGING_SIZE - 1,
       );
+
+      verbose(
+        'Querying for logs',
+        currentBlockNumber,
+        'to',
+        currentBlockNumber + nMoreBlocks,
+      );
+
       const logs = await provider.getLogs({
         fromBlock: currentBlockNumber,
         toBlock: currentBlockNumber + nMoreBlocks,
       });
 
+      verbose(
+        `Fetched ${logs.length} logs`,
+        currentBlockNumber,
+        'to',
+        currentBlockNumber + nMoreBlocks,
+      );
+
+      // initialize blockLogs
       for (
         let i = currentBlockNumber;
         i <= currentBlockNumber + nMoreBlocks;
-        i++
+        i += 1
       ) {
         blockLogs.set(i, []);
       }
@@ -90,8 +107,8 @@ export const processNextBlock = async (): Promise<void> => {
             );
             process.exit(1);
           }
-          pushingBlock = log.blockNumber;
           blockLogs.set(pushingBlock, [...pushingLogs]);
+          pushingBlock = log.blockNumber;
           pushingLogs = [];
           logIndex = 0;
         }
@@ -112,6 +129,55 @@ export const processNextBlock = async (): Promise<void> => {
       throw new Error(
         `Could not find logs for block ${currentBlockNumber}, but should have been fetched`,
       );
+    }
+
+    /*
+     * Logic needed to account for blocks that get emmited, but which don't have the logs indexed yet
+     * This happens in networks with very fast block times, like arbitrum (<=250ms block times)
+     * See: https://github.com/ethers-io/ethers.js/issues/3486
+     *
+     * Basically, the change that @area implemented here is to try and detect if a block actually has
+     * logs, but which don't get retrived using the `getLogs` call.
+     * If that happens, it means the block was emitted, but the logs weren't indexed yet, at which point
+     * we just short-circuit and re-process the block.
+     * We do this enough times, until the logs are actually indexed.
+     */
+    if (logs.length === 0) {
+      verbose('No logs seen in block', currentBlockNumber);
+      // Check whether block actually has no logs
+      let block = blocksMap.get(currentBlockNumber);
+      if (
+        !block ||
+        (block.transactions as string[]).every((tx) => typeof tx === 'string')
+      ) {
+        block = await provider.getBlockWithTransactions(currentBlockNumber);
+        // May as well save this block in the blocksMap in case it turns out we need it in mapLogToContractEvent
+        blocksMap.set(currentBlockNumber, block);
+      }
+
+      let mustReindex = false;
+      for (const tx of block.transactions) {
+        if (typeof tx === 'string') {
+          throw Error('tx was a string, but should have been a TxResponse');
+        }
+        const txReceipt = await provider.getTransactionReceipt(tx.hash);
+        if (txReceipt.logs.length > 0) {
+          verbose(
+            `Proved ${currentBlockNumber} has logs, but weren't given any, will reindex`,
+          );
+          mustReindex = true;
+          // Then the block has events, and they've not been indexed yet.
+          // We exit out of this handler, and wait until they've been indexed.
+          // We remove the empty array from blockLogs to cause the getLogs call to be made again
+          blockLogs.delete(currentBlockNumber);
+          // Now we've proved we're missing events, don't need to look at any other transactions in
+          // this block.
+          break;
+        }
+      }
+      if (mustReindex) {
+        continue;
+      }
     }
 
     for (const log of logs) {
@@ -148,6 +214,8 @@ export const processNextBlock = async (): Promise<void> => {
       // Call the processor in a blocking way to ensure events get processed sequentially
       await eventProcessor(event);
     }
+
+    verbose('processed block', currentBlockNumber);
 
     lastBlockNumber = currentBlockNumber;
     setLastBlockNumber(currentBlockNumber);
