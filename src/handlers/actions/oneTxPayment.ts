@@ -103,6 +103,14 @@ export default async (oneTxPaymentEvent: ContractEvent): Promise<void> => {
         networkInverseFee,
       );
       break;
+    default:
+      handlerV6(
+        oneTxPaymentEvent,
+        colonyAddress,
+        colonyClient,
+        networkInverseFee,
+      );
+      break;
   }
 };
 
