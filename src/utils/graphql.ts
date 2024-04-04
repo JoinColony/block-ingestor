@@ -1,5 +1,5 @@
 import dotenv from 'dotenv';
-import { DocumentNode } from 'graphql';
+import { DocumentNode, Kind, isExecutableDefinitionNode } from 'graphql';
 
 import { query } from '~amplifyClient';
 
@@ -11,9 +11,11 @@ export const delay = async (timeout: number): Promise<void> => {
   });
 };
 
-export const tryFetchGraphqlQuery = async (
+export const tryFetchGraphqlQuery = async <
+  TVariables extends Record<string, unknown> = {},
+>(
   queryString: DocumentNode,
-  variables?: Record<string, any>,
+  variables?: TVariables,
   maxRetries: number = 3,
   blockTime: number = process.env.BLOCK_TIME
     ? parseInt(process.env.BLOCK_TIME, 10) * 1000
@@ -21,25 +23,21 @@ export const tryFetchGraphqlQuery = async (
 ): Promise<any> => {
   let currentTry = 0;
 
-  console.log({ currentTry, maxRetries, blockTime });
-
   while (true) {
-    const result = await query(queryString, variables);
+    const result = await query<Record<string, unknown>, TVariables>(
+      queryString,
+      variables,
+    );
 
     /*
      * @NOTE That this limits to only fetching one operation at a time
      */
 
-    console.log({ result });
-    console.log(queryString.definitions[0]);
+    const queryFieldName = extractQueryFieldName(queryString);
 
-    // result.data.getColonyMetadata = null
-    // @ts-expect-error
-    if (result?.data?.getColonyMetadata) {
+    if (result?.data?.[queryFieldName]) {
       return result.data;
     }
-
-    console.log({ currentTry });
 
     if (currentTry < maxRetries) {
       await delay(blockTime);
@@ -49,4 +47,19 @@ export const tryFetchGraphqlQuery = async (
       throw new Error('Could not fetch graphql data in time');
     }
   }
+};
+
+const extractQueryFieldName = (queryString: DocumentNode): string => {
+  const definitionNode = queryString.definitions[0];
+
+  if (!isExecutableDefinitionNode(definitionNode)) {
+    throw new Error('Could not extract query field name');
+  }
+
+  const selectionNode = definitionNode.selectionSet.selections[0];
+  if (selectionNode.kind !== Kind.FIELD) {
+    throw new Error('Could not extract query field name');
+  }
+
+  return selectionNode.name.value;
 };
