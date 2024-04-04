@@ -40,6 +40,9 @@ export default async (event: ContractEvent): Promise<void> => {
    * If colony metadata doesn't exist, log it and do not create anything in the DB
    * In dev, this will be the case for Metacolony
    */
+
+  console.log({ colonyMetadata });
+
   if (!colonyMetadata?.getColonyMetadata) {
     output(`Could not find metadata for colony ${colonyAddress}. Skipping...`);
     return;
