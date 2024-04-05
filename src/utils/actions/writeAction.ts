@@ -43,17 +43,8 @@ export const writeActionFromEvent = async (
     colonyExtensions,
   );
 
-  console.log({
-    id: transactionHash,
-    colonyId: colonyAddress,
-    blockNumber,
-    createdAt: new Date(timestamp * 1000).toISOString(),
-    showInActionsList,
-    isMotionFinalization,
-    ...actionFields,
-  });
-
   verbose('Action', actionType, 'took place in Colony:', colonyAddress);
+
   await mutate<CreateColonyActionMutation, CreateColonyActionMutationVariables>(
     CreateColonyActionDocument,
     {
