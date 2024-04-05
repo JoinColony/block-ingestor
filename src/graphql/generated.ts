@@ -9222,6 +9222,18 @@ export type GetCurrentVersionQuery = {
   } | null;
 };
 
+export type GetCurrentColonyVersionQueryVariables = Exact<{
+  [key: string]: never;
+}>;
+
+export type GetCurrentColonyVersionQuery = {
+  __typename?: 'Query';
+  getCurrentVersionByKey?: {
+    __typename?: 'ModelCurrentVersionConnection';
+    items: Array<{ __typename?: 'CurrentVersion'; version: number } | null>;
+  } | null;
+};
+
 export type GetColonyDecisionByActionIdQueryVariables = Exact<{
   actionId: Scalars['ID'];
 }>;
@@ -10496,6 +10508,15 @@ export const GetCurrentVersionDocument = gql`
     getCurrentVersionByKey(key: $key) {
       items {
         id
+        version
+      }
+    }
+  }
+`;
+export const GetCurrentColonyVersionDocument = gql`
+  query GetCurrentColonyVersion {
+    getCurrentVersionByKey(key: "colony") {
+      items {
         version
       }
     }
