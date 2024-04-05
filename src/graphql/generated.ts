@@ -8358,15 +8358,6 @@ export type UpdateColonyContributorMutation = {
   } | null;
 };
 
-export type SetCurrentVersionMutationVariables = Exact<{
-  input: SetCurrentVersionInput;
-}>;
-
-export type SetCurrentVersionMutation = {
-  __typename?: 'Mutation';
-  setCurrentVersion?: boolean | null;
-};
-
 export type CreateCurrentVersionMutationVariables = Exact<{
   input: CreateCurrentVersionInput;
 }>;
@@ -9672,11 +9663,6 @@ export const UpdateColonyContributorDocument = gql`
     updateColonyContributor(input: $input) {
       id
     }
-  }
-`;
-export const SetCurrentVersionDocument = gql`
-  mutation SetCurrentVersion($input: SetCurrentVersionInput!) {
-    setCurrentVersion(input: $input)
   }
 `;
 export const CreateCurrentVersionDocument = gql`
