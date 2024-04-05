@@ -1,7 +1,3 @@
-mutation SetCurrentVersion($input: SetCurrentVersionInput!) {
-  setCurrentVersion(input: $input)
-}
-
 mutation CreateCurrentVersion($input: CreateCurrentVersionInput!) {
   createCurrentVersion(input: $input) {
     id
