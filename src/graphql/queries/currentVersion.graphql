@@ -1,7 +1,6 @@
-query GetCurrentVersion($key: String!) {
-  getCurrentVersionByKey(key: $key) {
+query GetCurrentColonyVersion {
+  getCurrentVersionByKey(key: "colony") {
     items {
-      id
       version
     }
   }
