@@ -28,22 +28,21 @@ export default async (event: ContractEvent): Promise<void> => {
 
   /*
    * Determine if the colony metadata was created from the client side
-   * by trying to fetch/refetch it up to a number of 3 blocks in prod or 10 in dev
+   * by trying to fetch/refetch it up to a certain number of blocks
    */
-  const colonyMetadata = await tryFetchGraphqlQuery(
-    GetColonyMetadataDocument,
-    {
+  let colonyMetadata: Record<string, Record<string, unknown>> = {};
+  try {
+    colonyMetadata = await tryFetchGraphqlQuery(GetColonyMetadataDocument, {
       id: `etherealcolonymetadata-${transactionHash}`,
-    },
-    process.env.NODE_ENV !== 'production' ? 10 : undefined,
-  );
+    });
+  } catch (error) {
+    // Most likely we couldn't find metadata for this particular colony
+  }
 
   /**
    * If colony metadata doesn't exist, log it and do not create anything in the DB
    * In dev, this will be the case for Metacolony
    */
-
-  console.log({ colonyMetadata });
 
   if (!colonyMetadata?.getColonyMetadata) {
     output(`Could not find metadata for colony ${colonyAddress}. Skipping...`);
