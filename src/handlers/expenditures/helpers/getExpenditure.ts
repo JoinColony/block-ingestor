@@ -59,8 +59,6 @@ export const getStreamingPaymentFromDB = async (
     id: paymentDatabaseId,
   });
 
-  console.log({ response, paymentDatabaseId });
-
   const streamingPayment = response?.data?.getStreamingPayment;
 
   return streamingPayment;
