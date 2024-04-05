@@ -15,7 +15,6 @@ import {
 } from '~graphql';
 
 export default async (event: ContractEvent): Promise<void> => {
-  console.log(event);
   const { expenditureId, agent: initiatorAddress } = event.args;
   const convertedExpenditureId = toNumber(expenditureId);
 
