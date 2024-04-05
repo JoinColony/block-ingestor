@@ -9,3 +9,15 @@ mutation UpdateCurrentVersion($input: UpdateCurrentVersionInput!) {
     id
   }
 }
+
+mutation CreateCurrentVersion($input: CreateCurrentVersionInput!) {
+  createCurrentVersion(input: $input) {
+    id
+  }
+}
+
+mutation UpdateCurrentVersion($input: UpdateCurrentVersionInput!) {
+  updateCurrentVersion(input: $input) {
+    id
+  }
+}
