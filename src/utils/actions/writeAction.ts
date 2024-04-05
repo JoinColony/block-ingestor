@@ -52,6 +52,7 @@ export const writeActionFromEvent = async (
   });
 
   verbose('Action', actionType, 'took place in Colony:', colonyAddress);
+
   await mutate<CreateColonyActionMutation, CreateColonyActionMutationVariables>(
     CreateColonyActionDocument,
     {
