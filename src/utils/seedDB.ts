@@ -9,11 +9,10 @@ import {
   CreateCurrentNetworkInverseFeeDocument,
   CreateCurrentNetworkInverseFeeMutation,
   CreateCurrentNetworkInverseFeeMutationVariables,
-  SetCurrentVersionDocument,
-  SetCurrentVersionMutation,
-  SetCurrentVersionMutationVariables,
 } from '~graphql';
 import networkClient from '~networkClient';
+
+import { updateCurrentVersion } from './currentVersion';
 
 import { mapLogToContractEvent } from './events';
 import { writeExtensionVersionFromEvent } from './extensions';
@@ -63,16 +62,7 @@ const seedExtensionsVersions = async (): Promise<void> => {
 
 const seedColoniesVersions = async (): Promise<void> => {
   const version = await networkClient.getCurrentColonyVersion();
-
-  await mutate<SetCurrentVersionMutation, SetCurrentVersionMutationVariables>(
-    SetCurrentVersionDocument,
-    {
-      input: {
-        key: COLONY_CURRENT_VERSION_KEY,
-        version: toNumber(version),
-      },
-    },
-  );
+  await updateCurrentVersion(COLONY_CURRENT_VERSION_KEY, toNumber(version));
 };
 
 export const seedDB = async (): Promise<void> => {
