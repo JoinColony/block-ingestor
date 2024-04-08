@@ -1,0 +1,8 @@
+query GetCurrentVersion($key: String!) {
+  getCurrentVersionByKey(key: $key) {
+    items {
+      id
+      version
+    }
+  }
+}
