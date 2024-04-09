@@ -1,4 +1,4 @@
-import { ContractEvent } from '~types';
+import { ContractEvent, ContractEventsSignatures } from '~types';
 import {
   createFundsClaim,
   getExpenditureDatabaseId,
@@ -7,6 +7,7 @@ import {
   isColonyAddress,
   output,
   toNumber,
+  transactionHasEvent,
   verbose,
 } from '~utils';
 import {
@@ -105,7 +106,17 @@ export default async (event: ContractEvent): Promise<void> => {
    */
   const { recipientAddress } = existingSlot;
   const isColony = await isColonyAddress(recipientAddress ?? '');
-  if (recipientAddress && isColony) {
+
+  /**
+   * However, if this event has been emitted by the OneTxPayment extension, and is a direct payment to a colony
+   * then the transfer event will create the funds claim, so we don't want to duplicate it here
+   */
+  const hasOneTxPaymentEvent = await transactionHasEvent(
+    event.transactionHash,
+    ContractEventsSignatures.OneTxPaymentMade,
+  );
+
+  if (recipientAddress && isColony && !hasOneTxPaymentEvent) {
     await createFundsClaim({
       colonyAddress: recipientAddress,
       tokenAddress,
