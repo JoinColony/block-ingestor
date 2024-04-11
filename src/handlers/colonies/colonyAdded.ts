@@ -6,10 +6,13 @@ import {
   UpdateColonyContributorDocument,
   UpdateColonyContributorMutation,
   UpdateColonyContributorMutationVariables,
-  CreateUniqueColonyDocument,
-  CreateUniqueColonyMutation,
-  CreateUniqueColonyMutationVariables,
   GetColonyMetadataDocument,
+  DeleteColonyContributorDocument,
+  DeleteColonyContributorMutation,
+  DeleteColonyContributorMutationVariables,
+  DeleteColonyMetadataMutation,
+  DeleteColonyMetadataMutationVariables,
+  DeleteColonyMetadataDocument,
 } from '~graphql';
 import { coloniesSet } from '~stats';
 import { ContractEvent, ContractEventsSignatures } from '~types';
@@ -21,6 +24,7 @@ import {
 } from '~utils';
 import { getColonyContributorId } from '~utils/contributors';
 import { tryFetchGraphqlQuery } from '~utils/graphql';
+import { createUniqueColony } from './helpers/createUniqueColony';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { transactionHash, args } = event;
@@ -95,6 +99,42 @@ export default async (event: ContractEvent): Promise<void> => {
 
   await createColonyFounderInitialRoleEntry(event, colonyFounderAddress);
 
+  try {
+    /*
+     * Create the colony entry in the database
+     */
+    await createUniqueColony({
+      colonyAddress: utils.getAddress(colonyAddress),
+      tokenAddress: utils.getAddress(tokenAddress),
+      transactionHash,
+      initiatorAddress: utils.getAddress(colonyFounderAddress),
+    });
+  } catch {
+    /*
+     * If the createUniqueColony fails for any reason
+     * then we should tidy up the contributor we created
+     */
+    await mutate<
+      DeleteColonyContributorMutation,
+      DeleteColonyContributorMutationVariables
+    >(DeleteColonyContributorDocument, {
+      input: {
+        id: getColonyContributorId(colonyAddress, colonyFounderAddress),
+      },
+    });
+    return;
+  } finally {
+    /*
+     * Delete the ethereal metadata entry whether it is successful or fails
+     */
+    await mutate<
+      DeleteColonyMetadataMutation,
+      DeleteColonyMetadataMutationVariables
+    >(DeleteColonyMetadataDocument, {
+      input: { id: `etherealcolonymetadata-${transactionHash}` },
+    });
+  }
+
   /*
    * A new contributor is created when assigned permissions, so just update the watched status of the colony founder.
    * I'm doing this here to avoid a race condition with the front end. It's simpler to perform an update here than to
@@ -110,27 +150,6 @@ export default async (event: ContractEvent): Promise<void> => {
       isWatching: true,
     },
   });
-
-  /*
-   * Create the colony entry in the database
-   *
-   * @TODO Move the logic from create unique colony in here, that way we can
-   * more granularly control the creation of the colony
-   *
-   * We can also do cool stuff like if there's an error creating the colony,
-   * tell the ingestor to stop watching it
-   */
-  await mutate<CreateUniqueColonyMutation, CreateUniqueColonyMutationVariables>(
-    CreateUniqueColonyDocument,
-    {
-      input: {
-        colonyAddress: utils.getAddress(colonyAddress),
-        tokenAddress: utils.getAddress(tokenAddress),
-        transactionHash,
-        initiatorAddress: utils.getAddress(colonyFounderAddress),
-      },
-    },
-  );
 
   /*
    * Setup all Colony specific listeners for it

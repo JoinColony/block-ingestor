@@ -8364,13 +8364,54 @@ export type UpdateColonyMetadataMutation = {
   updateColonyMetadata?: { __typename?: 'ColonyMetadata'; id: string } | null;
 };
 
-export type CreateUniqueColonyMutationVariables = Exact<{
-  input: CreateUniqueColonyInput;
+export type CreateColonyMutationVariables = Exact<{
+  input: CreateColonyInput;
+  condition?: InputMaybe<ModelColonyConditionInput>;
 }>;
 
-export type CreateUniqueColonyMutation = {
+export type CreateColonyMutation = {
   __typename?: 'Mutation';
-  createUniqueColony?: { __typename?: 'Colony'; id: string } | null;
+  createColony?: { __typename?: 'Colony'; id: string } | null;
+};
+
+export type CreateColonyMetadataMutationVariables = Exact<{
+  input: CreateColonyMetadataInput;
+}>;
+
+export type CreateColonyMetadataMutation = {
+  __typename?: 'Mutation';
+  createColonyMetadata?: { __typename?: 'ColonyMetadata'; id: string } | null;
+};
+
+export type DeleteColonyMetadataMutationVariables = Exact<{
+  input: DeleteColonyMetadataInput;
+}>;
+
+export type DeleteColonyMetadataMutation = {
+  __typename?: 'Mutation';
+  deleteColonyMetadata?: { __typename?: 'ColonyMetadata'; id: string } | null;
+};
+
+export type CreateColonyMemberInviteMutationVariables = Exact<{
+  input: CreateColonyMemberInviteInput;
+  condition?: InputMaybe<ModelColonyMemberInviteConditionInput>;
+}>;
+
+export type CreateColonyMemberInviteMutation = {
+  __typename?: 'Mutation';
+  createColonyMemberInvite?: {
+    __typename?: 'ColonyMemberInvite';
+    id: string;
+  } | null;
+};
+
+export type CreateColonyTokensMutationVariables = Exact<{
+  input: CreateColonyTokensInput;
+}>;
+
+export type CreateColonyTokensMutation = {
+  __typename?: 'Mutation';
+  createColonyTokens?: { __typename?: 'ColonyTokens'; id: string } | null;
 };
 
 export type CreateColonyContributorMutationVariables = Exact<{
@@ -8392,6 +8433,18 @@ export type UpdateColonyContributorMutationVariables = Exact<{
 export type UpdateColonyContributorMutation = {
   __typename?: 'Mutation';
   updateColonyContributor?: {
+    __typename?: 'ColonyContributor';
+    id: string;
+  } | null;
+};
+
+export type DeleteColonyContributorMutationVariables = Exact<{
+  input: DeleteColonyContributorInput;
+}>;
+
+export type DeleteColonyContributorMutation = {
+  __typename?: 'Mutation';
+  deleteColonyContributor?: {
     __typename?: 'ColonyContributor';
     id: string;
   } | null;
@@ -8726,15 +8779,6 @@ export type UpdateStatsMutation = {
   updateIngestorStats?: { __typename?: 'IngestorStats'; id: string } | null;
 };
 
-export type CreateColonyTokensMutationVariables = Exact<{
-  input: CreateColonyTokensInput;
-}>;
-
-export type CreateColonyTokensMutation = {
-  __typename?: 'Mutation';
-  createColonyTokens?: { __typename?: 'ColonyTokens'; id: string } | null;
-};
-
 export type DeleteColonyTokensMutationVariables = Exact<{
   input: DeleteColonyTokensInput;
 }>;
@@ -8811,6 +8855,16 @@ export type GetColonyMetadataQuery = {
     description?: string | null;
     isWhitelistActivated?: boolean | null;
     whitelistedAddresses?: Array<string> | null;
+    etherealData?: {
+      __typename?: 'ColonyMetadataEtherealData';
+      colonyAvatar?: string | null;
+      colonyDisplayName: string;
+      colonyName: string;
+      colonyThumbnail?: string | null;
+      initiatorAddress: string;
+      tokenAvatar?: string | null;
+      tokenThumbnail?: string | null;
+    } | null;
     externalLinks?: Array<{
       __typename?: 'ExternalLink';
       name: ExternalLinks;
@@ -8872,6 +8926,26 @@ export type GetColonyQuery = {
         nativeSkillId: number;
       } | null>;
     } | null;
+  } | null;
+  getColonyByAddress?: {
+    __typename?: 'ModelColonyConnection';
+    items: Array<{ __typename?: 'Colony'; id: string; name: string } | null>;
+  } | null;
+  getColonyByType?: {
+    __typename?: 'ModelColonyConnection';
+    items: Array<{ __typename?: 'Colony'; id: string; name: string } | null>;
+  } | null;
+};
+
+export type GetColonyByNameQueryVariables = Exact<{
+  name: Scalars['String'];
+}>;
+
+export type GetColonyByNameQuery = {
+  __typename?: 'Query';
+  getColonyByName?: {
+    __typename?: 'ModelColonyConnection';
+    items: Array<{ __typename?: 'Colony'; id: string; name: string } | null>;
   } | null;
 };
 
@@ -9668,9 +9742,43 @@ export const UpdateColonyMetadataDocument = gql`
     }
   }
 `;
-export const CreateUniqueColonyDocument = gql`
-  mutation CreateUniqueColony($input: CreateUniqueColonyInput!) {
-    createUniqueColony(input: $input) {
+export const CreateColonyDocument = gql`
+  mutation CreateColony(
+    $input: CreateColonyInput!
+    $condition: ModelColonyConditionInput
+  ) {
+    createColony(input: $input, condition: $condition) {
+      id
+    }
+  }
+`;
+export const CreateColonyMetadataDocument = gql`
+  mutation CreateColonyMetadata($input: CreateColonyMetadataInput!) {
+    createColonyMetadata(input: $input) {
+      id
+    }
+  }
+`;
+export const DeleteColonyMetadataDocument = gql`
+  mutation DeleteColonyMetadata($input: DeleteColonyMetadataInput!) {
+    deleteColonyMetadata(input: $input) {
+      id
+    }
+  }
+`;
+export const CreateColonyMemberInviteDocument = gql`
+  mutation CreateColonyMemberInvite(
+    $input: CreateColonyMemberInviteInput!
+    $condition: ModelColonyMemberInviteConditionInput
+  ) {
+    createColonyMemberInvite(input: $input, condition: $condition) {
+      id
+    }
+  }
+`;
+export const CreateColonyTokensDocument = gql`
+  mutation CreateColonyTokens($input: CreateColonyTokensInput!) {
+    createColonyTokens(input: $input) {
       id
     }
   }
@@ -9685,6 +9793,13 @@ export const CreateColonyContributorDocument = gql`
 export const UpdateColonyContributorDocument = gql`
   mutation UpdateColonyContributor($input: UpdateColonyContributorInput!) {
     updateColonyContributor(input: $input) {
+      id
+    }
+  }
+`;
+export const DeleteColonyContributorDocument = gql`
+  mutation DeleteColonyContributor($input: DeleteColonyContributorInput!) {
+    deleteColonyContributor(input: $input) {
       id
     }
   }
@@ -9931,13 +10046,6 @@ export const UpdateStatsDocument = gql`
     }
   }
 `;
-export const CreateColonyTokensDocument = gql`
-  mutation CreateColonyTokens($input: CreateColonyTokensInput!) {
-    createColonyTokens(input: $input) {
-      id
-    }
-  }
-`;
 export const DeleteColonyTokensDocument = gql`
   mutation DeleteColonyTokens($input: DeleteColonyTokensInput!) {
     deleteColonyTokens(input: $input) {
@@ -10000,6 +10108,15 @@ export const GetColonyMetadataDocument = gql`
   query GetColonyMetadata($id: ID!) {
     getColonyMetadata(id: $id) {
       ...ColonyMetadata
+      etherealData {
+        colonyAvatar
+        colonyDisplayName
+        colonyName
+        colonyThumbnail
+        initiatorAddress
+        tokenAvatar
+        tokenThumbnail
+      }
     }
   }
   ${ColonyMetadata}
@@ -10009,8 +10126,30 @@ export const GetColonyDocument = gql`
     getColony(id: $id) {
       ...Colony
     }
+    getColonyByAddress(id: $id) {
+      items {
+        id
+        name
+      }
+    }
+    getColonyByType(type: METACOLONY) {
+      items {
+        id
+        name
+      }
+    }
   }
   ${Colony}
+`;
+export const GetColonyByNameDocument = gql`
+  query GetColonyByName($name: String!) {
+    getColonyByName(name: $name) {
+      items {
+        id
+        name
+      }
+    }
+  }
 `;
 export const GetColonyByNativeTokenIdDocument = gql`
   query GetColonyByNativeTokenId(

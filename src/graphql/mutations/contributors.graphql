@@ -9,3 +9,9 @@ mutation UpdateColonyContributor($input: UpdateColonyContributorInput!) {
     id
   }
 }
+
+mutation DeleteColonyContributor($input: DeleteColonyContributorInput!) {
+  deleteColonyContributor(input: $input) {
+    id
+  }
+}
