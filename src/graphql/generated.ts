@@ -272,6 +272,8 @@ export type ColonyAction = {
    * @TODO: Make this field non-nullable
    */
   isMotionFinalization?: Maybe<Scalars['Boolean']>;
+  /** Members impacted by the action (used for add/remove verified members) */
+  members?: Maybe<Array<Scalars['ID']>>;
   /** Metadata associated with the action (Eg. Custom action title) */
   metadata?: Maybe<ColonyActionMetadata>;
   /** Expanded `ColonyMotion` for the corresponding `motionId` */
@@ -372,6 +374,9 @@ export type ColonyActionRolesInput = {
  * These can all happen in a Colony and will be interpreted by the dApp according to their types
  */
 export enum ColonyActionType {
+  /** An action related to adding verified members */
+  AddVerifiedMembers = 'ADD_VERIFIED_MEMBERS',
+  AddVerifiedMembersMotion = 'ADD_VERIFIED_MEMBERS_MOTION',
   /** An action related to canceling an expenditure */
   CancelExpenditure = 'CANCEL_EXPENDITURE',
   /** An action related to a motion to cancel an expenditure */
@@ -410,6 +415,8 @@ export enum ColonyActionType {
   FundExpenditureMotion = 'FUND_EXPENDITURE_MOTION',
   /** A generic or unspecified Colony action */
   Generic = 'GENERIC',
+  /** An action related to locking an expenditure */
+  LockExpenditure = 'LOCK_EXPENDITURE',
   /** An action related to the creation of safe transactions via Safe Control */
   MakeArbitraryTransaction = 'MAKE_ARBITRARY_TRANSACTION',
   MakeArbitraryTransactionsMotion = 'MAKE_ARBITRARY_TRANSACTIONS_MOTION',
@@ -433,6 +440,9 @@ export enum ColonyActionType {
   PaymentMotion = 'PAYMENT_MOTION',
   /** An action related to the recovery functionality of a Colony */
   Recovery = 'RECOVERY',
+  /** An action related to removing verified members */
+  RemoveVerifiedMembers = 'REMOVE_VERIFIED_MEMBERS',
+  RemoveVerifiedMembersMotion = 'REMOVE_VERIFIED_MEMBERS_MOTION',
   /** An action related to creating a motion to release an expenditure stage */
   SetExpenditureStateMotion = 'SET_EXPENDITURE_STATE_MOTION',
   /** An action related to setting user roles within a Colony */
@@ -1104,6 +1114,7 @@ export type CreateColonyActionInput = {
   initiatorAddress: Scalars['ID'];
   isMotion?: InputMaybe<Scalars['Boolean']>;
   isMotionFinalization?: InputMaybe<Scalars['Boolean']>;
+  members?: InputMaybe<Array<Scalars['ID']>>;
   motionDomainId?: InputMaybe<Scalars['Int']>;
   motionId?: InputMaybe<Scalars['ID']>;
   networkFee?: InputMaybe<Scalars['String']>;
@@ -2269,6 +2280,7 @@ export type ModelColonyActionConditionInput = {
   initiatorAddress?: InputMaybe<ModelIdInput>;
   isMotion?: InputMaybe<ModelBooleanInput>;
   isMotionFinalization?: InputMaybe<ModelBooleanInput>;
+  members?: InputMaybe<ModelIdInput>;
   motionDomainId?: InputMaybe<ModelIntInput>;
   motionId?: InputMaybe<ModelIdInput>;
   networkFee?: InputMaybe<ModelStringInput>;
@@ -2309,6 +2321,7 @@ export type ModelColonyActionFilterInput = {
   initiatorAddress?: InputMaybe<ModelIdInput>;
   isMotion?: InputMaybe<ModelBooleanInput>;
   isMotionFinalization?: InputMaybe<ModelBooleanInput>;
+  members?: InputMaybe<ModelIdInput>;
   motionDomainId?: InputMaybe<ModelIntInput>;
   motionId?: InputMaybe<ModelIdInput>;
   networkFee?: InputMaybe<ModelStringInput>;
@@ -3469,6 +3482,7 @@ export type ModelSubscriptionColonyActionFilterInput = {
   initiatorAddress?: InputMaybe<ModelSubscriptionIdInput>;
   isMotion?: InputMaybe<ModelSubscriptionBooleanInput>;
   isMotionFinalization?: InputMaybe<ModelSubscriptionBooleanInput>;
+  members?: InputMaybe<ModelSubscriptionIdInput>;
   motionDomainId?: InputMaybe<ModelSubscriptionIntInput>;
   motionId?: InputMaybe<ModelSubscriptionIdInput>;
   networkFee?: InputMaybe<ModelSubscriptionStringInput>;
@@ -4437,8 +4451,6 @@ export type Mutation = {
   deleteUserTokens?: Maybe<UserTokens>;
   /** Removes the user from the colony whitelist */
   removeMemberFromColonyWhitelist?: Maybe<Scalars['Boolean']>;
-  /** Updates the latest available version of a Colony or an extension */
-  setCurrentVersion?: Maybe<Scalars['Boolean']>;
   updateAnnotation?: Maybe<Annotation>;
   updateColony?: Maybe<Colony>;
   updateColonyAction?: Maybe<ColonyAction>;
@@ -4960,11 +4972,6 @@ export type MutationDeleteUserTokensArgs = {
 /** Root mutation type */
 export type MutationRemoveMemberFromColonyWhitelistArgs = {
   input: RemoveMemberFromColonyWhitelistInput;
-};
-
-/** Root mutation type */
-export type MutationSetCurrentVersionArgs = {
-  input?: InputMaybe<SetCurrentVersionInput>;
 };
 
 /** Root mutation type */
@@ -6479,6 +6486,7 @@ export enum SearchableColonyActionAggregateField {
   InitiatorAddress = 'initiatorAddress',
   IsMotion = 'isMotion',
   IsMotionFinalization = 'isMotionFinalization',
+  Members = 'members',
   MotionDomainId = 'motionDomainId',
   MotionId = 'motionId',
   NetworkFee = 'networkFee',
@@ -6526,6 +6534,7 @@ export type SearchableColonyActionFilterInput = {
   initiatorAddress?: InputMaybe<SearchableIdFilterInput>;
   isMotion?: InputMaybe<SearchableBooleanFilterInput>;
   isMotionFinalization?: InputMaybe<SearchableBooleanFilterInput>;
+  members?: InputMaybe<SearchableIdFilterInput>;
   motionDomainId?: InputMaybe<SearchableIntFilterInput>;
   motionId?: InputMaybe<SearchableIdFilterInput>;
   networkFee?: InputMaybe<SearchableStringFilterInput>;
@@ -6565,6 +6574,7 @@ export enum SearchableColonyActionSortableFields {
   InitiatorAddress = 'initiatorAddress',
   IsMotion = 'isMotion',
   IsMotionFinalization = 'isMotionFinalization',
+  Members = 'members',
   MotionDomainId = 'motionDomainId',
   MotionId = 'motionId',
   NetworkFee = 'networkFee',
@@ -6637,18 +6647,6 @@ export type SearchableStringFilterInput = {
   range?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;
   regexp?: InputMaybe<Scalars['String']>;
   wildcard?: InputMaybe<Scalars['String']>;
-};
-
-/**
- * Input data to store the latest available version of the core Colony contract and available extensions
- *
- * The extension hash is generated like so: `keccak256(toUtf8Bytes(extensionName))`, where `extensionName` is the name of the extension contract file in the Colony Network (e.g. `VotingReputation`)
- */
-export type SetCurrentVersionInput = {
-  /** COLONY for the Colony contract, extension hash for extensions */
-  key: Scalars['String'];
-  /** Latest available version */
-  version: Scalars['Int'];
 };
 
 export type SimpleTarget = {
@@ -7547,6 +7545,7 @@ export type UpdateColonyActionInput = {
   initiatorAddress?: InputMaybe<Scalars['ID']>;
   isMotion?: InputMaybe<Scalars['Boolean']>;
   isMotionFinalization?: InputMaybe<Scalars['Boolean']>;
+  members?: InputMaybe<Array<Scalars['ID']>>;
   motionDomainId?: InputMaybe<Scalars['Int']>;
   motionId?: InputMaybe<Scalars['ID']>;
   networkFee?: InputMaybe<Scalars['String']>;

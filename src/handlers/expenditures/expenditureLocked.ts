@@ -1,21 +1,33 @@
 import { mutate } from '~amplifyClient';
 import {
+  ColonyActionType,
   ExpenditureStatus,
   UpdateExpenditureDocument,
   UpdateExpenditureMutation,
   UpdateExpenditureMutationVariables,
 } from '~graphql';
-import { ContractEvent } from '~types';
-import { getExpenditureDatabaseId, toNumber, verbose } from '~utils';
+import { ContractEvent, ContractEventsSignatures } from '~types';
+import {
+  getExpenditureDatabaseId,
+  toNumber,
+  transactionHasEvent,
+  verbose,
+  writeActionFromEvent,
+} from '~utils';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { contractAddress: colonyAddress } = event;
-  const { expenditureId } = event.args;
+  const { expenditureId, agent: initiatorAddress } = event.args;
   const convertedExpenditureId = toNumber(expenditureId);
+
+  const databaseId = getExpenditureDatabaseId(
+    colonyAddress,
+    convertedExpenditureId,
+  );
 
   verbose(
     'Expenditure with ID',
-    convertedExpenditureId,
+    databaseId,
     'locked in Colony:',
     colonyAddress,
   );
@@ -24,9 +36,25 @@ export default async (event: ContractEvent): Promise<void> => {
     UpdateExpenditureDocument,
     {
       input: {
-        id: getExpenditureDatabaseId(colonyAddress, convertedExpenditureId),
+        id: databaseId,
         status: ExpenditureStatus.Locked,
       },
     },
   );
+
+  /**
+   * @NOTE: Only create a `LOCK_EXPENDITURE` action if the expenditure was not created as part of a OneTxPayment
+   */
+  const hasOneTxPaymentEvent = await transactionHasEvent(
+    event.transactionHash,
+    ContractEventsSignatures.OneTxPaymentMade,
+  );
+
+  if (!hasOneTxPaymentEvent) {
+    await writeActionFromEvent(event, colonyAddress, {
+      type: ColonyActionType.LockExpenditure,
+      initiatorAddress,
+      expenditureId: databaseId,
+    });
+  }
 };
