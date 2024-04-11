@@ -18,7 +18,7 @@ import {
   handleMoveFundsAction,
   handleEditDomainAction,
   handleEditColonyAction,
-  handleVersionUpgradeAction,
+  handleColonyUpgradeAction,
   handleEmitDomainReputationAction,
   handleNetworkFeeInverseSet,
   handleManagePermissionsAction,
@@ -217,7 +217,7 @@ export default async (event: ContractEvent): Promise<void> => {
     }
 
     case ContractEventsSignatures.ColonyUpgraded: {
-      await handleVersionUpgradeAction(event);
+      await handleColonyUpgradeAction(event);
       return;
     }
 
