@@ -27,6 +27,7 @@ import {
   CreateMotionMessageMutationVariables,
 } from '~graphql';
 import { SIMPLE_DECISIONS_ACTION_CODE } from '~constants';
+import networkClient from '~networkClient';
 
 import {
   getMotionDatabaseId,
@@ -92,9 +93,7 @@ export const getMotionData = async ({
   colonyAddress,
   isDecision = false,
 }: GetMotionDataArgs): Promise<ColonyMotion> => {
-  const { skillRep, rootHash, repSubmitted } = await votingClient.getMotion(
-    motionId,
-  );
+  const { skillRep, repSubmitted } = await votingClient.getMotion(motionId);
   const totalStakeFraction = await votingClient.getTotalStakeFraction();
   const userMinStakeFraction = await votingClient.getUserMinStakeFraction();
   const requiredStake: string = getRequiredStake(
@@ -133,7 +132,6 @@ export const getMotionData = async ({
     remainingStakes: [requiredStake, requiredStake], // [nayRemaining, yayRemaining]
     usersStakes: [],
     userMinStake,
-    rootHash,
     motionDomainId: getDomainDatabaseId(colonyAddress, domainId.toNumber()),
     nativeMotionDomainId: domainId.toString(),
     stakerRewards: [],
@@ -250,6 +248,7 @@ export const createMotionInDB = async (
     | 'motionId'
     | 'initiatorAddress'
     | 'blockNumber'
+    | 'rootHash'
   > & {
     gasEstimate: string;
     expenditureId?: string;
@@ -283,6 +282,10 @@ export const createMotionInDB = async (
     creatorAddress,
   );
 
+  const rootHash = await networkClient.getReputationRootHash({
+    blockTag: blockNumber,
+  });
+
   const actionData = {
     id: transactionHash,
     colonyId: colonyAddress,
@@ -291,6 +294,7 @@ export const createMotionInDB = async (
     motionId: motionData.id,
     initiatorAddress: creatorAddress,
     blockNumber,
+    rootHash,
     ...input,
   };
 
