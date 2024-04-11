@@ -6,7 +6,7 @@ import {
   ListColoniesQuery,
   ListColoniesQueryVariables,
 } from '~graphql';
-import { ContractEventsSignatures } from '~types';
+import { ContractEventsSignatures, EventHandler } from '~types';
 import { notNull, output } from '~utils';
 import {
   addEventListener,
@@ -15,16 +15,51 @@ import {
 } from '~eventListeners';
 
 import { EventListenerType } from './types';
+import {
+  handleAnnotateTransaction,
+  handleColonyAdded,
+  handleColonyFundsClaimed,
+  handleColonyMetadataDelta,
+  handleColonyUpgradeAction,
+  handleColonyVersionAdded,
+  handleCreateDomainAction,
+  handleEditColonyAction,
+  handleEditDomainAction,
+  handleEmitDomainReputationAction,
+  handleExpenditureAdded,
+  handleExpenditureCancelled,
+  handleExpenditureClaimDelaySet,
+  handleExpenditureFinalized,
+  handleExpenditureGlobalClaimDelaySet,
+  handleExpenditureLocked,
+  handleExpenditurePayoutClaimed,
+  handleExpenditurePayoutModifierSet,
+  handleExpenditurePayoutSet,
+  handleExpenditureRecipientSet,
+  handleExpenditureStateChanged,
+  handleExpenditureTransferred,
+  handleMakeAbitraryTransactionAction,
+  handleManagePermissionsAction,
+  handleMintTokensAction,
+  handleMoveFundsAction,
+  handleReputationMiningCycleComplete,
+  handleSetTokenAuthority,
+  handleTokenUnlockedAction,
+  handleTransfer,
+} from '~handlers';
+import setTokenAuthority from '~handlers/tokens/setTokenAuthority';
 
 const addColonyEventListener = (
   eventSignature: ContractEventsSignatures,
   address: string,
+  handler: EventHandler,
 ): void => {
   addEventListener({
     type: EventListenerType.Colony,
     address,
     eventSignature,
     topics: [utils.id(eventSignature)],
+    handler,
   });
 };
 
@@ -62,10 +97,17 @@ export const setupListenersForColonies = async (): Promise<void> => {
     setupListenersForColony(colonyAddress, tokenAddress);
   });
 
-  addNetworkEventListener(ContractEventsSignatures.ColonyAdded);
-  addNetworkEventListener(ContractEventsSignatures.ColonyVersionAdded);
+  addNetworkEventListener(
+    ContractEventsSignatures.ColonyAdded,
+    handleColonyAdded,
+  );
+  addNetworkEventListener(
+    ContractEventsSignatures.ColonyVersionAdded,
+    handleColonyVersionAdded,
+  );
   addNetworkEventListener(
     ContractEventsSignatures.ReputationMiningCycleComplete,
+    handleReputationMiningCycleComplete,
   );
 };
 
@@ -75,38 +117,52 @@ export const setupListenersForColony = (
 ): void => {
   output(`Setting up listeners for colony ${colonyAddress}`);
 
-  const colonyEvents = [
-    ContractEventsSignatures.ColonyFundsClaimed,
-    ContractEventsSignatures.ColonyUpgraded,
-    ContractEventsSignatures.TokensMinted,
-    ContractEventsSignatures.DomainAdded,
-    ContractEventsSignatures.DomainMetadata,
-    ContractEventsSignatures.TokenUnlocked,
-    ContractEventsSignatures.ColonyFundsMovedBetweenFundingPots,
-    ContractEventsSignatures.ColonyMetadata,
-    ContractEventsSignatures.ArbitraryReputationUpdate,
-    ContractEventsSignatures.ColonyRoleSet,
-    ContractEventsSignatures.RecoveryRoleSet,
-    ContractEventsSignatures.ColonyRoleSet_OLD,
-    ContractEventsSignatures.ExpenditureGlobalClaimDelaySet,
-    ContractEventsSignatures.ExpenditureAdded,
-    ContractEventsSignatures.ExpenditureRecipientSet,
-    ContractEventsSignatures.ExpenditurePayoutSet,
-    ContractEventsSignatures.ExpenditureLocked,
-    ContractEventsSignatures.ExpenditureCancelled,
-    ContractEventsSignatures.ExpenditureFinalized,
-    ContractEventsSignatures.ExpenditureTransferred,
-    ContractEventsSignatures.ExpenditureClaimDelaySet,
-    ContractEventsSignatures.ExpenditurePayoutModifierSet,
-    ContractEventsSignatures.ExpenditurePayoutClaimed,
-    ContractEventsSignatures.ExpenditureStateChanged,
-    ContractEventsSignatures.AnnotateTransaction,
-    ContractEventsSignatures.ArbitraryTransaction,
-    ContractEventsSignatures.ColonyMetadataDelta,
-  ];
+  const colonyEventHandlers = {
+    [ContractEventsSignatures.ColonyFundsClaimed]: handleColonyFundsClaimed,
+    [ContractEventsSignatures.ColonyUpgraded]: handleColonyUpgradeAction,
+    [ContractEventsSignatures.TokensMinted]: handleMintTokensAction,
+    [ContractEventsSignatures.DomainAdded]: handleCreateDomainAction,
+    [ContractEventsSignatures.DomainMetadata]: handleEditDomainAction,
+    [ContractEventsSignatures.TokenUnlocked]: handleTokenUnlockedAction,
+    [ContractEventsSignatures.ColonyFundsMovedBetweenFundingPots]:
+      handleMoveFundsAction,
+    [ContractEventsSignatures.ColonyMetadata]: handleEditColonyAction,
+    [ContractEventsSignatures.ArbitraryReputationUpdate]:
+      handleEmitDomainReputationAction,
+    [ContractEventsSignatures.ColonyRoleSet]: handleManagePermissionsAction,
+    [ContractEventsSignatures.RecoveryRoleSet]: handleManagePermissionsAction,
+    [ContractEventsSignatures.ColonyRoleSet_OLD]: handleManagePermissionsAction,
+    [ContractEventsSignatures.ExpenditureGlobalClaimDelaySet]:
+      handleExpenditureGlobalClaimDelaySet,
+    [ContractEventsSignatures.ExpenditureAdded]: handleExpenditureAdded,
+    [ContractEventsSignatures.ExpenditureRecipientSet]:
+      handleExpenditureRecipientSet,
+    [ContractEventsSignatures.ExpenditurePayoutSet]: handleExpenditurePayoutSet,
+    [ContractEventsSignatures.ExpenditureLocked]: handleExpenditureLocked,
+    [ContractEventsSignatures.ExpenditureCancelled]: handleExpenditureCancelled,
+    [ContractEventsSignatures.ExpenditureFinalized]: handleExpenditureFinalized,
+    [ContractEventsSignatures.ExpenditureTransferred]:
+      handleExpenditureTransferred,
+    [ContractEventsSignatures.ExpenditureClaimDelaySet]:
+      handleExpenditureClaimDelaySet,
+    [ContractEventsSignatures.ExpenditurePayoutModifierSet]:
+      handleExpenditurePayoutModifierSet,
+    [ContractEventsSignatures.ExpenditurePayoutClaimed]:
+      handleExpenditurePayoutClaimed,
+    [ContractEventsSignatures.ExpenditureStateChanged]:
+      handleExpenditureStateChanged,
+    [ContractEventsSignatures.AnnotateTransaction]: handleAnnotateTransaction,
+    [ContractEventsSignatures.ArbitraryTransaction]:
+      handleMakeAbitraryTransactionAction,
+    [ContractEventsSignatures.ColonyMetadataDelta]: handleColonyMetadataDelta,
+  };
 
-  colonyEvents.forEach((eventSignature) =>
-    addColonyEventListener(eventSignature, colonyAddress),
+  Object.entries(colonyEventHandlers).forEach(([eventSignature, handler]) =>
+    addColonyEventListener(
+      eventSignature as ContractEventsSignatures,
+      colonyAddress,
+      handler,
+    ),
   );
 
   /*
@@ -117,9 +173,18 @@ export const setupListenersForColony = (
    */
   addTokenEventListener(
     ContractEventsSignatures.Transfer,
+    handleTransfer,
     undefined,
     colonyAddress,
   );
-  addTokenEventListener(ContractEventsSignatures.LogSetAuthority, tokenAddress);
-  addTokenEventListener(ContractEventsSignatures.LogSetOwner, tokenAddress);
+  addTokenEventListener(
+    ContractEventsSignatures.LogSetAuthority,
+    handleSetTokenAuthority,
+    tokenAddress,
+  );
+  addTokenEventListener(
+    ContractEventsSignatures.LogSetOwner,
+    setTokenAuthority,
+    tokenAddress,
+  );
 };

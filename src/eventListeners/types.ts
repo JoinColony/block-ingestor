@@ -1,9 +1,10 @@
-import { ContractEventsSignatures } from '~types';
+import { ContractEventsSignatures, EventHandler } from '~types';
 
 export interface BaseEventListener {
   type: EventListenerType;
   eventSignature: ContractEventsSignatures;
   topics: Array<string | null>;
+  handler: EventHandler;
   address?: string;
 }
 

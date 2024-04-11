@@ -1,4 +1,8 @@
 import { Extension, getExtensionHash } from '@colony/colony-js';
+import {
+  handleExpenditureMadeStaged,
+  handleStagedPaymentReleased,
+} from '~handlers';
 
 import { ContractEventsSignatures } from '~types';
 import { output } from '~utils';
@@ -20,17 +24,20 @@ export const setupListenersForStagedExpenditure = (
   stagedExpenditureAddress: string,
   colonyAddress: string,
 ): void => {
-  const events = [
-    ContractEventsSignatures.ExpenditureMadeStaged,
-    ContractEventsSignatures.StagedPaymentReleased,
-  ];
+  const eventHandlers = {
+    [ContractEventsSignatures.ExpenditureMadeStaged]:
+      handleExpenditureMadeStaged,
+    [ContractEventsSignatures.StagedPaymentReleased]:
+      handleStagedPaymentReleased,
+  };
 
-  events.forEach((eventSignature) =>
+  Object.entries(eventHandlers).forEach(([eventSignature, handler]) =>
     addExtensionEventListener(
-      eventSignature,
+      eventSignature as ContractEventsSignatures,
       Extension.StagedExpenditure,
       stagedExpenditureAddress,
       colonyAddress,
+      handler,
     ),
   );
 };

@@ -41,7 +41,6 @@ export const tryFetchGraphqlQuery = async <
 
     if (currentTry < maxRetries) {
       await delay(blockTime);
-      console.log('this should delay');
       currentTry += 1;
     } else {
       throw new Error('Could not fetch graphql data in time');

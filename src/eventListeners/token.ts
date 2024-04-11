@@ -1,4 +1,4 @@
-import { ContractEventsSignatures } from '~types';
+import { ContractEventsSignatures, EventHandler } from '~types';
 import { addEventListener, getEventListeners } from '~eventListeners';
 import { EventListenerType, EventListener } from './types';
 import { utils } from 'ethers';
@@ -6,6 +6,7 @@ import isEqual from 'lodash/isEqual';
 
 export const addTokenEventListener = (
   eventSignature: ContractEventsSignatures,
+  handler: EventHandler,
   tokenAddress?: string,
   recipientAddress?: string,
 ): void => {
@@ -14,6 +15,7 @@ export const addTokenEventListener = (
     eventSignature,
     address: tokenAddress,
     topics: [utils.id(eventSignature)],
+    handler,
   };
 
   if (recipientAddress) {

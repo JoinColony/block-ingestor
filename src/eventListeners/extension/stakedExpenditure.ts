@@ -1,4 +1,11 @@
 import { Extension, getExtensionHash } from '@colony/colony-js';
+import {
+  handleExpenditureCancelled,
+  handleExpenditureMadeViaStake,
+  handleExpenditureStakerPunished,
+  handleExtensionInitialised,
+  handleStakeReclaimed,
+} from '~handlers';
 
 import { ContractEventsSignatures } from '~types';
 import { output } from '~utils';
@@ -26,19 +33,23 @@ export const setupListenersForStakedExpenditure = (
   isInitialized: boolean,
 ): void => {
   if (isInitialized) {
-    const events = [
-      ContractEventsSignatures.StakeReclaimed,
-      ContractEventsSignatures.ExpenditureCancelled,
-      ContractEventsSignatures.ExpenditureStakerPunished,
-      ContractEventsSignatures.ExpenditureMadeViaStake,
-    ];
+    const eventHandlers = {
+      [ContractEventsSignatures.StakeReclaimed]: handleStakeReclaimed,
+      [ContractEventsSignatures.ExpenditureCancelled]:
+        handleExpenditureCancelled,
+      [ContractEventsSignatures.ExpenditureStakerPunished]:
+        handleExpenditureStakerPunished,
+      [ContractEventsSignatures.ExpenditureMadeViaStake]:
+        handleExpenditureMadeViaStake,
+    };
 
-    events.forEach((eventSignature) =>
+    Object.entries(eventHandlers).forEach(([eventSignature, handler]) =>
       addExtensionEventListener(
-        eventSignature,
+        eventSignature as ContractEventsSignatures,
         Extension.StakedExpenditure,
         stakedExpenditureAddress,
         colonyAddress,
+        handler,
       ),
     );
   } else {
@@ -47,6 +58,7 @@ export const setupListenersForStakedExpenditure = (
       Extension.StagedExpenditure,
       stakedExpenditureAddress,
       colonyAddress,
+      handleExtensionInitialised,
     );
   }
 };

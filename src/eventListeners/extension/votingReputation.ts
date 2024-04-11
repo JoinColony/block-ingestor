@@ -1,4 +1,14 @@
 import { Extension, getExtensionHash } from '@colony/colony-js';
+import {
+  handleExtensionInitialised,
+  handleMotionCreated,
+  handleMotionEventSet,
+  handleMotionFinalized,
+  handleMotionRewardClaimed,
+  handleMotionStaked,
+  handleMotionVoteRevealed,
+  handleMotionVoteSubmitted,
+} from '~handlers';
 
 import { ContractEventsSignatures } from '~types';
 import { output } from '~utils';
@@ -33,6 +43,7 @@ export const setupListenersForVotingReputation = (
       Extension.VotingReputation,
       votingReputationAddress,
       colonyAddress,
+      handleExtensionInitialised,
     );
   }
 };
@@ -41,22 +52,23 @@ export const setupMotionsListeners = (
   votingReputationAddress: string,
   colonyAddress: string,
 ): void => {
-  const motionEvents = [
-    ContractEventsSignatures.MotionCreated,
-    ContractEventsSignatures.MotionStaked,
-    ContractEventsSignatures.MotionFinalized,
-    ContractEventsSignatures.MotionRewardClaimed,
-    ContractEventsSignatures.MotionVoteSubmitted,
-    ContractEventsSignatures.MotionVoteRevealed,
-    ContractEventsSignatures.MotionEventSet,
-  ];
+  const motionEventHandlers = {
+    [ContractEventsSignatures.MotionCreated]: handleMotionCreated,
+    [ContractEventsSignatures.MotionStaked]: handleMotionStaked,
+    [ContractEventsSignatures.MotionFinalized]: handleMotionFinalized,
+    [ContractEventsSignatures.MotionRewardClaimed]: handleMotionRewardClaimed,
+    [ContractEventsSignatures.MotionVoteSubmitted]: handleMotionVoteSubmitted,
+    [ContractEventsSignatures.MotionVoteRevealed]: handleMotionVoteRevealed,
+    [ContractEventsSignatures.MotionEventSet]: handleMotionEventSet,
+  };
 
-  motionEvents.forEach((eventSignature) =>
+  Object.entries(motionEventHandlers).forEach(([eventSignature, handler]) =>
     addExtensionEventListener(
-      eventSignature,
+      eventSignature as ContractEventsSignatures,
       Extension.VotingReputation,
       votingReputationAddress,
       colonyAddress,
+      handler,
     ),
   );
 };

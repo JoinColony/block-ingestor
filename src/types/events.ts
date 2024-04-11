@@ -126,3 +126,5 @@ export type NetworkClients =
   | TokenClient
   | AnyColonyClient
   | AnyVotingReputationClient;
+
+export type EventHandler = (event: ContractEvent) => Promise<void>;
