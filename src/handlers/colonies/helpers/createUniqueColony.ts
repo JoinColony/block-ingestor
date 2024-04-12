@@ -21,6 +21,9 @@ import {
   CreateDomainMetadataMutationVariables,
   CreateDomainMutation,
   CreateDomainMutationVariables,
+  DeleteColonyMetadataDocument,
+  DeleteColonyMetadataMutation,
+  DeleteColonyMetadataMutationVariables,
   DomainColor,
   GetColonyByNameDocument,
   GetColonyByNameQuery,
@@ -251,6 +254,16 @@ export const createUniqueColony = async ({
   }
 
   /*
+   * Delete the ethereal metadata entry
+   */
+  await mutate<
+    DeleteColonyMetadataMutation,
+    DeleteColonyMetadataMutationVariables
+  >(DeleteColonyMetadataDocument, {
+    input: { id: `etherealcolonymetadata-${transactionHash}` },
+  });
+
+  /*
    * Create the member invite
    */
   const inviteMutation = await mutate<
@@ -314,6 +327,4 @@ export const createUniqueColony = async ({
       },
     },
   );
-
-  throw new Error('fails');
 };

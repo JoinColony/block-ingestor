@@ -7,12 +7,6 @@ import {
   UpdateColonyContributorMutation,
   UpdateColonyContributorMutationVariables,
   GetColonyMetadataDocument,
-  DeleteColonyContributorDocument,
-  DeleteColonyContributorMutation,
-  DeleteColonyContributorMutationVariables,
-  DeleteColonyMetadataMutation,
-  DeleteColonyMetadataMutationVariables,
-  DeleteColonyMetadataDocument,
 } from '~graphql';
 import { coloniesSet } from '~stats';
 import { ContractEvent, ContractEventsSignatures } from '~types';
@@ -80,6 +74,24 @@ export default async (event: ContractEvent): Promise<void> => {
     args: { user: '' },
   };
 
+  try {
+    /*
+     * Create the colony entry in the database
+     */
+    await createUniqueColony({
+      colonyAddress: utils.getAddress(colonyAddress),
+      tokenAddress: utils.getAddress(tokenAddress),
+      transactionHash,
+      initiatorAddress: utils.getAddress(colonyFounderAddress),
+    });
+  } catch (error) {
+    console.error(error);
+    /*
+     * If createUniqueColony fails for any reason, don't continue
+     */
+    return;
+  }
+
   /*
    * @NOTE This needs to called manually in here, as opposed to the handler
    * since all the role set events (5 ColonyRoleSets + 1 RecoverRoleSet) get emmited
@@ -98,42 +110,6 @@ export default async (event: ContractEvent): Promise<void> => {
    */
 
   await createColonyFounderInitialRoleEntry(event, colonyFounderAddress);
-
-  try {
-    /*
-     * Create the colony entry in the database
-     */
-    await createUniqueColony({
-      colonyAddress: utils.getAddress(colonyAddress),
-      tokenAddress: utils.getAddress(tokenAddress),
-      transactionHash,
-      initiatorAddress: utils.getAddress(colonyFounderAddress),
-    });
-  } catch {
-    /*
-     * If the createUniqueColony fails for any reason
-     * then we should tidy up the contributor we created
-     */
-    await mutate<
-      DeleteColonyContributorMutation,
-      DeleteColonyContributorMutationVariables
-    >(DeleteColonyContributorDocument, {
-      input: {
-        id: getColonyContributorId(colonyAddress, colonyFounderAddress),
-      },
-    });
-    return;
-  } finally {
-    /*
-     * Delete the ethereal metadata entry whether it is successful or fails
-     */
-    await mutate<
-      DeleteColonyMetadataMutation,
-      DeleteColonyMetadataMutationVariables
-    >(DeleteColonyMetadataDocument, {
-      input: { id: `etherealcolonymetadata-${transactionHash}` },
-    });
-  }
 
   /*
    * A new contributor is created when assigned permissions, so just update the watched status of the colony founder.
