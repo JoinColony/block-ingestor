@@ -11,9 +11,6 @@ import {
   GetColonyExtensionQuery,
   GetColonyExtensionQueryVariables,
   GetColonyExtensionDocument,
-  SetCurrentVersionDocument,
-  SetCurrentVersionMutation,
-  SetCurrentVersionMutationVariables,
   UpdateColonyExtensionByAddressDocument,
   UpdateColonyExtensionByAddressMutation,
   UpdateColonyExtensionByAddressMutationVariables,
@@ -22,6 +19,7 @@ import {
   GetColonyExtensionByHashAndColonyQueryVariables,
   CreateColonyExtensionInput,
 } from '~graphql';
+import { updateCurrentVersion } from '~utils/currentVersion';
 
 /**
  * Function writing the extension version to the db based on the ExtensionAddedToNetwork event payload
@@ -39,15 +37,7 @@ export const writeExtensionVersionFromEvent = async (
     'added to network',
   );
 
-  await mutate<SetCurrentVersionMutation, SetCurrentVersionMutationVariables>(
-    SetCurrentVersionDocument,
-    {
-      input: {
-        key: extensionHash,
-        version: convertedVersion,
-      },
-    },
-  );
+  await updateCurrentVersion(extensionHash, convertedVersion);
 };
 
 /**

@@ -8358,13 +8358,22 @@ export type UpdateColonyContributorMutation = {
   } | null;
 };
 
-export type SetCurrentVersionMutationVariables = Exact<{
-  input: SetCurrentVersionInput;
+export type CreateCurrentVersionMutationVariables = Exact<{
+  input: CreateCurrentVersionInput;
 }>;
 
-export type SetCurrentVersionMutation = {
+export type CreateCurrentVersionMutation = {
   __typename?: 'Mutation';
-  setCurrentVersion?: boolean | null;
+  createCurrentVersion?: { __typename?: 'CurrentVersion'; id: string } | null;
+};
+
+export type UpdateCurrentVersionMutationVariables = Exact<{
+  input: UpdateCurrentVersionInput;
+}>;
+
+export type UpdateCurrentVersionMutation = {
+  __typename?: 'Mutation';
+  updateCurrentVersion?: { __typename?: 'CurrentVersion'; id: string } | null;
 };
 
 export type UpdateColonyDecisionMutationVariables = Exact<{
@@ -8891,6 +8900,22 @@ export type GetColonyContributorQuery = {
     __typename?: 'ColonyContributor';
     id: string;
     isVerified: boolean;
+  } | null;
+};
+
+export type GetCurrentVersionQueryVariables = Exact<{
+  key: Scalars['String'];
+}>;
+
+export type GetCurrentVersionQuery = {
+  __typename?: 'Query';
+  getCurrentVersionByKey?: {
+    __typename?: 'ModelCurrentVersionConnection';
+    items: Array<{
+      __typename?: 'CurrentVersion';
+      id: string;
+      version: number;
+    } | null>;
   } | null;
 };
 
@@ -9640,9 +9665,18 @@ export const UpdateColonyContributorDocument = gql`
     }
   }
 `;
-export const SetCurrentVersionDocument = gql`
-  mutation SetCurrentVersion($input: SetCurrentVersionInput!) {
-    setCurrentVersion(input: $input)
+export const CreateCurrentVersionDocument = gql`
+  mutation CreateCurrentVersion($input: CreateCurrentVersionInput!) {
+    createCurrentVersion(input: $input) {
+      id
+    }
+  }
+`;
+export const UpdateCurrentVersionDocument = gql`
+  mutation UpdateCurrentVersion($input: UpdateCurrentVersionInput!) {
+    updateCurrentVersion(input: $input) {
+      id
+    }
   }
 `;
 export const UpdateColonyDecisionDocument = gql`
@@ -10005,6 +10039,16 @@ export const GetColonyContributorDocument = gql`
     getColonyContributor(id: $id) {
       id
       isVerified
+    }
+  }
+`;
+export const GetCurrentVersionDocument = gql`
+  query GetCurrentVersion($key: String!) {
+    getCurrentVersionByKey(key: $key) {
+      items {
+        id
+        version
+      }
     }
   }
 `;
