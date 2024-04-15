@@ -4277,6 +4277,14 @@ export type MotionStakesInput = {
 /** Quick access flages to check the current state of a motion in its lifecycle */
 export type MotionStateHistory = {
   __typename?: 'MotionStateHistory';
+  /** The timestamp when all votes were revealed */
+  allVotesRevealedAt?: Maybe<Scalars['AWSDateTime']>;
+  /** The timestamp when all votes were submitted */
+  allVotesSubmittedAt?: Maybe<Scalars['AWSDateTime']>;
+  /** The timestamp when the motion ended (Passed or failed) */
+  endedAt?: Maybe<Scalars['AWSDateTime']>;
+  /** The timestamp when the motion was finalized */
+  finalizedAt?: Maybe<Scalars['AWSDateTime']>;
   /** Whether the motion has failed */
   hasFailed: Scalars['Boolean'];
   /** Whether the motion has failed and cannot be finalized (e.g. if it doesn't get staked) */
@@ -4287,10 +4295,22 @@ export type MotionStateHistory = {
   hasVoted: Scalars['Boolean'];
   /** Motion is in reveal phase (votes are being revealed) */
   inRevealPhase: Scalars['Boolean'];
+  /** The timestamp when the NAY side was fully staked */
+  naySideFullyStakedAt?: Maybe<Scalars['AWSDateTime']>;
+  /** The timestamp when the YAY side was fully staked */
+  yaySideFullyStakedAt?: Maybe<Scalars['AWSDateTime']>;
 };
 
 /** Input used to change the current state of a motion */
 export type MotionStateHistoryInput = {
+  /** The timestamp when all votes were revealed */
+  allVotesRevealedAt?: InputMaybe<Scalars['AWSDateTime']>;
+  /** The timestamp when all votes were submitted */
+  allVotesSubmittedAt?: InputMaybe<Scalars['AWSDateTime']>;
+  /** The timestamp when the motion ended (Passed or failed) */
+  endedAt?: InputMaybe<Scalars['AWSDateTime']>;
+  /** The timestamp when the motion was finalized */
+  finalizedAt?: InputMaybe<Scalars['AWSDateTime']>;
   /** Whether the motion has failed */
   hasFailed: Scalars['Boolean'];
   /** Whether the motion has failed and cannot be finalized (e.g. if it doesn't get staked) */
@@ -4301,6 +4321,10 @@ export type MotionStateHistoryInput = {
   hasVoted: Scalars['Boolean'];
   /** Motion is in reveal phase (votes are being revealed) */
   inRevealPhase: Scalars['Boolean'];
+  /** The timestamp when the NAY side was fully staked */
+  naySideFullyStakedAt?: InputMaybe<Scalars['AWSDateTime']>;
+  /** The timestamp when the YAY side was fully staked */
+  yaySideFullyStakedAt?: InputMaybe<Scalars['AWSDateTime']>;
 };
 
 /** Root mutation type */
@@ -8248,6 +8272,12 @@ export type ColonyMotionFragment = {
     hasFailed: boolean;
     hasFailedNotFinalizable: boolean;
     inRevealPhase: boolean;
+    yaySideFullyStakedAt?: string | null;
+    naySideFullyStakedAt?: string | null;
+    allVotesSubmittedAt?: string | null;
+    allVotesRevealedAt?: string | null;
+    endedAt?: string | null;
+    finalizedAt?: string | null;
   };
 };
 
@@ -9296,6 +9326,12 @@ export type GetColonyMotionQuery = {
       hasFailed: boolean;
       hasFailedNotFinalizable: boolean;
       inRevealPhase: boolean;
+      yaySideFullyStakedAt?: string | null;
+      naySideFullyStakedAt?: string | null;
+      allVotesSubmittedAt?: string | null;
+      allVotesRevealedAt?: string | null;
+      endedAt?: string | null;
+      finalizedAt?: string | null;
     };
   } | null;
 };
@@ -9573,6 +9609,12 @@ export const ColonyMotion = gql`
       hasFailed
       hasFailedNotFinalizable
       inRevealPhase
+      yaySideFullyStakedAt
+      naySideFullyStakedAt
+      allVotesSubmittedAt
+      allVotesRevealedAt
+      endedAt
+      finalizedAt
     }
     isDecision
     transactionHash

@@ -48,6 +48,7 @@ export const setupMotionsListeners = (
     ContractEventsSignatures.MotionRewardClaimed,
     ContractEventsSignatures.MotionVoteSubmitted,
     ContractEventsSignatures.MotionVoteRevealed,
+    ContractEventsSignatures.MotionEventSet,
   ];
 
   motionEvents.forEach((eventSignature) =>
