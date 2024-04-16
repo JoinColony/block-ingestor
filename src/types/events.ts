@@ -69,6 +69,17 @@ export enum ContractEventsSignatures {
   MotionVoteRevealed = 'MotionVoteRevealed(uint256,address,uint256)',
   MotionEventSet = 'MotionEventSet(uint256,uint256)',
 
+  // Multisig
+
+  MultisigRoleSet = 'MultisigRoleSet(address agent, address user, uint256 domainId, uint256 roleId, bool setTo)',
+  MultisigMotionExecuted = 'MotionExecuted(address agent, uint256 motionId, bool success)',
+  MultisigMotionCancelled = 'MotionCancelled(address agent, uint256 motionId)',
+  MultisigMotionCreated = 'MotionCreated(address agent, uint256 motionId)',
+  MultisigApprovalChanged = 'ApprovalChanged(address agent, uint256 motionId, uint8 role, bool approval)',
+  MultisigRejectionChanged = 'RejectionChanged(address agent, uint256 motionId, uint8 role, bool approval)',
+  MultisigGlobalThresholdSet = 'GlobalThresholdSet(uint256 globalThreshold)',
+  MultisigDomainSkillThresholdSet = 'DomainSkillThresholdSet(uint256 domainSkillId, uint256 threshold)',
+
   // Expenditures
   ExpenditureGlobalClaimDelaySet = 'ExpenditureGlobalClaimDelaySet(address,uint256)',
   ExpenditureClaimDelaySet = 'ExpenditureClaimDelaySet(address,uint256,uint256,uint256)',
