@@ -11,6 +11,7 @@ export const SUPPORTED_EXTENSION_IDS = [
   Extension.StakedExpenditure,
   Extension.StagedExpenditure,
   Extension.StreamingPayments,
+  Extension.MultisigPermissions,
 ];
 
 export const SIMPLE_DECISIONS_ACTION_CODE = '0x12345678';
