@@ -30,6 +30,7 @@ import {
   handleExtensionUninstalled,
   handleExtensionUpgraded,
 } from '~handlers';
+import { setupListenersForMultiSigExtensions } from './multiSig';
 
 export * from './stakedExpenditure';
 export * from './stagedExpenditure';
@@ -91,6 +92,7 @@ export const setupListenersForExtensions = async (): Promise<void> => {
   await setupListenersForStakedExpenditureExtensions();
   await setupListenersForStagedExpenditureExtensions();
   await setupListenersForStreamingPaymentsExtensions();
+  await setupListenersForMultiSigExtensions();
 };
 
 export const fetchExistingExtensions = async (
