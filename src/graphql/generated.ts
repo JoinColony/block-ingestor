@@ -1490,20 +1490,6 @@ export type CreateTransactionInput = {
   titleValues?: InputMaybe<Scalars['String']>;
 };
 
-/** Input data for creating a unique Colony within the Colony Network. Use this instead of the automatically generated `CreateColonyInput` input type */
-export type CreateUniqueColonyInput = {
-  /** Unique identifier for the Colony. This is the Colony's contract address */
-  colonyAddress: Scalars['ID'];
-  /** User id of creator to associate with further invite codes */
-  initiatorAddress: Scalars['ID'];
-  /** Unique identifier for the Colony's native token (this is its address) */
-  tokenAddress: Scalars['ID'];
-  /** The transaction hash of colony creation transaction */
-  transactionHash: Scalars['String'];
-  /** Type of the Colony (regular or MetaColony) */
-  type?: InputMaybe<ColonyType>;
-};
-
 /** Input data for creating a unique user within the Colony Network Use this instead of the automatically generated `CreateUserInput` input type */
 export type CreateUniqueUserInput = {
   /** Unique identifier for the user. This is the user's wallet address */
@@ -4367,8 +4353,6 @@ export type Mutation = {
   createStreamingPaymentMetadata?: Maybe<StreamingPaymentMetadata>;
   createToken?: Maybe<Token>;
   createTransaction?: Maybe<Transaction>;
-  /** Create a unique Colony within the Colony Network. Use this instead of the automatically generated `createColony` mutation */
-  createUniqueColony?: Maybe<Colony>;
   /** Create a unique user within the Colony Network. Use this instead of the automatically generated `createUser` mutation */
   createUniqueUser?: Maybe<User>;
   createUser?: Maybe<User>;
@@ -4676,11 +4660,6 @@ export type MutationCreateTokenArgs = {
 export type MutationCreateTransactionArgs = {
   condition?: InputMaybe<ModelTransactionConditionInput>;
   input: CreateTransactionInput;
-};
-
-/** Root mutation type */
-export type MutationCreateUniqueColonyArgs = {
-  input?: InputMaybe<CreateUniqueColonyInput>;
 };
 
 /** Root mutation type */
