@@ -5,12 +5,12 @@ import { getColonyTokenAddress, getDomainDatabaseId } from '~utils';
 import { createMotionInDB } from '../helpers';
 
 export const handleMintTokensMotion = async (
+  colonyAddress: string,
   event: ContractEvent,
   parsedAction: TransactionDescription,
   gasEstimate: BigNumber,
 ): Promise<void> => {
   const {
-    colonyAddress,
     args: { domainId },
     blockNumber,
   } = event;
@@ -21,7 +21,7 @@ export const handleMintTokensMotion = async (
   const { name, args: actionArgs } = parsedAction;
   const amount = actionArgs[0].toString();
   const tokenAddress = await getColonyTokenAddress(colonyAddress, blockNumber);
-  await createMotionInDB(event, {
+  await createMotionInDB(colonyAddress, event, {
     type: motionNameMapping[name],
     tokenAddress,
     fromDomainId: getDomainDatabaseId(colonyAddress, domainId),

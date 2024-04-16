@@ -10,21 +10,17 @@ import { MultiPayment } from '~handlers/actions/oneTxPayment';
 import { createMotionInDB } from '../helpers';
 
 export const handlePaymentMotion = async (
+  colonyAddress: string,
   event: ContractEvent,
   parsedAction: TransactionDescription,
   gasEstimate: BigNumber,
 ): Promise<void> => {
-  const { colonyAddress } = event;
-  if (!colonyAddress) {
-    return;
-  }
-
   const { name, args: actionArgs } = parsedAction;
   const [, , , , recipients, tokenAddresses, amounts, fromDomainId] =
     actionArgs;
 
   if (recipients.length === 1) {
-    await createMotionInDB(event, {
+    await createMotionInDB(colonyAddress, event, {
       type: motionNameMapping[name],
       fromDomainId: getDomainDatabaseId(colonyAddress, toNumber(fromDomainId)),
       tokenAddress: tokenAddresses[0],
@@ -42,7 +38,7 @@ export const handlePaymentMotion = async (
       return payment;
     });
 
-    await createMotionInDB(event, {
+    await createMotionInDB(colonyAddress, event, {
       type: ColonyActionType.MultiplePaymentMotion,
       fromDomainId: getDomainDatabaseId(colonyAddress, toNumber(fromDomainId)),
       payments,

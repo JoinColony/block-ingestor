@@ -44,6 +44,7 @@ export interface ExtensionEventListener extends BaseEventListener {
   address: string;
   colonyAddress: string;
   extensionHash: string;
+  handler: EventHandler;
 }
 
 export type EventListener =

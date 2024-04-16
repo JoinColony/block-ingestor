@@ -6,6 +6,7 @@ import {
 } from '@colony/colony-js';
 import { LogDescription } from '@ethersproject/abi';
 import provider from '~provider';
+import { EventListener } from '~eventListeners';
 
 /*
  * Custom contract event, since we need some log values as well
@@ -17,8 +18,6 @@ export interface ContractEvent extends LogDescription {
   blockNumber: number;
   blockHash: string;
   timestamp: number;
-  // Optional property that will be set if the event is emitted by an extension
-  colonyAddress?: string;
 }
 
 /*
@@ -127,4 +126,7 @@ export type NetworkClients =
   | AnyColonyClient
   | AnyVotingReputationClient;
 
-export type EventHandler = (event: ContractEvent) => Promise<void>;
+export type EventHandler = (
+  event: ContractEvent,
+  listener: EventListener,
+) => Promise<void>;

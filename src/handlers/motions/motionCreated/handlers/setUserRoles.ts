@@ -11,15 +11,11 @@ import {
 import { createMotionInDB } from '../helpers';
 
 export const handleSetUserRolesMotion = async (
+  colonyAddress: string,
   event: ContractEvent,
   parsedAction: TransactionDescription,
   gasEstimate: BigNumber,
 ): Promise<void> => {
-  const { colonyAddress } = event;
-  if (!colonyAddress) {
-    return;
-  }
-
   const { name, args: actionArgs } = parsedAction;
   const [userAddress, domainId, zeroPadHexString] = actionArgs.slice(-3);
   const colonyRolesDatabaseId = getColonyRolesDatabaseId(
@@ -32,7 +28,7 @@ export const handleSetUserRolesMotion = async (
     colonyRolesDatabaseId,
   );
 
-  await createMotionInDB(event, {
+  await createMotionInDB(colonyAddress, event, {
     type: motionNameMapping[name],
     fromDomainId: getDomainDatabaseId(colonyAddress, domainId),
     recipientAddress: userAddress,

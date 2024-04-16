@@ -4,7 +4,7 @@ import {
   UpdateExpenditureMutation,
   UpdateExpenditureMutationVariables,
 } from '~graphql';
-import { ContractEvent } from '~types';
+import { EventHandler } from '~types';
 import {
   getCachedColonyClient,
   getExpenditureDatabaseId,
@@ -21,7 +21,7 @@ import {
   NotEditActionError,
 } from './helpers';
 
-export default async (event: ContractEvent): Promise<void> => {
+export const handleExpenditureStateChanged: EventHandler = async (event) => {
   const { contractAddress: colonyAddress } = event;
   const { expenditureId } = event.args;
   const convertedExpenditureId = toNumber(expenditureId);

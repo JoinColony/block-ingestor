@@ -6,18 +6,16 @@ import { getColonyDecisionId } from '~utils/decisions';
 import { SimpleTransactionDescription, createMotionInDB } from '../helpers';
 
 export const handleSimpleDecisionMotion = async (
+  colonyAddress: string,
   event: ContractEvent,
   parsedAction: SimpleTransactionDescription,
   gasEstimate: BigNumber,
 ): Promise<void> => {
-  const { colonyAddress, transactionHash } = event;
-  if (!colonyAddress) {
-    return;
-  }
+  const { transactionHash } = event;
 
   const { name } = parsedAction;
 
-  await createMotionInDB(event, {
+  await createMotionInDB(colonyAddress, event, {
     type: motionNameMapping[name],
     colonyDecisionId: getColonyDecisionId(colonyAddress, transactionHash),
     gasEstimate: gasEstimate.toString(),

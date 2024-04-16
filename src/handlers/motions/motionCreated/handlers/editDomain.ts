@@ -5,11 +5,12 @@ import { getDomainDatabaseId, getPendingMetadataDatabaseId } from '~utils';
 import { createMotionInDB } from '../helpers';
 
 export const handleEditDomainMotion = async (
+  colonyAddress: string,
   event: ContractEvent,
   parsedAction: TransactionDescription,
   gasEstimate: BigNumber,
 ): Promise<void> => {
-  const { transactionHash, colonyAddress } = event;
+  const { transactionHash } = event;
   if (!colonyAddress) {
     return;
   }
@@ -22,7 +23,7 @@ export const handleEditDomainMotion = async (
     transactionHash,
   );
 
-  await createMotionInDB(event, {
+  await createMotionInDB(colonyAddress, event, {
     type: motionNameMapping[name],
     pendingDomainMetadataId,
     fromDomainId: getDomainDatabaseId(colonyAddress, nativeDomainId),

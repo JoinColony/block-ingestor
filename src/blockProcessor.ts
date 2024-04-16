@@ -212,7 +212,7 @@ export const processNextBlock = async (): Promise<void> => {
         }
 
         // Call the handler in a blocking way to ensure events get processed sequentially
-        await listener.handler(event);
+        await listener.handler(event, listener);
       }
     }
 

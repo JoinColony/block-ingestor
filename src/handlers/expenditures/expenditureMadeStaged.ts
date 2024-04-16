@@ -1,22 +1,21 @@
 import { mutate } from '~amplifyClient';
+import { ExtensionEventListener } from '~eventListeners';
 import {
   ExpenditureType,
   UpdateExpenditureDocument,
   UpdateExpenditureMutation,
   UpdateExpenditureMutationVariables,
 } from '~graphql';
-import { ContractEvent } from '~types';
-import { getExpenditureDatabaseId, output, toNumber, verbose } from '~utils';
+import { EventHandler } from '~types';
+import { getExpenditureDatabaseId, toNumber, verbose } from '~utils';
 
-export default async (event: ContractEvent): Promise<void> => {
-  const { colonyAddress } = event;
+export const handleExpenditureMadeStaged: EventHandler = async (
+  event,
+  listener,
+) => {
   const { expenditureId, staged } = event.args;
   const convertedExpenditureId = toNumber(expenditureId);
-
-  if (!colonyAddress) {
-    output('Colony address missing for ExpenditureMadeStaged event');
-    return;
-  }
+  const { colonyAddress } = listener as ExtensionEventListener;
 
   verbose(
     `Expenditure with ID ${convertedExpenditureId} in colony ${colonyAddress} ${

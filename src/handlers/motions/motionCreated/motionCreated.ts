@@ -1,7 +1,7 @@
 import { BigNumber, constants } from 'ethers';
 import { StaticJsonRpcProvider } from '@ethersproject/providers';
 
-import { ColonyOperations, ContractEvent } from '~types';
+import { ColonyOperations, EventHandler } from '~types';
 import {
   getCachedColonyClient,
   getStakedExpenditureClient,
@@ -30,17 +30,17 @@ import {
   handleCancelExpenditureViaArbitrationMotion,
   handleFinalizeExpenditureViaArbitrationMotion,
 } from './handlers';
+import { ExtensionEventListener } from '~eventListeners';
 
-export default async (event: ContractEvent): Promise<void> => {
+export const handleMotionCreated: EventHandler = async (
+  event,
+  listener,
+): Promise<void> => {
   const {
     args: { motionId },
-    colonyAddress,
     blockNumber,
   } = event;
-
-  if (!colonyAddress) {
-    return;
-  }
+  const { colonyAddress } = listener as ExtensionEventListener;
 
   const colonyClient = await getCachedColonyClient(colonyAddress);
   const votingReputationClient = await getVotingClient(colonyAddress);
@@ -132,42 +132,78 @@ export default async (event: ContractEvent): Promise<void> => {
     /* Handle the action type-specific mutation here */
     switch (contractOperation) {
       case ColonyOperations.MintTokens: {
-        await handleMintTokensMotion(event, parsedAction, gasEstimate);
+        await handleMintTokensMotion(
+          colonyAddress,
+          event,
+          parsedAction,
+          gasEstimate,
+        );
         break;
       }
       case ColonyOperations.AddDomain: {
-        await handleAddDomainMotion(event, parsedAction, gasEstimate);
+        await handleAddDomainMotion(
+          colonyAddress,
+          event,
+          parsedAction,
+          gasEstimate,
+        );
         break;
       }
 
       case ColonyOperations.EditDomain: {
-        await handleEditDomainMotion(event, parsedAction, gasEstimate);
+        await handleEditDomainMotion(
+          colonyAddress,
+          event,
+          parsedAction,
+          gasEstimate,
+        );
         break;
       }
 
       case ColonyOperations.Upgrade: {
-        await handleNetworkUpgradeMotion(event, parsedAction, gasEstimate);
+        await handleNetworkUpgradeMotion(
+          colonyAddress,
+          event,
+          parsedAction,
+          gasEstimate,
+        );
         break;
       }
 
       case ColonyOperations.UnlockToken: {
-        await handleUnlockTokenMotion(event, parsedAction, gasEstimate);
+        await handleUnlockTokenMotion(
+          colonyAddress,
+          event,
+          parsedAction,
+          gasEstimate,
+        );
         break;
       }
 
       case ColonyOperations.MakePaymentFundedFromDomain: {
-        await handlePaymentMotion(event, parsedAction, gasEstimate);
+        await handlePaymentMotion(
+          colonyAddress,
+          event,
+          parsedAction,
+          gasEstimate,
+        );
         break;
       }
 
       case ColonyOperations.MoveFundsBetweenPots: {
-        await handleMoveFundsMotion(event, parsedAction, gasEstimate);
+        await handleMoveFundsMotion(
+          colonyAddress,
+          event,
+          parsedAction,
+          gasEstimate,
+        );
         break;
       }
 
       case ColonyOperations.EmitDomainReputationReward:
       case ColonyOperations.EmitDomainReputationPenalty: {
         await handleDomainEditReputationMotion(
+          colonyAddress,
           event,
           parsedAction,
           gasEstimate,
@@ -176,22 +212,38 @@ export default async (event: ContractEvent): Promise<void> => {
       }
 
       case ColonyOperations.EditColony: {
-        await handleEditColonyMotion(event, parsedAction, gasEstimate);
+        await handleEditColonyMotion(
+          colonyAddress,
+          event,
+          parsedAction,
+          gasEstimate,
+        );
         break;
       }
 
       case ColonyOperations.SetUserRoles: {
-        await handleSetUserRolesMotion(event, parsedAction, gasEstimate);
+        await handleSetUserRolesMotion(
+          colonyAddress,
+          event,
+          parsedAction,
+          gasEstimate,
+        );
         break;
       }
 
       case ColonyOperations.Multicall: {
-        await handleMulticallMotion(event, parsedAction, gasEstimate);
+        await handleMulticallMotion(
+          colonyAddress,
+          event,
+          parsedAction,
+          gasEstimate,
+        );
         break;
       }
 
       case ColonyOperations.SimpleDecision: {
         await handleSimpleDecisionMotion(
+          colonyAddress,
           event,
           parsedAction as SimpleTransactionDescription,
           gasEstimate,
@@ -201,6 +253,7 @@ export default async (event: ContractEvent): Promise<void> => {
 
       case ColonyOperations.MakeArbitraryTransactions: {
         await handleMakeArbitraryTransactionsMotion(
+          colonyAddress,
           event,
           parsedAction,
           gasEstimate,
@@ -211,6 +264,7 @@ export default async (event: ContractEvent): Promise<void> => {
 
       case ColonyOperations.CancelStakedExpenditure: {
         await handleCancelStakedExpenditureMotion(
+          colonyAddress,
           event,
           parsedAction,
           gasEstimate,
@@ -219,12 +273,18 @@ export default async (event: ContractEvent): Promise<void> => {
       }
 
       case ColonyOperations.EditColonyByDelta: {
-        await handleMetadataDeltaMotion(event, parsedAction, gasEstimate);
+        await handleMetadataDeltaMotion(
+          colonyAddress,
+          event,
+          parsedAction,
+          gasEstimate,
+        );
         break;
       }
 
       case ColonyOperations.CancelExpenditureViaArbitration: {
         await handleCancelExpenditureViaArbitrationMotion(
+          colonyAddress,
           event,
           parsedAction,
           gasEstimate,
@@ -234,6 +294,7 @@ export default async (event: ContractEvent): Promise<void> => {
 
       case ColonyOperations.FinalizeExpenditureViaArbitration: {
         await handleFinalizeExpenditureViaArbitrationMotion(
+          colonyAddress,
           event,
           parsedAction,
           gasEstimate,

@@ -245,6 +245,7 @@ type MotionFields = Omit<
   >;
 
 export const createMotionInDB = async (
+  colonyAddress: string,
   event: ContractEvent,
   motionFields: MotionFields,
 ): Promise<GraphQLFnReturn<CreateColonyMotionMutation> | undefined> => {
@@ -252,7 +253,6 @@ export const createMotionInDB = async (
     transactionHash,
     blockNumber,
     logIndex,
-    colonyAddress,
     args: { motionId, creator: creatorAddress, domainId },
     timestamp,
   } = event;
@@ -263,10 +263,6 @@ export const createMotionInDB = async (
     expenditureFunding,
     ...actionFields
   } = motionFields;
-
-  if (!colonyAddress) {
-    return;
-  }
 
   const votingClient = await getVotingClient(colonyAddress);
   if (!votingClient) {

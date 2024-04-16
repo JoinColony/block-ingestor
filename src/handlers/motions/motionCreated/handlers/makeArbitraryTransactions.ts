@@ -7,20 +7,15 @@ import { getDomainDatabaseId } from '~utils';
 import { createMotionInDB } from '../helpers';
 
 export const handleMakeArbitraryTransactionsMotion = async (
+  colonyAddress: string,
   event: ContractEvent,
   parsedAction: TransactionDescription,
   gasEstimate: BigNumber,
 ): Promise<void> => {
-  const { colonyAddress } = event;
-
-  if (!colonyAddress) {
-    return;
-  }
-
   const { name, args: actionArgs } = parsedAction;
   const [recipients] = actionArgs;
 
-  await createMotionInDB(event, {
+  await createMotionInDB(colonyAddress, event, {
     type: motionNameMapping[name],
     recipientAddress: recipients[0],
     fromDomainId: getDomainDatabaseId(colonyAddress, Id.RootDomain),
