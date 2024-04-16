@@ -21,8 +21,6 @@ import { verbose } from './logger';
 export const mapLogToContractEvent = async (
   log: Log,
   iface: utils.Interface,
-  // Additional properties to attach to the contract event
-  additionalProperties?: Record<string, unknown>,
 ): Promise<ContractEvent | null> => {
   const { provider } = networkClient;
   const {
@@ -51,7 +49,6 @@ export const mapLogToContractEvent = async (
       contractAddress: eventContractAddress,
       blockHash,
       timestamp,
-      ...additionalProperties,
     };
   } catch (error) {
     /*

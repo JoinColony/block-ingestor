@@ -1,9 +1,6 @@
 import { Log } from '@ethersproject/abstract-provider';
 import { blocksMap, getLatestSeenBlockNumber } from '~blockListener';
-import {
-  getAdditionalContractEventProperties,
-  getMatchingListeners,
-} from '~eventListeners';
+import { getMatchingListeners } from '~eventListeners';
 import { getInterfaceByListener } from '~interfaces';
 import provider from '~provider';
 import {
@@ -196,14 +193,7 @@ export const processNextBlock = async (): Promise<void> => {
           continue;
         }
 
-        // Depending on the listener type, we might want to "attach" some additional properties to the mapped event
-        const additionalProperties =
-          getAdditionalContractEventProperties(listener);
-        const event = await mapLogToContractEvent(
-          log,
-          iface,
-          additionalProperties,
-        );
+        const event = await mapLogToContractEvent(log, iface);
         if (!event) {
           output(
             `Failed to map log describing event ${listener.eventSignature} in transaction ${log.transactionHash} `,

@@ -1,6 +1,6 @@
 import { verbose } from '~utils';
 
-import { EventListener, EventListenerType } from './types';
+import { EventListener } from './types';
 
 let listeners: EventListener[] = [];
 
@@ -43,16 +43,3 @@ export const getMatchingListeners = (
 };
 
 export const getListenersStats = (): string => JSON.stringify(listeners);
-
-export const getAdditionalContractEventProperties = (
-  listener: EventListener,
-): Record<string, unknown> => {
-  switch (listener.type) {
-    case EventListenerType.Extension:
-      return {
-        colonyAddress: listener.colonyAddress,
-      };
-    default:
-      return {};
-  }
-};
