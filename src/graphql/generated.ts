@@ -8396,6 +8396,21 @@ export type ExpenditureFragment = {
   }> | null;
 };
 
+export type ExpenditureSlotFragment = {
+  __typename?: 'ExpenditureSlot';
+  id: number;
+  recipientAddress?: string | null;
+  claimDelay?: string | null;
+  payoutModifier?: number | null;
+  payouts?: Array<{
+    __typename?: 'ExpenditurePayout';
+    tokenAddress: string;
+    amount: string;
+    isClaimed: boolean;
+    networkFee?: string | null;
+  }> | null;
+};
+
 export type ExtensionFragment = {
   __typename?: 'ColonyExtension';
   id: string;
@@ -9037,6 +9052,50 @@ export type GetActionIdFromAnnotationQueryVariables = Exact<{
 export type GetActionIdFromAnnotationQuery = {
   __typename?: 'Query';
   getAnnotation?: { __typename?: 'Annotation'; actionId: string } | null;
+};
+
+export type GetActionByIdQueryVariables = Exact<{
+  id: Scalars['ID'];
+}>;
+
+export type GetActionByIdQuery = {
+  __typename?: 'Query';
+  getColonyAction?: {
+    __typename?: 'ColonyAction';
+    id: string;
+    type: ColonyActionType;
+    expenditureSlotChanges?: {
+      __typename?: 'ExpenditureSlotChanges';
+      oldSlots: Array<{
+        __typename?: 'ExpenditureSlot';
+        id: number;
+        recipientAddress?: string | null;
+        claimDelay?: string | null;
+        payoutModifier?: number | null;
+        payouts?: Array<{
+          __typename?: 'ExpenditurePayout';
+          tokenAddress: string;
+          amount: string;
+          isClaimed: boolean;
+          networkFee?: string | null;
+        }> | null;
+      }>;
+      newSlots: Array<{
+        __typename?: 'ExpenditureSlot';
+        id: number;
+        recipientAddress?: string | null;
+        claimDelay?: string | null;
+        payoutModifier?: number | null;
+        payouts?: Array<{
+          __typename?: 'ExpenditurePayout';
+          tokenAddress: string;
+          amount: string;
+          isClaimed: boolean;
+          networkFee?: string | null;
+        }> | null;
+      }>;
+    } | null;
+  } | null;
 };
 
 export type GetColonyMetadataQueryVariables = Exact<{
@@ -9836,6 +9895,20 @@ export const ColonyMetadata = gql`
     }
   }
 `;
+export const ExpenditureSlot = gql`
+  fragment ExpenditureSlot on ExpenditureSlot {
+    id
+    recipientAddress
+    claimDelay
+    payoutModifier
+    payouts {
+      tokenAddress
+      amount
+      isClaimed
+      networkFee
+    }
+  }
+`;
 export const ExpenditureBalance = gql`
   fragment ExpenditureBalance on ExpenditureBalance {
     tokenAddress
@@ -9846,16 +9919,7 @@ export const Expenditure = gql`
   fragment Expenditure on Expenditure {
     id
     slots {
-      id
-      recipientAddress
-      claimDelay
-      payoutModifier
-      payouts {
-        tokenAddress
-        amount
-        isClaimed
-        networkFee
-      }
+      ...ExpenditureSlot
     }
     motions {
       items {
@@ -9872,6 +9936,7 @@ export const Expenditure = gql`
     ownerAddress
     userStakeId
   }
+  ${ExpenditureSlot}
   ${ExpenditureBalance}
 `;
 export const Extension = gql`
@@ -10398,6 +10463,23 @@ export const GetActionIdFromAnnotationDocument = gql`
       actionId
     }
   }
+`;
+export const GetActionByIdDocument = gql`
+  query GetActionById($id: ID!) {
+    getColonyAction(id: $id) {
+      id
+      type
+      expenditureSlotChanges {
+        oldSlots {
+          ...ExpenditureSlot
+        }
+        newSlots {
+          ...ExpenditureSlot
+        }
+      }
+    }
+  }
+  ${ExpenditureSlot}
 `;
 export const GetColonyMetadataDocument = gql`
   query GetColonyMetadata($id: ID!) {
