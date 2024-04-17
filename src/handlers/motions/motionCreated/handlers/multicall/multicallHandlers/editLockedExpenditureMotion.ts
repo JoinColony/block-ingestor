@@ -117,7 +117,7 @@ export const editLockedExpenditureMotionHandler: MulticallHandler = async ({
   }
 
   createMotionInDB(event, {
-    type: ColonyActionType.EditLockedExpenditureMotion,
+    type: ColonyActionType.EditExpenditureMotion,
     gasEstimate,
     expenditureId: expenditure.id,
     editedExpenditureSlots: updatedSlots,
