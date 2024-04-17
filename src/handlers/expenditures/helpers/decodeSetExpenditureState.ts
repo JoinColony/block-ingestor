@@ -7,7 +7,6 @@ import {
 } from '~graphql';
 import { toNumber } from '~utils';
 
-import { getUpdatedExpenditureSlots } from './getUpdatedSlots';
 import {
   EXPENDITURESLOTS_SLOT,
   EXPENDITURESLOT_CLAIMDELAY,
@@ -18,49 +17,59 @@ import {
 } from '~constants';
 
 /**
- * Util function decoding the changes to the expenditure resulting from
- * the ExpenditureStateChanged event and merging them with the existing slots
+ * Util function decoding the changes to the expenditure slot resulting from
+ * the ExpenditureStateChanged event
  * It supports changes to the following properties:
  *  - Recipient address
  *  - Claim delay
  *  - Payout modifier
- * If there were no changes to the expenditure slots, it returns undefined
+ * If there were no changes to the expenditure slot, it returns undefined
  */
-export const decodeUpdatedSlots = (
+export const decodeUpdatedSlot = (
   expenditure: ExpenditureFragment,
   storageSlot: BigNumber,
   keys: string[],
   value: string,
-): ExpenditureSlot[] | undefined => {
-  let updatedSlots: ExpenditureSlot[] | undefined;
+): ExpenditureSlot | undefined => {
+  let updatedSlot: ExpenditureSlot | undefined;
 
   if (storageSlot.eq(EXPENDITURESLOTS_SLOT)) {
     const slotId = toNumber(keys[0]);
+
+    const existingSlot = expenditure.slots.find(
+      ({ id }) => id === toNumber(keys[0]),
+    );
 
     if (keys[1] === EXPENDITURESLOT_RECIPIENT) {
       const recipientAddress = utils.defaultAbiCoder
         .decode(['address'], value)
         .toString();
 
-      updatedSlots = getUpdatedExpenditureSlots(expenditure.slots, slotId, {
+      updatedSlot = {
+        ...existingSlot,
+        id: slotId,
         recipientAddress,
-      });
+      };
     } else if (keys[1] === EXPENDITURESLOT_CLAIMDELAY) {
       const claimDelay = BigNumber.from(value).toString();
 
-      updatedSlots = getUpdatedExpenditureSlots(expenditure.slots, slotId, {
+      updatedSlot = {
+        ...existingSlot,
+        id: slotId,
         claimDelay,
-      });
+      };
     } else if (keys[1] === EXPENDITURESLOT_PAYOUTMODIFIER) {
       const payoutModifier = toNumber(value);
 
-      updatedSlots = getUpdatedExpenditureSlots(expenditure.slots, slotId, {
+      updatedSlot = {
+        ...existingSlot,
+        id: slotId,
         payoutModifier,
-      });
+      };
     }
   }
 
-  return updatedSlots;
+  return updatedSlot;
 };
 
 const EXPENDITURE_CONTRACT_STATUS_TO_ENUM: Record<number, ExpenditureStatus> = {
