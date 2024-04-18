@@ -111,7 +111,7 @@ export const saveEvent = async (event: ContractEvent): Promise<void> => {
     id: `${chainId}_${transactionHash}_${logIndex}`,
     agent: parsedArgs?.agent || contractAddress,
     chainMetadata: {
-      chainId,
+      chainId: Number(chainId), // @TODO why did this change?
       transactionHash,
       logIndex,
       blockNumber,
