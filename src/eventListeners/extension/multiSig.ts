@@ -2,7 +2,7 @@ import { Extension, getExtensionHash } from '@colony/colony-js';
 import { handleExtensionInitialised } from '~handlers';
 
 import { ContractEventsSignatures } from '~types';
-import { output } from '~utils';
+import { output } from '~utils/logger';
 
 import { addExtensionEventListener, fetchExistingExtensions } from './index';
 
@@ -12,54 +12,39 @@ export const setupListenersForMultiSigExtensions = async (): Promise<void> => {
     getExtensionHash(Extension.MultisigPermissions),
   );
   existingExtensions.forEach((extension) =>
-    setupListenersForMultiSig(
-      extension.id,
-      extension.colonyId,
-      extension.isInitialized,
-    ),
+    setupMultiSigListeners(extension.id, extension.colonyId),
   );
 };
 
-export const setupListenersForMultiSig = (
+export const handleMultiSigInstalled = (
   votingReputationAddress: string,
   colonyAddress: string,
-  isInitialized: boolean,
 ): void => {
-  if (isInitialized) {
-    setupMotionsListeners(votingReputationAddress, colonyAddress);
-  } else {
-    addExtensionEventListener(
-      ContractEventsSignatures.ExtensionInitialised,
-      Extension.MultisigPermissions,
-      votingReputationAddress,
-      colonyAddress,
-      handleExtensionInitialised,
-    );
-  }
+  setupMultiSigListeners(votingReputationAddress, colonyAddress);
 };
 
-export const setupMotionsListeners = (
+export const setupMultiSigListeners = (
   votingReputationAddress: string,
   colonyAddress: string,
 ): void => {
-  const motionEvents = [
-    ContractEventsSignatures.MultisigRoleSet,
-    ContractEventsSignatures.MultisigMotionExecuted,
-    ContractEventsSignatures.MultisigMotionCancelled,
-    ContractEventsSignatures.MultisigMotionCreated,
-    ContractEventsSignatures.MultisigApprovalChanged,
-    ContractEventsSignatures.MultisigRejectionChanged,
-    ContractEventsSignatures.MultisigGlobalThresholdSet,
-    ContractEventsSignatures.MultisigDomainSkillThresholdSet,
-  ];
+  const motionEvents = {
+    [ContractEventsSignatures.MultisigRoleSet]: () => {},
+    [ContractEventsSignatures.MultisigMotionExecuted]: () => {},
+    [ContractEventsSignatures.MultisigMotionCancelled]: () => {},
+    [ContractEventsSignatures.MultisigMotionCreated]: () => {},
+    [ContractEventsSignatures.MultisigApprovalChanged]: () => {},
+    [ContractEventsSignatures.MultisigRejectionChanged]: () => {},
+    [ContractEventsSignatures.MultisigGlobalThresholdSet]: () => {},
+    [ContractEventsSignatures.MultisigDomainSkillThresholdSet]: () => {},
+  };
 
-  motionEvents.forEach((eventSignature) =>
+  Object.entries(motionEvents).forEach(([eventSignature, handler]) =>
     addExtensionEventListener(
       eventSignature,
       Extension.MultisigPermissions,
       votingReputationAddress,
       colonyAddress,
-      () => {},
+      handler,
     ),
   );
 };
