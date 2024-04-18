@@ -6,6 +6,7 @@ import {
   setupListenersForStagedExpenditure,
   setupListenerForOneTxPayment,
 } from '~eventListeners';
+import { handleMultiSigInstalled } from '~eventListeners/extension/multiSig';
 import { setupListenersForStreamingPayments } from '~eventListeners/extension/streamingPayments';
 import networkClient from '~networkClient';
 import { ContractEvent } from '~types';
@@ -22,6 +23,7 @@ export default async (event: ContractEvent): Promise<void> => {
   );
 
   await writeExtensionFromEvent(event, extensionAddress);
+  console.log('extension installed!', event);
 
   if (extensionHash === getExtensionHash(Extension.VotingReputation)) {
     setupListenersForVotingReputation(extensionAddress, colony, false);
@@ -33,6 +35,10 @@ export default async (event: ContractEvent): Promise<void> => {
     setupListenerForOneTxPayment(extensionAddress, colony);
   } else if (extensionHash === getExtensionHash(Extension.StreamingPayments)) {
     setupListenersForStreamingPayments(extensionAddress, colony);
+  } else if (
+    extensionHash === getExtensionHash(Extension.MultisigPermissions)
+  ) {
+    handleMultiSigInstalled(extensionAddress, colony);
   }
 
   await updateExtensionCount(extensionHash);
