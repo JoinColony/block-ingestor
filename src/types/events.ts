@@ -71,14 +71,14 @@ export enum ContractEventsSignatures {
 
   // Multisig
 
-  MultisigRoleSet = 'MultisigRoleSet(address agent, address user, uint256 domainId, uint256 roleId, bool setTo)',
-  MultisigMotionExecuted = 'MotionExecuted(address agent, uint256 motionId, bool success)',
-  MultisigMotionCancelled = 'MotionCancelled(address agent, uint256 motionId)',
-  MultisigMotionCreated = 'MotionCreated(address agent, uint256 motionId)',
-  MultisigApprovalChanged = 'ApprovalChanged(address agent, uint256 motionId, uint8 role, bool approval)',
-  MultisigRejectionChanged = 'RejectionChanged(address agent, uint256 motionId, uint8 role, bool approval)',
-  MultisigGlobalThresholdSet = 'GlobalThresholdSet(uint256 globalThreshold)',
-  MultisigDomainSkillThresholdSet = 'DomainSkillThresholdSet(uint256 domainSkillId, uint256 threshold)',
+  MultisigRoleSet = 'MultisigRoleSet(address,address,uint256,uint256,bool)',
+  MultisigMotionExecuted = 'MotionExecuted(address,uint256,bool)',
+  MultisigMotionCancelled = 'MotionCancelled(address,uint256)',
+  MultisigMotionCreated = 'MotionCreated(address,uint256)',
+  MultisigApprovalChanged = 'ApprovalChanged(address,uint256,uint8,bool)',
+  MultisigRejectionChanged = 'RejectionChanged(address,uint256,uint8,bool)',
+  MultisigGlobalThresholdSet = 'GlobalThresholdSet(uint256)',
+  MultisigDomainSkillThresholdSet = 'DomainSkillThresholdSet(uint256,uint256)',
 
   // Expenditures
   ExpenditureGlobalClaimDelaySet = 'ExpenditureGlobalClaimDelaySet(address,uint256)',
