@@ -23,7 +23,6 @@ export default async (event: ContractEvent): Promise<void> => {
   );
 
   await writeExtensionFromEvent(event, extensionAddress);
-  console.log('extension installed!', event);
 
   if (extensionHash === getExtensionHash(Extension.VotingReputation)) {
     setupListenersForVotingReputation(extensionAddress, colony, false);
