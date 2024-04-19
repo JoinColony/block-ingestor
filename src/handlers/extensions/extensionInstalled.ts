@@ -23,7 +23,6 @@ export default async (event: ContractEvent): Promise<void> => {
   );
 
   await writeExtensionFromEvent(event, extensionAddress);
-  console.log('extension installed!', event);
 
   if (extensionHash === getExtensionHash(Extension.VotingReputation)) {
     setupListenersForVotingReputation(extensionAddress, colony, false);
@@ -38,7 +37,7 @@ export default async (event: ContractEvent): Promise<void> => {
   } else if (
     extensionHash === getExtensionHash(Extension.MultisigPermissions)
   ) {
-    handleMultiSigInstalled(extensionAddress, colony);
+    await handleMultiSigInstalled(extensionAddress, colony);
   }
 
   await updateExtensionCount(extensionHash);
