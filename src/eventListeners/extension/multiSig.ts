@@ -1,6 +1,7 @@
 import { Extension, getExtensionHash } from '@colony/colony-js';
 
 import { ContractEventsSignatures } from '~types';
+import { addMultiSigParamsToDB } from '~utils/extensions/multiSig';
 import { output } from '~utils/logger';
 
 import { addExtensionEventListener, fetchExistingExtensions } from './index';
@@ -15,15 +16,16 @@ export const setupListenersForMultiSigExtensions = async (): Promise<void> => {
   );
 };
 
-export const handleMultiSigInstalled = (
-  votingReputationAddress: string,
+export const handleMultiSigInstalled = async (
+  multiSigAddress: string,
   colonyAddress: string,
-): void => {
-  setupMultiSigListeners(votingReputationAddress, colonyAddress);
+): Promise<void> => {
+  await addMultiSigParamsToDB(multiSigAddress, colonyAddress);
+  setupMultiSigListeners(multiSigAddress, colonyAddress);
 };
 
 export const setupMultiSigListeners = (
-  votingReputationAddress: string,
+  multiSigAddress: string,
   colonyAddress: string,
 ): void => {
   const motionEvents = [
@@ -41,7 +43,7 @@ export const setupMultiSigListeners = (
     addExtensionEventListener(
       eventSignature,
       Extension.MultisigPermissions,
-      votingReputationAddress,
+      multiSigAddress,
       colonyAddress,
     ),
   );
