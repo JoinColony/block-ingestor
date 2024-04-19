@@ -8,7 +8,7 @@ import {
 } from '~graphql';
 import { getMultiSigClient } from '~utils/clients';
 
-const getMultiSigParams = async (
+const getInitialMultiSigParams = async (
   multiSigClient: AnyMultisigPermissionsClient,
 ): Promise<ExtensionParams> => {
   const colonyThreshold = await multiSigClient.getGlobalThreshold();
@@ -30,7 +30,7 @@ export const addMultiSigParamsToDB = async (
     return;
   }
 
-  const params = await getMultiSigParams(multiSigClient);
+  const params = await getInitialMultiSigParams(multiSigClient);
   await mutate<
     UpdateColonyExtensionByAddressMutation,
     UpdateColonyExtensionByAddressMutationVariables
