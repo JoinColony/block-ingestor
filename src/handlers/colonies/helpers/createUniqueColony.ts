@@ -303,7 +303,7 @@ export const createUniqueColony = async ({
   >(CreateDomainMetadataDocument, {
     input: {
       id: `${checksummedAddress}_${Id.RootDomain}`,
-      color: DomainColor.LightPink,
+      color: DomainColor.Root,
       name: 'General',
       description: '',
     },
