@@ -10,8 +10,38 @@ mutation UpdateColonyMetadata($input: UpdateColonyMetadataInput!) {
   }
 }
 
-mutation CreateUniqueColony($input: CreateUniqueColonyInput!) {
-  createUniqueColony(input: $input) {
+mutation CreateColony(
+  $input: CreateColonyInput!
+  $condition: ModelColonyConditionInput
+) {
+  createColony(input: $input, condition: $condition) {
+    id
+  }
+}
+
+mutation CreateColonyMetadata($input: CreateColonyMetadataInput!) {
+  createColonyMetadata(input: $input) {
+    id
+  }
+}
+
+mutation DeleteColonyMetadata($input: DeleteColonyMetadataInput!) {
+  deleteColonyMetadata(input: $input) {
+    id
+  }
+}
+
+mutation CreateColonyMemberInvite(
+  $input: CreateColonyMemberInviteInput!
+  $condition: ModelColonyMemberInviteConditionInput
+) {
+  createColonyMemberInvite(input: $input, condition: $condition) {
+    id
+  }
+}
+
+mutation CreateColonyTokens($input: CreateColonyTokensInput!) {
+  createColonyTokens(input: $input) {
     id
   }
 }

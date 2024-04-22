@@ -1,12 +1,42 @@
 query GetColonyMetadata($id: ID!) {
   getColonyMetadata(id: $id) {
     ...ColonyMetadata
+    etherealData {
+      colonyAvatar
+      colonyDisplayName
+      colonyName
+      colonyThumbnail
+      initiatorAddress
+      tokenAvatar
+      tokenThumbnail
+    }
   }
 }
 
 query GetColony($id: ID!, $nextToken: String) {
   getColony(id: $id) {
     ...Colony
+  }
+  getColonyByAddress(id: $id) {
+    items {
+      id
+      name
+    }
+  }
+  getColonyByType(type: METACOLONY) {
+    items {
+      id
+      name
+    }
+  }
+}
+
+query GetColonyByName($name: String!) {
+  getColonyByName(name: $name) {
+    items {
+      id
+      name
+    }
   }
 }
 

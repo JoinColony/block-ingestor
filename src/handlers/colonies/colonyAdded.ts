@@ -6,9 +6,6 @@ import {
   UpdateColonyContributorDocument,
   UpdateColonyContributorMutation,
   UpdateColonyContributorMutationVariables,
-  CreateUniqueColonyDocument,
-  CreateUniqueColonyMutation,
-  CreateUniqueColonyMutationVariables,
   GetColonyMetadataDocument,
 } from '~graphql';
 import { coloniesSet } from '~stats';
@@ -21,6 +18,7 @@ import {
 } from '~utils';
 import { getColonyContributorId } from '~utils/contributors';
 import { tryFetchGraphqlQuery } from '~utils/graphql';
+import { createUniqueColony } from './helpers/createUniqueColony';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { transactionHash, args } = event;
@@ -76,6 +74,24 @@ export default async (event: ContractEvent): Promise<void> => {
     args: { user: '' },
   };
 
+  try {
+    /*
+     * Create the colony entry in the database
+     */
+    await createUniqueColony({
+      colonyAddress: utils.getAddress(colonyAddress),
+      tokenAddress: utils.getAddress(tokenAddress),
+      transactionHash,
+      initiatorAddress: utils.getAddress(colonyFounderAddress),
+    });
+  } catch (error) {
+    console.error(error);
+    /*
+     * If createUniqueColony fails for any reason, don't continue
+     */
+    return;
+  }
+
   /*
    * @NOTE This needs to called manually in here, as opposed to the handler
    * since all the role set events (5 ColonyRoleSets + 1 RecoverRoleSet) get emmited
@@ -110,27 +126,6 @@ export default async (event: ContractEvent): Promise<void> => {
       isWatching: true,
     },
   });
-
-  /*
-   * Create the colony entry in the database
-   *
-   * @TODO Move the logic from create unique colony in here, that way we can
-   * more granularly control the creation of the colony
-   *
-   * We can also do cool stuff like if there's an error creating the colony,
-   * tell the ingestor to stop watching it
-   */
-  await mutate<CreateUniqueColonyMutation, CreateUniqueColonyMutationVariables>(
-    CreateUniqueColonyDocument,
-    {
-      input: {
-        colonyAddress: utils.getAddress(colonyAddress),
-        tokenAddress: utils.getAddress(tokenAddress),
-        transactionHash,
-        initiatorAddress: utils.getAddress(colonyFounderAddress),
-      },
-    },
-  );
 
   /*
    * Setup all Colony specific listeners for it
