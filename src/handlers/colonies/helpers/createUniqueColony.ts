@@ -1,5 +1,6 @@
 import { Id } from '@colony/colony-js';
 import { utils } from 'ethers';
+import { randomUUID } from 'crypto';
 import { mutate, query } from '~amplifyClient';
 import {
   ColonyType,
@@ -189,7 +190,7 @@ export const createUniqueColony = async ({
     );
   }
 
-  const memberInviteCode = crypto.randomUUID();
+  const memberInviteCode = randomUUID();
 
   const chainId = getChainId();
   const version = await colonyClient.version();
