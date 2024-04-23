@@ -183,7 +183,7 @@ export const createUniqueColony = async ({
 
   const [existingToken] = tokenQuery?.data?.getTokenFromEverywhere?.items ?? [];
 
-  if (!existingToken || !existingToken?.id) {
+  if (!existingToken?.id) {
     throw new Error(
       `Token with address "${checksummedToken}" does not exist, hence it cannot be used as a native token for this colony`,
     );
@@ -322,7 +322,7 @@ export const createUniqueColony = async ({
         colonyId: checksummedAddress,
         isRoot: true,
         nativeId: Id.RootDomain,
-        nativeSkillId: skillId.toNumber(),
+        nativeSkillId: skillId.toString(),
         nativeFundingPotId: fundingPotId.toNumber(),
       },
     },
