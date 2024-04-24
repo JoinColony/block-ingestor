@@ -4,6 +4,7 @@ import { mutate, query } from '~amplifyClient';
 import {
   ColonyActionType,
   ExpenditureFragment,
+  ExpenditurePayout,
   ExpenditureSlot,
   ExpenditureStatus,
   GetActionByIdDocument,
@@ -22,6 +23,7 @@ import {
   writeActionFromEvent,
 } from '~utils';
 import { convertToCallTrace } from '~utils/convertTrace';
+import { splitAmountAndFee } from '~utils/networkFee';
 import {
   decodeUpdatedSlot,
   decodeUpdatedStatus,
@@ -115,9 +117,11 @@ export const createEditExpenditureAction = async (
   let hasUpdatedSlots = false;
   let updatedStatus: ExpenditureStatus | undefined;
 
-  for (const event of actionEvents) {
-    if (event.signature === ContractEventsSignatures.ExpenditureStateChanged) {
-      const updatedSlot = decodeUpdatedSlot(event, expenditure);
+  for (const actionEvent of actionEvents) {
+    if (
+      actionEvent.signature === ContractEventsSignatures.ExpenditureStateChanged
+    ) {
+      const updatedSlot = decodeUpdatedSlot(actionEvent, expenditure);
       if (updatedSlot) {
         updatedSlots = getUpdatedExpenditureSlots(
           updatedSlots,
@@ -128,10 +132,43 @@ export const createEditExpenditureAction = async (
         hasUpdatedSlots = true;
       }
 
-      const decodedStatus = decodeUpdatedStatus(event);
+      const decodedStatus = decodeUpdatedStatus(actionEvent);
       if (decodedStatus) {
         updatedStatus = decodedStatus;
       }
+    } else if (
+      actionEvent.signature === ContractEventsSignatures.ExpenditurePayoutSet
+    ) {
+      const {
+        slot,
+        token: tokenAddress,
+        amount: amountWithFee,
+      } = actionEvent.args;
+
+      const convertedSlot = toNumber(slot);
+      const existingPayouts =
+        expenditure.slots.find((slot) => slot.id === convertedSlot)?.payouts ??
+        [];
+
+      const [amountLessFee, feeAmount] = await splitAmountAndFee(amountWithFee);
+
+      const updatedPayouts: ExpenditurePayout[] = [
+        ...existingPayouts.filter(
+          (payout) => payout.tokenAddress !== tokenAddress,
+        ),
+        {
+          tokenAddress,
+          amount: amountLessFee,
+          networkFee: feeAmount,
+          isClaimed: false,
+        },
+      ];
+
+      updatedSlots = getUpdatedExpenditureSlots(updatedSlots, convertedSlot, {
+        payouts: updatedPayouts,
+      });
+
+      hasUpdatedSlots = true;
     }
   }
 
