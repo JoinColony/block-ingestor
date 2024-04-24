@@ -10208,19 +10208,28 @@ export type GetDomainMetadataQuery = {
   } | null;
 };
 
-export type GetDomainByNativeSkillIdQueryVariables = Exact<{
-  nativeSkillId: Scalars['String'];
+export type GetDomainsByExtensionAddressQueryVariables = Exact<{
+  extensionAddress: Scalars['ID'];
 }>;
 
-export type GetDomainByNativeSkillIdQuery = {
+export type GetDomainsByExtensionAddressQuery = {
   __typename?: 'Query';
-  getDomainByNativeSkillId?: {
-    __typename?: 'ModelDomainConnection';
+  listColonyExtensions?: {
+    __typename?: 'ModelColonyExtensionConnection';
     items: Array<{
-      __typename?: 'Domain';
-      id: string;
-      nativeSkillId: string;
-      nativeId: number;
+      __typename?: 'ColonyExtension';
+      colony: {
+        __typename?: 'Colony';
+        id: string;
+        domains?: {
+          __typename?: 'ModelDomainConnection';
+          items: Array<{
+            __typename?: 'Domain';
+            nativeSkillId: number;
+            nativeId: number;
+          } | null>;
+        } | null;
+      };
     } | null>;
   } | null;
 };
@@ -10446,6 +10455,30 @@ export type GetExtensionInstallationsCountQuery = {
     stagedExpenditure: number;
     streamingPayments: number;
     reputationWeighted: number;
+  } | null;
+};
+
+export type GetColonyExtensionByAddressQueryVariables = Exact<{
+  extensionAddress: Scalars['ID'];
+}>;
+
+export type GetColonyExtensionByAddressQuery = {
+  __typename?: 'Query';
+  getColonyExtension?: {
+    __typename?: 'ColonyExtension';
+    colonyId: string;
+    params?: {
+      __typename?: 'ExtensionParams';
+      multiSig?: {
+        __typename?: 'MultiSigParams';
+        colonyThreshold: number;
+        domainThresholds?: Array<{
+          __typename?: 'MultiSigDomainConfig';
+          domainId: string;
+          domainThreshold: number;
+        } | null> | null;
+      } | null;
+    } | null;
   } | null;
 };
 
@@ -11576,13 +11609,19 @@ export const GetDomainMetadataDocument = gql`
     }
   }
 `;
-export const GetDomainByNativeSkillIdDocument = gql`
-  query GetDomainByNativeSkillId($nativeSkillId: String!) {
-    getDomainByNativeSkillId(nativeSkillId: $nativeSkillId) {
+export const GetDomainsByExtensionAddressDocument = gql`
+  query GetDomainsByExtensionAddress($extensionAddress: ID!) {
+    listColonyExtensions(filter: { id: { eq: $extensionAddress } }) {
       items {
-        id
-        nativeSkillId
-        nativeId
+        colony {
+          domains {
+            items {
+              nativeSkillId
+              nativeId
+            }
+          }
+          id
+        }
       }
     }
   }
@@ -11699,6 +11738,22 @@ export const GetExtensionInstallationsCountDocument = gql`
       stagedExpenditure
       streamingPayments
       reputationWeighted
+    }
+  }
+`;
+export const GetColonyExtensionByAddressDocument = gql`
+  query GetColonyExtensionByAddress($extensionAddress: ID!) {
+    getColonyExtension(id: $extensionAddress) {
+      params {
+        multiSig {
+          colonyThreshold
+          domainThresholds {
+            domainId
+            domainThreshold
+          }
+        }
+      }
+      colonyId
     }
   }
 `;
