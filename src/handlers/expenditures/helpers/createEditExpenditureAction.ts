@@ -1,10 +1,14 @@
 import { AnyColonyClient } from '@colony/colony-js';
 import { utils } from 'ethers';
-import { mutate } from '~amplifyClient';
+import { mutate, query } from '~amplifyClient';
 import {
   ColonyActionType,
+  ExpenditureFragment,
   ExpenditureSlot,
   ExpenditureStatus,
+  GetActionByIdDocument,
+  GetActionByIdQuery,
+  GetActionByIdQueryVariables,
   UpdateExpenditureDocument,
   UpdateExpenditureMutation,
   UpdateExpenditureMutationVariables,
@@ -14,86 +18,117 @@ import { ContractEvent, ContractEventsSignatures } from '~types';
 import {
   getExpenditureDatabaseId,
   mapLogToContractEvent,
-  notNull,
   toNumber,
   writeActionFromEvent,
 } from '~utils';
+import { convertToCallTrace } from '~utils/convertTrace';
 import {
   decodeUpdatedSlot,
   decodeUpdatedStatus,
 } from './decodeSetExpenditureState';
-import { getExpenditureFromDB } from './getExpenditure';
-import { getUpdatedExpenditureSlotsWithHistory } from './getUpdatedSlots';
+import { getUpdatedExpenditureSlots } from './getUpdatedSlots';
+
+export enum CreateEditExpenditureActionResult {
+  NotEditAction = 'NotEditAction',
+}
+
+const MULTICALL_SIGNATURE = '0xac9650d8';
+const SET_EXPENDITURE_STATE_SIGNATURE = '0xc9a2ce7c';
+const SET_EXPENDITURE_PAYOUT_SIGNATURE = '0xbae82ec9';
 
 export const createEditExpenditureAction = async (
   event: ContractEvent,
+  expenditure: ExpenditureFragment,
   colonyClient: AnyColonyClient,
-): Promise<void> => {
-  const { contractAddress: colonyAddress, transactionHash, logIndex } = event;
+): Promise<CreateEditExpenditureActionResult | undefined> => {
+  const { transactionHash } = event;
 
-  const receipt = await provider.getTransactionReceipt(transactionHash);
-  const logs = await Promise.all(
-    receipt.logs.filter(
-      (log) =>
-        log.topics.includes(
-          utils.id(ContractEventsSignatures.ExpenditureStateChanged),
-        ) ||
-        log.topics.includes(
-          utils.id(ContractEventsSignatures.ExpenditurePayoutSet),
-        ),
-    ),
-  );
-
-  /**
-   * Do not create action if the event is not the first relevant log in the transaction
-   */
-  if (logIndex !== logs[0]?.logIndex) {
+  const actionExists = await checkActionExists(transactionHash);
+  if (actionExists) {
     return;
   }
 
+  const { contractAddress: colonyAddress, blockNumber } = event;
   const { expenditureId } = event.args;
+
   const convertedExpenditureId = toNumber(expenditureId);
   const databaseId = getExpenditureDatabaseId(
     colonyAddress,
     convertedExpenditureId,
   );
 
-  const expenditure = await getExpenditureFromDB(databaseId);
-  if (!expenditure) {
-    return;
+  const callTrace = await getCallTrace(transactionHash);
+
+  let setStateCount = 0;
+  let setPayoutCount = 0;
+
+  // @TODO: Implement counting potential calls to setExpenditureState and setExpenditurePayout before and after the multicall
+  for (const call of callTrace.calls) {
+    if (call.input.startsWith(MULTICALL_SIGNATURE)) {
+      for (const subCall of call.calls) {
+        if (subCall.input.startsWith(SET_EXPENDITURE_STATE_SIGNATURE)) {
+          setStateCount += 1;
+        } else if (subCall.input.startsWith(SET_EXPENDITURE_PAYOUT_SIGNATURE)) {
+          setPayoutCount += 1;
+        }
+      }
+    }
   }
 
-  let updatedSlots: ExpenditureSlot[] = [];
+  // If there are no relevant calls (or no multicall at all), there is no edit action
+  if (!setStateCount && !setPayoutCount) {
+    return CreateEditExpenditureActionResult.NotEditAction;
+  }
+
+  const logs = await provider.getLogs({
+    fromBlock: blockNumber,
+    toBlock: blockNumber,
+    topics: [
+      [
+        utils.id(ContractEventsSignatures.ExpenditureStateChanged),
+        utils.id(ContractEventsSignatures.ExpenditurePayoutSet),
+      ],
+    ],
+  });
+
+  const actionEvents = [];
+  for (const log of logs) {
+    try {
+      const event = await mapLogToContractEvent(log, colonyClient.interface);
+      if (
+        event?.signature === ContractEventsSignatures.ExpenditureStateChanged &&
+        setStateCount > 0
+      ) {
+        actionEvents.push(event);
+        setStateCount -= 1;
+      } else if (
+        event?.signature === ContractEventsSignatures.ExpenditurePayoutSet &&
+        setPayoutCount > 0
+      ) {
+        actionEvents.push(event);
+        setPayoutCount -= 1;
+      }
+    } catch {}
+  }
+
+  let updatedSlots: ExpenditureSlot[] = expenditure.slots;
+  let hasUpdatedSlots = false;
   let updatedStatus: ExpenditureStatus | undefined;
 
-  const events = (
-    await Promise.all(
-      logs.map((log) => mapLogToContractEvent(log, colonyClient.interface)),
-    )
-  ).filter(notNull);
-
-  for (const event of events) {
+  for (const event of actionEvents) {
     if (event.signature === ContractEventsSignatures.ExpenditureStateChanged) {
-      const { storageSlot, value } = event.args;
-      // The unfortunate naming of the `keys` property means we have to access it like so
-      const keys = event.args[4];
-
-      const updatedSlot = decodeUpdatedSlot(
-        expenditure,
-        storageSlot,
-        keys,
-        value,
-      );
+      const updatedSlot = decodeUpdatedSlot(event, expenditure);
       if (updatedSlot) {
-        updatedSlots = getUpdatedExpenditureSlotsWithHistory(
-          expenditure.slots,
+        updatedSlots = getUpdatedExpenditureSlots(
+          updatedSlots,
           updatedSlot.id,
           updatedSlot,
-          updatedSlots,
         );
+
+        hasUpdatedSlots = true;
       }
 
-      const decodedStatus = decodeUpdatedStatus(storageSlot, keys, value);
+      const decodedStatus = decodeUpdatedStatus(event);
       if (decodedStatus) {
         updatedStatus = decodedStatus;
       }
@@ -111,7 +146,7 @@ export const createEditExpenditureAction = async (
     },
   );
 
-  if (updatedSlots) {
+  if (hasUpdatedSlots) {
     const { agent: initiatorAddress } = event.args;
 
     await writeActionFromEvent(event, colonyAddress, {
@@ -124,4 +159,32 @@ export const createEditExpenditureAction = async (
       },
     });
   }
+};
+
+const checkActionExists = async (transactionHash: string): Promise<boolean> => {
+  const existingActionQuery = await query<
+    GetActionByIdQuery,
+    GetActionByIdQueryVariables
+  >(GetActionByIdDocument, {
+    id: transactionHash,
+  });
+
+  return !!existingActionQuery?.data?.getColonyAction;
+};
+
+const getCallTrace = async (transactionHash: string): Promise<any> => {
+  const transaction = await provider.getTransaction(transactionHash);
+
+  const isDev = process.env.NODE_ENV === 'development';
+  const trace = await provider.send('debug_traceTransaction', [
+    transactionHash,
+    ...(!isDev ? [{ tracer: 'callTracer' }] : []),
+  ]);
+
+  let callTrace = trace;
+  if (isDev) {
+    callTrace = convertToCallTrace(trace, transaction);
+  }
+
+  return callTrace;
 };
