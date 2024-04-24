@@ -1,11 +1,10 @@
 import {
   ColonyActionType,
   ExpenditurePayout,
-  ExpenditureSlot,
   ExpenditureStatus,
 } from '~graphql';
 import { toNumber } from 'lodash';
-import { getUpdatedExpenditureSlotsWithHistory } from '~handlers/expenditures/helpers';
+import { getUpdatedExpenditureSlots } from '~handlers/expenditures/helpers';
 import { utils } from 'ethers';
 import {
   EXPENDITURESLOTS_SLOT,
@@ -39,11 +38,11 @@ export const editLockedExpenditureMotionHandler: MulticallHandler = async ({
   decodedFunctions,
   expenditure,
 }) => {
-  let updatedSlots: ExpenditureSlot[] = [];
-
   if (!expenditure) {
     return;
   }
+
+  let updatedSlots = expenditure.slots;
 
   for (const decodedFunction of decodedFunctions) {
     if (
@@ -70,14 +69,9 @@ export const editLockedExpenditureMotionHandler: MulticallHandler = async ({
         },
       ];
 
-      updatedSlots = getUpdatedExpenditureSlotsWithHistory(
-        expenditure.slots,
-        convertedSlot,
-        {
-          payouts: updatedPayouts,
-        },
-        updatedSlots,
-      );
+      updatedSlots = getUpdatedExpenditureSlots(updatedSlots, convertedSlot, {
+        payouts: updatedPayouts,
+      });
     } else if (
       decodedFunction.fragment === ContractMethodSignatures.SetExpenditureState
     ) {
@@ -92,24 +86,22 @@ export const editLockedExpenditureMotionHandler: MulticallHandler = async ({
             .decode(['address'], value)
             .toString();
 
-          updatedSlots = getUpdatedExpenditureSlotsWithHistory(
-            expenditure.slots,
+          updatedSlots = getUpdatedExpenditureSlots(
+            updatedSlots,
             convertedSlot,
             {
               recipientAddress,
             },
-            updatedSlots,
           );
         } else if (slotType === EXPENDITURESLOT_CLAIMDELAY) {
           const claimDelay = toNumber(value).toString();
 
-          updatedSlots = getUpdatedExpenditureSlotsWithHistory(
-            expenditure.slots,
+          updatedSlots = getUpdatedExpenditureSlots(
+            updatedSlots,
             convertedSlot,
             {
               claimDelay,
             },
-            updatedSlots,
           );
         }
       }
