@@ -58,6 +58,7 @@ import {
 import {
   handleMultiSigCreated,
   handleMultiSigGlobalThresholdUpdated,
+  handleDomainSkillThresholdSet,
 } from '~handlers/multiSig';
 
 dotenv.config();
@@ -375,6 +376,11 @@ export default async (event: ContractEvent): Promise<void> => {
 
     case ContractEventsSignatures.MultisigGlobalThresholdSet: {
       await handleMultiSigGlobalThresholdUpdated(event);
+      return;
+    }
+
+    case ContractEventsSignatures.MultisigDomainSkillThresholdSet: {
+      await handleDomainSkillThresholdSet(event);
       return;
     }
 
