@@ -15,3 +15,13 @@ query GetDomainMetadata($id: ID!) {
     }
   }
 }
+
+query GetDomainByNativeSkillId($nativeSkillId: Int!) {
+  getDomainByNativeSkillId(nativeSkillId: $nativeSkillId) {
+    items {
+      id
+      nativeSkillId
+      nativeId
+    }
+  }
+}
