@@ -15,10 +15,11 @@ import {
   EXPENDITURES_SLOT,
   EXPENDITURE_OWNER_AND_STATUS,
 } from '~constants';
+import { ContractEvent } from '~types';
 
 /**
- * Util function decoding the changes to the expenditure slot resulting from
- * the ExpenditureStateChanged event
+ * Util function decoding changes to the expenditure slot resulting from
+ * an ExpenditureStateChanged event
  * It supports changes to the following properties:
  *  - Recipient address
  *  - Claim delay
@@ -26,11 +27,13 @@ import {
  * If there were no changes to the expenditure slot, it returns undefined
  */
 export const decodeUpdatedSlot = (
+  event: ContractEvent,
   expenditure: ExpenditureFragment,
-  storageSlot: BigNumber,
-  keys: string[],
-  value: string,
 ): ExpenditureSlot | undefined => {
+  const { storageSlot, value } = event.args;
+  // The unfortunate naming of the `keys` property means we have to access it like so
+  const keys = event.args[4];
+
   let updatedSlot: ExpenditureSlot | undefined;
 
   if (storageSlot.eq(EXPENDITURESLOTS_SLOT)) {
@@ -79,11 +82,16 @@ const EXPENDITURE_CONTRACT_STATUS_TO_ENUM: Record<number, ExpenditureStatus> = {
   3: ExpenditureStatus.Locked,
 };
 
+/**
+ * Util decoding changes to expenditure status following an ExpenditureStateChanged event
+ */
 export const decodeUpdatedStatus = (
-  storageSlot: BigNumber,
-  keys: string[],
-  value: string,
+  event: ContractEvent,
 ): ExpenditureStatus | undefined => {
+  const { storageSlot, value } = event.args;
+  // The unfortunate naming of the `keys` property means we have to access it like so
+  const keys = event.args[4];
+
   let updatedStatus: ExpenditureStatus | undefined;
 
   if (storageSlot.eq(EXPENDITURES_SLOT)) {
