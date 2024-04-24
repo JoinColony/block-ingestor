@@ -54,7 +54,10 @@ import {
   handleColonyMetadataDelta,
   handleMotionEventSet,
 } from './handlers';
-import { handleMultiSigGlobalThresholdUpdated } from '~handlers/multiSig';
+import {
+  handleMultiSigCreated,
+  handleMultiSigGlobalThresholdUpdated,
+} from '~handlers/multiSig';
 
 dotenv.config();
 
@@ -178,6 +181,12 @@ export default async (event: ContractEvent): Promise<void> => {
 
     case ContractEventsSignatures.MotionEventSet: {
       await handleMotionEventSet(event);
+      return;
+    }
+
+    /* Entry points for multiSig events */
+    case ContractEventsSignatures.MultisigMotionCreated: {
+      await handleMultiSigCreated(event);
       return;
     }
 

@@ -71,3 +71,27 @@ export enum MotionVote {
   NAY,
   YAY,
 }
+
+export const multiSigNameMapping: { [key: string]: ColonyActionType } = {
+  [ColonyOperations.MintTokens]: ColonyActionType.MintTokensMultisig,
+  [ColonyOperations.AddDomain]: ColonyActionType.CreateDomainMultisig,
+  [ColonyOperations.EditDomain]: ColonyActionType.EditDomainMultisig,
+  [ColonyOperations.MakePaymentFundedFromDomain]:
+    ColonyActionType.PaymentMultisig,
+  [ColonyOperations.UnlockToken]: ColonyActionType.UnlockTokenMultisig,
+  [ColonyOperations.EditColony]: ColonyActionType.ColonyEditMultisig,
+  [ColonyOperations.SetUserRoles]: ColonyActionType.SetUserRolesMultisig,
+  [ColonyOperations.MoveFundsBetweenPots]: ColonyActionType.MoveFundsMultisig,
+  [ColonyOperations.Upgrade]: ColonyActionType.VersionUpgradeMultisig,
+  [ColonyOperations.EmitDomainReputationPenalty]:
+    ColonyActionType.EmitDomainReputationPenaltyMultisig,
+  [ColonyOperations.EmitDomainReputationReward]:
+    ColonyActionType.EmitDomainReputationRewardMultisig,
+  [ColonyOperations.SimpleDecision]: ColonyActionType.CreateDecisionMultisig,
+  [ColonyOperations.MakeArbitraryTransactions]:
+    ColonyActionType.MakeArbitraryTransactionsMultisig,
+  [ColonyOperations.CancelStakedExpenditure]:
+    ColonyActionType.CancelStakedExpenditureMultisig,
+  [ColonyOperations.SetExpenditureState]:
+    ColonyActionType.SetExpenditureStateMultisig,
+};
