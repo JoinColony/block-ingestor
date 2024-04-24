@@ -50,3 +50,18 @@ query GetExtensionInstallationsCount($id: ID!) {
     reputationWeighted
   }
 }
+
+query GetColonyExtensionByAddress($extensionAddress: ID!) {
+  getColonyExtension(id: $extensionAddress) {
+    params {
+      multiSig {
+        colonyThreshold
+        domainThresholds {
+          domainId
+          domainThreshold
+        }
+      }
+    }
+    colonyId
+  }
+}
