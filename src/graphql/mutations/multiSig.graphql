@@ -1,0 +1,11 @@
+mutation CreateColonyMultiSig($input: CreateColonyMultiSigInput!) {
+  createColonyMultiSig(input: $input) {
+    id
+  }
+}
+
+mutation UpdateColonyMultiSig($input: UpdateColonyMultiSigInput!) {
+  updateColonyMultiSig(input: $input) {
+    id
+  }
+}
