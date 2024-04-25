@@ -68,7 +68,13 @@ export const createEditExpenditureAction = async (
   let setStateCount = 0;
   let setPayoutCount = 0;
 
-  // @TODO: Implement counting potential calls to setExpenditureState and setExpenditurePayout before and after the multicall
+  /**
+   * @NOTE: There might be other setExpenditureState and setExpenditurePayout calls in the transaction
+   * that are not part of the multicall, so we need to also count and skip them later
+   */
+  let setStateSkipCount = 0;
+  let setPayoutSkipCount = 0;
+
   for (const call of callTrace.calls) {
     if (call.input.startsWith(MULTICALL_SIGNATURE)) {
       for (const subCall of call.calls) {
@@ -78,6 +84,15 @@ export const createEditExpenditureAction = async (
           setPayoutCount += 1;
         }
       }
+
+      break;
+    }
+
+    if (call.input.startsWith(SET_EXPENDITURE_STATE_SIGNATURE)) {
+      setStateSkipCount += 1;
+    }
+    if (call.input.startsWith(SET_EXPENDITURE_PAYOUT_SIGNATURE)) {
+      setPayoutSkipCount += 1;
     }
   }
 
@@ -105,12 +120,22 @@ export const createEditExpenditureAction = async (
         event?.signature === ContractEventsSignatures.ExpenditureStateChanged &&
         setStateCount > 0
       ) {
+        if (setStateSkipCount > 0) {
+          setStateSkipCount -= 1;
+          continue;
+        }
+
         actionEvents.push(event);
         setStateCount -= 1;
       } else if (
         event?.signature === ContractEventsSignatures.ExpenditurePayoutSet &&
         setPayoutCount > 0
       ) {
+        if (setPayoutSkipCount > 0) {
+          setPayoutSkipCount -= 1;
+          continue;
+        }
+
         actionEvents.push(event);
         setPayoutCount -= 1;
       }
