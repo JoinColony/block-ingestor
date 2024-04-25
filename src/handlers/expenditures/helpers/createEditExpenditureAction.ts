@@ -59,6 +59,10 @@ export const createEditExpenditureAction = async (
     convertedExpenditureId,
   );
 
+  /**
+   * @NOTE: Call trace will contain all the calls made in the transaction
+   * We need to determine if there was a multicall containing calls to setExpenditureState and setExpenditurePayout
+   */
   const callTrace = await getCallTrace(transactionHash);
 
   let setStateCount = 0;
@@ -113,6 +117,9 @@ export const createEditExpenditureAction = async (
     } catch {}
   }
 
+  /**
+   * Determine changes to the expenditure after all relevant events have been processed
+   */
   let updatedSlots: ExpenditureSlot[] = expenditure.slots;
   let hasUpdatedSlots = false;
   let updatedStatus: ExpenditureStatus | undefined;
