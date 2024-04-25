@@ -1,4 +1,4 @@
-import { BigNumber, utils } from 'ethers';
+import { BigNumber, BigNumberish, utils } from 'ethers';
 
 import {
   ExpenditureFragment,
@@ -17,6 +17,12 @@ import {
 } from '~constants';
 import { ContractEvent } from '~types';
 
+interface SetExpenditureStateParams {
+  storageSlot: BigNumberish;
+  keys: string[];
+  value: string;
+}
+
 /**
  * Util function decoding changes to the expenditure slot resulting from
  * an ExpenditureStateChanged event
@@ -27,16 +33,15 @@ import { ContractEvent } from '~types';
  * If there were no changes to the expenditure slot, it returns undefined
  */
 export const decodeUpdatedSlot = (
-  event: ContractEvent,
   expenditure: ExpenditureFragment,
+  params: SetExpenditureStateParams,
 ): ExpenditureSlot | undefined => {
-  const { storageSlot, value } = event.args;
+  const { storageSlot, value, keys } = params;
   // The unfortunate naming of the `keys` property means we have to access it like so
-  const keys = event.args[4];
 
   let updatedSlot: ExpenditureSlot | undefined;
 
-  if (storageSlot.eq(EXPENDITURESLOTS_SLOT)) {
+  if (BigNumber.from(storageSlot).eq(EXPENDITURESLOTS_SLOT)) {
     const slotId = toNumber(keys[0]);
 
     const existingSlot = expenditure.slots.find(

@@ -128,7 +128,15 @@ export const createEditExpenditureAction = async (
     if (
       actionEvent.signature === ContractEventsSignatures.ExpenditureStateChanged
     ) {
-      const updatedSlot = decodeUpdatedSlot(actionEvent, expenditure);
+      const { storageSlot, value } = actionEvent.args;
+      const keys = actionEvent.args[4];
+
+      const updatedSlot = decodeUpdatedSlot(expenditure, {
+        storageSlot,
+        keys,
+        value,
+      });
+
       if (updatedSlot) {
         updatedSlots = getUpdatedExpenditureSlots(
           updatedSlots,
