@@ -51,7 +51,14 @@ export default async (event: ContractEvent): Promise<void> => {
   );
 
   if (result === CreateEditExpenditureActionResult.NotEditAction) {
-    const updatedSlot = decodeUpdatedSlot(event, expenditure);
+    const { storageSlot, value } = event.args;
+    const keys = event.args[4];
+
+    const updatedSlot = decodeUpdatedSlot(expenditure, {
+      storageSlot,
+      keys,
+      value,
+    });
     const updatedSlots = updatedSlot
       ? getUpdatedExpenditureSlots(
           expenditure.slots,
