@@ -1,5 +1,11 @@
 import { ContractEvent } from '~types';
-import { getExpenditureDatabaseId, output, toNumber, verbose } from '~utils';
+import {
+  getCachedColonyClient,
+  getExpenditureDatabaseId,
+  output,
+  toNumber,
+  verbose,
+} from '~utils';
 import {
   ExpenditurePayout,
   UpdateExpenditureDocument,
@@ -9,7 +15,12 @@ import {
 import { mutate } from '~amplifyClient';
 import { splitAmountAndFee } from '~utils/networkFee';
 
-import { getExpenditureFromDB, getUpdatedExpenditureSlots } from './helpers';
+import {
+  getExpenditureFromDB,
+  getUpdatedExpenditureSlots,
+  createEditExpenditureAction,
+  CreateEditExpenditureActionResult,
+} from './helpers';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { contractAddress: colonyAddress } = event;
@@ -17,7 +28,10 @@ export default async (event: ContractEvent): Promise<void> => {
   const convertedExpenditureId = toNumber(expenditureId);
   const convertedSlot = toNumber(slot);
 
-  const [amountLessFee, feeAmount] = await splitAmountAndFee(amount);
+  const colonyClient = await getCachedColonyClient(colonyAddress);
+  if (!colonyClient) {
+    return;
+  }
 
   const databaseId = getExpenditureDatabaseId(
     colonyAddress,
@@ -32,38 +46,51 @@ export default async (event: ContractEvent): Promise<void> => {
     return;
   }
 
-  const existingPayouts =
-    expenditure.slots.find((slot) => slot.id === convertedSlot)?.payouts ?? [];
-
-  const updatedPayouts: ExpenditurePayout[] = [
-    ...existingPayouts.filter((payout) => payout.tokenAddress !== tokenAddress),
-    {
-      tokenAddress,
-      amount: amountLessFee,
-      networkFee: feeAmount,
-      isClaimed: false,
-    },
-  ];
-
-  const updatedSlots = getUpdatedExpenditureSlots(
-    expenditure.slots,
-    convertedSlot,
-    {
-      payouts: updatedPayouts,
-    },
+  const result = await createEditExpenditureAction(
+    event,
+    expenditure,
+    colonyClient,
   );
 
-  verbose(
-    `Payout set for expenditure with ID ${convertedExpenditureId} in colony ${colonyAddress}`,
-  );
+  if (result === CreateEditExpenditureActionResult.NotEditAction) {
+    const [amountLessFee, feeAmount] = await splitAmountAndFee(amount);
 
-  await mutate<UpdateExpenditureMutation, UpdateExpenditureMutationVariables>(
-    UpdateExpenditureDocument,
-    {
-      input: {
-        id: databaseId,
-        slots: updatedSlots,
+    const existingPayouts =
+      expenditure.slots.find((slot) => slot.id === convertedSlot)?.payouts ??
+      [];
+
+    const updatedPayouts: ExpenditurePayout[] = [
+      ...existingPayouts.filter(
+        (payout) => payout.tokenAddress !== tokenAddress,
+      ),
+      {
+        tokenAddress,
+        amount: amountLessFee,
+        networkFee: feeAmount,
+        isClaimed: false,
       },
-    },
-  );
+    ];
+
+    const updatedSlots = getUpdatedExpenditureSlots(
+      expenditure.slots,
+      convertedSlot,
+      {
+        payouts: updatedPayouts,
+      },
+    );
+
+    verbose(
+      `Payout set for expenditure with ID ${convertedExpenditureId} in colony ${colonyAddress}`,
+    );
+
+    await mutate<UpdateExpenditureMutation, UpdateExpenditureMutationVariables>(
+      UpdateExpenditureDocument,
+      {
+        input: {
+          id: databaseId,
+          slots: updatedSlots,
+        },
+      },
+    );
+  }
 };
