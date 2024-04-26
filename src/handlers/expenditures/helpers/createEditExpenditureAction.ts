@@ -30,19 +30,33 @@ import {
 } from './decodeSetExpenditureState';
 import { getUpdatedExpenditureSlots } from './getUpdatedSlots';
 
-export enum CreateEditExpenditureActionResult {
-  NotEditAction = 'NotEditAction',
+export class NotEditActionError extends Error {
+  constructor() {
+    super('Transaction does not contain edit expenditure action');
+  }
 }
 
 const MULTICALL_SIGNATURE = '0xac9650d8';
 const SET_EXPENDITURE_STATE_SIGNATURE = '0xc9a2ce7c';
 const SET_EXPENDITURE_PAYOUT_SIGNATURE = '0xbae82ec9';
 
+const METHOD_SIGNATURE_TO_EVENT: Record<string, ContractEventsSignatures> = {
+  [SET_EXPENDITURE_STATE_SIGNATURE]:
+    ContractEventsSignatures.ExpenditureStateChanged,
+  [SET_EXPENDITURE_PAYOUT_SIGNATURE]:
+    ContractEventsSignatures.ExpenditurePayoutSet,
+};
+
+/**
+ * This function gets called for both `ExpenditureStateChanged` and `ExpenditurePayoutSet` events
+ * It determines whether the event is part of an edit action and creates it in the DB
+ * Otherwise, it returns a result allowing the handler to continue processing as normal
+ */
 export const createEditExpenditureAction = async (
   event: ContractEvent,
   expenditure: ExpenditureFragment,
   colonyClient: AnyColonyClient,
-): Promise<CreateEditExpenditureActionResult | undefined> => {
+): Promise<void> => {
   const { transactionHash } = event;
 
   const actionExists = await checkActionExists(transactionHash);
@@ -59,88 +73,11 @@ export const createEditExpenditureAction = async (
     convertedExpenditureId,
   );
 
-  /**
-   * @NOTE: Call trace will contain all the calls made in the transaction
-   * We need to determine if there was a multicall containing calls to setExpenditureState and setExpenditurePayout
-   */
-  const callTrace = await getCallTrace(transactionHash);
-
-  let setStateCount = 0;
-  let setPayoutCount = 0;
-
-  /**
-   * @NOTE: There might be other setExpenditureState and setExpenditurePayout calls in the transaction
-   * that are not part of the multicall, so we need to also count and skip them later
-   */
-  let setStateSkipCount = 0;
-  let setPayoutSkipCount = 0;
-
-  for (const call of callTrace.calls) {
-    if (call.input.startsWith(MULTICALL_SIGNATURE)) {
-      for (const subCall of call.calls) {
-        if (subCall.input.startsWith(SET_EXPENDITURE_STATE_SIGNATURE)) {
-          setStateCount += 1;
-        } else if (subCall.input.startsWith(SET_EXPENDITURE_PAYOUT_SIGNATURE)) {
-          setPayoutCount += 1;
-        }
-      }
-
-      break;
-    }
-
-    if (call.input.startsWith(SET_EXPENDITURE_STATE_SIGNATURE)) {
-      setStateSkipCount += 1;
-    }
-    if (call.input.startsWith(SET_EXPENDITURE_PAYOUT_SIGNATURE)) {
-      setPayoutSkipCount += 1;
-    }
-  }
-
-  // If there are no relevant calls (or no multicall at all), there is no edit action
-  if (!setStateCount && !setPayoutCount) {
-    return CreateEditExpenditureActionResult.NotEditAction;
-  }
-
-  const logs = await provider.getLogs({
-    fromBlock: blockNumber,
-    toBlock: blockNumber,
-    topics: [
-      [
-        utils.id(ContractEventsSignatures.ExpenditureStateChanged),
-        utils.id(ContractEventsSignatures.ExpenditurePayoutSet),
-      ],
-    ],
-  });
-
-  const actionEvents = [];
-  for (const log of logs) {
-    try {
-      const event = await mapLogToContractEvent(log, colonyClient.interface);
-      if (
-        event?.signature === ContractEventsSignatures.ExpenditureStateChanged &&
-        setStateCount > 0
-      ) {
-        if (setStateSkipCount > 0) {
-          setStateSkipCount -= 1;
-          continue;
-        }
-
-        actionEvents.push(event);
-        setStateCount -= 1;
-      } else if (
-        event?.signature === ContractEventsSignatures.ExpenditurePayoutSet &&
-        setPayoutCount > 0
-      ) {
-        if (setPayoutSkipCount > 0) {
-          setPayoutSkipCount -= 1;
-          continue;
-        }
-
-        actionEvents.push(event);
-        setPayoutCount -= 1;
-      }
-    } catch {}
-  }
+  const actionEvents = await getEditActionEvents(
+    transactionHash,
+    blockNumber,
+    colonyClient,
+  );
 
   /**
    * Determine changes to the expenditure after all relevant events have been processed
@@ -264,4 +201,98 @@ const getCallTrace = async (transactionHash: string): Promise<any> => {
   }
 
   return callTrace;
+};
+
+const getEditActionEvents = async (
+  transactionHash: string,
+  blockNumber: number,
+  colonyClient: AnyColonyClient,
+): Promise<ContractEvent[]> => {
+  /**
+   * @NOTE: Call trace will contain all the calls made in the transaction
+   * We need to determine if there was a multicall containing calls to setExpenditureState and setExpenditurePayout
+   */
+  const callTrace = await getCallTrace(transactionHash);
+
+  const eventSignatures = [
+    ContractEventsSignatures.ExpenditureStateChanged,
+    ContractEventsSignatures.ExpenditurePayoutSet,
+  ];
+
+  /**
+   * Count number of relevant events inside multicall
+   * and number of events before the multicall that we need to skip
+   */
+  const eventCounts = eventSignatures.reduce<
+    Partial<Record<ContractEventsSignatures, number>>
+  >((acc, signature) => {
+    acc[signature] = 0;
+    return acc;
+  }, {});
+
+  const skipEventCounts = eventSignatures.reduce<
+    Partial<Record<ContractEventsSignatures, number>>
+  >((acc, signature) => {
+    acc[signature] = 0;
+    return acc;
+  }, {});
+
+  for (const call of callTrace.calls) {
+    if (call.input.startsWith(MULTICALL_SIGNATURE)) {
+      for (const subCall of call.calls) {
+        const event =
+          METHOD_SIGNATURE_TO_EVENT[subCall.input.slice(0, 10) as string];
+        if (event) {
+          eventCounts[event] = (eventCounts[event] ?? 0) + 1;
+        }
+      }
+
+      break;
+    }
+
+    const event = METHOD_SIGNATURE_TO_EVENT[call.input.slice(0, 10) as string];
+    if (event) {
+      skipEventCounts[event] = (skipEventCounts[event] ?? 0) + 1;
+    }
+  }
+
+  if (Object.values(eventCounts).every((count) => count === 0)) {
+    throw new NotEditActionError();
+  }
+
+  const logs = await provider.getLogs({
+    fromBlock: blockNumber,
+    toBlock: blockNumber,
+    topics: [
+      [
+        utils.id(ContractEventsSignatures.ExpenditureStateChanged),
+        utils.id(ContractEventsSignatures.ExpenditurePayoutSet),
+      ],
+    ],
+  });
+
+  const actionEvents = [];
+  for (const log of logs) {
+    const event = await mapLogToContractEvent(log, colonyClient.interface);
+
+    if (!event) {
+      continue;
+    }
+
+    const eventSignature = event.signature as ContractEventsSignatures;
+
+    if ((skipEventCounts[eventSignature] ?? 0) > 0) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      skipEventCounts[eventSignature]! -= 1;
+      continue;
+    }
+
+    if ((eventCounts[eventSignature] ?? 0) > 0) {
+      actionEvents.push(event);
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      eventCounts[eventSignature]! -= 1;
+    }
+  }
+
+  return actionEvents;
 };
