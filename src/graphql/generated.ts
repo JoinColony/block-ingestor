@@ -630,9 +630,11 @@ export type ColonyHistoricRole = {
   domainId: Scalars['ID'];
   /**
    * Unique identifier for the role snapshot
-   * Format: `colonyAddress_domainNativeId_userAddress_blockNumber_roles`
+   * Format: `<colonyAddress>_<domainNativeId>_<userAddress>_<blockNumber>_roles`  or `<colonyAddress>_<domainNativeId>_<userAddress>_<blockNumber>_multisig_roles`
    */
   id: Scalars['ID'];
+  /** Will be true if the colony role is a multi sig role */
+  isMultiSig?: Maybe<Scalars['Boolean']>;
   /** Recovery role */
   role_0?: Maybe<Scalars['Boolean']>;
   /** Root role */
@@ -885,9 +887,11 @@ export type ColonyRole = {
   domainId: Scalars['ID'];
   /**
    * Unique identifier for the role snapshot
-   * Format: `<colonyAddress>_<domainNativeId>_<userAddress>_roles`
+   * Format: `<colonyAddress>_<domainNativeId>_<userAddress>_roles` or `<colonyAddress>_<domainNativeId>_<userAddress>_multisig_roles`
    */
   id: Scalars['ID'];
+  /** Will be true if the colony role is a multi sig role */
+  isMultiSig?: Maybe<Scalars['Boolean']>;
   /** Block at which permissions were update last */
   latestBlock: Scalars['Int'];
   /** Recovery role */
@@ -1176,6 +1180,7 @@ export type CreateColonyHistoricRoleInput = {
   createdAt?: InputMaybe<Scalars['AWSDateTime']>;
   domainId: Scalars['ID'];
   id?: InputMaybe<Scalars['ID']>;
+  isMultiSig?: InputMaybe<Scalars['Boolean']>;
   role_0?: InputMaybe<Scalars['Boolean']>;
   role_1?: InputMaybe<Scalars['Boolean']>;
   role_2?: InputMaybe<Scalars['Boolean']>;
@@ -1259,6 +1264,7 @@ export type CreateColonyRoleInput = {
   colonyRolesId?: InputMaybe<Scalars['ID']>;
   domainId: Scalars['ID'];
   id?: InputMaybe<Scalars['ID']>;
+  isMultiSig?: InputMaybe<Scalars['Boolean']>;
   latestBlock: Scalars['Int'];
   role_0?: InputMaybe<Scalars['Boolean']>;
   role_1?: InputMaybe<Scalars['Boolean']>;
@@ -1773,6 +1779,8 @@ export enum DomainColor {
   PurpleGrey = 'PURPLE_GREY',
   /** A red color */
   Red = 'RED',
+  /** The default domain color for the root domain. Only used by the root by default and cannot be selected by the user. */
+  Root = 'ROOT',
   /** A yellow color */
   Yellow = 'YELLOW',
 }
@@ -2479,6 +2487,7 @@ export type ModelColonyHistoricRoleConditionInput = {
   colonyId?: InputMaybe<ModelIdInput>;
   createdAt?: InputMaybe<ModelStringInput>;
   domainId?: InputMaybe<ModelIdInput>;
+  isMultiSig?: InputMaybe<ModelBooleanInput>;
   not?: InputMaybe<ModelColonyHistoricRoleConditionInput>;
   or?: InputMaybe<Array<InputMaybe<ModelColonyHistoricRoleConditionInput>>>;
   role_0?: InputMaybe<ModelBooleanInput>;
@@ -2504,6 +2513,7 @@ export type ModelColonyHistoricRoleFilterInput = {
   createdAt?: InputMaybe<ModelStringInput>;
   domainId?: InputMaybe<ModelIdInput>;
   id?: InputMaybe<ModelIdInput>;
+  isMultiSig?: InputMaybe<ModelBooleanInput>;
   not?: InputMaybe<ModelColonyHistoricRoleFilterInput>;
   or?: InputMaybe<Array<InputMaybe<ModelColonyHistoricRoleFilterInput>>>;
   role_0?: InputMaybe<ModelBooleanInput>;
@@ -2628,6 +2638,7 @@ export type ModelColonyRoleConditionInput = {
   colonyAddress?: InputMaybe<ModelIdInput>;
   colonyRolesId?: InputMaybe<ModelIdInput>;
   domainId?: InputMaybe<ModelIdInput>;
+  isMultiSig?: InputMaybe<ModelBooleanInput>;
   latestBlock?: InputMaybe<ModelIntInput>;
   not?: InputMaybe<ModelColonyRoleConditionInput>;
   or?: InputMaybe<Array<InputMaybe<ModelColonyRoleConditionInput>>>;
@@ -2652,6 +2663,7 @@ export type ModelColonyRoleFilterInput = {
   colonyRolesId?: InputMaybe<ModelIdInput>;
   domainId?: InputMaybe<ModelIdInput>;
   id?: InputMaybe<ModelIdInput>;
+  isMultiSig?: InputMaybe<ModelBooleanInput>;
   latestBlock?: InputMaybe<ModelIntInput>;
   not?: InputMaybe<ModelColonyRoleFilterInput>;
   or?: InputMaybe<Array<InputMaybe<ModelColonyRoleFilterInput>>>;
@@ -3532,6 +3544,7 @@ export type ModelSubscriptionColonyHistoricRoleFilterInput = {
   createdAt?: InputMaybe<ModelSubscriptionStringInput>;
   domainId?: InputMaybe<ModelSubscriptionIdInput>;
   id?: InputMaybe<ModelSubscriptionIdInput>;
+  isMultiSig?: InputMaybe<ModelSubscriptionBooleanInput>;
   or?: InputMaybe<
     Array<InputMaybe<ModelSubscriptionColonyHistoricRoleFilterInput>>
   >;
@@ -3601,6 +3614,7 @@ export type ModelSubscriptionColonyRoleFilterInput = {
   colonyAddress?: InputMaybe<ModelSubscriptionIdInput>;
   domainId?: InputMaybe<ModelSubscriptionIdInput>;
   id?: InputMaybe<ModelSubscriptionIdInput>;
+  isMultiSig?: InputMaybe<ModelSubscriptionBooleanInput>;
   latestBlock?: InputMaybe<ModelSubscriptionIntInput>;
   or?: InputMaybe<Array<InputMaybe<ModelSubscriptionColonyRoleFilterInput>>>;
   role_0?: InputMaybe<ModelSubscriptionBooleanInput>;
@@ -4424,8 +4438,6 @@ export type Mutation = {
   deleteUserTokens?: Maybe<UserTokens>;
   /** Removes the user from the colony whitelist */
   removeMemberFromColonyWhitelist?: Maybe<Scalars['Boolean']>;
-  /** Updates the latest available version of a Colony or an extension */
-  setCurrentVersion?: Maybe<Scalars['Boolean']>;
   updateAnnotation?: Maybe<Annotation>;
   updateColony?: Maybe<Colony>;
   updateColonyAction?: Maybe<ColonyAction>;
@@ -4942,11 +4954,6 @@ export type MutationDeleteUserTokensArgs = {
 /** Root mutation type */
 export type MutationRemoveMemberFromColonyWhitelistArgs = {
   input: RemoveMemberFromColonyWhitelistInput;
-};
-
-/** Root mutation type */
-export type MutationSetCurrentVersionArgs = {
-  input?: InputMaybe<SetCurrentVersionInput>;
 };
 
 /** Root mutation type */
@@ -6605,18 +6612,6 @@ export type SearchableStringFilterInput = {
   wildcard?: InputMaybe<Scalars['String']>;
 };
 
-/**
- * Input data to store the latest available version of the core Colony contract and available extensions
- *
- * The extension hash is generated like so: `keccak256(toUtf8Bytes(extensionName))`, where `extensionName` is the name of the extension contract file in the Colony Network (e.g. `VotingReputation`)
- */
-export type SetCurrentVersionInput = {
-  /** COLONY for the Colony contract, extension hash for extensions */
-  key: Scalars['String'];
-  /** Latest available version */
-  version: Scalars['Int'];
-};
-
 export type SimpleTarget = {
   __typename?: 'SimpleTarget';
   id: Scalars['String'];
@@ -7585,6 +7580,7 @@ export type UpdateColonyHistoricRoleInput = {
   createdAt?: InputMaybe<Scalars['AWSDateTime']>;
   domainId?: InputMaybe<Scalars['ID']>;
   id: Scalars['ID'];
+  isMultiSig?: InputMaybe<Scalars['Boolean']>;
   role_0?: InputMaybe<Scalars['Boolean']>;
   role_1?: InputMaybe<Scalars['Boolean']>;
   role_2?: InputMaybe<Scalars['Boolean']>;
@@ -7668,6 +7664,7 @@ export type UpdateColonyRoleInput = {
   colonyRolesId?: InputMaybe<Scalars['ID']>;
   domainId?: InputMaybe<Scalars['ID']>;
   id: Scalars['ID'];
+  isMultiSig?: InputMaybe<Scalars['Boolean']>;
   latestBlock?: InputMaybe<Scalars['Int']>;
   role_0?: InputMaybe<Scalars['Boolean']>;
   role_1?: InputMaybe<Scalars['Boolean']>;
