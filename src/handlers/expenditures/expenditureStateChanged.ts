@@ -18,7 +18,7 @@ import {
   getUpdatedExpenditureSlots,
   decodeUpdatedStatus,
   createEditExpenditureAction,
-  CreateEditExpenditureActionResult,
+  NotEditActionError,
 } from './helpers';
 
 export default async (event: ContractEvent): Promise<void> => {
@@ -44,44 +44,43 @@ export default async (event: ContractEvent): Promise<void> => {
     return;
   }
 
-  const result = await createEditExpenditureAction(
-    event,
-    expenditure,
-    colonyClient,
-  );
+  try {
+    await createEditExpenditureAction(event, expenditure, colonyClient);
+  } catch (error) {
+    if (error instanceof NotEditActionError) {
+      // If transaction does not contain edit expenditure action, continue processing as normal
+      const { storageSlot, value } = event.args;
+      const keys = event.args[4];
 
-  if (result === CreateEditExpenditureActionResult.NotEditAction) {
-    const { storageSlot, value } = event.args;
-    const keys = event.args[4];
-
-    const updatedSlot = decodeUpdatedSlot(expenditure, {
-      storageSlot,
-      keys,
-      value,
-    });
-    const updatedSlots = updatedSlot
-      ? getUpdatedExpenditureSlots(
-          expenditure.slots,
-          updatedSlot.id,
-          updatedSlot,
-        )
-      : undefined;
-
-    const updatedStatus = decodeUpdatedStatus(event);
-
-    verbose(`State of expenditure with ID ${databaseId} changed`);
-
-    if (!!updatedSlots || !!updatedStatus) {
-      await mutate<
-        UpdateExpenditureMutation,
-        UpdateExpenditureMutationVariables
-      >(UpdateExpenditureDocument, {
-        input: {
-          id: databaseId,
-          slots: updatedSlots,
-          status: updatedStatus,
-        },
+      const updatedSlot = decodeUpdatedSlot(expenditure, {
+        storageSlot,
+        keys,
+        value,
       });
+      const updatedSlots = updatedSlot
+        ? getUpdatedExpenditureSlots(
+            expenditure.slots,
+            updatedSlot.id,
+            updatedSlot,
+          )
+        : undefined;
+
+      const updatedStatus = decodeUpdatedStatus(event);
+
+      verbose(`State of expenditure with ID ${databaseId} changed`);
+
+      if (!!updatedSlots || !!updatedStatus) {
+        await mutate<
+          UpdateExpenditureMutation,
+          UpdateExpenditureMutationVariables
+        >(UpdateExpenditureDocument, {
+          input: {
+            id: databaseId,
+            slots: updatedSlots,
+            status: updatedStatus,
+          },
+        });
+      }
     }
   }
 };
