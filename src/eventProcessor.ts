@@ -227,7 +227,8 @@ export default async (event: ContractEvent): Promise<void> => {
       return;
     }
 
-    case ContractEventsSignatures.ColonyRoleSet: {
+    case ContractEventsSignatures.ColonyRoleSet:
+    case ContractEventsSignatures.MultisigRoleSet: {
       await handleManagePermissionsAction(event);
       return;
     }
