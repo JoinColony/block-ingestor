@@ -19,7 +19,7 @@ import {
   getExpenditureFromDB,
   getUpdatedExpenditureSlots,
   createEditExpenditureAction,
-  CreateEditExpenditureActionResult,
+  NotEditActionError,
 } from './helpers';
 
 export default async (event: ContractEvent): Promise<void> => {
@@ -46,51 +46,50 @@ export default async (event: ContractEvent): Promise<void> => {
     return;
   }
 
-  const result = await createEditExpenditureAction(
-    event,
-    expenditure,
-    colonyClient,
-  );
+  try {
+    await createEditExpenditureAction(event, expenditure, colonyClient);
+  } catch (error) {
+    if (error instanceof NotEditActionError) {
+      // If transaction does not contain edit expenditure action, continue processing as normal
+      const [amountLessFee, feeAmount] = await splitAmountAndFee(amount);
 
-  if (result === CreateEditExpenditureActionResult.NotEditAction) {
-    const [amountLessFee, feeAmount] = await splitAmountAndFee(amount);
+      const existingPayouts =
+        expenditure.slots.find((slot) => slot.id === convertedSlot)?.payouts ??
+        [];
 
-    const existingPayouts =
-      expenditure.slots.find((slot) => slot.id === convertedSlot)?.payouts ??
-      [];
+      const updatedPayouts: ExpenditurePayout[] = [
+        ...existingPayouts.filter(
+          (payout) => payout.tokenAddress !== tokenAddress,
+        ),
+        {
+          tokenAddress,
+          amount: amountLessFee,
+          networkFee: feeAmount,
+          isClaimed: false,
+        },
+      ];
 
-    const updatedPayouts: ExpenditurePayout[] = [
-      ...existingPayouts.filter(
-        (payout) => payout.tokenAddress !== tokenAddress,
-      ),
-      {
-        tokenAddress,
-        amount: amountLessFee,
-        networkFee: feeAmount,
-        isClaimed: false,
-      },
-    ];
+      const updatedSlots = getUpdatedExpenditureSlots(
+        expenditure.slots,
+        convertedSlot,
+        {
+          payouts: updatedPayouts,
+        },
+      );
 
-    const updatedSlots = getUpdatedExpenditureSlots(
-      expenditure.slots,
-      convertedSlot,
-      {
-        payouts: updatedPayouts,
-      },
-    );
+      verbose(
+        `Payout set for expenditure with ID ${convertedExpenditureId} in colony ${colonyAddress}`,
+      );
 
-    verbose(
-      `Payout set for expenditure with ID ${convertedExpenditureId} in colony ${colonyAddress}`,
-    );
-
-    await mutate<UpdateExpenditureMutation, UpdateExpenditureMutationVariables>(
-      UpdateExpenditureDocument,
-      {
+      await mutate<
+        UpdateExpenditureMutation,
+        UpdateExpenditureMutationVariables
+      >(UpdateExpenditureDocument, {
         input: {
           id: databaseId,
           slots: updatedSlots,
         },
-      },
-    );
+      });
+    }
   }
 };
