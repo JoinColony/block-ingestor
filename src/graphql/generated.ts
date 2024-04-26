@@ -682,9 +682,11 @@ export type ColonyHistoricRole = {
   domainId: Scalars['ID'];
   /**
    * Unique identifier for the role snapshot
-   * Format: `colonyAddress_domainNativeId_userAddress_blockNumber_roles`
+   * Format: `<colonyAddress>_<domainNativeId>_<userAddress>_<blockNumber>_roles`  or `<colonyAddress>_<domainNativeId>_<userAddress>_<blockNumber>_multisig_roles`
    */
   id: Scalars['ID'];
+  /** Will be true if the colony role is a multi sig role */
+  isMultiSig?: Maybe<Scalars['Boolean']>;
   /** Recovery role */
   role_0?: Maybe<Scalars['Boolean']>;
   /** Root role */
@@ -929,9 +931,11 @@ export type ColonyRole = {
   domainId: Scalars['ID'];
   /**
    * Unique identifier for the role snapshot
-   * Format: `<colonyAddress>_<domainNativeId>_<userAddress>_roles`
+   * Format: `<colonyAddress>_<domainNativeId>_<userAddress>_roles` or `<colonyAddress>_<domainNativeId>_<userAddress>_multisig_roles`
    */
   id: Scalars['ID'];
+  /** Will be true if the colony role is a multi sig role */
+  isMultiSig?: Maybe<Scalars['Boolean']>;
   /** Block at which permissions were update last */
   latestBlock: Scalars['Int'];
   /** Recovery role */
@@ -1227,6 +1231,7 @@ export type CreateColonyHistoricRoleInput = {
   createdAt?: InputMaybe<Scalars['AWSDateTime']>;
   domainId: Scalars['ID'];
   id?: InputMaybe<Scalars['ID']>;
+  isMultiSig?: InputMaybe<Scalars['Boolean']>;
   role_0?: InputMaybe<Scalars['Boolean']>;
   role_1?: InputMaybe<Scalars['Boolean']>;
   role_2?: InputMaybe<Scalars['Boolean']>;
@@ -1308,6 +1313,7 @@ export type CreateColonyRoleInput = {
   colonyRolesId?: InputMaybe<Scalars['ID']>;
   domainId: Scalars['ID'];
   id?: InputMaybe<Scalars['ID']>;
+  isMultiSig?: InputMaybe<Scalars['Boolean']>;
   latestBlock: Scalars['Int'];
   role_0?: InputMaybe<Scalars['Boolean']>;
   role_1?: InputMaybe<Scalars['Boolean']>;
@@ -2574,6 +2580,7 @@ export type ModelColonyHistoricRoleConditionInput = {
   colonyId?: InputMaybe<ModelIdInput>;
   createdAt?: InputMaybe<ModelStringInput>;
   domainId?: InputMaybe<ModelIdInput>;
+  isMultiSig?: InputMaybe<ModelBooleanInput>;
   not?: InputMaybe<ModelColonyHistoricRoleConditionInput>;
   or?: InputMaybe<Array<InputMaybe<ModelColonyHistoricRoleConditionInput>>>;
   role_0?: InputMaybe<ModelBooleanInput>;
@@ -2599,6 +2606,7 @@ export type ModelColonyHistoricRoleFilterInput = {
   createdAt?: InputMaybe<ModelStringInput>;
   domainId?: InputMaybe<ModelIdInput>;
   id?: InputMaybe<ModelIdInput>;
+  isMultiSig?: InputMaybe<ModelBooleanInput>;
   not?: InputMaybe<ModelColonyHistoricRoleFilterInput>;
   or?: InputMaybe<Array<InputMaybe<ModelColonyHistoricRoleFilterInput>>>;
   role_0?: InputMaybe<ModelBooleanInput>;
@@ -2719,6 +2727,7 @@ export type ModelColonyRoleConditionInput = {
   colonyAddress?: InputMaybe<ModelIdInput>;
   colonyRolesId?: InputMaybe<ModelIdInput>;
   domainId?: InputMaybe<ModelIdInput>;
+  isMultiSig?: InputMaybe<ModelBooleanInput>;
   latestBlock?: InputMaybe<ModelIntInput>;
   not?: InputMaybe<ModelColonyRoleConditionInput>;
   or?: InputMaybe<Array<InputMaybe<ModelColonyRoleConditionInput>>>;
@@ -2743,6 +2752,7 @@ export type ModelColonyRoleFilterInput = {
   colonyRolesId?: InputMaybe<ModelIdInput>;
   domainId?: InputMaybe<ModelIdInput>;
   id?: InputMaybe<ModelIdInput>;
+  isMultiSig?: InputMaybe<ModelBooleanInput>;
   latestBlock?: InputMaybe<ModelIntInput>;
   not?: InputMaybe<ModelColonyRoleFilterInput>;
   or?: InputMaybe<Array<InputMaybe<ModelColonyRoleFilterInput>>>;
@@ -3627,6 +3637,7 @@ export type ModelSubscriptionColonyHistoricRoleFilterInput = {
   createdAt?: InputMaybe<ModelSubscriptionStringInput>;
   domainId?: InputMaybe<ModelSubscriptionIdInput>;
   id?: InputMaybe<ModelSubscriptionIdInput>;
+  isMultiSig?: InputMaybe<ModelSubscriptionBooleanInput>;
   or?: InputMaybe<
     Array<InputMaybe<ModelSubscriptionColonyHistoricRoleFilterInput>>
   >;
@@ -3694,6 +3705,7 @@ export type ModelSubscriptionColonyRoleFilterInput = {
   colonyAddress?: InputMaybe<ModelSubscriptionIdInput>;
   domainId?: InputMaybe<ModelSubscriptionIdInput>;
   id?: InputMaybe<ModelSubscriptionIdInput>;
+  isMultiSig?: InputMaybe<ModelSubscriptionBooleanInput>;
   latestBlock?: InputMaybe<ModelSubscriptionIntInput>;
   or?: InputMaybe<Array<InputMaybe<ModelSubscriptionColonyRoleFilterInput>>>;
   role_0?: InputMaybe<ModelSubscriptionBooleanInput>;
@@ -7729,6 +7741,7 @@ export type UpdateColonyHistoricRoleInput = {
   createdAt?: InputMaybe<Scalars['AWSDateTime']>;
   domainId?: InputMaybe<Scalars['ID']>;
   id: Scalars['ID'];
+  isMultiSig?: InputMaybe<Scalars['Boolean']>;
   role_0?: InputMaybe<Scalars['Boolean']>;
   role_1?: InputMaybe<Scalars['Boolean']>;
   role_2?: InputMaybe<Scalars['Boolean']>;
@@ -7810,6 +7823,7 @@ export type UpdateColonyRoleInput = {
   colonyRolesId?: InputMaybe<Scalars['ID']>;
   domainId?: InputMaybe<Scalars['ID']>;
   id: Scalars['ID'];
+  isMultiSig?: InputMaybe<Scalars['Boolean']>;
   latestBlock?: InputMaybe<Scalars['Int']>;
   role_0?: InputMaybe<Scalars['Boolean']>;
   role_1?: InputMaybe<Scalars['Boolean']>;
