@@ -90,6 +90,9 @@ export default async (event: ContractEvent): Promise<void> => {
           slots: updatedSlots,
         },
       });
+    } else {
+      // Make sure to re-throw any other errors
+      throw error;
     }
   }
 };
