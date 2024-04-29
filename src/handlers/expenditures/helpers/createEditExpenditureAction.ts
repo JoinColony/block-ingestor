@@ -22,7 +22,6 @@ import {
   toNumber,
   writeActionFromEvent,
 } from '~utils';
-import { convertToCallTrace } from '~utils/convertTrace';
 import { splitAmountAndFee } from '~utils/networkFee';
 import {
   decodeUpdatedSlot,
@@ -36,16 +35,11 @@ export class NotEditActionError extends Error {
   }
 }
 
-const MULTICALL_SIGNATURE = '0xac9650d8';
-const SET_EXPENDITURE_STATE_SIGNATURE = '0xc9a2ce7c';
-const SET_EXPENDITURE_PAYOUT_SIGNATURE = '0xbae82ec9';
-
-const METHOD_SIGNATURE_TO_EVENT: Record<string, ContractEventsSignatures> = {
-  [SET_EXPENDITURE_STATE_SIGNATURE]:
-    ContractEventsSignatures.ExpenditureStateChanged,
-  [SET_EXPENDITURE_PAYOUT_SIGNATURE]:
-    ContractEventsSignatures.ExpenditurePayoutSet,
-};
+/**
+ * Defines how much time has to elapse before we consider
+ * `setExpenditureState` and `setExpenditurePayout` calls as an edit action
+ */
+const ACTION_TIME_THRESHOLD = 30;
 
 /**
  * This function gets called for both `ExpenditureStateChanged` and `ExpenditurePayoutSet` events
@@ -58,6 +52,13 @@ export const createEditExpenditureAction = async (
   colonyClient: AnyColonyClient,
 ): Promise<void> => {
   const { transactionHash } = event;
+
+  const secondsSinceCreate = Math.floor(
+    (new Date().getTime() - new Date(expenditure.createdAt).getTime()) / 1000,
+  );
+  if (secondsSinceCreate < ACTION_TIME_THRESHOLD) {
+    return;
+  }
 
   const actionExists = await checkActionExists(transactionHash);
   if (actionExists) {
@@ -73,12 +74,27 @@ export const createEditExpenditureAction = async (
     convertedExpenditureId,
   );
 
-  const actionEvents = await getEditActionEvents(
-    transactionHash,
-    blockNumber,
-    colonyClient,
-  );
+  const logs = await provider.getLogs({
+    fromBlock: blockNumber,
+    toBlock: blockNumber,
+    topics: [
+      [
+        utils.id(ContractEventsSignatures.ExpenditureStateChanged),
+        utils.id(ContractEventsSignatures.ExpenditurePayoutSet),
+      ],
+    ],
+  });
 
+  const actionEvents = [];
+  for (const log of logs) {
+    const mappedEvent = await mapLogToContractEvent(
+      log,
+      colonyClient.interface,
+    );
+    if (mappedEvent) {
+      actionEvents.push(mappedEvent);
+    }
+  }
   /**
    * Determine changes to the expenditure after all relevant events have been processed
    */
@@ -184,115 +200,4 @@ const checkActionExists = async (transactionHash: string): Promise<boolean> => {
   });
 
   return !!existingActionQuery?.data?.getColonyAction;
-};
-
-const getCallTrace = async (transactionHash: string): Promise<any> => {
-  const transaction = await provider.getTransaction(transactionHash);
-
-  const isDev = process.env.NODE_ENV === 'development';
-  const trace = await provider.send('debug_traceTransaction', [
-    transactionHash,
-    ...(!isDev ? [{ tracer: 'callTracer' }] : []),
-  ]);
-
-  let callTrace = trace;
-  if (isDev) {
-    callTrace = convertToCallTrace(trace, transaction);
-  }
-
-  return callTrace;
-};
-
-const getEditActionEvents = async (
-  transactionHash: string,
-  blockNumber: number,
-  colonyClient: AnyColonyClient,
-): Promise<ContractEvent[]> => {
-  /**
-   * @NOTE: Call trace will contain all the calls made in the transaction
-   * We need to determine if there was a multicall containing calls to setExpenditureState and setExpenditurePayout
-   */
-  const callTrace = await getCallTrace(transactionHash);
-
-  const eventSignatures = [
-    ContractEventsSignatures.ExpenditureStateChanged,
-    ContractEventsSignatures.ExpenditurePayoutSet,
-  ];
-
-  /**
-   * Count number of relevant events inside multicall
-   * and number of events before the multicall that we need to skip
-   */
-  const eventCounts = eventSignatures.reduce<
-    Partial<Record<ContractEventsSignatures, number>>
-  >((acc, signature) => {
-    acc[signature] = 0;
-    return acc;
-  }, {});
-
-  const skipEventCounts = eventSignatures.reduce<
-    Partial<Record<ContractEventsSignatures, number>>
-  >((acc, signature) => {
-    acc[signature] = 0;
-    return acc;
-  }, {});
-
-  for (const call of callTrace.calls) {
-    if (call.input.startsWith(MULTICALL_SIGNATURE)) {
-      for (const subCall of call.calls) {
-        const event =
-          METHOD_SIGNATURE_TO_EVENT[subCall.input.slice(0, 10) as string];
-        if (event) {
-          eventCounts[event] = (eventCounts[event] ?? 0) + 1;
-        }
-      }
-
-      break;
-    }
-
-    const event = METHOD_SIGNATURE_TO_EVENT[call.input.slice(0, 10) as string];
-    if (event) {
-      skipEventCounts[event] = (skipEventCounts[event] ?? 0) + 1;
-    }
-  }
-
-  if (Object.values(eventCounts).every((count) => count === 0)) {
-    throw new NotEditActionError();
-  }
-
-  const logs = await provider.getLogs({
-    fromBlock: blockNumber,
-    toBlock: blockNumber,
-    topics: [
-      [
-        utils.id(ContractEventsSignatures.ExpenditureStateChanged),
-        utils.id(ContractEventsSignatures.ExpenditurePayoutSet),
-      ],
-    ],
-  });
-
-  const actionEvents = [];
-  for (const log of logs) {
-    const event = await mapLogToContractEvent(log, colonyClient.interface);
-
-    if (!event) {
-      continue;
-    }
-
-    const eventSignature = event.signature as ContractEventsSignatures;
-
-    if ((skipEventCounts[eventSignature] ?? 0) > 0) {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      skipEventCounts[eventSignature]! -= 1;
-      continue;
-    }
-
-    if ((eventCounts[eventSignature] ?? 0) > 0) {
-      actionEvents.push(event);
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      eventCounts[eventSignature]! -= 1;
-    }
-  }
-
-  return actionEvents;
 };
