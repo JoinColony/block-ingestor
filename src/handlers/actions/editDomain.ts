@@ -1,19 +1,19 @@
-import { utils } from 'ethers';
 import { ColonyActionType } from '~graphql';
-import provider from '~provider';
 import { ContractEvent, ContractEventsSignatures } from '~types';
 import {
   toNumber,
   verbose,
   writeActionFromEvent,
   getDomainDatabaseId,
+  transactionHasEvent,
 } from '~utils';
 
 export default async (event: ContractEvent): Promise<void> => {
-  const receipt = await provider.getTransactionReceipt(event.transactionHash);
-  const hasDomainAddedEvent = receipt.logs.some((log) =>
-    log.topics.includes(utils.id(ContractEventsSignatures.DomainAdded)),
+  const hasDomainAddedEvent = await transactionHasEvent(
+    event.transactionHash,
+    ContractEventsSignatures.DomainAdded,
   );
+
   if (hasDomainAddedEvent) {
     verbose(
       'Not acting upon the DomainMetadata event as a DomainAdded event was present in the same transaction',
