@@ -81,6 +81,9 @@ export default async (event: ContractEvent): Promise<void> => {
           },
         });
       }
+    } else {
+      // Make sure to re-throw any other errors
+      throw error;
     }
   }
 };
