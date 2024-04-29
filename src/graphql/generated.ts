@@ -8367,6 +8367,7 @@ export type ExpenditureFragment = {
   status: ExpenditureStatus;
   ownerAddress: string;
   userStakeId?: string | null;
+  createdAt: string;
   slots: Array<{
     __typename?: 'ExpenditureSlot';
     id: number;
@@ -9339,6 +9340,7 @@ export type GetExpenditureQuery = {
     status: ExpenditureStatus;
     ownerAddress: string;
     userStakeId?: string | null;
+    createdAt: string;
     slots: Array<{
       __typename?: 'ExpenditureSlot';
       id: number;
@@ -9384,6 +9386,7 @@ export type GetExpenditureByNativeFundingPotIdAndColonyQuery = {
       status: ExpenditureStatus;
       ownerAddress: string;
       userStakeId?: string | null;
+      createdAt: string;
       slots: Array<{
         __typename?: 'ExpenditureSlot';
         id: number;
@@ -9935,6 +9938,7 @@ export const Expenditure = gql`
     status
     ownerAddress
     userStakeId
+    createdAt
   }
   ${ExpenditureSlot}
   ${ExpenditureBalance}

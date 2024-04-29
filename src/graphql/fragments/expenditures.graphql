@@ -22,6 +22,7 @@ fragment Expenditure on Expenditure {
   status
   ownerAddress
   userStakeId
+  createdAt
 }
 
 # It is important this fragment contains all the fields of the ExpenditureSlot type
