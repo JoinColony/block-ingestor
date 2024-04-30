@@ -1,36 +1,37 @@
 import { Result, TransactionDescription } from 'ethers/lib/utils';
 import { BigNumber, utils } from 'ethers';
-import {
-  getCachedColonyClient,
-  getExpenditureDatabaseId,
-  output,
-  toNumber,
-} from '~utils';
+import { getCachedColonyClient, output } from '~utils';
 import { ContractEvent, ContractMethodSignatures } from '~types';
-import { getExpenditureFromDB } from '~handlers/expenditures/helpers';
 import { AnyColonyClient } from '@colony/colony-js';
-import { multicallHandlers, supportedMulticallFragments } from './fragments';
+import { multicallHandlers } from './multicallHandlers';
 
-export type DecodedFunctions = Array<{
-  fragment: ContractMethodSignatures;
-  decodedAction: Result;
-}>;
+// List all supported multicall functions
+export const supportedMulticallFunctions: ContractMethodSignatures[] = [
+  ContractMethodSignatures.MoveFundsBetweenPots,
+  ContractMethodSignatures.SetExpenditureState,
+  ContractMethodSignatures.SetExpenditurePayout,
+];
+
+export interface DecodedFunction {
+  functionSignature: ContractMethodSignatures;
+  args: Result;
+}
 
 const decodeFunctions = (
-  encodedActions: utils.Result,
+  encodedFunctions: utils.Result,
   colonyClient: AnyColonyClient,
-): DecodedFunctions => {
-  const decodedFunctions: DecodedFunctions = [];
-  for (const action of encodedActions) {
-    supportedMulticallFragments.forEach((fragment) => {
+): DecodedFunction[] => {
+  const decodedFunctions: DecodedFunction[] = [];
+  for (const functionCall of encodedFunctions) {
+    supportedMulticallFunctions.forEach((fragment) => {
       try {
-        const decodedAction = colonyClient.interface.decodeFunctionData(
+        const decodedArgs = colonyClient.interface.decodeFunctionData(
           fragment,
-          action,
+          functionCall,
         );
         decodedFunctions.push({
-          fragment: fragment as ContractMethodSignatures,
-          decodedAction,
+          functionSignature: fragment,
+          args: decodedArgs,
         });
       } catch {
         // silent. We are expecting all but one of the fragments to error for each arg.
@@ -53,48 +54,29 @@ export const handleMulticallMotion = async (
     return;
   }
 
-  // Multicall takes an array of an array of encoded actions.
-  const encodedActions = parsedAction.args[0];
+  // Multicall takes an array of an array of encoded function calls
+  const encodedFunctions = parsedAction.args[0];
 
-  // Multicall can have an arbitrary number of underlying actions. Difficult to predict in advance how much
+  // Multicall can have an arbitrary number of underlying function calls. Difficult to predict in advance how much
   // gas executing this action will consume. Let's start by assuming 100k gas per action.
   const updatedGasEstimate = gasEstimate
-    .add(BigNumber.from(encodedActions.length ?? 0).mul(100000))
+    .add(BigNumber.from(encodedFunctions.length ?? 0).mul(100000))
     .toString();
 
   // We need to determine which multicallMotion this is and pass it to the appropriate handler
-  const decodedFunctions: DecodedFunctions = decodeFunctions(
-    encodedActions,
-    colonyClient,
-  );
-
-  const [, , expenditureId] = decodedFunctions[0].decodedAction;
-
-  const convertedExpenditureId = toNumber(expenditureId);
-
-  const databaseId = getExpenditureDatabaseId(
-    colonyAddress,
-    convertedExpenditureId,
-  );
-
-  const expenditure = await getExpenditureFromDB(databaseId);
-  if (!expenditure) {
-    output(
-      `Could not find expenditure with ID: ${databaseId} in the db when handling ExpenditureStateChanged event`,
-    );
-    return;
-  }
+  const decodedFunctions = decodeFunctions(encodedFunctions, colonyClient);
 
   for (const [validator, handler] of multicallHandlers) {
-    if (
-      validator({ decodedFunctions, expenditureStatus: expenditure.status })
-    ) {
+    if (validator({ decodedFunctions })) {
       handler({
         event,
         decodedFunctions,
         gasEstimate: updatedGasEstimate,
-        expenditure,
       });
+
+      return;
     }
   }
+
+  output('No handler found for multicall motion');
 };
