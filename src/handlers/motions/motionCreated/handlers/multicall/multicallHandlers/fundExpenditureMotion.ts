@@ -2,29 +2,22 @@ import { Result } from 'ethers/lib/utils';
 import { query } from '~amplifyClient';
 import {
   ColonyActionType,
-  ExpenditureStatus,
   GetExpenditureByNativeFundingPotIdAndColonyDocument,
   GetExpenditureByNativeFundingPotIdAndColonyQuery,
   GetExpenditureByNativeFundingPotIdAndColonyQueryVariables,
 } from '~graphql';
 import { createMotionInDB } from '~handlers/motions/motionCreated/helpers';
 import { ContractEvent, ContractMethodSignatures } from '~types';
-import { getVotingClient, notNull, toNumber } from '~utils';
-import { MulticallHandler, MulticallValidator } from '../fragments';
+import { notNull, toNumber } from '~utils';
+import { MulticallHandler, MulticallValidator } from './types';
 
 export const isFundExpenditureMotion: MulticallValidator = ({
   decodedFunctions,
-  expenditureStatus,
 }) => {
-  const fragmentsToMatch = [
-    ContractMethodSignatures.MoveFundsBetweenPots,
-    ContractMethodSignatures.MoveFundsBetweenPots_OLD,
-  ];
-  return (
-    expenditureStatus === ExpenditureStatus.Locked &&
-    decodedFunctions.every((decodedFunction) =>
-      fragmentsToMatch.includes(decodedFunction.fragment),
-    )
+  return decodedFunctions.every(
+    (decodedFunction) =>
+      decodedFunction.functionSignature ===
+      ContractMethodSignatures.MoveFundsBetweenPots,
   );
 };
 
@@ -36,7 +29,7 @@ export const fundExpenditureMotionHandler: MulticallHandler = ({
   decodedFunctions.forEach((decodedFunction) => {
     moveFundsBetweenPotsMulti({
       event,
-      args: decodedFunction.decodedAction,
+      args: decodedFunction.args,
       gasEstimate,
     });
   });
@@ -90,12 +83,6 @@ const moveFundsBetweenPotsMulti = async ({
   );
 
   if (!expenditure || existingFundMotions.has(transactionHash)) {
-    return;
-  }
-
-  const votingClient = await getVotingClient(colonyAddress);
-
-  if (!votingClient) {
     return;
   }
 
