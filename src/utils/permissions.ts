@@ -476,7 +476,7 @@ export const createInitialMultiSigRolesDatabaseEntry = async (
     true,
   );
 
-  const { role_0, role_1, role_2, role_3, role_5 } =
+  const { role_0, role_1, role_2, role_3, role_5, role_6 } =
     await getRolesMapFromHexString(userRoles, colonyRolesDatabaseId);
 
   const events = await getAllMultiSigRoleEventsFromTransaction(
@@ -522,6 +522,7 @@ export const createInitialMultiSigRolesDatabaseEntry = async (
         role_2,
         role_3,
         role_5,
+        role_6,
         isMultiSig: true,
       },
     },
@@ -546,6 +547,7 @@ export const createInitialMultiSigRolesDatabaseEntry = async (
       role_2,
       role_3,
       role_5,
+      role_6,
     },
     true,
   );
@@ -568,6 +570,7 @@ export const createInitialMultiSigRolesDatabaseEntry = async (
         role_2,
         role_3,
         role_5,
+        role_6,
       },
       individualEvents: JSON.stringify([
         ...events.map(
