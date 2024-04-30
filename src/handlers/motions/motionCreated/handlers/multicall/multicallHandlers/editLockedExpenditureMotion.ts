@@ -1,40 +1,46 @@
-import {
-  ColonyActionType,
-  ExpenditurePayout,
-  ExpenditureStatus,
-} from '~graphql';
+import { ColonyActionType, ExpenditurePayout } from '~graphql';
 import { toNumber } from 'lodash';
+import { BigNumber } from 'ethers';
 import {
   decodeUpdatedSlot,
   getUpdatedExpenditureSlots,
+  getExpenditureFromDB,
 } from '~handlers/expenditures/helpers';
 import { createMotionInDB } from '~handlers/motions/motionCreated/helpers';
-import { MulticallHandler, MulticallValidator } from '../fragments';
+import { MulticallHandler, MulticallValidator } from './types';
 import { ContractMethodSignatures } from '~types';
 import { splitAmountAndFee } from '~utils/networkFee';
+import { getExpenditureDatabaseId } from '~utils';
+import { EXPENDITURESLOTS_SLOT } from '~constants';
 
 export const isEditLockedExpenditureMotion: MulticallValidator = ({
   decodedFunctions,
-  expenditureStatus,
 }) => {
-  const fragmentsToMatch = [
+  const signaturesToMatch = [
     ContractMethodSignatures.SetExpenditurePayout,
     ContractMethodSignatures.SetExpenditureState,
   ];
-  return (
-    expenditureStatus === ExpenditureStatus.Locked &&
-    decodedFunctions.every((decodedFunction) =>
-      fragmentsToMatch.includes(decodedFunction.fragment),
-    )
-  );
+
+  return signaturesToMatch.includes(decodedFunctions[0].functionSignature);
 };
 
 export const editLockedExpenditureMotionHandler: MulticallHandler = async ({
   event,
   gasEstimate,
   decodedFunctions,
-  expenditure,
 }) => {
+  /**
+   * @NOTE: We get expenditure ID from the first multicall function
+   * This means if the multicall edits multiple expenditures, we will only create a motion for the first one
+   */
+  const expenditureId = decodedFunctions[0]?.args._id;
+  const convertedExpenditureId = toNumber(expenditureId);
+  const databaseId = getExpenditureDatabaseId(
+    event.colonyAddress ?? '',
+    convertedExpenditureId,
+  );
+
+  const expenditure = await getExpenditureFromDB(databaseId);
   if (!expenditure) {
     return;
   }
@@ -42,11 +48,16 @@ export const editLockedExpenditureMotionHandler: MulticallHandler = async ({
   let updatedSlots = expenditure.slots;
 
   for (const decodedFunction of decodedFunctions) {
+    const decodedFunctionExpenditureId = decodedFunction.args._id;
+    if (!BigNumber.from(decodedFunctionExpenditureId).eq(expenditureId)) {
+      continue;
+    }
+
     if (
-      decodedFunction.fragment === ContractMethodSignatures.SetExpenditurePayout
+      decodedFunction.functionSignature ===
+      ContractMethodSignatures.SetExpenditurePayout
     ) {
-      const [, , , slotId, tokenAddress, amountWithFee] =
-        decodedFunction.decodedAction;
+      const [, , , slotId, tokenAddress, amountWithFee] = decodedFunction.args;
       const convertedSlot = toNumber(slotId);
       const existingPayouts =
         expenditure.slots.find((slot) => slot.id === convertedSlot)?.payouts ??
@@ -70,22 +81,24 @@ export const editLockedExpenditureMotionHandler: MulticallHandler = async ({
         payouts: updatedPayouts,
       });
     } else if (
-      decodedFunction.fragment === ContractMethodSignatures.SetExpenditureState
+      decodedFunction.functionSignature ===
+      ContractMethodSignatures.SetExpenditureState
     ) {
-      const [, , , storageSlot, , keys, value] = decodedFunction.decodedAction;
+      const [, , , storageSlot, , keys, value] = decodedFunction.args;
+      if (storageSlot.eq(EXPENDITURESLOTS_SLOT)) {
+        const updatedSlot = decodeUpdatedSlot(expenditure, {
+          storageSlot,
+          keys,
+          value,
+        });
 
-      const updatedSlot = decodeUpdatedSlot(expenditure, {
-        storageSlot,
-        keys,
-        value,
-      });
-
-      if (updatedSlot) {
-        updatedSlots = getUpdatedExpenditureSlots(
-          updatedSlots,
-          updatedSlot.id,
-          updatedSlot,
-        );
+        if (updatedSlot) {
+          updatedSlots = getUpdatedExpenditureSlots(
+            updatedSlots,
+            updatedSlot.id,
+            updatedSlot,
+          );
+        }
       }
     }
   }
