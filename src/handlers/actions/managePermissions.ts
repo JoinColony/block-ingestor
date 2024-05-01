@@ -194,6 +194,7 @@ export default async (event: ContractEvent): Promise<void> => {
         roles: {
           ...rolesFromAllUpdateEventsForAction,
         },
+        rolesAreMultiSig: isMultiSig ? true : null,
         individualEvents,
       });
     }
