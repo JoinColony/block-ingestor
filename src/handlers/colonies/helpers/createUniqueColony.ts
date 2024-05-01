@@ -1,5 +1,6 @@
 import { Id } from '@colony/colony-js';
 import { utils } from 'ethers';
+import { randomUUID } from 'crypto';
 import { mutate, query } from '~amplifyClient';
 import {
   ColonyType,
@@ -183,13 +184,13 @@ export const createUniqueColony = async ({
 
   const [existingToken] = tokenQuery?.data?.getTokenFromEverywhere?.items ?? [];
 
-  if (!existingToken || !existingToken?.id) {
+  if (!existingToken?.id) {
     throw new Error(
       `Token with address "${checksummedToken}" does not exist, hence it cannot be used as a native token for this colony`,
     );
   }
 
-  const memberInviteCode = crypto.randomUUID();
+  const memberInviteCode = randomUUID();
 
   const chainId = getChainId();
   const version = await colonyClient.version();
@@ -322,7 +323,7 @@ export const createUniqueColony = async ({
         colonyId: checksummedAddress,
         isRoot: true,
         nativeId: Id.RootDomain,
-        nativeSkillId: skillId.toNumber(),
+        nativeSkillId: skillId.toString(),
         nativeFundingPotId: fundingPotId.toNumber(),
       },
     },

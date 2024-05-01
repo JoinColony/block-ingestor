@@ -53,7 +53,7 @@ export type ChainMetadata = {
   /** The block number of the event */
   blockNumber?: Maybe<Scalars['Int']>;
   /** The chain ID of the event */
-  chainId: Scalars['Int'];
+  chainId: Scalars['String'];
   /** The log index of the event */
   logIndex?: Maybe<Scalars['Int']>;
   /** The network the event occurred on */
@@ -62,17 +62,11 @@ export type ChainMetadata = {
   transactionHash?: Maybe<Scalars['String']>;
 };
 
-/** Input data for relevant chain metadata of a Colony (if applicable) */
 export type ChainMetadataInput = {
-  /** The block number of the creation transaction */
   blockNumber?: InputMaybe<Scalars['Int']>;
-  /** The chain ID of the network */
-  chainId: Scalars['Int'];
-  /** The log index of the creation transaction */
+  chainId: Scalars['String'];
   logIndex?: InputMaybe<Scalars['Int']>;
-  /** The network the Colony is deployed on */
   network?: InputMaybe<Network>;
-  /** The transaction hash of the creation transaction */
   transactionHash?: InputMaybe<Scalars['String']>;
 };
 
@@ -1321,7 +1315,7 @@ export type CreateDomainInput = {
   isRoot: Scalars['Boolean'];
   nativeFundingPotId: Scalars['Int'];
   nativeId: Scalars['Int'];
-  nativeSkillId: Scalars['Int'];
+  nativeSkillId: Scalars['String'];
   reputation?: InputMaybe<Scalars['String']>;
   reputationPercentage?: InputMaybe<Scalars['String']>;
 };
@@ -1732,7 +1726,7 @@ export type Domain = {
    * Native skill ID of the Domain
    * The native skill ID is assigned to a domain from the contract on creation
    */
-  nativeSkillId: Scalars['Int'];
+  nativeSkillId: Scalars['String'];
   /** The amount of reputation in the domain */
   reputation?: Maybe<Scalars['String']>;
   /** The amount of reputation in the domain, as a percentage of the total in the colony */
@@ -2072,7 +2066,7 @@ export type GetMotionTimeoutPeriodsReturn = {
 };
 
 export type GetSafeTransactionStatusInput = {
-  chainId: Scalars['Int'];
+  chainId: Scalars['String'];
   transactionHash: Scalars['String'];
 };
 
@@ -2845,7 +2839,7 @@ export type ModelDomainConditionInput = {
   isRoot?: InputMaybe<ModelBooleanInput>;
   nativeFundingPotId?: InputMaybe<ModelIntInput>;
   nativeId?: InputMaybe<ModelIntInput>;
-  nativeSkillId?: InputMaybe<ModelIntInput>;
+  nativeSkillId?: InputMaybe<ModelStringInput>;
   not?: InputMaybe<ModelDomainConditionInput>;
   or?: InputMaybe<Array<InputMaybe<ModelDomainConditionInput>>>;
   reputation?: InputMaybe<ModelStringInput>;
@@ -2865,7 +2859,7 @@ export type ModelDomainFilterInput = {
   isRoot?: InputMaybe<ModelBooleanInput>;
   nativeFundingPotId?: InputMaybe<ModelIntInput>;
   nativeId?: InputMaybe<ModelIntInput>;
-  nativeSkillId?: InputMaybe<ModelIntInput>;
+  nativeSkillId?: InputMaybe<ModelStringInput>;
   not?: InputMaybe<ModelDomainFilterInput>;
   or?: InputMaybe<Array<InputMaybe<ModelDomainFilterInput>>>;
   reputation?: InputMaybe<ModelStringInput>;
@@ -3685,7 +3679,7 @@ export type ModelSubscriptionDomainFilterInput = {
   isRoot?: InputMaybe<ModelSubscriptionBooleanInput>;
   nativeFundingPotId?: InputMaybe<ModelSubscriptionIntInput>;
   nativeId?: InputMaybe<ModelSubscriptionIntInput>;
-  nativeSkillId?: InputMaybe<ModelSubscriptionIntInput>;
+  nativeSkillId?: InputMaybe<ModelSubscriptionStringInput>;
   or?: InputMaybe<Array<InputMaybe<ModelSubscriptionDomainFilterInput>>>;
   reputation?: InputMaybe<ModelSubscriptionStringInput>;
   reputationPercentage?: InputMaybe<ModelSubscriptionStringInput>;
@@ -5217,11 +5211,7 @@ export type NativeTokenStatus = {
   unlocked?: Maybe<Scalars['Boolean']>;
 };
 
-/**
- * Input data for the status of a Colony's native token
- *
- * Colonies can have different types of native tokens in various modes. Here we define some important properties that the dApp uses to enable or disable certain features or views. This is set when a Colony is created and can be changed later
- */
+/** Colonies can have different types of native tokens in various modes. Here we define some important properties that the dApp uses to enable or disable certain features or views. This is set when a Colony is created and can be changed later */
 export type NativeTokenStatusInput = {
   /** Whether the native token is mintable */
   mintable?: InputMaybe<Scalars['Boolean']>;
@@ -6308,14 +6298,14 @@ export type ReputationMiningCycleMetadata = {
 export type Safe = {
   __typename?: 'Safe';
   address: Scalars['String'];
-  chainId: Scalars['Int'];
+  chainId: Scalars['String'];
   moduleContractAddress: Scalars['String'];
   name: Scalars['String'];
 };
 
 export type SafeInput = {
   address: Scalars['String'];
-  chainId: Scalars['Int'];
+  chainId: Scalars['String'];
   moduleContractAddress: Scalars['String'];
   name: Scalars['String'];
 };
@@ -7693,7 +7683,7 @@ export type UpdateDomainInput = {
   isRoot?: InputMaybe<Scalars['Boolean']>;
   nativeFundingPotId?: InputMaybe<Scalars['Int']>;
   nativeId?: InputMaybe<Scalars['Int']>;
-  nativeSkillId?: InputMaybe<Scalars['Int']>;
+  nativeSkillId?: InputMaybe<Scalars['String']>;
   reputation?: InputMaybe<Scalars['String']>;
   reputationPercentage?: InputMaybe<Scalars['String']>;
 };
@@ -8126,7 +8116,7 @@ export type ColonyFragment = {
     items: Array<{
       __typename?: 'Domain';
       id: string;
-      nativeSkillId: number;
+      nativeSkillId: string;
     } | null>;
   } | null;
 };
@@ -8894,7 +8884,7 @@ export type GetColonyQuery = {
       items: Array<{
         __typename?: 'Domain';
         id: string;
-        nativeSkillId: number;
+        nativeSkillId: string;
       } | null>;
     } | null;
   } | null;
