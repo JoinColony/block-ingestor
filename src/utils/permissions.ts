@@ -571,6 +571,7 @@ export const createInitialMultiSigRolesDatabaseEntry = async (
         role_5,
         role_6,
       },
+      rolesAreMultiSig: true,
       individualEvents: JSON.stringify([
         ...events.map(
           ({ name, args: { roleId, setTo }, transactionHash, logIndex }) => ({
