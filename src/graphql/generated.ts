@@ -310,6 +310,8 @@ export type ColonyAction = {
   recipientUser?: Maybe<User>;
   /** Colony roles that are associated with the action */
   roles?: Maybe<ColonyActionRoles>;
+  /** Colony roles that are associated with the action are multi sig roles */
+  rolesAreMultiSig?: Maybe<Scalars['Boolean']>;
   /** The reputation root hash at the time of the creation of the action */
   rootHash: Scalars['String'];
   /** Safe transactions associated with the action */
@@ -1134,6 +1136,7 @@ export type CreateColonyActionInput = {
   pendingDomainMetadataId?: InputMaybe<Scalars['ID']>;
   recipientAddress?: InputMaybe<Scalars['ID']>;
   roles?: InputMaybe<ColonyActionRolesInput>;
+  rolesAreMultiSig?: InputMaybe<Scalars['Boolean']>;
   rootHash: Scalars['String'];
   showInActionsList: Scalars['Boolean'];
   toDomainId?: InputMaybe<Scalars['ID']>;
@@ -2319,6 +2322,7 @@ export type ModelColonyActionConditionInput = {
   pendingColonyMetadataId?: InputMaybe<ModelIdInput>;
   pendingDomainMetadataId?: InputMaybe<ModelIdInput>;
   recipientAddress?: InputMaybe<ModelIdInput>;
+  rolesAreMultiSig?: InputMaybe<ModelBooleanInput>;
   rootHash?: InputMaybe<ModelStringInput>;
   showInActionsList?: InputMaybe<ModelBooleanInput>;
   toDomainId?: InputMaybe<ModelIdInput>;
@@ -2361,6 +2365,7 @@ export type ModelColonyActionFilterInput = {
   pendingColonyMetadataId?: InputMaybe<ModelIdInput>;
   pendingDomainMetadataId?: InputMaybe<ModelIdInput>;
   recipientAddress?: InputMaybe<ModelIdInput>;
+  rolesAreMultiSig?: InputMaybe<ModelBooleanInput>;
   rootHash?: InputMaybe<ModelStringInput>;
   showInActionsList?: InputMaybe<ModelBooleanInput>;
   toDomainId?: InputMaybe<ModelIdInput>;
@@ -3524,6 +3529,7 @@ export type ModelSubscriptionColonyActionFilterInput = {
   pendingColonyMetadataId?: InputMaybe<ModelSubscriptionIdInput>;
   pendingDomainMetadataId?: InputMaybe<ModelSubscriptionIdInput>;
   recipientAddress?: InputMaybe<ModelSubscriptionIdInput>;
+  rolesAreMultiSig?: InputMaybe<ModelSubscriptionBooleanInput>;
   rootHash?: InputMaybe<ModelSubscriptionStringInput>;
   showInActionsList?: InputMaybe<ModelSubscriptionBooleanInput>;
   toDomainId?: InputMaybe<ModelSubscriptionIdInput>;
@@ -6577,6 +6583,7 @@ export enum SearchableColonyActionAggregateField {
   PendingColonyMetadataId = 'pendingColonyMetadataId',
   PendingDomainMetadataId = 'pendingDomainMetadataId',
   RecipientAddress = 'recipientAddress',
+  RolesAreMultiSig = 'rolesAreMultiSig',
   RootHash = 'rootHash',
   ShowInActionsList = 'showInActionsList',
   ToDomainId = 'toDomainId',
@@ -6628,6 +6635,7 @@ export type SearchableColonyActionFilterInput = {
   pendingColonyMetadataId?: InputMaybe<SearchableIdFilterInput>;
   pendingDomainMetadataId?: InputMaybe<SearchableIdFilterInput>;
   recipientAddress?: InputMaybe<SearchableIdFilterInput>;
+  rolesAreMultiSig?: InputMaybe<SearchableBooleanFilterInput>;
   rootHash?: InputMaybe<SearchableStringFilterInput>;
   showInActionsList?: InputMaybe<SearchableBooleanFilterInput>;
   toDomainId?: InputMaybe<SearchableIdFilterInput>;
@@ -6667,6 +6675,7 @@ export enum SearchableColonyActionSortableFields {
   PendingColonyMetadataId = 'pendingColonyMetadataId',
   PendingDomainMetadataId = 'pendingDomainMetadataId',
   RecipientAddress = 'recipientAddress',
+  RolesAreMultiSig = 'rolesAreMultiSig',
   RootHash = 'rootHash',
   ShowInActionsList = 'showInActionsList',
   ToDomainId = 'toDomainId',
@@ -7705,6 +7714,7 @@ export type UpdateColonyActionInput = {
   pendingDomainMetadataId?: InputMaybe<Scalars['ID']>;
   recipientAddress?: InputMaybe<Scalars['ID']>;
   roles?: InputMaybe<ColonyActionRolesInput>;
+  rolesAreMultiSig?: InputMaybe<Scalars['Boolean']>;
   rootHash?: InputMaybe<Scalars['String']>;
   showInActionsList?: InputMaybe<Scalars['Boolean']>;
   toDomainId?: InputMaybe<Scalars['ID']>;
