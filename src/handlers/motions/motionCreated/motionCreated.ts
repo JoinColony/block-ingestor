@@ -181,7 +181,12 @@ export default async (event: ContractEvent): Promise<void> => {
       }
 
       case ColonyOperations.SetUserRoles: {
-        await handleSetUserRolesMotion(event, parsedAction, gasEstimate);
+        await handleSetUserRolesMotion(
+          event,
+          parsedAction,
+          gasEstimate,
+          motion.altTarget,
+        );
         break;
       }
 
