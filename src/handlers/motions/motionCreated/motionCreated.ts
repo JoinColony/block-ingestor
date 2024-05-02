@@ -227,6 +227,7 @@ export const handleMotionCreated: EventHandler = async (
           event,
           parsedAction,
           gasEstimate,
+          motion.altTarget,
         );
         break;
       }
