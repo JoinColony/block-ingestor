@@ -120,7 +120,12 @@ export const handleMotionCreated: EventHandler = async (
       }
 
       case ColonyOperations.SetUserRoles: {
-        await handleSetUserRolesMotion(colonyAddress, event, parsedAction);
+        await handleSetUserRolesMotion(
+          colonyAddress,
+          event,
+          parsedAction,
+          motion.altTarget,
+        );
         break;
       }
 
