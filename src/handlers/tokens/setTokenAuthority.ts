@@ -24,10 +24,7 @@ export default async (event: ContractEvent): Promise<void> => {
     let mintable = false;
 
     // only set the unlock / mint status for colony network tokens
-    if (
-      client.tokenClientType === TokenClientType.Colony ||
-      client.tokenClientType === TokenClientType.ColonyLegacy
-    ) {
+    if (client.tokenClientType === TokenClientType.Colony) {
       try {
         await client.provider.call(
           {
