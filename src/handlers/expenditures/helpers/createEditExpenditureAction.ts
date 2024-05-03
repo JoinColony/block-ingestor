@@ -36,12 +36,6 @@ export class NotEditActionError extends Error {
 }
 
 /**
- * Defines how much time has to elapse before we consider
- * `setExpenditureState` and `setExpenditurePayout` calls as an edit action
- */
-const ACTION_TIME_THRESHOLD = 30;
-
-/**
  * This function gets called for both `ExpenditureStateChanged` and `ExpenditurePayoutSet` events
  * It determines whether the event is part of an edit action and creates it in the DB
  * Otherwise, it returns a result allowing the handler to continue processing as normal
@@ -53,11 +47,13 @@ export const createEditExpenditureAction = async (
 ): Promise<void> => {
   const { transactionHash } = event;
 
-  const secondsSinceCreate = Math.floor(
-    (new Date().getTime() - new Date(expenditure.createdAt).getTime()) / 1000,
-  );
-  if (secondsSinceCreate < ACTION_TIME_THRESHOLD) {
-    return;
+  if (!expenditure.firstEditTransactionHash) {
+    /**
+     * If expenditure doesn't have `firstEditTransactionHash` set, it means it's the first time
+     * we see an ExpenditurePayoutSet event, which is normally part of expenditure creation
+     * Only subsequent ExpenditurePayoutSet events will be considered as edit actions
+     */
+    throw new NotEditActionError();
   }
 
   const actionExists = await checkActionExists(transactionHash);

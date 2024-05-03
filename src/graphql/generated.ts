@@ -1385,6 +1385,7 @@ export type CreateExpenditureInput = {
   colonyId: Scalars['ID'];
   createdAt?: InputMaybe<Scalars['AWSDateTime']>;
   finalizedAt?: InputMaybe<Scalars['AWSTimestamp']>;
+  firstEditTransactionHash?: InputMaybe<Scalars['String']>;
   id?: InputMaybe<Scalars['ID']>;
   isStaked: Scalars['Boolean'];
   nativeDomainId: Scalars['Int'];
@@ -1903,6 +1904,8 @@ export type Expenditure = {
   createdAt: Scalars['AWSDateTime'];
   /** The timestamp at which the expenditure was finalized */
   finalizedAt?: Maybe<Scalars['AWSTimestamp']>;
+  /** Hash of the first transaction that contained ExpenditurePayoutSet event */
+  firstEditTransactionHash?: Maybe<Scalars['String']>;
   /**
    * Unique identifier for the role snapshot
    * Self-managed, format: `colonyId_nativeExpenditureId`
@@ -2990,6 +2993,7 @@ export type ModelExpenditureConditionInput = {
   colonyId?: InputMaybe<ModelIdInput>;
   createdAt?: InputMaybe<ModelStringInput>;
   finalizedAt?: InputMaybe<ModelIntInput>;
+  firstEditTransactionHash?: InputMaybe<ModelStringInput>;
   isStaked?: InputMaybe<ModelBooleanInput>;
   nativeDomainId?: InputMaybe<ModelIntInput>;
   nativeFundingPotId?: InputMaybe<ModelIntInput>;
@@ -3013,6 +3017,7 @@ export type ModelExpenditureFilterInput = {
   colonyId?: InputMaybe<ModelIdInput>;
   createdAt?: InputMaybe<ModelStringInput>;
   finalizedAt?: InputMaybe<ModelIntInput>;
+  firstEditTransactionHash?: InputMaybe<ModelStringInput>;
   id?: InputMaybe<ModelIdInput>;
   isStaked?: InputMaybe<ModelBooleanInput>;
   nativeDomainId?: InputMaybe<ModelIntInput>;
@@ -3801,6 +3806,7 @@ export type ModelSubscriptionExpenditureFilterInput = {
   colonyId?: InputMaybe<ModelSubscriptionIdInput>;
   createdAt?: InputMaybe<ModelSubscriptionStringInput>;
   finalizedAt?: InputMaybe<ModelSubscriptionIntInput>;
+  firstEditTransactionHash?: InputMaybe<ModelSubscriptionStringInput>;
   id?: InputMaybe<ModelSubscriptionIdInput>;
   isStaked?: InputMaybe<ModelSubscriptionBooleanInput>;
   nativeDomainId?: InputMaybe<ModelSubscriptionIntInput>;
@@ -7811,6 +7817,7 @@ export type UpdateExpenditureInput = {
   colonyId?: InputMaybe<Scalars['ID']>;
   createdAt?: InputMaybe<Scalars['AWSDateTime']>;
   finalizedAt?: InputMaybe<Scalars['AWSTimestamp']>;
+  firstEditTransactionHash?: InputMaybe<Scalars['String']>;
   id: Scalars['ID'];
   isStaked?: InputMaybe<Scalars['Boolean']>;
   nativeDomainId?: InputMaybe<Scalars['Int']>;
@@ -8276,6 +8283,7 @@ export type ExpenditureFragment = {
   ownerAddress: string;
   userStakeId?: string | null;
   createdAt: string;
+  firstEditTransactionHash?: string | null;
   slots: Array<{
     __typename?: 'ExpenditureSlot';
     id: number;
@@ -9169,6 +9177,7 @@ export type GetExpenditureQuery = {
     ownerAddress: string;
     userStakeId?: string | null;
     createdAt: string;
+    firstEditTransactionHash?: string | null;
     slots: Array<{
       __typename?: 'ExpenditureSlot';
       id: number;
@@ -9215,6 +9224,7 @@ export type GetExpenditureByNativeFundingPotIdAndColonyQuery = {
       ownerAddress: string;
       userStakeId?: string | null;
       createdAt: string;
+      firstEditTransactionHash?: string | null;
       slots: Array<{
         __typename?: 'ExpenditureSlot';
         id: number;
@@ -9762,6 +9772,7 @@ export const Expenditure = gql`
     ownerAddress
     userStakeId
     createdAt
+    firstEditTransactionHash
   }
   ${ExpenditureSlot}
   ${ExpenditureBalance}

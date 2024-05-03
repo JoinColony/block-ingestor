@@ -88,6 +88,9 @@ export default async (event: ContractEvent): Promise<void> => {
         input: {
           id: databaseId,
           slots: updatedSlots,
+          firstEditTransactionHash: expenditure.firstEditTransactionHash
+            ? undefined
+            : event.transactionHash,
         },
       });
     } else {
