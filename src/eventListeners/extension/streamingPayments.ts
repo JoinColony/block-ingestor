@@ -23,6 +23,9 @@ export const setupListenersForStreamingPayments = (
   const events = [
     ContractEventsSignatures.StreamingPaymentCreated,
     ContractEventsSignatures.PaymentTokenUpdated,
+    ContractEventsSignatures.StartTimeSet,
+    ContractEventsSignatures.EndTimeSet,
+    ContractEventsSignatures.ClaimWaived,
   ];
 
   events.forEach((eventSignature) =>

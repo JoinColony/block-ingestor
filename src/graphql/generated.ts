@@ -319,6 +319,10 @@ export type ColonyAction = {
    * Currently it is impossible to tell the reason for the action being hidden from the actions list
    */
   showInActionsList: Scalars['Boolean'];
+  /** Streaming payment associated with the action, if any */
+  streamingPayment?: Maybe<StreamingPayment>;
+  /** ID of the associated streaming payment, if any */
+  streamingPaymentId?: Maybe<Scalars['ID']>;
   /** The target Domain of the action, if applicable */
   toDomain?: Maybe<Domain>;
   /** The target Domain identifier, if applicable */
@@ -381,6 +385,8 @@ export enum ColonyActionType {
   CancelExpenditure = 'CANCEL_EXPENDITURE',
   /** An action related to a motion to cancel an expenditure */
   CancelExpenditureMotion = 'CANCEL_EXPENDITURE_MOTION',
+  /** An action related to cancelling a streaming payment */
+  CancelStreamingPayment = 'CANCEL_STREAMING_PAYMENT',
   /** An action related to editing a Colony's details */
   ColonyEdit = 'COLONY_EDIT',
   /** An action related to editing a Colony's details via a motion */
@@ -1126,6 +1132,7 @@ export type CreateColonyActionInput = {
   recipientAddress?: InputMaybe<Scalars['ID']>;
   roles?: InputMaybe<ColonyActionRolesInput>;
   showInActionsList: Scalars['Boolean'];
+  streamingPaymentId?: InputMaybe<Scalars['ID']>;
   toDomainId?: InputMaybe<Scalars['ID']>;
   toPotId?: InputMaybe<Scalars['Int']>;
   tokenAddress?: InputMaybe<Scalars['ID']>;
@@ -2292,6 +2299,7 @@ export type ModelColonyActionConditionInput = {
   pendingDomainMetadataId?: InputMaybe<ModelIdInput>;
   recipientAddress?: InputMaybe<ModelIdInput>;
   showInActionsList?: InputMaybe<ModelBooleanInput>;
+  streamingPaymentId?: InputMaybe<ModelIdInput>;
   toDomainId?: InputMaybe<ModelIdInput>;
   toPotId?: InputMaybe<ModelIntInput>;
   tokenAddress?: InputMaybe<ModelIdInput>;
@@ -2333,6 +2341,7 @@ export type ModelColonyActionFilterInput = {
   pendingDomainMetadataId?: InputMaybe<ModelIdInput>;
   recipientAddress?: InputMaybe<ModelIdInput>;
   showInActionsList?: InputMaybe<ModelBooleanInput>;
+  streamingPaymentId?: InputMaybe<ModelIdInput>;
   toDomainId?: InputMaybe<ModelIdInput>;
   toPotId?: InputMaybe<ModelIntInput>;
   tokenAddress?: InputMaybe<ModelIdInput>;
@@ -3493,6 +3502,7 @@ export type ModelSubscriptionColonyActionFilterInput = {
   pendingDomainMetadataId?: InputMaybe<ModelSubscriptionIdInput>;
   recipientAddress?: InputMaybe<ModelSubscriptionIdInput>;
   showInActionsList?: InputMaybe<ModelSubscriptionBooleanInput>;
+  streamingPaymentId?: InputMaybe<ModelSubscriptionIdInput>;
   toDomainId?: InputMaybe<ModelSubscriptionIdInput>;
   toPotId?: InputMaybe<ModelSubscriptionIntInput>;
   tokenAddress?: InputMaybe<ModelSubscriptionIdInput>;
@@ -5425,6 +5435,7 @@ export type ProfileMetadataInput = {
 export type Query = {
   __typename?: 'Query';
   getActionByExpenditureId?: Maybe<ModelColonyActionConnection>;
+  getActionByStreamingPaymentId?: Maybe<ModelColonyActionConnection>;
   getActionsByColony?: Maybe<ModelColonyActionConnection>;
   getAnnotation?: Maybe<Annotation>;
   getColoniesByNativeTokenId?: Maybe<ModelColonyConnection>;
@@ -5555,6 +5566,15 @@ export type QueryGetActionByExpenditureIdArgs = {
   limit?: InputMaybe<Scalars['Int']>;
   nextToken?: InputMaybe<Scalars['String']>;
   sortDirection?: InputMaybe<ModelSortDirection>;
+};
+
+/** Root query type */
+export type QueryGetActionByStreamingPaymentIdArgs = {
+  filter?: InputMaybe<ModelColonyActionFilterInput>;
+  limit?: InputMaybe<Scalars['Int']>;
+  nextToken?: InputMaybe<Scalars['String']>;
+  sortDirection?: InputMaybe<ModelSortDirection>;
+  streamingPaymentId: Scalars['ID'];
 };
 
 /** Root query type */
@@ -6496,6 +6516,7 @@ export enum SearchableColonyActionAggregateField {
   PendingDomainMetadataId = 'pendingDomainMetadataId',
   RecipientAddress = 'recipientAddress',
   ShowInActionsList = 'showInActionsList',
+  StreamingPaymentId = 'streamingPaymentId',
   ToDomainId = 'toDomainId',
   ToPotId = 'toPotId',
   TokenAddress = 'tokenAddress',
@@ -6546,6 +6567,7 @@ export type SearchableColonyActionFilterInput = {
   pendingDomainMetadataId?: InputMaybe<SearchableIdFilterInput>;
   recipientAddress?: InputMaybe<SearchableIdFilterInput>;
   showInActionsList?: InputMaybe<SearchableBooleanFilterInput>;
+  streamingPaymentId?: InputMaybe<SearchableIdFilterInput>;
   toDomainId?: InputMaybe<SearchableIdFilterInput>;
   toPotId?: InputMaybe<SearchableIntFilterInput>;
   tokenAddress?: InputMaybe<SearchableIdFilterInput>;
@@ -6584,6 +6606,7 @@ export enum SearchableColonyActionSortableFields {
   PendingDomainMetadataId = 'pendingDomainMetadataId',
   RecipientAddress = 'recipientAddress',
   ShowInActionsList = 'showInActionsList',
+  StreamingPaymentId = 'streamingPaymentId',
   ToDomainId = 'toDomainId',
   ToPotId = 'toPotId',
   TokenAddress = 'tokenAddress',
@@ -7557,6 +7580,7 @@ export type UpdateColonyActionInput = {
   recipientAddress?: InputMaybe<Scalars['ID']>;
   roles?: InputMaybe<ColonyActionRolesInput>;
   showInActionsList?: InputMaybe<Scalars['Boolean']>;
+  streamingPaymentId?: InputMaybe<Scalars['ID']>;
   toDomainId?: InputMaybe<Scalars['ID']>;
   toPotId?: InputMaybe<Scalars['Int']>;
   tokenAddress?: InputMaybe<Scalars['ID']>;
