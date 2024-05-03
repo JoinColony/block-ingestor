@@ -3,6 +3,7 @@ import {
   handlePaymentTokenUpdated,
   handleStreamingPaymentCreated,
 } from '~handlers';
+import { handleStreamingPaymentEndTimeSet } from '~handlers/expenditures/streamingPaymentEndTimeSet';
 
 import { ContractEventsSignatures } from '~types';
 import { output } from '~utils';
@@ -28,6 +29,7 @@ export const setupListenersForStreamingPayments = (
     [ContractEventsSignatures.StreamingPaymentCreated]:
       handleStreamingPaymentCreated,
     [ContractEventsSignatures.PaymentTokenUpdated]: handlePaymentTokenUpdated,
+    [ContractEventsSignatures.StartTimeSet]: handleStreamingPaymentEndTimeSet,
   };
 
   Object.entries(eventHandlers).forEach(([eventSignature, handler]) =>
