@@ -1,6 +1,7 @@
 import { Extension, getExtensionHash } from '@colony/colony-js';
 import {
   handlePaymentTokenUpdated,
+  handleStreamingPaymentClaimed,
   handleStreamingPaymentCreated,
 } from '~handlers';
 import { handleStreamingPaymentEndTimeSet } from '~handlers/expenditures/streamingPaymentEndTimeSet';
@@ -29,7 +30,9 @@ export const setupListenersForStreamingPayments = (
     [ContractEventsSignatures.StreamingPaymentCreated]:
       handleStreamingPaymentCreated,
     [ContractEventsSignatures.PaymentTokenUpdated]: handlePaymentTokenUpdated,
-    [ContractEventsSignatures.StartTimeSet]: handleStreamingPaymentEndTimeSet,
+    [ContractEventsSignatures.EndTimeSet]: handleStreamingPaymentEndTimeSet,
+    [ContractEventsSignatures.StreamingPaymentClaimed]:
+      handleStreamingPaymentClaimed,
   };
 
   Object.entries(eventHandlers).forEach(([eventSignature, handler]) =>
