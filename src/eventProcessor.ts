@@ -53,6 +53,7 @@ import {
   handleSetTokenAuthority,
   handleExpenditureStateChanged,
   handleStreamingPaymentEndTimeSet,
+  handleStreamingPaymentClaimed,
 } from './handlers';
 
 dotenv.config();
@@ -358,6 +359,11 @@ export default async (event: ContractEvent): Promise<void> => {
     case ContractEventsSignatures.LogSetOwner: {
       // We have to execute exactly the same logic as for LogSetAuthority
       await handleSetTokenAuthority(event);
+      return;
+    }
+
+    case ContractEventsSignatures.StreamingPaymentClaimed: {
+      await handleStreamingPaymentClaimed(event);
       return;
     }
 

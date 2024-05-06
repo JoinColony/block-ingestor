@@ -18,3 +18,4 @@ export { default as handleStreamingPaymentEndTimeSet } from './streamingPaymentE
 export { default as handleExpenditureMadeViaStake } from './expenditureMadeViaStake';
 export { default as handlePaymentTokenUpdated } from './paymentTokenUpdated';
 export { default as handleExpenditureStateChanged } from './expenditureStateChanged';
+export { default as handleStreamingPaymentClaimed } from './streamingPaymentClaimed';
