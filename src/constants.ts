@@ -12,3 +12,6 @@ export const SUPPORTED_EXTENSION_IDS = [
 ];
 
 export const SIMPLE_DECISIONS_ACTION_CODE = '0x12345678';
+export const BLOCK_PAGING_SIZE = process.env.BLOCK_PAGING_SIZE
+  ? parseInt(process.env.BLOCK_PAGING_SIZE, 10)
+  : 1000;
