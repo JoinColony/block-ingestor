@@ -56,6 +56,7 @@ import {
   handleExpenditureStateChanged,
   handleStakeFractionSet,
   handleStreamingPaymentEndTimeSet,
+  handleStreamingPaymentClaimed,
 } from './handlers';
 
 dotenv.config();
@@ -374,9 +375,15 @@ export default async (event: ContractEvent): Promise<void> => {
       return;
     }
 
-    case ContractEventsSignatures.ColonyMetadataDelta:
+    case ContractEventsSignatures.StreamingPaymentClaimed: {
+      await handleStreamingPaymentClaimed(event);
+      return;
+    }
+
+    case ContractEventsSignatures.ColonyMetadataDelta: {
       await handleColonyMetadataDelta(event);
       return;
+    }
 
     default: {
       return;

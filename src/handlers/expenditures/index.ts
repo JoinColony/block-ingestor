@@ -19,3 +19,4 @@ export { default as handleExpenditureMadeViaStake } from './expenditureMadeViaSt
 export { default as handlePaymentTokenUpdated } from './paymentTokenUpdated';
 export { default as handleExpenditureStateChanged } from './expenditureStateChanged';
 export { default as handleStakeFractionSet } from './stakeFractionSet';
+export { default as handleStreamingPaymentClaimed } from './streamingPaymentClaimed';
