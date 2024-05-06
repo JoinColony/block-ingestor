@@ -47,6 +47,10 @@ export const createEditExpenditureAction = async (
 ): Promise<void> => {
   const { transactionHash } = event;
 
+  if (expenditure.status === ExpenditureStatus.Draft) {
+    throw new NotEditActionError();
+  }
+
   if (!expenditure.firstEditTransactionHash) {
     /**
      * If expenditure doesn't have `firstEditTransactionHash` set, it means it's the first time
