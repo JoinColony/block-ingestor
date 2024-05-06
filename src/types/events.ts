@@ -99,6 +99,7 @@ export enum ContractEventsSignatures {
   StartTimeSet = 'StartTimeSet(address,uint256,uint256)',
   EndTimeSet = 'EndTimeSet(address,uint256,uint256)',
   ClaimWaived = 'ClaimWaived(address,uint256,address)',
+  StreamingPaymentClaimed = 'StreamingPaymentClaimed(address,uint256,address,uint256)',
 
   // Annotations
   AnnotateTransaction = 'Annotation(address,bytes32,string)',
