@@ -11,3 +11,18 @@ query GetActionIdFromAnnotation($id: ID!) {
     actionId
   }
 }
+
+query GetActionById($id: ID!) {
+  getColonyAction(id: $id) {
+    id
+    type
+    expenditureSlotChanges {
+      oldSlots {
+        ...ExpenditureSlot
+      }
+      newSlots {
+        ...ExpenditureSlot
+      }
+    }
+  }
+}

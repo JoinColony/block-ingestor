@@ -245,6 +245,11 @@ export type ColonyAction = {
   expenditure?: Maybe<Expenditure>;
   /** ID of the associated expenditure, if any */
   expenditureId?: Maybe<Scalars['ID']>;
+  /**
+   * Changes to the expenditure slots associated with the action, if any
+   * Applicable to `EDIT_EXPENDITURE` action only
+   */
+  expenditureSlotChanges?: Maybe<ExpenditureSlotChanges>;
   /** The source Domain of the action, if applicable */
   fromDomain?: Maybe<Domain>;
   /** The source Domain identifier, if applicable */
@@ -397,8 +402,10 @@ export enum ColonyActionType {
   EditDomain = 'EDIT_DOMAIN',
   /** An action related to editing a domain's details via a motion */
   EditDomainMotion = 'EDIT_DOMAIN_MOTION',
+  /** An action related to editing an expenditure */
+  EditExpenditure = 'EDIT_EXPENDITURE',
   /** An action related to creating a motion to edit an expenditure */
-  EditLockedExpenditureMotion = 'EDIT_LOCKED_EXPENDITURE_MOTION',
+  EditExpenditureMotion = 'EDIT_EXPENDITURE_MOTION',
   /** An action related to a domain reputation penalty within a Colony (smite) */
   EmitDomainReputationPenalty = 'EMIT_DOMAIN_REPUTATION_PENALTY',
   /** An action related to a domain reputation penalty within a Colony (smite) via a motion */
@@ -1107,6 +1114,7 @@ export type CreateColonyActionInput = {
   colonyId: Scalars['ID'];
   createdAt?: InputMaybe<Scalars['AWSDateTime']>;
   expenditureId?: InputMaybe<Scalars['ID']>;
+  expenditureSlotChanges?: InputMaybe<ExpenditureSlotChangesInput>;
   fromDomainId?: InputMaybe<Scalars['ID']>;
   fromPotId?: InputMaybe<Scalars['Int']>;
   id?: InputMaybe<Scalars['ID']>;
@@ -1377,6 +1385,7 @@ export type CreateExpenditureInput = {
   colonyId: Scalars['ID'];
   createdAt?: InputMaybe<Scalars['AWSDateTime']>;
   finalizedAt?: InputMaybe<Scalars['AWSTimestamp']>;
+  firstEditTransactionHash?: InputMaybe<Scalars['String']>;
   id?: InputMaybe<Scalars['ID']>;
   isStaked: Scalars['Boolean'];
   nativeDomainId: Scalars['Int'];
@@ -1895,6 +1904,8 @@ export type Expenditure = {
   createdAt: Scalars['AWSDateTime'];
   /** The timestamp at which the expenditure was finalized */
   finalizedAt?: Maybe<Scalars['AWSTimestamp']>;
+  /** Hash of the first transaction that contained ExpenditurePayoutSet event */
+  firstEditTransactionHash?: Maybe<Scalars['String']>;
   /**
    * Unique identifier for the role snapshot
    * Self-managed, format: `colonyId_nativeExpenditureId`
@@ -1995,6 +2006,17 @@ export type ExpenditureSlot = {
   payoutModifier?: Maybe<Scalars['Int']>;
   payouts?: Maybe<Array<ExpenditurePayout>>;
   recipientAddress?: Maybe<Scalars['String']>;
+};
+
+export type ExpenditureSlotChanges = {
+  __typename?: 'ExpenditureSlotChanges';
+  newSlots: Array<ExpenditureSlot>;
+  oldSlots: Array<ExpenditureSlot>;
+};
+
+export type ExpenditureSlotChangesInput = {
+  newSlots: Array<ExpenditureSlotInput>;
+  oldSlots: Array<ExpenditureSlotInput>;
 };
 
 export type ExpenditureSlotInput = {
@@ -2971,6 +2993,7 @@ export type ModelExpenditureConditionInput = {
   colonyId?: InputMaybe<ModelIdInput>;
   createdAt?: InputMaybe<ModelStringInput>;
   finalizedAt?: InputMaybe<ModelIntInput>;
+  firstEditTransactionHash?: InputMaybe<ModelStringInput>;
   isStaked?: InputMaybe<ModelBooleanInput>;
   nativeDomainId?: InputMaybe<ModelIntInput>;
   nativeFundingPotId?: InputMaybe<ModelIntInput>;
@@ -2994,6 +3017,7 @@ export type ModelExpenditureFilterInput = {
   colonyId?: InputMaybe<ModelIdInput>;
   createdAt?: InputMaybe<ModelStringInput>;
   finalizedAt?: InputMaybe<ModelIntInput>;
+  firstEditTransactionHash?: InputMaybe<ModelStringInput>;
   id?: InputMaybe<ModelIdInput>;
   isStaked?: InputMaybe<ModelBooleanInput>;
   nativeDomainId?: InputMaybe<ModelIntInput>;
@@ -3782,6 +3806,7 @@ export type ModelSubscriptionExpenditureFilterInput = {
   colonyId?: InputMaybe<ModelSubscriptionIdInput>;
   createdAt?: InputMaybe<ModelSubscriptionStringInput>;
   finalizedAt?: InputMaybe<ModelSubscriptionIntInput>;
+  firstEditTransactionHash?: InputMaybe<ModelSubscriptionStringInput>;
   id?: InputMaybe<ModelSubscriptionIdInput>;
   isStaked?: InputMaybe<ModelSubscriptionBooleanInput>;
   nativeDomainId?: InputMaybe<ModelSubscriptionIntInput>;
@@ -7538,6 +7563,7 @@ export type UpdateColonyActionInput = {
   colonyId?: InputMaybe<Scalars['ID']>;
   createdAt?: InputMaybe<Scalars['AWSDateTime']>;
   expenditureId?: InputMaybe<Scalars['ID']>;
+  expenditureSlotChanges?: InputMaybe<ExpenditureSlotChangesInput>;
   fromDomainId?: InputMaybe<Scalars['ID']>;
   fromPotId?: InputMaybe<Scalars['Int']>;
   id: Scalars['ID'];
@@ -7791,6 +7817,7 @@ export type UpdateExpenditureInput = {
   colonyId?: InputMaybe<Scalars['ID']>;
   createdAt?: InputMaybe<Scalars['AWSDateTime']>;
   finalizedAt?: InputMaybe<Scalars['AWSTimestamp']>;
+  firstEditTransactionHash?: InputMaybe<Scalars['String']>;
   id: Scalars['ID'];
   isStaked?: InputMaybe<Scalars['Boolean']>;
   nativeDomainId?: InputMaybe<Scalars['Int']>;
@@ -8255,6 +8282,8 @@ export type ExpenditureFragment = {
   status: ExpenditureStatus;
   ownerAddress: string;
   userStakeId?: string | null;
+  createdAt: string;
+  firstEditTransactionHash?: string | null;
   slots: Array<{
     __typename?: 'ExpenditureSlot';
     id: number;
@@ -8281,6 +8310,21 @@ export type ExpenditureFragment = {
     __typename?: 'ExpenditureBalance';
     tokenAddress: string;
     amount: string;
+  }> | null;
+};
+
+export type ExpenditureSlotFragment = {
+  __typename?: 'ExpenditureSlot';
+  id: number;
+  recipientAddress?: string | null;
+  claimDelay?: string | null;
+  payoutModifier?: number | null;
+  payouts?: Array<{
+    __typename?: 'ExpenditurePayout';
+    tokenAddress: string;
+    amount: string;
+    isClaimed: boolean;
+    networkFee?: string | null;
   }> | null;
 };
 
@@ -8878,6 +8922,50 @@ export type GetActionIdFromAnnotationQuery = {
   getAnnotation?: { __typename?: 'Annotation'; actionId: string } | null;
 };
 
+export type GetActionByIdQueryVariables = Exact<{
+  id: Scalars['ID'];
+}>;
+
+export type GetActionByIdQuery = {
+  __typename?: 'Query';
+  getColonyAction?: {
+    __typename?: 'ColonyAction';
+    id: string;
+    type: ColonyActionType;
+    expenditureSlotChanges?: {
+      __typename?: 'ExpenditureSlotChanges';
+      oldSlots: Array<{
+        __typename?: 'ExpenditureSlot';
+        id: number;
+        recipientAddress?: string | null;
+        claimDelay?: string | null;
+        payoutModifier?: number | null;
+        payouts?: Array<{
+          __typename?: 'ExpenditurePayout';
+          tokenAddress: string;
+          amount: string;
+          isClaimed: boolean;
+          networkFee?: string | null;
+        }> | null;
+      }>;
+      newSlots: Array<{
+        __typename?: 'ExpenditureSlot';
+        id: number;
+        recipientAddress?: string | null;
+        claimDelay?: string | null;
+        payoutModifier?: number | null;
+        payouts?: Array<{
+          __typename?: 'ExpenditurePayout';
+          tokenAddress: string;
+          amount: string;
+          isClaimed: boolean;
+          networkFee?: string | null;
+        }> | null;
+      }>;
+    } | null;
+  } | null;
+};
+
 export type GetColonyMetadataQueryVariables = Exact<{
   id: Scalars['ID'];
 }>;
@@ -9088,6 +9176,8 @@ export type GetExpenditureQuery = {
     status: ExpenditureStatus;
     ownerAddress: string;
     userStakeId?: string | null;
+    createdAt: string;
+    firstEditTransactionHash?: string | null;
     slots: Array<{
       __typename?: 'ExpenditureSlot';
       id: number;
@@ -9133,6 +9223,8 @@ export type GetExpenditureByNativeFundingPotIdAndColonyQuery = {
       status: ExpenditureStatus;
       ownerAddress: string;
       userStakeId?: string | null;
+      createdAt: string;
+      firstEditTransactionHash?: string | null;
       slots: Array<{
         __typename?: 'ExpenditureSlot';
         id: number;
@@ -9639,6 +9731,20 @@ export const ColonyMetadata = gql`
     }
   }
 `;
+export const ExpenditureSlot = gql`
+  fragment ExpenditureSlot on ExpenditureSlot {
+    id
+    recipientAddress
+    claimDelay
+    payoutModifier
+    payouts {
+      tokenAddress
+      amount
+      isClaimed
+      networkFee
+    }
+  }
+`;
 export const ExpenditureBalance = gql`
   fragment ExpenditureBalance on ExpenditureBalance {
     tokenAddress
@@ -9649,16 +9755,7 @@ export const Expenditure = gql`
   fragment Expenditure on Expenditure {
     id
     slots {
-      id
-      recipientAddress
-      claimDelay
-      payoutModifier
-      payouts {
-        tokenAddress
-        amount
-        isClaimed
-        networkFee
-      }
+      ...ExpenditureSlot
     }
     motions {
       items {
@@ -9674,7 +9771,10 @@ export const Expenditure = gql`
     status
     ownerAddress
     userStakeId
+    createdAt
+    firstEditTransactionHash
   }
+  ${ExpenditureSlot}
   ${ExpenditureBalance}
 `;
 export const Extension = gql`
@@ -10162,6 +10262,23 @@ export const GetActionIdFromAnnotationDocument = gql`
       actionId
     }
   }
+`;
+export const GetActionByIdDocument = gql`
+  query GetActionById($id: ID!) {
+    getColonyAction(id: $id) {
+      id
+      type
+      expenditureSlotChanges {
+        oldSlots {
+          ...ExpenditureSlot
+        }
+        newSlots {
+          ...ExpenditureSlot
+        }
+      }
+    }
+  }
+  ${ExpenditureSlot}
 `;
 export const GetColonyMetadataDocument = gql`
   query GetColonyMetadata($id: ID!) {

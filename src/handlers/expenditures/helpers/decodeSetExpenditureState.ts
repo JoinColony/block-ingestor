@@ -1,4 +1,4 @@
-import { BigNumber, utils } from 'ethers';
+import { BigNumber, BigNumberish, utils } from 'ethers';
 
 import {
   ExpenditureFragment,
@@ -7,7 +7,6 @@ import {
 } from '~graphql';
 import { toNumber } from '~utils';
 
-import { getUpdatedExpenditureSlots } from './getUpdatedSlots';
 import {
   EXPENDITURESLOTS_SLOT,
   EXPENDITURESLOT_CLAIMDELAY,
@@ -16,51 +15,69 @@ import {
   EXPENDITURES_SLOT,
   EXPENDITURE_OWNER_AND_STATUS,
 } from '~constants';
+import { ContractEvent } from '~types';
+
+interface SetExpenditureStateParams {
+  storageSlot: BigNumberish;
+  keys: string[];
+  value: string;
+}
 
 /**
- * Util function decoding the changes to the expenditure resulting from
- * the ExpenditureStateChanged event and merging them with the existing slots
+ * Util function decoding changes to the expenditure slot resulting from
+ * an ExpenditureStateChanged event
  * It supports changes to the following properties:
  *  - Recipient address
  *  - Claim delay
  *  - Payout modifier
- * If there were no changes to the expenditure slots, it returns undefined
+ * If there were no changes to the expenditure slot, it returns undefined
  */
-export const decodeUpdatedSlots = (
+export const decodeUpdatedSlot = (
   expenditure: ExpenditureFragment,
-  storageSlot: BigNumber,
-  keys: string[],
-  value: string,
-): ExpenditureSlot[] | undefined => {
-  let updatedSlots: ExpenditureSlot[] | undefined;
+  params: SetExpenditureStateParams,
+): ExpenditureSlot | undefined => {
+  const { storageSlot, value, keys } = params;
+  // The unfortunate naming of the `keys` property means we have to access it like so
 
-  if (storageSlot.eq(EXPENDITURESLOTS_SLOT)) {
+  let updatedSlot: ExpenditureSlot | undefined;
+
+  if (BigNumber.from(storageSlot).eq(EXPENDITURESLOTS_SLOT)) {
     const slotId = toNumber(keys[0]);
+
+    const existingSlot = expenditure.slots.find(
+      ({ id }) => id === toNumber(keys[0]),
+    );
 
     if (keys[1] === EXPENDITURESLOT_RECIPIENT) {
       const recipientAddress = utils.defaultAbiCoder
         .decode(['address'], value)
         .toString();
 
-      updatedSlots = getUpdatedExpenditureSlots(expenditure.slots, slotId, {
+      updatedSlot = {
+        ...existingSlot,
+        id: slotId,
         recipientAddress,
-      });
+      };
     } else if (keys[1] === EXPENDITURESLOT_CLAIMDELAY) {
       const claimDelay = BigNumber.from(value).toString();
 
-      updatedSlots = getUpdatedExpenditureSlots(expenditure.slots, slotId, {
+      updatedSlot = {
+        ...existingSlot,
+        id: slotId,
         claimDelay,
-      });
+      };
     } else if (keys[1] === EXPENDITURESLOT_PAYOUTMODIFIER) {
       const payoutModifier = toNumber(value);
 
-      updatedSlots = getUpdatedExpenditureSlots(expenditure.slots, slotId, {
+      updatedSlot = {
+        ...existingSlot,
+        id: slotId,
         payoutModifier,
-      });
+      };
     }
   }
 
-  return updatedSlots;
+  return updatedSlot;
 };
 
 const EXPENDITURE_CONTRACT_STATUS_TO_ENUM: Record<number, ExpenditureStatus> = {
@@ -70,11 +87,16 @@ const EXPENDITURE_CONTRACT_STATUS_TO_ENUM: Record<number, ExpenditureStatus> = {
   3: ExpenditureStatus.Locked,
 };
 
+/**
+ * Util decoding changes to expenditure status following an ExpenditureStateChanged event
+ */
 export const decodeUpdatedStatus = (
-  storageSlot: BigNumber,
-  keys: string[],
-  value: string,
+  event: ContractEvent,
 ): ExpenditureStatus | undefined => {
+  const { storageSlot, value } = event.args;
+  // The unfortunate naming of the `keys` property means we have to access it like so
+  const keys = event.args[4];
+
   let updatedStatus: ExpenditureStatus | undefined;
 
   if (storageSlot.eq(EXPENDITURES_SLOT)) {

@@ -1,3 +1,9 @@
+import { mutate } from '~amplifyClient';
+import {
+  UpdateExpenditureDocument,
+  UpdateExpenditureMutation,
+  UpdateExpenditureMutationVariables,
+} from '~graphql';
 import { ContractEvent } from '~types';
 import {
   getCachedColonyClient,
@@ -7,29 +13,18 @@ import {
   verbose,
 } from '~utils';
 import {
-  UpdateExpenditureDocument,
-  UpdateExpenditureMutation,
-  UpdateExpenditureMutationVariables,
-} from '~graphql';
-import { mutate } from '~amplifyClient';
-
-import {
   getExpenditureFromDB,
-  decodeUpdatedSlots,
+  decodeUpdatedSlot,
+  getUpdatedExpenditureSlots,
   decodeUpdatedStatus,
+  createEditExpenditureAction,
+  NotEditActionError,
 } from './helpers';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { contractAddress: colonyAddress } = event;
-  const { storageSlot, expenditureId, value } = event.args;
-  // The unfortunate naming of the `keys` property means we have to access it like so
-  const keys = event.args[4];
+  const { expenditureId } = event.args;
   const convertedExpenditureId = toNumber(expenditureId);
-
-  const colonyClient = await getCachedColonyClient(colonyAddress);
-  if (!colonyClient) {
-    return;
-  }
 
   const databaseId = getExpenditureDatabaseId(
     colonyAddress,
@@ -39,30 +34,56 @@ export default async (event: ContractEvent): Promise<void> => {
   const expenditure = await getExpenditureFromDB(databaseId);
   if (!expenditure) {
     output(
-      `Could not find expenditure with ID: ${databaseId} in the db when handling ExpenditureStateChanged event`,
+      `Could not find expenditure with ID: ${databaseId} in the db while handling ExpenditureStateChanged event`,
     );
     return;
   }
 
-  const updatedSlots = decodeUpdatedSlots(
-    expenditure,
-    storageSlot,
-    keys,
-    value,
-  );
+  const colonyClient = await getCachedColonyClient(colonyAddress);
+  if (!colonyClient) {
+    return;
+  }
 
-  const updatedStatus = decodeUpdatedStatus(storageSlot, keys, value);
+  try {
+    await createEditExpenditureAction(event, expenditure, colonyClient);
+  } catch (error) {
+    if (error instanceof NotEditActionError) {
+      // If transaction does not contain edit expenditure action, continue processing as normal
+      const { storageSlot, value } = event.args;
+      const keys = event.args[4];
 
-  verbose(`State of expenditure with ID ${databaseId} updated`);
+      const updatedSlot = decodeUpdatedSlot(expenditure, {
+        storageSlot,
+        keys,
+        value,
+      });
+      const updatedSlots = updatedSlot
+        ? getUpdatedExpenditureSlots(
+            expenditure.slots,
+            updatedSlot.id,
+            updatedSlot,
+          )
+        : undefined;
 
-  await mutate<UpdateExpenditureMutation, UpdateExpenditureMutationVariables>(
-    UpdateExpenditureDocument,
-    {
-      input: {
-        id: databaseId,
-        slots: updatedSlots,
-        status: updatedStatus,
-      },
-    },
-  );
+      const updatedStatus = decodeUpdatedStatus(event);
+
+      verbose(`State of expenditure with ID ${databaseId} changed`);
+
+      if (!!updatedSlots || !!updatedStatus) {
+        await mutate<
+          UpdateExpenditureMutation,
+          UpdateExpenditureMutationVariables
+        >(UpdateExpenditureDocument, {
+          input: {
+            id: databaseId,
+            slots: updatedSlots,
+            status: updatedStatus,
+          },
+        });
+      }
+    } else {
+      // Make sure to re-throw any other errors
+      throw error;
+    }
+  }
 };
