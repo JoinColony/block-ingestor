@@ -64,7 +64,7 @@ export const fundExpenditureMotionHandler: MulticallHandler = async ({
     }
 
     fundingItems.push({
-      amount: decodedFunction.args._amount,
+      amount: decodedFunction.args._amount.toString(),
       tokenAddress: decodedFunction.args._token,
     });
   }
