@@ -1902,6 +1902,7 @@ export type CreateTokenInput = {
 };
 
 export type CreateTransactionInput = {
+  associatedActionId?: InputMaybe<Scalars['String']>;
   blockHash?: InputMaybe<Scalars['String']>;
   blockNumber?: InputMaybe<Scalars['Int']>;
   colonyAddress: Scalars['ID'];
@@ -4756,6 +4757,7 @@ export type ModelSubscriptionTokenFilterInput = {
 
 export type ModelSubscriptionTransactionFilterInput = {
   and?: InputMaybe<Array<InputMaybe<ModelSubscriptionTransactionFilterInput>>>;
+  associatedActionId?: InputMaybe<ModelSubscriptionStringInput>;
   blockHash?: InputMaybe<ModelSubscriptionStringInput>;
   blockNumber?: InputMaybe<ModelSubscriptionIntInput>;
   colonyAddress?: InputMaybe<ModelSubscriptionIdInput>;
@@ -4898,6 +4900,7 @@ export type ModelTokenTypeInput = {
 
 export type ModelTransactionConditionInput = {
   and?: InputMaybe<Array<InputMaybe<ModelTransactionConditionInput>>>;
+  associatedActionId?: InputMaybe<ModelStringInput>;
   blockHash?: InputMaybe<ModelStringInput>;
   blockNumber?: InputMaybe<ModelIntInput>;
   colonyAddress?: InputMaybe<ModelIdInput>;
@@ -4933,6 +4936,7 @@ export type ModelTransactionConnection = {
 
 export type ModelTransactionFilterInput = {
   and?: InputMaybe<Array<InputMaybe<ModelTransactionFilterInput>>>;
+  associatedActionId?: InputMaybe<ModelStringInput>;
   blockHash?: InputMaybe<ModelStringInput>;
   blockNumber?: InputMaybe<ModelIntInput>;
   colonyAddress?: InputMaybe<ModelIdInput>;
@@ -9425,6 +9429,8 @@ export enum TokenType {
 /** Represents a transaction made in a colony by a user */
 export type Transaction = {
   __typename?: 'Transaction';
+  /** ID of the action associated with the transaction */
+  associatedActionId?: Maybe<Scalars['String']>;
   /** The block hash of the transaction */
   blockHash?: Maybe<Scalars['String']>;
   /** The block number of the transaction */
@@ -10024,6 +10030,7 @@ export type UpdateTokenInput = {
 };
 
 export type UpdateTransactionInput = {
+  associatedActionId?: InputMaybe<Scalars['String']>;
   blockHash?: InputMaybe<Scalars['String']>;
   blockNumber?: InputMaybe<Scalars['Int']>;
   colonyAddress?: InputMaybe<Scalars['ID']>;
@@ -10873,7 +10880,7 @@ export type GetStreamingPaymentQueryVariables = Exact<{
 }>;
 
 
-export type GetStreamingPaymentQuery = { __typename?: 'Query', getStreamingPayment?: { __typename?: 'StreamingPayment', id: string, endTime: number, payouts?: Array<{ __typename?: 'ExpenditurePayout', amount: string, tokenAddress: string, isClaimed: boolean }> | null } | null };
+export type GetStreamingPaymentQuery = { __typename?: 'Query', getStreamingPayment?: { __typename?: 'StreamingPayment', id: string, endTime: number, payouts?: Array<{ __typename?: 'ExpenditurePayout', amount: string, tokenAddress: string, isClaimed: boolean }> | null, claims?: Array<{ __typename?: 'StreamingPaymentClaim', amount: string, tokenAddress: string }> | null } | null };
 
 export type GetColonyExtensionQueryVariables = Exact<{
   id: Scalars['ID'];
@@ -12051,6 +12058,10 @@ export const GetStreamingPaymentDocument = gql`
       amount
       tokenAddress
       isClaimed
+    }
+    claims {
+      amount
+      tokenAddress
     }
   }
 }
