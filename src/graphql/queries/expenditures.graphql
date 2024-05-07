@@ -27,5 +27,9 @@ query GetStreamingPayment($id: ID!) {
       tokenAddress
       isClaimed
     }
+    claims {
+      amount
+      tokenAddress
+    }
   }
 }
