@@ -1450,6 +1450,7 @@ export type CreateSafeTransactionInput = {
 };
 
 export type CreateStreamingPaymentInput = {
+  claims?: InputMaybe<Array<StreamingPaymentClaimInput>>;
   createdAt?: InputMaybe<Scalars['AWSDateTime']>;
   endTime: Scalars['AWSTimestamp'];
   id?: InputMaybe<Scalars['ID']>;
@@ -6745,6 +6746,7 @@ export type StakerRewardsInput = {
 export type StreamingPayment = {
   __typename?: 'StreamingPayment';
   actions?: Maybe<ModelColonyActionConnection>;
+  claims?: Maybe<Array<StreamingPaymentClaim>>;
   createdAt: Scalars['AWSDateTime'];
   endTime: Scalars['AWSTimestamp'];
   id: Scalars['ID'];
@@ -6765,6 +6767,17 @@ export type StreamingPaymentActionsArgs = {
   limit?: InputMaybe<Scalars['Int']>;
   nextToken?: InputMaybe<Scalars['String']>;
   sortDirection?: InputMaybe<ModelSortDirection>;
+};
+
+export type StreamingPaymentClaim = {
+  __typename?: 'StreamingPaymentClaim';
+  amount: Scalars['String'];
+  tokenAddress: Scalars['ID'];
+};
+
+export type StreamingPaymentClaimInput = {
+  amount: Scalars['String'];
+  tokenAddress: Scalars['ID'];
 };
 
 export enum StreamingPaymentEndCondition {
@@ -7923,6 +7936,7 @@ export type UpdateSafeTransactionInput = {
 };
 
 export type UpdateStreamingPaymentInput = {
+  claims?: InputMaybe<Array<StreamingPaymentClaimInput>>;
   createdAt?: InputMaybe<Scalars['AWSDateTime']>;
   endTime?: InputMaybe<Scalars['AWSTimestamp']>;
   id: Scalars['ID'];
@@ -9346,6 +9360,11 @@ export type GetStreamingPaymentQuery = {
       tokenAddress: string;
       isClaimed: boolean;
     }> | null;
+    claims?: Array<{
+      __typename?: 'StreamingPaymentClaim';
+      amount: string;
+      tokenAddress: string;
+    }> | null;
   } | null;
 };
 
@@ -10527,6 +10546,10 @@ export const GetStreamingPaymentDocument = gql`
         amount
         tokenAddress
         isClaimed
+      }
+      claims {
+        amount
+        tokenAddress
       }
     }
   }
