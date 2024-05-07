@@ -568,6 +568,8 @@ export enum ColonyActionType {
   CreateDomainMultisig = 'CREATE_DOMAIN_MULTISIG',
   /** An action related to creating an expenditure (advanced payment) */
   CreateExpenditure = 'CREATE_EXPENDITURE',
+  /** An action related to creating a streaming payment */
+  CreateStreamingPayment = 'CREATE_STREAMING_PAYMENT',
   /** An action related to editing a domain's details */
   EditDomain = 'EDIT_DOMAIN',
   /** An action related to editing a domain's details via a motion */
@@ -10668,6 +10670,11 @@ export type GetStreamingPaymentQuery = {
       tokenAddress: string;
       isClaimed: boolean;
     }> | null;
+    claims?: Array<{
+      __typename?: 'StreamingPaymentClaim';
+      amount: string;
+      tokenAddress: string;
+    }> | null;
   } | null;
 };
 
@@ -12171,6 +12178,10 @@ export const GetStreamingPaymentDocument = gql`
         amount
         tokenAddress
         isClaimed
+      }
+      claims {
+        amount
+        tokenAddress
       }
     }
   }
