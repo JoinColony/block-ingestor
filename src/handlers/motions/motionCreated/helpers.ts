@@ -314,6 +314,7 @@ export const createMotionInDB = async (
       expenditureId: actionFields.expenditureId,
       expenditureSlotId,
       editedExpenditureSlots,
+      expenditureFunding,
     }),
     createMotionMessage(initialMotionMessage),
     createColonyAction(actionData, timestamp),
