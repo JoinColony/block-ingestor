@@ -5,6 +5,12 @@ import { ContractEvent, ContractMethodSignatures } from '~types';
 import { AnyColonyClient } from '@colony/colony-js';
 import { multicallHandlers } from './multicallHandlers';
 
+/**
+ * @NOTE: This is a rather rudimentary way of handling multicall motions
+ * which only works for multicalls created by UI sagas.
+ * It should be refactored as part of https://github.com/JoinColony/colonyCDapp/issues/2317
+ */
+
 // List all supported multicall functions
 export const supportedMulticallFunctions: ContractMethodSignatures[] = [
   ContractMethodSignatures.MoveFundsBetweenPots,

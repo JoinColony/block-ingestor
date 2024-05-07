@@ -239,7 +239,10 @@ type MotionFields = Omit<
 > &
   Pick<
     CreateColonyMotionInput,
-    'gasEstimate' | 'expenditureSlotId' | 'editedExpenditureSlots'
+    | 'gasEstimate'
+    | 'expenditureSlotId'
+    | 'editedExpenditureSlots'
+    | 'expenditureFunding'
   >;
 
 export const createMotionInDB = async (
@@ -258,6 +261,7 @@ export const createMotionInDB = async (
     gasEstimate,
     expenditureSlotId,
     editedExpenditureSlots,
+    expenditureFunding,
     ...actionFields
   } = motionFields;
 
