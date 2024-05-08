@@ -59,6 +59,7 @@ export const handleStreamingPaymentEndTimeSet: EventHandler = async (
     input: {
       id: databaseId,
       endTime: toNumber(endTime),
+      isCancelled: isCancelAction ? true : null,
     },
   });
 
