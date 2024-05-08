@@ -7,12 +7,7 @@ import {
   UpdateStreamingPaymentMutationVariables,
 } from '~graphql';
 import { EventHandler } from '~types';
-import {
-  getExpenditureDatabaseId,
-  getStreamingPaymentsClient,
-  output,
-  toNumber,
-} from '~utils';
+import { getExpenditureDatabaseId, output, toNumber } from '~utils';
 import { getStreamingPaymentFromDB } from './helpers';
 
 export const handleStreamingPaymentClaimed: EventHandler = async (
@@ -23,13 +18,6 @@ export const handleStreamingPaymentClaimed: EventHandler = async (
   const convertedNativeId = toNumber(streamingPaymentId);
 
   const { colonyAddress } = listener as ExtensionEventListener;
-
-  const streamingPaymentsClient = await getStreamingPaymentsClient(
-    colonyAddress,
-  );
-  if (!streamingPaymentsClient) {
-    return;
-  }
 
   const databaseId = getExpenditureDatabaseId(colonyAddress, convertedNativeId);
 
