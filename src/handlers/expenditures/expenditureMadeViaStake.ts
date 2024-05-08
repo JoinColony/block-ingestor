@@ -3,6 +3,9 @@ import {
   CreateUserStakeDocument,
   CreateUserStakeMutation,
   CreateUserStakeMutationVariables,
+  UpdateColonyActionDocument,
+  UpdateColonyActionMutation,
+  UpdateColonyActionMutationVariables,
   UpdateExpenditureDocument,
   UpdateExpenditureMutation,
   UpdateExpenditureMutationVariables,
@@ -60,6 +63,17 @@ export default async (event: ContractEvent): Promise<void> => {
         userAddress: creator,
         colonyAddress,
         isClaimed: false,
+      },
+    },
+  );
+
+  await mutate<UpdateColonyActionMutation, UpdateColonyActionMutationVariables>(
+    UpdateColonyActionDocument,
+    {
+      input: {
+        id: event.transactionHash,
+        showInActionsList: true,
+        initiatorAddress: creator,
       },
     },
   );
