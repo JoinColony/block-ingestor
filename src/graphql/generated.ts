@@ -1488,6 +1488,7 @@ export type CreateStreamingPaymentInput = {
   endTime: Scalars['AWSTimestamp'];
   id?: InputMaybe<Scalars['ID']>;
   interval: Scalars['String'];
+  isCancelled?: InputMaybe<Scalars['Boolean']>;
   nativeDomainId: Scalars['Int'];
   nativeId: Scalars['Int'];
   payouts?: InputMaybe<Array<ExpenditurePayoutInput>>;
@@ -3408,6 +3409,7 @@ export type ModelStreamingPaymentConditionInput = {
   createdAt?: InputMaybe<ModelStringInput>;
   endTime?: InputMaybe<ModelIntInput>;
   interval?: InputMaybe<ModelStringInput>;
+  isCancelled?: InputMaybe<ModelBooleanInput>;
   nativeDomainId?: InputMaybe<ModelIntInput>;
   nativeId?: InputMaybe<ModelIntInput>;
   not?: InputMaybe<ModelStreamingPaymentConditionInput>;
@@ -3433,6 +3435,7 @@ export type ModelStreamingPaymentFilterInput = {
   endTime?: InputMaybe<ModelIntInput>;
   id?: InputMaybe<ModelIdInput>;
   interval?: InputMaybe<ModelStringInput>;
+  isCancelled?: InputMaybe<ModelBooleanInput>;
   nativeDomainId?: InputMaybe<ModelIntInput>;
   nativeId?: InputMaybe<ModelIntInput>;
   not?: InputMaybe<ModelStreamingPaymentFilterInput>;
@@ -4001,6 +4004,7 @@ export type ModelSubscriptionStreamingPaymentFilterInput = {
   endTime?: InputMaybe<ModelSubscriptionIntInput>;
   id?: InputMaybe<ModelSubscriptionIdInput>;
   interval?: InputMaybe<ModelSubscriptionStringInput>;
+  isCancelled?: InputMaybe<ModelSubscriptionBooleanInput>;
   nativeDomainId?: InputMaybe<ModelSubscriptionIntInput>;
   nativeId?: InputMaybe<ModelSubscriptionIntInput>;
   or?: InputMaybe<
@@ -6872,10 +6876,13 @@ export type StakerRewardsInput = {
 
 export type StreamingPayment = {
   __typename?: 'StreamingPayment';
+  actions?: Maybe<ModelColonyActionConnection>;
   createdAt: Scalars['AWSDateTime'];
   endTime: Scalars['AWSTimestamp'];
   id: Scalars['ID'];
   interval: Scalars['String'];
+  /** Is the stream cancelled? */
+  isCancelled?: Maybe<Scalars['Boolean']>;
   metadata?: Maybe<StreamingPaymentMetadata>;
   nativeDomainId: Scalars['Int'];
   nativeId: Scalars['Int'];
@@ -6883,6 +6890,13 @@ export type StreamingPayment = {
   recipientAddress: Scalars['String'];
   startTime: Scalars['AWSTimestamp'];
   updatedAt: Scalars['AWSDateTime'];
+};
+
+export type StreamingPaymentActionsArgs = {
+  filter?: InputMaybe<ModelColonyActionFilterInput>;
+  limit?: InputMaybe<Scalars['Int']>;
+  nextToken?: InputMaybe<Scalars['String']>;
+  sortDirection?: InputMaybe<ModelSortDirection>;
 };
 
 export enum StreamingPaymentEndCondition {
@@ -8069,6 +8083,7 @@ export type UpdateStreamingPaymentInput = {
   endTime?: InputMaybe<Scalars['AWSTimestamp']>;
   id: Scalars['ID'];
   interval?: InputMaybe<Scalars['String']>;
+  isCancelled?: InputMaybe<Scalars['Boolean']>;
   nativeDomainId?: InputMaybe<Scalars['Int']>;
   nativeId?: InputMaybe<Scalars['Int']>;
   payouts?: InputMaybe<Array<ExpenditurePayoutInput>>;
