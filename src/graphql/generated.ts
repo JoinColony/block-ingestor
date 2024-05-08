@@ -11466,6 +11466,7 @@ export type GetStreamingPaymentQuery = {
       __typename?: 'StreamingPaymentClaim';
       amount: string;
       tokenAddress: string;
+      timestamp: number;
     }> | null;
   } | null;
 };
@@ -13119,6 +13120,7 @@ export const GetStreamingPaymentDocument = gql`
       claims {
         amount
         tokenAddress
+        timestamp
       }
     }
   }
