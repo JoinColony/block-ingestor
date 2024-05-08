@@ -57,6 +57,7 @@ export default async (event: ContractEvent): Promise<void> => {
     input: {
       id: databaseId,
       endTime: toNumber(endTime),
+      isCancelled: isCancelAction ? true : null,
     },
   });
 
