@@ -6904,11 +6904,13 @@ export type StreamingPaymentActionsArgs = {
 export type StreamingPaymentClaim = {
   __typename?: 'StreamingPaymentClaim';
   amount: Scalars['String'];
+  timestamp: Scalars['AWSTimestamp'];
   tokenAddress: Scalars['ID'];
 };
 
 export type StreamingPaymentClaimInput = {
   amount: Scalars['String'];
+  timestamp: Scalars['AWSTimestamp'];
   tokenAddress: Scalars['ID'];
 };
 
@@ -9537,6 +9539,7 @@ export type GetStreamingPaymentQuery = {
       __typename?: 'StreamingPaymentClaim';
       amount: string;
       tokenAddress: string;
+      timestamp: number;
     }> | null;
   } | null;
 };
@@ -10756,6 +10759,7 @@ export const GetStreamingPaymentDocument = gql`
       claims {
         amount
         tokenAddress
+        timestamp
       }
     }
   }
