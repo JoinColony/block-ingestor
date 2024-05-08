@@ -14,6 +14,7 @@ export const handleStreamingPaymentClaimed: EventHandler = async (
   event,
   listener,
 ) => {
+  const { timestamp } = event;
   const { amount, streamingPaymentId, token: tokenAddress } = event.args;
   const convertedNativeId = toNumber(streamingPaymentId);
 
@@ -32,6 +33,7 @@ export const handleStreamingPaymentClaimed: EventHandler = async (
   const newClaim: StreamingPaymentClaim = {
     amount: amount.toString(),
     tokenAddress,
+    timestamp,
   };
   const claims: StreamingPaymentClaim[] = streamingPayment.claims
     ? [...streamingPayment.claims, newClaim]
