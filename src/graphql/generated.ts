@@ -9339,6 +9339,7 @@ export type GetStreamingPaymentQuery = {
   getStreamingPayment?: {
     __typename?: 'StreamingPayment';
     id: string;
+    endTime: number;
     payouts?: Array<{
       __typename?: 'ExpenditurePayout';
       amount: string;
@@ -10521,6 +10522,7 @@ export const GetStreamingPaymentDocument = gql`
   query GetStreamingPayment($id: ID!) {
     getStreamingPayment(id: $id) {
       id
+      endTime
       payouts {
         amount
         tokenAddress
