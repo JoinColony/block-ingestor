@@ -10804,7 +10804,7 @@ export type GetStreamingPaymentQueryVariables = Exact<{
 }>;
 
 
-export type GetStreamingPaymentQuery = { __typename?: 'Query', getStreamingPayment?: { __typename?: 'StreamingPayment', id: string, payouts?: Array<{ __typename?: 'ExpenditurePayout', amount: string, tokenAddress: string, isClaimed: boolean }> | null } | null };
+export type GetStreamingPaymentQuery = { __typename?: 'Query', getStreamingPayment?: { __typename?: 'StreamingPayment', id: string, endTime: number, payouts?: Array<{ __typename?: 'ExpenditurePayout', amount: string, tokenAddress: string, isClaimed: boolean }> | null } | null };
 
 export type GetColonyExtensionQueryVariables = Exact<{
   id: Scalars['ID'];
@@ -11961,6 +11961,7 @@ export const GetStreamingPaymentDocument = gql`
     query GetStreamingPayment($id: ID!) {
   getStreamingPayment(id: $id) {
     id
+    endTime
     payouts {
       amount
       tokenAddress
