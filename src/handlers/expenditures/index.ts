@@ -19,6 +19,7 @@ export * from './expenditureMadeViaStake';
 export * from './paymentTokenUpdated';
 export * from './expenditureStateChanged';
 export * from './stakeFractionSet';
+export * from './streamingPaymentStartTimeSet';
 export * from './streamingPaymentEndTimeSet';
 export * from './streamingPaymentClaimed';
 export * from './streamingPaymentClaimWaived';
