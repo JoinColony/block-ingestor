@@ -1,3 +1,4 @@
+import { BigNumber } from 'ethers';
 import { mutate } from '~amplifyClient';
 import { ExtensionEventListener } from '~eventListeners';
 import {
@@ -9,7 +10,6 @@ import {
 import { EventHandler } from '~types';
 import {
   getExpenditureDatabaseId,
-  getStreamingPaymentsClient,
   toNumber,
   verbose,
   writeActionFromEvent,
@@ -19,32 +19,17 @@ export const handleStreamingPaymentEndTimeSet: EventHandler = async (
   event,
   listener,
 ) => {
-  const { blockNumber, timestamp } = event;
-  const { agent: initiatorAddress, streamingPaymentId } = event.args;
+  const { timestamp } = event;
+  const { agent: initiatorAddress, streamingPaymentId, endTime } = event.args;
   const convertedNativeId = toNumber(streamingPaymentId);
 
   const { colonyAddress } = listener as ExtensionEventListener;
 
-  const streamingPaymentsClient = await getStreamingPaymentsClient(
-    colonyAddress,
-  );
-  if (!streamingPaymentsClient) {
-    return;
-  }
-
-  const streamingPayment = await streamingPaymentsClient.getStreamingPayment(
-    streamingPaymentId,
-    { blockTag: blockNumber },
-  );
-  if (!streamingPayment) {
-    return;
-  }
-
-  const { endTime } = streamingPayment;
-
   const databaseId = getExpenditureDatabaseId(colonyAddress, convertedNativeId);
 
-  const isCancelAction = streamingPayment.endTime.eq(timestamp);
+  // When a streaming payment is cancelled, the endTime is set to the current block timestamp
+  // Therefore, if the endTime and timestamp are equal, we can assume this is a cancel action
+  const isCancelAction = BigNumber.from(timestamp).eq(endTime);
 
   if (isCancelAction) {
     verbose(`Streaming payment with ID ${databaseId} cancelled`);
