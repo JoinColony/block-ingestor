@@ -6,12 +6,7 @@ import {
   UpdateStreamingPaymentMutationVariables,
 } from '~graphql';
 import { ContractEvent } from '~types';
-import {
-  getExpenditureDatabaseId,
-  getStreamingPaymentsClient,
-  output,
-  toNumber,
-} from '~utils';
+import { getExpenditureDatabaseId, output, toNumber } from '~utils';
 import { getStreamingPaymentFromDB } from './helpers';
 
 export default async (event: ContractEvent): Promise<void> => {
@@ -20,13 +15,6 @@ export default async (event: ContractEvent): Promise<void> => {
   const convertedNativeId = toNumber(streamingPaymentId);
 
   if (!colonyAddress) {
-    return;
-  }
-
-  const streamingPaymentsClient = await getStreamingPaymentsClient(
-    colonyAddress,
-  );
-  if (!streamingPaymentsClient) {
     return;
   }
 
