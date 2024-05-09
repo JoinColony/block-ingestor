@@ -319,6 +319,10 @@ export type ColonyAction = {
    * Currently it is impossible to tell the reason for the action being hidden from the actions list
    */
   showInActionsList: Scalars['Boolean'];
+  /** Streaming payment associated with the action, if any */
+  streamingPayment?: Maybe<StreamingPayment>;
+  /** ID of the associated streaming payment, if any */
+  streamingPaymentId?: Maybe<Scalars['ID']>;
   /** The target Domain of the action, if applicable */
   toDomain?: Maybe<Domain>;
   /** The target Domain identifier, if applicable */
@@ -381,6 +385,8 @@ export enum ColonyActionType {
   CancelExpenditure = 'CANCEL_EXPENDITURE',
   /** An action related to a motion to cancel an expenditure */
   CancelExpenditureMotion = 'CANCEL_EXPENDITURE_MOTION',
+  /** An action related to cancelling a streaming payment */
+  CancelStreamingPayment = 'CANCEL_STREAMING_PAYMENT',
   /** An action related to editing a Colony's details */
   ColonyEdit = 'COLONY_EDIT',
   /** An action related to editing a Colony's details via a motion */
@@ -1126,6 +1132,7 @@ export type CreateColonyActionInput = {
   recipientAddress?: InputMaybe<Scalars['ID']>;
   roles?: InputMaybe<ColonyActionRolesInput>;
   showInActionsList: Scalars['Boolean'];
+  streamingPaymentId?: InputMaybe<Scalars['ID']>;
   toDomainId?: InputMaybe<Scalars['ID']>;
   toPotId?: InputMaybe<Scalars['Int']>;
   tokenAddress?: InputMaybe<Scalars['ID']>;
@@ -1473,6 +1480,7 @@ export type CreateStreamingPaymentInput = {
   endTime: Scalars['AWSTimestamp'];
   id?: InputMaybe<Scalars['ID']>;
   interval: Scalars['String'];
+  isCancelled?: InputMaybe<Scalars['Boolean']>;
   nativeDomainId: Scalars['Int'];
   nativeId: Scalars['Int'];
   payouts?: InputMaybe<Array<ExpenditurePayoutInput>>;
@@ -2292,6 +2300,7 @@ export type ModelColonyActionConditionInput = {
   pendingDomainMetadataId?: InputMaybe<ModelIdInput>;
   recipientAddress?: InputMaybe<ModelIdInput>;
   showInActionsList?: InputMaybe<ModelBooleanInput>;
+  streamingPaymentId?: InputMaybe<ModelIdInput>;
   toDomainId?: InputMaybe<ModelIdInput>;
   toPotId?: InputMaybe<ModelIntInput>;
   tokenAddress?: InputMaybe<ModelIdInput>;
@@ -2333,6 +2342,7 @@ export type ModelColonyActionFilterInput = {
   pendingDomainMetadataId?: InputMaybe<ModelIdInput>;
   recipientAddress?: InputMaybe<ModelIdInput>;
   showInActionsList?: InputMaybe<ModelBooleanInput>;
+  streamingPaymentId?: InputMaybe<ModelIdInput>;
   toDomainId?: InputMaybe<ModelIdInput>;
   toPotId?: InputMaybe<ModelIntInput>;
   tokenAddress?: InputMaybe<ModelIdInput>;
@@ -3366,6 +3376,7 @@ export type ModelStreamingPaymentConditionInput = {
   createdAt?: InputMaybe<ModelStringInput>;
   endTime?: InputMaybe<ModelIntInput>;
   interval?: InputMaybe<ModelStringInput>;
+  isCancelled?: InputMaybe<ModelBooleanInput>;
   nativeDomainId?: InputMaybe<ModelIntInput>;
   nativeId?: InputMaybe<ModelIntInput>;
   not?: InputMaybe<ModelStreamingPaymentConditionInput>;
@@ -3391,6 +3402,7 @@ export type ModelStreamingPaymentFilterInput = {
   endTime?: InputMaybe<ModelIntInput>;
   id?: InputMaybe<ModelIdInput>;
   interval?: InputMaybe<ModelStringInput>;
+  isCancelled?: InputMaybe<ModelBooleanInput>;
   nativeDomainId?: InputMaybe<ModelIntInput>;
   nativeId?: InputMaybe<ModelIntInput>;
   not?: InputMaybe<ModelStreamingPaymentFilterInput>;
@@ -3493,6 +3505,7 @@ export type ModelSubscriptionColonyActionFilterInput = {
   pendingDomainMetadataId?: InputMaybe<ModelSubscriptionIdInput>;
   recipientAddress?: InputMaybe<ModelSubscriptionIdInput>;
   showInActionsList?: InputMaybe<ModelSubscriptionBooleanInput>;
+  streamingPaymentId?: InputMaybe<ModelSubscriptionIdInput>;
   toDomainId?: InputMaybe<ModelSubscriptionIdInput>;
   toPotId?: InputMaybe<ModelSubscriptionIntInput>;
   tokenAddress?: InputMaybe<ModelSubscriptionIdInput>;
@@ -3957,6 +3970,7 @@ export type ModelSubscriptionStreamingPaymentFilterInput = {
   endTime?: InputMaybe<ModelSubscriptionIntInput>;
   id?: InputMaybe<ModelSubscriptionIdInput>;
   interval?: InputMaybe<ModelSubscriptionStringInput>;
+  isCancelled?: InputMaybe<ModelSubscriptionBooleanInput>;
   nativeDomainId?: InputMaybe<ModelSubscriptionIntInput>;
   nativeId?: InputMaybe<ModelSubscriptionIntInput>;
   or?: InputMaybe<
@@ -5425,6 +5439,7 @@ export type ProfileMetadataInput = {
 export type Query = {
   __typename?: 'Query';
   getActionByExpenditureId?: Maybe<ModelColonyActionConnection>;
+  getActionByStreamingPaymentId?: Maybe<ModelColonyActionConnection>;
   getActionsByColony?: Maybe<ModelColonyActionConnection>;
   getAnnotation?: Maybe<Annotation>;
   getColoniesByNativeTokenId?: Maybe<ModelColonyConnection>;
@@ -5555,6 +5570,15 @@ export type QueryGetActionByExpenditureIdArgs = {
   limit?: InputMaybe<Scalars['Int']>;
   nextToken?: InputMaybe<Scalars['String']>;
   sortDirection?: InputMaybe<ModelSortDirection>;
+};
+
+/** Root query type */
+export type QueryGetActionByStreamingPaymentIdArgs = {
+  filter?: InputMaybe<ModelColonyActionFilterInput>;
+  limit?: InputMaybe<Scalars['Int']>;
+  nextToken?: InputMaybe<Scalars['String']>;
+  sortDirection?: InputMaybe<ModelSortDirection>;
+  streamingPaymentId: Scalars['ID'];
 };
 
 /** Root query type */
@@ -6496,6 +6520,7 @@ export enum SearchableColonyActionAggregateField {
   PendingDomainMetadataId = 'pendingDomainMetadataId',
   RecipientAddress = 'recipientAddress',
   ShowInActionsList = 'showInActionsList',
+  StreamingPaymentId = 'streamingPaymentId',
   ToDomainId = 'toDomainId',
   ToPotId = 'toPotId',
   TokenAddress = 'tokenAddress',
@@ -6546,6 +6571,7 @@ export type SearchableColonyActionFilterInput = {
   pendingDomainMetadataId?: InputMaybe<SearchableIdFilterInput>;
   recipientAddress?: InputMaybe<SearchableIdFilterInput>;
   showInActionsList?: InputMaybe<SearchableBooleanFilterInput>;
+  streamingPaymentId?: InputMaybe<SearchableIdFilterInput>;
   toDomainId?: InputMaybe<SearchableIdFilterInput>;
   toPotId?: InputMaybe<SearchableIntFilterInput>;
   tokenAddress?: InputMaybe<SearchableIdFilterInput>;
@@ -6584,6 +6610,7 @@ export enum SearchableColonyActionSortableFields {
   PendingDomainMetadataId = 'pendingDomainMetadataId',
   RecipientAddress = 'recipientAddress',
   ShowInActionsList = 'showInActionsList',
+  StreamingPaymentId = 'streamingPaymentId',
   ToDomainId = 'toDomainId',
   ToPotId = 'toPotId',
   TokenAddress = 'tokenAddress',
@@ -6717,10 +6744,13 @@ export type StakerRewardsInput = {
 
 export type StreamingPayment = {
   __typename?: 'StreamingPayment';
+  actions?: Maybe<ModelColonyActionConnection>;
   createdAt: Scalars['AWSDateTime'];
   endTime: Scalars['AWSTimestamp'];
   id: Scalars['ID'];
   interval: Scalars['String'];
+  /** Is the stream cancelled? */
+  isCancelled?: Maybe<Scalars['Boolean']>;
   metadata?: Maybe<StreamingPaymentMetadata>;
   nativeDomainId: Scalars['Int'];
   nativeId: Scalars['Int'];
@@ -6728,6 +6758,13 @@ export type StreamingPayment = {
   recipientAddress: Scalars['String'];
   startTime: Scalars['AWSTimestamp'];
   updatedAt: Scalars['AWSDateTime'];
+};
+
+export type StreamingPaymentActionsArgs = {
+  filter?: InputMaybe<ModelColonyActionFilterInput>;
+  limit?: InputMaybe<Scalars['Int']>;
+  nextToken?: InputMaybe<Scalars['String']>;
+  sortDirection?: InputMaybe<ModelSortDirection>;
 };
 
 export enum StreamingPaymentEndCondition {
@@ -7557,6 +7594,7 @@ export type UpdateColonyActionInput = {
   recipientAddress?: InputMaybe<Scalars['ID']>;
   roles?: InputMaybe<ColonyActionRolesInput>;
   showInActionsList?: InputMaybe<Scalars['Boolean']>;
+  streamingPaymentId?: InputMaybe<Scalars['ID']>;
   toDomainId?: InputMaybe<Scalars['ID']>;
   toPotId?: InputMaybe<Scalars['Int']>;
   tokenAddress?: InputMaybe<Scalars['ID']>;
@@ -7910,6 +7948,7 @@ export type UpdateStreamingPaymentInput = {
   endTime?: InputMaybe<Scalars['AWSTimestamp']>;
   id: Scalars['ID'];
   interval?: InputMaybe<Scalars['String']>;
+  isCancelled?: InputMaybe<Scalars['Boolean']>;
   nativeDomainId?: InputMaybe<Scalars['Int']>;
   nativeId?: InputMaybe<Scalars['Int']>;
   payouts?: InputMaybe<Array<ExpenditurePayoutInput>>;
@@ -9193,6 +9232,7 @@ export type GetStreamingPaymentQuery = {
   getStreamingPayment?: {
     __typename?: 'StreamingPayment';
     id: string;
+    endTime: number;
     payouts?: Array<{
       __typename?: 'ExpenditurePayout';
       amount: string;
@@ -10307,6 +10347,7 @@ export const GetStreamingPaymentDocument = gql`
   query GetStreamingPayment($id: ID!) {
     getStreamingPayment(id: $id) {
       id
+      endTime
       payouts {
         amount
         tokenAddress
