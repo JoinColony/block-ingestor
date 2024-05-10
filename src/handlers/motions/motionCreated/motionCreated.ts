@@ -1,5 +1,5 @@
 import { BigNumber, constants } from 'ethers';
-import { JsonRpcProvider } from '@ethersproject/providers';
+import { StaticJsonRpcProvider } from '@ethersproject/providers';
 
 import { ColonyOperations, ContractEvent } from '~types';
 import {
@@ -72,7 +72,7 @@ export default async (event: ContractEvent): Promise<void> => {
   const estimateMotionGas = async (): Promise<string> =>
     /*
      * @NOTE Express casting required here since colonyJS forces it's own types internally
-     * Even though we instantiate the initial network client with a JsonRpcProvider, colonyJS
+     * Even though we instantiate the initial network client with a StaticJsonRpcProvider, colonyJS
      * will internally cast it to a BaseProvider which is a generic type that doesn't declare
      * all the methods actually available on the provider
      *
@@ -80,20 +80,23 @@ export default async (event: ContractEvent): Promise<void> => {
      *
      * Ultimately it's the same thing as the provider instance is the same
      */
-    await (colonyClient.provider as JsonRpcProvider).send('eth_estimateGas', [
-      {
-        from: votingReputationClient.address,
-        to:
-          /*
-           * If the motion target is 0x000... then we pass in the colony's address
-           */
-          motion.altTarget === constants.AddressZero
-            ? colonyClient.address
-            : motion.altTarget,
-        data: motion.action,
-      },
-      blockNumber,
-    ]);
+    await (colonyClient.provider as StaticJsonRpcProvider).send(
+      'eth_estimateGas',
+      [
+        {
+          from: votingReputationClient.address,
+          to:
+            /*
+             * If the motion target is 0x000... then we pass in the colony's address
+             */
+            motion.altTarget === constants.AddressZero
+              ? colonyClient.address
+              : motion.altTarget,
+          data: motion.action,
+        },
+        blockNumber,
+      ],
+    );
 
   try {
     const estimatedGasHexString = await estimateMotionGas();
