@@ -20,6 +20,7 @@ import {
   getExpenditureDatabaseId,
   mapLogToContractEvent,
   toNumber,
+  transactionHasEvent,
   writeActionFromEvent,
 } from '~utils';
 import { splitAmountAndFee } from '~utils/networkFee';
@@ -47,7 +48,12 @@ export const createEditExpenditureAction = async (
 ): Promise<void> => {
   const { transactionHash } = event;
 
-  if (!expenditure.firstEditTransactionHash) {
+  const hasOneTxPaymentEvent = await transactionHasEvent(
+    transactionHash,
+    ContractEventsSignatures.OneTxPaymentMade,
+  );
+
+  if (!expenditure.firstEditTransactionHash || hasOneTxPaymentEvent) {
     /**
      * If expenditure doesn't have `firstEditTransactionHash` set, it means it's the first time
      * we see an ExpenditurePayoutSet event, which is normally part of expenditure creation
