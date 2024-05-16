@@ -44,7 +44,6 @@ import {
   handleMoveFundsAction,
   handleReputationMiningCycleComplete,
   handleSetTokenAuthority,
-  handleStakeFractionSet,
   handleTokenUnlockedAction,
   handleTransfer,
 } from '~handlers';
@@ -152,7 +151,6 @@ export const setupListenersForColony = (
       handleExpenditurePayoutClaimed,
     [ContractEventsSignatures.ExpenditureStateChanged]:
       handleExpenditureStateChanged,
-    [ContractEventsSignatures.StakeFractionSet]: handleStakeFractionSet,
     [ContractEventsSignatures.AnnotateTransaction]: handleAnnotateTransaction,
     [ContractEventsSignatures.ArbitraryTransaction]:
       handleMakeAbitraryTransactionAction,
