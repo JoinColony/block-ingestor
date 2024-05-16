@@ -54,6 +54,7 @@ import {
   handleColonyMetadataDelta,
   handleMotionEventSet,
   handleExpenditureStateChanged,
+  handleStakeFractionSet,
 } from './handlers';
 
 dotenv.config();
@@ -75,6 +76,8 @@ export default async (event: ContractEvent): Promise<void> => {
       'Event does not have a signature. Possibly bad event data. Refusing the process!',
     );
   }
+
+  console.log('Handling event: ' + event.signature);
 
   switch (event.signature) {
     /*
@@ -313,6 +316,11 @@ export default async (event: ContractEvent): Promise<void> => {
 
     case ContractEventsSignatures.ExpenditureMadeViaStake: {
       await handleExpenditureMadeViaStake(event);
+      return;
+    }
+
+    case ContractEventsSignatures.StakeFractionSet: {
+      await handleStakeFractionSet(event);
       return;
     }
 
