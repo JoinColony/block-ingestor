@@ -77,8 +77,6 @@ export default async (event: ContractEvent): Promise<void> => {
     );
   }
 
-  console.log('Handling event: ' + event.signature);
-
   switch (event.signature) {
     /*
      * New Colony Added

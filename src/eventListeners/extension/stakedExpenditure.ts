@@ -31,6 +31,7 @@ export const setupListenersForStakedExpenditure = (
       ContractEventsSignatures.ExpenditureCancelled,
       ContractEventsSignatures.ExpenditureStakerPunished,
       ContractEventsSignatures.ExpenditureMadeViaStake,
+      ContractEventsSignatures.StakeFractionSet,
     ];
 
     events.forEach((eventSignature) =>
