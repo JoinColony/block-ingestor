@@ -23,6 +23,7 @@ export enum ColonyOperations {
   EditColonyByDelta = 'editColonyByDelta',
   CancelExpenditureViaArbitration = 'cancelExpenditureViaArbitration',
   FinalizeExpenditureViaArbitration = 'finalizeExpenditureViaArbitration',
+  ReleaseStagedPaymentViaArbitration = 'releaseStagedPaymentViaArbitration',
 }
 
 export enum MotionEvents {
@@ -66,6 +67,8 @@ export const motionNameMapping: { [key: string]: ColonyActionType } = {
     ColonyActionType.FinalizeExpenditureMotion,
   [ColonyOperations.SetExpenditureState]:
     ColonyActionType.SetExpenditureStateMotion,
+  [ColonyOperations.ReleaseStagedPaymentViaArbitration]:
+    ColonyActionType.ReleaseStagedPaymentMotion,
 };
 
 export enum MotionSide {

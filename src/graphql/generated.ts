@@ -461,6 +461,8 @@ export enum ColonyActionType {
   PaymentMotion = 'PAYMENT_MOTION',
   /** An action related to the recovery functionality of a Colony */
   Recovery = 'RECOVERY',
+  /** An action related to a motion to release a staged payment */
+  ReleaseStagedPaymentMotion = 'RELEASE_STAGED_PAYMENT_MOTION',
   /** An action related to removing verified members */
   RemoveVerifiedMembers = 'REMOVE_VERIFIED_MEMBERS',
   RemoveVerifiedMembersMotion = 'REMOVE_VERIFIED_MEMBERS_MOTION',
@@ -1402,6 +1404,7 @@ export type CreateExpenditureInput = {
 };
 
 export type CreateExpenditureMetadataInput = {
+  distributionType?: InputMaybe<SplitPaymentDistributionType>;
   fundFromDomainNativeId: Scalars['Int'];
   id?: InputMaybe<Scalars['ID']>;
   stages?: InputMaybe<Array<ExpenditureStageInput>>;
@@ -1970,6 +1973,11 @@ export type ExpenditureFundingItemInput = {
 export type ExpenditureMetadata = {
   __typename?: 'ExpenditureMetadata';
   createdAt: Scalars['AWSDateTime'];
+  /**
+   * Specifies the distribution type selected when creating a split payment
+   * Will be null for other payment types
+   */
+  distributionType?: Maybe<SplitPaymentDistributionType>;
   fundFromDomainNativeId: Scalars['Int'];
   id: Scalars['ID'];
   stages?: Maybe<Array<ExpenditureStage>>;
@@ -3031,6 +3039,7 @@ export type ModelExpenditureFilterInput = {
 
 export type ModelExpenditureMetadataConditionInput = {
   and?: InputMaybe<Array<InputMaybe<ModelExpenditureMetadataConditionInput>>>;
+  distributionType?: InputMaybe<ModelSplitPaymentDistributionTypeInput>;
   fundFromDomainNativeId?: InputMaybe<ModelIntInput>;
   not?: InputMaybe<ModelExpenditureMetadataConditionInput>;
   or?: InputMaybe<Array<InputMaybe<ModelExpenditureMetadataConditionInput>>>;
@@ -3044,6 +3053,7 @@ export type ModelExpenditureMetadataConnection = {
 
 export type ModelExpenditureMetadataFilterInput = {
   and?: InputMaybe<Array<InputMaybe<ModelExpenditureMetadataFilterInput>>>;
+  distributionType?: InputMaybe<ModelSplitPaymentDistributionTypeInput>;
   fundFromDomainNativeId?: InputMaybe<ModelIntInput>;
   id?: InputMaybe<ModelIdInput>;
   not?: InputMaybe<ModelExpenditureMetadataFilterInput>;
@@ -3380,6 +3390,11 @@ export enum ModelSortDirection {
   Asc = 'ASC',
   Desc = 'DESC',
 }
+
+export type ModelSplitPaymentDistributionTypeInput = {
+  eq?: InputMaybe<SplitPaymentDistributionType>;
+  ne?: InputMaybe<SplitPaymentDistributionType>;
+};
 
 export type ModelStreamingPaymentConditionInput = {
   and?: InputMaybe<Array<InputMaybe<ModelStreamingPaymentConditionInput>>>;
@@ -3817,6 +3832,7 @@ export type ModelSubscriptionExpenditureMetadataFilterInput = {
   and?: InputMaybe<
     Array<InputMaybe<ModelSubscriptionExpenditureMetadataFilterInput>>
   >;
+  distributionType?: InputMaybe<ModelSubscriptionStringInput>;
   fundFromDomainNativeId?: InputMaybe<ModelSubscriptionIntInput>;
   id?: InputMaybe<ModelSubscriptionIdInput>;
   or?: InputMaybe<
@@ -6764,6 +6780,12 @@ export enum SortingMethod {
   ByMorePermissions = 'BY_MORE_PERMISSIONS',
 }
 
+export enum SplitPaymentDistributionType {
+  Equal = 'EQUAL',
+  Reputation = 'REPUTATION',
+  Unequal = 'UNEQUAL',
+}
+
 export type StakedExpenditureParams = {
   __typename?: 'StakedExpenditureParams';
   stakeFraction: Scalars['String'];
@@ -7884,6 +7906,7 @@ export type UpdateExpenditureInput = {
 };
 
 export type UpdateExpenditureMetadataInput = {
+  distributionType?: InputMaybe<SplitPaymentDistributionType>;
   fundFromDomainNativeId?: InputMaybe<Scalars['Int']>;
   id: Scalars['ID'];
   stages?: InputMaybe<Array<ExpenditureStageInput>>;
