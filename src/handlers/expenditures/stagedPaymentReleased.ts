@@ -40,7 +40,7 @@ export default async (event: ContractEvent): Promise<void> => {
   });
   const metadata = response?.data?.getExpenditureMetadata;
 
-  if (!metadata || !metadata.stages) {
+  if (!metadata?.stages) {
     output(
       `Could not find stages data for expenditure with ID: ${databaseId}. This is a bug and needs investigating.`,
     );
