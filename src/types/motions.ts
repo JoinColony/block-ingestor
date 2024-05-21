@@ -21,6 +21,8 @@ export enum ColonyOperations {
   CancelStakedExpenditure = 'cancelAndPunish',
   SetExpenditureState = 'setExpenditureState',
   EditColonyByDelta = 'editColonyByDelta',
+  CancelExpenditureViaArbitration = 'cancelExpenditureViaArbitration',
+  FinalizeExpenditureViaArbitration = 'finalizeExpenditureViaArbitration',
 }
 
 export enum MotionEvents {
@@ -57,7 +59,11 @@ export const motionNameMapping: { [key: string]: ColonyActionType } = {
   [ColonyOperations.MakeArbitraryTransactions]:
     ColonyActionType.MakeArbitraryTransactionsMotion,
   [ColonyOperations.CancelStakedExpenditure]:
-    ColonyActionType.CancelStakedExpenditureMotion,
+    ColonyActionType.CancelExpenditureMotion,
+  [ColonyOperations.CancelExpenditureViaArbitration]:
+    ColonyActionType.CancelExpenditureMotion,
+  [ColonyOperations.FinalizeExpenditureViaArbitration]:
+    ColonyActionType.FinalizeExpenditureMotion,
   [ColonyOperations.SetExpenditureState]:
     ColonyActionType.SetExpenditureStateMotion,
 };

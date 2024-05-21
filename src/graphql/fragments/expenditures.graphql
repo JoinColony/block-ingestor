@@ -2,3 +2,41 @@ fragment ExpenditureBalance on ExpenditureBalance {
   tokenAddress
   amount
 }
+
+fragment Expenditure on Expenditure {
+  id
+  slots {
+    ...ExpenditureSlot
+  }
+  motions {
+    items {
+      transactionHash
+      action {
+        type
+      }
+    }
+  }
+  balances {
+    ...ExpenditureBalance
+  }
+  status
+  ownerAddress
+  userStakeId
+  createdAt
+  firstEditTransactionHash
+}
+
+# It is important this fragment contains all the fields of the ExpenditureSlot type
+# Otherwise, missing fields will be lost when block-ingestor updates slots
+fragment ExpenditureSlot on ExpenditureSlot {
+  id
+  recipientAddress
+  claimDelay
+  payoutModifier
+  payouts {
+    tokenAddress
+    amount
+    isClaimed
+    networkFee
+  }
+}

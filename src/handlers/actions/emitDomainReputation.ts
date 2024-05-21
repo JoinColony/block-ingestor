@@ -1,7 +1,12 @@
 import { BigNumber } from 'ethers';
 
-import { ContractEvent } from '~types';
-import { writeActionFromEvent, verbose, notNull } from '~utils';
+import { ContractEvent, ContractEventsSignatures } from '~types';
+import {
+  writeActionFromEvent,
+  verbose,
+  notNull,
+  transactionHasEvent,
+} from '~utils';
 import {
   ColonyActionType,
   GetColonyDocument,
@@ -11,13 +16,28 @@ import {
 import { query } from '~amplifyClient';
 
 export default async (event: ContractEvent): Promise<void> => {
-  const { contractAddress: colonyAddress } = event;
+  const { contractAddress: colonyAddress, transactionHash } = event;
   const {
     agent: initiatorAddress,
     user: userAddress,
     skillId,
     amount,
   } = event.args;
+
+  const hasExpenditureEvent = await transactionHasEvent(
+    transactionHash,
+    ContractEventsSignatures.ExpenditureStakerPunished,
+  );
+  if (hasExpenditureEvent) {
+    /**
+     * Do not create the action if `ExpenditureStakerPunished` event is present
+     * It will be created by expenditureCancelled handler
+     */
+    verbose(
+      'Not acting upon the ArbitraryReputationUpdate event as the ExpenditureStakerPunished event is present',
+    );
+    return;
+  }
 
   const isReputationChangePositive = BigNumber.from(amount).gt(0);
 

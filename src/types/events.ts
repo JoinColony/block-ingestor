@@ -48,7 +48,6 @@ export enum ContractEventsSignatures {
 
   // Actions
   TokensMinted = 'TokensMinted(address,address,uint256)',
-  PaymentAdded = 'PaymentAdded(address,uint256)',
   PayoutClaimed = 'PayoutClaimed(address,uint256,address,uint256)',
   OneTxPaymentMade = 'OneTxPaymentMade(address,uint256,uint256)',
   DomainAdded = 'DomainAdded(address,uint256)',
@@ -83,6 +82,7 @@ export enum ContractEventsSignatures {
   ExpenditurePayoutSet = 'ExpenditurePayoutSet(address,uint256,uint256,address,uint256)',
   ExpenditurePayoutModifierSet = 'ExpenditurePayoutModifierSet(address,uint256,uint256,int256)',
   ExpenditurePayoutClaimed = 'PayoutClaimed(address,uint256,uint256,address,uint256)',
+  ExpenditureStateChanged = 'ExpenditureStateChanged(address,uint256,uint256,bool[],bytes32[],bytes32)',
 
   // Staked Expenditures
   StakeReclaimed = 'StakeReclaimed(uint256)',

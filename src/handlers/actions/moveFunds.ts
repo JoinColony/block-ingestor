@@ -12,6 +12,7 @@ import {
 } from '~utils';
 import {
   ColonyActionType,
+  ExpenditureFragment,
   GetExpenditureByNativeFundingPotIdAndColonyDocument,
   GetExpenditureByNativeFundingPotIdAndColonyQuery,
   GetExpenditureByNativeFundingPotIdAndColonyQueryVariables,
@@ -35,6 +36,9 @@ export default async (event: ContractEvent): Promise<void> => {
     toPot,
   } = event.args;
 
+  const fromPotId = toNumber(fromPot);
+  const toPotId = toNumber(toPot);
+
   const colonyClient = await getCachedColonyClient(colonyAddress);
   if (!colonyClient) {
     return;
@@ -51,6 +55,12 @@ export default async (event: ContractEvent): Promise<void> => {
       blockTag: blockNumber,
     });
   }
+
+  // Check if the target pot belongs to an expenditure by trying to fetch it
+  const targetExpenditure = await getExpenditureByFundingPot(
+    colonyAddress,
+    toPotId,
+  );
 
   const hasOneTxPaymentEvent = await transactionHasEvent(
     transactionHash,
@@ -69,49 +79,54 @@ export default async (event: ContractEvent): Promise<void> => {
       toDomainId: toDomainId
         ? getDomainDatabaseId(colonyAddress, toNumber(toDomainId))
         : undefined,
+      fromPotId,
+      toPotId,
+      expenditureId: targetExpenditure?.id,
     });
   }
 
-  await updateExpenditureBalances(
-    colonyAddress,
-    toNumber(toPot),
-    tokenAddress,
-    amount,
-  );
+  if (targetExpenditure) {
+    await updateExpenditureBalances(targetExpenditure, tokenAddress, amount);
+  }
 };
 
-const updateExpenditureBalances = async (
+const getExpenditureByFundingPot = async (
   colonyAddress: string,
-  toPot: number,
-  tokenAddress: string,
-  amount: string,
-): Promise<void> => {
+  fundingPotId: number,
+): Promise<ExpenditureFragment | null> => {
   const response = await query<
     GetExpenditureByNativeFundingPotIdAndColonyQuery,
     GetExpenditureByNativeFundingPotIdAndColonyQueryVariables
   >(GetExpenditureByNativeFundingPotIdAndColonyDocument, {
     colonyAddress,
-    nativeFundingPotId: toPot,
+    nativeFundingPotId: fundingPotId,
   });
 
   const expenditure =
-    response?.data?.getExpendituresByNativeFundingPotIdAndColony?.items?.[0];
+    response?.data?.getExpendituresByNativeFundingPotIdAndColony?.items?.[0] ??
+    null;
 
-  if (expenditure) {
-    const updatedBalances = getUpdatedExpenditureBalances(
-      expenditure.balances ?? [],
-      tokenAddress,
-      amount,
-    );
+  return expenditure;
+};
 
-    await mutate<UpdateExpenditureMutation, UpdateExpenditureMutationVariables>(
-      UpdateExpenditureDocument,
-      {
-        input: {
-          id: expenditure.id,
-          balances: updatedBalances,
-        },
+const updateExpenditureBalances = async (
+  expenditure: ExpenditureFragment,
+  tokenAddress: string,
+  amount: string,
+): Promise<void> => {
+  const updatedBalances = getUpdatedExpenditureBalances(
+    expenditure.balances ?? [],
+    tokenAddress,
+    amount,
+  );
+
+  await mutate<UpdateExpenditureMutation, UpdateExpenditureMutationVariables>(
+    UpdateExpenditureDocument,
+    {
+      input: {
+        id: expenditure.id,
+        balances: updatedBalances,
       },
-    );
-  }
+    },
+  );
 };

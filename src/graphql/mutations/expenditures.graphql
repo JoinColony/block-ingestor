@@ -8,7 +8,6 @@ mutation UpdateExpenditure($input: UpdateExpenditureInput!) {
   updateExpenditure(input: $input) {
     id
     ownerAddress
-    stakedTransactionHash
   }
 }
 

@@ -1,14 +1,13 @@
 import { ContractEvent } from '~types';
 import { getExpenditureDatabaseId, output, toNumber, verbose } from '~utils';
 import {
-  ExpenditureSlot,
   UpdateExpenditureDocument,
   UpdateExpenditureMutation,
   UpdateExpenditureMutationVariables,
 } from '~graphql';
 import { mutate } from '~amplifyClient';
 
-import { getExpenditureFromDB } from './helpers';
+import { getExpenditureFromDB, getUpdatedExpenditureSlots } from './helpers';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { contractAddress: colonyAddress } = event;
@@ -27,18 +26,13 @@ export default async (event: ContractEvent): Promise<void> => {
     return;
   }
 
-  const existingSlot = expenditure.slots.find(
-    (slot) => slot.id === convertedSlot,
+  const updatedSlots = getUpdatedExpenditureSlots(
+    expenditure.slots,
+    convertedSlot,
+    {
+      payoutModifier: convertedPayoutModifier,
+    },
   );
-  const updatedSlot: ExpenditureSlot = {
-    ...existingSlot,
-    id: convertedSlot,
-    payoutModifier: convertedPayoutModifier,
-  };
-  const updatedSlots = [
-    ...expenditure.slots.filter((slot) => slot.id !== convertedSlot),
-    updatedSlot,
-  ];
 
   verbose(
     `Payout modifier set for expenditure with ID ${convertedExpenditureId} in colony ${colonyAddress}`,

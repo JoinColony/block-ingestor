@@ -3,16 +3,20 @@ import {
   CreateUserStakeDocument,
   CreateUserStakeMutation,
   CreateUserStakeMutationVariables,
+  UpdateColonyActionDocument,
+  UpdateColonyActionMutation,
+  UpdateColonyActionMutationVariables,
   UpdateExpenditureDocument,
   UpdateExpenditureMutation,
   UpdateExpenditureMutationVariables,
 } from '~graphql';
 import { ContractEvent } from '~types';
-import { getExpenditureDatabaseId, toNumber, verbose } from '~utils';
+import { getExpenditureDatabaseId, output, toNumber, verbose } from '~utils';
 import { getUserStakeDatabaseId } from '~utils/stakes';
+import { getExpenditureFromDB } from './helpers';
 
 export default async (event: ContractEvent): Promise<void> => {
-  const { colonyAddress, transactionHash } = event;
+  const { colonyAddress } = event;
   const { expenditureId, stake, creator } = event.args;
   const convertedExpenditureId = toNumber(expenditureId);
 
@@ -27,13 +31,24 @@ export default async (event: ContractEvent): Promise<void> => {
 
   verbose(`Expenditure with ID ${databaseId} made via stake`);
 
+  const expenditure = await getExpenditureFromDB(databaseId);
+  if (!expenditure) {
+    output(`Expenditure with ID ${databaseId} was not found in the DB`);
+    return;
+  }
+
+  const stakeDatabaseId = getUserStakeDatabaseId(
+    creator,
+    event.transactionHash,
+  );
+
   await mutate<UpdateExpenditureMutation, UpdateExpenditureMutationVariables>(
     UpdateExpenditureDocument,
     {
       input: {
         id: databaseId,
         isStaked: true,
-        stakedTransactionHash: transactionHash,
+        userStakeId: stakeDatabaseId,
       },
     },
   );
@@ -42,12 +57,23 @@ export default async (event: ContractEvent): Promise<void> => {
     CreateUserStakeDocument,
     {
       input: {
-        id: getUserStakeDatabaseId(creator, transactionHash),
-        actionId: transactionHash,
+        id: stakeDatabaseId,
+        actionId: event.transactionHash,
         amount: stake.toString(),
         userAddress: creator,
         colonyAddress,
         isClaimed: false,
+      },
+    },
+  );
+
+  await mutate<UpdateColonyActionMutation, UpdateColonyActionMutationVariables>(
+    UpdateColonyActionDocument,
+    {
+      input: {
+        id: event.transactionHash,
+        showInActionsList: true,
+        initiatorAddress: creator,
       },
     },
   );

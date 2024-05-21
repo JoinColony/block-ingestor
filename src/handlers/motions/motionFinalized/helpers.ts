@@ -13,9 +13,6 @@ import {
   getStagedExpenditureClient,
   output,
   updateColonyTokens,
-  toNumber,
-  insertAtIndex,
-  getExpenditureDatabaseId,
 } from '~utils';
 import { query, mutate } from '~amplifyClient';
 import {
@@ -32,16 +29,10 @@ import {
   GetDomainMetadataDocument,
   GetDomainMetadataQuery,
   GetDomainMetadataQueryVariables,
-  GetExpenditureMetadataDocument,
-  GetExpenditureMetadataQuery,
-  GetExpenditureMetadataQueryVariables,
   StakerReward,
   UpdateColonyDocument,
   UpdateColonyMetadataDocument,
   UpdateDomainMetadataDocument,
-  UpdateExpenditureMetadataDocument,
-  UpdateExpenditureMetadataMutation,
-  UpdateExpenditureMetadataMutationVariables,
 } from '~graphql';
 import { parseAction } from '../motionCreated/helpers';
 
@@ -389,118 +380,4 @@ export const updateColonyUnclaimedStakes = async (
       },
     });
   }
-};
-
-/**
- * Index of expenditure slots storage slot in network contracts
- * See: https://github.com/JoinColony/colonyNetwork/blob/develop/contracts/colony/ColonyStorage.sol
- */
-const EXPENDITURESLOTS_SLOT = 26;
-
-export const claimExpenditurePayouts = async (
-  action: string,
-  colonyAddress: string,
-): Promise<void> => {
-  const colonyClient = await getCachedColonyClient(colonyAddress);
-
-  const parsedAction = parseAction(action, { colonyClient }) as
-    | TransactionDescription
-    | undefined;
-
-  if (
-    !colonyClient ||
-    !parsedAction ||
-    parsedAction.name !== ColonyOperations.Multicall
-  ) {
-    return;
-  }
-
-  const firstAction = parsedAction.args[0][0];
-
-  let decodedSetExpenditureStateArgs;
-
-  try {
-    decodedSetExpenditureStateArgs = colonyClient.interface.decodeFunctionData(
-      'setExpenditureState',
-      firstAction,
-    );
-  } catch (error) {
-    return;
-  }
-
-  const [, , expenditureId, storageSlot, , keys, value] =
-    decodedSetExpenditureStateArgs;
-  const [slotId] = keys;
-
-  const convertedSlotId = toNumber(slotId);
-  const convertedExpenditureId = toNumber(expenditureId);
-  const convertedValue = toNumber(value);
-  const convertedStorageSlot = toNumber(storageSlot);
-
-  if (!colonyAddress) {
-    output('Colony address missing for ExpenditureStateChanged event');
-    return;
-  }
-
-  // @NOTE: If:
-  // - The value is not 0
-  // - The storage slot is not 26
-  // Then we can assume this state change ain't a stage release
-  if (convertedStorageSlot !== EXPENDITURESLOTS_SLOT || convertedValue !== 0) {
-    return;
-  }
-
-  const databaseId = getExpenditureDatabaseId(
-    colonyAddress,
-    convertedExpenditureId,
-  );
-
-  const expenditureMetadataResponse = await query<
-    GetExpenditureMetadataQuery,
-    GetExpenditureMetadataQueryVariables
-  >(GetExpenditureMetadataDocument, {
-    id: databaseId,
-  });
-
-  const metadata = expenditureMetadataResponse?.data?.getExpenditureMetadata;
-
-  if (!metadata || !metadata.stages) {
-    output(
-      `Could not find stages data for expenditure with ID: ${databaseId}. This is a bug and needs investigating.`,
-    );
-    return;
-  }
-
-  const existingStageIndex = metadata.stages.findIndex(
-    (stage) => stage.slotId === convertedSlotId,
-  );
-  const existingStage = metadata.stages[existingStageIndex];
-
-  // If the stage doesn't exist or it's been already set to released, we don't need to do anything
-  if (!existingStage || existingStage.isReleased) {
-    return;
-  }
-
-  const updatedStage = {
-    ...existingStage,
-    isReleased: true,
-  };
-
-  const updatedStages = insertAtIndex(
-    metadata.stages,
-    existingStageIndex,
-    updatedStage,
-  );
-
-  output(`Stage released in expenditure with ID: ${databaseId}`);
-
-  await mutate<
-    UpdateExpenditureMetadataMutation,
-    UpdateExpenditureMetadataMutationVariables
-  >(UpdateExpenditureMetadataDocument, {
-    input: {
-      id: databaseId,
-      stages: updatedStages,
-    },
-  });
 };

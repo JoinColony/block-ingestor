@@ -1,23 +1,6 @@
 query GetExpenditure($id: ID!) {
   getExpenditure(id: $id) {
-    id
-    slots {
-      id
-      recipientAddress
-      claimDelay
-      payoutModifier
-      payouts {
-        tokenAddress
-        amount
-        isClaimed
-        networkFee
-      }
-    }
-    balances {
-      ...ExpenditureBalance
-    }
-    stakedTransactionHash
-    ownerAddress
+    ...Expenditure
   }
 }
 
@@ -30,18 +13,7 @@ query GetExpenditureByNativeFundingPotIdAndColony(
     colonyId: { eq: $colonyAddress }
   ) {
     items {
-      id
-      balances {
-        ...ExpenditureBalance
-      }
-      motions {
-        items {
-          transactionHash
-          action {
-            type
-          }
-        }
-      }
+      ...Expenditure
     }
   }
 }

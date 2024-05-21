@@ -1,3 +1,4 @@
+import { Extension, getExtensionHash } from '@colony/colony-js';
 import { mutate, query } from '~amplifyClient';
 import {
   ColonyActionType,
@@ -5,11 +6,12 @@ import {
   CreateColonyActionInput,
   CreateColonyActionMutation,
   CreateColonyActionMutationVariables,
+  ExtensionFragment,
   GetExpenditureByNativeFundingPotIdAndColonyDocument,
   GetExpenditureByNativeFundingPotIdAndColonyQuery,
   GetExpenditureByNativeFundingPotIdAndColonyQueryVariables,
 } from '~graphql';
-import { toNumber, verbose, getExtensionInstallations } from '~utils';
+import { toNumber, verbose, getColonyExtensions } from '~utils';
 import { ContractEvent } from '~types';
 import networkClient from '~networkClient';
 
@@ -29,12 +31,20 @@ export const writeActionFromEvent = async (
 ): Promise<void> => {
   const { transactionHash, blockNumber, timestamp } = event;
 
-  const actionType = actionFields.type ?? 'UNKNOWN';
+  const actionType = actionFields.type;
+
+  const colonyExtensions = await getColonyExtensions(colonyAddress);
+
+  const isMotionFinalization = await isActionMotionFinalization(
+    actionFields.initiatorAddress,
+    colonyExtensions,
+  );
 
   const showInActionsList = await showActionInActionsList(
     event,
     colonyAddress,
     actionFields,
+    colonyExtensions,
   );
 
   const rootHash = await networkClient.getReputationRootHash({
@@ -42,6 +52,7 @@ export const writeActionFromEvent = async (
   });
 
   verbose('Action', actionType, 'took place in Colony:', colonyAddress);
+
   await mutate<CreateColonyActionMutation, CreateColonyActionMutationVariables>(
     CreateColonyActionDocument,
     {
@@ -52,6 +63,7 @@ export const writeActionFromEvent = async (
         createdAt: new Date(timestamp * 1000).toISOString(),
         showInActionsList,
         rootHash,
+        isMotionFinalization,
         ...actionFields,
       },
     },
@@ -62,6 +74,7 @@ const showActionInActionsList = async (
   { args }: ContractEvent,
   colonyAddress: string,
   { type, initiatorAddress, recipientAddress }: ActionFields,
+  colonyExtensions: ExtensionFragment[],
 ): Promise<boolean> => {
   if (type === ColonyActionType.MoveFunds) {
     const [, , toPot] = args;
@@ -86,7 +99,7 @@ const showActionInActionsList = async (
     }
   }
 
-  const extensionAddresses = await getExtensionInstallations(colonyAddress);
+  const extensionAddresses = colonyExtensions.map((extension) => extension.id);
 
   const isAddressInitiatorOrRecipient = (address: string): boolean =>
     address === initiatorAddress || address === recipientAddress;
@@ -96,5 +109,23 @@ const showActionInActionsList = async (
     !!extensionAddresses.find(isAddressInitiatorOrRecipient) ||
     isAddressInitiatorOrRecipient(networkClient.address) ||
     colonyAddress === initiatorAddress
+  );
+};
+
+/**
+ * Determines whether the action is a result of a motion being finalized
+ * by checking if its initiator was the Voting Reputation extension
+ */
+const isActionMotionFinalization = async (
+  initiatorAddress: string,
+  extensions: ExtensionFragment[],
+): Promise<boolean> => {
+  const initiatorExtension = extensions.find(
+    (extension) => extension.id === initiatorAddress,
+  );
+
+  return (
+    !!initiatorExtension &&
+    initiatorExtension.hash === getExtensionHash(Extension.VotingReputation)
   );
 };
