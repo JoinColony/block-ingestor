@@ -57,7 +57,7 @@ import {
 } from './handlers';
 import {
   handleMultiSigCreated,
-  handleMultiSigGlobalThresholdUpdated,
+  handleMultiSigGlobalThresholdSet,
   handleDomainSkillThresholdSet,
 } from '~handlers/multiSig';
 
@@ -375,7 +375,7 @@ export default async (event: ContractEvent): Promise<void> => {
     }
 
     case ContractEventsSignatures.MultisigGlobalThresholdSet: {
-      await handleMultiSigGlobalThresholdUpdated(event);
+      await handleMultiSigGlobalThresholdSet(event);
       return;
     }
 
