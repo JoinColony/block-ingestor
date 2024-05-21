@@ -47,30 +47,27 @@ export default async (event: ContractEvent): Promise<void> => {
 
     const updatedDomainThresholds = [...(multiSig.domainThresholds ?? [])];
 
-    for (const domain of colonyDomains) {
-      if (domain) {
-        const domainId = domain.nativeId.toString();
-        const { skillId } = await colonyClient.getDomain(domainId);
-        if (domainSkillId.eq(skillId)) {
-          const domainThresholdIndex =
-            multiSig.domainThresholds?.findIndex(
-              (domainThreshold) =>
-                (domainThreshold?.domainId ?? '') === domainId,
-            ) ?? -1;
+    const matchingDomain = colonyDomains.find((domain) =>
+      domainSkillId.eq(domain?.nativeSkillId),
+    );
 
-          if (domainThresholdIndex > -1) {
-            updatedDomainThresholds[domainThresholdIndex] = {
-              domainId,
-              domainThreshold: toNumber(threshold),
-            };
-          } else {
-            updatedDomainThresholds.push({
-              domainId,
-              domainThreshold: toNumber(threshold),
-            });
-          }
-          break;
-        }
+    if (matchingDomain) {
+      const domainId = matchingDomain.nativeId.toString();
+      const domainThresholdIndex =
+        multiSig.domainThresholds?.findIndex(
+          (domainThreshold) => (domainThreshold?.domainId ?? '') === domainId,
+        ) ?? -1;
+
+      if (domainThresholdIndex > -1) {
+        updatedDomainThresholds[domainThresholdIndex] = {
+          domainId,
+          domainThreshold: toNumber(threshold),
+        };
+      } else {
+        updatedDomainThresholds.push({
+          domainId,
+          domainThreshold: toNumber(threshold),
+        });
       }
     }
 
