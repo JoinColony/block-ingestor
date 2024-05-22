@@ -54,6 +54,7 @@ import {
   handleColonyMetadataDelta,
   handleMotionEventSet,
 } from './handlers';
+import { handleMultiSigGlobalThresholdUpdated } from '~handlers/multiSig';
 
 dotenv.config();
 
@@ -353,6 +354,11 @@ export default async (event: ContractEvent): Promise<void> => {
     case ContractEventsSignatures.LogSetOwner: {
       // We have to execute exactly the same logic as for LogSetAuthority
       await handleSetTokenAuthority(event);
+      return;
+    }
+
+    case ContractEventsSignatures.MultisigGlobalThresholdSet: {
+      await handleMultiSigGlobalThresholdUpdated(event);
       return;
     }
 
