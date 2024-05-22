@@ -16,7 +16,7 @@ query GetDomainMetadata($id: ID!) {
   }
 }
 
-query GetDomainByNativeSkillId($nativeSkillId: Int!) {
+query GetDomainByNativeSkillId($nativeSkillId: String!) {
   getDomainByNativeSkillId(nativeSkillId: $nativeSkillId) {
     items {
       id
