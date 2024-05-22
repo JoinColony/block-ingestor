@@ -1455,7 +1455,7 @@ export type CreateDomainInput = {
   isRoot: Scalars['Boolean'];
   nativeFundingPotId: Scalars['Int'];
   nativeId: Scalars['Int'];
-  nativeSkillId: Scalars['Int'];
+  nativeSkillId: Scalars['String'];
   reputation?: InputMaybe<Scalars['String']>;
   reputationPercentage?: InputMaybe<Scalars['String']>;
 };
@@ -1883,7 +1883,7 @@ export type Domain = {
    * Native skill ID of the Domain
    * The native skill ID is assigned to a domain from the contract on creation
    */
-  nativeSkillId: Scalars['Int'];
+  nativeSkillId: Scalars['String'];
   /** The amount of reputation in the domain */
   reputation?: Maybe<Scalars['String']>;
   /** The amount of reputation in the domain, as a percentage of the total in the colony */
@@ -3084,7 +3084,7 @@ export type ModelDomainConditionInput = {
   isRoot?: InputMaybe<ModelBooleanInput>;
   nativeFundingPotId?: InputMaybe<ModelIntInput>;
   nativeId?: InputMaybe<ModelIntInput>;
-  nativeSkillId?: InputMaybe<ModelIntInput>;
+  nativeSkillId?: InputMaybe<ModelStringInput>;
   not?: InputMaybe<ModelDomainConditionInput>;
   or?: InputMaybe<Array<InputMaybe<ModelDomainConditionInput>>>;
   reputation?: InputMaybe<ModelStringInput>;
@@ -3104,7 +3104,7 @@ export type ModelDomainFilterInput = {
   isRoot?: InputMaybe<ModelBooleanInput>;
   nativeFundingPotId?: InputMaybe<ModelIntInput>;
   nativeId?: InputMaybe<ModelIntInput>;
-  nativeSkillId?: InputMaybe<ModelIntInput>;
+  nativeSkillId?: InputMaybe<ModelStringInput>;
   not?: InputMaybe<ModelDomainFilterInput>;
   or?: InputMaybe<Array<InputMaybe<ModelDomainFilterInput>>>;
   reputation?: InputMaybe<ModelStringInput>;
@@ -3983,7 +3983,7 @@ export type ModelSubscriptionDomainFilterInput = {
   isRoot?: InputMaybe<ModelSubscriptionBooleanInput>;
   nativeFundingPotId?: InputMaybe<ModelSubscriptionIntInput>;
   nativeId?: InputMaybe<ModelSubscriptionIntInput>;
-  nativeSkillId?: InputMaybe<ModelSubscriptionIntInput>;
+  nativeSkillId?: InputMaybe<ModelSubscriptionStringInput>;
   or?: InputMaybe<Array<InputMaybe<ModelSubscriptionDomainFilterInput>>>;
   reputation?: InputMaybe<ModelSubscriptionStringInput>;
   reputationPercentage?: InputMaybe<ModelSubscriptionStringInput>;
@@ -6134,7 +6134,7 @@ export type QueryGetDomainByNativeSkillIdArgs = {
   filter?: InputMaybe<ModelDomainFilterInput>;
   limit?: InputMaybe<Scalars['Int']>;
   nativeId?: InputMaybe<ModelIntKeyConditionInput>;
-  nativeSkillId: Scalars['Int'];
+  nativeSkillId: Scalars['String'];
   nextToken?: InputMaybe<Scalars['String']>;
   sortDirection?: InputMaybe<ModelSortDirection>;
 };
@@ -8363,7 +8363,7 @@ export type UpdateDomainInput = {
   isRoot?: InputMaybe<Scalars['Boolean']>;
   nativeFundingPotId?: InputMaybe<Scalars['Int']>;
   nativeId?: InputMaybe<Scalars['Int']>;
-  nativeSkillId?: InputMaybe<Scalars['Int']>;
+  nativeSkillId?: InputMaybe<Scalars['String']>;
   reputation?: InputMaybe<Scalars['String']>;
   reputationPercentage?: InputMaybe<Scalars['String']>;
 };
@@ -8805,7 +8805,7 @@ export type ColonyFragment = {
     items: Array<{
       __typename?: 'Domain';
       id: string;
-      nativeSkillId: number;
+      nativeSkillId: string;
     } | null>;
   } | null;
 };
@@ -9725,7 +9725,7 @@ export type GetColonyQuery = {
       items: Array<{
         __typename?: 'Domain';
         id: string;
-        nativeSkillId: number;
+        nativeSkillId: string;
       } | null>;
     } | null;
   } | null;
@@ -9863,7 +9863,7 @@ export type GetDomainMetadataQuery = {
 };
 
 export type GetDomainByNativeSkillIdQueryVariables = Exact<{
-  nativeSkillId: Scalars['Int'];
+  nativeSkillId: Scalars['String'];
 }>;
 
 export type GetDomainByNativeSkillIdQuery = {
@@ -9873,7 +9873,7 @@ export type GetDomainByNativeSkillIdQuery = {
     items: Array<{
       __typename?: 'Domain';
       id: string;
-      nativeSkillId: number;
+      nativeSkillId: string;
       nativeId: number;
     } | null>;
   } | null;
@@ -11314,7 +11314,7 @@ export const GetDomainMetadataDocument = gql`
   }
 `;
 export const GetDomainByNativeSkillIdDocument = gql`
-  query GetDomainByNativeSkillId($nativeSkillId: Int!) {
+  query GetDomainByNativeSkillId($nativeSkillId: String!) {
     getDomainByNativeSkillId(nativeSkillId: $nativeSkillId) {
       items {
         id
