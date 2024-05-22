@@ -140,7 +140,7 @@ export const getMultiSigData = async ({
 };
 
 const getDomainIdByNativeSkillId = async (
-  nativeSkillId: number,
+  nativeSkillId: string,
 ): Promise<number | null> => {
   const result = await query<
     GetDomainByNativeSkillIdQuery,
@@ -192,7 +192,7 @@ export const createMultiSigInDB = async (
   const motion = await multiSigClient.getMotion(multiSigId);
 
   const domainId = await getDomainIdByNativeSkillId(
-    motion.domainSkillId.toNumber(),
+    motion.domainSkillId.toString(),
   );
 
   if (domainId === null) {
