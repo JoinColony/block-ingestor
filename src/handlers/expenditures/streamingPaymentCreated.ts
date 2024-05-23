@@ -1,20 +1,23 @@
 import { mutate } from '~amplifyClient';
 import {
+  ColonyActionType,
   CreateStreamingPaymentDocument,
   CreateStreamingPaymentMutation,
   CreateStreamingPaymentMutationVariables,
 } from '~graphql';
 import { ContractEvent } from '~types';
 import {
+  getDomainDatabaseId,
   getExpenditureDatabaseId,
   getStreamingPaymentsClient,
   toNumber,
   verbose,
+  writeActionFromEvent,
 } from '~utils';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { colonyAddress, blockNumber } = event;
-  const { streamingPaymentId } = event.args;
+  const { streamingPaymentId, agent: initiatorAddress } = event.args;
   const convertedNativeId = toNumber(streamingPaymentId);
 
   if (!colonyAddress) {
@@ -61,5 +64,12 @@ export default async (event: ContractEvent): Promise<void> => {
       endTime: toNumber(endTime),
       interval: interval.toString(),
     },
+  });
+
+  await writeActionFromEvent(event, colonyAddress, {
+    type: ColonyActionType.CreateStreamingPayment,
+    initiatorAddress,
+    expenditureId: databaseId,
+    fromDomainId: getDomainDatabaseId(colonyAddress, toNumber(domainId)),
   });
 };
