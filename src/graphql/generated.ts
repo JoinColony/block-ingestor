@@ -9862,6 +9862,23 @@ export type GetDomainMetadataQuery = {
   } | null;
 };
 
+export type GetDomainByNativeSkillIdQueryVariables = Exact<{
+  nativeSkillId: Scalars['String'];
+}>;
+
+export type GetDomainByNativeSkillIdQuery = {
+  __typename?: 'Query';
+  getDomainByNativeSkillId?: {
+    __typename?: 'ModelDomainConnection';
+    items: Array<{
+      __typename?: 'Domain';
+      id: string;
+      nativeSkillId: string;
+      nativeId: number;
+    } | null>;
+  } | null;
+};
+
 export type GetDomainsByExtensionAddressQueryVariables = Exact<{
   extensionAddress: Scalars['ID'];
 }>;
@@ -9879,7 +9896,7 @@ export type GetDomainsByExtensionAddressQuery = {
           __typename?: 'ModelDomainConnection';
           items: Array<{
             __typename?: 'Domain';
-            nativeSkillId: number;
+            nativeSkillId: string;
             nativeId: number;
           } | null>;
         } | null;
@@ -11342,6 +11359,17 @@ export const GetDomainMetadataDocument = gql`
         oldDescription
         oldName
         transactionHash
+      }
+    }
+  }
+`;
+export const GetDomainByNativeSkillIdDocument = gql`
+  query GetDomainByNativeSkillId($nativeSkillId: String!) {
+    getDomainByNativeSkillId(nativeSkillId: $nativeSkillId) {
+      items {
+        id
+        nativeSkillId
+        nativeId
       }
     }
   }
