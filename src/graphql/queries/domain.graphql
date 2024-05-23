@@ -16,6 +16,16 @@ query GetDomainMetadata($id: ID!) {
   }
 }
 
+query GetDomainByNativeSkillId($nativeSkillId: String!) {
+  getDomainByNativeSkillId(nativeSkillId: $nativeSkillId) {
+    items {
+      id
+      nativeSkillId
+      nativeId
+    }
+  }
+}
+
 query GetDomainsByExtensionAddress($extensionAddress: ID!) {
   listColonyExtensions(filter: {id: {eq: $extensionAddress}}) {
     items {
