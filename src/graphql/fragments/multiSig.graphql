@@ -1,6 +1,7 @@
 fragment MultiSigUserSignature on MultiSigUserSignature {
   id
-  domainId
+  multiSigId
+  role
   userAddress
   vote
   createdAt
