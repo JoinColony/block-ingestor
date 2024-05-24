@@ -56,6 +56,7 @@ import {
   handleExpenditureStateChanged,
 } from './handlers';
 import {
+  handleApprovalChanged,
   handleMultiSigCreated,
   handleMultiSigGlobalThresholdSet,
   handleDomainSkillThresholdSet,
@@ -189,6 +190,10 @@ export default async (event: ContractEvent): Promise<void> => {
     /* Entry points for multiSig events */
     case ContractEventsSignatures.MultisigMotionCreated: {
       await handleMultiSigCreated(event);
+      return;
+    }
+    case ContractEventsSignatures.MultisigApprovalChanged: {
+      await handleApprovalChanged(event);
       return;
     }
 
