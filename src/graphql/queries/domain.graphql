@@ -25,3 +25,19 @@ query GetDomainByNativeSkillId($nativeSkillId: String!) {
     }
   }
 }
+
+query GetDomainsByExtensionAddress($extensionAddress: ID!) {
+  listColonyExtensions(filter: {id: {eq: $extensionAddress}}) {
+    items {
+      colony {
+        domains {
+          items {
+            nativeSkillId
+            nativeId
+          }
+        }
+        id
+      }
+    }
+  }
+}
