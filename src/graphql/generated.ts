@@ -1069,10 +1069,51 @@ export type ColonyMotionMessagesArgs = {
   sortDirection?: InputMaybe<ModelSortDirection>;
 };
 
+<<<<<<< HEAD
 /** Represents a Motion within a Colony */
 export type ColonyMotionVoterRewardsArgs = {
   createdAt?: InputMaybe<ModelStringKeyConditionInput>;
   filter?: InputMaybe<ModelVoterRewardsHistoryFilterInput>;
+  limit?: InputMaybe<Scalars['Int']>;
+  nextToken?: InputMaybe<Scalars['String']>;
+  sortDirection?: InputMaybe<ModelSortDirection>;
+=======
+/** Represents a MultiSig motion within a Colony */
+export type ColonyMultiSig = {
+  __typename?: 'ColonyMultiSig';
+  action?: Maybe<ColonyAction>;
+  createdAt: Scalars['AWSDateTime'];
+  /**
+   * The internal database id of the multiSig
+   * To ensure uniqueness, we format as: `chainId-multiSigExtnAddress_nativeMultiSigId`
+   */
+  id: Scalars['ID'];
+  /** Whether the multiSig is a Simple Decision */
+  isDecision: Scalars['Boolean'];
+  /** Whether the multiSig was executed or not */
+  isExecuted: Scalars['Boolean'];
+  /** Whether the multiSig was cancelled or not */
+  isRejected: Scalars['Boolean'];
+  /** Expanded domain in which the multiSig was created */
+  multiSigDomain: Domain;
+  /** Unique identifier of the multiSigs domain in the database */
+  multiSigDomainId: Scalars['ID'];
+  /** The on chain id of the domain associated with the motion */
+  nativeMultiSigDomainId: Scalars['String'];
+  /** The on chain id of the multiSig */
+  nativeMultiSigId: Scalars['ID'];
+  /** Required role for signing */
+  requiredPermissions: Scalars['Int'];
+  signatures?: Maybe<ModelMultiSigUserSignatureConnection>;
+  /** The transaction hash of the creteMotion (multisig) action */
+  transactionHash: Scalars['ID'];
+  updatedAt: Scalars['AWSDateTime'];
+>>>>>>> b53281d (feat: implement multisig vote removal)
+};
+
+/** Represents a MultiSig motion within a Colony */
+export type ColonyMultiSigSignaturesArgs = {
+  filter?: InputMaybe<ModelMultiSigUserSignatureFilterInput>;
   limit?: InputMaybe<Scalars['Int']>;
   nextToken?: InputMaybe<Scalars['String']>;
   sortDirection?: InputMaybe<ModelSortDirection>;
@@ -1493,7 +1534,7 @@ export type CreateColonyMultiSigInput = {
   isRejected: Scalars['Boolean'];
   multiSigDomainId: Scalars['ID'];
   nativeMultiSigDomainId: Scalars['String'];
-  nativeMultiSigId: Scalars['String'];
+  nativeMultiSigId: Scalars['ID'];
   requiredPermissions: Scalars['Int'];
   transactionHash: Scalars['ID'];
 };
@@ -2996,7 +3037,7 @@ export type ModelColonyMultiSigConditionInput = {
   isRejected?: InputMaybe<ModelBooleanInput>;
   multiSigDomainId?: InputMaybe<ModelIdInput>;
   nativeMultiSigDomainId?: InputMaybe<ModelStringInput>;
-  nativeMultiSigId?: InputMaybe<ModelStringInput>;
+  nativeMultiSigId?: InputMaybe<ModelIdInput>;
   not?: InputMaybe<ModelColonyMultiSigConditionInput>;
   or?: InputMaybe<Array<InputMaybe<ModelColonyMultiSigConditionInput>>>;
   requiredPermissions?: InputMaybe<ModelIntInput>;
@@ -3017,7 +3058,7 @@ export type ModelColonyMultiSigFilterInput = {
   isRejected?: InputMaybe<ModelBooleanInput>;
   multiSigDomainId?: InputMaybe<ModelIdInput>;
   nativeMultiSigDomainId?: InputMaybe<ModelStringInput>;
-  nativeMultiSigId?: InputMaybe<ModelStringInput>;
+  nativeMultiSigId?: InputMaybe<ModelIdInput>;
   not?: InputMaybe<ModelColonyMultiSigFilterInput>;
   or?: InputMaybe<Array<InputMaybe<ModelColonyMultiSigFilterInput>>>;
   requiredPermissions?: InputMaybe<ModelIntInput>;
@@ -4077,7 +4118,7 @@ export type ModelSubscriptionColonyMultiSigFilterInput = {
   isRejected?: InputMaybe<ModelSubscriptionBooleanInput>;
   multiSigDomainId?: InputMaybe<ModelSubscriptionIdInput>;
   nativeMultiSigDomainId?: InputMaybe<ModelSubscriptionStringInput>;
-  nativeMultiSigId?: InputMaybe<ModelSubscriptionStringInput>;
+  nativeMultiSigId?: InputMaybe<ModelSubscriptionIdInput>;
   or?: InputMaybe<
     Array<InputMaybe<ModelSubscriptionColonyMultiSigFilterInput>>
   >;
@@ -8631,7 +8672,7 @@ export type UpdateColonyMultiSigInput = {
   isRejected?: InputMaybe<Scalars['Boolean']>;
   multiSigDomainId?: InputMaybe<Scalars['ID']>;
   nativeMultiSigDomainId?: InputMaybe<Scalars['String']>;
-  nativeMultiSigId?: InputMaybe<Scalars['String']>;
+  nativeMultiSigId?: InputMaybe<Scalars['ID']>;
   requiredPermissions?: InputMaybe<Scalars['Int']>;
   transactionHash?: InputMaybe<Scalars['ID']>;
 };
@@ -9406,7 +9447,46 @@ export type DomainMetadataFragment = {
 };
 
 export type TokenFragment = { __typename?: 'Token'; tokenAddress: string };
+<<<<<<< HEAD
 >>>>>>> ce9a82c (feat: handle multisig approval changed)
+=======
+=======
+export type MultiSigUserSignatureFragment = {
+  __typename?: 'MultiSigUserSignature';
+  id: string;
+  multiSigId: string;
+  role: number;
+  userAddress: string;
+  vote: MultiSigVote;
+  createdAt: string;
+};
+
+export type ColonyMultiSigFragment = {
+  __typename?: 'ColonyMultiSig';
+  id: string;
+  nativeMultiSigId: string;
+  multiSigDomainId: string;
+  nativeMultiSigDomainId: string;
+  requiredPermissions: number;
+  transactionHash: string;
+  isExecuted: boolean;
+  isRejected: boolean;
+  isDecision: boolean;
+  signatures?: {
+    __typename?: 'ModelMultiSigUserSignatureConnection';
+    items: Array<{
+      __typename?: 'MultiSigUserSignature';
+      id: string;
+      multiSigId: string;
+      role: number;
+      userAddress: string;
+      vote: MultiSigVote;
+      createdAt: string;
+    } | null>;
+  } | null;
+};
+>>>>>>> 51c39ba (feat: implement mint tokens multisig creation and groundwork for more multisig motions)
+>>>>>>> b53281d (feat: implement multisig vote removal)
 
 export type CreateColonyActionMutationVariables = Exact<{
   input: CreateColonyActionInput;
@@ -9809,6 +9889,18 @@ export type CreateApprovalVoteMutationVariables = Exact<{
 export type CreateApprovalVoteMutation = {
   __typename?: 'Mutation';
   createMultiSigUserSignature?: {
+    __typename?: 'MultiSigUserSignature';
+    id: string;
+  } | null;
+};
+
+export type RemoveMultiSigVoteMutationVariables = Exact<{
+  id: Scalars['ID'];
+}>;
+
+export type RemoveMultiSigVoteMutation = {
+  __typename?: 'Mutation';
+  deleteMultiSigUserSignature?: {
     __typename?: 'MultiSigUserSignature';
     id: string;
   } | null;
@@ -10696,11 +10788,100 @@ export type GetVoterRewardsQueryVariables = Exact<{
 
 export type GetVoterRewardsQuery = {
   __typename?: 'Query';
+<<<<<<< HEAD
   getVoterRewards?: {
     __typename?: 'VoterRewardsReturn';
     min: string;
     max: string;
     reward: string;
+=======
+  getColonyActionByMultiSigId?: {
+    __typename?: 'ModelColonyActionConnection';
+    items: Array<{
+      __typename?: 'ColonyAction';
+      id: string;
+      colonyDecisionId?: string | null;
+      pendingDomainMetadata?: {
+        __typename?: 'DomainMetadata';
+        name: string;
+        color: DomainColor;
+        description?: string | null;
+        changelog?: Array<{
+          __typename?: 'DomainMetadataChangelog';
+          transactionHash: string;
+          oldName: string;
+          newName: string;
+          oldColor: DomainColor;
+          newColor: DomainColor;
+          oldDescription?: string | null;
+          newDescription?: string | null;
+        }> | null;
+      } | null;
+      pendingColonyMetadata?: {
+        __typename?: 'ColonyMetadata';
+        id: string;
+        displayName: string;
+        avatar?: string | null;
+        thumbnail?: string | null;
+        description?: string | null;
+        isWhitelistActivated?: boolean | null;
+        whitelistedAddresses?: Array<string> | null;
+        externalLinks?: Array<{
+          __typename?: 'ExternalLink';
+          name: ExternalLinks;
+          link: string;
+        }> | null;
+        changelog?: Array<{
+          __typename?: 'ColonyMetadataChangelog';
+          transactionHash: string;
+          oldDisplayName: string;
+          newDisplayName: string;
+          hasAvatarChanged: boolean;
+          hasWhitelistChanged: boolean;
+          haveTokensChanged: boolean;
+          hasDescriptionChanged?: boolean | null;
+          haveExternalLinksChanged?: boolean | null;
+        }> | null;
+        modifiedTokenAddresses?: {
+          __typename?: 'PendingModifiedTokenAddresses';
+          added?: Array<string> | null;
+          removed?: Array<string> | null;
+        } | null;
+      } | null;
+    } | null>;
+  } | null;
+};
+
+export type GetColonyMultiSigQueryVariables = Exact<{
+  id: Scalars['ID'];
+}>;
+
+export type GetColonyMultiSigQuery = {
+  __typename?: 'Query';
+  getColonyMultiSig?: {
+    __typename?: 'ColonyMultiSig';
+    id: string;
+    nativeMultiSigId: string;
+    multiSigDomainId: string;
+    nativeMultiSigDomainId: string;
+    requiredPermissions: number;
+    transactionHash: string;
+    isExecuted: boolean;
+    isRejected: boolean;
+    isDecision: boolean;
+    signatures?: {
+      __typename?: 'ModelMultiSigUserSignatureConnection';
+      items: Array<{
+        __typename?: 'MultiSigUserSignature';
+        id: string;
+        multiSigId: string;
+        role: number;
+        userAddress: string;
+        vote: MultiSigVote;
+        createdAt: string;
+      } | null>;
+    } | null;
+>>>>>>> b53281d (feat: implement multisig vote removal)
   } | null;
 };
 
@@ -11095,7 +11276,9 @@ export const ColonyMultiSig = gql`
     isRejected
     isDecision
     signatures {
-      ...MultiSigUserSignature
+      items {
+        ...MultiSigUserSignature
+      }
     }
   }
   ${MultiSigUserSignature}
@@ -11393,6 +11576,13 @@ export const CreateUserVoterRewardDocument = gql`
 export const CreateApprovalVoteDocument = gql`
   mutation CreateApprovalVote($input: CreateMultiSigUserSignatureInput!) {
     createMultiSigUserSignature(input: $input) {
+      id
+    }
+  }
+`;
+export const RemoveMultiSigVoteDocument = gql`
+  mutation RemoveMultiSigVote($id: ID!) {
+    deleteMultiSigUserSignature(input: { id: $id }) {
       id
     }
   }
