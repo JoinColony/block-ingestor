@@ -18,6 +18,8 @@ fragment ColonyMultiSig on ColonyMultiSig {
   isRejected
   isDecision
   signatures {
-    ...MultiSigUserSignature
+    items {
+      ...MultiSigUserSignature
+    }
   }
 }

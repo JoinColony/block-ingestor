@@ -4,6 +4,9 @@ import {
   CreateApprovalVoteMutation,
   CreateApprovalVoteMutationVariables,
   MultiSigVote,
+  RemoveMultiSigVoteDocument,
+  RemoveMultiSigVoteMutation,
+  RemoveMultiSigVoteMutationVariables,
 } from '~graphql';
 
 interface AddApprovalVoteParams {
@@ -27,5 +30,12 @@ export const addApprovalVote = async ({
         vote: MultiSigVote.Approve,
       },
     },
+  );
+};
+
+export const removeMultiSigVote = async (id: string): Promise<void> => {
+  await mutate<RemoveMultiSigVoteMutation, RemoveMultiSigVoteMutationVariables>(
+    RemoveMultiSigVoteDocument,
+    { id },
   );
 };
