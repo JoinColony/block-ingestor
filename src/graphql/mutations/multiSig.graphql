@@ -15,3 +15,9 @@ mutation CreateApprovalVote($input: CreateMultiSigUserSignatureInput!) {
     id
   }
 }
+
+mutation RemoveMultiSigVote($id: ID!) {
+  deleteMultiSigUserSignature(input: {id: $id}) {
+    id
+  }
+}
