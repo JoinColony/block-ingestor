@@ -7,6 +7,7 @@ mutation CreateColonyMultiSig($input: CreateColonyMultiSigInput!) {
 mutation UpdateColonyMultiSig($input: UpdateColonyMultiSigInput!) {
   updateColonyMultiSig(input: $input) {
     id
+    isRejected
   }
 }
 
