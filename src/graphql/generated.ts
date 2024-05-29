@@ -9467,7 +9467,11 @@ export type UpdateColonyMultiSigMutationVariables = Exact<{
 
 export type UpdateColonyMultiSigMutation = {
   __typename?: 'Mutation';
-  updateColonyMultiSig?: { __typename?: 'ColonyMultiSig'; id: string } | null;
+  updateColonyMultiSig?: {
+    __typename?: 'ColonyMultiSig';
+    id: string;
+    isRejected: boolean;
+  } | null;
 };
 
 export type CreateApprovalVoteMutationVariables = Exact<{
@@ -11165,6 +11169,7 @@ export const UpdateColonyMultiSigDocument = gql`
   mutation UpdateColonyMultiSig($input: UpdateColonyMultiSigInput!) {
     updateColonyMultiSig(input: $input) {
       id
+      isRejected
     }
   }
 `;
