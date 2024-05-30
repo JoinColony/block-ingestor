@@ -11,6 +11,7 @@ import {
 
 interface AddApprovalVoteParams {
   userAddress: string;
+  colonyAddress: string;
   multiSigId: string;
   role: number;
 }
@@ -19,11 +20,13 @@ export const addApprovalVote = async ({
   multiSigId,
   role,
   userAddress,
+  colonyAddress,
 }: AddApprovalVoteParams): Promise<void> => {
   await mutate<CreateApprovalVoteMutation, CreateApprovalVoteMutationVariables>(
     CreateApprovalVoteDocument,
     {
       input: {
+        colonyAddress,
         multiSigId,
         userAddress,
         role,

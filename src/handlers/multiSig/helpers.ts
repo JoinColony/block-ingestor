@@ -9,7 +9,7 @@ import {
 } from '~graphql';
 
 export const getMultiSigDatabaseId = (
-  chainId: number,
+  chainId: string,
   multiSigExtnAddress: string,
   nativeMotionId: BigNumber,
 ): string => `${chainId}-${multiSigExtnAddress}_${nativeMotionId}`;
