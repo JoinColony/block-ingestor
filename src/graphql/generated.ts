@@ -1525,6 +1525,7 @@ export type CreateMotionMessageInput = {
 };
 
 export type CreateMultiSigUserSignatureInput = {
+  colonyAddress: Scalars['ID'];
   createdAt?: InputMaybe<Scalars['AWSDateTime']>;
   id?: InputMaybe<Scalars['ID']>;
   multiSigId: Scalars['ID'];
@@ -3377,6 +3378,7 @@ export type ModelMotionMessageFilterInput = {
 
 export type ModelMultiSigUserSignatureConditionInput = {
   and?: InputMaybe<Array<InputMaybe<ModelMultiSigUserSignatureConditionInput>>>;
+  colonyAddress?: InputMaybe<ModelIdInput>;
   createdAt?: InputMaybe<ModelStringInput>;
   multiSigId?: InputMaybe<ModelIdInput>;
   not?: InputMaybe<ModelMultiSigUserSignatureConditionInput>;
@@ -3394,6 +3396,7 @@ export type ModelMultiSigUserSignatureConnection = {
 
 export type ModelMultiSigUserSignatureFilterInput = {
   and?: InputMaybe<Array<InputMaybe<ModelMultiSigUserSignatureFilterInput>>>;
+  colonyAddress?: InputMaybe<ModelIdInput>;
   createdAt?: InputMaybe<ModelStringInput>;
   id?: InputMaybe<ModelIdInput>;
   multiSigId?: InputMaybe<ModelIdInput>;
@@ -4119,6 +4122,7 @@ export type ModelSubscriptionMultiSigUserSignatureFilterInput = {
   and?: InputMaybe<
     Array<InputMaybe<ModelSubscriptionMultiSigUserSignatureFilterInput>>
   >;
+  colonyAddress?: InputMaybe<ModelSubscriptionIdInput>;
   createdAt?: InputMaybe<ModelSubscriptionStringInput>;
   id?: InputMaybe<ModelSubscriptionIdInput>;
   multiSigId?: InputMaybe<ModelSubscriptionIdInput>;
@@ -4659,6 +4663,7 @@ export type MultiSigParamsInput = {
 
 export type MultiSigUserSignature = {
   __typename?: 'MultiSigUserSignature';
+  colonyAddress: Scalars['ID'];
   createdAt: Scalars['AWSDateTime'];
   id: Scalars['ID'];
   multiSigId: Scalars['ID'];
@@ -8456,6 +8461,7 @@ export type UpdateMotionMessageInput = {
 };
 
 export type UpdateMultiSigUserSignatureInput = {
+  colonyAddress?: InputMaybe<Scalars['ID']>;
   createdAt?: InputMaybe<Scalars['AWSDateTime']>;
   id: Scalars['ID'];
   multiSigId?: InputMaybe<Scalars['ID']>;
@@ -9032,6 +9038,7 @@ export type MultiSigUserSignatureFragment = {
   id: string;
   multiSigId: string;
   role: number;
+  colonyAddress: string;
   userAddress: string;
   vote: MultiSigVote;
   createdAt: string;
@@ -9055,6 +9062,7 @@ export type ColonyMultiSigFragment = {
       id: string;
       multiSigId: string;
       role: number;
+      colonyAddress: string;
       userAddress: string;
       vote: MultiSigVote;
       createdAt: string;
@@ -9900,6 +9908,7 @@ export type GetDomainMetadataQuery = {
 
 export type GetDomainByNativeSkillIdQueryVariables = Exact<{
   nativeSkillId: Scalars['String'];
+  colonyAddress: Scalars['ID'];
 }>;
 
 export type GetDomainByNativeSkillIdQuery = {
@@ -10457,6 +10466,7 @@ export type GetColonyMultiSigQuery = {
         id: string;
         multiSigId: string;
         role: number;
+        colonyAddress: string;
         userAddress: string;
         vote: MultiSigVote;
         createdAt: string;
@@ -10480,6 +10490,7 @@ export type GetUserMultiSigSignatureQuery = {
       id: string;
       multiSigId: string;
       role: number;
+      colonyAddress: string;
       userAddress: string;
       vote: MultiSigVote;
       createdAt: string;
@@ -10835,6 +10846,7 @@ export const MultiSigUserSignature = gql`
     id
     multiSigId
     role
+    colonyAddress
     userAddress
     vote
     createdAt
@@ -11443,8 +11455,11 @@ export const GetDomainMetadataDocument = gql`
   }
 `;
 export const GetDomainByNativeSkillIdDocument = gql`
-  query GetDomainByNativeSkillId($nativeSkillId: String!) {
-    getDomainByNativeSkillId(nativeSkillId: $nativeSkillId) {
+  query GetDomainByNativeSkillId($nativeSkillId: String!, $colonyAddress: ID!) {
+    getDomainByNativeSkillId(
+      nativeSkillId: $nativeSkillId
+      filter: { colonyId: { eq: $colonyAddress } }
+    ) {
       items {
         id
         nativeSkillId

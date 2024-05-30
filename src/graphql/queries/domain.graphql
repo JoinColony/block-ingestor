@@ -16,8 +16,8 @@ query GetDomainMetadata($id: ID!) {
   }
 }
 
-query GetDomainByNativeSkillId($nativeSkillId: String!) {
-  getDomainByNativeSkillId(nativeSkillId: $nativeSkillId) {
+query GetDomainByNativeSkillId($nativeSkillId: String!, $colonyAddress: ID!) {
+  getDomainByNativeSkillId(nativeSkillId: $nativeSkillId, filter: {colonyId: {eq: $colonyAddress}}) {
     items {
       id
       nativeSkillId

@@ -23,6 +23,7 @@ import {
   GetDomainByNativeSkillIdQueryVariables,
 } from '~graphql';
 import networkClient from '~networkClient';
+import { getChainId } from '~provider';
 import { ColonyOperations, ContractEvent } from '~types';
 import {
   getDomainDatabaseId,
@@ -119,7 +120,7 @@ export const getMultiSigData = async ({
   colonyAddress,
   isDecision = false,
 }: GetMultiSigDataArgs): Promise<ColonyMultiSig> => {
-  const { chainId } = await multiSigClient.provider.getNetwork();
+  const chainId = getChainId();
   const multiSigDatabaseId = getMultiSigDatabaseId(
     chainId,
     multiSigClient.address,
@@ -140,6 +141,7 @@ export const getMultiSigData = async ({
 };
 
 const getDomainIdByNativeSkillId = async (
+  colonyAddress: string,
   nativeSkillId: string,
 ): Promise<number | null> => {
   const result = await query<
@@ -147,6 +149,7 @@ const getDomainIdByNativeSkillId = async (
     GetDomainByNativeSkillIdQueryVariables
   >(GetDomainByNativeSkillIdDocument, {
     nativeSkillId,
+    colonyAddress,
   });
 
   if (result?.data?.getDomainByNativeSkillId?.items[0]) {
@@ -192,6 +195,7 @@ export const createMultiSigInDB = async (
   const motion = await multiSigClient.getMotion(multiSigId);
 
   const domainId = await getDomainIdByNativeSkillId(
+    colonyAddress,
     motion.domainSkillId.toString(),
   );
 
