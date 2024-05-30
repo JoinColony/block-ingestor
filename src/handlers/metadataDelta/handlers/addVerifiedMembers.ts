@@ -46,7 +46,7 @@ export const handleAddVerifiedMembers = async (
         id: getColonyContributorId(colonyAddress, userAddress),
       });
 
-      // If the wallet address does not currently belong to a Colony contributor,
+      // If a wallet address is not currently a member of a Colony,
       // add the entity as a new Colony contributor
       if (item?.data?.getColonyContributor === null) {
         await createColonyContributor({
