@@ -32,6 +32,7 @@ import {
   verbose,
 } from '~utils';
 import { getMultiSigDatabaseId } from '../helpers';
+import { getChainId } from '~provider';
 
 export interface SimpleTransactionDescription {
   name: ColonyOperations.SimpleDecision;
