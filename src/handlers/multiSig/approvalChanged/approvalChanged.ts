@@ -1,7 +1,8 @@
-import { BigNumber } from 'ethers';
 import { MultiSigVote } from '~graphql';
+import { getChainId } from '~provider';
 import { ContractEvent } from '~types';
-import { getUserMultiSigSignature } from '../helpers';
+import { getMultiSigClient } from '~utils/clients';
+import { getMultiSigDatabaseId, getUserMultiSigSignature } from '../helpers';
 import { addApprovalVote, removeMultiSigVote } from './helpers';
 
 export default async (event: ContractEvent): Promise<void> => {
@@ -10,8 +11,20 @@ export default async (event: ContractEvent): Promise<void> => {
     return;
   }
 
+  const multiSigClient = await getMultiSigClient(colonyAddress);
+
+  if (!multiSigClient) {
+    return;
+  }
+
+  const chainId = getChainId();
   const { agent: userAddress, motionId, role, approval } = event.args;
-  const multiSigId = BigNumber.from(motionId).toString();
+
+  const multiSigId = getMultiSigDatabaseId(
+    chainId,
+    multiSigClient.address,
+    motionId,
+  );
 
   const existingVote = await getUserMultiSigSignature({
     multiSigId,
@@ -29,6 +42,7 @@ export default async (event: ContractEvent): Promise<void> => {
         multiSigId,
         role,
         userAddress,
+        colonyAddress,
       });
     }
   }
