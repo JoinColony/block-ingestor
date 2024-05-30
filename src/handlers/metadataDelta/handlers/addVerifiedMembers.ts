@@ -52,6 +52,7 @@ export const handleAddVerifiedMembers = async (
         await createColonyContributor({
           colonyAddress,
           contributorAddress: userAddress,
+          isWatching: true,
         });
 
         return;
