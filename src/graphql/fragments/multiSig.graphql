@@ -2,6 +2,7 @@ fragment MultiSigUserSignature on MultiSigUserSignature {
   id
   multiSigId
   role
+  colonyAddress
   userAddress
   vote
   createdAt
