@@ -5,7 +5,7 @@ import {
   UpdateColonyMultiSigMutationVariables,
 } from '~graphql';
 import { ContractEvent } from '~types';
-import { getMultiSigClient } from '~utils';
+import { getMultiSigClient, verbose } from '~utils';
 import { getMultiSigDatabaseId } from './helpers';
 import { getChainId } from '~provider';
 
@@ -32,6 +32,8 @@ export default async (event: ContractEvent): Promise<void> => {
     multiSigClient.address,
     motionId,
   );
+
+  verbose(`MultiSig motion: ${motionId} has been rejected`);
 
   await mutate<
     UpdateColonyMultiSigInput,
