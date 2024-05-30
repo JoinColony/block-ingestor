@@ -17,7 +17,10 @@ import {
   writeActionFromEvent,
 } from '~utils';
 
-import { getColonyContributorId } from '~utils/contributors';
+import {
+  createColonyContributor,
+  getColonyContributorId,
+} from '~utils/contributors';
 
 export const handleAddVerifiedMembers = async (
   event: ContractEvent,
@@ -42,6 +45,17 @@ export const handleAddVerifiedMembers = async (
       >(GetColonyContributorDocument, {
         id: getColonyContributorId(colonyAddress, userAddress),
       });
+
+      // If the wallet address does not currently belong to a Colony contributor,
+      // add the entity as a new Colony contributor
+      if (item?.data?.getColonyContributor === null) {
+        await createColonyContributor({
+          colonyAddress,
+          contributorAddress: userAddress,
+        });
+
+        return;
+      }
 
       // If user is already verified, don't verify them again
       if (item?.data?.getColonyContributor?.isVerified) {
