@@ -5,31 +5,21 @@ import {
   UpdateColonyMultiSigMutationVariables,
 } from '~graphql';
 import { ContractEvent } from '~types';
-import { getMultiSigClient, verbose } from '~utils';
+import { verbose } from '~utils';
 import { getMultiSigDatabaseId } from './helpers';
 import { getChainId } from '~provider';
 
 export default async (event: ContractEvent): Promise<void> => {
   const {
     args: { motionId },
-    colonyAddress,
+    contractAddress: multiSigExtensionAddress,
   } = event;
-
-  if (!colonyAddress) {
-    return;
-  }
-
-  const multiSigClient = await getMultiSigClient(colonyAddress);
-
-  if (!multiSigClient) {
-    return;
-  }
 
   const chainId = getChainId();
 
   const multiSigDatabaseId = getMultiSigDatabaseId(
     chainId,
-    multiSigClient.address,
+    multiSigExtensionAddress,
     motionId,
   );
 
