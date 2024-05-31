@@ -31,6 +31,7 @@ export const createFundsClaim = async ({
       colonyFundsClaimsId: colonyAddress,
       colonyFundsClaimTokenId: tokenAddress,
       createdAtBlock: blockNumber,
+      isClaimed: false,
       amount,
     },
   });

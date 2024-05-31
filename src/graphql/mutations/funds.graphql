@@ -7,6 +7,15 @@ mutation CreateColonyFundsClaim(
   }
 }
 
+mutation UpdateColonyFundsClaim(
+  $input: UpdateColonyFundsClaimInput!
+  $condition: ModelColonyFundsClaimConditionInput
+) {
+  updateColonyFundsClaim(input: $input, condition: $condition) {
+    id
+  }
+}
+
 mutation DeleteColonyFundsClaim(
   $input: DeleteColonyFundsClaimInput!
   $condition: ModelColonyFundsClaimConditionInput

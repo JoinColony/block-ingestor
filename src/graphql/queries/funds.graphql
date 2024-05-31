@@ -8,6 +8,7 @@ query GetColonyUnclaimedFunds(
       colonyFundsClaimsId: { eq: $colonyAddress }
       colonyFundsClaimTokenId: { eq: $tokenAddress }
       createdAtBlock: { le: $upToBlock }
+      isClaimed: { ne: true }
     }
   ) {
     items {

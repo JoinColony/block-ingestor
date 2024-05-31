@@ -512,6 +512,8 @@ export type ColonyChainFundsClaim = {
   createdAtBlock: Scalars['Int'];
   /** Unique identifier for the Colony Chain Funds Claim */
   id: Scalars['ID'];
+  /** Boolean to indicate whether the claim has been claimed or not */
+  isClaimed?: Maybe<Scalars['Boolean']>;
   /** Timestamp when the Chain Funds Claim was last updated */
   updatedAt: Scalars['AWSDateTime'];
 };
@@ -521,6 +523,7 @@ export type ColonyChainFundsClaimInput = {
   createdAt?: InputMaybe<Scalars['AWSDateTime']>;
   createdAtBlock: Scalars['Int'];
   id?: InputMaybe<Scalars['ID']>;
+  isClaimed?: InputMaybe<Scalars['Boolean']>;
   updatedAt?: InputMaybe<Scalars['AWSDateTime']>;
 };
 
@@ -636,6 +639,8 @@ export type ColonyFundsClaim = {
   createdAtBlock: Scalars['Int'];
   /** Unique identifier for the Colony Funds Claim */
   id: Scalars['ID'];
+  /** Boolean to indicate whether the claim has been claimed or not */
+  isClaimed?: Maybe<Scalars['Boolean']>;
   /** Token associated with the Colony Funds Claim */
   token: Token;
   updatedAt: Scalars['AWSDateTime'];
@@ -1208,6 +1213,7 @@ export type CreateColonyFundsClaimInput = {
   createdAt?: InputMaybe<Scalars['AWSDateTime']>;
   createdAtBlock: Scalars['Int'];
   id?: InputMaybe<Scalars['ID']>;
+  isClaimed?: InputMaybe<Scalars['Boolean']>;
 };
 
 export type CreateColonyHistoricRoleInput = {
@@ -2536,6 +2542,7 @@ export type ModelColonyFundsClaimConditionInput = {
   colonyFundsClaimsId?: InputMaybe<ModelIdInput>;
   createdAt?: InputMaybe<ModelStringInput>;
   createdAtBlock?: InputMaybe<ModelIntInput>;
+  isClaimed?: InputMaybe<ModelBooleanInput>;
   not?: InputMaybe<ModelColonyFundsClaimConditionInput>;
   or?: InputMaybe<Array<InputMaybe<ModelColonyFundsClaimConditionInput>>>;
 };
@@ -2554,6 +2561,7 @@ export type ModelColonyFundsClaimFilterInput = {
   createdAt?: InputMaybe<ModelStringInput>;
   createdAtBlock?: InputMaybe<ModelIntInput>;
   id?: InputMaybe<ModelIdInput>;
+  isClaimed?: InputMaybe<ModelBooleanInput>;
   not?: InputMaybe<ModelColonyFundsClaimFilterInput>;
   or?: InputMaybe<Array<InputMaybe<ModelColonyFundsClaimFilterInput>>>;
 };
@@ -3607,6 +3615,7 @@ export type ModelSubscriptionColonyFundsClaimFilterInput = {
   createdAt?: InputMaybe<ModelSubscriptionStringInput>;
   createdAtBlock?: InputMaybe<ModelSubscriptionIntInput>;
   id?: InputMaybe<ModelSubscriptionIdInput>;
+  isClaimed?: InputMaybe<ModelSubscriptionBooleanInput>;
   or?: InputMaybe<
     Array<InputMaybe<ModelSubscriptionColonyFundsClaimFilterInput>>
   >;
@@ -7724,6 +7733,7 @@ export type UpdateColonyFundsClaimInput = {
   createdAt?: InputMaybe<Scalars['AWSDateTime']>;
   createdAtBlock?: InputMaybe<Scalars['Int']>;
   id: Scalars['ID'];
+  isClaimed?: InputMaybe<Scalars['Boolean']>;
 };
 
 export type UpdateColonyHistoricRoleInput = {
@@ -8836,6 +8846,19 @@ export type CreateColonyFundsClaimMutationVariables = Exact<{
 export type CreateColonyFundsClaimMutation = {
   __typename?: 'Mutation';
   createColonyFundsClaim?: {
+    __typename?: 'ColonyFundsClaim';
+    id: string;
+  } | null;
+};
+
+export type UpdateColonyFundsClaimMutationVariables = Exact<{
+  input: UpdateColonyFundsClaimInput;
+  condition?: InputMaybe<ModelColonyFundsClaimConditionInput>;
+}>;
+
+export type UpdateColonyFundsClaimMutation = {
+  __typename?: 'Mutation';
+  updateColonyFundsClaim?: {
     __typename?: 'ColonyFundsClaim';
     id: string;
   } | null;
@@ -10298,6 +10321,16 @@ export const CreateColonyFundsClaimDocument = gql`
     }
   }
 `;
+export const UpdateColonyFundsClaimDocument = gql`
+  mutation UpdateColonyFundsClaim(
+    $input: UpdateColonyFundsClaimInput!
+    $condition: ModelColonyFundsClaimConditionInput
+  ) {
+    updateColonyFundsClaim(input: $input, condition: $condition) {
+      id
+    }
+  }
+`;
 export const DeleteColonyFundsClaimDocument = gql`
   mutation DeleteColonyFundsClaim(
     $input: DeleteColonyFundsClaimInput!
@@ -10745,6 +10778,7 @@ export const GetColonyUnclaimedFundsDocument = gql`
         colonyFundsClaimsId: { eq: $colonyAddress }
         colonyFundsClaimTokenId: { eq: $tokenAddress }
         createdAtBlock: { le: $upToBlock }
+        isClaimed: { ne: true }
       }
     ) {
       items {
