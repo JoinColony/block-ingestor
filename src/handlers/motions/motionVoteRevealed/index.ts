@@ -7,6 +7,9 @@ import {
 } from '../helpers';
 import { VoterRecord } from '~graphql';
 import { ExtensionEventListener } from '~eventListeners';
+import { createUserReward } from './helpers';
+import networkClient from '~networkClient';
+import { BigNumber } from 'ethers';
 
 export const handleMotionVoteRevealed: EventHandler = async (
   event,
@@ -67,6 +70,18 @@ export const handleMotionVoteRevealed: EventHandler = async (
           [MotionSide.YAY]: yayVotePercentage.toString(),
         },
       },
+    });
+
+    const rootHash = await networkClient.getReputationRootHash({
+      blockTag: blockNumber,
+    });
+    await createUserReward({
+      colonyAddress,
+      motionDatabaseId,
+      motionId: BigNumber.from(motionId).toString(),
+      userAddress: voter,
+      rootHash,
+      nativeMotionDomainId: revealedMotion.nativeMotionDomainId,
     });
 
     verbose(
