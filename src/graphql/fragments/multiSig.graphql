@@ -1,6 +1,8 @@
 fragment MultiSigUserSignature on MultiSigUserSignature {
   id
-  domainId
+  multiSigId
+  role
+  colonyAddress
   userAddress
   vote
   createdAt
@@ -17,6 +19,8 @@ fragment ColonyMultiSig on ColonyMultiSig {
   isRejected
   isDecision
   signatures {
-    ...MultiSigUserSignature
+    items {
+      ...MultiSigUserSignature
+    }
   }
 }

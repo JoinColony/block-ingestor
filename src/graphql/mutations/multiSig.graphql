@@ -9,3 +9,15 @@ mutation UpdateColonyMultiSig($input: UpdateColonyMultiSigInput!) {
     id
   }
 }
+
+mutation CreateApprovalVote($input: CreateMultiSigUserSignatureInput!) {
+  createMultiSigUserSignature(input: $input) {
+    id
+  }
+}
+
+mutation RemoveMultiSigVote($id: ID!) {
+  deleteMultiSigUserSignature(input: {id: $id}) {
+    id
+  }
+}
