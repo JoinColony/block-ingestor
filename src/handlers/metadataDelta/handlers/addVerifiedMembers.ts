@@ -52,17 +52,10 @@ export const handleAddVerifiedMembers = async (
         await createColonyContributor({
           colonyAddress,
           contributorAddress: userAddress,
+          isWatching: true,
         });
 
-        await mutate<
-          UpdateColonyContributorMutation,
-          UpdateColonyContributorMutationVariables
-        >(UpdateColonyContributorDocument, {
-          input: {
-            id: getColonyContributorId(colonyAddress, userAddress),
-            isWatching: true,
-          },
-        });
+        return;
       }
 
       // If user is already verified, don't verify them again

@@ -57,9 +57,11 @@ const getColonyContributor = async ({
 export const createColonyContributor = async ({
   colonyAddress,
   contributorAddress,
+  isWatching = false,
 }: {
   colonyAddress: string;
   contributorAddress: string;
+  isWatching?: boolean;
 }): Promise<void> => {
   await mutate<
     CreateColonyContributorMutation,
@@ -72,6 +74,7 @@ export const createColonyContributor = async ({
       contributorAddress,
       isVerified: false,
       hasPermissions: true, // if this is the first time a contributor is being created, it's because permissions are being given
+      isWatching,
     },
   });
 };
