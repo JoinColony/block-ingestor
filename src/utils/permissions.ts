@@ -367,6 +367,9 @@ export const createInitialColonyRolesDatabaseEntry = async (
     await createColonyContributor({
       colonyAddress,
       contributorAddress: targetAddress,
+      hasPermissions: true,
+      colonyReputationPercentage: 0,
+      isVerified: false,
     });
   }
 };

@@ -1,6 +1,7 @@
 import { query, mutate } from '~amplifyClient';
 import {
   CreateColonyContributorDocument,
+  CreateColonyContributorInput,
   CreateColonyContributorMutation,
   CreateColonyContributorMutationVariables,
   GetAllColonyRolesDocument,
@@ -57,10 +58,8 @@ const getColonyContributor = async ({
 export const createColonyContributor = async ({
   colonyAddress,
   contributorAddress,
-}: {
-  colonyAddress: string;
-  contributorAddress: string;
-}): Promise<void> => {
+  ...rest
+}: CreateColonyContributorInput): Promise<void> => {
   await mutate<
     CreateColonyContributorMutation,
     CreateColonyContributorMutationVariables
@@ -68,10 +67,8 @@ export const createColonyContributor = async ({
     input: {
       id: getColonyContributorId(colonyAddress, contributorAddress),
       colonyAddress,
-      colonyReputationPercentage: 0,
       contributorAddress,
-      isVerified: false,
-      hasPermissions: true, // if this is the first time a contributor is being created, it's because permissions are being given
+      ...rest,
     },
   });
 };

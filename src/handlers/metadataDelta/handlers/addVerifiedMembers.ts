@@ -52,6 +52,9 @@ export const handleAddVerifiedMembers = async (
         await createColonyContributor({
           colonyAddress,
           contributorAddress: userAddress,
+          hasPermissions: false,
+          isVerified: true,
+          colonyReputationPercentage: 0,
         });
 
         return;
