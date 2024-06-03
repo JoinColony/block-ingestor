@@ -7,7 +7,6 @@ import {
   getColonyTokenAddress,
   getDomainDatabaseId,
   verbose,
-  createFundsClaim,
 } from '~utils';
 
 export default async (event: ContractEvent): Promise<void> => {
@@ -29,13 +28,6 @@ export default async (event: ContractEvent): Promise<void> => {
       amount: amount.toString(),
       tokenAddress,
       fromDomainId: getDomainDatabaseId(colonyAddress, Id.RootDomain),
-    });
-
-    await createFundsClaim({
-      colonyAddress,
-      tokenAddress,
-      amount: amount.toString(),
-      event,
     });
   } else {
     verbose(
