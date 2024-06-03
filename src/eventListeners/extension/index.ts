@@ -1,7 +1,7 @@
 import { utils } from 'ethers';
 import { Extension, getExtensionHash } from '@colony/colony-js';
 
-import { ContractEventsSignatures } from '~types';
+import { ContractEventsSignatures, EventHandler } from '~types';
 import {
   EventListenerType,
   addEventListener,
@@ -23,6 +23,13 @@ import { addNetworkEventListener } from '../network';
 import { setupListenersForVotingReputationExtensions } from './votingReputation';
 import { setupListenersForStakedExpenditureExtensions } from './stakedExpenditure';
 import { setupListenersForStreamingPaymentsExtensions } from './streamingPayments';
+import {
+  handleExtensionAddedToNetwork,
+  handleExtensionDeprecated,
+  handleExtensionInstalled,
+  handleExtensionUninstalled,
+  handleExtensionUpgraded,
+} from '~handlers';
 
 export * from './stakedExpenditure';
 export * from './stagedExpenditure';
@@ -34,6 +41,7 @@ export const addExtensionEventListener = (
   extensionId: Extension,
   extensionAddress: string,
   colonyAddress: string,
+  handler: EventHandler,
 ): void => {
   addEventListener({
     type: EventListenerType.Extension,
@@ -42,6 +50,7 @@ export const addExtensionEventListener = (
     colonyAddress,
     topics: [utils.id(eventSignature)],
     extensionHash: getExtensionHash(extensionId),
+    handler,
   });
 };
 
@@ -61,16 +70,20 @@ export const removeExtensionEventListeners = (
 };
 
 export const setupListenersForExtensions = async (): Promise<void> => {
-  const extensionEvents = [
-    ContractEventsSignatures.ExtensionAddedToNetwork,
-    ContractEventsSignatures.ExtensionInstalled,
-    ContractEventsSignatures.ExtensionUninstalled,
-    ContractEventsSignatures.ExtensionDeprecated,
-    ContractEventsSignatures.ExtensionUpgraded,
-  ];
+  const extensionEventHandlers = {
+    [ContractEventsSignatures.ExtensionAddedToNetwork]:
+      handleExtensionAddedToNetwork,
+    [ContractEventsSignatures.ExtensionInstalled]: handleExtensionInstalled,
+    [ContractEventsSignatures.ExtensionUninstalled]: handleExtensionUninstalled,
+    [ContractEventsSignatures.ExtensionDeprecated]: handleExtensionDeprecated,
+    [ContractEventsSignatures.ExtensionUpgraded]: handleExtensionUpgraded,
+  };
 
-  extensionEvents.forEach((eventSignature) =>
-    addNetworkEventListener(eventSignature),
+  Object.entries(extensionEventHandlers).forEach(([eventSignature, handler]) =>
+    addNetworkEventListener(
+      eventSignature as ContractEventsSignatures,
+      handler,
+    ),
   );
 
   setupListenerForOneTxPaymentExtensions();

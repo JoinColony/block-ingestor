@@ -1,4 +1,3 @@
-import { ContractEvent } from '~types';
 import { getExpenditureDatabaseId, toNumber, verbose } from '~utils';
 import { mutate } from '~amplifyClient';
 import {
@@ -8,15 +7,16 @@ import {
 } from '~graphql';
 
 import { getStreamingPaymentFromDB } from './helpers';
+import { EventHandler } from '~types';
+import { ExtensionEventListener } from '~eventListeners';
 
-export default async (event: ContractEvent): Promise<void> => {
-  const { colonyAddress } = event;
+export const handlePaymentTokenUpdated: EventHandler = async (
+  event,
+  listener,
+) => {
   const { streamingPaymentId, token: tokenAddress, amount } = event.args;
   const convertedNativeId = toNumber(streamingPaymentId);
-
-  if (!colonyAddress) {
-    return;
-  }
+  const { colonyAddress } = listener as ExtensionEventListener;
 
   const databaseId = getExpenditureDatabaseId(colonyAddress, convertedNativeId);
   const streamingPayment = await getStreamingPaymentFromDB(databaseId);

@@ -1,10 +1,11 @@
 import { mutate } from '~amplifyClient';
+import { ExtensionEventListener } from '~eventListeners';
 import {
   CreateStreamingPaymentDocument,
   CreateStreamingPaymentMutation,
   CreateStreamingPaymentMutationVariables,
 } from '~graphql';
-import { ContractEvent } from '~types';
+import { EventHandler } from '~types';
 import {
   getExpenditureDatabaseId,
   getStreamingPaymentsClient,
@@ -12,14 +13,14 @@ import {
   verbose,
 } from '~utils';
 
-export default async (event: ContractEvent): Promise<void> => {
-  const { colonyAddress, blockNumber } = event;
+export const handleStreamingPaymentCreated: EventHandler = async (
+  event,
+  listener,
+) => {
+  const { blockNumber } = event;
   const { streamingPaymentId } = event.args;
   const convertedNativeId = toNumber(streamingPaymentId);
-
-  if (!colonyAddress) {
-    return;
-  }
+  const { colonyAddress } = listener as ExtensionEventListener;
 
   const streamingPaymentsClient = await getStreamingPaymentsClient(
     colonyAddress,

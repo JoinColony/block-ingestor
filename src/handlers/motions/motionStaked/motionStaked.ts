@@ -1,4 +1,5 @@
-import { ContractEvent, MotionSide } from '~types';
+import { ExtensionEventListener } from '~eventListeners';
+import { EventHandler, MotionSide } from '~types';
 import { verbose, getVotingClient } from '~utils';
 import {
   getMotionDatabaseId,
@@ -15,19 +16,18 @@ import {
   updateUserStake,
 } from '../helpers';
 
-export default async (event: ContractEvent): Promise<void> => {
+export const handleMotionStaked: EventHandler = async (
+  event,
+  listener,
+): Promise<void> => {
   const {
-    colonyAddress,
     logIndex,
     transactionHash,
     args: { vote, amount, staker, motionId },
     timestamp,
     blockNumber,
   } = event;
-
-  if (!colonyAddress) {
-    return;
-  }
+  const { colonyAddress } = listener as ExtensionEventListener;
 
   await updateUserColonyStake(staker, colonyAddress, amount);
 

@@ -1,6 +1,7 @@
 import { BigNumber, constants } from 'ethers';
+import { ExtensionEventListener } from '~eventListeners';
 
-import { ContractEvent, MotionEvents } from '~types';
+import { EventHandler, MotionEvents } from '~types';
 import { getVotingClient } from '~utils';
 
 import {
@@ -16,19 +17,15 @@ import {
   updateColonyUnclaimedStakes,
 } from './helpers';
 
-export default async (event: ContractEvent): Promise<void> => {
+export const handleMotionFinalized: EventHandler = async (event, listener) => {
   const {
-    colonyAddress,
     logIndex,
     transactionHash,
     args: { motionId, action },
     blockNumber,
     timestamp,
   } = event;
-
-  if (!colonyAddress) {
-    return;
-  }
+  const { colonyAddress } = listener as ExtensionEventListener;
 
   const votingClient = await getVotingClient(colonyAddress);
 

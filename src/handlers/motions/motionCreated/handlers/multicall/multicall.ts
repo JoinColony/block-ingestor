@@ -49,11 +49,11 @@ const decodeFunctions = (
 };
 
 export const handleMulticallMotion = async (
+  colonyAddress: string,
   event: ContractEvent,
   parsedAction: TransactionDescription,
   gasEstimate: BigNumber,
 ): Promise<void> => {
-  const { colonyAddress = '' } = event ?? {};
   const colonyClient = await getCachedColonyClient(colonyAddress);
 
   if (!colonyClient) {
@@ -75,6 +75,7 @@ export const handleMulticallMotion = async (
   for (const [validator, handler] of multicallHandlers) {
     if (validator({ decodedFunctions })) {
       handler({
+        colonyAddress,
         event,
         decodedFunctions,
         gasEstimate: updatedGasEstimate,

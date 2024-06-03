@@ -1,4 +1,4 @@
-import { ContractEvent, MotionSide } from '~types';
+import { EventHandler, MotionSide } from '~types';
 import { getVotingClient, verbose } from '~utils';
 import {
   getMotionDatabaseId,
@@ -6,17 +6,17 @@ import {
   updateMotionInDB,
 } from '../helpers';
 import { VoterRecord } from '~graphql';
+import { ExtensionEventListener } from '~eventListeners';
 
-export default async (event: ContractEvent): Promise<void> => {
+export const handleMotionVoteRevealed: EventHandler = async (
+  event,
+  listener,
+) => {
   const {
-    colonyAddress,
     args: { motionId, voter, vote },
     blockNumber,
   } = event;
-
-  if (!colonyAddress) {
-    return;
-  }
+  const { colonyAddress } = listener as ExtensionEventListener;
 
   const votingClient = await getVotingClient(colonyAddress);
 

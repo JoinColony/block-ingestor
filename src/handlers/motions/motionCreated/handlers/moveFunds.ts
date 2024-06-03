@@ -12,15 +12,12 @@ import {
 import { createMotionInDB } from '../helpers';
 
 export const handleMoveFundsMotion = async (
+  colonyAddress: string,
   event: ContractEvent,
   parsedAction: TransactionDescription,
   gasEstimate: BigNumber,
 ): Promise<void> => {
-  const { colonyAddress, blockNumber } = event;
-
-  if (!colonyAddress) {
-    return;
-  }
+  const { blockNumber } = event;
 
   const { name, args: actionArgs } = parsedAction;
 
@@ -57,7 +54,7 @@ export const handleMoveFundsMotion = async (
     });
   }
 
-  await createMotionInDB(event, {
+  await createMotionInDB(colonyAddress, event, {
     type: motionNameMapping[name],
     tokenAddress,
     amount: amount.toString(),

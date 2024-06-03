@@ -1,4 +1,5 @@
 import { mutate, query } from '~amplifyClient';
+import { ExtensionEventListener } from '~eventListeners';
 import {
   GetExpenditureMetadataDocument,
   GetExpenditureMetadataQuery,
@@ -7,7 +8,7 @@ import {
   UpdateExpenditureMetadataMutation,
   UpdateExpenditureMetadataMutationVariables,
 } from '~graphql';
-import { ContractEvent } from '~types';
+import { EventHandler } from '~types';
 import {
   getExpenditureDatabaseId,
   insertAtIndex,
@@ -16,16 +17,14 @@ import {
   verbose,
 } from '~utils';
 
-export default async (event: ContractEvent): Promise<void> => {
-  const { colonyAddress } = event;
+export const handleStagedPaymentReleased: EventHandler = async (
+  event,
+  listener,
+) => {
   const { expenditureId, slot } = event.args;
   const convertedExpenditureId = toNumber(expenditureId);
   const convertedSlot = toNumber(slot);
-
-  if (!colonyAddress) {
-    output('Colony address missing for StagedPaymentReleased event');
-    return;
-  }
+  const { colonyAddress } = listener as ExtensionEventListener;
 
   const databaseId = getExpenditureDatabaseId(
     colonyAddress,

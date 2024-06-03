@@ -1,10 +1,6 @@
 import { Log } from '@ethersproject/abstract-provider';
 import { blocksMap, getLatestSeenBlockNumber } from '~blockListener';
-import {
-  getAdditionalContractEventProperties,
-  getMatchingListener,
-} from '~eventListeners';
-import eventProcessor from '~eventProcessor';
+import { getMatchingListeners } from '~eventListeners';
 import { getInterfaceByListener } from '~interfaces';
 import provider from '~provider';
 import {
@@ -181,38 +177,33 @@ export const processNextBlock = async (): Promise<void> => {
     }
 
     for (const log of logs) {
-      // For each log, try to find a matching listener to establish if we should handle or dismiss it
-      const listener = getMatchingListener(log.topics, log.address);
-      if (!listener) {
+      // Find listeners that match the log
+      const listeners = getMatchingListeners(log.topics, log.address);
+      if (!listeners.length) {
         continue;
       }
 
-      // In order to parse the log, we need an ethers interface
-      const iface = getInterfaceByListener(listener);
-      if (!iface) {
-        output(
-          `Failed to get an interface for a log with listener type ${listener.type}`,
-        );
-        continue;
-      }
+      for (const listener of listeners) {
+        // In order to parse the log, we need an ethers interface
+        const iface = getInterfaceByListener(listener);
+        if (!iface) {
+          output(
+            `Failed to get an interface for a log with listener type ${listener.type}`,
+          );
+          continue;
+        }
 
-      // Depending on the listener type, we might want to "attach" some additional properties to the mapped event
-      const additionalProperties =
-        getAdditionalContractEventProperties(listener);
-      const event = await mapLogToContractEvent(
-        log,
-        iface,
-        additionalProperties,
-      );
-      if (!event) {
-        output(
-          `Failed to map log describing event ${listener.eventSignature} in transaction ${log.transactionHash} `,
-        );
-        continue;
-      }
+        const event = await mapLogToContractEvent(log, iface);
+        if (!event) {
+          output(
+            `Failed to map log describing event ${listener.eventSignature} in transaction ${log.transactionHash} `,
+          );
+          continue;
+        }
 
-      // Call the processor in a blocking way to ensure events get processed sequentially
-      await eventProcessor(event);
+        // Call the handler in a blocking way to ensure events get processed sequentially
+        await listener.handler(event, listener);
+      }
     }
 
     verbose('processed block', currentBlockNumber);

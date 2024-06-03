@@ -6,19 +6,17 @@ import { getColonyTokenAddress, getDomainDatabaseId } from '~utils';
 import { createMotionInDB } from '../helpers';
 
 export const handleUnlockTokenMotion = async (
+  colonyAddress: string,
   event: ContractEvent,
   parsedAction: TransactionDescription,
   gasEstimate: BigNumber,
 ): Promise<void> => {
-  const { colonyAddress, blockNumber } = event;
-  if (!colonyAddress) {
-    return;
-  }
+  const { blockNumber } = event;
 
   const { name } = parsedAction;
   const tokenAddress = await getColonyTokenAddress(colonyAddress, blockNumber);
 
-  await createMotionInDB(event, {
+  await createMotionInDB(colonyAddress, event, {
     type: motionNameMapping[name],
     fromDomainId: getDomainDatabaseId(colonyAddress, Id.RootDomain),
     tokenAddress,

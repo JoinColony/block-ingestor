@@ -7,13 +7,14 @@ import { toNumber } from '~utils';
 import { createMotionInDB } from '../helpers';
 
 export const handleNetworkUpgradeMotion = async (
+  colonyAddress: string,
   event: ContractEvent,
   parsedAction: TransactionDescription,
   gasEstimate: BigNumber,
 ): Promise<void> => {
   const { name, args: actionArgs } = parsedAction;
   const newVersion = actionArgs[0];
-  await createMotionInDB(event, {
+  await createMotionInDB(colonyAddress, event, {
     type: motionNameMapping[name],
     newColonyVersion: toNumber(newVersion),
     gasEstimate: gasEstimate.toString(),

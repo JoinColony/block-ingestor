@@ -1,4 +1,5 @@
-import { ContractEvent } from '~types';
+import { ExtensionEventListener } from '~eventListeners';
+import { EventHandler } from '~types';
 import { verbose, getVotingClient } from '~utils';
 
 import {
@@ -7,16 +8,12 @@ import {
   updateMotionInDB,
 } from '../helpers';
 
-export default async (event: ContractEvent): Promise<void> => {
+export const handleMotionEventSet: EventHandler = async (event, listener) => {
   const {
-    colonyAddress,
     args: { motionId, eventIndex },
     timestamp,
   } = event;
-
-  if (!colonyAddress) {
-    return;
-  }
+  const { colonyAddress } = listener as ExtensionEventListener;
 
   const votingClient = await getVotingClient(colonyAddress);
 

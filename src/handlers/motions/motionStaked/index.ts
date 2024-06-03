@@ -1,1 +1,1 @@
-export { default } from './motionStaked';
+export * from './motionStaked';

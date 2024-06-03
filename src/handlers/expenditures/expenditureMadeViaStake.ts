@@ -1,4 +1,5 @@
 import { mutate } from '~amplifyClient';
+import { ExtensionEventListener } from '~eventListeners';
 import {
   CreateUserStakeDocument,
   CreateUserStakeMutation,
@@ -10,15 +11,19 @@ import {
   UpdateExpenditureMutation,
   UpdateExpenditureMutationVariables,
 } from '~graphql';
-import { ContractEvent } from '~types';
+import { EventHandler } from '~types';
 import { getExpenditureDatabaseId, output, toNumber, verbose } from '~utils';
 import { getUserStakeDatabaseId } from '~utils/stakes';
 import { getExpenditureFromDB } from './helpers';
 
-export default async (event: ContractEvent): Promise<void> => {
-  const { colonyAddress } = event;
+export const handleExpenditureMadeViaStake: EventHandler = async (
+  event,
+  listener,
+) => {
+  const { transactionHash } = event;
   const { expenditureId, stake, creator } = event.args;
   const convertedExpenditureId = toNumber(expenditureId);
+  const { colonyAddress } = listener as ExtensionEventListener;
 
   if (!colonyAddress) {
     return;
@@ -37,10 +42,7 @@ export default async (event: ContractEvent): Promise<void> => {
     return;
   }
 
-  const stakeDatabaseId = getUserStakeDatabaseId(
-    creator,
-    event.transactionHash,
-  );
+  const stakeDatabaseId = getUserStakeDatabaseId(creator, transactionHash);
 
   await mutate<UpdateExpenditureMutation, UpdateExpenditureMutationVariables>(
     UpdateExpenditureDocument,
@@ -58,7 +60,7 @@ export default async (event: ContractEvent): Promise<void> => {
     {
       input: {
         id: stakeDatabaseId,
-        actionId: event.transactionHash,
+        actionId: transactionHash,
         amount: stake.toString(),
         userAddress: creator,
         colonyAddress,
@@ -71,7 +73,7 @@ export default async (event: ContractEvent): Promise<void> => {
     UpdateColonyActionDocument,
     {
       input: {
-        id: event.transactionHash,
+        id: transactionHash,
         showInActionsList: true,
         initiatorAddress: creator,
       },

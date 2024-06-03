@@ -1,4 +1,4 @@
-import { ContractEvent } from '~types';
+import { EventHandler } from '~types';
 import {
   getExpenditureDatabaseId,
   toNumber,
@@ -13,16 +13,23 @@ import {
   UpdateExpenditureMutation,
   UpdateExpenditureMutationVariables,
 } from '~graphql';
+import { EventListenerType } from '~eventListeners';
 
-export default async (event: ContractEvent): Promise<void> => {
+export const handleExpenditureCancelled: EventHandler = async (
+  event,
+  listener,
+) => {
   const { expenditureId, agent: initiatorAddress } = event.args;
   const convertedExpenditureId = toNumber(expenditureId);
 
   /**
    * @NOTE: This event can be emitted by either colony or StakedExpenditure extension
-   * Depending on that, the colony address will be accessible under `colonyAddress` or `contractAddress`
+   * Depending on that, the colony address can be accessed from the listener or the event
    */
-  const colonyAddress = event.colonyAddress ?? event.contractAddress;
+  const colonyAddress =
+    listener.type === EventListenerType.Extension
+      ? listener.colonyAddress
+      : event.contractAddress;
 
   const databaseId = getExpenditureDatabaseId(
     colonyAddress,

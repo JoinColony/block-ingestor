@@ -11,6 +11,7 @@ import {
 import { createMotionInDB } from '../helpers';
 
 export const handleMetadataDeltaMotion = async (
+  colonyAddress: string,
   event: ContractEvent,
   desc: TransactionDescription,
   gasEstimate: BigNumber,
@@ -30,7 +31,7 @@ export const handleMetadataDeltaMotion = async (
     }
 
     if (isAddVerifiedMembersOperation(operation)) {
-      await createMotionInDB(event, {
+      await createMotionInDB(colonyAddress, event, {
         type: ColonyActionType.AddVerifiedMembersMotion,
         members: operation.payload,
         gasEstimate: gasEstimate.toString(),
@@ -38,7 +39,7 @@ export const handleMetadataDeltaMotion = async (
     }
 
     if (isRemoveVerifiedMembersOperation(operation)) {
-      await createMotionInDB(event, {
+      await createMotionInDB(colonyAddress, event, {
         type: ColonyActionType.RemoveVerifiedMembersMotion,
         members: operation.payload,
         gasEstimate: gasEstimate.toString(),

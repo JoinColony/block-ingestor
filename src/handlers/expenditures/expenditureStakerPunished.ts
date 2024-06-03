@@ -1,12 +1,16 @@
-import { ContractEvent } from '~types';
+import { ExtensionEventListener } from '~eventListeners';
+import { EventHandler } from '~types';
 import { getExpenditureDatabaseId, toNumber, verbose } from '~utils';
 
 import { updateExpenditureStake } from './helpers';
 
-export default async (event: ContractEvent): Promise<void> => {
-  const { colonyAddress } = event;
+export const handleExpenditureStakerPunished: EventHandler = async (
+  event,
+  listener,
+) => {
   const { expenditureId, punished } = event.args;
   const convertedExpenditureId = toNumber(expenditureId);
+  const { colonyAddress } = listener as ExtensionEventListener;
 
   if (!colonyAddress) {
     return;
