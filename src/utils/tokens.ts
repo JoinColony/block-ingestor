@@ -1,3 +1,4 @@
+import { constants } from 'ethers';
 import { BlockTag } from '@ethersproject/abstract-provider';
 
 import { mutate, query } from '~amplifyClient';
@@ -42,6 +43,56 @@ export const getExistingTokenAddresses = (colony: Colony): string[] =>
   colony.tokens?.items
     .map((tokenItem) => tokenItem?.tokenAddress)
     .filter((item): item is string => !!item) ?? [];
+
+interface ModifiedTokenAddresses {
+  added: string[];
+  removed: string[];
+}
+
+export const getModifiedTokenAddresses = (
+  colony: Colony,
+  updatedTokenAddresses?: string[] | null,
+): ModifiedTokenAddresses => {
+  const nativeTokenAddress = colony.nativeToken.tokenAddress;
+  const existingTokenAddresses = getExistingTokenAddresses(colony);
+
+  const modifiedTokenAddresses: ModifiedTokenAddresses = {
+    added: [],
+    removed: [],
+  };
+
+  if (!updatedTokenAddresses) {
+    return modifiedTokenAddresses;
+  }
+
+  const prevAddresses = new Set(existingTokenAddresses);
+  const newAddresses = new Set(updatedTokenAddresses);
+
+  // If a new address is not in the previous address set it has been added.
+  // Ignore the chain's default and colony native tokens.
+  newAddresses.forEach((address) => {
+    const hasChanged = !prevAddresses.has(address);
+    const isSecondaryToken =
+      address !== nativeTokenAddress && address !== constants.AddressZero;
+
+    if (isSecondaryToken && hasChanged) {
+      modifiedTokenAddresses.added.push(address);
+    }
+  });
+
+  // If a previous address is not in the new address set, it has been removed.
+  prevAddresses.forEach((address) => {
+    const hasChanged = !newAddresses.has(address);
+    const isSecondaryToken =
+      address !== nativeTokenAddress && address !== constants.AddressZero;
+
+    if (isSecondaryToken && hasChanged) {
+      modifiedTokenAddresses.removed.push(address);
+    }
+  });
+
+  return modifiedTokenAddresses;
+};
 
 export const updateColonyTokens = async (
   colony: Colony,

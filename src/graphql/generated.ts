@@ -423,6 +423,8 @@ export enum ColonyActionType {
   /** An action related to the creation of safe transactions via Safe Control */
   MakeArbitraryTransaction = 'MAKE_ARBITRARY_TRANSACTION',
   MakeArbitraryTransactionsMotion = 'MAKE_ARBITRARY_TRANSACTIONS_MOTION',
+  /** An action related to adding / removing approved colony tokens */
+  ManageTokens = 'MANAGE_TOKENS',
   /** An action related to minting tokens within a Colony */
   MintTokens = 'MINT_TOKENS',
   /** An action related to minting tokens within a Colony via a motion */
@@ -8372,6 +8374,7 @@ export type VotingReputationParamsInput = {
 export type ColonyFragment = {
   __typename?: 'Colony';
   colonyAddress: string;
+  nativeToken: { __typename?: 'Token'; tokenAddress: string };
   tokens?: {
     __typename?: 'ModelColonyTokensConnection';
     items: Array<{
@@ -8613,6 +8616,8 @@ export type DomainMetadataFragment = {
     newDescription?: string | null;
   }> | null;
 };
+
+export type TokenFragment = { __typename?: 'Token'; tokenAddress: string };
 
 export type CreateColonyActionMutationVariables = Exact<{
   input: CreateColonyActionInput;
@@ -9250,6 +9255,7 @@ export type GetColonyQuery = {
   getColony?: {
     __typename?: 'Colony';
     colonyAddress: string;
+    nativeToken: { __typename?: 'Token'; tokenAddress: string };
     tokens?: {
       __typename?: 'ModelColonyTokensConnection';
       items: Array<{
@@ -9934,9 +9940,17 @@ export type GetColonyStakeQuery = {
   getColonyStake?: { __typename?: 'ColonyStake'; totalAmount: string } | null;
 };
 
+export const Token = gql`
+  fragment Token on Token {
+    tokenAddress: id
+  }
+`;
 export const Colony = gql`
   fragment Colony on Colony {
     colonyAddress: id
+    nativeToken {
+      ...Token
+    }
     tokens {
       items {
         id
@@ -9962,6 +9976,7 @@ export const Colony = gql`
       nextToken
     }
   }
+  ${Token}
 `;
 export const ColonyMetadata = gql`
   fragment ColonyMetadata on ColonyMetadata {
