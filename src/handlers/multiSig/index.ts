@@ -3,3 +3,4 @@ export { default as handleMultiSigGlobalThresholdSet } from './globalThresholdSe
 export { default as handleDomainSkillThresholdSet } from './domainSkillThresholdSet';
 export { default as handleApprovalChanged } from './approvalChanged/approvalChanged';
 export { default as handleMultiSigMotionCanceled } from './motionCanceled';
+export { default as handleMultiSigMotionExecuted } from './multiSigExecuted/multiSigExecuted';

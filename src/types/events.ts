@@ -71,7 +71,6 @@ export enum ContractEventsSignatures {
   MotionEventSet = 'MotionEventSet(uint256,uint256)',
 
   // Multisig
-
   MultisigRoleSet = 'MultisigRoleSet(address,address,uint256,uint256,bool)',
   MultisigMotionExecuted = 'MotionExecuted(address,uint256,bool)',
   MultisigMotionCancelled = 'MotionCancelled(address,uint256)',
