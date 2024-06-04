@@ -3,6 +3,7 @@ import { ExtensionEventListener } from '~eventListeners';
 
 import { EventHandler, MotionEvents } from '~types';
 import { getVotingClient } from '~utils';
+import { linkPendingMetadata } from '~utils/colonyMetadata';
 
 import {
   getMotionDatabaseId,
@@ -13,7 +14,6 @@ import {
 
 import {
   getStakerReward,
-  linkPendingMetadata,
   updateColonyUnclaimedStakes,
   updateAmountToExcludeNetworkFee,
 } from './helpers';
@@ -57,7 +57,12 @@ export const handleMotionFinalized: EventHandler = async (event, listener) => {
       Number(yayPercentage) > Number(nayPercentage);
 
     if (yayWon) {
-      await linkPendingMetadata(action, colonyAddress, finalizedMotion);
+      await linkPendingMetadata(
+        action,
+        colonyAddress,
+        finalizedMotion.id,
+        false,
+      );
       await updateAmountToExcludeNetworkFee(
         action,
         colonyAddress,
