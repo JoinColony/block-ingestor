@@ -5,10 +5,10 @@ import {
   getOneTxPaymentClient,
   getStagedExpenditureClient,
   getStakedExpenditureClient,
+  parseAction,
   verbose,
 } from '~utils';
 import { handleMintTokensMultiSig } from './handlers/mintTokens';
-import { parseMultiSigAction } from './helpers';
 
 export default async (event: ContractEvent): Promise<void> => {
   const {
@@ -47,7 +47,7 @@ export default async (event: ContractEvent): Promise<void> => {
     verbose(`No action data in multiSig motion: ${motionId}`);
   }
 
-  const parsedAction = parseMultiSigAction(actionData, {
+  const parsedAction = parseAction(actionData, {
     colonyClient,
     oneTxPaymentClient,
     stakedExpenditureClient,

@@ -2,6 +2,7 @@ import { BigNumber, constants } from 'ethers';
 
 import { ContractEvent, MotionEvents } from '~types';
 import { getVotingClient } from '~utils';
+import { linkPendingMetadata } from '~utils/colonyMetadata';
 
 import {
   getMotionDatabaseId,
@@ -10,11 +11,7 @@ import {
   getMessageKey,
 } from '../helpers';
 
-import {
-  getStakerReward,
-  linkPendingMetadata,
-  updateColonyUnclaimedStakes,
-} from './helpers';
+import { getStakerReward, updateColonyUnclaimedStakes } from './helpers';
 
 export default async (event: ContractEvent): Promise<void> => {
   const {
@@ -59,7 +56,12 @@ export default async (event: ContractEvent): Promise<void> => {
       Number(yayPercentage) > Number(nayPercentage);
 
     if (yayWon) {
-      await linkPendingMetadata(action, colonyAddress, finalizedMotion);
+      await linkPendingMetadata(
+        action,
+        colonyAddress,
+        finalizedMotion.id,
+        false,
+      );
     }
 
     const updatedStakerRewards = await Promise.all(

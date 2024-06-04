@@ -1,22 +1,16 @@
 import { BigNumber } from 'ethers';
-import { TransactionDescription } from 'ethers/lib/utils';
-import {
-  AnyColonyClient,
-  AnyOneTxPaymentClient,
-  AnyStakedExpenditureClient,
-  AnyStagedExpenditureClient,
-  AnyVotingReputationClient,
-} from '@colony/colony-js';
+import { AnyVotingReputationClient } from '@colony/colony-js';
 
-import { ColonyOperations, ContractEvent, MotionEvents } from '~types';
-import { getDomainDatabaseId, getVotingClient, verbose } from '~utils';
+import { ContractEvent, MotionEvents } from '~types';
+import {
+  createColonyAction,
+  getDomainDatabaseId,
+  getVotingClient,
+} from '~utils';
 import { GraphQLFnReturn, mutate } from '~amplifyClient';
 import {
   ColonyMotion,
-  CreateColonyActionDocument,
   CreateColonyActionInput,
-  CreateColonyActionMutation,
-  CreateColonyActionMutationVariables,
   CreateColonyMotionDocument,
   CreateColonyMotionInput,
   CreateColonyMotionMutation,
@@ -26,7 +20,6 @@ import {
   CreateMotionMessageMutation,
   CreateMotionMessageMutationVariables,
 } from '~graphql';
-import { SIMPLE_DECISIONS_ACTION_CODE } from '~constants';
 import networkClient from '~networkClient';
 
 import {
@@ -35,46 +28,6 @@ import {
   getUserMinStake,
   getMessageKey,
 } from '../helpers';
-
-export interface SimpleTransactionDescription {
-  name: ColonyOperations.SimpleDecision;
-}
-
-interface MotionActionClients {
-  colonyClient?: AnyColonyClient | null;
-  oneTxPaymentClient?: AnyOneTxPaymentClient | null;
-  stakedExpenditureClient?: AnyStakedExpenditureClient | null;
-  stagedExpenditureClient?: AnyStagedExpenditureClient | null;
-}
-
-export const parseAction = (
-  action: string,
-  clients: MotionActionClients,
-): TransactionDescription | SimpleTransactionDescription | undefined => {
-  if (action === SIMPLE_DECISIONS_ACTION_CODE) {
-    return {
-      name: ColonyOperations.SimpleDecision,
-    };
-  }
-
-  for (const key in clients) {
-    const client = clients[key as keyof MotionActionClients];
-    if (!client) {
-      continue;
-    }
-    // Return the first time a client can successfully parse the motion
-    try {
-      return client.interface.parseTransaction({
-        data: action,
-      });
-    } catch {
-      continue;
-    }
-  }
-
-  verbose(`Unable to parse ${action}`);
-  return undefined;
-};
 
 interface GetMotionDataArgs {
   transactionHash: string;
@@ -208,21 +161,6 @@ const createMotionMessage = async (
       ...initialMotionMessage,
     },
   });
-};
-
-const createColonyAction = async (
-  actionData: CreateColonyActionInput,
-  blockTimestamp: number,
-): Promise<void> => {
-  await mutate<CreateColonyActionMutation, CreateColonyActionMutationVariables>(
-    CreateColonyActionDocument,
-    {
-      input: {
-        ...actionData,
-        createdAt: new Date(blockTimestamp * 1000).toISOString(),
-      },
-    },
-  );
 };
 
 type MotionFields = Omit<

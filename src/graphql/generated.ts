@@ -942,6 +942,8 @@ export type ColonyMultiSig = {
   __typename?: 'ColonyMultiSig';
   action?: Maybe<ColonyAction>;
   createdAt: Scalars['AWSDateTime'];
+  /** The timestamp when the motion was finalized */
+  finalizedAt?: Maybe<Scalars['AWSDateTime']>;
   /**
    * The internal database id of the multiSig
    * To ensure uniqueness, we format as: `chainId-multiSigExtnAddress_nativeMultiSigId`
@@ -1389,6 +1391,7 @@ export type CreateColonyMotionInput = {
 };
 
 export type CreateColonyMultiSigInput = {
+  finalizedAt?: InputMaybe<Scalars['AWSDateTime']>;
   id?: InputMaybe<Scalars['ID']>;
   isDecision: Scalars['Boolean'];
   isExecuted: Scalars['Boolean'];
@@ -2844,6 +2847,7 @@ export type ModelColonyMotionFilterInput = {
 
 export type ModelColonyMultiSigConditionInput = {
   and?: InputMaybe<Array<InputMaybe<ModelColonyMultiSigConditionInput>>>;
+  finalizedAt?: InputMaybe<ModelStringInput>;
   isDecision?: InputMaybe<ModelBooleanInput>;
   isExecuted?: InputMaybe<ModelBooleanInput>;
   isRejected?: InputMaybe<ModelBooleanInput>;
@@ -2864,6 +2868,7 @@ export type ModelColonyMultiSigConnection = {
 
 export type ModelColonyMultiSigFilterInput = {
   and?: InputMaybe<Array<InputMaybe<ModelColonyMultiSigFilterInput>>>;
+  finalizedAt?: InputMaybe<ModelStringInput>;
   id?: InputMaybe<ModelIdInput>;
   isDecision?: InputMaybe<ModelBooleanInput>;
   isExecuted?: InputMaybe<ModelBooleanInput>;
@@ -3900,6 +3905,7 @@ export type ModelSubscriptionColonyMultiSigFilterInput = {
   and?: InputMaybe<
     Array<InputMaybe<ModelSubscriptionColonyMultiSigFilterInput>>
   >;
+  finalizedAt?: InputMaybe<ModelSubscriptionStringInput>;
   id?: InputMaybe<ModelSubscriptionIdInput>;
   isDecision?: InputMaybe<ModelSubscriptionBooleanInput>;
   isExecuted?: InputMaybe<ModelSubscriptionBooleanInput>;
@@ -8254,6 +8260,7 @@ export type UpdateColonyMotionInput = {
 };
 
 export type UpdateColonyMultiSigInput = {
+  finalizedAt?: InputMaybe<Scalars['AWSDateTime']>;
   id: Scalars['ID'];
   isDecision?: InputMaybe<Scalars['Boolean']>;
   isExecuted?: InputMaybe<Scalars['Boolean']>;
