@@ -1,20 +1,9 @@
-import {
-  AnyColonyClient,
-  AnyMultisigPermissionsClient,
-  AnyOneTxPaymentClient,
-  AnyStagedExpenditureClient,
-  AnyStakedExpenditureClient,
-} from '@colony/colony-js';
+import { AnyMultisigPermissionsClient } from '@colony/colony-js';
 import { BigNumber } from 'ethers';
-import { TransactionDescription } from 'ethers/lib/utils';
 import { GraphQLFnReturn, mutate, query } from '~amplifyClient';
-import { SIMPLE_DECISIONS_ACTION_CODE } from '~constants';
 import {
   ColonyMultiSig,
-  CreateColonyActionDocument,
   CreateColonyActionInput,
-  CreateColonyActionMutation,
-  CreateColonyActionMutationVariables,
   CreateColonyMultiSigDocument,
   CreateColonyMultiSigInput,
   CreateColonyMultiSigMutationVariables,
@@ -24,54 +13,14 @@ import {
 } from '~graphql';
 import networkClient from '~networkClient';
 import { getChainId } from '~provider';
-import { ColonyOperations, ContractEvent } from '~types';
+import { ContractEvent } from '~types';
 import {
   getDomainDatabaseId,
   getMultiSigClient,
   output,
-  verbose,
+  createColonyAction,
 } from '~utils';
 import { getMultiSigDatabaseId } from '../helpers';
-
-export interface SimpleTransactionDescription {
-  name: ColonyOperations.SimpleDecision;
-}
-
-interface MultiSigActionClients {
-  colonyClient?: AnyColonyClient | null;
-  oneTxPaymentClient?: AnyOneTxPaymentClient | null;
-  stakedExpenditureClient?: AnyStakedExpenditureClient | null;
-  stagedExpenditureClient?: AnyStagedExpenditureClient | null;
-}
-
-export const parseMultiSigAction = (
-  action: string,
-  clients: MultiSigActionClients,
-): TransactionDescription | SimpleTransactionDescription | undefined => {
-  if (action === SIMPLE_DECISIONS_ACTION_CODE) {
-    return {
-      name: ColonyOperations.SimpleDecision,
-    };
-  }
-
-  for (const key in clients) {
-    const client = clients[key as keyof MultiSigActionClients];
-    if (!client) {
-      continue;
-    }
-    // Return the first time a client can successfully parse the motion
-    try {
-      return client.interface.parseTransaction({
-        data: action,
-      });
-    } catch {
-      continue;
-    }
-  }
-
-  verbose(`Unable to parse multiSig: ${action}`);
-  return undefined;
-};
 
 const createColonyMultiSig = async (
   motionData: CreateColonyMultiSigInput,
@@ -84,21 +33,6 @@ const createColonyMultiSig = async (
       ...motionData,
     },
   });
-};
-
-const createColonyAction = async (
-  actionData: CreateColonyActionInput,
-  blockTimestamp: number,
-): Promise<void> => {
-  await mutate<CreateColonyActionMutation, CreateColonyActionMutationVariables>(
-    CreateColonyActionDocument,
-    {
-      input: {
-        ...actionData,
-        createdAt: new Date(blockTimestamp * 1000).toISOString(),
-      },
-    },
-  );
 };
 
 interface GetMultiSigDataArgs {
