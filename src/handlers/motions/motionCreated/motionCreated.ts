@@ -9,8 +9,9 @@ import {
   getOneTxPaymentClient,
   getVotingClient,
   verbose,
+  parseAction,
+  SimpleTransactionDescription,
 } from '~utils';
-import { SimpleTransactionDescription, parseAction } from './helpers';
 import {
   handleEditDomainMotion,
   handleAddDomainMotion,
