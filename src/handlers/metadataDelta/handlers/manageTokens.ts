@@ -30,6 +30,10 @@ export const handleManageTokens = async (
     tokenAddresses,
   );
 
+  const unaffectedTokenAddresses = existingTokenAddresses.filter(
+    (address) => !modifiedTokenAddresses.removed.includes(address),
+  );
+
   await updateColonyTokens(
     colony,
     existingTokenAddresses,
@@ -42,7 +46,7 @@ export const handleManageTokens = async (
     approvedTokenChanges: {
       added: modifiedTokenAddresses.added,
       removed: modifiedTokenAddresses.removed,
-      existing: existingTokenAddresses,
+      unaffected: unaffectedTokenAddresses,
     },
   });
 };
