@@ -43,17 +43,18 @@ export type Annotation = {
   updatedAt: Scalars['AWSDateTime'];
 };
 
+/** Token IDs */
 export type ApprovedTokenChanges = {
   __typename?: 'ApprovedTokenChanges';
   added?: Maybe<Array<Maybe<Scalars['ID']>>>;
-  existing?: Maybe<Array<Maybe<Scalars['ID']>>>;
   removed?: Maybe<Array<Maybe<Scalars['ID']>>>;
+  unaffected?: Maybe<Array<Maybe<Scalars['ID']>>>;
 };
 
 export type ApprovedTokenChangesInput = {
   added?: InputMaybe<Array<InputMaybe<Scalars['ID']>>>;
-  existing?: InputMaybe<Array<InputMaybe<Scalars['ID']>>>;
   removed?: InputMaybe<Array<InputMaybe<Scalars['ID']>>>;
+  unaffected?: InputMaybe<Array<InputMaybe<Scalars['ID']>>>;
 };
 
 /**
