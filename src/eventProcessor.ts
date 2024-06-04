@@ -61,6 +61,7 @@ import {
   handleMultiSigGlobalThresholdSet,
   handleDomainSkillThresholdSet,
   handleMultiSigMotionCanceled,
+  handleMultiSigMotionExecuted,
 } from '~handlers/multiSig';
 
 dotenv.config();
@@ -193,8 +194,29 @@ export default async (event: ContractEvent): Promise<void> => {
       await handleMultiSigCreated(event);
       return;
     }
+
     case ContractEventsSignatures.MultisigApprovalChanged: {
       await handleApprovalChanged(event);
+      return;
+    }
+
+    case ContractEventsSignatures.MultisigGlobalThresholdSet: {
+      await handleMultiSigGlobalThresholdSet(event);
+      return;
+    }
+
+    case ContractEventsSignatures.MultisigDomainSkillThresholdSet: {
+      await handleDomainSkillThresholdSet(event);
+      return;
+    }
+
+    case ContractEventsSignatures.MultisigMotionCancelled: {
+      await handleMultiSigMotionCanceled(event);
+      return;
+    }
+
+    case ContractEventsSignatures.MultisigMotionExecuted: {
+      await handleMultiSigMotionExecuted(event);
       return;
     }
 
@@ -377,21 +399,6 @@ export default async (event: ContractEvent): Promise<void> => {
     case ContractEventsSignatures.LogSetOwner: {
       // We have to execute exactly the same logic as for LogSetAuthority
       await handleSetTokenAuthority(event);
-      return;
-    }
-
-    case ContractEventsSignatures.MultisigGlobalThresholdSet: {
-      await handleMultiSigGlobalThresholdSet(event);
-      return;
-    }
-
-    case ContractEventsSignatures.MultisigDomainSkillThresholdSet: {
-      await handleDomainSkillThresholdSet(event);
-      return;
-    }
-
-    case ContractEventsSignatures.MultisigMotionCancelled: {
-      await handleMultiSigMotionCanceled(event);
       return;
     }
 
