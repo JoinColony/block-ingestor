@@ -7,49 +7,20 @@ import {
   GetColonyActionByMotionIdDocument,
   GetColonyActionByMotionIdQuery,
   GetColonyActionByMotionIdQueryVariables,
-  GetColonyDecisionByActionIdDocument,
-  GetColonyDecisionByActionIdQuery,
-  GetColonyDecisionByActionIdQueryVariables,
   GetColonyMotionDocument,
   GetColonyMotionQuery,
   GetColonyMotionQueryVariables,
   UpdateColonyActionDocument,
-  UpdateColonyDecisionDocument,
-  UpdateColonyDecisionMutation,
-  UpdateColonyDecisionMutationVariables,
   UpdateColonyMotionDocument,
 } from '~graphql';
 import { MotionSide, MotionVote } from '~types';
 import { verbose, output } from '~utils';
+import { updateDecisionInDB } from '~utils/decisions';
 
 export * from './motionStaked/helpers';
 
 export const getMotionSide = (vote: BigNumber): MotionSide =>
   vote.eq(MotionVote.YAY) ? MotionSide.YAY : MotionSide.NAY;
-
-const updateDecisionInDB = async (
-  actionId: string,
-  decisionData: Omit<UpdateColonyDecisionMutationVariables, 'id'>,
-): Promise<void> => {
-  const { data } =
-    (await query<
-      GetColonyDecisionByActionIdQuery,
-      GetColonyDecisionByActionIdQueryVariables
-    >(GetColonyDecisionByActionIdDocument, {
-      actionId,
-    })) ?? {};
-
-  const decision = data?.getColonyDecisionByActionId?.items[0];
-
-  if (decision)
-    await mutate<
-      UpdateColonyDecisionMutation,
-      UpdateColonyDecisionMutationVariables
-    >(UpdateColonyDecisionDocument, {
-      id: decision.id,
-      ...decisionData,
-    });
-};
 
 export const updateMotionInDB = async (
   motionData: ColonyMotion,
