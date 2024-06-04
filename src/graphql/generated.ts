@@ -46,15 +46,15 @@ export type Annotation = {
 /** Token IDs */
 export type ApprovedTokenChanges = {
   __typename?: 'ApprovedTokenChanges';
-  added?: Maybe<Array<Maybe<Scalars['ID']>>>;
-  removed?: Maybe<Array<Maybe<Scalars['ID']>>>;
-  unaffected?: Maybe<Array<Maybe<Scalars['ID']>>>;
+  added?: Maybe<Array<Scalars['ID']>>;
+  removed?: Maybe<Array<Scalars['ID']>>;
+  unaffected?: Maybe<Array<Scalars['ID']>>;
 };
 
 export type ApprovedTokenChangesInput = {
-  added?: InputMaybe<Array<InputMaybe<Scalars['ID']>>>;
-  removed?: InputMaybe<Array<InputMaybe<Scalars['ID']>>>;
-  unaffected?: InputMaybe<Array<InputMaybe<Scalars['ID']>>>;
+  added?: InputMaybe<Array<Scalars['ID']>>;
+  removed?: InputMaybe<Array<Scalars['ID']>>;
+  unaffected?: InputMaybe<Array<Scalars['ID']>>;
 };
 
 /**
