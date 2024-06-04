@@ -42,13 +42,10 @@ fragment ColonyMetadata on ColonyMetadata {
     oldDisplayName
     newDisplayName
     hasAvatarChanged
-    hasWhitelistChanged
     haveTokensChanged
     hasDescriptionChanged
     haveExternalLinksChanged
   }
-  isWhitelistActivated
-  whitelistedAddresses
   modifiedTokenAddresses {
     added
     removed

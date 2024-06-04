@@ -224,7 +224,6 @@ export const createUniqueColony = async ({
         },
       },
       colonyMemberInviteCode: memberInviteCode, // above
-      whitelist: [initiatorAddress], // initiator user
     },
   });
 
@@ -244,7 +243,6 @@ export const createUniqueColony = async ({
     input: {
       id: checksummedAddress,
       displayName: colonyDisplayName,
-      isWhitelistActivated: false,
     },
   });
 
