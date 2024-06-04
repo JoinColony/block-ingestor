@@ -1495,11 +1495,12 @@ export type CreateColonyMotionInput = {
 };
 
 export type CreateColonyMultiSigInput = {
-  finalizedAt?: InputMaybe<Scalars['AWSDateTime']>;
+  executedAt?: InputMaybe<Scalars['AWSDateTime']>;
   id?: InputMaybe<Scalars['ID']>;
   isDecision: Scalars['Boolean'];
   isExecuted: Scalars['Boolean'];
   isRejected: Scalars['Boolean'];
+  isSuccess?: InputMaybe<Scalars['Boolean']>;
   multiSigDomainId: Scalars['ID'];
   nativeMultiSigDomainId: Scalars['String'];
   nativeMultiSigId: Scalars['ID'];
@@ -3000,10 +3001,11 @@ export type ModelColonyMotionFilterInput = {
 
 export type ModelColonyMultiSigConditionInput = {
   and?: InputMaybe<Array<InputMaybe<ModelColonyMultiSigConditionInput>>>;
-  finalizedAt?: InputMaybe<ModelStringInput>;
+  executedAt?: InputMaybe<ModelStringInput>;
   isDecision?: InputMaybe<ModelBooleanInput>;
   isExecuted?: InputMaybe<ModelBooleanInput>;
   isRejected?: InputMaybe<ModelBooleanInput>;
+  isSuccess?: InputMaybe<ModelBooleanInput>;
   multiSigDomainId?: InputMaybe<ModelIdInput>;
   nativeMultiSigDomainId?: InputMaybe<ModelStringInput>;
   nativeMultiSigId?: InputMaybe<ModelIdInput>;
@@ -3021,11 +3023,12 @@ export type ModelColonyMultiSigConnection = {
 
 export type ModelColonyMultiSigFilterInput = {
   and?: InputMaybe<Array<InputMaybe<ModelColonyMultiSigFilterInput>>>;
-  finalizedAt?: InputMaybe<ModelStringInput>;
+  executedAt?: InputMaybe<ModelStringInput>;
   id?: InputMaybe<ModelIdInput>;
   isDecision?: InputMaybe<ModelBooleanInput>;
   isExecuted?: InputMaybe<ModelBooleanInput>;
   isRejected?: InputMaybe<ModelBooleanInput>;
+  isSuccess?: InputMaybe<ModelBooleanInput>;
   multiSigDomainId?: InputMaybe<ModelIdInput>;
   nativeMultiSigDomainId?: InputMaybe<ModelStringInput>;
   nativeMultiSigId?: InputMaybe<ModelIdInput>;
@@ -4082,11 +4085,12 @@ export type ModelSubscriptionColonyMultiSigFilterInput = {
   and?: InputMaybe<
     Array<InputMaybe<ModelSubscriptionColonyMultiSigFilterInput>>
   >;
-  finalizedAt?: InputMaybe<ModelSubscriptionStringInput>;
+  executedAt?: InputMaybe<ModelSubscriptionStringInput>;
   id?: InputMaybe<ModelSubscriptionIdInput>;
   isDecision?: InputMaybe<ModelSubscriptionBooleanInput>;
   isExecuted?: InputMaybe<ModelSubscriptionBooleanInput>;
   isRejected?: InputMaybe<ModelSubscriptionBooleanInput>;
+  isSuccess?: InputMaybe<ModelSubscriptionBooleanInput>;
   multiSigDomainId?: InputMaybe<ModelSubscriptionIdInput>;
   nativeMultiSigDomainId?: InputMaybe<ModelSubscriptionStringInput>;
   nativeMultiSigId?: InputMaybe<ModelSubscriptionIdInput>;
@@ -8637,11 +8641,12 @@ export type UpdateColonyMotionInput = {
 };
 
 export type UpdateColonyMultiSigInput = {
-  finalizedAt?: InputMaybe<Scalars['AWSDateTime']>;
+  executedAt?: InputMaybe<Scalars['AWSDateTime']>;
   id: Scalars['ID'];
   isDecision?: InputMaybe<Scalars['Boolean']>;
   isExecuted?: InputMaybe<Scalars['Boolean']>;
   isRejected?: InputMaybe<Scalars['Boolean']>;
+  isSuccess?: InputMaybe<Scalars['Boolean']>;
   multiSigDomainId?: InputMaybe<Scalars['ID']>;
   nativeMultiSigDomainId?: InputMaybe<Scalars['String']>;
   nativeMultiSigId?: InputMaybe<Scalars['ID']>;
