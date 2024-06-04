@@ -43,6 +43,19 @@ export type Annotation = {
   updatedAt: Scalars['AWSDateTime'];
 };
 
+export type ApprovedTokenChanges = {
+  __typename?: 'ApprovedTokenChanges';
+  added?: Maybe<Array<Maybe<Scalars['ID']>>>;
+  existing?: Maybe<Array<Maybe<Scalars['ID']>>>;
+  removed?: Maybe<Array<Maybe<Scalars['ID']>>>;
+};
+
+export type ApprovedTokenChangesInput = {
+  added?: InputMaybe<Array<InputMaybe<Scalars['ID']>>>;
+  existing?: InputMaybe<Array<InputMaybe<Scalars['ID']>>>;
+  removed?: InputMaybe<Array<InputMaybe<Scalars['ID']>>>;
+};
+
 /**
  * Represents metadata related to a blockchain event
  * Applies to Colonies, Tokens and Events, but not all fields are revlant to all
@@ -222,6 +235,8 @@ export type ColonyAction = {
   annotation?: Maybe<Annotation>;
   /** The id of the associated annotation, if there is one */
   annotationId?: Maybe<Scalars['ID']>;
+  /** Approved tokens impacted by the action (used for manage tokens) */
+  approvedTokenChanges?: Maybe<ApprovedTokenChanges>;
   /** The block number where the action was recorded */
   blockNumber: Scalars['Int'];
   /** The Colony that the action belongs to */
@@ -1111,6 +1126,7 @@ export type CreateAnnotationInput = {
 export type CreateColonyActionInput = {
   amount?: InputMaybe<Scalars['String']>;
   annotationId?: InputMaybe<Scalars['ID']>;
+  approvedTokenChanges?: InputMaybe<ApprovedTokenChangesInput>;
   blockNumber: Scalars['Int'];
   colonyActionsId?: InputMaybe<Scalars['ID']>;
   colonyDecisionId?: InputMaybe<Scalars['ID']>;
@@ -7721,6 +7737,7 @@ export type UpdateAnnotationInput = {
 export type UpdateColonyActionInput = {
   amount?: InputMaybe<Scalars['String']>;
   annotationId?: InputMaybe<Scalars['ID']>;
+  approvedTokenChanges?: InputMaybe<ApprovedTokenChangesInput>;
   blockNumber?: InputMaybe<Scalars['Int']>;
   colonyActionsId?: InputMaybe<Scalars['ID']>;
   colonyDecisionId?: InputMaybe<Scalars['ID']>;

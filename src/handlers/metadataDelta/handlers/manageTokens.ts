@@ -39,9 +39,10 @@ export const handleManageTokens = async (
   await writeActionFromEvent(event, colonyAddress, {
     type: ColonyActionType.ManageTokens,
     initiatorAddress,
-    // @TODO: Add fields for these
-    // existingTokenAddresses
-    // addedTokens
-    // removedTokens
+    approvedTokenChanges: {
+      added: modifiedTokenAddresses.added,
+      removed: modifiedTokenAddresses.removed,
+      existing: existingTokenAddresses,
+    },
   });
 };
