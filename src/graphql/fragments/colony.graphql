@@ -52,8 +52,4 @@ fragment ColonyMetadata on ColonyMetadata {
   }
   isWhitelistActivated
   whitelistedAddresses
-  modifiedTokenAddresses {
-    added
-    removed
-  }
 }

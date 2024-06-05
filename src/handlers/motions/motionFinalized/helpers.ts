@@ -8,11 +8,9 @@ import {
   getCachedColonyClient,
   getColonyFromDB,
   getDomainDatabaseId,
-  getExistingTokenAddresses,
   getStakedExpenditureClient,
   getStagedExpenditureClient,
   output,
-  updateColonyTokens,
 } from '~utils';
 import { query, mutate } from '~amplifyClient';
 import {
@@ -198,7 +196,6 @@ const linkPendingColonyMetadataWithColony = async (
   }
 
   const {
-    haveTokensChanged,
     hasAvatarChanged,
     hasWhitelistChanged,
     newDisplayName,
@@ -242,21 +239,6 @@ const linkPendingColonyMetadataWithColony = async (
 
   if (haveExternalLinksChanged) {
     updatedMetadata.externalLinks = pendingColonyMetadata.externalLinks;
-  }
-
-  if (haveTokensChanged && pendingColonyMetadata.modifiedTokenAddresses) {
-    // If tokens have changed, update colony tokens
-    const colony = await getColonyFromDB(colonyAddress);
-
-    if (colony) {
-      const existingTokenAddresses = getExistingTokenAddresses(colony);
-
-      await updateColonyTokens(
-        colony,
-        existingTokenAddresses,
-        pendingColonyMetadata.modifiedTokenAddresses,
-      );
-    }
   }
 
   await mutate(UpdateColonyMetadataDocument, {
