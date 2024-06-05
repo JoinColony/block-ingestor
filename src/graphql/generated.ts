@@ -8736,6 +8736,59 @@ export type VotingReputationParamsInput = {
   voterRewardFraction: Scalars['String'];
 };
 
+export type ActionMetadataInfoFragment = {
+  __typename?: 'ColonyAction';
+  id: string;
+  colonyDecisionId?: string | null;
+  pendingDomainMetadata?: {
+    __typename?: 'DomainMetadata';
+    name: string;
+    color: DomainColor;
+    description?: string | null;
+    changelog?: Array<{
+      __typename?: 'DomainMetadataChangelog';
+      transactionHash: string;
+      oldName: string;
+      newName: string;
+      oldColor: DomainColor;
+      newColor: DomainColor;
+      oldDescription?: string | null;
+      newDescription?: string | null;
+    }> | null;
+  } | null;
+  pendingColonyMetadata?: {
+    __typename?: 'ColonyMetadata';
+    id: string;
+    displayName: string;
+    avatar?: string | null;
+    thumbnail?: string | null;
+    description?: string | null;
+    isWhitelistActivated?: boolean | null;
+    whitelistedAddresses?: Array<string> | null;
+    externalLinks?: Array<{
+      __typename?: 'ExternalLink';
+      name: ExternalLinks;
+      link: string;
+    }> | null;
+    changelog?: Array<{
+      __typename?: 'ColonyMetadataChangelog';
+      transactionHash: string;
+      oldDisplayName: string;
+      newDisplayName: string;
+      hasAvatarChanged: boolean;
+      hasWhitelistChanged: boolean;
+      haveTokensChanged: boolean;
+      hasDescriptionChanged?: boolean | null;
+      haveExternalLinksChanged?: boolean | null;
+    }> | null;
+    modifiedTokenAddresses?: {
+      __typename?: 'PendingModifiedTokenAddresses';
+      added?: Array<string> | null;
+      removed?: Array<string> | null;
+    } | null;
+  } | null;
+};
+
 export type ColonyFragment = {
   __typename?: 'Colony';
   colonyAddress: string;
@@ -8973,9 +9026,8 @@ export type DomainMetadataFragment = {
   }> | null;
 };
 
-<<<<<<< HEAD
 export type TokenFragment = { __typename?: 'Token'; tokenAddress: string };
-=======
+
 export type MultiSigUserSignatureFragment = {
   __typename?: 'MultiSigUserSignature';
   id: string;
@@ -9012,7 +9064,6 @@ export type ColonyMultiSigFragment = {
     } | null>;
   } | null;
 };
->>>>>>> 51c39ba (feat: implement mint tokens multisig creation and groundwork for more multisig motions)
 
 export type CreateColonyActionMutationVariables = Exact<{
   input: CreateColonyActionInput;
@@ -10605,6 +10656,49 @@ export const ColonyMetadata = gql`
     }
   }
 `;
+export const ActionMetadataInfo = gql`
+  fragment ActionMetadataInfo on ColonyAction {
+    id
+    pendingDomainMetadata {
+      ...DomainMetadata
+    }
+    pendingColonyMetadata {
+      ...ColonyMetadata
+    }
+    colonyDecisionId
+  }
+  ${DomainMetadata}
+  ${ColonyMetadata}
+`;
+export const Colony = gql`
+  fragment Colony on Colony {
+    colonyAddress: id
+    tokens {
+      items {
+        id
+        tokenAddress: tokenID
+      }
+    }
+    motionsWithUnclaimedStakes {
+      motionId
+      unclaimedRewards {
+        address
+        rewards {
+          yay
+          nay
+        }
+        isClaimed
+      }
+    }
+    domains(limit: 1000, nextToken: $nextToken) {
+      items {
+        id
+        nativeSkillId
+      }
+      nextToken
+    }
+  }
+`;
 export const ExpenditureSlot = gql`
   fragment ExpenditureSlot on ExpenditureSlot {
     id
@@ -10761,22 +10855,6 @@ export const ColonyMotion = gql`
   ${UserMotionStakes}
   ${StakerReward}
   ${VoterRecord}
-`;
-export const DomainMetadata = gql`
-  fragment DomainMetadata on DomainMetadata {
-    name
-    color
-    description
-    changelog {
-      transactionHash
-      oldName
-      newName
-      oldColor
-      newColor
-      oldDescription
-      newDescription
-    }
-  }
 `;
 export const MultiSigUserSignature = gql`
   fragment MultiSigUserSignature on MultiSigUserSignature {
@@ -11594,19 +11672,11 @@ export const GetColonyActionByMotionIdDocument = gql`
   query GetColonyActionByMotionId($motionId: ID!) {
     getColonyActionByMotionId(motionId: $motionId) {
       items {
-        id
-        pendingDomainMetadata {
-          ...DomainMetadata
-        }
-        pendingColonyMetadata {
-          ...ColonyMetadata
-        }
-        colonyDecisionId
+        ...ActionMetadataInfo
       }
     }
   }
-  ${DomainMetadata}
-  ${ColonyMetadata}
+  ${ActionMetadataInfo}
 `;
 export const GetColonyMotionDocument = gql`
   query GetColonyMotion($id: ID!) {
@@ -11620,19 +11690,11 @@ export const GetColonyActionByMultiSigIdDocument = gql`
   query GetColonyActionByMultiSigId($multiSigId: ID!) {
     getColonyActionByMultiSigId(multiSigId: $multiSigId) {
       items {
-        id
-        pendingDomainMetadata {
-          ...DomainMetadata
-        }
-        pendingColonyMetadata {
-          ...ColonyMetadata
-        }
-        colonyDecisionId
+        ...ActionMetadataInfo
       }
     }
   }
-  ${DomainMetadata}
-  ${ColonyMetadata}
+  ${ActionMetadataInfo}
 `;
 export const GetColonyMultiSigDocument = gql`
   query GetColonyMultiSig($id: ID!) {

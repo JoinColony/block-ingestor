@@ -4,9 +4,6 @@ import {
   ColonyMotion,
   CreateMotionMessageDocument,
   CreateMotionMessageInput,
-  GetColonyActionByMotionIdDocument,
-  GetColonyActionByMotionIdQuery,
-  GetColonyActionByMotionIdQueryVariables,
   GetColonyMotionDocument,
   GetColonyMotionQuery,
   GetColonyMotionQueryVariables,
@@ -15,6 +12,7 @@ import {
 } from '~graphql';
 import { MotionSide, MotionVote } from '~types';
 import { verbose, output } from '~utils';
+import { getActionByMotionId } from '~utils/actions';
 import { updateDecisionInDB } from '~utils/decisions';
 
 export * from './motionStaked/helpers';
@@ -44,15 +42,7 @@ export const updateMotionInDB = async (
   }
 
   if (showInActionsList !== undefined) {
-    const { data } =
-      (await query<
-        GetColonyActionByMotionIdQuery,
-        GetColonyActionByMotionIdQueryVariables
-      >(GetColonyActionByMotionIdDocument, {
-        motionId: motionData.id,
-      })) ?? {};
-
-    const colonyAction = data?.getColonyActionByMotionId?.items[0];
+    const colonyAction = await getActionByMotionId(motionData.id);
 
     if (!colonyAction) {
       verbose(

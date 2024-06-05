@@ -5,7 +5,7 @@ import {
   getOneTxPaymentClient,
   getStagedExpenditureClient,
   getStakedExpenditureClient,
-  parseAction,
+  parseOperation,
   verbose,
 } from '~utils';
 import { handleMintTokensMultiSig } from './handlers/mintTokens';
@@ -47,19 +47,19 @@ export default async (event: ContractEvent): Promise<void> => {
     verbose(`No action data in multiSig motion: ${motionId}`);
   }
 
-  const parsedAction = parseAction(actionData, {
+  const parsedOperation = parseOperation(actionData, {
     colonyClient,
     oneTxPaymentClient,
     stakedExpenditureClient,
     stagedExpenditureClient,
   });
 
-  if (parsedAction) {
-    const contractOperation = parsedAction.name;
+  if (parsedOperation) {
+    const contractOperation = parsedOperation.name;
     /* Handle the action type-specific mutation here */
     switch (contractOperation) {
       case ColonyOperations.MintTokens: {
-        await handleMintTokensMultiSig(event, parsedAction);
+        await handleMintTokensMultiSig(event, parsedOperation);
         break;
       }
       default: {
