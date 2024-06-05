@@ -1,19 +1,12 @@
 import { MultiSigVote } from '~graphql';
 import { getChainId } from '~provider';
 import { ContractEvent } from '~types';
-import { getMultiSigClient } from '~utils/clients';
 import { getMultiSigDatabaseId, getUserMultiSigSignature } from '../helpers';
 import { addApprovalVote, removeMultiSigVote } from './helpers';
 
 export default async (event: ContractEvent): Promise<void> => {
-  const { colonyAddress } = event;
+  const { contractAddress: multiSigExtensionAddress, colonyAddress } = event;
   if (!colonyAddress) {
-    return;
-  }
-
-  const multiSigClient = await getMultiSigClient(colonyAddress);
-
-  if (!multiSigClient) {
     return;
   }
 
@@ -22,7 +15,7 @@ export default async (event: ContractEvent): Promise<void> => {
 
   const multiSigId = getMultiSigDatabaseId(
     chainId,
-    multiSigClient.address,
+    multiSigExtensionAddress,
     motionId,
   );
 
