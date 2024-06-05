@@ -46,7 +46,6 @@ fragment ColonyMetadata on ColonyMetadata {
     newDisplayName
     hasAvatarChanged
     hasWhitelistChanged
-    haveTokensChanged
     hasDescriptionChanged
     haveExternalLinksChanged
   }

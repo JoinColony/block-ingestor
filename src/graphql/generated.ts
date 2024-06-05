@@ -774,8 +774,6 @@ export type ColonyMetadataChangelog = {
   hasWhitelistChanged: Scalars['Boolean'];
   /** Whether the colony's external links have changed */
   haveExternalLinksChanged?: Maybe<Scalars['Boolean']>;
-  /** Whether tokens have been added or removed from the Colony's token list */
-  haveTokensChanged: Scalars['Boolean'];
   /** Display name of the Colony after the change */
   newDisplayName: Scalars['String'];
   /** Whether safes have been added or removed from the Colony's safe list */
@@ -793,7 +791,6 @@ export type ColonyMetadataChangelogInput = {
   hasObjectiveChanged?: InputMaybe<Scalars['Boolean']>;
   hasWhitelistChanged: Scalars['Boolean'];
   haveExternalLinksChanged?: InputMaybe<Scalars['Boolean']>;
-  haveTokensChanged: Scalars['Boolean'];
   newDisplayName: Scalars['String'];
   newSafes?: InputMaybe<Array<SafeInput>>;
   oldDisplayName: Scalars['String'];
@@ -8424,7 +8421,6 @@ export type ColonyMetadataFragment = {
     newDisplayName: string;
     hasAvatarChanged: boolean;
     hasWhitelistChanged: boolean;
-    haveTokensChanged: boolean;
     hasDescriptionChanged?: boolean | null;
     haveExternalLinksChanged?: boolean | null;
   }> | null;
@@ -9227,7 +9223,6 @@ export type GetColonyMetadataQuery = {
       newDisplayName: string;
       hasAvatarChanged: boolean;
       hasWhitelistChanged: boolean;
-      haveTokensChanged: boolean;
       hasDescriptionChanged?: boolean | null;
       haveExternalLinksChanged?: boolean | null;
     }> | null;
@@ -9718,7 +9713,6 @@ export type GetColonyActionByMotionIdQuery = {
           newDisplayName: string;
           hasAvatarChanged: boolean;
           hasWhitelistChanged: boolean;
-          haveTokensChanged: boolean;
           hasDescriptionChanged?: boolean | null;
           haveExternalLinksChanged?: boolean | null;
         }> | null;
@@ -9979,7 +9973,6 @@ export const ColonyMetadata = gql`
       newDisplayName
       hasAvatarChanged
       hasWhitelistChanged
-      haveTokensChanged
       hasDescriptionChanged
       haveExternalLinksChanged
     }
