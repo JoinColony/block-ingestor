@@ -2,9 +2,8 @@ import { ColonyActionType } from '~graphql';
 import { ContractEvent } from '~types';
 import {
   ManageTokensOperation /* , writeActionFromEvent */,
+  getApprovedTokenChanges,
   getColonyFromDB,
-  getExistingTokenAddresses,
-  getModifiedTokenAddresses,
   updateColonyTokens,
   writeActionFromEvent,
 } from '~utils';
@@ -24,15 +23,14 @@ export const handleManageTokens = async (
     return;
   }
 
-  const existingTokenAddresses = getExistingTokenAddresses(colony);
-  const modifiedTokenAddresses = getModifiedTokenAddresses(
+  const {
+    existingTokenAddresses,
+    modifiedTokenAddresses,
+    unaffectedTokenAddresses,
+  } = getApprovedTokenChanges({
     colony,
     tokenAddresses,
-  );
-
-  const unaffectedTokenAddresses = existingTokenAddresses.filter(
-    (address) => !modifiedTokenAddresses.removed.includes(address),
-  );
+  });
 
   await updateColonyTokens(
     colony,

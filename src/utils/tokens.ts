@@ -94,6 +94,36 @@ export const getModifiedTokenAddresses = (
   return modifiedTokenAddresses;
 };
 
+interface ApprovedTokenChanges {
+  existingTokenAddresses: string[];
+  modifiedTokenAddresses: ModifiedTokenAddresses;
+  unaffectedTokenAddresses: string[];
+}
+
+export const getApprovedTokenChanges = ({
+  colony,
+  tokenAddresses,
+}: {
+  colony: Colony;
+  tokenAddresses: string[];
+}): ApprovedTokenChanges => {
+  const existingTokenAddresses = getExistingTokenAddresses(colony);
+  const modifiedTokenAddresses = getModifiedTokenAddresses(
+    colony,
+    tokenAddresses,
+  );
+
+  const unaffectedTokenAddresses = existingTokenAddresses.filter(
+    (address) => !modifiedTokenAddresses.removed.includes(address),
+  );
+
+  return {
+    existingTokenAddresses,
+    modifiedTokenAddresses,
+    unaffectedTokenAddresses,
+  };
+};
+
 export const updateColonyTokens = async (
   colony: Colony,
   existingTokenAddresses: string[],
