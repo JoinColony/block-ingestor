@@ -16,7 +16,6 @@ import {
   GetTokenFromEverywhereDocument,
   GetTokenFromEverywhereQuery,
   GetTokenFromEverywhereQueryVariables,
-  PendingModifiedTokenAddresses,
   GetColonyByNativeTokenIdDocument,
   GetColonyByNativeTokenIdQuery,
   GetColonyByNativeTokenIdQueryVariables,
@@ -127,7 +126,7 @@ export const getApprovedTokenChanges = ({
 export const updateColonyTokens = async (
   colony: Colony,
   existingTokenAddresses: string[],
-  { added, removed }: PendingModifiedTokenAddresses,
+  { added, removed }: ModifiedTokenAddresses,
 ): Promise<void> => {
   const currentAddresses = new Set(existingTokenAddresses);
   added?.forEach(async (tokenAddress) => {
