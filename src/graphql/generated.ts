@@ -742,11 +742,8 @@ export type ColonyMetadata = {
   externalLinks?: Maybe<Array<ExternalLink>>;
   /** Unique identifier for the Colony (contract address) */
   id: Scalars['ID'];
-  /**
-   * Token addresses that were modified in a previous action (motion)
-   * Only present on pendingColonyMetadata for consumption in block ingestor
-   */
-  modifiedTokenAddresses?: Maybe<PendingModifiedTokenAddresses>;
+  /** The address book feature (aka Whitelist is active for this Colony) */
+  isWhitelistActivated?: Maybe<Scalars['Boolean']>;
   /** Colony Objective */
   objective?: Maybe<ColonyObjective>;
   /** List of safes that are used within the Colony */
@@ -1275,7 +1272,7 @@ export type CreateColonyMetadataInput = {
   etherealData?: InputMaybe<ColonyMetadataEtherealDataInput>;
   externalLinks?: InputMaybe<Array<ExternalLinkInput>>;
   id?: InputMaybe<Scalars['ID']>;
-  modifiedTokenAddresses?: InputMaybe<PendingModifiedTokenAddressesInput>;
+  isWhitelistActivated?: InputMaybe<Scalars['Boolean']>;
   objective?: InputMaybe<ColonyObjectiveInput>;
   safes?: InputMaybe<Array<SafeInput>>;
   thumbnail?: InputMaybe<Scalars['String']>;
@@ -5347,20 +5344,6 @@ export type PaymentInput = {
   tokenAddress: Scalars['String'];
 };
 
-/** Colony token modifications that are stored temporarily and commited to the database once the corresponding motion passes */
-export type PendingModifiedTokenAddresses = {
-  __typename?: 'PendingModifiedTokenAddresses';
-  /** List of tokens that were added to the Colony's token list */
-  added?: Maybe<Array<Scalars['String']>>;
-  /** List of tokens that were removed from the Colony's token list */
-  removed?: Maybe<Array<Scalars['String']>>;
-};
-
-export type PendingModifiedTokenAddressesInput = {
-  added?: InputMaybe<Array<Scalars['String']>>;
-  removed?: InputMaybe<Array<Scalars['String']>>;
-};
-
 export type PrivateBetaInviteCode = {
   __typename?: 'PrivateBetaInviteCode';
   createdAt: Scalars['AWSDateTime'];
@@ -7835,7 +7818,7 @@ export type UpdateColonyMetadataInput = {
   etherealData?: InputMaybe<ColonyMetadataEtherealDataInput>;
   externalLinks?: InputMaybe<Array<ExternalLinkInput>>;
   id: Scalars['ID'];
-  modifiedTokenAddresses?: InputMaybe<PendingModifiedTokenAddressesInput>;
+  isWhitelistActivated?: InputMaybe<Scalars['Boolean']>;
   objective?: InputMaybe<ColonyObjectiveInput>;
   safes?: InputMaybe<Array<SafeInput>>;
   thumbnail?: InputMaybe<Scalars['String']>;
@@ -8404,11 +8387,6 @@ export type ColonyMetadataFragment = {
     hasDescriptionChanged?: boolean | null;
     haveExternalLinksChanged?: boolean | null;
   }> | null;
-  modifiedTokenAddresses?: {
-    __typename?: 'PendingModifiedTokenAddresses';
-    added?: Array<string> | null;
-    removed?: Array<string> | null;
-  } | null;
 };
 
 export type ExpenditureBalanceFragment = {
@@ -9209,11 +9187,6 @@ export type GetColonyMetadataQuery = {
       hasDescriptionChanged?: boolean | null;
       haveExternalLinksChanged?: boolean | null;
     }> | null;
-    modifiedTokenAddresses?: {
-      __typename?: 'PendingModifiedTokenAddresses';
-      added?: Array<string> | null;
-      removed?: Array<string> | null;
-    } | null;
   } | null;
 };
 
@@ -9702,11 +9675,6 @@ export type GetColonyActionByMotionIdQuery = {
           hasDescriptionChanged?: boolean | null;
           haveExternalLinksChanged?: boolean | null;
         }> | null;
-        modifiedTokenAddresses?: {
-          __typename?: 'PendingModifiedTokenAddresses';
-          added?: Array<string> | null;
-          removed?: Array<string> | null;
-        } | null;
       } | null;
     } | null>;
   } | null;
@@ -9967,10 +9935,8 @@ export const ColonyMetadata = gql`
       hasDescriptionChanged
       haveExternalLinksChanged
     }
-    modifiedTokenAddresses {
-      added
-      removed
-    }
+    isWhitelistActivated
+    whitelistedAddresses
   }
 `;
 export const ExpenditureSlot = gql`
