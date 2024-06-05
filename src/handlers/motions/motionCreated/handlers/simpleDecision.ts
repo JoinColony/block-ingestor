@@ -1,7 +1,7 @@
 import { BigNumber } from 'ethers';
 
 import { ContractEvent, motionNameMapping } from '~types';
-import { SimpleTransactionDescription } from '~utils/actions/parseAction';
+import { SimpleTransactionDescription } from '~utils';
 import { getColonyDecisionId } from '~utils/decisions';
 
 import { createMotionInDB } from '../helpers';

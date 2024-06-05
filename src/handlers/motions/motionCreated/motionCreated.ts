@@ -9,8 +9,8 @@ import {
   getOneTxPaymentClient,
   getVotingClient,
   verbose,
-  parseAction,
   SimpleTransactionDescription,
+  parseOperation,
 } from '~utils';
 import {
   handleEditDomainMotion,
@@ -63,7 +63,7 @@ export default async (event: ContractEvent): Promise<void> => {
   const motion = await votingReputationClient.getMotion(motionId, {
     blockTag: blockNumber,
   });
-  const parsedAction = parseAction(motion.action, {
+  const parsedOperation = parseOperation(motion.action, {
     colonyClient,
     oneTxPaymentClient,
     stakedExpenditureClient,
@@ -128,41 +128,41 @@ export default async (event: ContractEvent): Promise<void> => {
    */
   gasEstimate = gasEstimate.add(100_000);
 
-  if (parsedAction) {
-    const contractOperation = parsedAction.name;
+  if (parsedOperation) {
+    const contractOperation = parsedOperation.name;
     /* Handle the action type-specific mutation here */
     switch (contractOperation) {
       case ColonyOperations.MintTokens: {
-        await handleMintTokensMotion(event, parsedAction, gasEstimate);
+        await handleMintTokensMotion(event, parsedOperation, gasEstimate);
         break;
       }
       case ColonyOperations.AddDomain: {
-        await handleAddDomainMotion(event, parsedAction, gasEstimate);
+        await handleAddDomainMotion(event, parsedOperation, gasEstimate);
         break;
       }
 
       case ColonyOperations.EditDomain: {
-        await handleEditDomainMotion(event, parsedAction, gasEstimate);
+        await handleEditDomainMotion(event, parsedOperation, gasEstimate);
         break;
       }
 
       case ColonyOperations.Upgrade: {
-        await handleNetworkUpgradeMotion(event, parsedAction, gasEstimate);
+        await handleNetworkUpgradeMotion(event, parsedOperation, gasEstimate);
         break;
       }
 
       case ColonyOperations.UnlockToken: {
-        await handleUnlockTokenMotion(event, parsedAction, gasEstimate);
+        await handleUnlockTokenMotion(event, parsedOperation, gasEstimate);
         break;
       }
 
       case ColonyOperations.MakePaymentFundedFromDomain: {
-        await handlePaymentMotion(event, parsedAction, gasEstimate);
+        await handlePaymentMotion(event, parsedOperation, gasEstimate);
         break;
       }
 
       case ColonyOperations.MoveFundsBetweenPots: {
-        await handleMoveFundsMotion(event, parsedAction, gasEstimate);
+        await handleMoveFundsMotion(event, parsedOperation, gasEstimate);
         break;
       }
 
@@ -170,21 +170,21 @@ export default async (event: ContractEvent): Promise<void> => {
       case ColonyOperations.EmitDomainReputationPenalty: {
         await handleDomainEditReputationMotion(
           event,
-          parsedAction,
+          parsedOperation,
           gasEstimate,
         );
         break;
       }
 
       case ColonyOperations.EditColony: {
-        await handleEditColonyMotion(event, parsedAction, gasEstimate);
+        await handleEditColonyMotion(event, parsedOperation, gasEstimate);
         break;
       }
 
       case ColonyOperations.SetUserRoles: {
         await handleSetUserRolesMotion(
           event,
-          parsedAction,
+          parsedOperation,
           gasEstimate,
           motion.altTarget,
         );
@@ -192,14 +192,14 @@ export default async (event: ContractEvent): Promise<void> => {
       }
 
       case ColonyOperations.Multicall: {
-        await handleMulticallMotion(event, parsedAction, gasEstimate);
+        await handleMulticallMotion(event, parsedOperation, gasEstimate);
         break;
       }
 
       case ColonyOperations.SimpleDecision: {
         await handleSimpleDecisionMotion(
           event,
-          parsedAction as SimpleTransactionDescription,
+          parsedOperation as SimpleTransactionDescription,
           gasEstimate,
         );
         break;
@@ -208,7 +208,7 @@ export default async (event: ContractEvent): Promise<void> => {
       case ColonyOperations.MakeArbitraryTransactions: {
         await handleMakeArbitraryTransactionsMotion(
           event,
-          parsedAction,
+          parsedOperation,
           gasEstimate,
         );
 
@@ -218,21 +218,21 @@ export default async (event: ContractEvent): Promise<void> => {
       case ColonyOperations.CancelStakedExpenditure: {
         await handleCancelStakedExpenditureMotion(
           event,
-          parsedAction,
+          parsedOperation,
           gasEstimate,
         );
         break;
       }
 
       case ColonyOperations.EditColonyByDelta: {
-        await handleMetadataDeltaMotion(event, parsedAction, gasEstimate);
+        await handleMetadataDeltaMotion(event, parsedOperation, gasEstimate);
         break;
       }
 
       case ColonyOperations.CancelExpenditureViaArbitration: {
         await handleCancelExpenditureViaArbitrationMotion(
           event,
-          parsedAction,
+          parsedOperation,
           gasEstimate,
         );
         break;
@@ -241,7 +241,7 @@ export default async (event: ContractEvent): Promise<void> => {
       case ColonyOperations.FinalizeExpenditureViaArbitration: {
         await handleFinalizeExpenditureViaArbitrationMotion(
           event,
-          parsedAction,
+          parsedOperation,
           gasEstimate,
         );
         break;

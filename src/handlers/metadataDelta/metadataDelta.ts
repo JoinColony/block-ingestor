@@ -1,11 +1,16 @@
 import { ContractEvent } from '~types';
-import { isAddVerifiedMembersOperation, isRemoveVerifiedMembersOperation, parseOperation, verbose } from '~utils';
+import {
+  isAddVerifiedMembersOperation,
+  isRemoveVerifiedMembersOperation,
+  parseMetadataDeltaOperation,
+  verbose,
+} from '~utils';
 import { handleAddVerifiedMembers } from './handlers/addVerifiedMembers';
 import { handleRemoveVerifiedMembers } from './handlers/removeVerifiedMembers';
 
 export default async (event: ContractEvent): Promise<void> => {
   const operationString = event.args.metadata;
-  const operation = parseOperation(operationString);
+  const operation = parseMetadataDeltaOperation(operationString);
 
   if (operation === null) {
     return;

@@ -39,7 +39,7 @@ const isMetadataDeltaOperation = (
   );
 };
 
-export const parseOperation = (
+export const parseMetadataDeltaOperation = (
   operationString: string,
 ): MetadataDeltaOperation | null => {
   try {
