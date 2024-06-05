@@ -7,12 +7,6 @@ import {
   ColonyMetadata,
   CreateDomainMetadataDocument,
   DomainMetadata,
-  GetColonyActionByMotionIdDocument,
-  GetColonyActionByMotionIdQuery,
-  GetColonyActionByMotionIdQueryVariables,
-  GetColonyActionByMultiSigIdDocument,
-  GetColonyActionByMultiSigIdQuery,
-  GetColonyActionByMultiSigIdQueryVariables,
   GetColonyMetadataDocument,
   GetColonyMetadataQuery,
   GetColonyMetadataQueryVariables,
@@ -31,13 +25,17 @@ import {
   getStagedExpenditureClient,
   getStakedExpenditureClient,
 } from './clients';
-import { parseAction } from './actions';
+import {
+  getActionByMotionId,
+  getActionByMultiSigId,
+  parseOperation,
+} from './actions';
 
 const linkPendingDomainMetadataWithDomain = async (
   pendingDomainMetadata: DomainMetadata,
   colonyAddress: string,
   isEditingADomain: boolean,
-  parsedAction: TransactionDescription,
+  parsedOperation: TransactionDescription,
 ): Promise<void> => {
   if (!isEditingADomain) {
     const colonyClient = await getCachedColonyClient(colonyAddress);
@@ -58,7 +56,7 @@ const linkPendingDomainMetadataWithDomain = async (
       },
     });
   } else if (isEditingADomain) {
-    const nativeDomainId = parsedAction.args[2].toNumber(); // domainId arg from editDomain action
+    const nativeDomainId = parsedOperation.args[2].toNumber(); // domainId arg from editDomain action
     const databaseDomainId = getDomainDatabaseId(colonyAddress, nativeDomainId);
 
     const { data } =
@@ -236,23 +234,23 @@ export const linkPendingMetadata = async (
     colonyAddress,
   );
 
-  const parsedAction = parseAction(action, {
+  const parsedOperation = parseOperation(action, {
     colonyClient,
     oneTxPaymentClient,
     stakedExpenditureClient,
     stagedExpenditureClient,
   });
 
-  if (!parsedAction) {
+  if (!parsedOperation) {
     return;
   }
 
   const isMotionAddingADomain =
-    parsedAction.name === ColonyOperations.AddDomain;
+    parsedOperation.name === ColonyOperations.AddDomain;
   const isMotionEditingADomain =
-    parsedAction.name === ColonyOperations.EditDomain;
+    parsedOperation.name === ColonyOperations.EditDomain;
   const isMotionEditingAColony =
-    parsedAction.name === ColonyOperations.EditColony;
+    parsedOperation.name === ColonyOperations.EditColony;
 
   if (
     isMotionAddingADomain ||
@@ -262,25 +260,9 @@ export const linkPendingMetadata = async (
     let colonyAction;
 
     if (isMultiSig) {
-      const { data } =
-        (await query<
-          GetColonyActionByMotionIdQuery,
-          GetColonyActionByMotionIdQueryVariables
-        >(GetColonyActionByMotionIdDocument, {
-          motionId,
-        })) ?? {};
-
-      colonyAction = data?.getColonyActionByMotionId?.items;
+      colonyAction = await getActionByMultiSigId(motionId);
     } else {
-      const { data } =
-        (await query<
-          GetColonyActionByMultiSigIdQuery,
-          GetColonyActionByMultiSigIdQueryVariables
-        >(GetColonyActionByMultiSigIdDocument, {
-          multiSigId: motionId,
-        })) ?? {};
-
-      colonyAction = data?.getColonyActionByMultiSigId?.items;
+      colonyAction = await getActionByMotionId(motionId);
     }
     /*
      * pendingDomainMetadata is a motion data prop that we use to store the metadata of a Domain that COULD be created/edited
@@ -290,20 +272,17 @@ export const linkPendingMetadata = async (
      */
     if (
       (isMotionAddingADomain || isMotionEditingADomain) &&
-      colonyAction?.[0]?.pendingDomainMetadata
+      colonyAction?.pendingDomainMetadata
     ) {
       await linkPendingDomainMetadataWithDomain(
-        colonyAction[0].pendingDomainMetadata,
+        colonyAction.pendingDomainMetadata,
         colonyAddress,
         isMotionEditingADomain,
-        parsedAction,
+        parsedOperation,
       );
-    } else if (
-      isMotionEditingAColony &&
-      colonyAction?.[0]?.pendingColonyMetadata
-    ) {
+    } else if (isMotionEditingAColony && colonyAction?.pendingColonyMetadata) {
       await linkPendingColonyMetadataWithColony(
-        colonyAction[0].pendingColonyMetadata,
+        colonyAction.pendingColonyMetadata,
         colonyAddress,
       );
     }

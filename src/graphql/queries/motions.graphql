@@ -1,17 +1,7 @@
 query GetColonyActionByMotionId($motionId: ID!) {
   getColonyActionByMotionId(motionId: $motionId) {
     items {
-      id
-      pendingDomainMetadata {
-        ...DomainMetadata
-      }
-      pendingColonyMetadata {
-        ...ColonyMetadata
-      }
-      colonyDecisionId
-      amount
-      networkFee
-      type
+      ...ActionMetadataInfo
     }
   }
 }
