@@ -60,7 +60,7 @@ import {
   handleMultiSigCreated,
   handleMultiSigGlobalThresholdSet,
   handleDomainSkillThresholdSet,
-  handleMultiSigMotionCanceled,
+  handleMultiSigMotionCancelled,
   handleMultiSigMotionExecuted,
 } from '~handlers/multiSig';
 
@@ -211,7 +211,7 @@ export default async (event: ContractEvent): Promise<void> => {
     }
 
     case ContractEventsSignatures.MultisigMotionCancelled: {
-      await handleMultiSigMotionCanceled(event);
+      await handleMultiSigMotionCancelled(event);
       return;
     }
 

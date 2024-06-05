@@ -1,7 +1,6 @@
 import { getChainId } from '~provider';
 
 import { ContractEvent } from '~types';
-import { getMultiSigClient } from '~utils';
 // import { linkPendingMetadata } from '~utils/colonyMetadata';
 
 import {
@@ -12,6 +11,7 @@ import {
 
 export default async (event: ContractEvent): Promise<void> => {
   const {
+    contractAddress: multiSigExtensionAddress,
     colonyAddress,
     args: { motionId, success },
     timestamp,
@@ -21,16 +21,10 @@ export default async (event: ContractEvent): Promise<void> => {
     return;
   }
 
-  const multiSigClient = await getMultiSigClient(colonyAddress);
-
-  if (!multiSigClient) {
-    return;
-  }
-
   const chainId = getChainId();
   const multiSigDatabaseId = getMultiSigDatabaseId(
     chainId,
-    multiSigClient.address,
+    multiSigExtensionAddress,
     motionId,
   );
   const finalizedMultiSig = await getMultiSigFromDB(multiSigDatabaseId);
@@ -53,6 +47,6 @@ export default async (event: ContractEvent): Promise<void> => {
       executedAt: new Date(timestamp * 1000).toISOString(),
     };
 
-    await updateMultiSigInDB(updatedMultiSigData, true);
+    await updateMultiSigInDB(updatedMultiSigData);
   }
 };
