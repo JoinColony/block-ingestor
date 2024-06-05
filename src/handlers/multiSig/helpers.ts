@@ -11,13 +11,9 @@ import {
   GetColonyMultiSigQuery,
   GetColonyMultiSigQueryVariables,
   UpdateColonyMultiSigDocument,
-  GetColonyActionByMultiSigIdQuery,
-  GetColonyActionByMultiSigIdQueryVariables,
-  GetColonyActionByMultiSigIdDocument,
-  UpdateColonyActionDocument,
+  UpdateColonyMultiSigInput,
 } from '~graphql';
-import { updateDecisionInDB } from '~utils/decisions';
-import { output, verbose } from '~utils/logger';
+import { output } from '~utils/logger';
 
 export const getMultiSigDatabaseId = (
   chainId: string,
@@ -77,44 +73,11 @@ export const getMultiSigFromDB = async (
 };
 
 export const updateMultiSigInDB = async (
-  multiSigData: Partial<ColonyMultiSig> & { id: string },
-  showInActionsList?: boolean,
+  multiSigData: UpdateColonyMultiSigInput,
 ): Promise<void> => {
   await mutate(UpdateColonyMultiSigDocument, {
     input: {
       ...multiSigData,
     },
   });
-
-  if (showInActionsList !== undefined) {
-    const { data } =
-      (await query<
-        GetColonyActionByMultiSigIdQuery,
-        GetColonyActionByMultiSigIdQueryVariables
-      >(GetColonyActionByMultiSigIdDocument, {
-        multiSigId: multiSigData.id,
-      })) ?? {};
-
-    const colonyAction = data?.getColonyActionByMultiSigId?.items[0];
-
-    if (!colonyAction) {
-      verbose(
-        'Could not find the action in the db. This is a bug and needs investigating.',
-      );
-    } else {
-      await mutate(UpdateColonyActionDocument, {
-        input: {
-          id: colonyAction.id,
-          showInActionsList,
-        },
-      });
-
-      // If is decision
-      if (colonyAction.colonyDecisionId) {
-        await updateDecisionInDB(colonyAction.id, {
-          showInDecisionsList: showInActionsList,
-        });
-      }
-    }
-  }
 };
