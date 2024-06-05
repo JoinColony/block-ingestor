@@ -767,8 +767,6 @@ export type ColonyMetadataChangelog = {
   hasObjectiveChanged?: Maybe<Scalars['Boolean']>;
   /** Whether the colony's external links have changed */
   haveExternalLinksChanged?: Maybe<Scalars['Boolean']>;
-  /** Whether tokens have been added or removed from the Colony's token list */
-  haveTokensChanged: Scalars['Boolean'];
   /** Display name of the Colony after the change */
   newDisplayName: Scalars['String'];
   /** Whether safes have been added or removed from the Colony's safe list */
@@ -785,7 +783,6 @@ export type ColonyMetadataChangelogInput = {
   hasDescriptionChanged?: InputMaybe<Scalars['Boolean']>;
   hasObjectiveChanged?: InputMaybe<Scalars['Boolean']>;
   haveExternalLinksChanged?: InputMaybe<Scalars['Boolean']>;
-  haveTokensChanged: Scalars['Boolean'];
   newDisplayName: Scalars['String'];
   newSafes?: InputMaybe<Array<SafeInput>>;
   oldDisplayName: Scalars['String'];
@@ -8383,7 +8380,7 @@ export type ColonyMetadataFragment = {
     oldDisplayName: string;
     newDisplayName: string;
     hasAvatarChanged: boolean;
-    haveTokensChanged: boolean;
+    hasWhitelistChanged: boolean;
     hasDescriptionChanged?: boolean | null;
     haveExternalLinksChanged?: boolean | null;
   }> | null;
@@ -9183,7 +9180,7 @@ export type GetColonyMetadataQuery = {
       oldDisplayName: string;
       newDisplayName: string;
       hasAvatarChanged: boolean;
-      haveTokensChanged: boolean;
+      hasWhitelistChanged: boolean;
       hasDescriptionChanged?: boolean | null;
       haveExternalLinksChanged?: boolean | null;
     }> | null;
@@ -9671,7 +9668,7 @@ export type GetColonyActionByMotionIdQuery = {
           oldDisplayName: string;
           newDisplayName: string;
           hasAvatarChanged: boolean;
-          haveTokensChanged: boolean;
+          hasWhitelistChanged: boolean;
           hasDescriptionChanged?: boolean | null;
           haveExternalLinksChanged?: boolean | null;
         }> | null;
@@ -9931,7 +9928,7 @@ export const ColonyMetadata = gql`
       oldDisplayName
       newDisplayName
       hasAvatarChanged
-      haveTokensChanged
+      hasWhitelistChanged
       hasDescriptionChanged
       haveExternalLinksChanged
     }
