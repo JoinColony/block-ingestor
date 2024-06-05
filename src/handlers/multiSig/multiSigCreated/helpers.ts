@@ -161,7 +161,7 @@ export const createMultiSigInDB = async (
     colonyId: colonyAddress,
     isMultiSig: true,
     multiSigId: multiSigData.id,
-    showInActionsList: false,
+    showInActionsList: true,
     initiatorAddress: motion.creator,
     blockNumber,
     rootHash,

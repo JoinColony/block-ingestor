@@ -3,7 +3,7 @@ import {
   isAddVerifiedMembersOperation,
   isManageTokensOperation,
   isRemoveVerifiedMembersOperation,
-  parseOperation,
+  parseMetadataDeltaOperation,
   verbose,
 } from '~utils';
 import { handleAddVerifiedMembers } from './handlers/addVerifiedMembers';
@@ -12,7 +12,7 @@ import { handleManageTokens } from './handlers/manageTokens';
 
 export default async (event: ContractEvent): Promise<void> => {
   const operationString = event.args.metadata;
-  const operation = parseOperation(operationString);
+  const operation = parseMetadataDeltaOperation(operationString);
 
   if (operation === null) {
     return;

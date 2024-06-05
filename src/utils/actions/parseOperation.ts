@@ -20,11 +20,11 @@ export interface SimpleTransactionDescription {
   name: ColonyOperations.SimpleDecision;
 }
 
-export const parseAction = (
-  action: string,
+export const parseOperation = (
+  operation: string,
   clients: MotionActionClients,
 ): TransactionDescription | SimpleTransactionDescription | undefined => {
-  if (action === SIMPLE_DECISIONS_ACTION_CODE) {
+  if (operation === SIMPLE_DECISIONS_ACTION_CODE) {
     return {
       name: ColonyOperations.SimpleDecision,
     };
@@ -38,13 +38,13 @@ export const parseAction = (
     // Return the first time a client can successfully parse the motion
     try {
       return client.interface.parseTransaction({
-        data: action,
+        data: operation,
       });
     } catch {
       continue;
     }
   }
 
-  verbose(`Unable to parse ${action}`);
+  verbose(`Unable to parse ${operation}`);
   return undefined;
 };

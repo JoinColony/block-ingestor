@@ -9,8 +9,8 @@ import {
   getOneTxPaymentClient,
   getVotingClient,
   verbose,
-  parseAction,
   SimpleTransactionDescription,
+  parseOperation,
 } from '~utils';
 import {
   handleEditDomainMotion,
@@ -63,7 +63,7 @@ export const handleMotionCreated: EventHandler = async (
   const motion = await votingReputationClient.getMotion(motionId, {
     blockTag: blockNumber,
   });
-  const parsedAction = parseAction(motion.action, {
+  const parsedOperation = parseOperation(motion.action, {
     colonyClient,
     oneTxPaymentClient,
     stakedExpenditureClient,
@@ -128,15 +128,15 @@ export const handleMotionCreated: EventHandler = async (
    */
   gasEstimate = gasEstimate.add(100_000);
 
-  if (parsedAction) {
-    const contractOperation = parsedAction.name;
+  if (parsedOperation) {
+    const contractOperation = parsedOperation.name;
     /* Handle the action type-specific mutation here */
     switch (contractOperation) {
       case ColonyOperations.MintTokens: {
         await handleMintTokensMotion(
           colonyAddress,
           event,
-          parsedAction,
+          parsedOperation,
           gasEstimate,
         );
         break;
@@ -145,7 +145,7 @@ export const handleMotionCreated: EventHandler = async (
         await handleAddDomainMotion(
           colonyAddress,
           event,
-          parsedAction,
+          parsedOperation,
           gasEstimate,
         );
         break;
@@ -155,7 +155,7 @@ export const handleMotionCreated: EventHandler = async (
         await handleEditDomainMotion(
           colonyAddress,
           event,
-          parsedAction,
+          parsedOperation,
           gasEstimate,
         );
         break;
@@ -165,7 +165,7 @@ export const handleMotionCreated: EventHandler = async (
         await handleNetworkUpgradeMotion(
           colonyAddress,
           event,
-          parsedAction,
+          parsedOperation,
           gasEstimate,
         );
         break;
@@ -175,7 +175,7 @@ export const handleMotionCreated: EventHandler = async (
         await handleUnlockTokenMotion(
           colonyAddress,
           event,
-          parsedAction,
+          parsedOperation,
           gasEstimate,
         );
         break;
@@ -185,7 +185,7 @@ export const handleMotionCreated: EventHandler = async (
         await handlePaymentMotion(
           colonyAddress,
           event,
-          parsedAction,
+          parsedOperation,
           gasEstimate,
         );
         break;
@@ -195,7 +195,7 @@ export const handleMotionCreated: EventHandler = async (
         await handleMoveFundsMotion(
           colonyAddress,
           event,
-          parsedAction,
+          parsedOperation,
           gasEstimate,
         );
         break;
@@ -206,7 +206,7 @@ export const handleMotionCreated: EventHandler = async (
         await handleDomainEditReputationMotion(
           colonyAddress,
           event,
-          parsedAction,
+          parsedOperation,
           gasEstimate,
         );
         break;
@@ -216,7 +216,7 @@ export const handleMotionCreated: EventHandler = async (
         await handleEditColonyMotion(
           colonyAddress,
           event,
-          parsedAction,
+          parsedOperation,
           gasEstimate,
         );
         break;
@@ -226,7 +226,7 @@ export const handleMotionCreated: EventHandler = async (
         await handleSetUserRolesMotion(
           colonyAddress,
           event,
-          parsedAction,
+          parsedOperation,
           gasEstimate,
           motion.altTarget,
         );
@@ -237,7 +237,7 @@ export const handleMotionCreated: EventHandler = async (
         await handleMulticallMotion(
           colonyAddress,
           event,
-          parsedAction,
+          parsedOperation,
           gasEstimate,
         );
         break;
@@ -247,7 +247,7 @@ export const handleMotionCreated: EventHandler = async (
         await handleSimpleDecisionMotion(
           colonyAddress,
           event,
-          parsedAction as SimpleTransactionDescription,
+          parsedOperation as SimpleTransactionDescription,
           gasEstimate,
         );
         break;
@@ -257,7 +257,7 @@ export const handleMotionCreated: EventHandler = async (
         await handleMakeArbitraryTransactionsMotion(
           colonyAddress,
           event,
-          parsedAction,
+          parsedOperation,
           gasEstimate,
         );
 
@@ -268,7 +268,7 @@ export const handleMotionCreated: EventHandler = async (
         await handleCancelStakedExpenditureMotion(
           colonyAddress,
           event,
-          parsedAction,
+          parsedOperation,
           gasEstimate,
         );
         break;
@@ -278,7 +278,7 @@ export const handleMotionCreated: EventHandler = async (
         await handleMetadataDeltaMotion(
           colonyAddress,
           event,
-          parsedAction,
+          parsedOperation,
           gasEstimate,
         );
         break;
@@ -288,7 +288,7 @@ export const handleMotionCreated: EventHandler = async (
         await handleCancelExpenditureViaArbitrationMotion(
           colonyAddress,
           event,
-          parsedAction,
+          parsedOperation,
           gasEstimate,
         );
         break;
@@ -298,7 +298,7 @@ export const handleMotionCreated: EventHandler = async (
         await handleFinalizeExpenditureViaArbitrationMotion(
           colonyAddress,
           event,
-          parsedAction,
+          parsedOperation,
           gasEstimate,
         );
         break;
