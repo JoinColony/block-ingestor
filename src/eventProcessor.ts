@@ -57,6 +57,7 @@ import {
 } from './handlers';
 import {
   handleApprovalChanged,
+  handleRejectionChanged,
   handleMultiSigCreated,
   handleMultiSigGlobalThresholdSet,
   handleDomainSkillThresholdSet,
@@ -197,6 +198,12 @@ export default async (event: ContractEvent): Promise<void> => {
 
     case ContractEventsSignatures.MultisigApprovalChanged: {
       await handleApprovalChanged(event);
+      return;
+    }
+
+    case ContractEventsSignatures.MultisigRejectionChanged: {
+      console.log('hello?');
+      await handleRejectionChanged(event);
       return;
     }
 
