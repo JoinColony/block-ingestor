@@ -1816,7 +1816,7 @@ export type CreateSafeTransactionInput = {
 };
 
 export type CreateStreamingPaymentInput = {
-  amount?: InputMaybe<Scalars['String']>;
+  amount: Scalars['String'];
   claims?: InputMaybe<Array<StreamingPaymentClaimInput>>;
   createdAt?: InputMaybe<Scalars['AWSDateTime']>;
   endTime: Scalars['AWSTimestamp'];
@@ -1827,7 +1827,7 @@ export type CreateStreamingPaymentInput = {
   nativeId: Scalars['Int'];
   recipientAddress: Scalars['String'];
   startTime: Scalars['AWSTimestamp'];
-  tokenAddress?: InputMaybe<Scalars['String']>;
+  tokenAddress: Scalars['String'];
 };
 
 export type CreateStreamingPaymentMetadataInput = {
@@ -8244,7 +8244,7 @@ export type StakerRewardsInput = {
 export type StreamingPayment = {
   __typename?: 'StreamingPayment';
   actions?: Maybe<ModelColonyActionConnection>;
-  amount?: Maybe<Scalars['String']>;
+  amount: Scalars['String'];
   claims?: Maybe<Array<StreamingPaymentClaim>>;
   createdAt: Scalars['AWSDateTime'];
   endTime: Scalars['AWSTimestamp'];
@@ -8257,7 +8257,7 @@ export type StreamingPayment = {
   nativeId: Scalars['Int'];
   recipientAddress: Scalars['String'];
   startTime: Scalars['AWSTimestamp'];
-  tokenAddress?: Maybe<Scalars['String']>;
+  tokenAddress: Scalars['String'];
   updatedAt: Scalars['AWSDateTime'];
 };
 
@@ -8272,13 +8272,11 @@ export type StreamingPaymentClaim = {
   __typename?: 'StreamingPaymentClaim';
   amount: Scalars['String'];
   timestamp: Scalars['AWSTimestamp'];
-  tokenAddress: Scalars['ID'];
 };
 
 export type StreamingPaymentClaimInput = {
   amount: Scalars['String'];
   timestamp: Scalars['AWSTimestamp'];
-  tokenAddress: Scalars['ID'];
 };
 
 export enum StreamingPaymentEndCondition {
@@ -11465,12 +11463,11 @@ export type GetStreamingPaymentQuery = {
     __typename?: 'StreamingPayment';
     id: string;
     endTime: number;
-    tokenAddress?: string | null;
-    amount?: string | null;
+    tokenAddress: string;
+    amount: string;
     claims?: Array<{
       __typename?: 'StreamingPaymentClaim';
       amount: string;
-      tokenAddress: string;
       timestamp: number;
     }> | null;
   } | null;
@@ -13121,7 +13118,6 @@ export const GetStreamingPaymentDocument = gql`
       amount
       claims {
         amount
-        tokenAddress
         timestamp
       }
     }
