@@ -45,6 +45,8 @@ export default async (event: ContractEvent): Promise<void> => {
     startTime,
     endTime,
     interval,
+    token: tokenAddress,
+    amount,
   } = streamingPayment;
 
   const databaseId = getExpenditureDatabaseId(colonyAddress, convertedNativeId);
@@ -63,6 +65,8 @@ export default async (event: ContractEvent): Promise<void> => {
       startTime: toNumber(startTime),
       endTime: toNumber(endTime),
       interval: interval.toString(),
+      tokenAddress,
+      amount: amount.toString(),
     },
   });
 
