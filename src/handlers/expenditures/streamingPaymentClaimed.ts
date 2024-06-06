@@ -11,7 +11,7 @@ import { getStreamingPaymentFromDB } from './helpers';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { colonyAddress, timestamp } = event;
-  const { amount, streamingPaymentId, token: tokenAddress } = event.args;
+  const { amount, streamingPaymentId } = event.args;
   const convertedNativeId = toNumber(streamingPaymentId);
 
   if (!colonyAddress) {
@@ -30,7 +30,6 @@ export default async (event: ContractEvent): Promise<void> => {
 
   const newClaim: StreamingPaymentClaim = {
     amount: amount.toString(),
-    tokenAddress,
     timestamp,
   };
   const claims: StreamingPaymentClaim[] = streamingPayment.claims
