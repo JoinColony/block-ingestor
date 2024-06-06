@@ -46,6 +46,8 @@ export const handleStreamingPaymentCreated: EventHandler = async (
     startTime,
     endTime,
     interval,
+    token: tokenAddress,
+    amount,
   } = streamingPayment;
 
   const databaseId = getExpenditureDatabaseId(colonyAddress, convertedNativeId);
@@ -64,6 +66,8 @@ export const handleStreamingPaymentCreated: EventHandler = async (
       startTime: toNumber(startTime),
       endTime: toNumber(endTime),
       interval: interval.toString(),
+      tokenAddress,
+      amount: amount.toString(),
     },
   });
 
