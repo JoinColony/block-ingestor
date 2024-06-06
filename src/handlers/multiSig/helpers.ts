@@ -12,6 +12,12 @@ import {
   GetColonyMultiSigQueryVariables,
   UpdateColonyMultiSigDocument,
   UpdateColonyMultiSigInput,
+  RemoveMultiSigVoteMutation,
+  RemoveMultiSigVoteMutationVariables,
+  RemoveMultiSigVoteDocument,
+  CreateApprovalVoteMutation,
+  CreateApprovalVoteMutationVariables,
+  CreateApprovalVoteDocument,
 } from '~graphql';
 import { output } from '~utils/logger';
 
@@ -80,4 +86,40 @@ export const updateMultiSigInDB = async (
       ...multiSigData,
     },
   });
+};
+
+interface addMultiSigVoteParams {
+  userAddress: string;
+  colonyAddress: string;
+  multiSigId: string;
+  role: number;
+  vote: MultiSigVote.Approve | MultiSigVote.Reject;
+}
+
+export const addMultiSigVote = async ({
+  multiSigId,
+  role,
+  userAddress,
+  colonyAddress,
+  vote,
+}: addMultiSigVoteParams): Promise<void> => {
+  await mutate<CreateApprovalVoteMutation, CreateApprovalVoteMutationVariables>(
+    CreateApprovalVoteDocument,
+    {
+      input: {
+        colonyAddress,
+        multiSigId,
+        userAddress,
+        role,
+        vote,
+      },
+    },
+  );
+};
+
+export const removeMultiSigVote = async (id: string): Promise<void> => {
+  await mutate<RemoveMultiSigVoteMutation, RemoveMultiSigVoteMutationVariables>(
+    RemoveMultiSigVoteDocument,
+    { id },
+  );
 };
