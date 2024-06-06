@@ -1452,6 +1452,7 @@ export type CreateSafeTransactionInput = {
 };
 
 export type CreateStreamingPaymentInput = {
+  amount?: InputMaybe<Scalars['String']>;
   claims?: InputMaybe<Array<StreamingPaymentClaimInput>>;
   createdAt?: InputMaybe<Scalars['AWSDateTime']>;
   endTime: Scalars['AWSTimestamp'];
@@ -1460,9 +1461,9 @@ export type CreateStreamingPaymentInput = {
   isCancelled?: InputMaybe<Scalars['Boolean']>;
   nativeDomainId: Scalars['Int'];
   nativeId: Scalars['Int'];
-  payouts?: InputMaybe<Array<ExpenditurePayoutInput>>;
   recipientAddress: Scalars['String'];
   startTime: Scalars['AWSTimestamp'];
+  tokenAddress?: InputMaybe<Scalars['String']>;
 };
 
 export type CreateStreamingPaymentMetadataInput = {
@@ -3342,6 +3343,7 @@ export type ModelSplitPaymentDistributionTypeInput = {
 };
 
 export type ModelStreamingPaymentConditionInput = {
+  amount?: InputMaybe<ModelStringInput>;
   and?: InputMaybe<Array<InputMaybe<ModelStreamingPaymentConditionInput>>>;
   createdAt?: InputMaybe<ModelStringInput>;
   endTime?: InputMaybe<ModelIntInput>;
@@ -3353,6 +3355,7 @@ export type ModelStreamingPaymentConditionInput = {
   or?: InputMaybe<Array<InputMaybe<ModelStreamingPaymentConditionInput>>>;
   recipientAddress?: InputMaybe<ModelStringInput>;
   startTime?: InputMaybe<ModelIntInput>;
+  tokenAddress?: InputMaybe<ModelStringInput>;
 };
 
 export type ModelStreamingPaymentConnection = {
@@ -3367,6 +3370,7 @@ export type ModelStreamingPaymentEndConditionInput = {
 };
 
 export type ModelStreamingPaymentFilterInput = {
+  amount?: InputMaybe<ModelStringInput>;
   and?: InputMaybe<Array<InputMaybe<ModelStreamingPaymentFilterInput>>>;
   createdAt?: InputMaybe<ModelStringInput>;
   endTime?: InputMaybe<ModelIntInput>;
@@ -3379,6 +3383,7 @@ export type ModelStreamingPaymentFilterInput = {
   or?: InputMaybe<Array<InputMaybe<ModelStreamingPaymentFilterInput>>>;
   recipientAddress?: InputMaybe<ModelStringInput>;
   startTime?: InputMaybe<ModelIntInput>;
+  tokenAddress?: InputMaybe<ModelStringInput>;
 };
 
 export type ModelStreamingPaymentMetadataConditionInput = {
@@ -3923,6 +3928,7 @@ export type ModelSubscriptionSafeTransactionFilterInput = {
 };
 
 export type ModelSubscriptionStreamingPaymentFilterInput = {
+  amount?: InputMaybe<ModelSubscriptionStringInput>;
   and?: InputMaybe<
     Array<InputMaybe<ModelSubscriptionStreamingPaymentFilterInput>>
   >;
@@ -3938,6 +3944,7 @@ export type ModelSubscriptionStreamingPaymentFilterInput = {
   >;
   recipientAddress?: InputMaybe<ModelSubscriptionStringInput>;
   startTime?: InputMaybe<ModelSubscriptionIntInput>;
+  tokenAddress?: InputMaybe<ModelSubscriptionStringInput>;
 };
 
 export type ModelSubscriptionStreamingPaymentMetadataFilterInput = {
@@ -6748,6 +6755,7 @@ export type StakerRewardsInput = {
 export type StreamingPayment = {
   __typename?: 'StreamingPayment';
   actions?: Maybe<ModelColonyActionConnection>;
+  amount?: Maybe<Scalars['String']>;
   claims?: Maybe<Array<StreamingPaymentClaim>>;
   createdAt: Scalars['AWSDateTime'];
   endTime: Scalars['AWSTimestamp'];
@@ -6758,9 +6766,9 @@ export type StreamingPayment = {
   metadata?: Maybe<StreamingPaymentMetadata>;
   nativeDomainId: Scalars['Int'];
   nativeId: Scalars['Int'];
-  payouts?: Maybe<Array<ExpenditurePayout>>;
   recipientAddress: Scalars['String'];
   startTime: Scalars['AWSTimestamp'];
+  tokenAddress?: Maybe<Scalars['String']>;
   updatedAt: Scalars['AWSDateTime'];
 };
 
@@ -7940,6 +7948,7 @@ export type UpdateSafeTransactionInput = {
 };
 
 export type UpdateStreamingPaymentInput = {
+  amount?: InputMaybe<Scalars['String']>;
   claims?: InputMaybe<Array<StreamingPaymentClaimInput>>;
   createdAt?: InputMaybe<Scalars['AWSDateTime']>;
   endTime?: InputMaybe<Scalars['AWSTimestamp']>;
@@ -7948,9 +7957,9 @@ export type UpdateStreamingPaymentInput = {
   isCancelled?: InputMaybe<Scalars['Boolean']>;
   nativeDomainId?: InputMaybe<Scalars['Int']>;
   nativeId?: InputMaybe<Scalars['Int']>;
-  payouts?: InputMaybe<Array<ExpenditurePayoutInput>>;
   recipientAddress?: InputMaybe<Scalars['String']>;
   startTime?: InputMaybe<Scalars['AWSTimestamp']>;
+  tokenAddress?: InputMaybe<Scalars['String']>;
 };
 
 export type UpdateStreamingPaymentMetadataInput = {
@@ -9358,12 +9367,8 @@ export type GetStreamingPaymentQuery = {
     __typename?: 'StreamingPayment';
     id: string;
     endTime: number;
-    payouts?: Array<{
-      __typename?: 'ExpenditurePayout';
-      amount: string;
-      tokenAddress: string;
-      isClaimed: boolean;
-    }> | null;
+    tokenAddress?: string | null;
+    amount?: string | null;
     claims?: Array<{
       __typename?: 'StreamingPaymentClaim';
       amount: string;
@@ -10547,11 +10552,8 @@ export const GetStreamingPaymentDocument = gql`
     getStreamingPayment(id: $id) {
       id
       endTime
-      payouts {
-        amount
-        tokenAddress
-        isClaimed
-      }
+      tokenAddress
+      amount
       claims {
         amount
         tokenAddress
