@@ -1,7 +1,6 @@
-import { ExtensionEventListener } from '~eventListeners';
 import { MultiSigVote } from '~graphql';
 import { getChainId } from '~provider';
-import { EventHandler } from '~types';
+import { ContractEvent } from '~types';
 import {
   addMultiSigVote,
   getMultiSigDatabaseId,
@@ -9,13 +8,11 @@ import {
   removeMultiSigVote,
 } from '../helpers';
 
-export const handleMultiSigApprovalChanged: EventHandler = async (
-  event,
-  listener,
-) => {
-  const { contractAddress: multiSigExtensionAddress } = event;
-
-  const { colonyAddress } = listener as ExtensionEventListener;
+export default async (event: ContractEvent): Promise<void> => {
+  const { contractAddress: multiSigExtensionAddress, colonyAddress } = event;
+  if (!colonyAddress) {
+    return;
+  }
 
   const chainId = getChainId();
   const { agent: userAddress, motionId, role, approval } = event.args;
@@ -29,7 +26,7 @@ export const handleMultiSigApprovalChanged: EventHandler = async (
   const existingVote = await getUserMultiSigSignature({
     multiSigId,
     userAddress,
-    vote: MultiSigVote.Approve,
+    vote: MultiSigVote.Reject,
   });
 
   if (!approval) {
@@ -43,7 +40,7 @@ export const handleMultiSigApprovalChanged: EventHandler = async (
         role,
         userAddress,
         colonyAddress,
-        vote: MultiSigVote.Approve,
+        vote: MultiSigVote.Reject,
       });
     }
   }
