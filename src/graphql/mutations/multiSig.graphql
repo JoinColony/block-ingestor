@@ -21,3 +21,9 @@ mutation RemoveMultiSigVote($id: ID!) {
     id
   }
 }
+
+mutation RemoveMultiSigRole($id: ID!) {
+  deleteColonyRole(input: {id: $id}) {
+    id
+  }
+}
