@@ -22,11 +22,8 @@ query GetStreamingPayment($id: ID!) {
   getStreamingPayment(id: $id) {
     id
     endTime
-    payouts {
-      amount
-      tokenAddress
-      isClaimed
-    }
+    tokenAddress
+    amount
     claims {
       amount
       tokenAddress
