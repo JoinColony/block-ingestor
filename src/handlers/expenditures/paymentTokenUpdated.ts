@@ -1,14 +1,14 @@
-import { getExpenditureDatabaseId, toNumber, verbose } from '~utils';
+import { getExpenditureDatabaseId, output, toNumber, verbose } from '~utils';
 import { mutate } from '~amplifyClient';
 import {
   UpdateStreamingPaymentDocument,
   UpdateStreamingPaymentMutation,
   UpdateStreamingPaymentMutationVariables,
 } from '~graphql';
-
-import { getStreamingPaymentFromDB } from './helpers';
 import { EventHandler } from '~types';
 import { ExtensionEventListener } from '~eventListeners';
+
+import { getStreamingPaymentFromDB } from './helpers';
 
 export const handlePaymentTokenUpdated: EventHandler = async (
   event,
@@ -22,20 +22,9 @@ export const handlePaymentTokenUpdated: EventHandler = async (
   const streamingPayment = await getStreamingPaymentFromDB(databaseId);
 
   if (!streamingPayment) {
+    output(`Streaming payment with ID ${databaseId} not found in the database`);
     return;
   }
-
-  const newPayout = {
-    amount: amount.toString(),
-    tokenAddress,
-    isClaimed: false,
-  };
-  const updatedPayouts = [
-    ...(streamingPayment.payouts?.filter(
-      (payout) => payout.tokenAddress !== tokenAddress,
-    ) ?? []),
-    newPayout,
-  ];
 
   verbose(`Payment token updated for streaming payment with ID ${databaseId}`);
 
@@ -45,7 +34,8 @@ export const handlePaymentTokenUpdated: EventHandler = async (
   >(UpdateStreamingPaymentDocument, {
     input: {
       id: databaseId,
-      payouts: updatedPayouts,
+      tokenAddress,
+      amount: amount.toString(),
     },
   });
 };
