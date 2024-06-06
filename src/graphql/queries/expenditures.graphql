@@ -36,7 +36,6 @@ query GetStreamingPayment($id: ID!) {
     amount
     claims {
       amount
-      tokenAddress
       timestamp
     }
   }
