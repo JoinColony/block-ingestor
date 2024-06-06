@@ -1,5 +1,5 @@
 import { ContractEvent } from '~types';
-import { getExpenditureDatabaseId, toNumber, verbose } from '~utils';
+import { getExpenditureDatabaseId, output, toNumber, verbose } from '~utils';
 import { mutate } from '~amplifyClient';
 import {
   UpdateStreamingPaymentDocument,
@@ -10,6 +10,7 @@ import {
 import { getStreamingPaymentFromDB } from './helpers';
 
 export default async (event: ContractEvent): Promise<void> => {
+  console.log(event);
   const { colonyAddress } = event;
   const { streamingPaymentId, token: tokenAddress, amount } = event.args;
   const convertedNativeId = toNumber(streamingPaymentId);
@@ -22,20 +23,9 @@ export default async (event: ContractEvent): Promise<void> => {
   const streamingPayment = await getStreamingPaymentFromDB(databaseId);
 
   if (!streamingPayment) {
+    output(`Streaming payment with ID ${databaseId} not found in the database`);
     return;
   }
-
-  const newPayout = {
-    amount: amount.toString(),
-    tokenAddress,
-    isClaimed: false,
-  };
-  const updatedPayouts = [
-    ...(streamingPayment.payouts?.filter(
-      (payout) => payout.tokenAddress !== tokenAddress,
-    ) ?? []),
-    newPayout,
-  ];
 
   verbose(`Payment token updated for streaming payment with ID ${databaseId}`);
 
@@ -45,7 +35,8 @@ export default async (event: ContractEvent): Promise<void> => {
   >(UpdateStreamingPaymentDocument, {
     input: {
       id: databaseId,
-      payouts: updatedPayouts,
+      tokenAddress,
+      amount: amount.toString(),
     },
   });
 };
