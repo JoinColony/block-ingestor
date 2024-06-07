@@ -305,6 +305,7 @@ export const handleMotionCreated: EventHandler = async (
 
       case ColonyOperations.ReleaseStagedPaymentViaArbitration: {
         await handleReleaseStagedPaymentViaArbitration(
+          colonyAddress,
           event,
           parsedAction,
           gasEstimate,
