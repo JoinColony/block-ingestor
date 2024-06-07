@@ -1,7 +1,7 @@
 import { ColonyActionType } from '~graphql';
 import { ContractEvent } from '~types';
 import {
-  ManageTokensOperation /* , writeActionFromEvent */,
+  ManageTokensOperation,
   getApprovedTokenChanges,
   getColonyFromDB,
   updateColonyTokens,
