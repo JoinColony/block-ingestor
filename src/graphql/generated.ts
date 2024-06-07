@@ -102,6 +102,7 @@ export enum ClientType {
   TokenSupplierClient = 'TokenSupplierClient',
   VestingSimpleClient = 'VestingSimpleClient',
   VotingReputationClient = 'VotingReputationClient',
+  WhitelistClient = 'WhitelistClient',
   WrappedTokenClient = 'WrappedTokenClient',
 }
 
@@ -565,7 +566,7 @@ export type ColonyContributor = {
    * Format: <colonyAddress>_<contributorAddress>
    */
   id: Scalars['ID'];
-  /** Is the contributor a member of a colony? */
+  /** Is the contributor a verified member of the colony? */
   isVerified: Scalars['Boolean'];
   /** Is the contributor watching the colony */
   isWatching?: Maybe<Scalars['Boolean']>;
@@ -742,8 +743,6 @@ export type ColonyMetadata = {
   externalLinks?: Maybe<Array<ExternalLink>>;
   /** Unique identifier for the Colony (contract address) */
   id: Scalars['ID'];
-  /** The address book feature (aka Whitelist is active for this Colony) */
-  isWhitelistActivated?: Maybe<Scalars['Boolean']>;
   /** Colony Objective */
   objective?: Maybe<ColonyObjective>;
   /** List of safes that are used within the Colony */
@@ -1269,7 +1268,6 @@ export type CreateColonyMetadataInput = {
   etherealData?: InputMaybe<ColonyMetadataEtherealDataInput>;
   externalLinks?: InputMaybe<Array<ExternalLinkInput>>;
   id?: InputMaybe<Scalars['ID']>;
-  isWhitelistActivated?: InputMaybe<Scalars['Boolean']>;
   objective?: InputMaybe<ColonyObjectiveInput>;
   safes?: InputMaybe<Array<SafeInput>>;
   thumbnail?: InputMaybe<Scalars['String']>;
@@ -5556,7 +5554,6 @@ export type Query = {
   listUsers?: Maybe<ModelUserConnection>;
   searchColonyActions?: Maybe<SearchableColonyActionConnection>;
   searchColonyContributors?: Maybe<SearchableColonyContributorConnection>;
-  searchColonyFundsClaims?: Maybe<SearchableColonyFundsClaimConnection>;
 };
 
 /** Root query type */
@@ -6378,18 +6375,6 @@ export type QuerySearchColonyContributorsArgs = {
   sort?: InputMaybe<Array<InputMaybe<SearchableColonyContributorSortInput>>>;
 };
 
-/** Root query type */
-export type QuerySearchColonyFundsClaimsArgs = {
-  aggregates?: InputMaybe<
-    Array<InputMaybe<SearchableColonyFundsClaimAggregationInput>>
-  >;
-  filter?: InputMaybe<SearchableColonyFundsClaimFilterInput>;
-  from?: InputMaybe<Scalars['Int']>;
-  limit?: InputMaybe<Scalars['Int']>;
-  nextToken?: InputMaybe<Scalars['String']>;
-  sort?: InputMaybe<Array<InputMaybe<SearchableColonyFundsClaimSortInput>>>;
-};
-
 export type ReputationMiningCycleMetadata = {
   __typename?: 'ReputationMiningCycleMetadata';
   createdAt: Scalars['AWSDateTime'];
@@ -6681,61 +6666,6 @@ export enum SearchableColonyContributorSortableFields {
   Id = 'id',
   IsVerified = 'isVerified',
   IsWatching = 'isWatching',
-  UpdatedAt = 'updatedAt',
-}
-
-export enum SearchableColonyFundsClaimAggregateField {
-  Amount = 'amount',
-  ColonyFundsClaimTokenId = 'colonyFundsClaimTokenId',
-  ColonyFundsClaimsId = 'colonyFundsClaimsId',
-  CreatedAt = 'createdAt',
-  CreatedAtBlock = 'createdAtBlock',
-  Id = 'id',
-  IsClaimed = 'isClaimed',
-  UpdatedAt = 'updatedAt',
-}
-
-export type SearchableColonyFundsClaimAggregationInput = {
-  field: SearchableColonyFundsClaimAggregateField;
-  name: Scalars['String'];
-  type: SearchableAggregateType;
-};
-
-export type SearchableColonyFundsClaimConnection = {
-  __typename?: 'SearchableColonyFundsClaimConnection';
-  aggregateItems: Array<Maybe<SearchableAggregateResult>>;
-  items: Array<Maybe<ColonyFundsClaim>>;
-  nextToken?: Maybe<Scalars['String']>;
-  total?: Maybe<Scalars['Int']>;
-};
-
-export type SearchableColonyFundsClaimFilterInput = {
-  amount?: InputMaybe<SearchableStringFilterInput>;
-  and?: InputMaybe<Array<InputMaybe<SearchableColonyFundsClaimFilterInput>>>;
-  colonyFundsClaimTokenId?: InputMaybe<SearchableIdFilterInput>;
-  colonyFundsClaimsId?: InputMaybe<SearchableIdFilterInput>;
-  createdAt?: InputMaybe<SearchableStringFilterInput>;
-  createdAtBlock?: InputMaybe<SearchableIntFilterInput>;
-  id?: InputMaybe<SearchableIdFilterInput>;
-  isClaimed?: InputMaybe<SearchableBooleanFilterInput>;
-  not?: InputMaybe<SearchableColonyFundsClaimFilterInput>;
-  or?: InputMaybe<Array<InputMaybe<SearchableColonyFundsClaimFilterInput>>>;
-  updatedAt?: InputMaybe<SearchableStringFilterInput>;
-};
-
-export type SearchableColonyFundsClaimSortInput = {
-  direction?: InputMaybe<SearchableSortDirection>;
-  field?: InputMaybe<SearchableColonyFundsClaimSortableFields>;
-};
-
-export enum SearchableColonyFundsClaimSortableFields {
-  Amount = 'amount',
-  ColonyFundsClaimTokenId = 'colonyFundsClaimTokenId',
-  ColonyFundsClaimsId = 'colonyFundsClaimsId',
-  CreatedAt = 'createdAt',
-  CreatedAtBlock = 'createdAtBlock',
-  Id = 'id',
-  IsClaimed = 'isClaimed',
   UpdatedAt = 'updatedAt',
 }
 
@@ -7815,7 +7745,6 @@ export type UpdateColonyMetadataInput = {
   etherealData?: InputMaybe<ColonyMetadataEtherealDataInput>;
   externalLinks?: InputMaybe<Array<ExternalLinkInput>>;
   id: Scalars['ID'];
-  isWhitelistActivated?: InputMaybe<Scalars['Boolean']>;
   objective?: InputMaybe<ColonyObjectiveInput>;
   safes?: InputMaybe<Array<SafeInput>>;
   thumbnail?: InputMaybe<Scalars['String']>;
@@ -8380,7 +8309,6 @@ export type ColonyMetadataFragment = {
     oldDisplayName: string;
     newDisplayName: string;
     hasAvatarChanged: boolean;
-    hasWhitelistChanged: boolean;
     hasDescriptionChanged?: boolean | null;
     haveExternalLinksChanged?: boolean | null;
   }> | null;
@@ -9180,7 +9108,6 @@ export type GetColonyMetadataQuery = {
       oldDisplayName: string;
       newDisplayName: string;
       hasAvatarChanged: boolean;
-      hasWhitelistChanged: boolean;
       hasDescriptionChanged?: boolean | null;
       haveExternalLinksChanged?: boolean | null;
     }> | null;
@@ -9668,7 +9595,6 @@ export type GetColonyActionByMotionIdQuery = {
           oldDisplayName: string;
           newDisplayName: string;
           hasAvatarChanged: boolean;
-          hasWhitelistChanged: boolean;
           hasDescriptionChanged?: boolean | null;
           haveExternalLinksChanged?: boolean | null;
         }> | null;
@@ -9928,12 +9854,9 @@ export const ColonyMetadata = gql`
       oldDisplayName
       newDisplayName
       hasAvatarChanged
-      hasWhitelistChanged
       hasDescriptionChanged
       haveExternalLinksChanged
     }
-    isWhitelistActivated
-    whitelistedAddresses
   }
 `;
 export const ExpenditureSlot = gql`
