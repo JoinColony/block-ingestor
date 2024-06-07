@@ -1,30 +1,17 @@
-import { ExtensionEventListener } from '~eventListeners';
 import { EventHandler } from '~types';
-import {
-  addStakedExpenditureParamsToDB,
-  getStakedExpenditureClient,
-} from '~utils';
+import { updateExtension } from '~utils/extensions/updateExtension';
 
 export const handleStakeFractionSet: EventHandler = async (
-  _,
-  listener,
+  event,
 ): Promise<void> => {
-  const { colonyAddress } = listener as ExtensionEventListener;
+  const { contractAddress } = event;
+  const { stakeFraction } = event.args;
 
-  if (!colonyAddress) {
-    return;
-  }
-
-  const stakedExpenditureClient = await getStakedExpenditureClient(
-    colonyAddress,
-  );
-
-  if (!stakedExpenditureClient) {
-    return;
-  }
-
-  await addStakedExpenditureParamsToDB(
-    stakedExpenditureClient?.address,
-    colonyAddress,
-  );
+  await updateExtension(contractAddress, {
+    params: {
+      stakedExpenditure: {
+        stakeFraction: stakeFraction.toString(),
+      },
+    },
+  });
 };
