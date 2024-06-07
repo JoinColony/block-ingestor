@@ -9,19 +9,16 @@ import {
 } from '~utils';
 
 export default async (
+  colonyAddress: string,
   event: ContractEvent,
   { name, args: actionArgs }: TransactionDescription,
   gasEstimate: BigNumber,
 ): Promise<void> => {
-  const { args, colonyAddress } = event;
+  const { args } = event;
   const [, , , , expenditureId] = actionArgs;
   const [, , domainId] = args;
 
-  if (!colonyAddress) {
-    return;
-  }
-
-  await createMotionInDB(event, {
+  await createMotionInDB(colonyAddress, event, {
     type: motionNameMapping[name],
     fromDomainId: colonyAddress
       ? getDomainDatabaseId(colonyAddress, domainId)
