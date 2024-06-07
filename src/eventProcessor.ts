@@ -202,7 +202,6 @@ export default async (event: ContractEvent): Promise<void> => {
     }
 
     case ContractEventsSignatures.MultisigRejectionChanged: {
-      console.log('hello?');
       await handleRejectionChanged(event);
       return;
     }
