@@ -1,6 +1,7 @@
+import { ExtensionEventListener } from '~eventListeners';
 import { getChainId } from '~provider';
 
-import { ContractEvent } from '~types';
+import { EventHandler } from '~types';
 // import { linkPendingMetadata } from '~utils/colonyMetadata';
 
 import {
@@ -9,13 +10,17 @@ import {
   updateMultiSigInDB,
 } from '../helpers';
 
-export default async (event: ContractEvent): Promise<void> => {
+export const handleMultiSigMotionExecuted: EventHandler = async (
+  event,
+  listener,
+) => {
   const {
     contractAddress: multiSigExtensionAddress,
-    colonyAddress,
     args: { motionId, success },
     timestamp,
   } = event;
+
+  const { colonyAddress } = listener as ExtensionEventListener;
 
   if (!colonyAddress) {
     return;

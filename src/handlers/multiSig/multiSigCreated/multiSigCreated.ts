@@ -1,4 +1,5 @@
-import { ColonyOperations, ContractEvent } from '~types';
+import { ExtensionEventListener } from '~eventListeners';
+import { ColonyOperations, EventHandler } from '~types';
 import {
   getCachedColonyClient,
   getMultiSigClient,
@@ -10,28 +11,26 @@ import {
 } from '~utils';
 import { handleMintTokensMultiSig } from './handlers/mintTokens';
 
-export default async (event: ContractEvent): Promise<void> => {
+export const handleMultiSigMotionCreated: EventHandler = async (
+  event,
+  listener,
+) => {
   const {
     args: { motionId },
-    colonyAddress,
     blockNumber,
   } = event;
 
-  if (!colonyAddress) {
-    return;
-  }
+  const { colonyAddress } = listener as ExtensionEventListener;
 
   const colonyClient = await getCachedColonyClient(colonyAddress);
   const multiSigClient = await getMultiSigClient(colonyAddress);
   const oneTxPaymentClient = await getOneTxPaymentClient(colonyAddress);
 
-  const stakedExpenditureClient = await getStakedExpenditureClient(
-    colonyAddress,
-  );
+  const stakedExpenditureClient =
+    await getStakedExpenditureClient(colonyAddress);
 
-  const stagedExpenditureClient = await getStagedExpenditureClient(
-    colonyAddress,
-  );
+  const stagedExpenditureClient =
+    await getStagedExpenditureClient(colonyAddress);
 
   if (!colonyClient || !multiSigClient) {
     return;
@@ -59,7 +58,7 @@ export default async (event: ContractEvent): Promise<void> => {
     /* Handle the action type-specific mutation here */
     switch (contractOperation) {
       case ColonyOperations.MintTokens: {
-        await handleMintTokensMultiSig(event, parsedOperation);
+        await handleMintTokensMultiSig(colonyAddress, event, parsedOperation);
         break;
       }
       default: {
