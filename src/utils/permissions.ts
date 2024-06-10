@@ -601,6 +601,8 @@ export const createInitialMultiSigRolesDatabaseEntry = async (
     await createColonyContributor({
       colonyAddress,
       contributorAddress: targetAddress,
+      colonyReputationPercentage: 0,
+      isVerified: false,
     });
   }
 };

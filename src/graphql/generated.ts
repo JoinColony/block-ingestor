@@ -915,7 +915,7 @@ export type ColonyMotion = {
    * It's a tuple: `[nayRemaining, yayRemaining]`
    */
   remainingStakes: Array<Scalars['String']>;
-  /** The amount of reputation that has submitted a vote */
+  /** The amount of reputaion that has submitted a vote */
   repSubmitted: Scalars['String'];
   /** The total required stake for one side to be activated */
   requiredStake: Scalars['String'];
@@ -949,6 +949,8 @@ export type ColonyMotionMessagesArgs = {
 export type ColonyMultiSig = {
   __typename?: 'ColonyMultiSig';
   action?: Maybe<ColonyAction>;
+  /** Colony address the multiSig belongs to */
+  colonyAddress: Scalars['ID'];
   createdAt: Scalars['AWSDateTime'];
   /** The timestamp when the motion was finalized */
   executedAt?: Maybe<Scalars['AWSDateTime']>;
@@ -1399,6 +1401,7 @@ export type CreateColonyMotionInput = {
 };
 
 export type CreateColonyMultiSigInput = {
+  colonyAddress: Scalars['ID'];
   executedAt?: InputMaybe<Scalars['AWSDateTime']>;
   id?: InputMaybe<Scalars['ID']>;
   isDecision: Scalars['Boolean'];
@@ -1520,6 +1523,7 @@ export type CreateExpenditureMetadataInput = {
 
 export type CreateExtensionInstallationsCountInput = {
   id?: InputMaybe<Scalars['ID']>;
+  multiSigPermissions: Scalars['Int'];
   oneTxPayment: Scalars['Int'];
   reputationWeighted: Scalars['Int'];
   stagedExpenditure: Scalars['Int'];
@@ -2188,6 +2192,7 @@ export type ExtensionInstallationsCount = {
   createdAt: Scalars['AWSDateTime'];
   /** The model id. It's the chain id the of the colony the extension belongs to */
   id: Scalars['ID'];
+  multiSigPermissions: Scalars['Int'];
   oneTxPayment: Scalars['Int'];
   reputationWeighted: Scalars['Int'];
   stagedExpenditure: Scalars['Int'];
@@ -2852,6 +2857,7 @@ export type ModelColonyMotionFilterInput = {
 
 export type ModelColonyMultiSigConditionInput = {
   and?: InputMaybe<Array<InputMaybe<ModelColonyMultiSigConditionInput>>>;
+  colonyAddress?: InputMaybe<ModelIdInput>;
   executedAt?: InputMaybe<ModelStringInput>;
   isDecision?: InputMaybe<ModelBooleanInput>;
   isExecuted?: InputMaybe<ModelBooleanInput>;
@@ -2874,6 +2880,7 @@ export type ModelColonyMultiSigConnection = {
 
 export type ModelColonyMultiSigFilterInput = {
   and?: InputMaybe<Array<InputMaybe<ModelColonyMultiSigFilterInput>>>;
+  colonyAddress?: InputMaybe<ModelIdInput>;
   executedAt?: InputMaybe<ModelStringInput>;
   id?: InputMaybe<ModelIdInput>;
   isDecision?: InputMaybe<ModelBooleanInput>;
@@ -3245,6 +3252,7 @@ export type ModelExtensionInstallationsCountConditionInput = {
   and?: InputMaybe<
     Array<InputMaybe<ModelExtensionInstallationsCountConditionInput>>
   >;
+  multiSigPermissions?: InputMaybe<ModelIntInput>;
   not?: InputMaybe<ModelExtensionInstallationsCountConditionInput>;
   oneTxPayment?: InputMaybe<ModelIntInput>;
   or?: InputMaybe<
@@ -3267,6 +3275,7 @@ export type ModelExtensionInstallationsCountFilterInput = {
     Array<InputMaybe<ModelExtensionInstallationsCountFilterInput>>
   >;
   id?: InputMaybe<ModelIdInput>;
+  multiSigPermissions?: InputMaybe<ModelIntInput>;
   not?: InputMaybe<ModelExtensionInstallationsCountFilterInput>;
   oneTxPayment?: InputMaybe<ModelIntInput>;
   or?: InputMaybe<
@@ -3910,6 +3919,7 @@ export type ModelSubscriptionColonyMultiSigFilterInput = {
   and?: InputMaybe<
     Array<InputMaybe<ModelSubscriptionColonyMultiSigFilterInput>>
   >;
+  colonyAddress?: InputMaybe<ModelSubscriptionIdInput>;
   executedAt?: InputMaybe<ModelSubscriptionStringInput>;
   id?: InputMaybe<ModelSubscriptionIdInput>;
   isDecision?: InputMaybe<ModelSubscriptionBooleanInput>;
@@ -4071,6 +4081,7 @@ export type ModelSubscriptionExtensionInstallationsCountFilterInput = {
     Array<InputMaybe<ModelSubscriptionExtensionInstallationsCountFilterInput>>
   >;
   id?: InputMaybe<ModelSubscriptionIdInput>;
+  multiSigPermissions?: InputMaybe<ModelSubscriptionIntInput>;
   oneTxPayment?: InputMaybe<ModelSubscriptionIntInput>;
   or?: InputMaybe<
     Array<InputMaybe<ModelSubscriptionExtensionInstallationsCountFilterInput>>
@@ -8233,6 +8244,7 @@ export type UpdateColonyMotionInput = {
 };
 
 export type UpdateColonyMultiSigInput = {
+  colonyAddress?: InputMaybe<Scalars['ID']>;
   executedAt?: InputMaybe<Scalars['AWSDateTime']>;
   id: Scalars['ID'];
   isDecision?: InputMaybe<Scalars['Boolean']>;
@@ -8382,6 +8394,7 @@ export type UpdateExtensionByColonyAndHashInput = {
 
 export type UpdateExtensionInstallationsCountInput = {
   id: Scalars['ID'];
+  multiSigPermissions?: InputMaybe<Scalars['Int']>;
   oneTxPayment?: InputMaybe<Scalars['Int']>;
   reputationWeighted?: InputMaybe<Scalars['Int']>;
   stagedExpenditure?: InputMaybe<Scalars['Int']>;
@@ -8763,8 +8776,6 @@ export type ActionMetadataInfoFragment = {
     avatar?: string | null;
     thumbnail?: string | null;
     description?: string | null;
-    isWhitelistActivated?: boolean | null;
-    whitelistedAddresses?: Array<string> | null;
     externalLinks?: Array<{
       __typename?: 'ExternalLink';
       name: ExternalLinks;
@@ -8776,7 +8787,6 @@ export type ActionMetadataInfoFragment = {
       oldDisplayName: string;
       newDisplayName: string;
       hasAvatarChanged: boolean;
-      hasWhitelistChanged: boolean;
       haveTokensChanged: boolean;
       hasDescriptionChanged?: boolean | null;
       haveExternalLinksChanged?: boolean | null;
@@ -9042,6 +9052,7 @@ export type MultiSigUserSignatureFragment = {
 export type ColonyMultiSigFragment = {
   __typename?: 'ColonyMultiSig';
   id: string;
+  colonyAddress: string;
   nativeMultiSigId: string;
   multiSigDomainId: string;
   nativeMultiSigDomainId: string;
@@ -10161,6 +10172,7 @@ export type GetExtensionInstallationsCountQuery = {
     stagedExpenditure: number;
     streamingPayments: number;
     reputationWeighted: number;
+    multiSigPermissions: number;
   } | null;
 };
 
@@ -10398,8 +10410,6 @@ export type GetColonyActionByMultiSigIdQuery = {
         avatar?: string | null;
         thumbnail?: string | null;
         description?: string | null;
-        isWhitelistActivated?: boolean | null;
-        whitelistedAddresses?: Array<string> | null;
         externalLinks?: Array<{
           __typename?: 'ExternalLink';
           name: ExternalLinks;
@@ -10411,7 +10421,6 @@ export type GetColonyActionByMultiSigIdQuery = {
           oldDisplayName: string;
           newDisplayName: string;
           hasAvatarChanged: boolean;
-          hasWhitelistChanged: boolean;
           haveTokensChanged: boolean;
           hasDescriptionChanged?: boolean | null;
           haveExternalLinksChanged?: boolean | null;
@@ -10435,6 +10444,7 @@ export type GetColonyMultiSigQuery = {
   getColonyMultiSig?: {
     __typename?: 'ColonyMultiSig';
     id: string;
+    colonyAddress: string;
     nativeMultiSigId: string;
     multiSigDomainId: string;
     nativeMultiSigDomainId: string;
@@ -10870,6 +10880,7 @@ export const MultiSigUserSignature = gql`
 export const ColonyMultiSig = gql`
   fragment ColonyMultiSig on ColonyMultiSig {
     id
+    colonyAddress
     nativeMultiSigId
     multiSigDomainId
     nativeMultiSigDomainId
@@ -11612,6 +11623,7 @@ export const GetExtensionInstallationsCountDocument = gql`
       stagedExpenditure
       streamingPayments
       reputationWeighted
+      multiSigPermissions
     }
   }
 `;

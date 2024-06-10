@@ -4,10 +4,11 @@ import { getColonyTokenAddress } from '~utils';
 import { createMultiSigInDB } from '../helpers';
 
 export const handleMintTokensMultiSig = async (
+  colonyAddress: string,
   event: ContractEvent,
   parsedAction: TransactionDescription,
 ): Promise<void> => {
-  const { colonyAddress, blockNumber } = event;
+  const { blockNumber } = event;
   if (!colonyAddress) {
     return;
   }
@@ -16,7 +17,7 @@ export const handleMintTokensMultiSig = async (
   const amount = actionArgs[0].toString();
   const tokenAddress = await getColonyTokenAddress(colonyAddress, blockNumber);
 
-  await createMultiSigInDB(event, {
+  await createMultiSigInDB(colonyAddress, event, {
     type: multiSigNameMapping[name],
     tokenAddress,
     amount,

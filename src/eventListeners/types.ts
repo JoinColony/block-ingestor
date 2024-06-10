@@ -15,6 +15,7 @@ export enum EventListenerType {
   Extension = 'Extension',
   Token = 'Token',
   OneTxPayment = 'OneTxPayment',
+  MultisigPermissions = 'MultisigPermissions',
 }
 
 export interface ColonyEventListener extends BaseEventListener {

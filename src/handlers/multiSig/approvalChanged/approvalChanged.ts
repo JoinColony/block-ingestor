@@ -1,14 +1,17 @@
+import { ExtensionEventListener } from '~eventListeners';
 import { MultiSigVote } from '~graphql';
 import { getChainId } from '~provider';
-import { ContractEvent } from '~types';
+import { EventHandler } from '~types';
 import { getMultiSigDatabaseId, getUserMultiSigSignature } from '../helpers';
 import { addApprovalVote, removeMultiSigVote } from './helpers';
 
-export default async (event: ContractEvent): Promise<void> => {
-  const { contractAddress: multiSigExtensionAddress, colonyAddress } = event;
-  if (!colonyAddress) {
-    return;
-  }
+export const handleMultiSigApprovalChanged: EventHandler = async (
+  event,
+  listener,
+) => {
+  const { contractAddress: multiSigExtensionAddress } = event;
+
+  const { colonyAddress } = listener as ExtensionEventListener;
 
   const chainId = getChainId();
   const { agent: userAddress, motionId, role, approval } = event.args;

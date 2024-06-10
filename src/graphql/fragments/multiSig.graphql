@@ -10,6 +10,7 @@ fragment MultiSigUserSignature on MultiSigUserSignature {
 
 fragment ColonyMultiSig on ColonyMultiSig {
   id
+  colonyAddress
   nativeMultiSigId
   multiSigDomainId
   nativeMultiSigDomainId

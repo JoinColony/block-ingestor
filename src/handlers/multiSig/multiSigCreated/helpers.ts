@@ -63,6 +63,7 @@ export const getMultiSigData = async ({
 
   return {
     id: multiSigDatabaseId,
+    colonyAddress,
     nativeMultiSigId: multiSigId.toString(),
     multiSigDomainId: getDomainDatabaseId(colonyAddress, domainId),
     nativeMultiSigDomainId: domainId.toString(),
@@ -94,11 +95,11 @@ const getDomainIdByNativeSkillId = async (
 };
 
 export const createMultiSigInDB = async (
+  colonyAddress: string,
   {
     transactionHash,
     blockNumber,
     logIndex,
-    colonyAddress,
     args: { motionId: multiSigId },
     timestamp,
   }: ContractEvent,

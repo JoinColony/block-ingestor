@@ -1,6 +1,13 @@
 import { Extension, getExtensionHash } from '@colony/colony-js';
-import { handleExtensionInitialised } from '~handlers';
-import { handleMultiSigGlobalThresholdUpdated } from '~handlers/multiSig';
+import { handleManagePermissionsAction } from '~handlers';
+import {
+  handleMultiSigApprovalChanged,
+  handleMultiSigDomainSkillThresholdSet,
+  handleMultiSigGlobalThresholdSet,
+  handleMultiSigMotionCancelled,
+  handleMultiSigMotionCreated,
+  handleMultiSigMotionExecuted,
+} from '~handlers/multiSig';
 
 import { ContractEventsSignatures } from '~types';
 import { addMultiSigParamsToDB } from '~utils/extensions/multiSig';
@@ -30,21 +37,26 @@ export const setupMultiSigListeners = (
   multiSigAddress: string,
   colonyAddress: string,
 ): void => {
-  const motionEvents = {
-    [ContractEventsSignatures.MultisigRoleSet]: () => {},
-    [ContractEventsSignatures.MultisigMotionExecuted]: () => {},
-    [ContractEventsSignatures.MultisigMotionCancelled]: () => {},
-    [ContractEventsSignatures.MultisigMotionCreated]: () => {},
-    [ContractEventsSignatures.MultisigApprovalChanged]: () => {},
-    [ContractEventsSignatures.MultisigRejectionChanged]: () => {},
+  const multiSigEvents = {
+    [ContractEventsSignatures.MultisigMotionExecuted]:
+      handleMultiSigMotionExecuted,
+    [ContractEventsSignatures.MultisigMotionCancelled]:
+      handleMultiSigMotionCancelled,
+    [ContractEventsSignatures.MultisigMotionCreated]:
+      handleMultiSigMotionCreated,
+    [ContractEventsSignatures.MultisigApprovalChanged]:
+      handleMultiSigApprovalChanged,
+    [ContractEventsSignatures.MultisigRoleSet]: handleManagePermissionsAction,
+    // [ContractEventsSignatures.MultisigRejectionChanged]: () => {},
     [ContractEventsSignatures.MultisigGlobalThresholdSet]:
-      handleMultiSigGlobalThresholdUpdated,
-    [ContractEventsSignatures.MultisigDomainSkillThresholdSet]: () => {},
+      handleMultiSigGlobalThresholdSet,
+    [ContractEventsSignatures.MultisigDomainSkillThresholdSet]:
+      handleMultiSigDomainSkillThresholdSet,
   };
 
-  Object.entries(motionEvents).forEach(([eventSignature, handler]) =>
+  Object.entries(multiSigEvents).forEach(([eventSignature, handler]) =>
     addExtensionEventListener(
-      eventSignature,
+      eventSignature as ContractEventsSignatures,
       Extension.MultisigPermissions,
       multiSigAddress,
       colonyAddress,

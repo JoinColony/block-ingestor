@@ -4,12 +4,12 @@ import {
   UpdateColonyMultiSigInput,
   UpdateColonyMultiSigMutationVariables,
 } from '~graphql';
-import { ContractEvent } from '~types';
+import { EventHandler } from '~types';
 import { verbose } from '~utils';
 import { getMultiSigDatabaseId } from './helpers';
 import { getChainId } from '~provider';
 
-export default async (event: ContractEvent): Promise<void> => {
+export const handleMultiSigMotionCancelled: EventHandler = async (event) => {
   const {
     args: { motionId },
     contractAddress: multiSigExtensionAddress,
