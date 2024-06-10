@@ -18,8 +18,6 @@ export const handleSetUserRolesMotion = async (
 ): Promise<void> => {
   const isMultiSig = altTarget !== constants.AddressZero;
 
-  const isMultiSig = altTarget !== constants.AddressZero;
-
   const { name, args: actionArgs } = parsedAction;
   const [userAddress, domainId, zeroPadHexString] = actionArgs.slice(-3);
   const colonyRolesDatabaseId = getColonyRolesDatabaseId(
