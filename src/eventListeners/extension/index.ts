@@ -86,11 +86,11 @@ export const setupListenersForExtensions = async (): Promise<void> => {
     ),
   );
 
-  setupListenerForOneTxPaymentExtensions();
-  setupListenersForVotingReputationExtensions();
-  setupListenersForStakedExpenditureExtensions();
-  setupListenersForStagedExpenditureExtensions();
-  setupListenersForStreamingPaymentsExtensions();
+  await setupListenerForOneTxPaymentExtensions();
+  await setupListenersForVotingReputationExtensions();
+  await setupListenersForStakedExpenditureExtensions();
+  await setupListenersForStagedExpenditureExtensions();
+  await setupListenersForStreamingPaymentsExtensions();
 };
 
 export const fetchExistingExtensions = async (
