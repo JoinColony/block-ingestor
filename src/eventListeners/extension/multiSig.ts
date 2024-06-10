@@ -2,6 +2,7 @@ import { Extension, getExtensionHash } from '@colony/colony-js';
 import { handleManagePermissionsAction } from '~handlers';
 import {
   handleMultiSigApprovalChanged,
+  handleMultiSigRejectionChanged,
   handleMultiSigDomainSkillThresholdSet,
   handleMultiSigGlobalThresholdSet,
   handleMultiSigMotionCancelled,
@@ -47,7 +48,8 @@ export const setupMultiSigListeners = (
     [ContractEventsSignatures.MultisigApprovalChanged]:
       handleMultiSigApprovalChanged,
     [ContractEventsSignatures.MultisigRoleSet]: handleManagePermissionsAction,
-    // [ContractEventsSignatures.MultisigRejectionChanged]: () => {},
+    [ContractEventsSignatures.MultisigRejectionChanged]:
+      handleMultiSigRejectionChanged,
     [ContractEventsSignatures.MultisigGlobalThresholdSet]:
       handleMultiSigGlobalThresholdSet,
     [ContractEventsSignatures.MultisigDomainSkillThresholdSet]:
