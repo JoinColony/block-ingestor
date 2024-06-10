@@ -7,9 +7,9 @@ import {
   UpdateColonyExtensionByAddressMutation,
   UpdateColonyExtensionByAddressMutationVariables,
 } from '~graphql';
-import { ContractEvent } from '~types';
+import { EventHandler } from '~types';
 
-export default async (event: ContractEvent): Promise<void> => {
+export const handleMultiSigGlobalThresholdSet: EventHandler = async (event) => {
   const { contractAddress: multiSigAddress } = event;
   const { globalThreshold } = event.args;
 
