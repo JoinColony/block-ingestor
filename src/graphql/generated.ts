@@ -9464,6 +9464,7 @@ export type MultiSigUserSignatureFragment = {
 export type ColonyMultiSigFragment = {
   __typename?: 'ColonyMultiSig';
   id: string;
+  colonyAddress: string;
   nativeMultiSigId: string;
   multiSigDomainId: string;
   nativeMultiSigDomainId: string;
@@ -10585,6 +10586,7 @@ export type GetExtensionInstallationsCountQuery = {
     stagedExpenditure: number;
     streamingPayments: number;
     reputationWeighted: number;
+    multiSigPermissions: number;
   } | null;
 };
 
@@ -10856,6 +10858,7 @@ export type GetColonyMultiSigQuery = {
   getColonyMultiSig?: {
     __typename?: 'ColonyMultiSig';
     id: string;
+    colonyAddress: string;
     nativeMultiSigId: string;
     multiSigDomainId: string;
     nativeMultiSigDomainId: string;
@@ -11281,6 +11284,7 @@ export const MultiSigUserSignature = gql`
 export const ColonyMultiSig = gql`
   fragment ColonyMultiSig on ColonyMultiSig {
     id
+    colonyAddress
     nativeMultiSigId
     multiSigDomainId
     nativeMultiSigDomainId
@@ -12023,6 +12027,7 @@ export const GetExtensionInstallationsCountDocument = gql`
       stagedExpenditure
       streamingPayments
       reputationWeighted
+      multiSigPermissions
     }
   }
 `;

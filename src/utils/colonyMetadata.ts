@@ -147,7 +147,6 @@ const linkPendingColonyMetadataWithColony = async (
   const {
     haveTokensChanged,
     hasAvatarChanged,
-    hasWhitelistChanged,
     newDisplayName,
     oldDisplayName,
     hasDescriptionChanged,
@@ -167,15 +166,6 @@ const linkPendingColonyMetadataWithColony = async (
     // If avatar has changed, update avatar and thumbnail
     updatedMetadata.avatar = pendingColonyMetadata.avatar;
     updatedMetadata.thumbnail = pendingColonyMetadata.thumbnail;
-  }
-
-  if (hasWhitelistChanged) {
-    // If whitelist has changed, update whitelistedAddresses and isWhitelistActivated
-    updatedMetadata.isWhitelistActivated =
-      pendingColonyMetadata.isWhitelistActivated;
-
-    updatedMetadata.whitelistedAddresses =
-      pendingColonyMetadata.whitelistedAddresses;
   }
 
   if (newDisplayName !== oldDisplayName) {
@@ -226,13 +216,11 @@ export const linkPendingMetadata = async (
   const colonyClient = await getCachedColonyClient(colonyAddress);
   const oneTxPaymentClient =
     (await colonyClient?.getExtensionClient(Extension.OneTxPayment)) ?? null;
-  const stakedExpenditureClient = await getStakedExpenditureClient(
-    colonyAddress,
-  );
+  const stakedExpenditureClient =
+    await getStakedExpenditureClient(colonyAddress);
 
-  const stagedExpenditureClient = await getStagedExpenditureClient(
-    colonyAddress,
-  );
+  const stagedExpenditureClient =
+    await getStagedExpenditureClient(colonyAddress);
 
   const parsedOperation = parseOperation(action, {
     colonyClient,
