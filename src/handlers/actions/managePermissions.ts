@@ -1,7 +1,7 @@
 import { BigNumber } from 'ethers';
 import { Id } from '@colony/colony-js';
 import { mutate, query } from '~amplifyClient';
-import { ContractEvent, ContractEventsSignatures } from '~types';
+import { ContractEventsSignatures, EventHandler } from '~types';
 import {
   getColonyRolesDatabaseId,
   getDomainDatabaseId,
@@ -28,15 +28,16 @@ import {
 } from '~graphql';
 import provider from '~provider';
 import { updateColonyContributor } from '~utils/contributors';
+import { ExtensionEventListener } from '~eventListeners';
 
-export default async (event: ContractEvent): Promise<void> => {
-  const {
-    args,
-    contractAddress,
-    blockNumber,
-    transactionHash,
-    colonyAddress: eventColonyAddress,
-  } = event;
+export const handleManagePermissionsAction: EventHandler = async (
+  event,
+  listener,
+) => {
+  const { args, contractAddress, blockNumber, transactionHash } = event;
+
+  const { colonyAddress: eventColonyAddress } =
+    listener as ExtensionEventListener;
 
   const isMultiSig =
     event.signature === ContractEventsSignatures.MultisigRoleSet;
@@ -105,9 +106,8 @@ export default async (event: ContractEvent): Promise<void> => {
       // We can get the msg.sender from the transaction receipt.
 
       if (!agent) {
-        const { from = '' } = await provider.getTransactionReceipt(
-          transactionHash,
-        );
+        const { from = '' } =
+          await provider.getTransactionReceipt(transactionHash);
         agent = from;
       }
       const allRoleEventsUpdates = isMultiSig

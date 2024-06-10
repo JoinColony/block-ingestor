@@ -6,7 +6,7 @@ export { default as handleMoveFundsAction } from './moveFunds';
 export { default as handleEditColonyAction } from './editColony';
 export { default as handleColonyUpgradeAction } from './colonyUpgrade';
 export { default as handleEmitDomainReputationAction } from './emitDomainReputation';
-export { default as handleManagePermissionsAction } from './managePermissions';
+export * from './managePermissions';
 export { default as handleAnnotateTransaction } from './annotateTransaction';
 export { default as handleMakeAbitraryTransactionAction } from './makeArbitraryTransaction';
 export { default as handleOneTxPaymentAction } from './oneTxPayment';

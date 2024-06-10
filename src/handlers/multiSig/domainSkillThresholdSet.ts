@@ -10,10 +10,12 @@ import {
   UpdateColonyExtensionByAddressMutation,
   UpdateColonyExtensionByAddressMutationVariables,
 } from '~graphql';
-import { ContractEvent } from '~types';
+import { ContractEvent, EventHandler } from '~types';
 import { getCachedColonyClient, toNumber } from '~utils';
 
-export default async (event: ContractEvent): Promise<void> => {
+export const handleMultiSigDomainSkillThresholdSet: EventHandler = async (
+  event: ContractEvent,
+) => {
   const { contractAddress: multiSigAddress } = event;
   const { domainSkillId, threshold } = event.args;
 
