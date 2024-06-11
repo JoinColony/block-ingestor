@@ -57,6 +57,7 @@ import {
   handleStakeFractionSet,
   handleStreamingPaymentEndTimeSet,
   handleStreamingPaymentClaimed,
+  handleStreamingPaymentClaimWaived,
 } from './handlers';
 
 dotenv.config();
@@ -346,6 +347,11 @@ export default async (event: ContractEvent): Promise<void> => {
 
     case ContractEventsSignatures.EndTimeSet: {
       await handleStreamingPaymentEndTimeSet(event);
+      return;
+    }
+
+    case ContractEventsSignatures.ClaimWaived: {
+      await handleStreamingPaymentClaimWaived(event);
       return;
     }
 

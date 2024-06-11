@@ -8114,6 +8114,7 @@ export type UpdateStreamingPaymentInput = {
   recipientAddress?: InputMaybe<Scalars['String']>;
   startTime?: InputMaybe<Scalars['AWSTimestamp']>;
   tokenAddress?: InputMaybe<Scalars['String']>;
+  isWaived?: InputMaybe<Scalars['Boolean']>;
 };
 
 export type UpdateStreamingPaymentMetadataInput = {
