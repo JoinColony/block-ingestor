@@ -15,7 +15,7 @@ export default async (
   gasEstimate: BigNumber,
 ): Promise<void> => {
   const { args } = event;
-  const [, , , , expenditureId] = actionArgs;
+  const [, , , , expenditureId, slotId] = actionArgs;
   const [, , domainId] = args;
 
   await createMotionInDB(colonyAddress, event, {
@@ -28,5 +28,6 @@ export default async (
       colonyAddress,
       toNumber(expenditureId),
     ),
+    expenditureSlotIds: [toNumber(slotId)],
   });
 };
