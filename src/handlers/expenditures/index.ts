@@ -21,3 +21,4 @@ export * from './expenditureStateChanged';
 export * from './stakeFractionSet';
 export * from './streamingPaymentEndTimeSet';
 export * from './streamingPaymentClaimed';
+export * from './streamingPaymentClaimWaived';
