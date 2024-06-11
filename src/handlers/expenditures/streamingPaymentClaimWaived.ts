@@ -1,15 +1,21 @@
 import { mutate } from '~amplifyClient';
 import {
+  ColonyActionType,
   UpdateStreamingPaymentDocument,
   UpdateStreamingPaymentMutation,
   UpdateStreamingPaymentMutationVariables,
 } from '~graphql';
 import { ContractEvent } from '~types';
-import { getExpenditureDatabaseId, toNumber, verbose } from '~utils';
+import {
+  getExpenditureDatabaseId,
+  toNumber,
+  verbose,
+  writeActionFromEvent,
+} from '~utils';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { colonyAddress } = event;
-  const { streamingPaymentId } = event.args;
+  const { agent: initiatorAddress, streamingPaymentId } = event.args;
   const convertedNativeId = toNumber(streamingPaymentId);
 
   if (!colonyAddress) {
@@ -30,4 +36,10 @@ export default async (event: ContractEvent): Promise<void> => {
   });
 
   verbose(`Streaming payment with ID ${databaseId} waived and cancelled`);
+
+  await writeActionFromEvent(event, colonyAddress, {
+    type: ColonyActionType.CancelAndWaiveStreamingPayment,
+    initiatorAddress,
+    streamingPaymentId: databaseId,
+  });
 };
