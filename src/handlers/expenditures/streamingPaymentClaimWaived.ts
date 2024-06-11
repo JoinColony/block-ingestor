@@ -8,8 +8,6 @@ import { ContractEvent } from '~types';
 import { getExpenditureDatabaseId, toNumber, verbose } from '~utils';
 
 export default async (event: ContractEvent): Promise<void> => {
-  console.log('ROMEO IM IN!');
-
   const { colonyAddress } = event;
   const { streamingPaymentId } = event.args;
   const convertedNativeId = toNumber(streamingPaymentId);
