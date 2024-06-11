@@ -1,18 +1,24 @@
 import { mutate } from '~amplifyClient';
 import { ExtensionEventListener } from '~eventListeners';
 import {
+  ColonyActionType,
   UpdateStreamingPaymentDocument,
   UpdateStreamingPaymentMutation,
   UpdateStreamingPaymentMutationVariables,
 } from '~graphql';
 import { EventHandler } from '~types';
-import { getExpenditureDatabaseId, toNumber, verbose } from '~utils';
+import {
+  getExpenditureDatabaseId,
+  toNumber,
+  verbose,
+  writeActionFromEvent,
+} from '~utils';
 
 export const handleStreamingPaymentClaimWaived: EventHandler = async (
   event,
   listener,
 ) => {
-  const { streamingPaymentId } = event.args;
+  const { agent: initiatorAddress, streamingPaymentId } = event.args;
   const convertedNativeId = toNumber(streamingPaymentId);
 
   const { colonyAddress } = listener as ExtensionEventListener;
@@ -31,4 +37,10 @@ export const handleStreamingPaymentClaimWaived: EventHandler = async (
   });
 
   verbose(`Streaming payment with ID ${databaseId} waived and cancelled`);
+
+  await writeActionFromEvent(event, colonyAddress, {
+    type: ColonyActionType.CancelAndWaiveStreamingPayment,
+    initiatorAddress,
+    streamingPaymentId: databaseId,
+  });
 };
