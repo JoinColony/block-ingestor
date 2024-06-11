@@ -12,8 +12,6 @@ export const handleStreamingPaymentClaimWaived: EventHandler = async (
   event,
   listener,
 ) => {
-  console.log('ROMEO IM IN!');
-
   const { streamingPaymentId } = event.args;
   const convertedNativeId = toNumber(streamingPaymentId);
 
