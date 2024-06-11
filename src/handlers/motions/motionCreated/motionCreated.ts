@@ -1,7 +1,11 @@
 import { BigNumber, constants } from 'ethers';
 import { StaticJsonRpcProvider } from '@ethersproject/providers';
 
-import { ColonyOperations, ContractEvent } from '~types';
+import {
+  ColonyOperations,
+  ContractEvent,
+  StreamingPaymentsOperations,
+} from '~types';
 import {
   getCachedColonyClient,
   getStakedExpenditureClient,
@@ -9,6 +13,7 @@ import {
   getOneTxPaymentClient,
   getVotingClient,
   verbose,
+  getStreamingPaymentsClient,
 } from '~utils';
 import { SimpleTransactionDescription, parseAction } from './helpers';
 import {
@@ -30,6 +35,7 @@ import {
   handleCancelExpenditureViaArbitrationMotion,
   handleFinalizeExpenditureViaArbitrationMotion,
   handleReleaseStagedPaymentViaArbitration,
+  handleCancelStreamingPaymentsMotion,
 } from './handlers';
 
 export default async (event: ContractEvent): Promise<void> => {
@@ -60,6 +66,10 @@ export default async (event: ContractEvent): Promise<void> => {
     colonyAddress,
   );
 
+  const streamingPaymentsClient = await getStreamingPaymentsClient(
+    colonyAddress,
+  );
+
   const motion = await votingReputationClient.getMotion(motionId, {
     blockTag: blockNumber,
   });
@@ -68,6 +78,7 @@ export default async (event: ContractEvent): Promise<void> => {
     oneTxPaymentClient,
     stakedExpenditureClient,
     stagedExpenditureClient,
+    streamingPaymentsClient,
   });
 
   let gasEstimate: BigNumber;
@@ -244,6 +255,15 @@ export default async (event: ContractEvent): Promise<void> => {
 
       case ColonyOperations.ReleaseStagedPaymentViaArbitration: {
         await handleReleaseStagedPaymentViaArbitration(
+          event,
+          parsedAction,
+          gasEstimate,
+        );
+        break;
+      }
+
+      case StreamingPaymentsOperations.CancelStreamingPayment: {
+        await handleCancelStreamingPaymentsMotion(
           event,
           parsedAction,
           gasEstimate,
