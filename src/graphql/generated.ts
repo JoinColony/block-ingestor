@@ -542,6 +542,8 @@ export enum ColonyActionType {
   AddVerifiedMembers = 'ADD_VERIFIED_MEMBERS',
   AddVerifiedMembersMotion = 'ADD_VERIFIED_MEMBERS_MOTION',
   AddVerifiedMembersMultisig = 'ADD_VERIFIED_MEMBERS_MULTISIG',
+  /** An action related to cancelling and waiving a streaming payment */
+  CancelAndWaiveStreamingPayment = 'CANCEL_AND_WAIVE_STREAMING_PAYMENT',
   /** An action related to canceling an expenditure */
   CancelExpenditure = 'CANCEL_EXPENDITURE',
   /** An action related to a motion to cancel an expenditure */
@@ -1765,6 +1767,7 @@ export type CreateStreamingPaymentInput = {
   id?: InputMaybe<Scalars['ID']>;
   interval: Scalars['String'];
   isCancelled?: InputMaybe<Scalars['Boolean']>;
+  isWaived?: InputMaybe<Scalars['Boolean']>;
   nativeDomainId: Scalars['Int'];
   nativeId: Scalars['Int'];
   recipientAddress: Scalars['String'];
@@ -3866,6 +3869,7 @@ export type ModelStreamingPaymentConditionInput = {
   endTime?: InputMaybe<ModelIntInput>;
   interval?: InputMaybe<ModelStringInput>;
   isCancelled?: InputMaybe<ModelBooleanInput>;
+  isWaived?: InputMaybe<ModelBooleanInput>;
   nativeDomainId?: InputMaybe<ModelIntInput>;
   nativeId?: InputMaybe<ModelIntInput>;
   not?: InputMaybe<ModelStreamingPaymentConditionInput>;
@@ -3894,6 +3898,7 @@ export type ModelStreamingPaymentFilterInput = {
   id?: InputMaybe<ModelIdInput>;
   interval?: InputMaybe<ModelStringInput>;
   isCancelled?: InputMaybe<ModelBooleanInput>;
+  isWaived?: InputMaybe<ModelBooleanInput>;
   nativeDomainId?: InputMaybe<ModelIntInput>;
   nativeId?: InputMaybe<ModelIntInput>;
   not?: InputMaybe<ModelStreamingPaymentFilterInput>;
@@ -4518,6 +4523,7 @@ export type ModelSubscriptionStreamingPaymentFilterInput = {
   id?: InputMaybe<ModelSubscriptionIdInput>;
   interval?: InputMaybe<ModelSubscriptionStringInput>;
   isCancelled?: InputMaybe<ModelSubscriptionBooleanInput>;
+  isWaived?: InputMaybe<ModelSubscriptionBooleanInput>;
   nativeDomainId?: InputMaybe<ModelSubscriptionIntInput>;
   nativeId?: InputMaybe<ModelSubscriptionIntInput>;
   or?: InputMaybe<
@@ -7732,6 +7738,8 @@ export type StreamingPayment = {
   interval: Scalars['String'];
   /** Is the stream cancelled? */
   isCancelled?: Maybe<Scalars['Boolean']>;
+  /** Is the stream waived? */
+  isWaived?: Maybe<Scalars['Boolean']>;
   metadata?: Maybe<StreamingPaymentMetadata>;
   nativeDomainId: Scalars['Int'];
   nativeId: Scalars['Int'];
@@ -9028,12 +9036,12 @@ export type UpdateStreamingPaymentInput = {
   id: Scalars['ID'];
   interval?: InputMaybe<Scalars['String']>;
   isCancelled?: InputMaybe<Scalars['Boolean']>;
+  isWaived?: InputMaybe<Scalars['Boolean']>;
   nativeDomainId?: InputMaybe<Scalars['Int']>;
   nativeId?: InputMaybe<Scalars['Int']>;
   recipientAddress?: InputMaybe<Scalars['String']>;
   startTime?: InputMaybe<Scalars['AWSTimestamp']>;
   tokenAddress?: InputMaybe<Scalars['String']>;
-  isWaived?: InputMaybe<Scalars['Boolean']>;
 };
 
 export type UpdateStreamingPaymentMetadataInput = {
