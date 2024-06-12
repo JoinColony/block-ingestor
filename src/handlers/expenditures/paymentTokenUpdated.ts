@@ -14,7 +14,7 @@ export const handlePaymentTokenUpdated: EventHandler = async (
   event,
   listener,
 ) => {
-  const { streamingPaymentId, token: tokenAddress, amount } = event.args;
+  const { streamingPaymentId, token: tokenAddress, amount, interval } = event.args;
   const convertedNativeId = toNumber(streamingPaymentId);
   const { colonyAddress } = listener as ExtensionEventListener;
 
@@ -34,8 +34,8 @@ export const handlePaymentTokenUpdated: EventHandler = async (
   >(UpdateStreamingPaymentDocument, {
     input: {
       id: databaseId,
-      tokenAddress,
       amount: amount.toString(),
+      interval: interval.toString(),
     },
   });
 };
