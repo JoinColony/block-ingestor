@@ -10,7 +10,7 @@ mutation UpdateColonyMultiSig($input: UpdateColonyMultiSigInput!) {
   }
 }
 
-mutation CreateApprovalVote($input: CreateMultiSigUserSignatureInput!) {
+mutation CreateMultiSigVote($input: CreateMultiSigUserSignatureInput!) {
   createMultiSigUserSignature(input: $input) {
     id
   }

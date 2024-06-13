@@ -9890,11 +9890,11 @@ export type UpdateColonyMultiSigMutation = {
   updateColonyMultiSig?: { __typename?: 'ColonyMultiSig'; id: string } | null;
 };
 
-export type CreateApprovalVoteMutationVariables = Exact<{
+export type CreateMultiSigVoteMutationVariables = Exact<{
   input: CreateMultiSigUserSignatureInput;
 }>;
 
-export type CreateApprovalVoteMutation = {
+export type CreateMultiSigVoteMutation = {
   __typename?: 'Mutation';
   createMultiSigUserSignature?: {
     __typename?: 'MultiSigUserSignature';
@@ -11598,8 +11598,8 @@ export const UpdateColonyMultiSigDocument = gql`
     }
   }
 `;
-export const CreateApprovalVoteDocument = gql`
-  mutation CreateApprovalVote($input: CreateMultiSigUserSignatureInput!) {
+export const CreateMultiSigVoteDocument = gql`
+  mutation CreateMultiSigVote($input: CreateMultiSigUserSignatureInput!) {
     createMultiSigUserSignature(input: $input) {
       id
     }
