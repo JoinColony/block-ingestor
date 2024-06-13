@@ -15,9 +15,9 @@ import {
   RemoveMultiSigVoteMutation,
   RemoveMultiSigVoteMutationVariables,
   RemoveMultiSigVoteDocument,
-  CreateApprovalVoteMutation,
-  CreateApprovalVoteMutationVariables,
-  CreateApprovalVoteDocument,
+  CreateMultiSigVoteMutation,
+  CreateMultiSigVoteMutationVariables,
+  CreateMultiSigVoteDocument,
 } from '~graphql';
 import { output } from '~utils/logger';
 
@@ -103,8 +103,8 @@ export const addMultiSigVote = async ({
   colonyAddress,
   vote,
 }: addMultiSigVoteParams): Promise<void> => {
-  await mutate<CreateApprovalVoteMutation, CreateApprovalVoteMutationVariables>(
-    CreateApprovalVoteDocument,
+  await mutate<CreateMultiSigVoteMutation, CreateMultiSigVoteMutationVariables>(
+    CreateMultiSigVoteDocument,
     {
       input: {
         colonyAddress,
