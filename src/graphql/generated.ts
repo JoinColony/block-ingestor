@@ -965,8 +965,6 @@ export type ColonyMultiSig = {
   isExecuted: Scalars['Boolean'];
   /** Whether the multiSig was cancelled or not */
   isRejected: Scalars['Boolean'];
-  /** Whether the multiSig was executed successfully or not */
-  isSuccess?: Maybe<Scalars['Boolean']>;
   /** Expanded domain in which the multiSig was created */
   multiSigDomain: Domain;
   /** Unique identifier of the multiSigs domain in the database */
@@ -1407,7 +1405,6 @@ export type CreateColonyMultiSigInput = {
   isDecision: Scalars['Boolean'];
   isExecuted: Scalars['Boolean'];
   isRejected: Scalars['Boolean'];
-  isSuccess?: InputMaybe<Scalars['Boolean']>;
   multiSigDomainId: Scalars['ID'];
   nativeMultiSigDomainId: Scalars['String'];
   nativeMultiSigId: Scalars['ID'];
@@ -2862,7 +2859,6 @@ export type ModelColonyMultiSigConditionInput = {
   isDecision?: InputMaybe<ModelBooleanInput>;
   isExecuted?: InputMaybe<ModelBooleanInput>;
   isRejected?: InputMaybe<ModelBooleanInput>;
-  isSuccess?: InputMaybe<ModelBooleanInput>;
   multiSigDomainId?: InputMaybe<ModelIdInput>;
   nativeMultiSigDomainId?: InputMaybe<ModelStringInput>;
   nativeMultiSigId?: InputMaybe<ModelIdInput>;
@@ -2886,7 +2882,6 @@ export type ModelColonyMultiSigFilterInput = {
   isDecision?: InputMaybe<ModelBooleanInput>;
   isExecuted?: InputMaybe<ModelBooleanInput>;
   isRejected?: InputMaybe<ModelBooleanInput>;
-  isSuccess?: InputMaybe<ModelBooleanInput>;
   multiSigDomainId?: InputMaybe<ModelIdInput>;
   nativeMultiSigDomainId?: InputMaybe<ModelStringInput>;
   nativeMultiSigId?: InputMaybe<ModelIdInput>;
@@ -3925,7 +3920,6 @@ export type ModelSubscriptionColonyMultiSigFilterInput = {
   isDecision?: InputMaybe<ModelSubscriptionBooleanInput>;
   isExecuted?: InputMaybe<ModelSubscriptionBooleanInput>;
   isRejected?: InputMaybe<ModelSubscriptionBooleanInput>;
-  isSuccess?: InputMaybe<ModelSubscriptionBooleanInput>;
   multiSigDomainId?: InputMaybe<ModelSubscriptionIdInput>;
   nativeMultiSigDomainId?: InputMaybe<ModelSubscriptionStringInput>;
   nativeMultiSigId?: InputMaybe<ModelSubscriptionIdInput>;
@@ -8250,7 +8244,6 @@ export type UpdateColonyMultiSigInput = {
   isDecision?: InputMaybe<Scalars['Boolean']>;
   isExecuted?: InputMaybe<Scalars['Boolean']>;
   isRejected?: InputMaybe<Scalars['Boolean']>;
-  isSuccess?: InputMaybe<Scalars['Boolean']>;
   multiSigDomainId?: InputMaybe<Scalars['ID']>;
   nativeMultiSigDomainId?: InputMaybe<Scalars['String']>;
   nativeMultiSigId?: InputMaybe<Scalars['ID']>;
