@@ -43,7 +43,7 @@ export const handleStreamingPaymentEndTimeSet: EventHandler = async (
   >(UpdateStreamingPaymentDocument, {
     input: {
       id: databaseId,
-      endTime: toNumber(endTime),
+      endTime: endTime.toString(),
       isCancelled: isCancelAction ? true : null,
     },
   });
