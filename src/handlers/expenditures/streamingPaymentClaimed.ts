@@ -32,7 +32,7 @@ export const handleStreamingPaymentClaimed: EventHandler = async (
 
   const newClaim: StreamingPaymentClaim = {
     amount: amount.toString(),
-    timestamp,
+    timestamp: timestamp.toString(),
   };
   const claims: StreamingPaymentClaim[] = streamingPayment.claims
     ? [...streamingPayment.claims, newClaim]

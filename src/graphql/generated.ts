@@ -1821,7 +1821,7 @@ export type CreateStreamingPaymentInput = {
   amount: Scalars['String'];
   claims?: InputMaybe<Array<StreamingPaymentClaimInput>>;
   createdAt?: InputMaybe<Scalars['AWSDateTime']>;
-  endTime: Scalars['AWSTimestamp'];
+  endTime: Scalars['String'];
   id?: InputMaybe<Scalars['ID']>;
   interval: Scalars['String'];
   isCancelled?: InputMaybe<Scalars['Boolean']>;
@@ -1829,7 +1829,7 @@ export type CreateStreamingPaymentInput = {
   nativeDomainId: Scalars['Int'];
   nativeId: Scalars['Int'];
   recipientAddress: Scalars['String'];
-  startTime: Scalars['AWSTimestamp'];
+  startTime: Scalars['String'];
   tokenAddress: Scalars['String'];
 };
 
@@ -4090,7 +4090,7 @@ export type ModelStreamingPaymentConditionInput = {
   amount?: InputMaybe<ModelStringInput>;
   and?: InputMaybe<Array<InputMaybe<ModelStreamingPaymentConditionInput>>>;
   createdAt?: InputMaybe<ModelStringInput>;
-  endTime?: InputMaybe<ModelIntInput>;
+  endTime?: InputMaybe<ModelStringInput>;
   interval?: InputMaybe<ModelStringInput>;
   isCancelled?: InputMaybe<ModelBooleanInput>;
   isWaived?: InputMaybe<ModelBooleanInput>;
@@ -4099,7 +4099,7 @@ export type ModelStreamingPaymentConditionInput = {
   not?: InputMaybe<ModelStreamingPaymentConditionInput>;
   or?: InputMaybe<Array<InputMaybe<ModelStreamingPaymentConditionInput>>>;
   recipientAddress?: InputMaybe<ModelStringInput>;
-  startTime?: InputMaybe<ModelIntInput>;
+  startTime?: InputMaybe<ModelStringInput>;
   tokenAddress?: InputMaybe<ModelStringInput>;
 };
 
@@ -4118,7 +4118,7 @@ export type ModelStreamingPaymentFilterInput = {
   amount?: InputMaybe<ModelStringInput>;
   and?: InputMaybe<Array<InputMaybe<ModelStreamingPaymentFilterInput>>>;
   createdAt?: InputMaybe<ModelStringInput>;
-  endTime?: InputMaybe<ModelIntInput>;
+  endTime?: InputMaybe<ModelStringInput>;
   id?: InputMaybe<ModelIdInput>;
   interval?: InputMaybe<ModelStringInput>;
   isCancelled?: InputMaybe<ModelBooleanInput>;
@@ -4128,7 +4128,7 @@ export type ModelStreamingPaymentFilterInput = {
   not?: InputMaybe<ModelStreamingPaymentFilterInput>;
   or?: InputMaybe<Array<InputMaybe<ModelStreamingPaymentFilterInput>>>;
   recipientAddress?: InputMaybe<ModelStringInput>;
-  startTime?: InputMaybe<ModelIntInput>;
+  startTime?: InputMaybe<ModelStringInput>;
   tokenAddress?: InputMaybe<ModelStringInput>;
 };
 
@@ -4780,7 +4780,7 @@ export type ModelSubscriptionStreamingPaymentFilterInput = {
     Array<InputMaybe<ModelSubscriptionStreamingPaymentFilterInput>>
   >;
   createdAt?: InputMaybe<ModelSubscriptionStringInput>;
-  endTime?: InputMaybe<ModelSubscriptionIntInput>;
+  endTime?: InputMaybe<ModelSubscriptionStringInput>;
   id?: InputMaybe<ModelSubscriptionIdInput>;
   interval?: InputMaybe<ModelSubscriptionStringInput>;
   isCancelled?: InputMaybe<ModelSubscriptionBooleanInput>;
@@ -4791,7 +4791,7 @@ export type ModelSubscriptionStreamingPaymentFilterInput = {
     Array<InputMaybe<ModelSubscriptionStreamingPaymentFilterInput>>
   >;
   recipientAddress?: InputMaybe<ModelSubscriptionStringInput>;
-  startTime?: InputMaybe<ModelSubscriptionIntInput>;
+  startTime?: InputMaybe<ModelSubscriptionStringInput>;
   tokenAddress?: InputMaybe<ModelSubscriptionStringInput>;
 };
 
@@ -8253,7 +8253,7 @@ export type StreamingPayment = {
   amount: Scalars['String'];
   claims?: Maybe<Array<StreamingPaymentClaim>>;
   createdAt: Scalars['AWSDateTime'];
-  endTime: Scalars['AWSTimestamp'];
+  endTime: Scalars['String'];
   id: Scalars['ID'];
   interval: Scalars['String'];
   /** Is the stream cancelled? */
@@ -8264,7 +8264,7 @@ export type StreamingPayment = {
   nativeDomainId: Scalars['Int'];
   nativeId: Scalars['Int'];
   recipientAddress: Scalars['String'];
-  startTime: Scalars['AWSTimestamp'];
+  startTime: Scalars['String'];
   tokenAddress: Scalars['String'];
   updatedAt: Scalars['AWSDateTime'];
 };
@@ -8279,12 +8279,12 @@ export type StreamingPaymentActionsArgs = {
 export type StreamingPaymentClaim = {
   __typename?: 'StreamingPaymentClaim';
   amount: Scalars['String'];
-  timestamp: Scalars['AWSTimestamp'];
+  timestamp: Scalars['String'];
 };
 
 export type StreamingPaymentClaimInput = {
   amount: Scalars['String'];
-  timestamp: Scalars['AWSTimestamp'];
+  timestamp: Scalars['String'];
 };
 
 export enum StreamingPaymentEndCondition {
@@ -9652,7 +9652,7 @@ export type UpdateStreamingPaymentInput = {
   amount?: InputMaybe<Scalars['String']>;
   claims?: InputMaybe<Array<StreamingPaymentClaimInput>>;
   createdAt?: InputMaybe<Scalars['AWSDateTime']>;
-  endTime?: InputMaybe<Scalars['AWSTimestamp']>;
+  endTime?: InputMaybe<Scalars['String']>;
   id: Scalars['ID'];
   interval?: InputMaybe<Scalars['String']>;
   isCancelled?: InputMaybe<Scalars['Boolean']>;
@@ -9660,7 +9660,7 @@ export type UpdateStreamingPaymentInput = {
   nativeDomainId?: InputMaybe<Scalars['Int']>;
   nativeId?: InputMaybe<Scalars['Int']>;
   recipientAddress?: InputMaybe<Scalars['String']>;
-  startTime?: InputMaybe<Scalars['AWSTimestamp']>;
+  startTime?: InputMaybe<Scalars['String']>;
   tokenAddress?: InputMaybe<Scalars['String']>;
 };
 
@@ -11471,13 +11471,13 @@ export type GetStreamingPaymentQuery = {
   getStreamingPayment?: {
     __typename?: 'StreamingPayment';
     id: string;
-    endTime: number;
+    endTime: string;
     tokenAddress: string;
     amount: string;
     claims?: Array<{
       __typename?: 'StreamingPaymentClaim';
       amount: string;
-      timestamp: number;
+      timestamp: string;
     }> | null;
   } | null;
 };
