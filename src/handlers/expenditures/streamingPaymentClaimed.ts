@@ -30,7 +30,7 @@ export default async (event: ContractEvent): Promise<void> => {
 
   const newClaim: StreamingPaymentClaim = {
     amount: amount.toString(),
-    timestamp,
+    timestamp: timestamp.toString(),
   };
   const claims: StreamingPaymentClaim[] = streamingPayment.claims
     ? [...streamingPayment.claims, newClaim]
