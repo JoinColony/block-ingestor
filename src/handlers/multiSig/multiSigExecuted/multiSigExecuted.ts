@@ -45,11 +45,11 @@ export const handleMultiSigMotionExecuted: EventHandler = async (
     );
     */
 
+    // @NOTE failing execution is allowed only after 1 week so the motion doesn't end up floating around
     const updatedMultiSigData = {
       id: multiSigDatabaseId,
-      isSuccess: success,
-      isExecuted: true,
       executedAt: new Date(timestamp * 1000).toISOString(),
+      ...(success ? { isExecuted: true } : { isRejected: true }),
     };
 
     await updateMultiSigInDB(updatedMultiSigData);
