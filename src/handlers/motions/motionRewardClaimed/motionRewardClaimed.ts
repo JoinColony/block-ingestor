@@ -10,7 +10,6 @@ import {
   updateColonyUnclaimedStakes,
   reclaimUserStake,
   getUpdatedStakerRewards,
-  getUserMotionStake,
 } from './helpers';
 import { ColonyMotion } from '~graphql';
 import { ExtensionEventListener } from '~eventListeners';
@@ -41,9 +40,8 @@ export const handleMotionRewardClaimed: EventHandler = async (
   const claimedMotion = await getMotionFromDB(motionDatabaseId);
 
   if (claimedMotion) {
-    const { stakerRewards, usersStakes } = claimedMotion;
+    const { stakerRewards } = claimedMotion;
 
-    const userStake = getUserMotionStake(usersStakes, staker);
     const updatedStakerRewards = getUpdatedStakerRewards(stakerRewards, staker);
 
     const newMotionMessages = [
@@ -66,11 +64,6 @@ export const handleMotionRewardClaimed: EventHandler = async (
       motionDatabaseId,
       updatedStakerRewards,
     );
-    await reclaimUserStake(
-      staker,
-      colonyAddress,
-      userStake,
-      updatedMotionData.transactionHash,
-    );
+    await reclaimUserStake(staker, updatedMotionData.transactionHash);
   }
 };
