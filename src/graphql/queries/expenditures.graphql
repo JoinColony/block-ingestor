@@ -23,7 +23,6 @@ query GetExpenditureMetadata($id: ID!) {
     stages {
       name
       slotId
-      isReleased
     }
   }
 }

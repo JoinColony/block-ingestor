@@ -51,14 +51,13 @@ export const handleStagedPaymentReleased: EventHandler = async (
   );
   const existingStage = metadata.stages[existingStageIndex];
 
-  // If the stage doesn't exist or it's been already set to released, we don't need to do anything
-  if (!existingStage || existingStage.isReleased) {
+  // If the stage doesn't exist, we don't need to do anything
+  if (!existingStage) {
     return;
   }
 
   const updatedStage = {
     ...existingStage,
-    isReleased: true,
   };
   const updatedStages = insertAtIndex(
     metadata.stages,
