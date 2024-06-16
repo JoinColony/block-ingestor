@@ -16,6 +16,7 @@ export const supportedMulticallFunctions: ContractMethodSignatures[] = [
   ContractMethodSignatures.MoveFundsBetweenPots,
   ContractMethodSignatures.SetExpenditureState,
   ContractMethodSignatures.SetExpenditurePayout,
+  ContractMethodSignatures.ReleaseStagedPaymentViaArbitration,
 ];
 
 export interface DecodedFunction {
@@ -72,8 +73,14 @@ export const handleMulticallMotion = async (
   // We need to determine which multicallMotion this is and pass it to the appropriate handler
   const decodedFunctions = decodeFunctions(encodedFunctions, colonyClient);
 
+  if (decodedFunctions.length === 0) {
+    return;
+  }
+
   for (const [validator, handler] of multicallHandlers) {
     if (validator({ decodedFunctions })) {
+      console.log({ decodedFunctions });
+      console.log('Multicall handler found: ', handler.name);
       handler({
         colonyAddress,
         event,
