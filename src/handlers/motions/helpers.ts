@@ -100,10 +100,3 @@ export const getMessageKey = (
 ): string => {
   return `${transactionHash}${logIndex}`;
 };
-
-export const getColonyStakeId = (
-  userAddress: string,
-  colonyAddress: string,
-): string => {
-  return `${userAddress}_${colonyAddress}`;
-};

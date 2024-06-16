@@ -2,23 +2,14 @@ import { BigNumber, constants } from 'ethers';
 import { MotionVote, MotionEvents } from '~types';
 import {
   ColonyMotion,
-  CreateColonyStakeDocument,
-  CreateColonyStakeMutation,
-  CreateColonyStakeMutationVariables,
   CreateMotionMessageInput,
   CreateUserStakeDocument,
   CreateUserStakeMutation,
   CreateUserStakeMutationVariables,
-  GetColonyStakeDocument,
-  GetColonyStakeQuery,
-  GetColonyStakeQueryVariables,
   GetUserStakeDocument,
   GetUserStakeQuery,
   GetUserStakeQueryVariables,
   MotionStakes,
-  UpdateColonyStakeDocument,
-  UpdateColonyStakeMutation,
-  UpdateColonyStakeMutationVariables,
   UpdateUserStakeDocument,
   UpdateUserStakeMutation,
   UpdateUserStakeMutationVariables,
@@ -26,7 +17,7 @@ import {
 } from '~graphql';
 import { mutate, query } from '~amplifyClient';
 import { getUserStakeDatabaseId } from '~utils/stakes';
-import { getMotionSide, getColonyStakeId } from '../helpers';
+import { getMotionSide } from '../helpers';
 import { getBlockChainTimestampISODate } from '~utils/dates';
 
 export const getRequiredStake = (
@@ -296,48 +287,6 @@ export const getUpdatedMessages = ({
   }
 
   return updatedMessages;
-};
-
-/**
- * If it's the first time a user has staked in a colony, we create a Colony Stake record for the user,
- * else we update the amount they've currently got staked in the colony.
- */
-export const updateUserColonyStake = async (
-  userAddress: string,
-  colonyAddress: string,
-  stakeAmount: BigNumber,
-): Promise<void> => {
-  const colonyStakeId = getColonyStakeId(userAddress, colonyAddress);
-  const { data } =
-    (await query<GetColonyStakeQuery, GetColonyStakeQueryVariables>(
-      GetColonyStakeDocument,
-      {
-        colonyStakeId,
-      },
-    )) ?? {};
-
-  if (data?.getColonyStake) {
-    const { totalAmount } = data?.getColonyStake;
-    const updatedTotal = BigNumber.from(totalAmount).add(stakeAmount);
-
-    await mutate<UpdateColonyStakeMutation, UpdateColonyStakeMutationVariables>(
-      UpdateColonyStakeDocument,
-      {
-        totalAmount: updatedTotal.toString(),
-        colonyStakeId,
-      },
-    );
-  } else {
-    await mutate<CreateColonyStakeMutation, CreateColonyStakeMutationVariables>(
-      CreateColonyStakeDocument,
-      {
-        totalAmount: stakeAmount.toString(),
-        colonyStakeId,
-        colonyAddress,
-        userAddress,
-      },
-    );
-  }
 };
 
 /**
