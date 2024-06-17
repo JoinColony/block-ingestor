@@ -23,9 +23,7 @@ export default async (
 
   await createMotionInDB(event, {
     type: motionNameMapping[name],
-    fromDomainId: colonyAddress
-      ? getDomainDatabaseId(colonyAddress, domainId)
-      : undefined,
+    fromDomainId: getDomainDatabaseId(colonyAddress, domainId),
     gasEstimate: gasEstimate.toString(),
     streamingPaymentId: getExpenditureDatabaseId(
       colonyAddress,
