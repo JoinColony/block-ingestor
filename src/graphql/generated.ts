@@ -9516,7 +9516,7 @@ export type ColonyMetadataFragment = { __typename?: 'ColonyMetadata', id: string
 
 export type ExpenditureBalanceFragment = { __typename?: 'ExpenditureBalance', tokenAddress: string, amount: string };
 
-export type ExpenditureFragment = { __typename?: 'Expenditure', id: string, status: ExpenditureStatus, ownerAddress: string, userStakeId?: string | null, createdAt: string, firstEditTransactionHash?: string | null, slots: Array<{ __typename?: 'ExpenditureSlot', id: number, recipientAddress?: string | null, claimDelay?: string | null, payoutModifier?: number | null, payouts?: Array<{ __typename?: 'ExpenditurePayout', tokenAddress: string, amount: string, isClaimed: boolean, networkFee?: string | null }> | null }>, motions?: { __typename?: 'ModelColonyMotionConnection', items: Array<{ __typename?: 'ColonyMotion', transactionHash: string, action?: { __typename?: 'ColonyAction', type: ColonyActionType } | null } | null> } | null, balances?: Array<{ __typename?: 'ExpenditureBalance', tokenAddress: string, amount: string }> | null };
+export type ExpenditureFragment = { __typename?: 'Expenditure', id: string, status: ExpenditureStatus, ownerAddress: string, userStakeId?: string | null, createdAt: string, firstEditTransactionHash?: string | null, type: ExpenditureType, slots: Array<{ __typename?: 'ExpenditureSlot', id: number, recipientAddress?: string | null, claimDelay?: string | null, payoutModifier?: number | null, payouts?: Array<{ __typename?: 'ExpenditurePayout', tokenAddress: string, amount: string, isClaimed: boolean, networkFee?: string | null }> | null }>, motions?: { __typename?: 'ModelColonyMotionConnection', items: Array<{ __typename?: 'ColonyMotion', transactionHash: string, action?: { __typename?: 'ColonyAction', type: ColonyActionType } | null } | null> } | null, balances?: Array<{ __typename?: 'ExpenditureBalance', tokenAddress: string, amount: string }> | null };
 
 export type ExpenditureSlotFragment = { __typename?: 'ExpenditureSlot', id: number, recipientAddress?: string | null, claimDelay?: string | null, payoutModifier?: number | null, payouts?: Array<{ __typename?: 'ExpenditurePayout', tokenAddress: string, amount: string, isClaimed: boolean, networkFee?: string | null }> | null };
 
@@ -10032,7 +10032,7 @@ export type GetExpenditureQueryVariables = Exact<{
 }>;
 
 
-export type GetExpenditureQuery = { __typename?: 'Query', getExpenditure?: { __typename?: 'Expenditure', id: string, status: ExpenditureStatus, ownerAddress: string, userStakeId?: string | null, createdAt: string, firstEditTransactionHash?: string | null, slots: Array<{ __typename?: 'ExpenditureSlot', id: number, recipientAddress?: string | null, claimDelay?: string | null, payoutModifier?: number | null, payouts?: Array<{ __typename?: 'ExpenditurePayout', tokenAddress: string, amount: string, isClaimed: boolean, networkFee?: string | null }> | null }>, motions?: { __typename?: 'ModelColonyMotionConnection', items: Array<{ __typename?: 'ColonyMotion', transactionHash: string, action?: { __typename?: 'ColonyAction', type: ColonyActionType } | null } | null> } | null, balances?: Array<{ __typename?: 'ExpenditureBalance', tokenAddress: string, amount: string }> | null } | null };
+export type GetExpenditureQuery = { __typename?: 'Query', getExpenditure?: { __typename?: 'Expenditure', id: string, status: ExpenditureStatus, ownerAddress: string, userStakeId?: string | null, createdAt: string, firstEditTransactionHash?: string | null, type: ExpenditureType, slots: Array<{ __typename?: 'ExpenditureSlot', id: number, recipientAddress?: string | null, claimDelay?: string | null, payoutModifier?: number | null, payouts?: Array<{ __typename?: 'ExpenditurePayout', tokenAddress: string, amount: string, isClaimed: boolean, networkFee?: string | null }> | null }>, motions?: { __typename?: 'ModelColonyMotionConnection', items: Array<{ __typename?: 'ColonyMotion', transactionHash: string, action?: { __typename?: 'ColonyAction', type: ColonyActionType } | null } | null> } | null, balances?: Array<{ __typename?: 'ExpenditureBalance', tokenAddress: string, amount: string }> | null } | null };
 
 export type GetExpenditureByNativeFundingPotIdAndColonyQueryVariables = Exact<{
   nativeFundingPotId: Scalars['Int'];
@@ -10040,14 +10040,7 @@ export type GetExpenditureByNativeFundingPotIdAndColonyQueryVariables = Exact<{
 }>;
 
 
-export type GetExpenditureByNativeFundingPotIdAndColonyQuery = { __typename?: 'Query', getExpendituresByNativeFundingPotIdAndColony?: { __typename?: 'ModelExpenditureConnection', items: Array<{ __typename?: 'Expenditure', id: string, status: ExpenditureStatus, ownerAddress: string, userStakeId?: string | null, createdAt: string, firstEditTransactionHash?: string | null, slots: Array<{ __typename?: 'ExpenditureSlot', id: number, recipientAddress?: string | null, claimDelay?: string | null, payoutModifier?: number | null, payouts?: Array<{ __typename?: 'ExpenditurePayout', tokenAddress: string, amount: string, isClaimed: boolean, networkFee?: string | null }> | null }>, motions?: { __typename?: 'ModelColonyMotionConnection', items: Array<{ __typename?: 'ColonyMotion', transactionHash: string, action?: { __typename?: 'ColonyAction', type: ColonyActionType } | null } | null> } | null, balances?: Array<{ __typename?: 'ExpenditureBalance', tokenAddress: string, amount: string }> | null } | null> } | null };
-
-export type GetExpenditureMetadataQueryVariables = Exact<{
-  id: Scalars['ID'];
-}>;
-
-
-export type GetExpenditureMetadataQuery = { __typename?: 'Query', getExpenditureMetadata?: { __typename?: 'ExpenditureMetadata', stages?: Array<{ __typename?: 'ExpenditureStage', name: string, slotId: number }> | null } | null };
+export type GetExpenditureByNativeFundingPotIdAndColonyQuery = { __typename?: 'Query', getExpendituresByNativeFundingPotIdAndColony?: { __typename?: 'ModelExpenditureConnection', items: Array<{ __typename?: 'Expenditure', id: string, status: ExpenditureStatus, ownerAddress: string, userStakeId?: string | null, createdAt: string, firstEditTransactionHash?: string | null, type: ExpenditureType, slots: Array<{ __typename?: 'ExpenditureSlot', id: number, recipientAddress?: string | null, claimDelay?: string | null, payoutModifier?: number | null, payouts?: Array<{ __typename?: 'ExpenditurePayout', tokenAddress: string, amount: string, isClaimed: boolean, networkFee?: string | null }> | null }>, motions?: { __typename?: 'ModelColonyMotionConnection', items: Array<{ __typename?: 'ColonyMotion', transactionHash: string, action?: { __typename?: 'ColonyAction', type: ColonyActionType } | null } | null> } | null, balances?: Array<{ __typename?: 'ExpenditureBalance', tokenAddress: string, amount: string }> | null } | null> } | null };
 
 export type GetStreamingPaymentQueryVariables = Exact<{
   id: Scalars['ID'];
@@ -10373,6 +10366,7 @@ export const Expenditure = gql`
   userStakeId
   createdAt
   firstEditTransactionHash
+  type
 }
     ${ExpenditureSlot}
 ${ExpenditureBalance}`;
@@ -11111,16 +11105,6 @@ export const GetExpenditureByNativeFundingPotIdAndColonyDocument = gql`
   }
 }
     ${Expenditure}`;
-export const GetExpenditureMetadataDocument = gql`
-    query GetExpenditureMetadata($id: ID!) {
-  getExpenditureMetadata(id: $id) {
-    stages {
-      name
-      slotId
-    }
-  }
-}
-    `;
 export const GetStreamingPaymentDocument = gql`
     query GetStreamingPayment($id: ID!) {
   getStreamingPayment(id: $id) {

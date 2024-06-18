@@ -1,79 +1,86 @@
-import { mutate, query } from '~amplifyClient';
+import { utils } from 'ethers';
 import { ExtensionEventListener } from '~eventListeners';
+import { ColonyActionType } from '~graphql';
+import { getInterfaceByListener } from '~interfaces';
+import provider from '~provider';
+import { ContractEventsSignatures, EventHandler } from '~types';
 import {
-  GetExpenditureMetadataDocument,
-  GetExpenditureMetadataQuery,
-  GetExpenditureMetadataQueryVariables,
-  UpdateExpenditureMetadataDocument,
-  UpdateExpenditureMetadataMutation,
-  UpdateExpenditureMetadataMutationVariables,
-} from '~graphql';
-import { EventHandler } from '~types';
-import {
+  checkActionExists,
+  getCachedColonyClient,
   getExpenditureDatabaseId,
-  insertAtIndex,
-  output,
+  mapLogToContractEvent,
   toNumber,
-  verbose,
+  writeActionFromEvent,
 } from '~utils';
 
 export const handleStagedPaymentReleased: EventHandler = async (
   event,
   listener,
 ) => {
-  const { expenditureId, slot } = event.args;
+  /**
+   * @NOTE: The UI uses multicall to potentially release multiple slots in one transaction
+   * Since we only want to create a single action, we will get all slot release events
+   * the first time we see this event and skip the subsequent ones
+   *
+   * Something to refactor once https://github.com/JoinColony/colonyCDapp/issues/2317 is implemented
+   */
+  const { transactionHash, blockNumber } = event;
+  const actionExists = await checkActionExists(transactionHash);
+  if (actionExists) {
+    return;
+  }
+
+  const { expenditureId } = event.args;
   const convertedExpenditureId = toNumber(expenditureId);
-  const convertedSlot = toNumber(slot);
+
   const { colonyAddress } = listener as ExtensionEventListener;
+  const colonyClient = await getCachedColonyClient(colonyAddress);
+  if (!colonyClient) {
+    return;
+  }
+
+  const releasedSlotIds = [];
+
+  const logs = await provider.getLogs({
+    fromBlock: blockNumber,
+    toBlock: blockNumber,
+    topics: [utils.id(ContractEventsSignatures.StagedPaymentReleased)],
+  });
+
+  const iface = getInterfaceByListener(listener);
+  if (!iface) {
+    return;
+  }
+
+  for (const log of logs) {
+    const mappedEvent = await mapLogToContractEvent(log, iface);
+
+    if (!mappedEvent) {
+      continue;
+    }
+
+    // Check the expenditure ID matches the one in the first event
+    const eventExpenditureId = toNumber(mappedEvent.args.expenditureId);
+
+    if (eventExpenditureId === convertedExpenditureId) {
+      releasedSlotIds.push(toNumber(mappedEvent.args.slot));
+    }
+  }
 
   const databaseId = getExpenditureDatabaseId(
     colonyAddress,
     convertedExpenditureId,
   );
 
-  const response = await query<
-    GetExpenditureMetadataQuery,
-    GetExpenditureMetadataQueryVariables
-  >(GetExpenditureMetadataDocument, {
-    id: databaseId,
-  });
-  const metadata = response?.data?.getExpenditureMetadata;
-
-  if (!metadata?.stages) {
-    output(
-      `Could not find stages data for expenditure with ID: ${databaseId}. This is a bug and needs investigating.`,
-    );
+  if (!releasedSlotIds.length) {
     return;
   }
 
-  const existingStageIndex = metadata.stages.findIndex(
-    (stage) => stage.slotId === convertedSlot,
-  );
-  const existingStage = metadata.stages[existingStageIndex];
-
-  // If the stage doesn't exist, we don't need to do anything
-  if (!existingStage) {
-    return;
-  }
-
-  const updatedStage = {
-    ...existingStage,
-  };
-  const updatedStages = insertAtIndex(
-    metadata.stages,
-    existingStageIndex,
-    updatedStage,
-  );
-
-  verbose(`Stage released in expenditure with ID: ${databaseId}`);
-
-  await mutate<
-    UpdateExpenditureMetadataMutation,
-    UpdateExpenditureMetadataMutationVariables
-  >(UpdateExpenditureMetadataDocument, {
-    input: {
-      id: databaseId,
-      stages: updatedStages,
-    },
+  await writeActionFromEvent(event, colonyAddress, {
+    type: ColonyActionType.ReleaseStagedPayments,
+    // @TODO: Figure out how to get the initiator address
+    initiatorAddress: '',
+    expenditureId: databaseId,
+    expenditureSlotIds: releasedSlotIds,
   });
 };
