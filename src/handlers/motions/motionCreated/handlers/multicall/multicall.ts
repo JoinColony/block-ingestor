@@ -1,8 +1,7 @@
-import { Result, TransactionDescription } from 'ethers/lib/utils';
+import { TransactionDescription } from 'ethers/lib/utils';
 import { BigNumber, utils } from 'ethers';
-import { getCachedColonyClient, output } from '~utils';
-import { ContractEvent, ContractMethodSignatures } from '~types';
-import { AnyColonyClient } from '@colony/colony-js';
+import { getCachedColonyClient, output, parseFunctionData } from '~utils';
+import { ContractEvent } from '~types';
 import { multicallHandlers } from './multicallHandlers';
 
 /**
@@ -11,39 +10,19 @@ import { multicallHandlers } from './multicallHandlers';
  * It should be refactored as part of https://github.com/JoinColony/colonyCDapp/issues/2317
  */
 
-// List all supported multicall functions
-export const supportedMulticallFunctions: ContractMethodSignatures[] = [
-  ContractMethodSignatures.MoveFundsBetweenPots,
-  ContractMethodSignatures.SetExpenditureState,
-  ContractMethodSignatures.SetExpenditurePayout,
-  ContractMethodSignatures.ReleaseStagedPaymentViaArbitration,
-];
-
-export interface DecodedFunction {
-  functionSignature: ContractMethodSignatures;
-  args: Result;
-}
-
 const decodeFunctions = (
-  encodedFunctions: utils.Result,
-  colonyClient: AnyColonyClient,
-): DecodedFunction[] => {
-  const decodedFunctions: DecodedFunction[] = [];
+  encodedFunctions: string[],
+  interfaces: utils.Interface[],
+): TransactionDescription[] => {
+  const decodedFunctions: TransactionDescription[] = [];
   for (const functionCall of encodedFunctions) {
-    supportedMulticallFunctions.forEach((fragment) => {
-      try {
-        const decodedArgs = colonyClient.interface.decodeFunctionData(
-          fragment,
-          functionCall,
-        );
-        decodedFunctions.push({
-          functionSignature: fragment,
-          args: decodedArgs,
-        });
-      } catch {
-        // silent. We are expecting all but one of the fragments to error for each arg.
-      }
-    });
+    const parsedFunction = parseFunctionData(functionCall, interfaces);
+    if (!parsedFunction) {
+      output(`Failed to parse multicall function: ${functionCall}`);
+      continue;
+    }
+
+    decodedFunctions.push(parsedFunction);
   }
 
   return decodedFunctions;
@@ -54,6 +33,7 @@ export const handleMulticallMotion = async (
   event: ContractEvent,
   parsedAction: TransactionDescription,
   gasEstimate: BigNumber,
+  interfaces: utils.Interface[],
 ): Promise<void> => {
   const colonyClient = await getCachedColonyClient(colonyAddress);
 
@@ -71,7 +51,7 @@ export const handleMulticallMotion = async (
     .toString();
 
   // We need to determine which multicallMotion this is and pass it to the appropriate handler
-  const decodedFunctions = decodeFunctions(encodedFunctions, colonyClient);
+  const decodedFunctions = decodeFunctions(encodedFunctions, interfaces);
 
   if (decodedFunctions.length === 0) {
     return;

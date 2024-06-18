@@ -13,7 +13,7 @@ export const isReleaseStagedPaymentsMotion: MulticallValidator = ({
 }) => {
   return decodedFunctions.every(
     (decodedFunction) =>
-      decodedFunction.functionSignature ===
+      decodedFunction.signature ===
       ContractMethodSignatures.ReleaseStagedPaymentViaArbitration,
   );
 };
@@ -24,7 +24,6 @@ export const releaseStagedPaymentsMotionHandler: MulticallHandler = async ({
   decodedFunctions,
   gasEstimate,
 }) => {
-  console.log(' RELEASE STAGED ');
   const [, , domainId] = event.args;
 
   // @NOTE: This handler assumes the multicall is releasing stages of a single expenditure
