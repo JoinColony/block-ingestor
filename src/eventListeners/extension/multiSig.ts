@@ -20,9 +20,6 @@ import {
   RemoveMultiSigRoleDocument,
   RemoveMultiSigRoleMutation,
   RemoveMultiSigRoleMutationVariables,
-  UpdateColonyMultiSigDocument,
-  UpdateColonyMultiSigMutation,
-  UpdateColonyMultiSigMutationVariables,
 } from '~graphql';
 
 import { ContractEventsSignatures } from '~types';
@@ -31,6 +28,7 @@ import { addMultiSigParamsToDB } from '~utils/extensions/multiSig';
 import { output } from '~utils/logger';
 
 import { addExtensionEventListener, fetchExistingExtensions } from './index';
+import { updateMultiSigInDB } from '~handlers/multiSig/helpers';
 
 export const setupListenersForMultiSigExtensions = async (): Promise<void> => {
   output(`Setting up listeners for MultiSig extensions`);
@@ -46,14 +44,13 @@ export const handleMultiSigInstalled = async (
   multiSigAddress: string,
   colonyAddress: string,
 ): Promise<void> => {
-  await addMultiSigParamsToDB(multiSigAddress, colonyAddress);
   setupMultiSigListeners(multiSigAddress, colonyAddress);
+  await addMultiSigParamsToDB(multiSigAddress, colonyAddress);
 };
 
 export const handleMultiSigUninstalled = async (
   colonyAddress: string,
 ): Promise<void> => {
-  // remove all the roles
   const multiSigRolesQuery = await query<
     GetAllMultiSigRolesQuery,
     GetAllMultiSigRolesQueryVariables
@@ -63,7 +60,6 @@ export const handleMultiSigUninstalled = async (
 
   const roleEntries = multiSigRolesQuery?.data?.listColonyRoles?.items ?? [];
 
-  // @TODO use updateMultiSigInDB when finalize gets merged
   await Promise.all(
     roleEntries.filter(notNull).map(async (entry) => {
       await mutate<
@@ -86,15 +82,10 @@ export const handleMultiSigUninstalled = async (
     activeMultiSigsQuery?.data?.listColonyMultiSigs?.items ?? [];
   await Promise.all(
     multiSigs.filter(notNull).map(async (entry) => {
-      await mutate<
-        UpdateColonyMultiSigMutation,
-        UpdateColonyMultiSigMutationVariables
-      >(UpdateColonyMultiSigDocument, {
-        input: {
-          id: entry.id,
-          isExecuted: false,
-          isRejected: true,
-        },
+      await updateMultiSigInDB({
+        id: entry.id,
+        isExecuted: false,
+        isRejected: true,
       });
     }),
   );
