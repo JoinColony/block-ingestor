@@ -1,3 +1,5 @@
+import { utils } from 'ethers';
+
 import { ColonyOperations, EventHandler } from '~types';
 import {
   getCachedColonyClient,
@@ -6,8 +8,9 @@ import {
   getOneTxPaymentClient,
   getVotingClient,
   verbose,
+  output,
   SimpleTransactionDescription,
-  parseOperation,
+  parseMotionAction,
 } from '~utils';
 import {
   handleEditDomainMotion,
@@ -61,48 +64,60 @@ export const handleMotionCreated: EventHandler = async (
   const motion = await votingReputationClient.getMotion(motionId, {
     blockTag: blockNumber,
   });
-  const parsedOperation = parseOperation(motion.action, {
-    colonyClient,
-    oneTxPaymentClient,
-    stakedExpenditureClient,
-    stagedExpenditureClient,
-  });
 
-  if (parsedOperation) {
-    const contractOperation = parsedOperation.name;
+  /**
+   * @NOTE: This is not good, we should use ABIs from @colony/abis instead.
+   * It would avoid having to make network calls each time the motion is created
+   */
+  const interfaces = [
+    colonyClient.interface,
+    oneTxPaymentClient?.interface,
+    stakedExpenditureClient?.interface,
+    stagedExpenditureClient?.interface,
+  ].filter(Boolean) as utils.Interface[]; // Casting seems necessary as TS does not pick up the .filter()
+
+  const parsedAction = parseMotionAction(motion.action, interfaces);
+
+  if (!parsedAction) {
+    output(`Failed to parse motion action: ${motion.action}`);
+    return;
+  }
+
+  if (parsedAction) {
+    const contractOperation = parsedAction.name;
     /* Handle the action type-specific mutation here */
     switch (contractOperation) {
       case ColonyOperations.MintTokens: {
-        await handleMintTokensMotion(colonyAddress, event, parsedOperation);
+        await handleMintTokensMotion(colonyAddress, event, parsedAction);
         break;
       }
       case ColonyOperations.AddDomain: {
-        await handleAddDomainMotion(colonyAddress, event, parsedOperation);
+        await handleAddDomainMotion(colonyAddress, event, parsedAction);
         break;
       }
 
       case ColonyOperations.EditDomain: {
-        await handleEditDomainMotion(colonyAddress, event, parsedOperation);
+        await handleEditDomainMotion(colonyAddress, event, parsedAction);
         break;
       }
 
       case ColonyOperations.Upgrade: {
-        await handleNetworkUpgradeMotion(colonyAddress, event, parsedOperation);
+        await handleNetworkUpgradeMotion(colonyAddress, event, parsedAction);
         break;
       }
 
       case ColonyOperations.UnlockToken: {
-        await handleUnlockTokenMotion(colonyAddress, event, parsedOperation);
+        await handleUnlockTokenMotion(colonyAddress, event, parsedAction);
         break;
       }
 
       case ColonyOperations.MakePaymentFundedFromDomain: {
-        await handlePaymentMotion(colonyAddress, event, parsedOperation);
+        await handlePaymentMotion(colonyAddress, event, parsedAction);
         break;
       }
 
       case ColonyOperations.MoveFundsBetweenPots: {
-        await handleMoveFundsMotion(colonyAddress, event, parsedOperation);
+        await handleMoveFundsMotion(colonyAddress, event, parsedAction);
         break;
       }
 
@@ -111,13 +126,13 @@ export const handleMotionCreated: EventHandler = async (
         await handleDomainEditReputationMotion(
           colonyAddress,
           event,
-          parsedOperation,
+          parsedAction,
         );
         break;
       }
 
       case ColonyOperations.EditColony: {
-        await handleEditColonyMotion(colonyAddress, event, parsedOperation);
+        await handleEditColonyMotion(colonyAddress, event, parsedAction);
         break;
       }
 
@@ -125,14 +140,14 @@ export const handleMotionCreated: EventHandler = async (
         await handleSetUserRolesMotion(
           colonyAddress,
           event,
-          parsedOperation,
+          parsedAction,
           motion.altTarget,
         );
         break;
       }
 
       case ColonyOperations.Multicall: {
-        await handleMulticallMotion(colonyAddress, event, parsedOperation);
+        await handleMulticallMotion(colonyAddress, event, parsedAction);
         break;
       }
 
@@ -140,7 +155,7 @@ export const handleMotionCreated: EventHandler = async (
         await handleSimpleDecisionMotion(
           colonyAddress,
           event,
-          parsedOperation as SimpleTransactionDescription,
+          parsedAction as SimpleTransactionDescription,
         );
         break;
       }
@@ -149,7 +164,7 @@ export const handleMotionCreated: EventHandler = async (
         await handleMakeArbitraryTransactionsMotion(
           colonyAddress,
           event,
-          parsedOperation,
+          parsedAction,
         );
 
         break;
@@ -159,13 +174,13 @@ export const handleMotionCreated: EventHandler = async (
         await handleCancelStakedExpenditureMotion(
           colonyAddress,
           event,
-          parsedOperation,
+          parsedAction,
         );
         break;
       }
 
       case ColonyOperations.EditColonyByDelta: {
-        await handleMetadataDeltaMotion(colonyAddress, event, parsedOperation);
+        await handleMetadataDeltaMotion(colonyAddress, event, parsedAction);
         break;
       }
 
@@ -173,7 +188,7 @@ export const handleMotionCreated: EventHandler = async (
         await handleCancelExpenditureViaArbitrationMotion(
           colonyAddress,
           event,
-          parsedOperation,
+          parsedAction,
         );
         break;
       }
@@ -182,7 +197,7 @@ export const handleMotionCreated: EventHandler = async (
         await handleFinalizeExpenditureViaArbitrationMotion(
           colonyAddress,
           event,
-          parsedOperation,
+          parsedAction,
         );
         break;
       }
@@ -192,7 +207,6 @@ export const handleMotionCreated: EventHandler = async (
           colonyAddress,
           event,
           parsedAction,
-          gasEstimate,
         );
         break;
       }

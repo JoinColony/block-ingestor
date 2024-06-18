@@ -22,9 +22,7 @@ export const releaseStagedPaymentsMotionHandler: MulticallHandler = async ({
   colonyAddress,
   event,
   decodedFunctions,
-  gasEstimate,
 }) => {
-  console.log(' RELEASE STAGED ');
   const [, , domainId] = event.args;
 
   // @NOTE: This handler assumes the multicall is releasing stages of a single expenditure
@@ -34,11 +32,10 @@ export const releaseStagedPaymentsMotionHandler: MulticallHandler = async ({
   );
 
   await createMotionInDB(colonyAddress, event, {
-    type: ColonyActionType.ReleaseStagedPaymentMotion,
+    type: ColonyActionType.ReleaseStagedPaymentsMotion,
     fromDomainId: colonyAddress
       ? getDomainDatabaseId(colonyAddress, domainId)
       : undefined,
-    gasEstimate: gasEstimate.toString(),
     expenditureId: getExpenditureDatabaseId(
       colonyAddress,
       toNumber(expenditureId),

@@ -1,3 +1,4 @@
+import { utils } from 'ethers';
 import { ExtensionEventListener } from '~eventListeners';
 import { ColonyOperations, EventHandler } from '~types';
 import {
@@ -6,7 +7,7 @@ import {
   getOneTxPaymentClient,
   getStagedExpenditureClient,
   getStakedExpenditureClient,
-  parseOperation,
+  parseMotionAction,
   verbose,
 } from '~utils';
 import {
@@ -60,12 +61,18 @@ export const handleMultiSigMotionCreated: EventHandler = async (
     verbose(`No action data in multiSig motion: ${motionId}`);
   }
 
-  const parsedOperation = parseOperation(actionData, {
-    colonyClient,
-    oneTxPaymentClient,
-    stakedExpenditureClient,
-    stagedExpenditureClient,
-  });
+  /**
+   * @NOTE: This is not good, we should use ABIs from @colony/abis instead.
+   * It would avoid having to make network calls each time the motion is created
+   */
+  const interfaces = [
+    colonyClient.interface,
+    oneTxPaymentClient?.interface,
+    stakedExpenditureClient?.interface,
+    stagedExpenditureClient?.interface,
+  ].filter(Boolean) as utils.Interface[]; // Casting seems necessary as TS does not pick up the .filter()
+
+  const parsedOperation = parseMotionAction(actionData, interfaces);
 
   if (parsedOperation) {
     const contractOperation = parsedOperation.name;
