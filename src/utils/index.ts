@@ -18,3 +18,4 @@ export * from './fundsClaims';
 export * from './metadataDelta';
 export * from './transactionHasEvent';
 export * from './parseFunction';
+export * from './actionExists';
