@@ -33,7 +33,7 @@ export const releaseStagedPaymentsMotionHandler: MulticallHandler = async ({
   );
 
   await createMotionInDB(colonyAddress, event, {
-    type: ColonyActionType.ReleaseStagedPaymentMotion,
+    type: ColonyActionType.ReleaseStagedPaymentsMotion,
     fromDomainId: colonyAddress
       ? getDomainDatabaseId(colonyAddress, domainId)
       : undefined,

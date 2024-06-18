@@ -7,6 +7,7 @@ import {
   ExpenditurePayout,
   ExpenditureSlot,
   ExpenditureStatus,
+  ExpenditureType,
   UpdateExpenditureDocument,
   UpdateExpenditureMutation,
   UpdateExpenditureMutationVariables,
@@ -51,7 +52,11 @@ export const createEditExpenditureAction = async (
     ContractEventsSignatures.OneTxPaymentMade,
   );
 
-  if (!expenditure.firstEditTransactionHash || hasOneTxPaymentEvent) {
+  if (
+    !expenditure.firstEditTransactionHash ||
+    hasOneTxPaymentEvent ||
+    expenditure.type === ExpenditureType.Staged
+  ) {
     /**
      * If expenditure doesn't have `firstEditTransactionHash` set, it means it's the first time
      * we see an ExpenditurePayoutSet event, which is normally part of expenditure creation
