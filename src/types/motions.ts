@@ -68,7 +68,7 @@ export const motionNameMapping: { [key: string]: ColonyActionType } = {
   [ColonyOperations.SetExpenditureState]:
     ColonyActionType.SetExpenditureStateMotion,
   [ColonyOperations.ReleaseStagedPaymentViaArbitration]:
-    ColonyActionType.ReleaseStagedPaymentMotion,
+    ColonyActionType.ReleaseStagedPaymentsMotion,
 };
 
 export enum MotionSide {

@@ -1,15 +1,13 @@
 import { AnyColonyClient } from '@colony/colony-js';
 import { utils } from 'ethers';
-import { mutate, query } from '~amplifyClient';
+import { mutate } from '~amplifyClient';
 import {
   ColonyActionType,
   ExpenditureFragment,
   ExpenditurePayout,
   ExpenditureSlot,
   ExpenditureStatus,
-  GetActionByIdDocument,
-  GetActionByIdQuery,
-  GetActionByIdQueryVariables,
+  ExpenditureType,
   UpdateExpenditureDocument,
   UpdateExpenditureMutation,
   UpdateExpenditureMutationVariables,
@@ -17,6 +15,7 @@ import {
 import provider from '~provider';
 import { ContractEvent, ContractEventsSignatures } from '~types';
 import {
+  checkActionExists,
   getExpenditureDatabaseId,
   mapLogToContractEvent,
   toNumber,
@@ -53,7 +52,11 @@ export const createEditExpenditureAction = async (
     ContractEventsSignatures.OneTxPaymentMade,
   );
 
-  if (!expenditure.firstEditTransactionHash || hasOneTxPaymentEvent) {
+  if (
+    !expenditure.firstEditTransactionHash ||
+    hasOneTxPaymentEvent ||
+    expenditure.type === ExpenditureType.Staged
+  ) {
     /**
      * If expenditure doesn't have `firstEditTransactionHash` set, it means it's the first time
      * we see an ExpenditurePayoutSet event, which is normally part of expenditure creation
@@ -191,15 +194,4 @@ export const createEditExpenditureAction = async (
       },
     });
   }
-};
-
-const checkActionExists = async (transactionHash: string): Promise<boolean> => {
-  const existingActionQuery = await query<
-    GetActionByIdQuery,
-    GetActionByIdQueryVariables
-  >(GetActionByIdDocument, {
-    id: transactionHash,
-  });
-
-  return !!existingActionQuery?.data?.getColonyAction;
 };
