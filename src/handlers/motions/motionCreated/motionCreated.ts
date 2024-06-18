@@ -147,7 +147,12 @@ export const handleMotionCreated: EventHandler = async (
       }
 
       case ColonyOperations.Multicall: {
-        await handleMulticallMotion(colonyAddress, event, parsedAction);
+        await handleMulticallMotion(
+          colonyAddress,
+          event,
+          parsedAction,
+          interfaces,
+        );
         break;
       }
 

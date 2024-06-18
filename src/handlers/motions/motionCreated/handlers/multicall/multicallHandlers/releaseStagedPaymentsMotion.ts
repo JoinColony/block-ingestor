@@ -13,7 +13,7 @@ export const isReleaseStagedPaymentsMotion: MulticallValidator = ({
 }) => {
   return decodedFunctions.every(
     (decodedFunction) =>
-      decodedFunction.functionSignature ===
+      decodedFunction.signature ===
       ContractMethodSignatures.ReleaseStagedPaymentViaArbitration,
   );
 };
