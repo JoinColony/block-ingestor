@@ -1,7 +1,7 @@
 import { BigNumber } from 'ethers';
 import { TransactionDescription } from 'ethers/lib/utils';
 import { BlockTag } from '@ethersproject/abstract-provider';
-import { AnyVotingReputationClient, Extension } from '@colony/colony-js';
+import { AnyVotingReputationClient } from '@colony/colony-js';
 
 import { ColonyOperations, MotionVote } from '~types';
 import {
@@ -9,9 +9,8 @@ import {
   getColonyFromDB,
   getDomainDatabaseId,
   getExistingTokenAddresses,
-  getStakedExpenditureClient,
-  getStagedExpenditureClient,
   output,
+  parseFunctionData,
   updateColonyTokens,
 } from '~utils';
 import { query, mutate } from '~amplifyClient';
@@ -34,7 +33,6 @@ import {
   UpdateColonyMetadataDocument,
   UpdateDomainMetadataDocument,
 } from '~graphql';
-import { parseAction } from '../motionCreated/helpers';
 
 export const getStakerReward = async (
   motionId: string,
@@ -266,23 +264,13 @@ export const linkPendingMetadata = async (
   finalizedMotion: ColonyMotion,
 ): Promise<void> => {
   const colonyClient = await getCachedColonyClient(colonyAddress);
-  const oneTxPaymentClient =
-    (await colonyClient?.getExtensionClient(Extension.OneTxPayment)) ?? null;
-  const stakedExpenditureClient = await getStakedExpenditureClient(
-    colonyAddress,
-  );
 
-  const stagedExpenditureClient = await getStagedExpenditureClient(
-    colonyAddress,
-  );
+  if (!colonyClient) {
+    return;
+  }
 
-  const parsedAction = parseAction(action, {
-    colonyClient,
-    oneTxPaymentClient,
-    stakedExpenditureClient,
-    stagedExpenditureClient,
-  });
-
+  // @NOTE: We only care about handful of events from Colony contract so not passing all the interfaces
+  const parsedAction = parseFunctionData(action, [colonyClient?.interface]);
   if (!parsedAction) {
     return;
   }
@@ -293,7 +281,6 @@ export const linkPendingMetadata = async (
     parsedAction.name === ColonyOperations.EditDomain;
   const isMotionEditingAColony =
     parsedAction.name === ColonyOperations.EditColony;
-
   if (
     isMotionAddingADomain ||
     isMotionEditingADomain ||
@@ -306,7 +293,6 @@ export const linkPendingMetadata = async (
       >(GetColonyActionByMotionIdDocument, {
         motionId: finalizedMotion.id,
       })) ?? {};
-
     const colonyAction = data?.getColonyActionByMotionId?.items;
     /*
      * pendingDomainMetadata is a motion data prop that we use to store the metadata of a Domain that COULD be created/edited

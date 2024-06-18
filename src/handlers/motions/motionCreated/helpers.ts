@@ -1,15 +1,9 @@
-import { BigNumber } from 'ethers';
+import { BigNumber, utils } from 'ethers';
 import { TransactionDescription } from 'ethers/lib/utils';
-import {
-  AnyColonyClient,
-  AnyOneTxPaymentClient,
-  AnyStakedExpenditureClient,
-  AnyStagedExpenditureClient,
-  AnyVotingReputationClient,
-} from '@colony/colony-js';
+import { AnyVotingReputationClient } from '@colony/colony-js';
 
 import { ColonyOperations, ContractEvent, MotionEvents } from '~types';
-import { getDomainDatabaseId, getVotingClient, verbose } from '~utils';
+import { getDomainDatabaseId, getVotingClient } from '~utils';
 import { GraphQLFnReturn, mutate } from '~amplifyClient';
 import {
   ColonyMotion,
@@ -35,45 +29,23 @@ import {
   getUserMinStake,
   getMessageKey,
 } from '../helpers';
+import { parseFunctionData } from '~utils/parseFunction';
 
 export interface SimpleTransactionDescription {
   name: ColonyOperations.SimpleDecision;
 }
 
-interface MotionActionClients {
-  colonyClient?: AnyColonyClient | null;
-  oneTxPaymentClient?: AnyOneTxPaymentClient | null;
-  stakedExpenditureClient?: AnyStakedExpenditureClient | null;
-  stagedExpenditureClient?: AnyStagedExpenditureClient | null;
-}
-
-export const parseAction = (
+export const parseMotionAction = (
   action: string,
-  clients: MotionActionClients,
-): TransactionDescription | SimpleTransactionDescription | undefined => {
+  interfaces: utils.Interface[],
+): TransactionDescription | SimpleTransactionDescription | null => {
   if (action === SIMPLE_DECISIONS_ACTION_CODE) {
     return {
       name: ColonyOperations.SimpleDecision,
     };
   }
 
-  for (const key in clients) {
-    const client = clients[key as keyof MotionActionClients];
-    if (!client) {
-      continue;
-    }
-    // Return the first time a client can successfully parse the motion
-    try {
-      return client.interface.parseTransaction({
-        data: action,
-      });
-    } catch {
-      continue;
-    }
-  }
-
-  verbose(`Unable to parse ${action}`);
-  return undefined;
+  return parseFunctionData(action, interfaces);
 };
 
 interface GetMotionDataArgs {
