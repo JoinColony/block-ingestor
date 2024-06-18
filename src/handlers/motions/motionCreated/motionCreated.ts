@@ -251,6 +251,7 @@ export const handleMotionCreated: EventHandler = async (
           event,
           parsedAction,
           gasEstimate,
+          interfaces,
         );
         break;
       }
