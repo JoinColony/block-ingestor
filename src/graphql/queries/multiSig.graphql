@@ -24,10 +24,11 @@ query GetUserMultiSigSignature($multiSigId: ID!, $userAddress: ID!, $vote: Multi
 }
 
 query GetAllMultiSigRoles($colonyAddress: ID!) {
-  listColonyRoles(
+  getRoleByColony(
     # This is a workaround to get as many as possible, will need to do pagination down the line 
-    limit: 1000
-    filter: {isMultiSig: {eq: true}, colonyAddress: {eq: $colonyAddress}}
+    colonyAddress: $colonyAddress
+    limit: 9999
+    filter: {isMultiSig: {eq: true}}
   ) {
     items {
       id
@@ -36,9 +37,10 @@ query GetAllMultiSigRoles($colonyAddress: ID!) {
 }
 
 query GetActiveColonyMultisigs($colonyAddress: ID!){
-  listColonyMultiSigs(
-    filter: {colonyAddress: {eq: $colonyAddress}, isExecuted: {eq: false}, isRejected: {eq: false}}
-    limit: 1000
+  getMultiSigByColonyAddress(
+    colonyAddress: $colonyAddress
+    filter: {isExecuted: {eq: false}, isRejected: {eq: false}}
+    limit: 9999
   ) {
     items {
       id
