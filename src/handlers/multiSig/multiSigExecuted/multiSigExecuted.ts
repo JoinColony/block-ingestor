@@ -16,7 +16,7 @@ export const handleMultiSigMotionExecuted: EventHandler = async (
 ) => {
   const {
     contractAddress: multiSigExtensionAddress,
-    args: { motionId, success },
+    args: { motionId, success, agent: userAddress },
     timestamp,
   } = event;
 
@@ -49,6 +49,7 @@ export const handleMultiSigMotionExecuted: EventHandler = async (
     const updatedMultiSigData = {
       id: multiSigDatabaseId,
       executedAt: new Date(timestamp * 1000).toISOString(),
+      executedBy: userAddress,
       isExecuted: true,
       hasActionCompleted: success,
     };
