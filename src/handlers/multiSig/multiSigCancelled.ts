@@ -11,8 +11,9 @@ import { getChainId } from '~provider';
 
 export const handleMultiSigMotionCancelled: EventHandler = async (event) => {
   const {
-    args: { motionId },
+    args: { motionId, agent: userAddress },
     contractAddress: multiSigExtensionAddress,
+    timestamp,
   } = event;
 
   const chainId = getChainId();
@@ -33,6 +34,8 @@ export const handleMultiSigMotionCancelled: EventHandler = async (event) => {
       id: multiSigDatabaseId,
       hasActionCompleted: false,
       isRejected: true,
+      rejectedAt: new Date(timestamp * 1000).toISOString(),
+      rejectedBy: userAddress,
     },
   });
 };
