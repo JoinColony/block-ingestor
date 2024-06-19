@@ -9170,9 +9170,6 @@ export type ActionMetadataInfoFragment = {
   __typename?: 'ColonyAction';
   id: string;
   colonyDecisionId?: string | null;
-  amount?: string | null;
-  networkFee?: string | null;
-  type: ColonyActionType;
   pendingDomainMetadata?: {
     __typename?: 'DomainMetadata';
     name: string;
@@ -9474,6 +9471,10 @@ export type ColonyMultiSigFragment = {
   isRejected: boolean;
   isDecision: boolean;
   hasActionCompleted: boolean;
+  executedAt?: string | null;
+  executedBy?: string | null;
+  rejectedAt?: string | null;
+  rejectedBy?: string | null;
   signatures?: {
     __typename?: 'ModelMultiSigUserSignatureConnection';
     items: Array<{
@@ -10675,9 +10676,6 @@ export type GetColonyActionByMotionIdQuery = {
       __typename?: 'ColonyAction';
       id: string;
       colonyDecisionId?: string | null;
-      amount?: string | null;
-      networkFee?: string | null;
-      type: ColonyActionType;
       pendingDomainMetadata?: {
         __typename?: 'DomainMetadata';
         name: string;
@@ -10814,9 +10812,6 @@ export type GetColonyActionByMultiSigIdQuery = {
       __typename?: 'ColonyAction';
       id: string;
       colonyDecisionId?: string | null;
-      amount?: string | null;
-      networkFee?: string | null;
-      type: ColonyActionType;
       pendingDomainMetadata?: {
         __typename?: 'DomainMetadata';
         name: string;
@@ -10878,6 +10873,10 @@ export type GetColonyMultiSigQuery = {
     isRejected: boolean;
     isDecision: boolean;
     hasActionCompleted: boolean;
+    executedAt?: string | null;
+    executedBy?: string | null;
+    rejectedAt?: string | null;
+    rejectedBy?: string | null;
     signatures?: {
       __typename?: 'ModelMultiSigUserSignatureConnection';
       items: Array<{
@@ -11103,9 +11102,6 @@ export const ActionMetadataInfo = gql`
       ...ColonyMetadata
     }
     colonyDecisionId
-    amount
-    networkFee
-    type
   }
   ${DomainMetadata}
   ${ColonyMetadata}
@@ -11334,6 +11330,10 @@ export const ColonyMultiSig = gql`
         ...MultiSigUserSignature
       }
     }
+    executedAt
+    executedBy
+    rejectedAt
+    rejectedBy
   }
   ${MultiSigUserSignature}
 `;
