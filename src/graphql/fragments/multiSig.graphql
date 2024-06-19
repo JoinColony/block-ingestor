@@ -25,4 +25,8 @@ fragment ColonyMultiSig on ColonyMultiSig {
       ...MultiSigUserSignature
     }
   }
+  executedAt
+  executedBy
+  rejectedAt
+  rejectedBy
 }
