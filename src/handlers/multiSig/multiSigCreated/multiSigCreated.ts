@@ -9,7 +9,10 @@ import {
   parseOperation,
   verbose,
 } from '~utils';
-import { handleMintTokensMultiSig } from './handlers/mintTokens';
+import {
+  handleMintTokensMultiSig,
+  handleUnlockTokenMultiSig,
+} from './handlers';
 
 export const handleMultiSigMotionCreated: EventHandler = async (
   event,
@@ -26,11 +29,13 @@ export const handleMultiSigMotionCreated: EventHandler = async (
   const multiSigClient = await getMultiSigClient(colonyAddress);
   const oneTxPaymentClient = await getOneTxPaymentClient(colonyAddress);
 
-  const stakedExpenditureClient =
-    await getStakedExpenditureClient(colonyAddress);
+  const stakedExpenditureClient = await getStakedExpenditureClient(
+    colonyAddress,
+  );
 
-  const stagedExpenditureClient =
-    await getStagedExpenditureClient(colonyAddress);
+  const stagedExpenditureClient = await getStagedExpenditureClient(
+    colonyAddress,
+  );
 
   if (!colonyClient || !multiSigClient) {
     return;
@@ -59,6 +64,10 @@ export const handleMultiSigMotionCreated: EventHandler = async (
     switch (contractOperation) {
       case ColonyOperations.MintTokens: {
         await handleMintTokensMultiSig(colonyAddress, event, parsedOperation);
+        break;
+      }
+      case ColonyOperations.UnlockToken: {
+        await handleUnlockTokenMultiSig(colonyAddress, event, parsedOperation);
         break;
       }
       default: {
