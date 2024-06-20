@@ -31,6 +31,7 @@ export const handleMultiSigMotionCancelled: EventHandler = async (event) => {
   >(UpdateColonyMultiSigDocument, {
     input: {
       id: multiSigDatabaseId,
+      hasActionCompleted: false,
       isRejected: true,
     },
   });

@@ -49,7 +49,8 @@ export const handleMultiSigMotionExecuted: EventHandler = async (
     const updatedMultiSigData = {
       id: multiSigDatabaseId,
       executedAt: new Date(timestamp * 1000).toISOString(),
-      ...(success ? { isExecuted: true } : { isRejected: true }),
+      isExecuted: true,
+      hasActionCompleted: success,
     };
 
     await updateMultiSigInDB(updatedMultiSigData);
