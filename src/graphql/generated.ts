@@ -9542,6 +9542,7 @@ export type ColonyMultiSigFragment = {
   isExecuted: boolean;
   isRejected: boolean;
   isDecision: boolean;
+  hasActionCompleted: boolean;
   signatures?: {
     __typename?: 'ModelMultiSigUserSignatureConnection';
     items: Array<{
@@ -10940,6 +10941,7 @@ export type GetColonyMultiSigQuery = {
     isExecuted: boolean;
     isRejected: boolean;
     isDecision: boolean;
+    hasActionCompleted: boolean;
     signatures?: {
       __typename?: 'ModelMultiSigUserSignatureConnection';
       items: Array<{
@@ -11365,6 +11367,7 @@ export const ColonyMultiSig = gql`
     isExecuted
     isRejected
     isDecision
+    hasActionCompleted
     signatures {
       items {
         ...MultiSigUserSignature
