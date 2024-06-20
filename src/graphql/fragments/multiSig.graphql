@@ -19,6 +19,7 @@ fragment ColonyMultiSig on ColonyMultiSig {
   isExecuted
   isRejected
   isDecision
+  hasActionCompleted
   signatures {
     items {
       ...MultiSigUserSignature
