@@ -72,6 +72,7 @@ export const getMultiSigData = async ({
     isExecuted: false,
     isRejected: false,
     isDecision,
+    hasActionCompleted: false,
   };
 };
 
