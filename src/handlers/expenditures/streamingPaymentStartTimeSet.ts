@@ -26,7 +26,7 @@ export default async (event: ContractEvent): Promise<void> => {
   >(UpdateStreamingPaymentDocument, {
     input: {
       id: databaseId,
-      startTime: toNumber(startTime),
+      startTime,
     },
   });
 };
