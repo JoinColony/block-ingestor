@@ -70,6 +70,11 @@ export const handleMultiSigMotionCreated: EventHandler = async (
         await handleUnlockTokenMultiSig(colonyAddress, event, parsedOperation);
         break;
       }
+      case ColonyOperations.AddDomain:
+      case ColonyOperations.EditDomain: {
+        await handleAddDomainMultiSig(colonyAddress, event, parsedOperation);
+        break;
+      }
       default: {
         break;
       }
