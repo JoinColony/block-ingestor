@@ -1,11 +1,17 @@
 import { mutate } from '~amplifyClient';
 import {
+  StreamingPaymentEndCondition,
   UpdateStreamingPaymentDocument,
+  UpdateStreamingPaymentMetadataDocument,
+  UpdateStreamingPaymentMetadataMutation,
+  UpdateStreamingPaymentMetadataMutationVariables,
   UpdateStreamingPaymentMutation,
   UpdateStreamingPaymentMutationVariables,
 } from '~graphql';
 import { ContractEvent } from '~types';
-import { getExpenditureDatabaseId, toNumber, verbose } from '~utils';
+import { getExpenditureDatabaseId, output, toNumber, verbose } from '~utils';
+import { getStreamingPaymentFromDB } from './helpers';
+import { getLimitAmount } from './helpers/getLimitAmount';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { colonyAddress } = event;
@@ -17,6 +23,13 @@ export default async (event: ContractEvent): Promise<void> => {
   }
 
   const databaseId = getExpenditureDatabaseId(colonyAddress, convertedNativeId);
+  const streamingPayment = await getStreamingPaymentFromDB(databaseId);
+  if (!streamingPayment) {
+    output(
+      `Could not find streaming payment with ID: ${databaseId} in the db. This is a bug and needs investigating.`,
+    );
+    return;
+  }
 
   verbose(`Start time set for streaming payment with ID ${databaseId}`);
 
@@ -29,4 +42,37 @@ export default async (event: ContractEvent): Promise<void> => {
       startTime: startTime.toString(),
     },
   });
+
+  if (
+    streamingPayment.metadata?.endCondition ===
+    StreamingPaymentEndCondition.LimitReached
+  ) {
+    const { endTime, amount, interval, tokenAddress } = streamingPayment;
+
+    const limitAmount = await getLimitAmount({
+      startTime: startTime.toString(),
+      endTime,
+      amount,
+      interval,
+      tokenAddress,
+    });
+
+    if (!limitAmount) {
+      return;
+    }
+
+    verbose(
+      `Limit amount updated to ${limitAmount.toString()} for streaming payment with ID ${databaseId}`,
+    );
+
+    await mutate<
+      UpdateStreamingPaymentMetadataMutation,
+      UpdateStreamingPaymentMetadataMutationVariables
+    >(UpdateStreamingPaymentMetadataDocument, {
+      input: {
+        id: databaseId,
+        limitAmount: limitAmount.toString(),
+      },
+    });
+  }
 };
