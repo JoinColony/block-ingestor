@@ -607,6 +607,8 @@ export enum ColonyActionType {
   CreateDomainMultisig = 'CREATE_DOMAIN_MULTISIG',
   /** An action related to creating an expenditure (advanced payment) */
   CreateExpenditure = 'CREATE_EXPENDITURE',
+  /** An action related to creating a streaming payment */
+  CreateStreamingPayment = 'CREATE_STREAMING_PAYMENT',
   /** An action related to editing a domain's details */
   EditDomain = 'EDIT_DOMAIN',
   /** An action related to editing a domain's details via a motion */
@@ -10635,6 +10637,18 @@ export type UpdateStreamingPaymentMutation = {
   } | null;
 };
 
+export type UpdateStreamingPaymentMetadataMutationVariables = Exact<{
+  input: UpdateStreamingPaymentMetadataInput;
+}>;
+
+export type UpdateStreamingPaymentMetadataMutation = {
+  __typename?: 'Mutation';
+  updateStreamingPaymentMetadata?: {
+    __typename?: 'StreamingPaymentMetadata';
+    id: string;
+  } | null;
+};
+
 export type CreateColonyExtensionMutationVariables = Exact<{
   input: CreateColonyExtensionInput;
 }>;
@@ -11473,14 +11487,21 @@ export type GetStreamingPaymentQuery = {
   getStreamingPayment?: {
     __typename?: 'StreamingPayment';
     id: string;
+    startTime: string;
     endTime: string;
     tokenAddress: string;
     amount: string;
+    interval: string;
     claims?: Array<{
       __typename?: 'StreamingPaymentClaim';
       amount: string;
       timestamp: string;
     }> | null;
+    metadata?: {
+      __typename?: 'StreamingPaymentMetadata';
+      endCondition: StreamingPaymentEndCondition;
+      limitAmount?: string | null;
+    } | null;
   } | null;
 };
 
@@ -12076,6 +12097,22 @@ export type GetTokenFromEverywhereQuery = {
   } | null;
 };
 
+export type GetTokenByAddressQueryVariables = Exact<{
+  address: Scalars['ID'];
+}>;
+
+export type GetTokenByAddressQuery = {
+  __typename?: 'Query';
+  getTokenByAddress?: {
+    __typename?: 'ModelTokenConnection';
+    items: Array<{
+      __typename?: 'Token';
+      decimals: number;
+      tokenAddress: string;
+    } | null>;
+  } | null;
+};
+
 export type GetNotificationUsersQueryVariables = Exact<{
   filter?: InputMaybe<ModelUserFilterInput>;
   limit?: InputMaybe<Scalars['Int']>;
@@ -12633,6 +12670,15 @@ export const UpdateStreamingPaymentDocument = gql`
     }
   }
 `;
+export const UpdateStreamingPaymentMetadataDocument = gql`
+  mutation UpdateStreamingPaymentMetadata(
+    $input: UpdateStreamingPaymentMetadataInput!
+  ) {
+    updateStreamingPaymentMetadata(input: $input) {
+      id
+    }
+  }
+`;
 export const CreateColonyExtensionDocument = gql`
   mutation CreateColonyExtension($input: CreateColonyExtensionInput!) {
     createColonyExtension(input: $input) {
@@ -13124,12 +13170,18 @@ export const GetStreamingPaymentDocument = gql`
   query GetStreamingPayment($id: ID!) {
     getStreamingPayment(id: $id) {
       id
+      startTime
       endTime
       tokenAddress
       amount
+      interval
       claims {
         amount
         timestamp
+      }
+      metadata {
+        endCondition
+        limitAmount
       }
     }
   }
@@ -13420,6 +13472,16 @@ export const GetTokenFromEverywhereDocument = gql`
     getTokenFromEverywhere(input: $input) {
       items {
         id
+      }
+    }
+  }
+`;
+export const GetTokenByAddressDocument = gql`
+  query GetTokenByAddress($address: ID!) {
+    getTokenByAddress(id: $address) {
+      items {
+        decimals
+        tokenAddress: id
       }
     }
   }
