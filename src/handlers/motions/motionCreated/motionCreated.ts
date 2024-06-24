@@ -29,6 +29,7 @@ import {
   handleMetadataDeltaMotion,
   handleCancelExpenditureViaArbitrationMotion,
   handleFinalizeExpenditureViaArbitrationMotion,
+  handleReleaseStagedPaymentViaArbitration,
 } from './handlers';
 import { ExtensionEventListener } from '~eventListeners';
 
@@ -294,6 +295,16 @@ export const handleMotionCreated: EventHandler = async (
 
       case ColonyOperations.FinalizeExpenditureViaArbitration: {
         await handleFinalizeExpenditureViaArbitrationMotion(
+          colonyAddress,
+          event,
+          parsedAction,
+          gasEstimate,
+        );
+        break;
+      }
+
+      case ColonyOperations.ReleaseStagedPaymentViaArbitration: {
+        await handleReleaseStagedPaymentViaArbitration(
           colonyAddress,
           event,
           parsedAction,

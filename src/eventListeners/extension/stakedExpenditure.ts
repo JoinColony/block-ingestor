@@ -4,6 +4,7 @@ import {
   handleExpenditureMadeViaStake,
   handleExpenditureStakerPunished,
   handleExtensionInitialised,
+  handleStakeFractionSet,
   handleStakeReclaimed,
 } from '~handlers';
 
@@ -41,6 +42,7 @@ export const setupListenersForStakedExpenditure = (
         handleExpenditureStakerPunished,
       [ContractEventsSignatures.ExpenditureMadeViaStake]:
         handleExpenditureMadeViaStake,
+      [ContractEventsSignatures.StakeFractionSet]: handleStakeFractionSet,
     };
 
     Object.entries(eventHandlers).forEach(([eventSignature, handler]) =>
