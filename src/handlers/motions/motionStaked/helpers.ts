@@ -14,6 +14,7 @@ import {
   UpdateUserStakeMutation,
   UpdateUserStakeMutationVariables,
   UserMotionStakes,
+  UserStakeType,
 } from '~graphql';
 import { mutate, query } from '~amplifyClient';
 import { getUserStakeDatabaseId } from '~utils/stakes';
@@ -332,6 +333,7 @@ export const updateUserStake = async (
           amount: amount.toString(),
           isClaimed: false,
           createdAt: new Date(timestamp * 1000).toISOString(),
+          type: UserStakeType.Motion,
         },
       },
     );
