@@ -6,6 +6,7 @@ import {
   AnyStakedExpenditureClient,
   AnyStagedExpenditureClient,
   AnyVotingReputationClient,
+  AnyStreamingPaymentsClient,
 } from '@colony/colony-js';
 
 import { ColonyOperations, ContractEvent, MotionEvents } from '~types';
@@ -45,6 +46,7 @@ interface MotionActionClients {
   oneTxPaymentClient?: AnyOneTxPaymentClient | null;
   stakedExpenditureClient?: AnyStakedExpenditureClient | null;
   stagedExpenditureClient?: AnyStagedExpenditureClient | null;
+  streamingPaymentsClient?: AnyStreamingPaymentsClient | null;
 }
 
 export const parseAction = (
