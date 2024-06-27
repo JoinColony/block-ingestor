@@ -4,11 +4,13 @@ import { ColonyActionType } from '~graphql';
 import { ContractEvent } from '~types';
 import {
   isAddVerifiedMembersOperation,
+  isManageTokensOperation,
   isRemoveVerifiedMembersOperation,
   parseOperation,
   verbose,
 } from '~utils';
 import { createMotionInDB } from '../helpers';
+import { manageTokensMotionHandler } from './metadataDeltaHandlers/manageTokens';
 
 export const handleMetadataDeltaMotion = async (
   colonyAddress: string,
@@ -43,6 +45,15 @@ export const handleMetadataDeltaMotion = async (
         type: ColonyActionType.RemoveVerifiedMembersMotion,
         members: operation.payload,
         gasEstimate: gasEstimate.toString(),
+      });
+    }
+
+    if (isManageTokensOperation(operation)) {
+      await manageTokensMotionHandler({
+        colonyAddress,
+        event,
+        gasEstimate,
+        operation,
       });
     }
   } catch (error) {

@@ -1,5 +1,8 @@
 fragment Colony on Colony {
   colonyAddress: id
+  nativeToken {
+    ...Token
+  }
   tokens {
     items {
       id
@@ -42,12 +45,7 @@ fragment ColonyMetadata on ColonyMetadata {
     oldDisplayName
     newDisplayName
     hasAvatarChanged
-    haveTokensChanged
     hasDescriptionChanged
     haveExternalLinksChanged
-  }
-  modifiedTokenAddresses {
-    added
-    removed
   }
 }

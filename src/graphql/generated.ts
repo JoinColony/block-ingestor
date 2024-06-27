@@ -43,6 +43,20 @@ export type Annotation = {
   updatedAt: Scalars['AWSDateTime'];
 };
 
+/** Token IDs */
+export type ApprovedTokenChanges = {
+  __typename?: 'ApprovedTokenChanges';
+  added: Array<Scalars['ID']>;
+  removed: Array<Scalars['ID']>;
+  unaffected: Array<Scalars['ID']>;
+};
+
+export type ApprovedTokenChangesInput = {
+  added: Array<Scalars['ID']>;
+  removed: Array<Scalars['ID']>;
+  unaffected: Array<Scalars['ID']>;
+};
+
 /**
  * Represents metadata related to a blockchain event
  * Applies to Colonies, Tokens and Events, but not all fields are revlant to all
@@ -88,6 +102,7 @@ export enum ClientType {
   TokenSupplierClient = 'TokenSupplierClient',
   VestingSimpleClient = 'VestingSimpleClient',
   VotingReputationClient = 'VotingReputationClient',
+  WhitelistClient = 'WhitelistClient',
   WrappedTokenClient = 'WrappedTokenClient',
 }
 
@@ -219,6 +234,8 @@ export type ColonyAction = {
   annotation?: Maybe<Annotation>;
   /** The id of the associated annotation, if there is one */
   annotationId?: Maybe<Scalars['ID']>;
+  /** Approved tokens impacted by the action (used for manage tokens) */
+  approvedTokenChanges?: Maybe<ApprovedTokenChanges>;
   /** The block number where the action was recorded */
   blockNumber: Scalars['Int'];
   /** The Colony that the action belongs to */
@@ -420,6 +437,10 @@ export enum ColonyActionType {
   /** An action related to the creation of safe transactions via Safe Control */
   MakeArbitraryTransaction = 'MAKE_ARBITRARY_TRANSACTION',
   MakeArbitraryTransactionsMotion = 'MAKE_ARBITRARY_TRANSACTIONS_MOTION',
+  /** An action related to adding / removing approved colony tokens */
+  ManageTokens = 'MANAGE_TOKENS',
+  /** An action related to adding / removing approved colony tokens */
+  ManageTokensMotion = 'MANAGE_TOKENS_MOTION',
   /** An action related to minting tokens within a Colony */
   MintTokens = 'MINT_TOKENS',
   /** An action related to minting tokens within a Colony via a motion */
@@ -545,7 +566,7 @@ export type ColonyContributor = {
    * Format: <colonyAddress>_<contributorAddress>
    */
   id: Scalars['ID'];
-  /** Is the contributor a member of a colony? */
+  /** Is the contributor a verified member of the colony? */
   isVerified: Scalars['Boolean'];
   /** Is the contributor watching the colony */
   isWatching?: Maybe<Scalars['Boolean']>;
@@ -722,11 +743,6 @@ export type ColonyMetadata = {
   externalLinks?: Maybe<Array<ExternalLink>>;
   /** Unique identifier for the Colony (contract address) */
   id: Scalars['ID'];
-  /**
-   * Token addresses that were modified in a previous action (motion)
-   * Only present on pendingColonyMetadata for consumption in block ingestor
-   */
-  modifiedTokenAddresses?: Maybe<PendingModifiedTokenAddresses>;
   /** Colony Objective */
   objective?: Maybe<ColonyObjective>;
   /** List of safes that are used within the Colony */
@@ -750,8 +766,6 @@ export type ColonyMetadataChangelog = {
   hasObjectiveChanged?: Maybe<Scalars['Boolean']>;
   /** Whether the colony's external links have changed */
   haveExternalLinksChanged?: Maybe<Scalars['Boolean']>;
-  /** Whether tokens have been added or removed from the Colony's token list */
-  haveTokensChanged: Scalars['Boolean'];
   /** Display name of the Colony after the change */
   newDisplayName: Scalars['String'];
   /** Whether safes have been added or removed from the Colony's safe list */
@@ -768,7 +782,6 @@ export type ColonyMetadataChangelogInput = {
   hasDescriptionChanged?: InputMaybe<Scalars['Boolean']>;
   hasObjectiveChanged?: InputMaybe<Scalars['Boolean']>;
   haveExternalLinksChanged?: InputMaybe<Scalars['Boolean']>;
-  haveTokensChanged: Scalars['Boolean'];
   newDisplayName: Scalars['String'];
   newSafes?: InputMaybe<Array<SafeInput>>;
   oldDisplayName: Scalars['String'];
@@ -1099,6 +1112,7 @@ export type CreateAnnotationInput = {
 export type CreateColonyActionInput = {
   amount?: InputMaybe<Scalars['String']>;
   annotationId?: InputMaybe<Scalars['ID']>;
+  approvedTokenChanges?: InputMaybe<ApprovedTokenChangesInput>;
   blockNumber: Scalars['Int'];
   colonyActionsId?: InputMaybe<Scalars['ID']>;
   colonyDecisionId?: InputMaybe<Scalars['ID']>;
@@ -1254,7 +1268,6 @@ export type CreateColonyMetadataInput = {
   etherealData?: InputMaybe<ColonyMetadataEtherealDataInput>;
   externalLinks?: InputMaybe<Array<ExternalLinkInput>>;
   id?: InputMaybe<Scalars['ID']>;
-  modifiedTokenAddresses?: InputMaybe<PendingModifiedTokenAddressesInput>;
   objective?: InputMaybe<ColonyObjectiveInput>;
   safes?: InputMaybe<Array<SafeInput>>;
   thumbnail?: InputMaybe<Scalars['String']>;
@@ -5326,20 +5339,6 @@ export type PaymentInput = {
   tokenAddress: Scalars['String'];
 };
 
-/** Colony token modifications that are stored temporarily and commited to the database once the corresponding motion passes */
-export type PendingModifiedTokenAddresses = {
-  __typename?: 'PendingModifiedTokenAddresses';
-  /** List of tokens that were added to the Colony's token list */
-  added?: Maybe<Array<Scalars['String']>>;
-  /** List of tokens that were removed from the Colony's token list */
-  removed?: Maybe<Array<Scalars['String']>>;
-};
-
-export type PendingModifiedTokenAddressesInput = {
-  added?: InputMaybe<Array<Scalars['String']>>;
-  removed?: InputMaybe<Array<Scalars['String']>>;
-};
-
 export type PrivateBetaInviteCode = {
   __typename?: 'PrivateBetaInviteCode';
   createdAt: Scalars['AWSDateTime'];
@@ -5555,7 +5554,6 @@ export type Query = {
   listUsers?: Maybe<ModelUserConnection>;
   searchColonyActions?: Maybe<SearchableColonyActionConnection>;
   searchColonyContributors?: Maybe<SearchableColonyContributorConnection>;
-  searchColonyFundsClaims?: Maybe<SearchableColonyFundsClaimConnection>;
 };
 
 /** Root query type */
@@ -6377,18 +6375,6 @@ export type QuerySearchColonyContributorsArgs = {
   sort?: InputMaybe<Array<InputMaybe<SearchableColonyContributorSortInput>>>;
 };
 
-/** Root query type */
-export type QuerySearchColonyFundsClaimsArgs = {
-  aggregates?: InputMaybe<
-    Array<InputMaybe<SearchableColonyFundsClaimAggregationInput>>
-  >;
-  filter?: InputMaybe<SearchableColonyFundsClaimFilterInput>;
-  from?: InputMaybe<Scalars['Int']>;
-  limit?: InputMaybe<Scalars['Int']>;
-  nextToken?: InputMaybe<Scalars['String']>;
-  sort?: InputMaybe<Array<InputMaybe<SearchableColonyFundsClaimSortInput>>>;
-};
-
 export type ReputationMiningCycleMetadata = {
   __typename?: 'ReputationMiningCycleMetadata';
   createdAt: Scalars['AWSDateTime'];
@@ -6680,61 +6666,6 @@ export enum SearchableColonyContributorSortableFields {
   Id = 'id',
   IsVerified = 'isVerified',
   IsWatching = 'isWatching',
-  UpdatedAt = 'updatedAt',
-}
-
-export enum SearchableColonyFundsClaimAggregateField {
-  Amount = 'amount',
-  ColonyFundsClaimTokenId = 'colonyFundsClaimTokenId',
-  ColonyFundsClaimsId = 'colonyFundsClaimsId',
-  CreatedAt = 'createdAt',
-  CreatedAtBlock = 'createdAtBlock',
-  Id = 'id',
-  IsClaimed = 'isClaimed',
-  UpdatedAt = 'updatedAt',
-}
-
-export type SearchableColonyFundsClaimAggregationInput = {
-  field: SearchableColonyFundsClaimAggregateField;
-  name: Scalars['String'];
-  type: SearchableAggregateType;
-};
-
-export type SearchableColonyFundsClaimConnection = {
-  __typename?: 'SearchableColonyFundsClaimConnection';
-  aggregateItems: Array<Maybe<SearchableAggregateResult>>;
-  items: Array<Maybe<ColonyFundsClaim>>;
-  nextToken?: Maybe<Scalars['String']>;
-  total?: Maybe<Scalars['Int']>;
-};
-
-export type SearchableColonyFundsClaimFilterInput = {
-  amount?: InputMaybe<SearchableStringFilterInput>;
-  and?: InputMaybe<Array<InputMaybe<SearchableColonyFundsClaimFilterInput>>>;
-  colonyFundsClaimTokenId?: InputMaybe<SearchableIdFilterInput>;
-  colonyFundsClaimsId?: InputMaybe<SearchableIdFilterInput>;
-  createdAt?: InputMaybe<SearchableStringFilterInput>;
-  createdAtBlock?: InputMaybe<SearchableIntFilterInput>;
-  id?: InputMaybe<SearchableIdFilterInput>;
-  isClaimed?: InputMaybe<SearchableBooleanFilterInput>;
-  not?: InputMaybe<SearchableColonyFundsClaimFilterInput>;
-  or?: InputMaybe<Array<InputMaybe<SearchableColonyFundsClaimFilterInput>>>;
-  updatedAt?: InputMaybe<SearchableStringFilterInput>;
-};
-
-export type SearchableColonyFundsClaimSortInput = {
-  direction?: InputMaybe<SearchableSortDirection>;
-  field?: InputMaybe<SearchableColonyFundsClaimSortableFields>;
-};
-
-export enum SearchableColonyFundsClaimSortableFields {
-  Amount = 'amount',
-  ColonyFundsClaimTokenId = 'colonyFundsClaimTokenId',
-  ColonyFundsClaimsId = 'colonyFundsClaimsId',
-  CreatedAt = 'createdAt',
-  CreatedAtBlock = 'createdAtBlock',
-  Id = 'id',
-  IsClaimed = 'isClaimed',
   UpdatedAt = 'updatedAt',
 }
 
@@ -7680,6 +7611,7 @@ export type UpdateAnnotationInput = {
 export type UpdateColonyActionInput = {
   amount?: InputMaybe<Scalars['String']>;
   annotationId?: InputMaybe<Scalars['ID']>;
+  approvedTokenChanges?: InputMaybe<ApprovedTokenChangesInput>;
   blockNumber?: InputMaybe<Scalars['Int']>;
   colonyActionsId?: InputMaybe<Scalars['ID']>;
   colonyDecisionId?: InputMaybe<Scalars['ID']>;
@@ -7813,7 +7745,6 @@ export type UpdateColonyMetadataInput = {
   etherealData?: InputMaybe<ColonyMetadataEtherealDataInput>;
   externalLinks?: InputMaybe<Array<ExternalLinkInput>>;
   id: Scalars['ID'];
-  modifiedTokenAddresses?: InputMaybe<PendingModifiedTokenAddressesInput>;
   objective?: InputMaybe<ColonyObjectiveInput>;
   safes?: InputMaybe<Array<SafeInput>>;
   thumbnail?: InputMaybe<Scalars['String']>;
@@ -8330,6 +8261,7 @@ export type VotingReputationParamsInput = {
 export type ColonyFragment = {
   __typename?: 'Colony';
   colonyAddress: string;
+  nativeToken: { __typename?: 'Token'; tokenAddress: string };
   tokens?: {
     __typename?: 'ModelColonyTokensConnection';
     items: Array<{
@@ -8377,15 +8309,9 @@ export type ColonyMetadataFragment = {
     oldDisplayName: string;
     newDisplayName: string;
     hasAvatarChanged: boolean;
-    haveTokensChanged: boolean;
     hasDescriptionChanged?: boolean | null;
     haveExternalLinksChanged?: boolean | null;
   }> | null;
-  modifiedTokenAddresses?: {
-    __typename?: 'PendingModifiedTokenAddresses';
-    added?: Array<string> | null;
-    removed?: Array<string> | null;
-  } | null;
 };
 
 export type ExpenditureBalanceFragment = {
@@ -8568,6 +8494,8 @@ export type DomainMetadataFragment = {
     newDescription?: string | null;
   }> | null;
 };
+
+export type TokenFragment = { __typename?: 'Token'; tokenAddress: string };
 
 export type CreateColonyActionMutationVariables = Exact<{
   input: CreateColonyActionInput;
@@ -9180,15 +9108,9 @@ export type GetColonyMetadataQuery = {
       oldDisplayName: string;
       newDisplayName: string;
       hasAvatarChanged: boolean;
-      haveTokensChanged: boolean;
       hasDescriptionChanged?: boolean | null;
       haveExternalLinksChanged?: boolean | null;
     }> | null;
-    modifiedTokenAddresses?: {
-      __typename?: 'PendingModifiedTokenAddresses';
-      added?: Array<string> | null;
-      removed?: Array<string> | null;
-    } | null;
   } | null;
 };
 
@@ -9202,6 +9124,7 @@ export type GetColonyQuery = {
   getColony?: {
     __typename?: 'Colony';
     colonyAddress: string;
+    nativeToken: { __typename?: 'Token'; tokenAddress: string };
     tokens?: {
       __typename?: 'ModelColonyTokensConnection';
       items: Array<{
@@ -9672,15 +9595,9 @@ export type GetColonyActionByMotionIdQuery = {
           oldDisplayName: string;
           newDisplayName: string;
           hasAvatarChanged: boolean;
-          haveTokensChanged: boolean;
           hasDescriptionChanged?: boolean | null;
           haveExternalLinksChanged?: boolean | null;
         }> | null;
-        modifiedTokenAddresses?: {
-          __typename?: 'PendingModifiedTokenAddresses';
-          added?: Array<string> | null;
-          removed?: Array<string> | null;
-        } | null;
       } | null;
     } | null>;
   } | null;
@@ -9883,9 +9800,17 @@ export type GetColonyStakeQuery = {
   getColonyStake?: { __typename?: 'ColonyStake'; totalAmount: string } | null;
 };
 
+export const Token = gql`
+  fragment Token on Token {
+    tokenAddress: id
+  }
+`;
 export const Colony = gql`
   fragment Colony on Colony {
     colonyAddress: id
+    nativeToken {
+      ...Token
+    }
     tokens {
       items {
         id
@@ -9911,6 +9836,7 @@ export const Colony = gql`
       nextToken
     }
   }
+  ${Token}
 `;
 export const ColonyMetadata = gql`
   fragment ColonyMetadata on ColonyMetadata {
@@ -9928,13 +9854,8 @@ export const ColonyMetadata = gql`
       oldDisplayName
       newDisplayName
       hasAvatarChanged
-      haveTokensChanged
       hasDescriptionChanged
       haveExternalLinksChanged
-    }
-    modifiedTokenAddresses {
-      added
-      removed
     }
   }
 `;

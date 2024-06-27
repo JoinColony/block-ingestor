@@ -4,6 +4,7 @@ import {
   RemoveVerifiedMembersOperation,
   MetadataDeltaOperation,
   MetadataDeltaOperationType,
+  ManageTokensOperation,
 } from './types';
 
 export const isAddVerifiedMembersOperation = (
@@ -22,6 +23,17 @@ export const isRemoveVerifiedMembersOperation = (
 ): operation is RemoveVerifiedMembersOperation => {
   return (
     operation.type === MetadataDeltaOperationType.REMOVE_VERIFIED_MEMBERS &&
+    operation.payload !== undefined &&
+    Array.isArray(operation.payload) &&
+    operation.payload.every((item) => typeof item === 'string')
+  );
+};
+
+export const isManageTokensOperation = (
+  operation: MetadataDeltaOperation,
+): operation is ManageTokensOperation => {
+  return (
+    operation.type === MetadataDeltaOperationType.MANAGE_TOKENS &&
     operation.payload !== undefined &&
     Array.isArray(operation.payload) &&
     operation.payload.every((item) => typeof item === 'string')
