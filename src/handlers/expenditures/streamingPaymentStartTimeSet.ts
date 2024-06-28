@@ -1,4 +1,3 @@
-import { getExpenditureDatabaseId, output, toNumber, verbose } from '~utils';
 import { mutate } from '~amplifyClient';
 import {
   StreamingPaymentEndCondition,
@@ -10,28 +9,34 @@ import {
   UpdateStreamingPaymentMutationVariables,
 } from '~graphql';
 import { EventHandler } from '~types';
-import { ExtensionEventListener } from '~eventListeners';
-
+import { getExpenditureDatabaseId, output, toNumber, verbose } from '~utils';
 import { getStreamingPaymentFromDB } from './helpers';
 import { getLimitAmount } from './helpers/getLimitAmount';
+import { ExtensionEventListener } from '~eventListeners';
 
-export const handlePaymentTokenUpdated: EventHandler = async (
+export const handleStreamingPaymentStartTimeSet: EventHandler = async (
   event,
   listener,
 ) => {
-  const { streamingPaymentId, token: tokenAddress, amount, interval } = event.args;
-  const convertedNativeId = toNumber(streamingPaymentId);
   const { colonyAddress } = listener as ExtensionEventListener;
 
-  const databaseId = getExpenditureDatabaseId(colonyAddress, convertedNativeId);
-  const streamingPayment = await getStreamingPaymentFromDB(databaseId);
+  const { streamingPaymentId, startTime } = event.args;
+  const convertedNativeId = toNumber(streamingPaymentId);
 
-  if (!streamingPayment) {
-    output(`Streaming payment with ID ${databaseId} not found in the database`);
+  if (!colonyAddress) {
     return;
   }
 
-  verbose(`Payment token updated for streaming payment with ID ${databaseId}`);
+  const databaseId = getExpenditureDatabaseId(colonyAddress, convertedNativeId);
+  const streamingPayment = await getStreamingPaymentFromDB(databaseId);
+  if (!streamingPayment) {
+    output(
+      `Could not find streaming payment with ID: ${databaseId} in the db. This is a bug and needs investigating.`,
+    );
+    return;
+  }
+
+  verbose(`Start time set for streaming payment with ID ${databaseId}`);
 
   await mutate<
     UpdateStreamingPaymentMutation,
@@ -39,8 +44,7 @@ export const handlePaymentTokenUpdated: EventHandler = async (
   >(UpdateStreamingPaymentDocument, {
     input: {
       id: databaseId,
-      amount: amount.toString(),
-      interval: interval.toString(),
+      startTime: startTime.toString(),
     },
   });
 
@@ -48,10 +52,10 @@ export const handlePaymentTokenUpdated: EventHandler = async (
     streamingPayment.metadata?.endCondition ===
     StreamingPaymentEndCondition.LimitReached
   ) {
-    const { startTime, endTime, tokenAddress } = streamingPayment;
+    const { endTime, amount, interval, tokenAddress } = streamingPayment;
 
     const limitAmount = await getLimitAmount({
-      startTime,
+      startTime: startTime.toString(),
       endTime,
       amount,
       interval,

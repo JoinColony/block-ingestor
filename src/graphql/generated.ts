@@ -8718,6 +8718,18 @@ export type UpdateStreamingPaymentMutation = {
   } | null;
 };
 
+export type UpdateStreamingPaymentMetadataMutationVariables = Exact<{
+  input: UpdateStreamingPaymentMetadataInput;
+}>;
+
+export type UpdateStreamingPaymentMetadataMutation = {
+  __typename?: 'Mutation';
+  updateStreamingPaymentMetadata?: {
+    __typename?: 'StreamingPaymentMetadata';
+    id: string;
+  } | null;
+};
+
 export type CreateColonyExtensionMutationVariables = Exact<{
   input: CreateColonyExtensionInput;
 }>;
@@ -9375,14 +9387,21 @@ export type GetStreamingPaymentQuery = {
   getStreamingPayment?: {
     __typename?: 'StreamingPayment';
     id: string;
+    startTime: string;
     endTime: string;
     tokenAddress: string;
     amount: string;
+    interval: string;
     claims?: Array<{
       __typename?: 'StreamingPaymentClaim';
       amount: string;
       timestamp: string;
     }> | null;
+    metadata?: {
+      __typename?: 'StreamingPaymentMetadata';
+      endCondition: StreamingPaymentEndCondition;
+      limitAmount?: string | null;
+    } | null;
   } | null;
 };
 
@@ -9756,6 +9775,31 @@ export type GetTokenFromEverywhereQuery = {
     __typename?: 'TokenFromEverywhereReturn';
     items?: Array<{ __typename?: 'Token'; id: string } | null> | null;
   } | null;
+};
+
+export type GetTokenByAddressQueryVariables = Exact<{
+  address: Scalars['ID'];
+}>;
+
+export type GetTokenByAddressQuery = {
+  __typename?: 'Query';
+  getTokenByAddress?: {
+    __typename?: 'ModelTokenConnection';
+    items: Array<{
+      __typename?: 'Token';
+      decimals: number;
+      tokenAddress: string;
+    } | null>;
+  } | null;
+};
+
+export type GetColonyStakeQueryVariables = Exact<{
+  colonyStakeId: Scalars['ID'];
+}>;
+
+export type GetColonyStakeQuery = {
+  __typename?: 'Query';
+  getColonyStake?: { __typename?: 'ColonyStake'; totalAmount: string } | null;
 };
 
 export const Colony = gql`
@@ -10166,6 +10210,15 @@ export const UpdateStreamingPaymentDocument = gql`
     }
   }
 `;
+export const UpdateStreamingPaymentMetadataDocument = gql`
+  mutation UpdateStreamingPaymentMetadata(
+    $input: UpdateStreamingPaymentMetadataInput!
+  ) {
+    updateStreamingPaymentMetadata(input: $input) {
+      id
+    }
+  }
+`;
 export const CreateColonyExtensionDocument = gql`
   mutation CreateColonyExtension($input: CreateColonyExtensionInput!) {
     createColonyExtension(input: $input) {
@@ -10559,12 +10612,18 @@ export const GetStreamingPaymentDocument = gql`
   query GetStreamingPayment($id: ID!) {
     getStreamingPayment(id: $id) {
       id
+      startTime
       endTime
       tokenAddress
       amount
+      interval
       claims {
         amount
         timestamp
+      }
+      metadata {
+        endCondition
+        limitAmount
       }
     }
   }
@@ -10767,6 +10826,23 @@ export const GetTokenFromEverywhereDocument = gql`
       items {
         id
       }
+    }
+  }
+`;
+export const GetTokenByAddressDocument = gql`
+  query GetTokenByAddress($address: ID!) {
+    getTokenByAddress(id: $address) {
+      items {
+        decimals
+        tokenAddress: id
+      }
+    }
+  }
+`;
+export const GetColonyStakeDocument = gql`
+  query GetColonyStake($colonyStakeId: ID!) {
+    getColonyStake(id: $colonyStakeId) {
+      totalAmount
     }
   }
 `;
