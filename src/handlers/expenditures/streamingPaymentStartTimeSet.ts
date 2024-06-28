@@ -8,13 +8,18 @@ import {
   UpdateStreamingPaymentMutation,
   UpdateStreamingPaymentMutationVariables,
 } from '~graphql';
-import { ContractEvent } from '~types';
+import { EventHandler } from '~types';
 import { getExpenditureDatabaseId, output, toNumber, verbose } from '~utils';
 import { getStreamingPaymentFromDB } from './helpers';
 import { getLimitAmount } from './helpers/getLimitAmount';
+import { ExtensionEventListener } from '~eventListeners';
 
-export default async (event: ContractEvent): Promise<void> => {
-  const { colonyAddress } = event;
+export const handleStreamingPaymentStartTimeSet: EventHandler = async (
+  event,
+  listener,
+) => {
+  const { colonyAddress } = listener as ExtensionEventListener;
+
   const { streamingPaymentId, startTime } = event.args;
   const convertedNativeId = toNumber(streamingPaymentId);
 
