@@ -5,7 +5,10 @@ import {
   handleStreamingPaymentClaimWaived,
   handleStreamingPaymentCreated,
 } from '~handlers';
-import { handleStreamingPaymentEndTimeSet } from '~handlers/expenditures/streamingPaymentEndTimeSet';
+import {
+  handleStreamingPaymentStartTimeSet,
+  handleStreamingPaymentEndTimeSet,
+} from '~handlers/expenditures/index';
 
 import { ContractEventsSignatures } from '~types';
 import { output } from '~utils';
@@ -31,6 +34,7 @@ export const setupListenersForStreamingPayments = (
     [ContractEventsSignatures.StreamingPaymentCreated]:
       handleStreamingPaymentCreated,
     [ContractEventsSignatures.PaymentTokenUpdated]: handlePaymentTokenUpdated,
+    [ContractEventsSignatures.StartTimeSet]: handleStreamingPaymentStartTimeSet,
     [ContractEventsSignatures.EndTimeSet]: handleStreamingPaymentEndTimeSet,
     [ContractEventsSignatures.StreamingPaymentClaimed]:
       handleStreamingPaymentClaimed,
