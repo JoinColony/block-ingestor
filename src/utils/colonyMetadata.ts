@@ -216,11 +216,13 @@ export const linkPendingMetadata = async (
   const colonyClient = await getCachedColonyClient(colonyAddress);
   const oneTxPaymentClient =
     (await colonyClient?.getExtensionClient(Extension.OneTxPayment)) ?? null;
-  const stakedExpenditureClient =
-    await getStakedExpenditureClient(colonyAddress);
+  const stakedExpenditureClient = await getStakedExpenditureClient(
+    colonyAddress,
+  );
 
-  const stagedExpenditureClient =
-    await getStagedExpenditureClient(colonyAddress);
+  const stagedExpenditureClient = await getStagedExpenditureClient(
+    colonyAddress,
+  );
 
   const parsedOperation = parseOperation(action, {
     colonyClient,

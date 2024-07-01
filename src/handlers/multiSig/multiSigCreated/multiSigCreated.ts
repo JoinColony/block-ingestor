@@ -10,7 +10,7 @@ import {
   verbose,
 } from '~utils';
 import { handleMintTokensMultiSig } from './handlers/mintTokens';
-import { handleAddDomainMultiSig } from './handlers/addDomain';
+import { handleAddOrEditDomainMultiSig } from './handlers/addOrEditDomain';
 
 export const handleMultiSigMotionCreated: EventHandler = async (
   event,
@@ -66,7 +66,11 @@ export const handleMultiSigMotionCreated: EventHandler = async (
       }
       case ColonyOperations.AddDomain:
       case ColonyOperations.EditDomain: {
-        await handleAddDomainMultiSig(colonyAddress, event, parsedOperation);
+        await handleAddOrEditDomainMultiSig(
+          colonyAddress,
+          event,
+          parsedOperation,
+        );
         break;
       }
       default: {
