@@ -942,6 +942,10 @@ export type ColonyMultiSig = {
   createdAt: Scalars['AWSDateTime'];
   /** The timestamp when the motion was finalized */
   executedAt?: Maybe<Scalars['AWSDateTime']>;
+  /** Wallet address of the user finalizing the motion */
+  executedBy?: Maybe<Scalars['ID']>;
+  /** Extended user object for given executedBy */
+  executedByUser?: Maybe<User>;
   /** Whether the underlying action completed */
   hasActionCompleted: Scalars['Boolean'];
   /**
@@ -963,6 +967,12 @@ export type ColonyMultiSig = {
   nativeMultiSigDomainId: Scalars['String'];
   /** The on chain id of the multiSig */
   nativeMultiSigId: Scalars['ID'];
+  /** The timestamp when the motion was rejected */
+  rejectedAt?: Maybe<Scalars['AWSDateTime']>;
+  /** Wallet address of the user rejecting the motion */
+  rejectedBy?: Maybe<Scalars['ID']>;
+  /** Extended user object for given rejectedBy */
+  rejectedByUser?: Maybe<User>;
   /** Required role for signing */
   requiredPermissions: Scalars['Int'];
   signatures?: Maybe<ModelMultiSigUserSignatureConnection>;
@@ -1391,6 +1401,7 @@ export type CreateColonyMotionInput = {
 export type CreateColonyMultiSigInput = {
   colonyAddress: Scalars['ID'];
   executedAt?: InputMaybe<Scalars['AWSDateTime']>;
+  executedBy?: InputMaybe<Scalars['ID']>;
   hasActionCompleted: Scalars['Boolean'];
   id?: InputMaybe<Scalars['ID']>;
   isDecision: Scalars['Boolean'];
@@ -1399,6 +1410,8 @@ export type CreateColonyMultiSigInput = {
   multiSigDomainId: Scalars['ID'];
   nativeMultiSigDomainId: Scalars['String'];
   nativeMultiSigId: Scalars['ID'];
+  rejectedAt?: InputMaybe<Scalars['AWSDateTime']>;
+  rejectedBy?: InputMaybe<Scalars['ID']>;
   requiredPermissions: Scalars['Int'];
   transactionHash: Scalars['ID'];
 };
@@ -2847,6 +2860,7 @@ export type ModelColonyMultiSigConditionInput = {
   and?: InputMaybe<Array<InputMaybe<ModelColonyMultiSigConditionInput>>>;
   colonyAddress?: InputMaybe<ModelIdInput>;
   executedAt?: InputMaybe<ModelStringInput>;
+  executedBy?: InputMaybe<ModelIdInput>;
   hasActionCompleted?: InputMaybe<ModelBooleanInput>;
   isDecision?: InputMaybe<ModelBooleanInput>;
   isExecuted?: InputMaybe<ModelBooleanInput>;
@@ -2856,6 +2870,8 @@ export type ModelColonyMultiSigConditionInput = {
   nativeMultiSigId?: InputMaybe<ModelIdInput>;
   not?: InputMaybe<ModelColonyMultiSigConditionInput>;
   or?: InputMaybe<Array<InputMaybe<ModelColonyMultiSigConditionInput>>>;
+  rejectedAt?: InputMaybe<ModelStringInput>;
+  rejectedBy?: InputMaybe<ModelIdInput>;
   requiredPermissions?: InputMaybe<ModelIntInput>;
   transactionHash?: InputMaybe<ModelIdInput>;
 };
@@ -2870,6 +2886,7 @@ export type ModelColonyMultiSigFilterInput = {
   and?: InputMaybe<Array<InputMaybe<ModelColonyMultiSigFilterInput>>>;
   colonyAddress?: InputMaybe<ModelIdInput>;
   executedAt?: InputMaybe<ModelStringInput>;
+  executedBy?: InputMaybe<ModelIdInput>;
   hasActionCompleted?: InputMaybe<ModelBooleanInput>;
   id?: InputMaybe<ModelIdInput>;
   isDecision?: InputMaybe<ModelBooleanInput>;
@@ -2880,6 +2897,8 @@ export type ModelColonyMultiSigFilterInput = {
   nativeMultiSigId?: InputMaybe<ModelIdInput>;
   not?: InputMaybe<ModelColonyMultiSigFilterInput>;
   or?: InputMaybe<Array<InputMaybe<ModelColonyMultiSigFilterInput>>>;
+  rejectedAt?: InputMaybe<ModelStringInput>;
+  rejectedBy?: InputMaybe<ModelIdInput>;
   requiredPermissions?: InputMaybe<ModelIntInput>;
   transactionHash?: InputMaybe<ModelIdInput>;
 };
@@ -3909,6 +3928,7 @@ export type ModelSubscriptionColonyMultiSigFilterInput = {
   >;
   colonyAddress?: InputMaybe<ModelSubscriptionIdInput>;
   executedAt?: InputMaybe<ModelSubscriptionStringInput>;
+  executedBy?: InputMaybe<ModelSubscriptionIdInput>;
   hasActionCompleted?: InputMaybe<ModelSubscriptionBooleanInput>;
   id?: InputMaybe<ModelSubscriptionIdInput>;
   isDecision?: InputMaybe<ModelSubscriptionBooleanInput>;
@@ -3920,6 +3940,8 @@ export type ModelSubscriptionColonyMultiSigFilterInput = {
   or?: InputMaybe<
     Array<InputMaybe<ModelSubscriptionColonyMultiSigFilterInput>>
   >;
+  rejectedAt?: InputMaybe<ModelSubscriptionStringInput>;
+  rejectedBy?: InputMaybe<ModelSubscriptionIdInput>;
   requiredPermissions?: InputMaybe<ModelSubscriptionIntInput>;
   transactionHash?: InputMaybe<ModelSubscriptionIdInput>;
 };
@@ -8269,6 +8291,7 @@ export type UpdateColonyMotionInput = {
 export type UpdateColonyMultiSigInput = {
   colonyAddress?: InputMaybe<Scalars['ID']>;
   executedAt?: InputMaybe<Scalars['AWSDateTime']>;
+  executedBy?: InputMaybe<Scalars['ID']>;
   hasActionCompleted?: InputMaybe<Scalars['Boolean']>;
   id: Scalars['ID'];
   isDecision?: InputMaybe<Scalars['Boolean']>;
@@ -8277,6 +8300,8 @@ export type UpdateColonyMultiSigInput = {
   multiSigDomainId?: InputMaybe<Scalars['ID']>;
   nativeMultiSigDomainId?: InputMaybe<Scalars['String']>;
   nativeMultiSigId?: InputMaybe<Scalars['ID']>;
+  rejectedAt?: InputMaybe<Scalars['AWSDateTime']>;
+  rejectedBy?: InputMaybe<Scalars['ID']>;
   requiredPermissions?: InputMaybe<Scalars['Int']>;
   transactionHash?: InputMaybe<Scalars['ID']>;
 };
@@ -9088,6 +9113,10 @@ export type ColonyMultiSigFragment = {
   isRejected: boolean;
   isDecision: boolean;
   hasActionCompleted: boolean;
+  executedAt?: string | null;
+  executedBy?: string | null;
+  rejectedAt?: string | null;
+  rejectedBy?: string | null;
   signatures?: {
     __typename?: 'ModelMultiSigUserSignatureConnection';
     items: Array<{
@@ -10501,6 +10530,10 @@ export type GetColonyMultiSigQuery = {
     isRejected: boolean;
     isDecision: boolean;
     hasActionCompleted: boolean;
+    executedAt?: string | null;
+    executedBy?: string | null;
+    rejectedAt?: string | null;
+    rejectedBy?: string | null;
     signatures?: {
       __typename?: 'ModelMultiSigUserSignatureConnection';
       items: Array<{
@@ -10950,6 +10983,10 @@ export const ColonyMultiSig = gql`
         ...MultiSigUserSignature
       }
     }
+    executedAt
+    executedBy
+    rejectedAt
+    rejectedBy
   }
   ${MultiSigUserSignature}
 `;
