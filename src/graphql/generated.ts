@@ -954,7 +954,9 @@ export type ColonyMultiSig = {
   createdAt: Scalars['AWSDateTime'];
   /** The timestamp when the motion was finalized */
   executedAt?: Maybe<Scalars['AWSDateTime']>;
+  /** Wallet address of the user finalizing the motion */
   executedBy?: Maybe<Scalars['ID']>;
+  /** Extended user object for given executedBy */
   executedByUser?: Maybe<User>;
   /** Whether the underlying action completed */
   hasActionCompleted: Scalars['Boolean'];
@@ -979,7 +981,9 @@ export type ColonyMultiSig = {
   nativeMultiSigId: Scalars['ID'];
   /** The timestamp when the motion was rejected */
   rejectedAt?: Maybe<Scalars['AWSDateTime']>;
+  /** Wallet address of the user rejecting the motion */
   rejectedBy?: Maybe<Scalars['ID']>;
+  /** Extended user object for given rejectedBy */
   rejectedByUser?: Maybe<User>;
   /** Required role for signing */
   requiredPermissions: Scalars['Int'];
@@ -9104,6 +9108,10 @@ export type ColonyMultiSigFragment = {
   isRejected: boolean;
   isDecision: boolean;
   hasActionCompleted: boolean;
+  executedAt?: string | null;
+  executedBy?: string | null;
+  rejectedAt?: string | null;
+  rejectedBy?: string | null;
   signatures?: {
     __typename?: 'ModelMultiSigUserSignatureConnection';
     items: Array<{
@@ -10506,6 +10514,10 @@ export type GetColonyMultiSigQuery = {
     isRejected: boolean;
     isDecision: boolean;
     hasActionCompleted: boolean;
+    executedAt?: string | null;
+    executedBy?: string | null;
+    rejectedAt?: string | null;
+    rejectedBy?: string | null;
     signatures?: {
       __typename?: 'ModelMultiSigUserSignatureConnection';
       items: Array<{
@@ -10972,6 +10984,10 @@ export const ColonyMultiSig = gql`
         ...MultiSigUserSignature
       }
     }
+    executedAt
+    executedBy
+    rejectedAt
+    rejectedBy
   }
   ${MultiSigUserSignature}
 `;
