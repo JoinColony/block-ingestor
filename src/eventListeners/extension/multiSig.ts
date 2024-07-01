@@ -9,12 +9,26 @@ import {
   handleMultiSigMotionCreated,
   handleMultiSigMotionExecuted,
 } from '~handlers/multiSig';
+import { mutate, query } from '~amplifyClient';
+import {
+  GetActiveColonyMultisigsDocument,
+  GetActiveColonyMultisigsQuery,
+  GetActiveColonyMultisigsQueryVariables,
+  GetAllMultiSigRolesDocument,
+  GetAllMultiSigRolesQuery,
+  GetAllMultiSigRolesQueryVariables,
+  RemoveMultiSigRoleDocument,
+  RemoveMultiSigRoleMutation,
+  RemoveMultiSigRoleMutationVariables,
+} from '~graphql';
 
 import { ContractEventsSignatures } from '~types';
+import { notNull } from '~utils';
 import { addMultiSigParamsToDB } from '~utils/extensions/multiSig';
 import { output } from '~utils/logger';
 
 import { addExtensionEventListener, fetchExistingExtensions } from './index';
+import { updateMultiSigInDB } from '~handlers/multiSig/helpers';
 
 export const setupListenersForMultiSigExtensions = async (): Promise<void> => {
   output(`Setting up listeners for MultiSig extensions`);
@@ -30,8 +44,51 @@ export const handleMultiSigInstalled = async (
   multiSigAddress: string,
   colonyAddress: string,
 ): Promise<void> => {
-  await addMultiSigParamsToDB(multiSigAddress, colonyAddress);
   setupMultiSigListeners(multiSigAddress, colonyAddress);
+  await addMultiSigParamsToDB(multiSigAddress, colonyAddress);
+};
+
+export const handleMultiSigUninstalled = async (
+  colonyAddress: string,
+): Promise<void> => {
+  const multiSigRolesQuery = await query<
+    GetAllMultiSigRolesQuery,
+    GetAllMultiSigRolesQueryVariables
+  >(GetAllMultiSigRolesDocument, {
+    colonyAddress,
+  });
+
+  const roleEntries = multiSigRolesQuery?.data?.listColonyRoles?.items ?? [];
+
+  await Promise.all(
+    roleEntries.filter(notNull).map(async (entry) => {
+      await mutate<
+        RemoveMultiSigRoleMutation,
+        RemoveMultiSigRoleMutationVariables
+      >(RemoveMultiSigRoleDocument, {
+        id: entry.id,
+      });
+    }),
+  );
+
+  const activeMultiSigsQuery = await query<
+    GetActiveColonyMultisigsQuery,
+    GetActiveColonyMultisigsQueryVariables
+  >(GetActiveColonyMultisigsDocument, {
+    colonyAddress,
+  });
+
+  const multiSigs =
+    activeMultiSigsQuery?.data?.listColonyMultiSigs?.items ?? [];
+  await Promise.all(
+    multiSigs.filter(notNull).map(async (entry) => {
+      await updateMultiSigInDB({
+        id: entry.id,
+        isExecuted: false,
+        isRejected: true,
+      });
+    }),
+  );
 };
 
 export const setupMultiSigListeners = (

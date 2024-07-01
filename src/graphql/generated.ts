@@ -5839,6 +5839,7 @@ export type Query = {
   getMotionState: Scalars['Int'];
   /** Get the timeout for the current period of a motion */
   getMotionTimeoutPeriods?: Maybe<GetMotionTimeoutPeriodsReturn>;
+  getMultiSigByColonyAddress?: Maybe<ModelColonyMultiSigConnection>;
   getMultiSigByTransactionHash?: Maybe<ModelColonyMultiSigConnection>;
   getMultiSigUserSignature?: Maybe<MultiSigUserSignature>;
   getMultiSigUserSignatureByMultiSigId?: Maybe<ModelMultiSigUserSignatureConnection>;
@@ -5847,6 +5848,7 @@ export type Query = {
   getProfileByEmail?: Maybe<ModelProfileConnection>;
   getProfileByUsername?: Maybe<ModelProfileConnection>;
   getReputationMiningCycleMetadata?: Maybe<ReputationMiningCycleMetadata>;
+  getRoleByColony?: Maybe<ModelColonyRoleConnection>;
   getRoleByDomainAndColony?: Maybe<ModelColonyRoleConnection>;
   getRoleByTargetAddressAndColony?: Maybe<ModelColonyRoleConnection>;
   getSafeTransaction?: Maybe<SafeTransaction>;
@@ -6282,6 +6284,15 @@ export type QueryGetMotionTimeoutPeriodsArgs = {
 };
 
 /** Root query type */
+export type QueryGetMultiSigByColonyAddressArgs = {
+  colonyAddress: Scalars['ID'];
+  filter?: InputMaybe<ModelColonyMultiSigFilterInput>;
+  limit?: InputMaybe<Scalars['Int']>;
+  nextToken?: InputMaybe<Scalars['String']>;
+  sortDirection?: InputMaybe<ModelSortDirection>;
+};
+
+/** Root query type */
 export type QueryGetMultiSigByTransactionHashArgs = {
   filter?: InputMaybe<ModelColonyMultiSigFilterInput>;
   limit?: InputMaybe<Scalars['Int']>;
@@ -6335,6 +6346,16 @@ export type QueryGetProfileByUsernameArgs = {
 /** Root query type */
 export type QueryGetReputationMiningCycleMetadataArgs = {
   id: Scalars['ID'];
+};
+
+/** Root query type */
+export type QueryGetRoleByColonyArgs = {
+  colonyAddress: Scalars['ID'];
+  domainId?: InputMaybe<ModelIdKeyConditionInput>;
+  filter?: InputMaybe<ModelColonyRoleFilterInput>;
+  limit?: InputMaybe<Scalars['Int']>;
+  nextToken?: InputMaybe<Scalars['String']>;
+  sortDirection?: InputMaybe<ModelSortDirection>;
 };
 
 /** Root query type */
@@ -9506,6 +9527,15 @@ export type RemoveMultiSigVoteMutation = {
   } | null;
 };
 
+export type RemoveMultiSigRoleMutationVariables = Exact<{
+  id: Scalars['ID'];
+}>;
+
+export type RemoveMultiSigRoleMutation = {
+  __typename?: 'Mutation';
+  deleteColonyRole?: { __typename?: 'ColonyRole'; id: string } | null;
+};
+
 export type CreateColonyRoleMutationVariables = Exact<{
   input: CreateColonyRoleInput;
 }>;
@@ -10510,6 +10540,30 @@ export type GetUserMultiSigSignatureQuery = {
   } | null;
 };
 
+export type GetAllMultiSigRolesQueryVariables = Exact<{
+  colonyAddress: Scalars['ID'];
+}>;
+
+export type GetAllMultiSigRolesQuery = {
+  __typename?: 'Query';
+  listColonyRoles?: {
+    __typename?: 'ModelColonyRoleConnection';
+    items: Array<{ __typename?: 'ColonyRole'; id: string } | null>;
+  } | null;
+};
+
+export type GetActiveColonyMultisigsQueryVariables = Exact<{
+  colonyAddress: Scalars['ID'];
+}>;
+
+export type GetActiveColonyMultisigsQuery = {
+  __typename?: 'Query';
+  listColonyMultiSigs?: {
+    __typename?: 'ModelColonyMultiSigConnection';
+    items: Array<{ __typename?: 'ColonyMultiSig'; id: string } | null>;
+  } | null;
+};
+
 export type GetColonyRoleQueryVariables = Exact<{
   id: Scalars['ID'];
 }>;
@@ -11210,6 +11264,13 @@ export const RemoveMultiSigVoteDocument = gql`
     }
   }
 `;
+export const RemoveMultiSigRoleDocument = gql`
+  mutation RemoveMultiSigRole($id: ID!) {
+    deleteColonyRole(input: { id: $id }) {
+      id
+    }
+  }
+`;
 export const CreateColonyRoleDocument = gql`
   mutation CreateColonyRole($input: CreateColonyRoleInput!) {
     createColonyRole(input: $input) {
@@ -11734,6 +11795,37 @@ export const GetUserMultiSigSignatureDocument = gql`
     }
   }
   ${MultiSigUserSignature}
+`;
+export const GetAllMultiSigRolesDocument = gql`
+  query GetAllMultiSigRoles($colonyAddress: ID!) {
+    listColonyRoles(
+      limit: 1000
+      filter: {
+        isMultiSig: { eq: true }
+        colonyAddress: { eq: $colonyAddress }
+      }
+    ) {
+      items {
+        id
+      }
+    }
+  }
+`;
+export const GetActiveColonyMultisigsDocument = gql`
+  query GetActiveColonyMultisigs($colonyAddress: ID!) {
+    listColonyMultiSigs(
+      filter: {
+        colonyAddress: { eq: $colonyAddress }
+        isExecuted: { eq: false }
+        isRejected: { eq: false }
+      }
+      limit: 1000
+    ) {
+      items {
+        id
+      }
+    }
+  }
 `;
 export const GetColonyRoleDocument = gql`
   query GetColonyRole($id: ID!) {
