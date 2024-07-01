@@ -10923,7 +10923,7 @@ export type GetAllMultiSigRolesQueryVariables = Exact<{
 
 export type GetAllMultiSigRolesQuery = {
   __typename?: 'Query';
-  listColonyRoles?: {
+  getRoleByColony?: {
     __typename?: 'ModelColonyRoleConnection';
     items: Array<{ __typename?: 'ColonyRole'; id: string } | null>;
   } | null;
@@ -10935,7 +10935,7 @@ export type GetActiveColonyMultisigsQueryVariables = Exact<{
 
 export type GetActiveColonyMultisigsQuery = {
   __typename?: 'Query';
-  listColonyMultiSigs?: {
+  getMultiSigByColonyAddress?: {
     __typename?: 'ModelColonyMultiSigConnection';
     items: Array<{ __typename?: 'ColonyMultiSig'; id: string } | null>;
   } | null;
@@ -12182,12 +12182,10 @@ export const GetUserMultiSigSignatureDocument = gql`
 `;
 export const GetAllMultiSigRolesDocument = gql`
   query GetAllMultiSigRoles($colonyAddress: ID!) {
-    listColonyRoles(
-      limit: 1000
-      filter: {
-        isMultiSig: { eq: true }
-        colonyAddress: { eq: $colonyAddress }
-      }
+    getRoleByColony(
+      colonyAddress: $colonyAddress
+      limit: 9999
+      filter: { isMultiSig: { eq: true } }
     ) {
       items {
         id
@@ -12197,13 +12195,10 @@ export const GetAllMultiSigRolesDocument = gql`
 `;
 export const GetActiveColonyMultisigsDocument = gql`
   query GetActiveColonyMultisigs($colonyAddress: ID!) {
-    listColonyMultiSigs(
-      filter: {
-        colonyAddress: { eq: $colonyAddress }
-        isExecuted: { eq: false }
-        isRejected: { eq: false }
-      }
-      limit: 1000
+    getMultiSigByColonyAddress(
+      colonyAddress: $colonyAddress
+      filter: { isExecuted: { eq: false }, isRejected: { eq: false } }
+      limit: 9999
     ) {
       items {
         id
