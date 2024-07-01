@@ -58,7 +58,7 @@ export const handleMultiSigUninstalled = async (
     colonyAddress,
   });
 
-  const roleEntries = multiSigRolesQuery?.data?.listColonyRoles?.items ?? [];
+  const roleEntries = multiSigRolesQuery?.data?.getRoleByColony?.items ?? [];
 
   await Promise.all(
     roleEntries.filter(notNull).map(async (entry) => {
@@ -79,7 +79,7 @@ export const handleMultiSigUninstalled = async (
   });
 
   const multiSigs =
-    activeMultiSigsQuery?.data?.listColonyMultiSigs?.items ?? [];
+    activeMultiSigsQuery?.data?.getMultiSigByColonyAddress?.items ?? [];
   await Promise.all(
     multiSigs.filter(notNull).map(async (entry) => {
       await updateMultiSigInDB({
