@@ -19,6 +19,7 @@ const extensionHashDBKeyMap = {
   [getExtensionHash(Extension.StagedExpenditure)]: 'stagedExpenditure',
   [getExtensionHash(Extension.OneTxPayment)]: 'oneTxPayment',
   [getExtensionHash(Extension.StreamingPayments)]: 'streamingPayments',
+  [getExtensionHash(Extension.MultisigPermissions)]: 'multiSigPermissions',
 };
 
 const getExtensionCount = async (extensionHash: string): Promise<number> => {
@@ -42,6 +43,7 @@ const getExtensionCount = async (extensionHash: string): Promise<number> => {
         stagedExpenditure: 0,
         streamingPayments: 0,
         reputationWeighted: 0,
+        multiSigPermissions: 0,
       },
     });
   }
@@ -52,6 +54,7 @@ const getExtensionCount = async (extensionHash: string): Promise<number> => {
     stagedExpenditure,
     streamingPayments,
     reputationWeighted,
+    multiSigPermissions,
   } = data?.getExtensionInstallationsCount ?? {};
 
   const extensionHashCountMap = {
@@ -60,6 +63,7 @@ const getExtensionCount = async (extensionHash: string): Promise<number> => {
     [getExtensionHash(Extension.StagedExpenditure)]: stagedExpenditure,
     [getExtensionHash(Extension.OneTxPayment)]: oneTxPayment,
     [getExtensionHash(Extension.StreamingPayments)]: streamingPayments,
+    [getExtensionHash(Extension.MultisigPermissions)]: multiSigPermissions,
   };
 
   return extensionHashCountMap[extensionHash] ?? 0;

@@ -129,3 +129,18 @@ const isActionMotionFinalization = async (
     initiatorExtension.hash === getExtensionHash(Extension.VotingReputation)
   );
 };
+
+export const createColonyAction = async (
+  actionData: CreateColonyActionInput,
+  blockTimestamp: number,
+): Promise<void> => {
+  await mutate<CreateColonyActionMutation, CreateColonyActionMutationVariables>(
+    CreateColonyActionDocument,
+    {
+      input: {
+        ...actionData,
+        createdAt: new Date(blockTimestamp * 1000).toISOString(),
+      },
+    },
+  );
+};
