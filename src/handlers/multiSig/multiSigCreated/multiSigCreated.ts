@@ -10,6 +10,7 @@ import {
   verbose,
 } from '~utils';
 import { handleMintTokensMultiSig } from './handlers/mintTokens';
+import { handleSetUserRolesMultiSig } from './handlers/setUserRoles';
 
 export const handleMultiSigMotionCreated: EventHandler = async (
   event,
@@ -26,11 +27,13 @@ export const handleMultiSigMotionCreated: EventHandler = async (
   const multiSigClient = await getMultiSigClient(colonyAddress);
   const oneTxPaymentClient = await getOneTxPaymentClient(colonyAddress);
 
-  const stakedExpenditureClient =
-    await getStakedExpenditureClient(colonyAddress);
+  const stakedExpenditureClient = await getStakedExpenditureClient(
+    colonyAddress,
+  );
 
-  const stagedExpenditureClient =
-    await getStagedExpenditureClient(colonyAddress);
+  const stagedExpenditureClient = await getStagedExpenditureClient(
+    colonyAddress,
+  );
 
   if (!colonyClient || !multiSigClient) {
     return;
@@ -41,6 +44,7 @@ export const handleMultiSigMotionCreated: EventHandler = async (
   });
 
   const actionData = motion.data[0];
+  const actionTarget = motion.targets[0];
 
   if (!actionData) {
     verbose(`No action data in multiSig motion: ${motionId}`);
@@ -59,6 +63,15 @@ export const handleMultiSigMotionCreated: EventHandler = async (
     switch (contractOperation) {
       case ColonyOperations.MintTokens: {
         await handleMintTokensMultiSig(colonyAddress, event, parsedOperation);
+        break;
+      }
+      case ColonyOperations.SetUserRoles: {
+        await handleSetUserRolesMultiSig(
+          colonyAddress,
+          event,
+          parsedOperation,
+          actionTarget,
+        );
         break;
       }
       default: {
