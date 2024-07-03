@@ -60,16 +60,6 @@ export const handleMultiSigMotionExecuted: EventHandler = async (
       true,
     );
 
-    /* @TODO fix this up when we start porting over domain motions
-     * the action string is not an event argument like it's for motions, so we may need to tweak linkPendingMetadata a bit
-    await linkPendingMetadata(
-      action,
-      colonyAddress,
-      finalizedMultiSig.id,
-      true,
-    );
-    */
-
     // @NOTE failing execution is allowed only after 1 week so the motion doesn't end up floating around
     const updatedMultiSigData = {
       id: multiSigDatabaseId,
