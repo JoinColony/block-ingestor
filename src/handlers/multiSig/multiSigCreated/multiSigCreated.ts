@@ -14,6 +14,7 @@ import {
   handleUnlockTokenMultiSig,
   handleAddOrEditDomainMultiSig,
 } from './handlers';
+import { handleMetadataDeltaMultiSig } from './handlers/metadataDelta';
 
 export const handleMultiSigMotionCreated: EventHandler = async (
   event,
@@ -74,6 +75,14 @@ export const handleMultiSigMotionCreated: EventHandler = async (
       case ColonyOperations.AddDomain:
       case ColonyOperations.EditDomain: {
         await handleAddOrEditDomainMultiSig(
+          colonyAddress,
+          event,
+          parsedOperation,
+        );
+        break;
+      }
+      case ColonyOperations.EditColonyByDelta: {
+        await handleMetadataDeltaMultiSig(
           colonyAddress,
           event,
           parsedOperation,
