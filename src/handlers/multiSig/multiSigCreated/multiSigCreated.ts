@@ -12,6 +12,7 @@ import {
 import {
   handleMetadataDeltaMultiSig,
   handleMintTokensMultiSig,
+  handleMoveFundsMultiSig,
   handleUnlockTokenMultiSig,
   handleAddOrEditDomainMultiSig,
 } from './handlers';
@@ -66,6 +67,10 @@ export const handleMultiSigMotionCreated: EventHandler = async (
     switch (contractOperation) {
       case ColonyOperations.MintTokens: {
         await handleMintTokensMultiSig(colonyAddress, event, parsedOperation);
+        break;
+      }
+      case ColonyOperations.MoveFundsBetweenPots: {
+        await handleMoveFundsMultiSig(colonyAddress, event, parsedOperation);
         break;
       }
       case ColonyOperations.UnlockToken: {
