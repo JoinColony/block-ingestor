@@ -9260,6 +9260,12 @@ export type ActionMetadataInfoFragment = {
       name: ExternalLinks;
       link: string;
     }> | null;
+    objective?: {
+      __typename?: 'ColonyObjective';
+      title: string;
+      description: string;
+      progress: number;
+    } | null;
     changelog?: Array<{
       __typename?: 'ColonyMetadataChangelog';
       transactionHash: string;
@@ -9268,6 +9274,7 @@ export type ActionMetadataInfoFragment = {
       hasAvatarChanged: boolean;
       hasDescriptionChanged?: boolean | null;
       haveExternalLinksChanged?: boolean | null;
+      hasObjectiveChanged?: boolean | null;
     }> | null;
   } | null;
 };
@@ -9317,6 +9324,12 @@ export type ColonyMetadataFragment = {
     name: ExternalLinks;
     link: string;
   }> | null;
+  objective?: {
+    __typename?: 'ColonyObjective';
+    title: string;
+    description: string;
+    progress: number;
+  } | null;
   changelog?: Array<{
     __typename?: 'ColonyMetadataChangelog';
     transactionHash: string;
@@ -9325,6 +9338,7 @@ export type ColonyMetadataFragment = {
     hasAvatarChanged: boolean;
     hasDescriptionChanged?: boolean | null;
     haveExternalLinksChanged?: boolean | null;
+    hasObjectiveChanged?: boolean | null;
   }> | null;
 };
 
@@ -10215,6 +10229,12 @@ export type GetColonyMetadataQuery = {
       name: ExternalLinks;
       link: string;
     }> | null;
+    objective?: {
+      __typename?: 'ColonyObjective';
+      title: string;
+      description: string;
+      progress: number;
+    } | null;
     changelog?: Array<{
       __typename?: 'ColonyMetadataChangelog';
       transactionHash: string;
@@ -10223,6 +10243,7 @@ export type GetColonyMetadataQuery = {
       hasAvatarChanged: boolean;
       hasDescriptionChanged?: boolean | null;
       haveExternalLinksChanged?: boolean | null;
+      hasObjectiveChanged?: boolean | null;
     }> | null;
   } | null;
 };
@@ -10770,6 +10791,12 @@ export type GetColonyActionByMotionIdQuery = {
           name: ExternalLinks;
           link: string;
         }> | null;
+        objective?: {
+          __typename?: 'ColonyObjective';
+          title: string;
+          description: string;
+          progress: number;
+        } | null;
         changelog?: Array<{
           __typename?: 'ColonyMetadataChangelog';
           transactionHash: string;
@@ -10778,6 +10805,7 @@ export type GetColonyActionByMotionIdQuery = {
           hasAvatarChanged: boolean;
           hasDescriptionChanged?: boolean | null;
           haveExternalLinksChanged?: boolean | null;
+          hasObjectiveChanged?: boolean | null;
         }> | null;
       } | null;
     } | null>;
@@ -10913,6 +10941,12 @@ export type GetVoterRewardsQuery = {
           name: ExternalLinks;
           link: string;
         }> | null;
+        objective?: {
+          __typename?: 'ColonyObjective';
+          title: string;
+          description: string;
+          progress: number;
+        } | null;
         changelog?: Array<{
           __typename?: 'ColonyMetadataChangelog';
           transactionHash: string;
@@ -10921,6 +10955,7 @@ export type GetVoterRewardsQuery = {
           hasAvatarChanged: boolean;
           hasDescriptionChanged?: boolean | null;
           haveExternalLinksChanged?: boolean | null;
+          hasObjectiveChanged?: boolean | null;
         }> | null;
       } | null;
     } | null>;
