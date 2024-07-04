@@ -145,6 +145,7 @@ const linkPendingColonyMetadataWithColony = async (
   }
 
   const {
+    hasObjectiveChanged,
     haveTokensChanged,
     hasAvatarChanged,
     newDisplayName,
@@ -179,6 +180,10 @@ const linkPendingColonyMetadataWithColony = async (
 
   if (haveExternalLinksChanged) {
     updatedMetadata.externalLinks = pendingColonyMetadata.externalLinks;
+  }
+
+  if (hasObjectiveChanged) {
+    updatedMetadata.objective = pendingColonyMetadata.objective;
   }
 
   if (haveTokensChanged && pendingColonyMetadata.modifiedTokenAddresses) {
