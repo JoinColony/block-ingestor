@@ -116,7 +116,6 @@ export const createMultiSigInDB = async (
     | 'initiatorAddress'
     | 'blockNumber'
     | 'rootHash'
-    | 'fromDomainId'
   >,
 ): Promise<GraphQLFnReturn<CreateColonyMultiSigInput> | undefined> => {
   if (!colonyAddress) {
