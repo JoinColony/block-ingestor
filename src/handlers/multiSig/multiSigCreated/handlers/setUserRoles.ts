@@ -1,7 +1,11 @@
 import { TransactionDescription } from 'ethers/lib/utils';
 
 import { ContractEvent, multiSigNameMapping } from '~types';
-import { getColonyRolesDatabaseId, getRolesMapFromHexString } from '~utils';
+import {
+  getColonyRolesDatabaseId,
+  getDomainDatabaseId,
+  getRolesMapFromHexString,
+} from '~utils';
 import { createMultiSigInDB } from '../helpers';
 
 export const handleSetUserRolesMultiSig = async (
@@ -34,6 +38,7 @@ export const handleSetUserRolesMultiSig = async (
 
   await createMultiSigInDB(colonyAddress, event, {
     type: multiSigNameMapping[name],
+    fromDomainId: getDomainDatabaseId(colonyAddress, domainId),
     recipientAddress: userAddress,
     roles,
     rolesAreMultiSig: isMultiSig ? true : null,
