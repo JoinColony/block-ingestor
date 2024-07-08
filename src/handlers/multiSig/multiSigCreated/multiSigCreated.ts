@@ -10,11 +10,11 @@ import {
   verbose,
 } from '~utils';
 import {
+  handleMetadataDeltaMultiSig,
   handleMintTokensMultiSig,
   handleUnlockTokenMultiSig,
   handleAddOrEditDomainMultiSig,
 } from './handlers';
-import { handleMetadataDeltaMultiSig } from './handlers/metadataDelta';
 
 export const handleMultiSigMotionCreated: EventHandler = async (
   event,
