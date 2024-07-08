@@ -1,5 +1,5 @@
 import { TransactionDescription } from 'ethers/lib/utils';
-import { ContractEvent, motionNameMapping } from '~types';
+import { ContractEvent, multiSigNameMapping } from '~types';
 import { getPendingMetadataDatabaseId } from '~utils';
 import { createMultiSigInDB } from '../helpers';
 
@@ -18,7 +18,7 @@ export const handleEditColonyMultiSig = async (
     transactionHash,
   );
   await createMultiSigInDB(colonyAddress, event, {
-    type: motionNameMapping[name],
+    type: multiSigNameMapping[name],
     pendingColonyMetadataId,
   });
 };
