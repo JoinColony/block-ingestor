@@ -3,7 +3,7 @@ import { ContractEvent, motionNameMapping } from '~types';
 import { getPendingMetadataDatabaseId } from '~utils';
 import { createMultiSigInDB } from '../helpers';
 
-export const handleEditColonyMotion = async (
+export const handleEditColonyMultiSig = async (
   colonyAddress: string,
   event: ContractEvent,
   { name }: TransactionDescription,
