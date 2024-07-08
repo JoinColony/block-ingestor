@@ -7,10 +7,12 @@ import {
   getStagedExpenditureClient,
   getStakedExpenditureClient,
   parseOperation,
+  SimpleTransactionDescription,
   verbose,
 } from '~utils';
 import {
   handleMintTokensMultiSig,
+  handleSimpleDecisionMultiSig,
   handleUnlockTokenMultiSig,
 } from './handlers';
 
@@ -68,6 +70,14 @@ export const handleMultiSigMotionCreated: EventHandler = async (
       }
       case ColonyOperations.UnlockToken: {
         await handleUnlockTokenMultiSig(colonyAddress, event, parsedOperation);
+        break;
+      }
+      case ColonyOperations.SimpleDecision: {
+        await handleSimpleDecisionMultiSig(
+          colonyAddress,
+          event,
+          parsedOperation as SimpleTransactionDescription,
+        );
         break;
       }
       default: {
