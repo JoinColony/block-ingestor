@@ -30,14 +30,14 @@ export const handleMetadataDeltaMultiSig = async (
 
     if (isAddVerifiedMembersOperation(operation)) {
       await createMultiSigInDB(colonyAddress, event, {
-        type: ColonyActionType.AddVerifiedMembersMotion,
+        type: ColonyActionType.AddVerifiedMembersMultisig,
         members: operation.payload,
       });
     }
 
     if (isRemoveVerifiedMembersOperation(operation)) {
       await createMultiSigInDB(colonyAddress, event, {
-        type: ColonyActionType.RemoveVerifiedMembersMotion,
+        type: ColonyActionType.RemoveVerifiedMembersMultisig,
         members: operation.payload,
       });
     }
