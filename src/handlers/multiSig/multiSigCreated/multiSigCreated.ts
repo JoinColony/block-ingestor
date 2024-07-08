@@ -10,7 +10,7 @@ import {
   verbose,
 } from '~utils';
 import {
-  handleEditColonyMotion,
+  handleEditColonyMultiSig,
   handleMetadataDeltaMultiSig,
   handleMintTokensMultiSig,
   handleMoveFundsMultiSig,
@@ -67,7 +67,7 @@ export const handleMultiSigMotionCreated: EventHandler = async (
     /* Handle the action type-specific mutation here */
     switch (contractOperation) {
       case ColonyOperations.EditColony: {
-        await handleEditColonyMotion(colonyAddress, event, parsedOperation);
+        await handleEditColonyMultiSig(colonyAddress, event, parsedOperation);
         break;
       }
       case ColonyOperations.MintTokens: {
