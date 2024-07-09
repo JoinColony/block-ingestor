@@ -30,6 +30,7 @@ export const handleMultiSigApprovalChanged: EventHandler = async (
     multiSigId,
     userAddress,
     vote: MultiSigVote.Approve,
+    role,
   });
 
   if (!approval) {

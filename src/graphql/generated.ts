@@ -10932,6 +10932,7 @@ export type GetUserMultiSigSignatureQueryVariables = Exact<{
   multiSigId: Scalars['ID'];
   userAddress: Scalars['ID'];
   vote: MultiSigVote;
+  role: Scalars['Int'];
 }>;
 
 export type GetUserMultiSigSignatureQuery = {
@@ -12203,9 +12204,14 @@ export const GetUserMultiSigSignatureDocument = gql`
     $multiSigId: ID!
     $userAddress: ID!
     $vote: MultiSigVote!
+    $role: Int!
   ) {
     getMultiSigUserSignatureByMultiSigId(
-      filter: { userAddress: { eq: $userAddress }, vote: { eq: $vote } }
+      filter: {
+        userAddress: { eq: $userAddress }
+        vote: { eq: $vote }
+        role: { eq: $role }
+      }
       multiSigId: $multiSigId
     ) {
       items {

@@ -12,9 +12,9 @@ query GetColonyMultiSig($id: ID!) {
   }
 }
 
-query GetUserMultiSigSignature($multiSigId: ID!, $userAddress: ID!, $vote: MultiSigVote!) {
+query GetUserMultiSigSignature($multiSigId: ID!, $userAddress: ID!, $vote: MultiSigVote!, $role: Int!) {
   getMultiSigUserSignatureByMultiSigId(
-    filter: {userAddress: {eq: $userAddress}, vote: {eq: $vote}},
+    filter: {userAddress: {eq: $userAddress}, vote: {eq: $vote}, role: {eq: $role}},
     multiSigId: $multiSigId
   ) {
     items {
