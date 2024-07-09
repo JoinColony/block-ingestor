@@ -1,7 +1,7 @@
 import { TransactionDescription } from 'ethers/lib/utils';
 import { ContractEvent, multiSigNameMapping } from '~types';
 import { createMultiSigInDB } from '../helpers';
-import { getPendingMetadataDatabaseId } from '~utils';
+import { getDomainDatabaseId, getPendingMetadataDatabaseId } from '~utils';
 
 export const handleAddOrEditDomainMultiSig = async (
   colonyAddress: string,
@@ -12,7 +12,11 @@ export const handleAddOrEditDomainMultiSig = async (
     return;
   }
 
-  const { name } = parsedAction;
+  const { name, args: actionArgs } = parsedAction;
+
+  const domainId = actionArgs[5];
+
+  const fromDomainId = getDomainDatabaseId(colonyAddress, domainId);
 
   const pendingDomainMetadataId = getPendingMetadataDatabaseId(
     colonyAddress,
@@ -22,5 +26,6 @@ export const handleAddOrEditDomainMultiSig = async (
   await createMultiSigInDB(colonyAddress, event, {
     type: multiSigNameMapping[name],
     pendingDomainMetadataId,
+    fromDomainId,
   });
 };
