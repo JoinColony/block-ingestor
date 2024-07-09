@@ -14,7 +14,7 @@ export const handleAddOrEditDomainMultiSig = async (
 
   const { name, args: actionArgs } = parsedAction;
 
-  const domainId = actionArgs[5];
+  const domainId = actionArgs[2];
 
   const fromDomainId = getDomainDatabaseId(colonyAddress, domainId);
 
