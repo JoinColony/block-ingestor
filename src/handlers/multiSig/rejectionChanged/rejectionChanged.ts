@@ -34,6 +34,7 @@ export const handleMultiSigRejectionChanged: EventHandler = async (
     multiSigId,
     userAddress,
     vote: MultiSigVote.Reject,
+    role,
   });
 
   if (!approval) {

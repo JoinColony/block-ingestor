@@ -31,11 +31,13 @@ interface GetUserMultiSigSignatureParams {
   multiSigId: string;
   userAddress: string;
   vote: MultiSigVote;
+  role: number;
 }
 export const getUserMultiSigSignature = async ({
   multiSigId,
   userAddress,
   vote,
+  role,
 }: GetUserMultiSigSignatureParams): Promise<MultiSigUserSignatureFragment | null> => {
   const response = await query<
     GetUserMultiSigSignatureQuery,
@@ -44,6 +46,7 @@ export const getUserMultiSigSignature = async ({
     vote,
     userAddress,
     multiSigId,
+    role,
   });
 
   const responseItems =
