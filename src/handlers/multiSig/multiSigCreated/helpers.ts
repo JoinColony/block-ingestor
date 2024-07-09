@@ -105,6 +105,7 @@ export const createMultiSigInDB = async (
     timestamp,
   }: ContractEvent,
   {
+    fromDomainId,
     ...input
   }: Omit<
     CreateColonyActionInput,
@@ -116,7 +117,6 @@ export const createMultiSigInDB = async (
     | 'initiatorAddress'
     | 'blockNumber'
     | 'rootHash'
-    | 'fromDomainId'
   >,
 ): Promise<GraphQLFnReturn<CreateColonyMultiSigInput> | undefined> => {
   if (!colonyAddress) {
@@ -167,7 +167,7 @@ export const createMultiSigInDB = async (
     initiatorAddress: motion.creator,
     blockNumber,
     rootHash,
-    fromDomainId: getDomainDatabaseId(colonyAddress, domainId),
+    fromDomainId: fromDomainId ?? getDomainDatabaseId(colonyAddress, domainId),
     ...input,
   };
 
