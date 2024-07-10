@@ -12,6 +12,7 @@ import {
 import {
   handleEditColonyMultiSig,
   handleMetadataDeltaMultiSig,
+  handleManageReputationMultiSig,
   handleMintTokensMultiSig,
   handleMoveFundsMultiSig,
   handleSetUserRolesMultiSig,
@@ -72,6 +73,22 @@ export const handleMultiSigMotionCreated: EventHandler = async (
         await handleEditColonyMultiSig(colonyAddress, event, parsedOperation);
         break;
       }
+      case ColonyOperations.EmitDomainReputationPenalty: {
+        await handleManageReputationMultiSig(
+          colonyAddress,
+          event,
+          parsedOperation,
+        );
+        break;
+      }
+      case ColonyOperations.EmitDomainReputationReward: {
+        await handleManageReputationMultiSig(
+          colonyAddress,
+          event,
+          parsedOperation,
+        );
+        break;
+      }
       case ColonyOperations.MintTokens: {
         await handleMintTokensMultiSig(colonyAddress, event, parsedOperation);
         break;
@@ -82,6 +99,7 @@ export const handleMultiSigMotionCreated: EventHandler = async (
       }
       case ColonyOperations.UnlockToken: {
         await handleUnlockTokenMultiSig(colonyAddress, event, parsedOperation);
+        break;
       }
       case ColonyOperations.SetUserRoles: {
         await handleSetUserRolesMultiSig(
