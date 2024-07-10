@@ -12,6 +12,7 @@ import {
 import {
   handleEditColonyMultiSig,
   handleMetadataDeltaMultiSig,
+  handleManageReputationMultiSig,
   handleMintTokensMultiSig,
   handleMoveFundsMultiSig,
   handleSetUserRolesMultiSig,
@@ -70,6 +71,22 @@ export const handleMultiSigMotionCreated: EventHandler = async (
     switch (contractOperation) {
       case ColonyOperations.EditColony: {
         await handleEditColonyMultiSig(colonyAddress, event, parsedOperation);
+        break;
+      }
+      case ColonyOperations.EmitDomainReputationPenalty: {
+        await handleManageReputationMultiSig(
+          colonyAddress,
+          event,
+          parsedOperation,
+        );
+        break;
+      }
+      case ColonyOperations.EmitDomainReputationReward: {
+        await handleManageReputationMultiSig(
+          colonyAddress,
+          event,
+          parsedOperation,
+        );
         break;
       }
       case ColonyOperations.MintTokens: {
