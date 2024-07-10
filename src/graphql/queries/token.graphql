@@ -5,12 +5,3 @@ query GetTokenFromEverywhere($input: TokenFromEverywhereArguments!) {
     }
   }
 }
-
-query GetTokenByAddress($address: ID!) {
-  getTokenByAddress(id: $address) {
-    items {
-      decimals
-      tokenAddress: id
-    }
-  }
-}

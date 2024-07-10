@@ -1,17 +1,12 @@
 import { mutate } from '~amplifyClient';
 import {
-  StreamingPaymentEndCondition,
   UpdateStreamingPaymentDocument,
-  UpdateStreamingPaymentMetadataDocument,
-  UpdateStreamingPaymentMetadataMutation,
-  UpdateStreamingPaymentMetadataMutationVariables,
   UpdateStreamingPaymentMutation,
   UpdateStreamingPaymentMutationVariables,
 } from '~graphql';
 import { EventHandler } from '~types';
 import { getExpenditureDatabaseId, output, toNumber, verbose } from '~utils';
 import { getStreamingPaymentFromDB } from './helpers';
-import { getLimitAmount } from './helpers/getLimitAmount';
 import { ExtensionEventListener } from '~eventListeners';
 
 export const handleStreamingPaymentStartTimeSet: EventHandler = async (
@@ -47,37 +42,4 @@ export const handleStreamingPaymentStartTimeSet: EventHandler = async (
       startTime: startTime.toString(),
     },
   });
-
-  if (
-    streamingPayment.metadata?.endCondition ===
-    StreamingPaymentEndCondition.LimitReached
-  ) {
-    const { endTime, amount, interval, tokenAddress } = streamingPayment;
-
-    const limitAmount = await getLimitAmount({
-      startTime: startTime.toString(),
-      endTime,
-      amount,
-      interval,
-      tokenAddress,
-    });
-
-    if (!limitAmount) {
-      return;
-    }
-
-    verbose(
-      `Limit amount updated to ${limitAmount.toString()} for streaming payment with ID ${databaseId}`,
-    );
-
-    await mutate<
-      UpdateStreamingPaymentMetadataMutation,
-      UpdateStreamingPaymentMetadataMutationVariables
-    >(UpdateStreamingPaymentMetadataDocument, {
-      input: {
-        id: databaseId,
-        limitAmount: limitAmount.toString(),
-      },
-    });
-  }
 };
