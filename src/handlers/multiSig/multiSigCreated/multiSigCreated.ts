@@ -10,6 +10,7 @@ import {
   verbose,
 } from '~utils';
 import {
+  handleMetadataDeltaMultiSig,
   handleMintTokensMultiSig,
   handleUnlockTokenMultiSig,
   handleAddOrEditDomainMultiSig,
@@ -74,6 +75,14 @@ export const handleMultiSigMotionCreated: EventHandler = async (
       case ColonyOperations.AddDomain:
       case ColonyOperations.EditDomain: {
         await handleAddOrEditDomainMultiSig(
+          colonyAddress,
+          event,
+          parsedOperation,
+        );
+        break;
+      }
+      case ColonyOperations.EditColonyByDelta: {
+        await handleMetadataDeltaMultiSig(
           colonyAddress,
           event,
           parsedOperation,
