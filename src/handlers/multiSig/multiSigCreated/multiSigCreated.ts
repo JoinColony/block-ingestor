@@ -12,6 +12,7 @@ import {
 import {
   handleMintTokensMultiSig,
   handleUnlockTokenMultiSig,
+  handleAddOrEditDomainMultiSig,
 } from './handlers';
 
 export const handleMultiSigMotionCreated: EventHandler = async (
@@ -68,6 +69,15 @@ export const handleMultiSigMotionCreated: EventHandler = async (
       }
       case ColonyOperations.UnlockToken: {
         await handleUnlockTokenMultiSig(colonyAddress, event, parsedOperation);
+        break;
+      }
+      case ColonyOperations.AddDomain:
+      case ColonyOperations.EditDomain: {
+        await handleAddOrEditDomainMultiSig(
+          colonyAddress,
+          event,
+          parsedOperation,
+        );
         break;
       }
       default: {

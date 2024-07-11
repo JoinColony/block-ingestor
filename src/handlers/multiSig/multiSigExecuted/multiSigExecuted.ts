@@ -9,6 +9,8 @@ import {
   getMultiSigFromDB,
   updateMultiSigInDB,
 } from '../helpers';
+import { getMultiSigClient, verbose } from '~utils';
+import { linkPendingMetadata } from '~utils/colonyMetadata';
 
 export const handleMultiSigMotionExecuted: EventHandler = async (
   event,
@@ -35,15 +37,28 @@ export const handleMultiSigMotionExecuted: EventHandler = async (
   const finalizedMultiSig = await getMultiSigFromDB(multiSigDatabaseId);
 
   if (finalizedMultiSig) {
-    /* @TODO fix this up when we start porting over domain motions
-     * the action string is not an event argument like it's for motions, so we may need to tweak linkPendingMetadata a bit
+    const multiSigClient = await getMultiSigClient(colonyAddress);
+
+    if (!multiSigClient) {
+      return;
+    }
+
+    const motion = await multiSigClient.getMotion(motionId);
+
+    const actionData = motion.data[0];
+
+    if (!actionData) {
+      verbose(`No action data in multiSig motion: ${motionId}`);
+
+      return;
+    }
+
     await linkPendingMetadata(
-      action,
+      actionData,
       colonyAddress,
       finalizedMultiSig.id,
       true,
     );
-    */
 
     // @NOTE failing execution is allowed only after 1 week so the motion doesn't end up floating around
     const updatedMultiSigData = {
