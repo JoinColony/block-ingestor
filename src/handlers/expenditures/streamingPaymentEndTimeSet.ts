@@ -10,10 +10,12 @@ import {
 import { EventHandler } from '~types';
 import {
   getExpenditureDatabaseId,
+  output,
   toNumber,
   verbose,
   writeActionFromEvent,
 } from '~utils';
+import { getStreamingPaymentFromDB } from './helpers';
 
 export const handleStreamingPaymentEndTimeSet: EventHandler = async (
   event,
@@ -26,6 +28,13 @@ export const handleStreamingPaymentEndTimeSet: EventHandler = async (
   const { colonyAddress } = listener as ExtensionEventListener;
 
   const databaseId = getExpenditureDatabaseId(colonyAddress, convertedNativeId);
+  const streamingPayment = await getStreamingPaymentFromDB(databaseId);
+  if (!streamingPayment) {
+    output(
+      `Could not find streaming payment with ID: ${databaseId} in the db. This is a bug and needs investigating.`,
+    );
+    return;
+  }
 
   // When a streaming payment is cancelled, the endTime is set to the current block timestamp
   // Therefore, if the endTime and timestamp are equal, we can assume this is a cancel action
