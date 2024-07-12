@@ -31,10 +31,12 @@ query GetExpenditureMetadata($id: ID!) {
 query GetStreamingPayment($id: ID!) {
   getStreamingPayment(id: $id) {
     id
-    payouts {
+    endTime
+    tokenAddress
+    amount
+    claims {
       amount
-      tokenAddress
-      isClaimed
+      timestamp
     }
   }
 }

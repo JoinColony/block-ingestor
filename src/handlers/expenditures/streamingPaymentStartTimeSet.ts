@@ -1,4 +1,3 @@
-import { getExpenditureDatabaseId, output, toNumber, verbose } from '~utils';
 import { mutate } from '~amplifyClient';
 import {
   UpdateStreamingPaymentDocument,
@@ -6,27 +5,33 @@ import {
   UpdateStreamingPaymentMutationVariables,
 } from '~graphql';
 import { EventHandler } from '~types';
+import { getExpenditureDatabaseId, output, toNumber, verbose } from '~utils';
+import { getStreamingPaymentFromDB } from './helpers';
 import { ExtensionEventListener } from '~eventListeners';
 
-import { getStreamingPaymentFromDB } from './helpers';
-
-export const handlePaymentTokenUpdated: EventHandler = async (
+export const handleStreamingPaymentStartTimeSet: EventHandler = async (
   event,
   listener,
 ) => {
-  const { streamingPaymentId, amount, interval } = event.args;
-  const convertedNativeId = toNumber(streamingPaymentId);
   const { colonyAddress } = listener as ExtensionEventListener;
 
-  const databaseId = getExpenditureDatabaseId(colonyAddress, convertedNativeId);
-  const streamingPayment = await getStreamingPaymentFromDB(databaseId);
+  const { streamingPaymentId, startTime } = event.args;
+  const convertedNativeId = toNumber(streamingPaymentId);
 
-  if (!streamingPayment) {
-    output(`Streaming payment with ID ${databaseId} not found in the database`);
+  if (!colonyAddress) {
     return;
   }
 
-  verbose(`Payment token updated for streaming payment with ID ${databaseId}`);
+  const databaseId = getExpenditureDatabaseId(colonyAddress, convertedNativeId);
+  const streamingPayment = await getStreamingPaymentFromDB(databaseId);
+  if (!streamingPayment) {
+    output(
+      `Could not find streaming payment with ID: ${databaseId} in the db. This is a bug and needs investigating.`,
+    );
+    return;
+  }
+
+  verbose(`Start time set for streaming payment with ID ${databaseId}`);
 
   await mutate<
     UpdateStreamingPaymentMutation,
@@ -34,8 +39,7 @@ export const handlePaymentTokenUpdated: EventHandler = async (
   >(UpdateStreamingPaymentDocument, {
     input: {
       id: databaseId,
-      amount: amount.toString(),
-      interval: interval.toString(),
+      startTime: startTime.toString(),
     },
   });
 };

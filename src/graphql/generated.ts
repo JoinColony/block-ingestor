@@ -318,6 +318,10 @@ export type ColonyAction = {
    * Currently it is impossible to tell the reason for the action being hidden from the actions list
    */
   showInActionsList: Scalars['Boolean'];
+  /** Streaming payment associated with the action, if any */
+  streamingPayment?: Maybe<StreamingPayment>;
+  /** ID of the associated streaming payment, if any */
+  streamingPaymentId?: Maybe<Scalars['ID']>;
   /** The target Domain of the action, if applicable */
   toDomain?: Maybe<Domain>;
   /** The target Domain identifier, if applicable */
@@ -376,10 +380,16 @@ export enum ColonyActionType {
   /** An action related to adding verified members */
   AddVerifiedMembers = 'ADD_VERIFIED_MEMBERS',
   AddVerifiedMembersMotion = 'ADD_VERIFIED_MEMBERS_MOTION',
+  /** An action related to cancelling and waiving a streaming payment */
+  CancelAndWaiveStreamingPayment = 'CANCEL_AND_WAIVE_STREAMING_PAYMENT',
   /** An action related to canceling an expenditure */
   CancelExpenditure = 'CANCEL_EXPENDITURE',
   /** An action related to a motion to cancel an expenditure */
   CancelExpenditureMotion = 'CANCEL_EXPENDITURE_MOTION',
+  /** An action related to cancelling a streaming payment */
+  CancelStreamingPayment = 'CANCEL_STREAMING_PAYMENT',
+  /** An action related to cancelling a streaming payment via a motion */
+  CancelStreamingPaymentMotion = 'CANCEL_STREAMING_PAYMENT_MOTION',
   /** An action related to editing a Colony's details */
   ColonyEdit = 'COLONY_EDIT',
   /** An action related to editing a Colony's details via a motion */
@@ -392,6 +402,8 @@ export enum ColonyActionType {
   CreateDomainMotion = 'CREATE_DOMAIN_MOTION',
   /** An action related to creating an expenditure (advanced payment) */
   CreateExpenditure = 'CREATE_EXPENDITURE',
+  /** An action related to creating a streaming payment */
+  CreateStreamingPayment = 'CREATE_STREAMING_PAYMENT',
   /** An action related to editing a domain's details */
   EditDomain = 'EDIT_DOMAIN',
   /** An action related to editing a domain's details via a motion */
@@ -949,6 +961,27 @@ export type ColonyRole = {
 };
 
 /**
+ * Keeps track of the current amount a user has staked in a colony
+ * When a user stakes, totalAmount increases. When a user reclaims their stake, totalAmount decreases.
+ */
+export type ColonyStake = {
+  __typename?: 'ColonyStake';
+  /** Unique identifier for the Colony */
+  colonyId: Scalars['ID'];
+  createdAt: Scalars['AWSDateTime'];
+  /**
+   * Unique identifier for the stake
+   * Format: `<userId>_<colonyId>`
+   */
+  id: Scalars['ID'];
+  /** Total staked amount */
+  totalAmount: Scalars['String'];
+  updatedAt: Scalars['AWSDateTime'];
+  /** Unique identifier for the user */
+  userId: Scalars['ID'];
+};
+
+/**
  * Represents the status of a Colony
  *
  * This contains important meta information about the Colony's token and other fundamental settings
@@ -1108,6 +1141,7 @@ export type CreateColonyActionInput = {
   roles?: InputMaybe<ColonyActionRolesInput>;
   rootHash: Scalars['String'];
   showInActionsList: Scalars['Boolean'];
+  streamingPaymentId?: InputMaybe<Scalars['ID']>;
   toDomainId?: InputMaybe<Scalars['ID']>;
   toPotId?: InputMaybe<Scalars['Int']>;
   tokenAddress?: InputMaybe<Scalars['ID']>;
@@ -1286,6 +1320,13 @@ export type CreateColonyRoleInput = {
   targetAddress: Scalars['ID'];
 };
 
+export type CreateColonyStakeInput = {
+  colonyId: Scalars['ID'];
+  id?: InputMaybe<Scalars['ID']>;
+  totalAmount: Scalars['String'];
+  userId: Scalars['ID'];
+};
+
 export type CreateColonyTokensInput = {
   colonyID: Scalars['ID'];
   id?: InputMaybe<Scalars['ID']>;
@@ -1443,21 +1484,24 @@ export type CreateSafeTransactionInput = {
 };
 
 export type CreateStreamingPaymentInput = {
+  amount: Scalars['String'];
+  claims?: InputMaybe<Array<StreamingPaymentClaimInput>>;
   createdAt?: InputMaybe<Scalars['AWSDateTime']>;
-  endTime: Scalars['AWSTimestamp'];
+  endTime: Scalars['String'];
   id?: InputMaybe<Scalars['ID']>;
   interval: Scalars['String'];
+  isCancelled?: InputMaybe<Scalars['Boolean']>;
+  isWaived?: InputMaybe<Scalars['Boolean']>;
   nativeDomainId: Scalars['Int'];
   nativeId: Scalars['Int'];
-  payouts?: InputMaybe<Array<ExpenditurePayoutInput>>;
   recipientAddress: Scalars['String'];
-  startTime: Scalars['AWSTimestamp'];
+  startTime: Scalars['String'];
+  tokenAddress: Scalars['ID'];
 };
 
 export type CreateStreamingPaymentMetadataInput = {
   endCondition: StreamingPaymentEndCondition;
   id?: InputMaybe<Scalars['ID']>;
-  limitAmount?: InputMaybe<Scalars['String']>;
 };
 
 export type CreateTokenInput = {
@@ -1610,6 +1654,10 @@ export type DeleteColonyMotionInput = {
 };
 
 export type DeleteColonyRoleInput = {
+  id: Scalars['ID'];
+};
+
+export type DeleteColonyStakeInput = {
   id: Scalars['ID'];
 };
 
@@ -2282,6 +2330,7 @@ export type ModelColonyActionConditionInput = {
   recipientAddress?: InputMaybe<ModelIdInput>;
   rootHash?: InputMaybe<ModelStringInput>;
   showInActionsList?: InputMaybe<ModelBooleanInput>;
+  streamingPaymentId?: InputMaybe<ModelIdInput>;
   toDomainId?: InputMaybe<ModelIdInput>;
   toPotId?: InputMaybe<ModelIntInput>;
   tokenAddress?: InputMaybe<ModelIdInput>;
@@ -2324,6 +2373,7 @@ export type ModelColonyActionFilterInput = {
   recipientAddress?: InputMaybe<ModelIdInput>;
   rootHash?: InputMaybe<ModelStringInput>;
   showInActionsList?: InputMaybe<ModelBooleanInput>;
+  streamingPaymentId?: InputMaybe<ModelIdInput>;
   toDomainId?: InputMaybe<ModelIdInput>;
   toPotId?: InputMaybe<ModelIntInput>;
   tokenAddress?: InputMaybe<ModelIdInput>;
@@ -2714,6 +2764,31 @@ export type ModelColonyRoleFilterInput = {
   role_5?: InputMaybe<ModelBooleanInput>;
   role_6?: InputMaybe<ModelBooleanInput>;
   targetAddress?: InputMaybe<ModelIdInput>;
+};
+
+export type ModelColonyStakeConditionInput = {
+  and?: InputMaybe<Array<InputMaybe<ModelColonyStakeConditionInput>>>;
+  colonyId?: InputMaybe<ModelIdInput>;
+  not?: InputMaybe<ModelColonyStakeConditionInput>;
+  or?: InputMaybe<Array<InputMaybe<ModelColonyStakeConditionInput>>>;
+  totalAmount?: InputMaybe<ModelStringInput>;
+  userId?: InputMaybe<ModelIdInput>;
+};
+
+export type ModelColonyStakeConnection = {
+  __typename?: 'ModelColonyStakeConnection';
+  items: Array<Maybe<ColonyStake>>;
+  nextToken?: Maybe<Scalars['String']>;
+};
+
+export type ModelColonyStakeFilterInput = {
+  and?: InputMaybe<Array<InputMaybe<ModelColonyStakeFilterInput>>>;
+  colonyId?: InputMaybe<ModelIdInput>;
+  id?: InputMaybe<ModelIdInput>;
+  not?: InputMaybe<ModelColonyStakeFilterInput>;
+  or?: InputMaybe<Array<InputMaybe<ModelColonyStakeFilterInput>>>;
+  totalAmount?: InputMaybe<ModelStringInput>;
+  userId?: InputMaybe<ModelIdInput>;
 };
 
 export type ModelColonyTokensConditionInput = {
@@ -3329,16 +3404,20 @@ export type ModelSplitPaymentDistributionTypeInput = {
 };
 
 export type ModelStreamingPaymentConditionInput = {
+  amount?: InputMaybe<ModelStringInput>;
   and?: InputMaybe<Array<InputMaybe<ModelStreamingPaymentConditionInput>>>;
   createdAt?: InputMaybe<ModelStringInput>;
-  endTime?: InputMaybe<ModelIntInput>;
+  endTime?: InputMaybe<ModelStringInput>;
   interval?: InputMaybe<ModelStringInput>;
+  isCancelled?: InputMaybe<ModelBooleanInput>;
+  isWaived?: InputMaybe<ModelBooleanInput>;
   nativeDomainId?: InputMaybe<ModelIntInput>;
   nativeId?: InputMaybe<ModelIntInput>;
   not?: InputMaybe<ModelStreamingPaymentConditionInput>;
   or?: InputMaybe<Array<InputMaybe<ModelStreamingPaymentConditionInput>>>;
   recipientAddress?: InputMaybe<ModelStringInput>;
-  startTime?: InputMaybe<ModelIntInput>;
+  startTime?: InputMaybe<ModelStringInput>;
+  tokenAddress?: InputMaybe<ModelIdInput>;
 };
 
 export type ModelStreamingPaymentConnection = {
@@ -3353,17 +3432,21 @@ export type ModelStreamingPaymentEndConditionInput = {
 };
 
 export type ModelStreamingPaymentFilterInput = {
+  amount?: InputMaybe<ModelStringInput>;
   and?: InputMaybe<Array<InputMaybe<ModelStreamingPaymentFilterInput>>>;
   createdAt?: InputMaybe<ModelStringInput>;
-  endTime?: InputMaybe<ModelIntInput>;
+  endTime?: InputMaybe<ModelStringInput>;
   id?: InputMaybe<ModelIdInput>;
   interval?: InputMaybe<ModelStringInput>;
+  isCancelled?: InputMaybe<ModelBooleanInput>;
+  isWaived?: InputMaybe<ModelBooleanInput>;
   nativeDomainId?: InputMaybe<ModelIntInput>;
   nativeId?: InputMaybe<ModelIntInput>;
   not?: InputMaybe<ModelStreamingPaymentFilterInput>;
   or?: InputMaybe<Array<InputMaybe<ModelStreamingPaymentFilterInput>>>;
   recipientAddress?: InputMaybe<ModelStringInput>;
-  startTime?: InputMaybe<ModelIntInput>;
+  startTime?: InputMaybe<ModelStringInput>;
+  tokenAddress?: InputMaybe<ModelIdInput>;
 };
 
 export type ModelStreamingPaymentMetadataConditionInput = {
@@ -3371,7 +3454,6 @@ export type ModelStreamingPaymentMetadataConditionInput = {
     Array<InputMaybe<ModelStreamingPaymentMetadataConditionInput>>
   >;
   endCondition?: InputMaybe<ModelStreamingPaymentEndConditionInput>;
-  limitAmount?: InputMaybe<ModelStringInput>;
   not?: InputMaybe<ModelStreamingPaymentMetadataConditionInput>;
   or?: InputMaybe<
     Array<InputMaybe<ModelStreamingPaymentMetadataConditionInput>>
@@ -3388,7 +3470,6 @@ export type ModelStreamingPaymentMetadataFilterInput = {
   and?: InputMaybe<Array<InputMaybe<ModelStreamingPaymentMetadataFilterInput>>>;
   endCondition?: InputMaybe<ModelStreamingPaymentEndConditionInput>;
   id?: InputMaybe<ModelIdInput>;
-  limitAmount?: InputMaybe<ModelStringInput>;
   not?: InputMaybe<ModelStreamingPaymentMetadataFilterInput>;
   or?: InputMaybe<Array<InputMaybe<ModelStreamingPaymentMetadataFilterInput>>>;
 };
@@ -3461,6 +3542,7 @@ export type ModelSubscriptionColonyActionFilterInput = {
   recipientAddress?: InputMaybe<ModelSubscriptionIdInput>;
   rootHash?: InputMaybe<ModelSubscriptionStringInput>;
   showInActionsList?: InputMaybe<ModelSubscriptionBooleanInput>;
+  streamingPaymentId?: InputMaybe<ModelSubscriptionIdInput>;
   toDomainId?: InputMaybe<ModelSubscriptionIdInput>;
   toPotId?: InputMaybe<ModelSubscriptionIntInput>;
   tokenAddress?: InputMaybe<ModelSubscriptionIdInput>;
@@ -3646,6 +3728,15 @@ export type ModelSubscriptionColonyRoleFilterInput = {
   role_5?: InputMaybe<ModelSubscriptionBooleanInput>;
   role_6?: InputMaybe<ModelSubscriptionBooleanInput>;
   targetAddress?: InputMaybe<ModelSubscriptionIdInput>;
+};
+
+export type ModelSubscriptionColonyStakeFilterInput = {
+  and?: InputMaybe<Array<InputMaybe<ModelSubscriptionColonyStakeFilterInput>>>;
+  colonyId?: InputMaybe<ModelSubscriptionIdInput>;
+  id?: InputMaybe<ModelSubscriptionIdInput>;
+  or?: InputMaybe<Array<InputMaybe<ModelSubscriptionColonyStakeFilterInput>>>;
+  totalAmount?: InputMaybe<ModelSubscriptionStringInput>;
+  userId?: InputMaybe<ModelSubscriptionIdInput>;
 };
 
 export type ModelSubscriptionColonyTokensFilterInput = {
@@ -3907,20 +3998,24 @@ export type ModelSubscriptionSafeTransactionFilterInput = {
 };
 
 export type ModelSubscriptionStreamingPaymentFilterInput = {
+  amount?: InputMaybe<ModelSubscriptionStringInput>;
   and?: InputMaybe<
     Array<InputMaybe<ModelSubscriptionStreamingPaymentFilterInput>>
   >;
   createdAt?: InputMaybe<ModelSubscriptionStringInput>;
-  endTime?: InputMaybe<ModelSubscriptionIntInput>;
+  endTime?: InputMaybe<ModelSubscriptionStringInput>;
   id?: InputMaybe<ModelSubscriptionIdInput>;
   interval?: InputMaybe<ModelSubscriptionStringInput>;
+  isCancelled?: InputMaybe<ModelSubscriptionBooleanInput>;
+  isWaived?: InputMaybe<ModelSubscriptionBooleanInput>;
   nativeDomainId?: InputMaybe<ModelSubscriptionIntInput>;
   nativeId?: InputMaybe<ModelSubscriptionIntInput>;
   or?: InputMaybe<
     Array<InputMaybe<ModelSubscriptionStreamingPaymentFilterInput>>
   >;
   recipientAddress?: InputMaybe<ModelSubscriptionStringInput>;
-  startTime?: InputMaybe<ModelSubscriptionIntInput>;
+  startTime?: InputMaybe<ModelSubscriptionStringInput>;
+  tokenAddress?: InputMaybe<ModelSubscriptionIdInput>;
 };
 
 export type ModelSubscriptionStreamingPaymentMetadataFilterInput = {
@@ -3929,7 +4024,6 @@ export type ModelSubscriptionStreamingPaymentMetadataFilterInput = {
   >;
   endCondition?: InputMaybe<ModelSubscriptionStringInput>;
   id?: InputMaybe<ModelSubscriptionIdInput>;
-  limitAmount?: InputMaybe<ModelSubscriptionStringInput>;
   or?: InputMaybe<
     Array<InputMaybe<ModelSubscriptionStreamingPaymentMetadataFilterInput>>
   >;
@@ -4371,6 +4465,7 @@ export type Mutation = {
   createColonyMetadata?: Maybe<ColonyMetadata>;
   createColonyMotion?: Maybe<ColonyMotion>;
   createColonyRole?: Maybe<ColonyRole>;
+  createColonyStake?: Maybe<ColonyStake>;
   createColonyTokens?: Maybe<ColonyTokens>;
   createContractEvent?: Maybe<ContractEvent>;
   createContributorReputation?: Maybe<ContributorReputation>;
@@ -4410,6 +4505,7 @@ export type Mutation = {
   deleteColonyMetadata?: Maybe<ColonyMetadata>;
   deleteColonyMotion?: Maybe<ColonyMotion>;
   deleteColonyRole?: Maybe<ColonyRole>;
+  deleteColonyStake?: Maybe<ColonyStake>;
   deleteColonyTokens?: Maybe<ColonyTokens>;
   deleteContractEvent?: Maybe<ContractEvent>;
   deleteContributorReputation?: Maybe<ContributorReputation>;
@@ -4447,6 +4543,7 @@ export type Mutation = {
   updateColonyMetadata?: Maybe<ColonyMetadata>;
   updateColonyMotion?: Maybe<ColonyMotion>;
   updateColonyRole?: Maybe<ColonyRole>;
+  updateColonyStake?: Maybe<ColonyStake>;
   updateColonyTokens?: Maybe<ColonyTokens>;
   updateContractEvent?: Maybe<ContractEvent>;
   updateContributorReputation?: Maybe<ContributorReputation>;
@@ -4558,6 +4655,12 @@ export type MutationCreateColonyMotionArgs = {
 export type MutationCreateColonyRoleArgs = {
   condition?: InputMaybe<ModelColonyRoleConditionInput>;
   input: CreateColonyRoleInput;
+};
+
+/** Root mutation type */
+export type MutationCreateColonyStakeArgs = {
+  condition?: InputMaybe<ModelColonyStakeConditionInput>;
+  input: CreateColonyStakeInput;
 };
 
 /** Root mutation type */
@@ -4788,6 +4891,12 @@ export type MutationDeleteColonyRoleArgs = {
 };
 
 /** Root mutation type */
+export type MutationDeleteColonyStakeArgs = {
+  condition?: InputMaybe<ModelColonyStakeConditionInput>;
+  input: DeleteColonyStakeInput;
+};
+
+/** Root mutation type */
 export type MutationDeleteColonyTokensArgs = {
   condition?: InputMaybe<ModelColonyTokensConditionInput>;
   input: DeleteColonyTokensInput;
@@ -5007,6 +5116,12 @@ export type MutationUpdateColonyMotionArgs = {
 export type MutationUpdateColonyRoleArgs = {
   condition?: InputMaybe<ModelColonyRoleConditionInput>;
   input: UpdateColonyRoleInput;
+};
+
+/** Root mutation type */
+export type MutationUpdateColonyStakeArgs = {
+  condition?: InputMaybe<ModelColonyStakeConditionInput>;
+  input: UpdateColonyStakeInput;
 };
 
 /** Root mutation type */
@@ -5372,6 +5487,7 @@ export type ProfileMetadataInput = {
 export type Query = {
   __typename?: 'Query';
   getActionByExpenditureId?: Maybe<ModelColonyActionConnection>;
+  getActionByStreamingPaymentId?: Maybe<ModelColonyActionConnection>;
   getActionsByColony?: Maybe<ModelColonyActionConnection>;
   getAnnotation?: Maybe<Annotation>;
   getColoniesByNativeTokenId?: Maybe<ModelColonyConnection>;
@@ -5394,6 +5510,8 @@ export type Query = {
   getColonyMetadata?: Maybe<ColonyMetadata>;
   getColonyMotion?: Maybe<ColonyMotion>;
   getColonyRole?: Maybe<ColonyRole>;
+  getColonyStake?: Maybe<ColonyStake>;
+  getColonyStakeByUserAddress?: Maybe<ModelColonyStakeConnection>;
   getColonyTokens?: Maybe<ColonyTokens>;
   getContractEvent?: Maybe<ContractEvent>;
   getContributorReputation?: Maybe<ContributorReputation>;
@@ -5465,6 +5583,7 @@ export type Query = {
   listColonyMetadata?: Maybe<ModelColonyMetadataConnection>;
   listColonyMotions?: Maybe<ModelColonyMotionConnection>;
   listColonyRoles?: Maybe<ModelColonyRoleConnection>;
+  listColonyStakes?: Maybe<ModelColonyStakeConnection>;
   listColonyTokens?: Maybe<ModelColonyTokensConnection>;
   listContractEvents?: Maybe<ModelContractEventConnection>;
   listContributorReputations?: Maybe<ModelContributorReputationConnection>;
@@ -5500,6 +5619,15 @@ export type QueryGetActionByExpenditureIdArgs = {
   limit?: InputMaybe<Scalars['Int']>;
   nextToken?: InputMaybe<Scalars['String']>;
   sortDirection?: InputMaybe<ModelSortDirection>;
+};
+
+/** Root query type */
+export type QueryGetActionByStreamingPaymentIdArgs = {
+  filter?: InputMaybe<ModelColonyActionFilterInput>;
+  limit?: InputMaybe<Scalars['Int']>;
+  nextToken?: InputMaybe<Scalars['String']>;
+  sortDirection?: InputMaybe<ModelSortDirection>;
+  streamingPaymentId: Scalars['ID'];
 };
 
 /** Root query type */
@@ -5649,6 +5777,21 @@ export type QueryGetColonyMotionArgs = {
 /** Root query type */
 export type QueryGetColonyRoleArgs = {
   id: Scalars['ID'];
+};
+
+/** Root query type */
+export type QueryGetColonyStakeArgs = {
+  id: Scalars['ID'];
+};
+
+/** Root query type */
+export type QueryGetColonyStakeByUserAddressArgs = {
+  colonyId?: InputMaybe<ModelIdKeyConditionInput>;
+  filter?: InputMaybe<ModelColonyStakeFilterInput>;
+  limit?: InputMaybe<Scalars['Int']>;
+  nextToken?: InputMaybe<Scalars['String']>;
+  sortDirection?: InputMaybe<ModelSortDirection>;
+  userId: Scalars['ID'];
 };
 
 /** Root query type */
@@ -6099,6 +6242,13 @@ export type QueryListColonyRolesArgs = {
 };
 
 /** Root query type */
+export type QueryListColonyStakesArgs = {
+  filter?: InputMaybe<ModelColonyStakeFilterInput>;
+  limit?: InputMaybe<Scalars['Int']>;
+  nextToken?: InputMaybe<Scalars['String']>;
+};
+
+/** Root query type */
 export type QueryListColonyTokensArgs = {
   filter?: InputMaybe<ModelColonyTokensFilterInput>;
   limit?: InputMaybe<Scalars['Int']>;
@@ -6425,6 +6575,7 @@ export enum SearchableColonyActionAggregateField {
   RecipientAddress = 'recipientAddress',
   RootHash = 'rootHash',
   ShowInActionsList = 'showInActionsList',
+  StreamingPaymentId = 'streamingPaymentId',
   ToDomainId = 'toDomainId',
   ToPotId = 'toPotId',
   TokenAddress = 'tokenAddress',
@@ -6476,6 +6627,7 @@ export type SearchableColonyActionFilterInput = {
   recipientAddress?: InputMaybe<SearchableIdFilterInput>;
   rootHash?: InputMaybe<SearchableStringFilterInput>;
   showInActionsList?: InputMaybe<SearchableBooleanFilterInput>;
+  streamingPaymentId?: InputMaybe<SearchableIdFilterInput>;
   toDomainId?: InputMaybe<SearchableIdFilterInput>;
   toPotId?: InputMaybe<SearchableIntFilterInput>;
   tokenAddress?: InputMaybe<SearchableIdFilterInput>;
@@ -6515,6 +6667,7 @@ export enum SearchableColonyActionSortableFields {
   RecipientAddress = 'recipientAddress',
   RootHash = 'rootHash',
   ShowInActionsList = 'showInActionsList',
+  StreamingPaymentId = 'streamingPaymentId',
   ToDomainId = 'toDomainId',
   ToPotId = 'toPotId',
   TokenAddress = 'tokenAddress',
@@ -6717,17 +6870,43 @@ export type StakerRewardsInput = {
 
 export type StreamingPayment = {
   __typename?: 'StreamingPayment';
+  actions?: Maybe<ModelColonyActionConnection>;
+  amount: Scalars['String'];
+  claims?: Maybe<Array<StreamingPaymentClaim>>;
   createdAt: Scalars['AWSDateTime'];
-  endTime: Scalars['AWSTimestamp'];
+  endTime: Scalars['String'];
   id: Scalars['ID'];
   interval: Scalars['String'];
+  /** Is the stream cancelled? */
+  isCancelled?: Maybe<Scalars['Boolean']>;
+  /** Is the stream waived? */
+  isWaived?: Maybe<Scalars['Boolean']>;
   metadata?: Maybe<StreamingPaymentMetadata>;
   nativeDomainId: Scalars['Int'];
   nativeId: Scalars['Int'];
-  payouts?: Maybe<Array<ExpenditurePayout>>;
   recipientAddress: Scalars['String'];
-  startTime: Scalars['AWSTimestamp'];
+  startTime: Scalars['String'];
+  token?: Maybe<Token>;
+  tokenAddress: Scalars['ID'];
   updatedAt: Scalars['AWSDateTime'];
+};
+
+export type StreamingPaymentActionsArgs = {
+  filter?: InputMaybe<ModelColonyActionFilterInput>;
+  limit?: InputMaybe<Scalars['Int']>;
+  nextToken?: InputMaybe<Scalars['String']>;
+  sortDirection?: InputMaybe<ModelSortDirection>;
+};
+
+export type StreamingPaymentClaim = {
+  __typename?: 'StreamingPaymentClaim';
+  amount: Scalars['String'];
+  timestamp: Scalars['String'];
+};
+
+export type StreamingPaymentClaimInput = {
+  amount: Scalars['String'];
+  timestamp: Scalars['String'];
 };
 
 export enum StreamingPaymentEndCondition {
@@ -6741,7 +6920,6 @@ export type StreamingPaymentMetadata = {
   createdAt: Scalars['AWSDateTime'];
   endCondition: StreamingPaymentEndCondition;
   id: Scalars['ID'];
-  limitAmount?: Maybe<Scalars['String']>;
   updatedAt: Scalars['AWSDateTime'];
 };
 
@@ -6760,6 +6938,7 @@ export type Subscription = {
   onCreateColonyMetadata?: Maybe<ColonyMetadata>;
   onCreateColonyMotion?: Maybe<ColonyMotion>;
   onCreateColonyRole?: Maybe<ColonyRole>;
+  onCreateColonyStake?: Maybe<ColonyStake>;
   onCreateColonyTokens?: Maybe<ColonyTokens>;
   onCreateContractEvent?: Maybe<ContractEvent>;
   onCreateContributorReputation?: Maybe<ContributorReputation>;
@@ -6797,6 +6976,7 @@ export type Subscription = {
   onDeleteColonyMetadata?: Maybe<ColonyMetadata>;
   onDeleteColonyMotion?: Maybe<ColonyMotion>;
   onDeleteColonyRole?: Maybe<ColonyRole>;
+  onDeleteColonyStake?: Maybe<ColonyStake>;
   onDeleteColonyTokens?: Maybe<ColonyTokens>;
   onDeleteContractEvent?: Maybe<ContractEvent>;
   onDeleteContributorReputation?: Maybe<ContributorReputation>;
@@ -6834,6 +7014,7 @@ export type Subscription = {
   onUpdateColonyMetadata?: Maybe<ColonyMetadata>;
   onUpdateColonyMotion?: Maybe<ColonyMotion>;
   onUpdateColonyRole?: Maybe<ColonyRole>;
+  onUpdateColonyStake?: Maybe<ColonyStake>;
   onUpdateColonyTokens?: Maybe<ColonyTokens>;
   onUpdateContractEvent?: Maybe<ContractEvent>;
   onUpdateContributorReputation?: Maybe<ContributorReputation>;
@@ -6910,6 +7091,10 @@ export type SubscriptionOnCreateColonyMotionArgs = {
 
 export type SubscriptionOnCreateColonyRoleArgs = {
   filter?: InputMaybe<ModelSubscriptionColonyRoleFilterInput>;
+};
+
+export type SubscriptionOnCreateColonyStakeArgs = {
+  filter?: InputMaybe<ModelSubscriptionColonyStakeFilterInput>;
 };
 
 export type SubscriptionOnCreateColonyTokensArgs = {
@@ -7060,6 +7245,10 @@ export type SubscriptionOnDeleteColonyRoleArgs = {
   filter?: InputMaybe<ModelSubscriptionColonyRoleFilterInput>;
 };
 
+export type SubscriptionOnDeleteColonyStakeArgs = {
+  filter?: InputMaybe<ModelSubscriptionColonyStakeFilterInput>;
+};
+
 export type SubscriptionOnDeleteColonyTokensArgs = {
   filter?: InputMaybe<ModelSubscriptionColonyTokensFilterInput>;
 };
@@ -7206,6 +7395,10 @@ export type SubscriptionOnUpdateColonyMotionArgs = {
 
 export type SubscriptionOnUpdateColonyRoleArgs = {
   filter?: InputMaybe<ModelSubscriptionColonyRoleFilterInput>;
+};
+
+export type SubscriptionOnUpdateColonyStakeArgs = {
+  filter?: InputMaybe<ModelSubscriptionColonyStakeFilterInput>;
 };
 
 export type SubscriptionOnUpdateColonyTokensArgs = {
@@ -7544,6 +7737,7 @@ export type UpdateColonyActionInput = {
   roles?: InputMaybe<ColonyActionRolesInput>;
   rootHash?: InputMaybe<Scalars['String']>;
   showInActionsList?: InputMaybe<Scalars['Boolean']>;
+  streamingPaymentId?: InputMaybe<Scalars['ID']>;
   toDomainId?: InputMaybe<Scalars['ID']>;
   toPotId?: InputMaybe<Scalars['Int']>;
   tokenAddress?: InputMaybe<Scalars['ID']>;
@@ -7698,6 +7892,13 @@ export type UpdateColonyRoleInput = {
   role_5?: InputMaybe<Scalars['Boolean']>;
   role_6?: InputMaybe<Scalars['Boolean']>;
   targetAddress?: InputMaybe<Scalars['ID']>;
+};
+
+export type UpdateColonyStakeInput = {
+  colonyId?: InputMaybe<Scalars['ID']>;
+  id: Scalars['ID'];
+  totalAmount?: InputMaybe<Scalars['String']>;
+  userId?: InputMaybe<Scalars['ID']>;
 };
 
 export type UpdateColonyTokensInput = {
@@ -7885,21 +8086,24 @@ export type UpdateSafeTransactionInput = {
 };
 
 export type UpdateStreamingPaymentInput = {
+  amount?: InputMaybe<Scalars['String']>;
+  claims?: InputMaybe<Array<StreamingPaymentClaimInput>>;
   createdAt?: InputMaybe<Scalars['AWSDateTime']>;
-  endTime?: InputMaybe<Scalars['AWSTimestamp']>;
+  endTime?: InputMaybe<Scalars['String']>;
   id: Scalars['ID'];
   interval?: InputMaybe<Scalars['String']>;
+  isCancelled?: InputMaybe<Scalars['Boolean']>;
+  isWaived?: InputMaybe<Scalars['Boolean']>;
   nativeDomainId?: InputMaybe<Scalars['Int']>;
   nativeId?: InputMaybe<Scalars['Int']>;
-  payouts?: InputMaybe<Array<ExpenditurePayoutInput>>;
   recipientAddress?: InputMaybe<Scalars['String']>;
-  startTime?: InputMaybe<Scalars['AWSTimestamp']>;
+  startTime?: InputMaybe<Scalars['String']>;
+  tokenAddress?: InputMaybe<Scalars['ID']>;
 };
 
 export type UpdateStreamingPaymentMetadataInput = {
   endCondition?: InputMaybe<StreamingPaymentEndCondition>;
   id: Scalars['ID'];
-  limitAmount?: InputMaybe<Scalars['String']>;
 };
 
 export type UpdateTokenInput = {
@@ -7981,6 +8185,7 @@ export type User = {
   /** Profile ID associated with the user */
   profileId?: Maybe<Scalars['ID']>;
   roles?: Maybe<ModelColonyRoleConnection>;
+  stakes?: Maybe<ModelColonyStakeConnection>;
   tokens?: Maybe<ModelUserTokensConnection>;
   transactionHistory?: Maybe<ModelTransactionConnection>;
   updatedAt: Scalars['AWSDateTime'];
@@ -7991,6 +8196,15 @@ export type User = {
 export type UserRolesArgs = {
   colonyAddress?: InputMaybe<ModelIdKeyConditionInput>;
   filter?: InputMaybe<ModelColonyRoleFilterInput>;
+  limit?: InputMaybe<Scalars['Int']>;
+  nextToken?: InputMaybe<Scalars['String']>;
+  sortDirection?: InputMaybe<ModelSortDirection>;
+};
+
+/** Represents a User within the Colony Network */
+export type UserStakesArgs = {
+  colonyId?: InputMaybe<ModelIdKeyConditionInput>;
+  filter?: InputMaybe<ModelColonyStakeFilterInput>;
   limit?: InputMaybe<Scalars['Int']>;
   nextToken?: InputMaybe<Scalars['String']>;
   sortDirection?: InputMaybe<ModelSortDirection>;
@@ -9300,11 +9514,13 @@ export type GetStreamingPaymentQuery = {
   getStreamingPayment?: {
     __typename?: 'StreamingPayment';
     id: string;
-    payouts?: Array<{
-      __typename?: 'ExpenditurePayout';
+    endTime: string;
+    tokenAddress: string;
+    amount: string;
+    claims?: Array<{
+      __typename?: 'StreamingPaymentClaim';
       amount: string;
-      tokenAddress: string;
-      isClaimed: boolean;
+      timestamp: string;
     }> | null;
   } | null;
 };
@@ -10482,10 +10698,12 @@ export const GetStreamingPaymentDocument = gql`
   query GetStreamingPayment($id: ID!) {
     getStreamingPayment(id: $id) {
       id
-      payouts {
+      endTime
+      tokenAddress
+      amount
+      claims {
         amount
-        tokenAddress
-        isClaimed
+        timestamp
       }
     }
   }

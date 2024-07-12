@@ -1,16 +1,19 @@
 import { mutate } from '~amplifyClient';
 import { ExtensionEventListener } from '~eventListeners';
 import {
+  ColonyActionType,
   CreateStreamingPaymentDocument,
   CreateStreamingPaymentMutation,
   CreateStreamingPaymentMutationVariables,
 } from '~graphql';
 import { EventHandler } from '~types';
 import {
+  getDomainDatabaseId,
   getExpenditureDatabaseId,
   getStreamingPaymentsClient,
   toNumber,
   verbose,
+  writeActionFromEvent,
 } from '~utils';
 
 export const handleStreamingPaymentCreated: EventHandler = async (
@@ -18,7 +21,7 @@ export const handleStreamingPaymentCreated: EventHandler = async (
   listener,
 ) => {
   const { blockNumber } = event;
-  const { streamingPaymentId } = event.args;
+  const { streamingPaymentId, agent: initiatorAddress } = event.args;
   const convertedNativeId = toNumber(streamingPaymentId);
   const { colonyAddress } = listener as ExtensionEventListener;
 
@@ -43,6 +46,8 @@ export const handleStreamingPaymentCreated: EventHandler = async (
     startTime,
     endTime,
     interval,
+    token: tokenAddress,
+    amount,
   } = streamingPayment;
 
   const databaseId = getExpenditureDatabaseId(colonyAddress, convertedNativeId);
@@ -58,9 +63,18 @@ export const handleStreamingPaymentCreated: EventHandler = async (
       nativeId: convertedNativeId,
       recipientAddress,
       nativeDomainId: toNumber(domainId),
-      startTime: toNumber(startTime),
-      endTime: toNumber(endTime),
+      startTime: startTime.toString(),
+      endTime: endTime.toString(),
       interval: interval.toString(),
+      tokenAddress,
+      amount: amount.toString(),
     },
+  });
+
+  await writeActionFromEvent(event, colonyAddress, {
+    type: ColonyActionType.CreateStreamingPayment,
+    initiatorAddress,
+    expenditureId: databaseId,
+    fromDomainId: getDomainDatabaseId(colonyAddress, toNumber(domainId)),
   });
 };
