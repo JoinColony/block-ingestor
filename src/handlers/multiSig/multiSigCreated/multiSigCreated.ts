@@ -14,6 +14,7 @@ import {
   handleMetadataDeltaMultiSig,
   handleMintTokensMultiSig,
   handleMoveFundsMultiSig,
+  handleSetUserRolesMultiSig,
   handleUnlockTokenMultiSig,
   handleAddOrEditDomainMultiSig,
 } from './handlers';
@@ -50,6 +51,7 @@ export const handleMultiSigMotionCreated: EventHandler = async (
   });
 
   const actionData = motion.data[0];
+  const actionTarget = motion.targets[0];
 
   if (!actionData) {
     verbose(`No action data in multiSig motion: ${motionId}`);
@@ -80,6 +82,14 @@ export const handleMultiSigMotionCreated: EventHandler = async (
       }
       case ColonyOperations.UnlockToken: {
         await handleUnlockTokenMultiSig(colonyAddress, event, parsedOperation);
+      }
+      case ColonyOperations.SetUserRoles: {
+        await handleSetUserRolesMultiSig(
+          colonyAddress,
+          event,
+          parsedOperation,
+          actionTarget,
+        );
         break;
       }
       case ColonyOperations.AddDomain:
