@@ -1,8 +1,9 @@
 import { TransactionDescription } from 'ethers/lib/utils';
 import { ContractEvent, multiSigNameMapping } from '~types';
 import { createMultiSigInDB } from '../helpers';
+import { toNumber } from '~utils';
 
-export const colonyVersionUpgrade = async (
+export const handleColonyVersionUpgrade = async (
   colonyAddress: string,
   event: ContractEvent,
   parsedAction: TransactionDescription,
@@ -13,12 +14,10 @@ export const colonyVersionUpgrade = async (
 
   const { name, args: actionArgs } = parsedAction;
 
-  //   const newColonyVersion = actionArgs[1].toString();
-
-  console.log('ROMEO ACTION ARGS: ', actionArgs);
+  const newColonyVersion = toNumber(actionArgs[0]);
 
   await createMultiSigInDB(colonyAddress, event, {
     type: multiSigNameMapping[name],
-    // newColonyVersion,
+    newColonyVersion,
   });
 };
