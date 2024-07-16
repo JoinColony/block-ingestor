@@ -18,6 +18,7 @@ import {
   handleSetUserRolesMultiSig,
   handleUnlockTokenMultiSig,
   handleAddOrEditDomainMultiSig,
+  handleColonyVersionUpgrade,
 } from './handlers';
 import { handlePaymentMultiSig } from './handlers/payment';
 
@@ -130,6 +131,10 @@ export const handleMultiSigMotionCreated: EventHandler = async (
       }
       case ColonyOperations.MakePaymentFundedFromDomain: {
         await handlePaymentMultiSig(colonyAddress, event, parsedOperation);
+        break;
+      }
+      case ColonyOperations.Upgrade: {
+        await handleColonyVersionUpgrade(colonyAddress, event, parsedOperation);
         break;
       }
       default: {
