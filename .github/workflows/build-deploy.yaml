@@ -133,11 +133,11 @@ jobs:
 
     - name: Deploy to Kubernetes cluster
       run: |
-        kubectl rollout restart deployment/cdapp-block-ingestor-${{ env.ENVIRONMENT_TAG }} -n ${{ env.NAMESPACE }}
+        kubectl rollout restart deployment/cdapp-block-ingestor-${{ env.ENVIRONMENT_TAG }}-arbitrum-sepolia -n ${{ env.NAMESPACE }}
 
     - name: Validate Kubernetes deployment
       run: |
-        kubectl rollout status deployment/cdapp-block-ingestor-${{ env.ENVIRONMENT_TAG }} -n ${{ env.NAMESPACE }}
+        kubectl rollout status deployment/cdapp-block-ingestor-${{ env.ENVIRONMENT_TAG }}-arbitrum-sepolia -n ${{ env.NAMESPACE }}
     
     - uses: sarisia/actions-status-discord@c193626e5ce172002b8161e116aa897de7ab5383
       if: always()
@@ -205,11 +205,11 @@ jobs:
 
     - name: Deploy to Kubernetes cluster
       run: |
-        kubectl rollout restart deployment/cdapp-block-ingestor-${{ env.ENVIRONMENT_TAG }} -n ${{ env.NAMESPACE }}
+        kubectl rollout restart deployment/cdapp-block-ingestor-${{ env.ENVIRONMENT_TAG }}-arbitrum-one -n ${{ env.NAMESPACE }}
 
     - name: Validate Kubernetes deployment
       run: |
-        kubectl rollout status deployment/cdapp-block-ingestor-${{ env.ENVIRONMENT_TAG }} -n ${{ env.NAMESPACE }}
+        kubectl rollout status deployment/cdapp-block-ingestor-${{ env.ENVIRONMENT_TAG }}-arbitrum-one -n ${{ env.NAMESPACE }}
     
     - uses: sarisia/actions-status-discord@c193626e5ce172002b8161e116aa897de7ab5383
       if: always()
