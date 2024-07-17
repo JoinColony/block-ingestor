@@ -25,8 +25,8 @@ export default async (event: ContractEvent): Promise<void> => {
 
     // only set the unlock / mint status for colony network tokens
     if (
-      client.tokenClientType === TokenClientType.Colony ||
-      client.tokenClientType === TokenClientType.ColonyLegacy
+      client.tokenClientType === TokenClientType.Colony // ||
+      // client.tokenClientType === TokenClientType.ColonyLegacy
     ) {
       try {
         await client.provider.call(
