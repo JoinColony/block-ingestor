@@ -516,6 +516,11 @@ export type ColonyAction = {
   showInActionsList: Scalars['Boolean'];
   /** Streaming payment associated with the action, if any */
   streamingPayment?: Maybe<StreamingPayment>;
+  /**
+   * Changes to the streaming payment associated with the action, if any
+   * Applicable to `EDIT_STREAMING_PAYMENT` action only
+   */
+  streamingPaymentChanges?: Maybe<FullStreamingPaymentChanges>;
   /** ID of the associated streaming payment, if any */
   streamingPaymentId?: Maybe<Scalars['ID']>;
   /** The target Domain of the action, if applicable */
@@ -619,6 +624,10 @@ export enum ColonyActionType {
   EditExpenditure = 'EDIT_EXPENDITURE',
   /** An action related to creating a motion to edit an expenditure */
   EditExpenditureMotion = 'EDIT_EXPENDITURE_MOTION',
+  /** An action related to editing a streaming payment */
+  EditStreamingPayment = 'EDIT_STREAMING_PAYMENT',
+  /** An action related to editing a streaming payment via a motion */
+  EditStreamingPaymentMotion = 'EDIT_STREAMING_PAYMENT_MOTION',
   /** An action related to a domain reputation penalty within a Colony (smite) */
   EmitDomainReputationPenalty = 'EMIT_DOMAIN_REPUTATION_PENALTY',
   /** An action related to a domain reputation penalty within a Colony (smite) via a motion */
@@ -1093,6 +1102,10 @@ export type ColonyMotion = {
   objectionAnnotation?: Maybe<Annotation>;
   /** Id of the associated objection annotation, if any */
   objectionAnnotationId?: Maybe<Scalars['ID']>;
+  /** Streaming payment metadata that is stored temporarily and committed to the database once the corresponding motion passes */
+  pendingStreamingPaymentMetadata?: Maybe<PendingStreamingPaymentMetadata>;
+  /** Identifier of streaming payment metadata that is stored temporarily and committed to the database once the corresponding motion passes */
+  pendingStreamingPaymentMetadataId?: Maybe<Scalars['ID']>;
   /**
    * Stakes remaining to activate either side of the motion
    * It's a tuple: `[nayRemaining, yayRemaining]`
@@ -1108,6 +1121,10 @@ export type ColonyMotion = {
   skillRep: Scalars['String'];
   /** List of staker rewards users will be receiving for a motion */
   stakerRewards: Array<StakerRewards>;
+  /** Streaming payment associated with the motion, if any */
+  streamingPaymentId?: Maybe<Scalars['ID']>;
+  /** Streaming Payment changes by the action */
+  streamingPaymentPendingChanges?: Maybe<StreamingPaymentPendingChanges>;
   /** The transaction hash of the createMotion action */
   transactionHash: Scalars['ID'];
   updatedAt: Scalars['AWSDateTime'];
@@ -1433,6 +1450,7 @@ export type CreateColonyActionInput = {
   rolesAreMultiSig?: InputMaybe<Scalars['Boolean']>;
   rootHash: Scalars['String'];
   showInActionsList: Scalars['Boolean'];
+  streamingPaymentChanges?: InputMaybe<FullStreamingPaymentChangesInput>;
   streamingPaymentId?: InputMaybe<Scalars['ID']>;
   toDomainId?: InputMaybe<Scalars['ID']>;
   toPotId?: InputMaybe<Scalars['Int']>;
@@ -1584,12 +1602,15 @@ export type CreateColonyMotionInput = {
   nativeMotionDomainId: Scalars['String'];
   nativeMotionId: Scalars['String'];
   objectionAnnotationId?: InputMaybe<Scalars['ID']>;
+  pendingStreamingPaymentMetadataId?: InputMaybe<Scalars['ID']>;
   remainingStakes: Array<Scalars['String']>;
   repSubmitted: Scalars['String'];
   requiredStake: Scalars['String'];
   revealedVotes: MotionStakesInput;
   skillRep: Scalars['String'];
   stakerRewards: Array<StakerRewardsInput>;
+  streamingPaymentId?: InputMaybe<Scalars['ID']>;
+  streamingPaymentPendingChanges?: InputMaybe<StreamingPaymentPendingChangesInput>;
   transactionHash: Scalars['ID'];
   userMinStake: Scalars['String'];
   usersStakes: Array<UserMotionStakesInput>;
@@ -1752,6 +1773,7 @@ export type CreateMotionMessageInput = {
   vote?: InputMaybe<Scalars['String']>;
 };
 
+<<<<<<< HEAD
 export type CreateMultiSigUserSignatureInput = {
   colonyAddress: Scalars['ID'];
   createdAt?: InputMaybe<Scalars['AWSDateTime']>;
@@ -1760,6 +1782,11 @@ export type CreateMultiSigUserSignatureInput = {
   role: Scalars['Int'];
   userAddress: Scalars['ID'];
   vote: MultiSigVote;
+=======
+export type CreatePendingStreamingPaymentMetadataInput = {
+  endCondition: StreamingPaymentEndCondition;
+  id?: InputMaybe<Scalars['ID']>;
+>>>>>>> a0923563 (Feat: Add editStreamingPaymentMotion multicall handler)
 };
 
 export type CreateNotificationsDataInput = {
@@ -1834,13 +1861,12 @@ export type CreateStreamingPaymentInput = {
   nativeId: Scalars['Int'];
   recipientAddress: Scalars['String'];
   startTime: Scalars['String'];
-  tokenAddress: Scalars['String'];
+  tokenAddress: Scalars['ID'];
 };
 
 export type CreateStreamingPaymentMetadataInput = {
   endCondition: StreamingPaymentEndCondition;
   id?: InputMaybe<Scalars['ID']>;
-  limitAmount?: InputMaybe<Scalars['String']>;
 };
 
 export type CreateTokenExchangeRateInput = {
@@ -2079,7 +2105,11 @@ export type DeleteMotionMessageInput = {
   id: Scalars['ID'];
 };
 
+<<<<<<< HEAD
 export type DeleteMultiSigUserSignatureInput = {
+=======
+export type DeletePendingStreamingPaymentMetadataInput = {
+>>>>>>> a0923563 (Feat: Add editStreamingPaymentMotion multicall handler)
   id: Scalars['ID'];
 };
 
@@ -2584,6 +2614,17 @@ export enum FilteringMethod {
   /** Apply a union filter */
   Union = 'UNION',
 }
+
+export type FullStreamingPaymentChanges = {
+  __typename?: 'FullStreamingPaymentChanges';
+  newValues: StreamingPaymentChanges;
+  oldValues: StreamingPaymentChanges;
+};
+
+export type FullStreamingPaymentChangesInput = {
+  newValues: StreamingPaymentChangesInput;
+  oldValues: StreamingPaymentChangesInput;
+};
 
 export type FunctionParam = {
   __typename?: 'FunctionParam';
@@ -3243,10 +3284,12 @@ export type ModelColonyMotionConditionInput = {
   not?: InputMaybe<ModelColonyMotionConditionInput>;
   objectionAnnotationId?: InputMaybe<ModelIdInput>;
   or?: InputMaybe<Array<InputMaybe<ModelColonyMotionConditionInput>>>;
+  pendingStreamingPaymentMetadataId?: InputMaybe<ModelIdInput>;
   remainingStakes?: InputMaybe<ModelStringInput>;
   repSubmitted?: InputMaybe<ModelStringInput>;
   requiredStake?: InputMaybe<ModelStringInput>;
   skillRep?: InputMaybe<ModelStringInput>;
+  streamingPaymentId?: InputMaybe<ModelIdInput>;
   transactionHash?: InputMaybe<ModelIdInput>;
   userMinStake?: InputMaybe<ModelStringInput>;
 };
@@ -3272,10 +3315,12 @@ export type ModelColonyMotionFilterInput = {
   not?: InputMaybe<ModelColonyMotionFilterInput>;
   objectionAnnotationId?: InputMaybe<ModelIdInput>;
   or?: InputMaybe<Array<InputMaybe<ModelColonyMotionFilterInput>>>;
+  pendingStreamingPaymentMetadataId?: InputMaybe<ModelIdInput>;
   remainingStakes?: InputMaybe<ModelStringInput>;
   repSubmitted?: InputMaybe<ModelStringInput>;
   requiredStake?: InputMaybe<ModelStringInput>;
   skillRep?: InputMaybe<ModelStringInput>;
+  streamingPaymentId?: InputMaybe<ModelIdInput>;
   transactionHash?: InputMaybe<ModelIdInput>;
   userMinStake?: InputMaybe<ModelStringInput>;
 };
@@ -3851,6 +3896,7 @@ export type ModelMotionMessageFilterInput = {
   vote?: InputMaybe<ModelStringInput>;
 };
 
+<<<<<<< HEAD
 export type ModelMultiSigUserSignatureConditionInput = {
   and?: InputMaybe<Array<InputMaybe<ModelMultiSigUserSignatureConditionInput>>>;
   colonyAddress?: InputMaybe<ModelIdInput>;
@@ -3885,6 +3931,27 @@ export type ModelMultiSigUserSignatureFilterInput = {
 export type ModelMultiSigVoteInput = {
   eq?: InputMaybe<MultiSigVote>;
   ne?: InputMaybe<MultiSigVote>;
+=======
+export type ModelPendingStreamingPaymentMetadataConditionInput = {
+  and?: InputMaybe<Array<InputMaybe<ModelPendingStreamingPaymentMetadataConditionInput>>>;
+  endCondition?: InputMaybe<ModelStreamingPaymentEndConditionInput>;
+  not?: InputMaybe<ModelPendingStreamingPaymentMetadataConditionInput>;
+  or?: InputMaybe<Array<InputMaybe<ModelPendingStreamingPaymentMetadataConditionInput>>>;
+};
+
+export type ModelPendingStreamingPaymentMetadataConnection = {
+  __typename?: 'ModelPendingStreamingPaymentMetadataConnection';
+  items: Array<Maybe<PendingStreamingPaymentMetadata>>;
+  nextToken?: Maybe<Scalars['String']>;
+};
+
+export type ModelPendingStreamingPaymentMetadataFilterInput = {
+  and?: InputMaybe<Array<InputMaybe<ModelPendingStreamingPaymentMetadataFilterInput>>>;
+  endCondition?: InputMaybe<ModelStreamingPaymentEndConditionInput>;
+  id?: InputMaybe<ModelIdInput>;
+  not?: InputMaybe<ModelPendingStreamingPaymentMetadataFilterInput>;
+  or?: InputMaybe<Array<InputMaybe<ModelPendingStreamingPaymentMetadataFilterInput>>>;
+>>>>>>> a0923563 (Feat: Add editStreamingPaymentMotion multicall handler)
 };
 
 export type ModelNotificationsDataConditionInput = {
@@ -4104,7 +4171,7 @@ export type ModelStreamingPaymentConditionInput = {
   or?: InputMaybe<Array<InputMaybe<ModelStreamingPaymentConditionInput>>>;
   recipientAddress?: InputMaybe<ModelStringInput>;
   startTime?: InputMaybe<ModelStringInput>;
-  tokenAddress?: InputMaybe<ModelStringInput>;
+  tokenAddress?: InputMaybe<ModelIdInput>;
 };
 
 export type ModelStreamingPaymentConnection = {
@@ -4133,7 +4200,7 @@ export type ModelStreamingPaymentFilterInput = {
   or?: InputMaybe<Array<InputMaybe<ModelStreamingPaymentFilterInput>>>;
   recipientAddress?: InputMaybe<ModelStringInput>;
   startTime?: InputMaybe<ModelStringInput>;
-  tokenAddress?: InputMaybe<ModelStringInput>;
+  tokenAddress?: InputMaybe<ModelIdInput>;
 };
 
 export type ModelStreamingPaymentMetadataConditionInput = {
@@ -4141,7 +4208,6 @@ export type ModelStreamingPaymentMetadataConditionInput = {
     Array<InputMaybe<ModelStreamingPaymentMetadataConditionInput>>
   >;
   endCondition?: InputMaybe<ModelStreamingPaymentEndConditionInput>;
-  limitAmount?: InputMaybe<ModelStringInput>;
   not?: InputMaybe<ModelStreamingPaymentMetadataConditionInput>;
   or?: InputMaybe<
     Array<InputMaybe<ModelStreamingPaymentMetadataConditionInput>>
@@ -4158,7 +4224,6 @@ export type ModelStreamingPaymentMetadataFilterInput = {
   and?: InputMaybe<Array<InputMaybe<ModelStreamingPaymentMetadataFilterInput>>>;
   endCondition?: InputMaybe<ModelStreamingPaymentEndConditionInput>;
   id?: InputMaybe<ModelIdInput>;
-  limitAmount?: InputMaybe<ModelStringInput>;
   not?: InputMaybe<ModelStreamingPaymentMetadataFilterInput>;
   or?: InputMaybe<Array<InputMaybe<ModelStreamingPaymentMetadataFilterInput>>>;
 };
@@ -4418,10 +4483,12 @@ export type ModelSubscriptionColonyMotionFilterInput = {
   nativeMotionId?: InputMaybe<ModelSubscriptionStringInput>;
   objectionAnnotationId?: InputMaybe<ModelSubscriptionIdInput>;
   or?: InputMaybe<Array<InputMaybe<ModelSubscriptionColonyMotionFilterInput>>>;
+  pendingStreamingPaymentMetadataId?: InputMaybe<ModelSubscriptionIdInput>;
   remainingStakes?: InputMaybe<ModelSubscriptionStringInput>;
   repSubmitted?: InputMaybe<ModelSubscriptionStringInput>;
   requiredStake?: InputMaybe<ModelSubscriptionStringInput>;
   skillRep?: InputMaybe<ModelSubscriptionStringInput>;
+  streamingPaymentId?: InputMaybe<ModelSubscriptionIdInput>;
   transactionHash?: InputMaybe<ModelSubscriptionIdInput>;
   userMinStake?: InputMaybe<ModelSubscriptionStringInput>;
 };
@@ -4678,12 +4745,24 @@ export type ModelSubscriptionMotionMessageFilterInput = {
   vote?: InputMaybe<ModelSubscriptionStringInput>;
 };
 
+<<<<<<< HEAD
 export type ModelSubscriptionMultiSigUserSignatureFilterInput = {
   and?: InputMaybe<
     Array<InputMaybe<ModelSubscriptionMultiSigUserSignatureFilterInput>>
   >;
   colonyAddress?: InputMaybe<ModelSubscriptionIdInput>;
   createdAt?: InputMaybe<ModelSubscriptionStringInput>;
+=======
+export type ModelSubscriptionPendingStreamingPaymentMetadataFilterInput = {
+  and?: InputMaybe<Array<InputMaybe<ModelSubscriptionPendingStreamingPaymentMetadataFilterInput>>>;
+  endCondition?: InputMaybe<ModelSubscriptionStringInput>;
+  id?: InputMaybe<ModelSubscriptionIdInput>;
+  or?: InputMaybe<Array<InputMaybe<ModelSubscriptionPendingStreamingPaymentMetadataFilterInput>>>;
+};
+
+export type ModelSubscriptionPrivateBetaInviteCodeFilterInput = {
+  and?: InputMaybe<Array<InputMaybe<ModelSubscriptionPrivateBetaInviteCodeFilterInput>>>;
+>>>>>>> a0923563 (Feat: Add editStreamingPaymentMotion multicall handler)
   id?: InputMaybe<ModelSubscriptionIdInput>;
   multiSigId?: InputMaybe<ModelSubscriptionIdInput>;
   or?: InputMaybe<
@@ -4796,7 +4875,7 @@ export type ModelSubscriptionStreamingPaymentFilterInput = {
   >;
   recipientAddress?: InputMaybe<ModelSubscriptionStringInput>;
   startTime?: InputMaybe<ModelSubscriptionStringInput>;
-  tokenAddress?: InputMaybe<ModelSubscriptionStringInput>;
+  tokenAddress?: InputMaybe<ModelSubscriptionIdInput>;
 };
 
 export type ModelSubscriptionStreamingPaymentMetadataFilterInput = {
@@ -4805,10 +4884,14 @@ export type ModelSubscriptionStreamingPaymentMetadataFilterInput = {
   >;
   endCondition?: InputMaybe<ModelSubscriptionStringInput>;
   id?: InputMaybe<ModelSubscriptionIdInput>;
+<<<<<<< HEAD
   limitAmount?: InputMaybe<ModelSubscriptionStringInput>;
   or?: InputMaybe<
     Array<InputMaybe<ModelSubscriptionStreamingPaymentMetadataFilterInput>>
   >;
+=======
+  or?: InputMaybe<Array<InputMaybe<ModelSubscriptionStreamingPaymentMetadataFilterInput>>>;
+>>>>>>> a0923563 (Feat: Add editStreamingPaymentMotion multicall handler)
 };
 
 export type ModelSubscriptionStringInput = {
@@ -5394,8 +5477,15 @@ export type Mutation = {
   createIngestorStats?: Maybe<IngestorStats>;
   createLiquidationAddress?: Maybe<LiquidationAddress>;
   createMotionMessage?: Maybe<MotionMessage>;
+<<<<<<< HEAD
   createMultiSigUserSignature?: Maybe<MultiSigUserSignature>;
+<<<<<<< HEAD
   createNotificationsData?: Maybe<NotificationsData>;
+=======
+=======
+  createPendingStreamingPaymentMetadata?: Maybe<PendingStreamingPaymentMetadata>;
+>>>>>>> a0923563 (Feat: Add editStreamingPaymentMotion multicall handler)
+>>>>>>> 7a6f2da (Feat: Add editStreamingPaymentMotion multicall handler)
   createPrivateBetaInviteCode?: Maybe<PrivateBetaInviteCode>;
   createProfile?: Maybe<Profile>;
   createReputationMiningCycleMetadata?: Maybe<ReputationMiningCycleMetadata>;
@@ -5442,8 +5532,15 @@ export type Mutation = {
   deleteIngestorStats?: Maybe<IngestorStats>;
   deleteLiquidationAddress?: Maybe<LiquidationAddress>;
   deleteMotionMessage?: Maybe<MotionMessage>;
+<<<<<<< HEAD
   deleteMultiSigUserSignature?: Maybe<MultiSigUserSignature>;
+<<<<<<< HEAD
   deleteNotificationsData?: Maybe<NotificationsData>;
+=======
+=======
+  deletePendingStreamingPaymentMetadata?: Maybe<PendingStreamingPaymentMetadata>;
+>>>>>>> a0923563 (Feat: Add editStreamingPaymentMotion multicall handler)
+>>>>>>> 7a6f2da (Feat: Add editStreamingPaymentMotion multicall handler)
   deletePrivateBetaInviteCode?: Maybe<PrivateBetaInviteCode>;
   deleteProfile?: Maybe<Profile>;
   deleteReputationMiningCycleMetadata?: Maybe<ReputationMiningCycleMetadata>;
@@ -5490,8 +5587,15 @@ export type Mutation = {
   updateIngestorStats?: Maybe<IngestorStats>;
   updateLiquidationAddress?: Maybe<LiquidationAddress>;
   updateMotionMessage?: Maybe<MotionMessage>;
+<<<<<<< HEAD
   updateMultiSigUserSignature?: Maybe<MultiSigUserSignature>;
+<<<<<<< HEAD
   updateNotificationsData?: Maybe<NotificationsData>;
+=======
+=======
+  updatePendingStreamingPaymentMetadata?: Maybe<PendingStreamingPaymentMetadata>;
+>>>>>>> a0923563 (Feat: Add editStreamingPaymentMotion multicall handler)
+>>>>>>> 7a6f2da (Feat: Add editStreamingPaymentMotion multicall handler)
   updatePrivateBetaInviteCode?: Maybe<PrivateBetaInviteCode>;
   updateProfile?: Maybe<Profile>;
   updateReputationMiningCycleMetadata?: Maybe<ReputationMiningCycleMetadata>;
@@ -5705,11 +5809,20 @@ export type MutationCreateMultiSigUserSignatureArgs = {
 };
 
 /** Root mutation type */
+<<<<<<< HEAD
 export type MutationCreateNotificationsDataArgs = {
   condition?: InputMaybe<ModelNotificationsDataConditionInput>;
   input: CreateNotificationsDataInput;
 };
 
+=======
+export type MutationCreatePendingStreamingPaymentMetadataArgs = {
+  condition?: InputMaybe<ModelPendingStreamingPaymentMetadataConditionInput>;
+  input: CreatePendingStreamingPaymentMetadataInput;
+};
+
+
+>>>>>>> 7a6f2da (Feat: Add editStreamingPaymentMotion multicall handler)
 /** Root mutation type */
 export type MutationCreatePrivateBetaInviteCodeArgs = {
   condition?: InputMaybe<ModelPrivateBetaInviteCodeConditionInput>;
@@ -5979,11 +6092,20 @@ export type MutationDeleteMultiSigUserSignatureArgs = {
 };
 
 /** Root mutation type */
+<<<<<<< HEAD
 export type MutationDeleteNotificationsDataArgs = {
   condition?: InputMaybe<ModelNotificationsDataConditionInput>;
   input: DeleteNotificationsDataInput;
 };
 
+=======
+export type MutationDeletePendingStreamingPaymentMetadataArgs = {
+  condition?: InputMaybe<ModelPendingStreamingPaymentMetadataConditionInput>;
+  input: DeletePendingStreamingPaymentMetadataInput;
+};
+
+
+>>>>>>> 7a6f2da (Feat: Add editStreamingPaymentMotion multicall handler)
 /** Root mutation type */
 export type MutationDeletePrivateBetaInviteCodeArgs = {
   condition?: InputMaybe<ModelPrivateBetaInviteCodeConditionInput>;
@@ -6253,11 +6375,20 @@ export type MutationUpdateMultiSigUserSignatureArgs = {
 };
 
 /** Root mutation type */
+<<<<<<< HEAD
 export type MutationUpdateNotificationsDataArgs = {
   condition?: InputMaybe<ModelNotificationsDataConditionInput>;
   input: UpdateNotificationsDataInput;
 };
 
+=======
+export type MutationUpdatePendingStreamingPaymentMetadataArgs = {
+  condition?: InputMaybe<ModelPendingStreamingPaymentMetadataConditionInput>;
+  input: UpdatePendingStreamingPaymentMetadataInput;
+};
+
+
+>>>>>>> 7a6f2da (Feat: Add editStreamingPaymentMotion multicall handler)
 /** Root mutation type */
 export type MutationUpdatePrivateBetaInviteCodeArgs = {
   condition?: InputMaybe<ModelPrivateBetaInviteCodeConditionInput>;
@@ -6501,6 +6632,14 @@ export type PaymentInput = {
   tokenAddress: Scalars['String'];
 };
 
+export type PendingStreamingPaymentMetadata = {
+  __typename?: 'PendingStreamingPaymentMetadata';
+  createdAt: Scalars['AWSDateTime'];
+  endCondition: StreamingPaymentEndCondition;
+  id: Scalars['ID'];
+  updatedAt: Scalars['AWSDateTime'];
+};
+
 export type PrivateBetaInviteCode = {
   __typename?: 'PrivateBetaInviteCode';
   createdAt: Scalars['AWSDateTime'];
@@ -6664,6 +6803,7 @@ export type Query = {
   getLiquidationAddress?: Maybe<LiquidationAddress>;
   getLiquidationAddressesByUserAddress?: Maybe<ModelLiquidationAddressConnection>;
   getMotionByExpenditureId?: Maybe<ModelColonyMotionConnection>;
+  getMotionByStreamingPaymentId?: Maybe<ModelColonyMotionConnection>;
   getMotionByTransactionHash?: Maybe<ModelColonyMotionConnection>;
   getMotionMessage?: Maybe<MotionMessage>;
   getMotionMessageByMotionId?: Maybe<ModelMotionMessageConnection>;
@@ -6672,11 +6812,18 @@ export type Query = {
   /** Get the timeout for the current period of a motion */
   getMotionTimeoutPeriods?: Maybe<GetMotionTimeoutPeriodsReturn>;
   getMotionVoterRewards?: Maybe<ModelVoterRewardsHistoryConnection>;
+<<<<<<< HEAD
   getMultiSigByColonyAddress?: Maybe<ModelColonyMultiSigConnection>;
   getMultiSigByTransactionHash?: Maybe<ModelColonyMultiSigConnection>;
   getMultiSigUserSignature?: Maybe<MultiSigUserSignature>;
   getMultiSigUserSignatureByMultiSigId?: Maybe<ModelMultiSigUserSignatureConnection>;
+<<<<<<< HEAD
   getNotificationsData?: Maybe<NotificationsData>;
+=======
+=======
+  getPendingStreamingPaymentMetadata?: Maybe<PendingStreamingPaymentMetadata>;
+>>>>>>> a0923563 (Feat: Add editStreamingPaymentMotion multicall handler)
+>>>>>>> 7a6f2da (Feat: Add editStreamingPaymentMotion multicall handler)
   getPrivateBetaInviteCode?: Maybe<PrivateBetaInviteCode>;
   getProfile?: Maybe<Profile>;
   getProfileByEmail?: Maybe<ModelProfileConnection>;
@@ -6745,8 +6892,15 @@ export type Query = {
   listIngestorStats?: Maybe<ModelIngestorStatsConnection>;
   listLiquidationAddresses?: Maybe<ModelLiquidationAddressConnection>;
   listMotionMessages?: Maybe<ModelMotionMessageConnection>;
+<<<<<<< HEAD
   listMultiSigUserSignatures?: Maybe<ModelMultiSigUserSignatureConnection>;
+<<<<<<< HEAD
   listNotificationsData?: Maybe<ModelNotificationsDataConnection>;
+=======
+=======
+  listPendingStreamingPaymentMetadata?: Maybe<ModelPendingStreamingPaymentMetadataConnection>;
+>>>>>>> a0923563 (Feat: Add editStreamingPaymentMotion multicall handler)
+>>>>>>> 7a6f2da (Feat: Add editStreamingPaymentMotion multicall handler)
   listPrivateBetaInviteCodes?: Maybe<ModelPrivateBetaInviteCodeConnection>;
   listProfiles?: Maybe<ModelProfileConnection>;
   listReputationMiningCycleMetadata?: Maybe<ModelReputationMiningCycleMetadataConnection>;
@@ -7149,6 +7303,16 @@ export type QueryGetMotionByExpenditureIdArgs = {
 };
 
 /** Root query type */
+export type QueryGetMotionByStreamingPaymentIdArgs = {
+  filter?: InputMaybe<ModelColonyMotionFilterInput>;
+  limit?: InputMaybe<Scalars['Int']>;
+  nextToken?: InputMaybe<Scalars['String']>;
+  sortDirection?: InputMaybe<ModelSortDirection>;
+  streamingPaymentId: Scalars['ID'];
+};
+
+
+/** Root query type */
 export type QueryGetMotionByTransactionHashArgs = {
   filter?: InputMaybe<ModelColonyMotionFilterInput>;
   limit?: InputMaybe<Scalars['Int']>;
@@ -7225,10 +7389,18 @@ export type QueryGetMultiSigUserSignatureByMultiSigIdArgs = {
 };
 
 /** Root query type */
+<<<<<<< HEAD
 export type QueryGetNotificationsDataArgs = {
   userAddress: Scalars['ID'];
 };
 
+=======
+export type QueryGetPendingStreamingPaymentMetadataArgs = {
+  id: Scalars['ID'];
+};
+
+
+>>>>>>> 7a6f2da (Feat: Add editStreamingPaymentMotion multicall handler)
 /** Root query type */
 export type QueryGetPrivateBetaInviteCodeArgs = {
   id: Scalars['ID'];
@@ -7671,6 +7843,7 @@ export type QueryListMultiSigUserSignaturesArgs = {
 };
 
 /** Root query type */
+<<<<<<< HEAD
 export type QueryListNotificationsDataArgs = {
   filter?: InputMaybe<ModelNotificationsDataFilterInput>;
   limit?: InputMaybe<Scalars['Int']>;
@@ -7679,6 +7852,15 @@ export type QueryListNotificationsDataArgs = {
   userAddress?: InputMaybe<Scalars['ID']>;
 };
 
+=======
+export type QueryListPendingStreamingPaymentMetadataArgs = {
+  filter?: InputMaybe<ModelPendingStreamingPaymentMetadataFilterInput>;
+  limit?: InputMaybe<Scalars['Int']>;
+  nextToken?: InputMaybe<Scalars['String']>;
+};
+
+
+>>>>>>> 7a6f2da (Feat: Add editStreamingPaymentMotion multicall handler)
 /** Root query type */
 export type QueryListPrivateBetaInviteCodesArgs = {
   filter?: InputMaybe<ModelPrivateBetaInviteCodeFilterInput>;
@@ -8265,11 +8447,13 @@ export type StreamingPayment = {
   /** Is the stream waived? */
   isWaived?: Maybe<Scalars['Boolean']>;
   metadata?: Maybe<StreamingPaymentMetadata>;
+  motions?: Maybe<ModelColonyMotionConnection>;
   nativeDomainId: Scalars['Int'];
   nativeId: Scalars['Int'];
   recipientAddress: Scalars['String'];
   startTime: Scalars['String'];
-  tokenAddress: Scalars['String'];
+  token?: Maybe<Token>;
+  tokenAddress: Scalars['ID'];
   updatedAt: Scalars['AWSDateTime'];
 };
 
@@ -8278,6 +8462,29 @@ export type StreamingPaymentActionsArgs = {
   limit?: InputMaybe<Scalars['Int']>;
   nextToken?: InputMaybe<Scalars['String']>;
   sortDirection?: InputMaybe<ModelSortDirection>;
+};
+
+
+export type StreamingPaymentMotionsArgs = {
+  filter?: InputMaybe<ModelColonyMotionFilterInput>;
+  limit?: InputMaybe<Scalars['Int']>;
+  nextToken?: InputMaybe<Scalars['String']>;
+  sortDirection?: InputMaybe<ModelSortDirection>;
+};
+
+export type StreamingPaymentChanges = {
+  __typename?: 'StreamingPaymentChanges';
+  amount?: Maybe<Scalars['String']>;
+  endTime?: Maybe<Scalars['String']>;
+  interval?: Maybe<Scalars['String']>;
+  startTime?: Maybe<Scalars['String']>;
+};
+
+export type StreamingPaymentChangesInput = {
+  amount?: InputMaybe<Scalars['String']>;
+  endTime?: InputMaybe<Scalars['String']>;
+  interval?: InputMaybe<Scalars['String']>;
+  startTime?: InputMaybe<Scalars['String']>;
 };
 
 export type StreamingPaymentClaim = {
@@ -8302,8 +8509,22 @@ export type StreamingPaymentMetadata = {
   createdAt: Scalars['AWSDateTime'];
   endCondition: StreamingPaymentEndCondition;
   id: Scalars['ID'];
-  limitAmount?: Maybe<Scalars['String']>;
   updatedAt: Scalars['AWSDateTime'];
+};
+
+export type StreamingPaymentPendingChanges = {
+  __typename?: 'StreamingPaymentPendingChanges';
+  amount?: Maybe<Scalars['String']>;
+  endTime?: Maybe<Scalars['String']>;
+  interval?: Maybe<Scalars['String']>;
+  startTime?: Maybe<Scalars['String']>;
+};
+
+export type StreamingPaymentPendingChangesInput = {
+  amount?: InputMaybe<Scalars['String']>;
+  endTime?: InputMaybe<Scalars['String']>;
+  interval?: InputMaybe<Scalars['String']>;
+  startTime?: InputMaybe<Scalars['String']>;
 };
 
 export type Subscription = {
@@ -8336,8 +8557,15 @@ export type Subscription = {
   onCreateIngestorStats?: Maybe<IngestorStats>;
   onCreateLiquidationAddress?: Maybe<LiquidationAddress>;
   onCreateMotionMessage?: Maybe<MotionMessage>;
+<<<<<<< HEAD
   onCreateMultiSigUserSignature?: Maybe<MultiSigUserSignature>;
+<<<<<<< HEAD
   onCreateNotificationsData?: Maybe<NotificationsData>;
+=======
+=======
+  onCreatePendingStreamingPaymentMetadata?: Maybe<PendingStreamingPaymentMetadata>;
+>>>>>>> a0923563 (Feat: Add editStreamingPaymentMotion multicall handler)
+>>>>>>> 7a6f2da (Feat: Add editStreamingPaymentMotion multicall handler)
   onCreatePrivateBetaInviteCode?: Maybe<PrivateBetaInviteCode>;
   onCreateProfile?: Maybe<Profile>;
   onCreateReputationMiningCycleMetadata?: Maybe<ReputationMiningCycleMetadata>;
@@ -8380,8 +8608,15 @@ export type Subscription = {
   onDeleteIngestorStats?: Maybe<IngestorStats>;
   onDeleteLiquidationAddress?: Maybe<LiquidationAddress>;
   onDeleteMotionMessage?: Maybe<MotionMessage>;
+<<<<<<< HEAD
   onDeleteMultiSigUserSignature?: Maybe<MultiSigUserSignature>;
+<<<<<<< HEAD
   onDeleteNotificationsData?: Maybe<NotificationsData>;
+=======
+=======
+  onDeletePendingStreamingPaymentMetadata?: Maybe<PendingStreamingPaymentMetadata>;
+>>>>>>> a0923563 (Feat: Add editStreamingPaymentMotion multicall handler)
+>>>>>>> 7a6f2da (Feat: Add editStreamingPaymentMotion multicall handler)
   onDeletePrivateBetaInviteCode?: Maybe<PrivateBetaInviteCode>;
   onDeleteProfile?: Maybe<Profile>;
   onDeleteReputationMiningCycleMetadata?: Maybe<ReputationMiningCycleMetadata>;
@@ -8424,8 +8659,15 @@ export type Subscription = {
   onUpdateIngestorStats?: Maybe<IngestorStats>;
   onUpdateLiquidationAddress?: Maybe<LiquidationAddress>;
   onUpdateMotionMessage?: Maybe<MotionMessage>;
+<<<<<<< HEAD
   onUpdateMultiSigUserSignature?: Maybe<MultiSigUserSignature>;
+<<<<<<< HEAD
   onUpdateNotificationsData?: Maybe<NotificationsData>;
+=======
+=======
+  onUpdatePendingStreamingPaymentMetadata?: Maybe<PendingStreamingPaymentMetadata>;
+>>>>>>> a0923563 (Feat: Add editStreamingPaymentMotion multicall handler)
+>>>>>>> 7a6f2da (Feat: Add editStreamingPaymentMotion multicall handler)
   onUpdatePrivateBetaInviteCode?: Maybe<PrivateBetaInviteCode>;
   onUpdateProfile?: Maybe<Profile>;
   onUpdateReputationMiningCycleMetadata?: Maybe<ReputationMiningCycleMetadata>;
@@ -8558,10 +8800,18 @@ export type SubscriptionOnCreateMultiSigUserSignatureArgs = {
   filter?: InputMaybe<ModelSubscriptionMultiSigUserSignatureFilterInput>;
 };
 
+<<<<<<< HEAD
 export type SubscriptionOnCreateNotificationsDataArgs = {
   filter?: InputMaybe<ModelSubscriptionNotificationsDataFilterInput>;
 };
 
+=======
+export type SubscriptionOnCreatePendingStreamingPaymentMetadataArgs = {
+  filter?: InputMaybe<ModelSubscriptionPendingStreamingPaymentMetadataFilterInput>;
+};
+
+
+>>>>>>> 7a6f2da (Feat: Add editStreamingPaymentMotion multicall handler)
 export type SubscriptionOnCreatePrivateBetaInviteCodeArgs = {
   filter?: InputMaybe<ModelSubscriptionPrivateBetaInviteCodeFilterInput>;
 };
@@ -8734,10 +8984,18 @@ export type SubscriptionOnDeleteMultiSigUserSignatureArgs = {
   filter?: InputMaybe<ModelSubscriptionMultiSigUserSignatureFilterInput>;
 };
 
+<<<<<<< HEAD
 export type SubscriptionOnDeleteNotificationsDataArgs = {
   filter?: InputMaybe<ModelSubscriptionNotificationsDataFilterInput>;
 };
 
+=======
+export type SubscriptionOnDeletePendingStreamingPaymentMetadataArgs = {
+  filter?: InputMaybe<ModelSubscriptionPendingStreamingPaymentMetadataFilterInput>;
+};
+
+
+>>>>>>> 7a6f2da (Feat: Add editStreamingPaymentMotion multicall handler)
 export type SubscriptionOnDeletePrivateBetaInviteCodeArgs = {
   filter?: InputMaybe<ModelSubscriptionPrivateBetaInviteCodeFilterInput>;
 };
@@ -8910,10 +9168,18 @@ export type SubscriptionOnUpdateMultiSigUserSignatureArgs = {
   filter?: InputMaybe<ModelSubscriptionMultiSigUserSignatureFilterInput>;
 };
 
+<<<<<<< HEAD
 export type SubscriptionOnUpdateNotificationsDataArgs = {
   filter?: InputMaybe<ModelSubscriptionNotificationsDataFilterInput>;
 };
 
+=======
+export type SubscriptionOnUpdatePendingStreamingPaymentMetadataArgs = {
+  filter?: InputMaybe<ModelSubscriptionPendingStreamingPaymentMetadataFilterInput>;
+};
+
+
+>>>>>>> 7a6f2da (Feat: Add editStreamingPaymentMotion multicall handler)
 export type SubscriptionOnUpdatePrivateBetaInviteCodeArgs = {
   filter?: InputMaybe<ModelSubscriptionPrivateBetaInviteCodeFilterInput>;
 };
@@ -9258,6 +9524,7 @@ export type UpdateColonyActionInput = {
   rolesAreMultiSig?: InputMaybe<Scalars['Boolean']>;
   rootHash?: InputMaybe<Scalars['String']>;
   showInActionsList?: InputMaybe<Scalars['Boolean']>;
+  streamingPaymentChanges?: InputMaybe<FullStreamingPaymentChangesInput>;
   streamingPaymentId?: InputMaybe<Scalars['ID']>;
   toDomainId?: InputMaybe<Scalars['ID']>;
   toPotId?: InputMaybe<Scalars['Int']>;
@@ -9387,12 +9654,15 @@ export type UpdateColonyMotionInput = {
   nativeMotionDomainId?: InputMaybe<Scalars['String']>;
   nativeMotionId?: InputMaybe<Scalars['String']>;
   objectionAnnotationId?: InputMaybe<Scalars['ID']>;
+  pendingStreamingPaymentMetadataId?: InputMaybe<Scalars['ID']>;
   remainingStakes?: InputMaybe<Array<Scalars['String']>>;
   repSubmitted?: InputMaybe<Scalars['String']>;
   requiredStake?: InputMaybe<Scalars['String']>;
   revealedVotes?: InputMaybe<MotionStakesInput>;
   skillRep?: InputMaybe<Scalars['String']>;
   stakerRewards?: InputMaybe<Array<StakerRewardsInput>>;
+  streamingPaymentId?: InputMaybe<Scalars['ID']>;
+  streamingPaymentPendingChanges?: InputMaybe<StreamingPaymentPendingChangesInput>;
   transactionHash?: InputMaybe<Scalars['ID']>;
   userMinStake?: InputMaybe<Scalars['String']>;
   usersStakes?: InputMaybe<Array<UserMotionStakesInput>>;
@@ -9583,6 +9853,7 @@ export type UpdateMotionMessageInput = {
   vote?: InputMaybe<Scalars['String']>;
 };
 
+<<<<<<< HEAD
 export type UpdateMultiSigUserSignatureInput = {
   colonyAddress?: InputMaybe<Scalars['ID']>;
   createdAt?: InputMaybe<Scalars['AWSDateTime']>;
@@ -9591,6 +9862,11 @@ export type UpdateMultiSigUserSignatureInput = {
   role?: InputMaybe<Scalars['Int']>;
   userAddress?: InputMaybe<Scalars['ID']>;
   vote?: InputMaybe<MultiSigVote>;
+=======
+export type UpdatePendingStreamingPaymentMetadataInput = {
+  endCondition?: InputMaybe<StreamingPaymentEndCondition>;
+  id: Scalars['ID'];
+>>>>>>> a0923563 (Feat: Add editStreamingPaymentMotion multicall handler)
 };
 
 export type UpdateNotificationsDataInput = {
@@ -9665,13 +9941,12 @@ export type UpdateStreamingPaymentInput = {
   nativeId?: InputMaybe<Scalars['Int']>;
   recipientAddress?: InputMaybe<Scalars['String']>;
   startTime?: InputMaybe<Scalars['String']>;
-  tokenAddress?: InputMaybe<Scalars['String']>;
+  tokenAddress?: InputMaybe<Scalars['ID']>;
 };
 
 export type UpdateStreamingPaymentMetadataInput = {
   endCondition?: InputMaybe<StreamingPaymentEndCondition>;
   id: Scalars['ID'];
-  limitAmount?: InputMaybe<Scalars['String']>;
 };
 
 export type UpdateTokenExchangeRateInput = {
