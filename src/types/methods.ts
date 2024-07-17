@@ -6,4 +6,7 @@ export enum ContractMethodSignatures {
   SetExpenditureState = 'setExpenditureState',
   SetExpenditurePayout = 'setExpenditurePayout(uint256,uint256,uint256,uint256,address,uint256)',
   ReleaseStagedPaymentViaArbitration = 'releaseStagedPaymentViaArbitration(uint256,uint256,uint256,uint256,uint256,uint256,address[])',
+  SetTokenAmount = 'setTokenAmount',
+  SetStartTime = 'setStartTime',
+  SetEndTime = 'setEndTime',
 }

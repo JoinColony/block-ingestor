@@ -1,6 +1,6 @@
 import { TransactionDescription } from 'ethers/lib/utils';
 import { utils } from 'ethers';
-import { decodeFunctions, getCachedColonyClient, output } from '~utils';
+import { decodeFunctions, output } from '~utils';
 import { ContractEvent } from '~types';
 import { multicallHandlers } from './multicallHandlers';
 
@@ -10,12 +10,6 @@ export const handleMulticallMotion = async (
   parsedAction: TransactionDescription,
   interfaces: utils.Interface[],
 ): Promise<void> => {
-  const colonyClient = await getCachedColonyClient(colonyAddress);
-
-  if (!colonyClient) {
-    return;
-  }
-
   // Multicall takes an array of an array of encoded function calls
   const encodedFunctions = parsedAction.args[0];
 
