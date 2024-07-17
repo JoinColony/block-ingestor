@@ -1,8 +1,12 @@
 import { Result, TransactionDescription } from 'ethers/lib/utils';
 import { BigNumber, utils } from 'ethers';
-import { getCachedColonyClient, output } from '~utils';
+import {
+  getCachedColonyClient,
+  getStreamingPaymentsClient,
+  output,
+} from '~utils';
 import { ContractEvent, ContractMethodSignatures } from '~types';
-import { AnyColonyClient } from '@colony/colony-js';
+import { AnyColonyClient, AnyStreamingPaymentsClient } from '@colony/colony-js';
 import { multicallHandlers } from './multicallHandlers';
 
 /**
@@ -18,6 +22,12 @@ export const supportedMulticallFunctions: ContractMethodSignatures[] = [
   ContractMethodSignatures.SetExpenditurePayout,
 ];
 
+export const supportedStreamingPaymentMulticall: ContractMethodSignatures[] = [
+  ContractMethodSignatures.SetTokenAmount,
+  ContractMethodSignatures.SetStartTime,
+  ContractMethodSignatures.SetEndTime,
+];
+
 export interface DecodedFunction {
   functionSignature: ContractMethodSignatures;
   args: Result;
@@ -26,6 +36,7 @@ export interface DecodedFunction {
 const decodeFunctions = (
   encodedFunctions: utils.Result,
   colonyClient: AnyColonyClient,
+  streamingPaymentsClient: AnyStreamingPaymentsClient | null,
 ): DecodedFunction[] => {
   const decodedFunctions: DecodedFunction[] = [];
   for (const functionCall of encodedFunctions) {
@@ -43,6 +54,23 @@ const decodeFunctions = (
         // silent. We are expecting all but one of the fragments to error for each arg.
       }
     });
+    if (streamingPaymentsClient) {
+      supportedStreamingPaymentMulticall.forEach((fragment) => {
+        try {
+          const decodedArgs =
+            streamingPaymentsClient.interface.decodeFunctionData(
+              fragment,
+              functionCall,
+            );
+          decodedFunctions.push({
+            functionSignature: fragment,
+            args: decodedArgs,
+          });
+        } catch {
+          // silent. We are expecting all but one of the fragments to error for each arg.
+        }
+      });
+    }
   }
 
   return decodedFunctions;
@@ -55,6 +83,9 @@ export const handleMulticallMotion = async (
   gasEstimate: BigNumber,
 ): Promise<void> => {
   const colonyClient = await getCachedColonyClient(colonyAddress);
+  const streamingPaymentsClient = await getStreamingPaymentsClient(
+    colonyAddress,
+  );
 
   if (!colonyClient) {
     return;
@@ -70,7 +101,11 @@ export const handleMulticallMotion = async (
     .toString();
 
   // We need to determine which multicallMotion this is and pass it to the appropriate handler
-  const decodedFunctions = decodeFunctions(encodedFunctions, colonyClient);
+  const decodedFunctions = decodeFunctions(
+    encodedFunctions,
+    colonyClient,
+    streamingPaymentsClient,
+  );
 
   for (const [validator, handler] of multicallHandlers) {
     if (validator({ decodedFunctions })) {

@@ -294,6 +294,9 @@ export const linkPendingMetadata = async (
   const isMotionEditingAColony =
     parsedAction.name === ColonyOperations.EditColony;
 
+  // @SAM-TODO isMotionEditingAStreamingPayment
+  // Might not be easy / possible to do here as it is a multicall
+
   if (
     isMotionAddingADomain ||
     isMotionEditingADomain ||
