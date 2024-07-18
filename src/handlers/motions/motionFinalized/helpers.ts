@@ -29,10 +29,16 @@ import {
   GetDomainMetadataDocument,
   GetDomainMetadataQuery,
   GetDomainMetadataQueryVariables,
+  GetPendingStreamingPaymentMetadataDocument,
+  GetPendingStreamingPaymentMetadataQuery,
+  GetPendingStreamingPaymentMetadataQueryVariables,
   StakerReward,
   UpdateColonyDocument,
   UpdateColonyMetadataDocument,
   UpdateDomainMetadataDocument,
+  UpdateStreamingPaymentMetadataDocument,
+  UpdateStreamingPaymentMetadataMutation,
+  UpdateStreamingPaymentMetadataMutationVariables,
 } from '~graphql';
 import { parseAction } from '../motionCreated/helpers';
 
@@ -373,4 +379,40 @@ export const updateColonyUnclaimedStakes = async (
       },
     });
   }
+};
+
+export const linkPendingStreamingPaymentMetadata = async ({
+  pendingStreamingPaymentMetadataId,
+  streamingPaymentId,
+}: {
+  pendingStreamingPaymentMetadataId: string;
+  streamingPaymentId: string;
+}): Promise<void> => {
+  const { data } =
+    (await query<
+      GetPendingStreamingPaymentMetadataQuery,
+      GetPendingStreamingPaymentMetadataQueryVariables
+    >(GetPendingStreamingPaymentMetadataDocument, {
+      id: pendingStreamingPaymentMetadataId,
+    })) ?? {};
+
+  const pendingStreamingPaymentMetadata =
+    data?.getPendingStreamingPaymentMetadata;
+
+  if (!pendingStreamingPaymentMetadata) {
+    output(
+      `Could not find the pending streaming payment metadata with the id: ${pendingStreamingPaymentMetadataId}. This is a bug and should be investigated.`,
+    );
+    return;
+  }
+
+  await mutate<
+    UpdateStreamingPaymentMetadataMutation,
+    UpdateStreamingPaymentMetadataMutationVariables
+  >(UpdateStreamingPaymentMetadataDocument, {
+    input: {
+      id: streamingPaymentId,
+      endCondition: pendingStreamingPaymentMetadata.endCondition,
+    },
+  });
 };

@@ -8686,6 +8686,8 @@ export type ColonyMotionFragment = {
   motionDomainId: string;
   isDecision: boolean;
   transactionHash: string;
+  streamingPaymentId?: string | null;
+  pendingStreamingPaymentMetadataId?: string | null;
   motionStakes: {
     __typename?: 'MotionStakes';
     raw: { __typename?: 'MotionStakeValues'; nay: string; yay: string };
@@ -9025,6 +9027,18 @@ export type UpdateStreamingPaymentMutation = {
   __typename?: 'Mutation';
   updateStreamingPayment?: {
     __typename?: 'StreamingPayment';
+    id: string;
+  } | null;
+};
+
+export type UpdateStreamingPaymentMetadataMutationVariables = Exact<{
+  input: UpdateStreamingPaymentMetadataInput;
+}>;
+
+export type UpdateStreamingPaymentMetadataMutation = {
+  __typename?: 'Mutation';
+  updateStreamingPaymentMetadata?: {
+    __typename?: 'StreamingPaymentMetadata';
     id: string;
   } | null;
 };
@@ -9697,6 +9711,19 @@ export type GetStreamingPaymentQuery = {
   } | null;
 };
 
+export type GetPendingStreamingPaymentMetadataQueryVariables = Exact<{
+  id: Scalars['ID'];
+}>;
+
+export type GetPendingStreamingPaymentMetadataQuery = {
+  __typename?: 'Query';
+  getPendingStreamingPaymentMetadata?: {
+    __typename?: 'PendingStreamingPaymentMetadata';
+    id: string;
+    endCondition: StreamingPaymentEndCondition;
+  } | null;
+};
+
 export type GetColonyExtensionQueryVariables = Exact<{
   id: Scalars['ID'];
 }>;
@@ -9903,6 +9930,8 @@ export type GetColonyMotionQuery = {
     motionDomainId: string;
     isDecision: boolean;
     transactionHash: string;
+    streamingPaymentId?: string | null;
+    pendingStreamingPaymentMetadataId?: string | null;
     motionStakes: {
       __typename?: 'MotionStakes';
       raw: { __typename?: 'MotionStakeValues'; nay: string; yay: string };
@@ -10275,6 +10304,8 @@ export const ColonyMotion = gql`
     }
     isDecision
     transactionHash
+    streamingPaymentId
+    pendingStreamingPaymentMetadataId
   }
   ${MotionStakes}
   ${UserMotionStakes}
@@ -10473,6 +10504,15 @@ export const CreateStreamingPaymentDocument = gql`
 export const UpdateStreamingPaymentDocument = gql`
   mutation UpdateStreamingPayment($input: UpdateStreamingPaymentInput!) {
     updateStreamingPayment(input: $input) {
+      id
+    }
+  }
+`;
+export const UpdateStreamingPaymentMetadataDocument = gql`
+  mutation UpdateStreamingPaymentMetadata(
+    $input: UpdateStreamingPaymentMetadataInput!
+  ) {
+    updateStreamingPaymentMetadata(input: $input) {
       id
     }
   }
@@ -10877,6 +10917,14 @@ export const GetStreamingPaymentDocument = gql`
         amount
         timestamp
       }
+    }
+  }
+`;
+export const GetPendingStreamingPaymentMetadataDocument = gql`
+  query getPendingStreamingPaymentMetadata($id: ID!) {
+    getPendingStreamingPaymentMetadata(id: $id) {
+      id
+      endCondition
     }
   }
 `;
