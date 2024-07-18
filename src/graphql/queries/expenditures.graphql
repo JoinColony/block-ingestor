@@ -21,9 +21,14 @@ query GetExpenditureByNativeFundingPotIdAndColony(
 query GetStreamingPayment($id: ID!) {
   getStreamingPayment(id: $id) {
     id
+    startTime
     endTime
     tokenAddress
     amount
+    interval
+    metadata {
+      endCondition
+    }
     claims {
       amount
       timestamp
