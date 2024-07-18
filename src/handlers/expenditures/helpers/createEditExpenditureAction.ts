@@ -120,7 +120,7 @@ export const createEditExpenditureAction = async (
       const { storageSlot, value } = actionEvent.args;
       const keys = actionEvent.args[4];
 
-      const updatedSlot = decodeUpdatedSlot(expenditure, {
+      const updatedSlot = decodeUpdatedSlot(updatedSlots, {
         storageSlot,
         keys,
         value,
