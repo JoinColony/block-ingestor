@@ -9748,6 +9748,7 @@ export type ExpenditureSlotFragment = {
   }> | null;
 };
 
+<<<<<<< HEAD
 export type ExtensionFragment = {
   __typename?: 'ColonyExtension';
   id: string;
@@ -9756,6 +9757,9 @@ export type ExtensionFragment = {
   isInitialized: boolean;
   version: number;
 };
+=======
+export type ColonyMotionFragment = { __typename?: 'ColonyMotion', id: string, nativeMotionId: string, requiredStake: string, remainingStakes: Array<string>, userMinStake: string, nativeMotionDomainId: string, isFinalized: boolean, createdBy: string, repSubmitted: string, skillRep: string, hasObjection: boolean, motionDomainId: string, isDecision: boolean, transactionHash: string, streamingPaymentId?: string | null, pendingStreamingPaymentMetadataId?: string | null, motionStakes: { __typename?: 'MotionStakes', raw: { __typename?: 'MotionStakeValues', nay: string, yay: string }, percentage: { __typename?: 'MotionStakeValues', nay: string, yay: string } }, usersStakes: Array<{ __typename?: 'UserMotionStakes', address: string, stakes: { __typename?: 'MotionStakes', raw: { __typename?: 'MotionStakeValues', yay: string, nay: string }, percentage: { __typename?: 'MotionStakeValues', yay: string, nay: string } } }>, stakerRewards: Array<{ __typename?: 'StakerRewards', address: string, isClaimed: boolean, rewards: { __typename?: 'MotionStakeValues', yay: string, nay: string } }>, voterRecord: Array<{ __typename?: 'VoterRecord', address: string, voteCount: string, vote?: number | null }>, revealedVotes: { __typename?: 'MotionStakes', raw: { __typename?: 'MotionStakeValues', yay: string, nay: string }, percentage: { __typename?: 'MotionStakeValues', yay: string, nay: string } }, motionStateHistory: { __typename?: 'MotionStateHistory', hasVoted: boolean, hasPassed: boolean, hasFailed: boolean, hasFailedNotFinalizable: boolean, inRevealPhase: boolean, yaySideFullyStakedAt?: string | null, naySideFullyStakedAt?: string | null, allVotesSubmittedAt?: string | null, allVotesRevealedAt?: string | null, endedAt?: string | null, finalizedAt?: string | null } };
+>>>>>>> 2309a795 (Feat: Link pendingStreamingPaymentMetadata when a motion is finalized)
 
 export type ColonyMotionFragment = {
   __typename?: 'ColonyMotion';
@@ -10161,6 +10165,13 @@ export type UpdateStreamingPaymentMutation = {
     id: string;
   } | null;
 };
+
+export type UpdateStreamingPaymentMetadataMutationVariables = Exact<{
+  input: UpdateStreamingPaymentMetadataInput;
+}>;
+
+
+export type UpdateStreamingPaymentMetadataMutation = { __typename?: 'Mutation', updateStreamingPaymentMetadata?: { __typename?: 'StreamingPaymentMetadata', id: string } | null };
 
 export type CreateColonyExtensionMutationVariables = Exact<{
   input: CreateColonyExtensionInput;
@@ -10924,6 +10935,13 @@ export type GetStreamingPaymentQuery = {
   } | null;
 };
 
+export type GetPendingStreamingPaymentMetadataQueryVariables = Exact<{
+  id: Scalars['ID'];
+}>;
+
+
+export type GetPendingStreamingPaymentMetadataQuery = { __typename?: 'Query', getPendingStreamingPaymentMetadata?: { __typename?: 'PendingStreamingPaymentMetadata', id: string, endCondition: StreamingPaymentEndCondition } | null };
+
 export type GetColonyExtensionQueryVariables = Exact<{
   id: Scalars['ID'];
 }>;
@@ -11141,6 +11159,7 @@ export type GetColonyMotionQueryVariables = Exact<{
   id: Scalars['ID'];
 }>;
 
+<<<<<<< HEAD
 export type GetColonyMotionQuery = {
   __typename?: 'Query';
   getColonyMotion?: {
@@ -11218,6 +11237,10 @@ export type GetColonyMotionQuery = {
     };
   } | null;
 };
+=======
+
+export type GetColonyMotionQuery = { __typename?: 'Query', getColonyMotion?: { __typename?: 'ColonyMotion', id: string, nativeMotionId: string, requiredStake: string, remainingStakes: Array<string>, userMinStake: string, nativeMotionDomainId: string, isFinalized: boolean, createdBy: string, repSubmitted: string, skillRep: string, hasObjection: boolean, motionDomainId: string, isDecision: boolean, transactionHash: string, streamingPaymentId?: string | null, pendingStreamingPaymentMetadataId?: string | null, motionStakes: { __typename?: 'MotionStakes', raw: { __typename?: 'MotionStakeValues', nay: string, yay: string }, percentage: { __typename?: 'MotionStakeValues', nay: string, yay: string } }, usersStakes: Array<{ __typename?: 'UserMotionStakes', address: string, stakes: { __typename?: 'MotionStakes', raw: { __typename?: 'MotionStakeValues', yay: string, nay: string }, percentage: { __typename?: 'MotionStakeValues', yay: string, nay: string } } }>, stakerRewards: Array<{ __typename?: 'StakerRewards', address: string, isClaimed: boolean, rewards: { __typename?: 'MotionStakeValues', yay: string, nay: string } }>, voterRecord: Array<{ __typename?: 'VoterRecord', address: string, voteCount: string, vote?: number | null }>, revealedVotes: { __typename?: 'MotionStakes', raw: { __typename?: 'MotionStakeValues', yay: string, nay: string }, percentage: { __typename?: 'MotionStakeValues', yay: string, nay: string } }, motionStateHistory: { __typename?: 'MotionStateHistory', hasVoted: boolean, hasPassed: boolean, hasFailed: boolean, hasFailedNotFinalizable: boolean, inRevealPhase: boolean, yaySideFullyStakedAt?: string | null, naySideFullyStakedAt?: string | null, allVotesSubmittedAt?: string | null, allVotesRevealedAt?: string | null, endedAt?: string | null, finalizedAt?: string | null } } | null };
+>>>>>>> 2309a795 (Feat: Link pendingStreamingPaymentMetadata when a motion is finalized)
 
 export type GetVoterRewardsQueryVariables = Exact<{
   input: GetVoterRewardsInput;
@@ -11701,6 +11724,7 @@ export const ColonyMotion = gql`
     usersStakes {
       ...UserMotionStakes
     }
+<<<<<<< HEAD
     userMinStake
     nativeMotionDomainId
     stakerRewards {
@@ -11740,6 +11764,42 @@ export const ColonyMotion = gql`
       finalizedAt
     }
     isDecision
+=======
+  }
+  repSubmitted
+  skillRep
+  hasObjection
+  motionDomainId
+  nativeMotionDomainId
+  motionStateHistory {
+    hasVoted
+    hasPassed
+    hasFailed
+    hasFailedNotFinalizable
+    inRevealPhase
+    yaySideFullyStakedAt
+    naySideFullyStakedAt
+    allVotesSubmittedAt
+    allVotesRevealedAt
+    endedAt
+    finalizedAt
+  }
+  isDecision
+  transactionHash
+  streamingPaymentId
+  pendingStreamingPaymentMetadataId
+}
+    ${MotionStakes}
+${UserMotionStakes}
+${StakerReward}
+${VoterRecord}`;
+export const DomainMetadata = gql`
+    fragment DomainMetadata on DomainMetadata {
+  name
+  color
+  description
+  changelog {
+>>>>>>> 2309a795 (Feat: Link pendingStreamingPaymentMetadata when a motion is finalized)
     transactionHash
   }
   ${MotionStakes}
@@ -11963,7 +12023,19 @@ export const UpdateStreamingPaymentDocument = gql`
       id
     }
   }
+<<<<<<< HEAD
 `;
+=======
+}
+    `;
+export const UpdateStreamingPaymentMetadataDocument = gql`
+    mutation UpdateStreamingPaymentMetadata($input: UpdateStreamingPaymentMetadataInput!) {
+  updateStreamingPaymentMetadata(input: $input) {
+    id
+  }
+}
+    `;
+>>>>>>> 2309a795 (Feat: Link pendingStreamingPaymentMetadata when a motion is finalized)
 export const CreateColonyExtensionDocument = gql`
   mutation CreateColonyExtension($input: CreateColonyExtensionInput!) {
     createColonyExtension(input: $input) {
@@ -12428,7 +12500,20 @@ export const GetStreamingPaymentDocument = gql`
       }
     }
   }
+<<<<<<< HEAD
 `;
+=======
+}
+    `;
+export const GetPendingStreamingPaymentMetadataDocument = gql`
+    query getPendingStreamingPaymentMetadata($id: ID!) {
+  getPendingStreamingPaymentMetadata(id: $id) {
+    id
+    endCondition
+  }
+}
+    `;
+>>>>>>> 2309a795 (Feat: Link pendingStreamingPaymentMetadata when a motion is finalized)
 export const GetColonyExtensionDocument = gql`
   query GetColonyExtension($id: ID!) {
     getColonyExtension(id: $id) {

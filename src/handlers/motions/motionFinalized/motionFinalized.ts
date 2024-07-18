@@ -15,6 +15,8 @@ import {
 
 import {
   getStakerReward,
+  linkPendingMetadata,
+  linkPendingStreamingPaymentMetadata,
   updateColonyUnclaimedStakes,
   updateAmountToExcludeNetworkFee,
 } from './helpers';
@@ -69,6 +71,17 @@ export const handleMotionFinalized: EventHandler = async (event, listener) => {
         colonyAddress,
         finalizedMotion,
       );
+
+      if (
+        finalizedMotion.pendingStreamingPaymentMetadataId &&
+        finalizedMotion.streamingPaymentId
+      ) {
+        await linkPendingStreamingPaymentMetadata({
+          pendingStreamingPaymentMetadataId:
+            finalizedMotion.pendingStreamingPaymentMetadataId,
+          streamingPaymentId: finalizedMotion.streamingPaymentId,
+        });
+      }
     }
 
     const updatedStakerRewards = await Promise.all(
