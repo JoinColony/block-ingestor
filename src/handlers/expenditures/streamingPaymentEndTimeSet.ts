@@ -10,12 +10,14 @@ import {
 import { EventHandler } from '~types';
 import {
   getExpenditureDatabaseId,
+  getStreamingPaymentsClient,
   output,
   toNumber,
   verbose,
   writeActionFromEvent,
 } from '~utils';
 import { getStreamingPaymentFromDB } from './helpers';
+import { createEditStreamingPaymentAction } from './helpers/createEditStreamingPaymentAction';
 
 export const handleStreamingPaymentEndTimeSet: EventHandler = async (
   event,
@@ -46,22 +48,34 @@ export const handleStreamingPaymentEndTimeSet: EventHandler = async (
     verbose(`End time set for streaming payment with ID ${databaseId}`);
   }
 
-  await mutate<
-    UpdateStreamingPaymentMutation,
-    UpdateStreamingPaymentMutationVariables
-  >(UpdateStreamingPaymentDocument, {
-    input: {
-      id: databaseId,
-      endTime: endTime.toString(),
-      isCancelled: isCancelAction ? true : null,
-    },
-  });
-
   if (isCancelAction) {
     await writeActionFromEvent(event, colonyAddress, {
       type: ColonyActionType.CancelStreamingPayment,
       initiatorAddress,
       streamingPaymentId: databaseId,
+    });
+
+    await mutate<
+      UpdateStreamingPaymentMutation,
+      UpdateStreamingPaymentMutationVariables
+    >(UpdateStreamingPaymentDocument, {
+      input: {
+        id: databaseId,
+        endTime: endTime.toString(),
+        isCancelled: isCancelAction ? true : null,
+      },
+    });
+  } else {
+    const streamingPaymentsClient = await getStreamingPaymentsClient(
+      colonyAddress,
+    );
+    if (!streamingPaymentsClient) {
+      return;
+    }
+    await createEditStreamingPaymentAction({
+      event,
+      streamingPaymentsClient,
+      colonyAddress,
     });
   }
 };

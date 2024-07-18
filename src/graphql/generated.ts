@@ -320,6 +320,11 @@ export type ColonyAction = {
   showInActionsList: Scalars['Boolean'];
   /** Streaming payment associated with the action, if any */
   streamingPayment?: Maybe<StreamingPayment>;
+  /**
+   * Changes to the streaming payment associated with the action, if any
+   * Applicable to `EDIT_STREAMING_PAYMENT` action only
+   */
+  streamingPaymentChanges?: Maybe<FullStreamingPaymentChanges>;
   /** ID of the associated streaming payment, if any */
   streamingPaymentId?: Maybe<Scalars['ID']>;
   /** The target Domain of the action, if applicable */
@@ -891,7 +896,7 @@ export type ColonyMotion = {
   /** Streaming payment associated with the motion, if any */
   streamingPaymentId?: Maybe<Scalars['ID']>;
   /** Streaming Payment changes by the action */
-  streamingPaymentPendingChanges?: Maybe<StreamingPaymentChanges>;
+  streamingPaymentPendingChanges?: Maybe<StreamingPaymentPendingChanges>;
   /** The transaction hash of the createMotion action */
   transactionHash: Scalars['ID'];
   updatedAt: Scalars['AWSDateTime'];
@@ -1152,6 +1157,7 @@ export type CreateColonyActionInput = {
   roles?: InputMaybe<ColonyActionRolesInput>;
   rootHash: Scalars['String'];
   showInActionsList: Scalars['Boolean'];
+  streamingPaymentChanges?: InputMaybe<FullStreamingPaymentChangesInput>;
   streamingPaymentId?: InputMaybe<Scalars['ID']>;
   toDomainId?: InputMaybe<Scalars['ID']>;
   toPotId?: InputMaybe<Scalars['Int']>;
@@ -1312,7 +1318,7 @@ export type CreateColonyMotionInput = {
   skillRep: Scalars['String'];
   stakerRewards: Array<StakerRewardsInput>;
   streamingPaymentId?: InputMaybe<Scalars['ID']>;
-  streamingPaymentPendingChanges?: InputMaybe<StreamingPaymentChangesInput>;
+  streamingPaymentPendingChanges?: InputMaybe<StreamingPaymentPendingChangesInput>;
   transactionHash: Scalars['ID'];
   userMinStake: Scalars['String'];
   usersStakes: Array<UserMotionStakesInput>;
@@ -2146,6 +2152,17 @@ export enum FilteringMethod {
   /** Apply a union filter */
   Union = 'UNION',
 }
+
+export type FullStreamingPaymentChanges = {
+  __typename?: 'FullStreamingPaymentChanges';
+  newValues: StreamingPaymentChanges;
+  oldValues: StreamingPaymentChanges;
+};
+
+export type FullStreamingPaymentChangesInput = {
+  newValues: StreamingPaymentChangesInput;
+  oldValues: StreamingPaymentChangesInput;
+};
 
 export type FunctionParam = {
   __typename?: 'FunctionParam';
@@ -7072,6 +7089,21 @@ export type StreamingPaymentMetadata = {
   updatedAt: Scalars['AWSDateTime'];
 };
 
+export type StreamingPaymentPendingChanges = {
+  __typename?: 'StreamingPaymentPendingChanges';
+  amount?: Maybe<Scalars['String']>;
+  endTime?: Maybe<Scalars['String']>;
+  interval?: Maybe<Scalars['String']>;
+  startTime?: Maybe<Scalars['String']>;
+};
+
+export type StreamingPaymentPendingChangesInput = {
+  amount?: InputMaybe<Scalars['String']>;
+  endTime?: InputMaybe<Scalars['String']>;
+  interval?: InputMaybe<Scalars['String']>;
+  startTime?: InputMaybe<Scalars['String']>;
+};
+
 export type Subscription = {
   __typename?: 'Subscription';
   onCreateAnnotation?: Maybe<Annotation>;
@@ -7901,6 +7933,7 @@ export type UpdateColonyActionInput = {
   roles?: InputMaybe<ColonyActionRolesInput>;
   rootHash?: InputMaybe<Scalars['String']>;
   showInActionsList?: InputMaybe<Scalars['Boolean']>;
+  streamingPaymentChanges?: InputMaybe<FullStreamingPaymentChangesInput>;
   streamingPaymentId?: InputMaybe<Scalars['ID']>;
   toDomainId?: InputMaybe<Scalars['ID']>;
   toPotId?: InputMaybe<Scalars['Int']>;
@@ -8039,7 +8072,7 @@ export type UpdateColonyMotionInput = {
   skillRep?: InputMaybe<Scalars['String']>;
   stakerRewards?: InputMaybe<Array<StakerRewardsInput>>;
   streamingPaymentId?: InputMaybe<Scalars['ID']>;
-  streamingPaymentPendingChanges?: InputMaybe<StreamingPaymentChangesInput>;
+  streamingPaymentPendingChanges?: InputMaybe<StreamingPaymentPendingChangesInput>;
   transactionHash?: InputMaybe<Scalars['ID']>;
   userMinStake?: InputMaybe<Scalars['String']>;
   usersStakes?: InputMaybe<Array<UserMotionStakesInput>>;
@@ -9700,9 +9733,15 @@ export type GetStreamingPaymentQuery = {
   getStreamingPayment?: {
     __typename?: 'StreamingPayment';
     id: string;
+    startTime: string;
     endTime: string;
     tokenAddress: string;
     amount: string;
+    interval: string;
+    metadata?: {
+      __typename?: 'StreamingPaymentMetadata';
+      endCondition: StreamingPaymentEndCondition;
+    } | null;
     claims?: Array<{
       __typename?: 'StreamingPaymentClaim';
       amount: string;
@@ -10910,9 +10949,14 @@ export const GetStreamingPaymentDocument = gql`
   query GetStreamingPayment($id: ID!) {
     getStreamingPayment(id: $id) {
       id
+      startTime
       endTime
       tokenAddress
       amount
+      interval
+      metadata {
+        endCondition
+      }
       claims {
         amount
         timestamp

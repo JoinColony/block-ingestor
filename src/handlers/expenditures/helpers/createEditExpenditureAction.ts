@@ -193,7 +193,9 @@ export const createEditExpenditureAction = async (
   }
 };
 
-const checkActionExists = async (transactionHash: string): Promise<boolean> => {
+export const checkActionExists = async (
+  transactionHash: string,
+): Promise<boolean> => {
   const existingActionQuery = await query<
     GetActionByIdQuery,
     GetActionByIdQueryVariables
