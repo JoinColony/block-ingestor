@@ -18,7 +18,6 @@ import {
   handleUnlockTokenMultiSig,
   handleAddOrEditDomainMultiSig,
 } from './handlers';
-import { handlePaymentMultiSig } from './handlers/payment';
 
 export const handleMultiSigMotionCreated: EventHandler = async (
   event,
@@ -83,6 +82,7 @@ export const handleMultiSigMotionCreated: EventHandler = async (
       }
       case ColonyOperations.UnlockToken: {
         await handleUnlockTokenMultiSig(colonyAddress, event, parsedOperation);
+        break;
       }
       case ColonyOperations.SetUserRoles: {
         await handleSetUserRolesMultiSig(
@@ -108,10 +108,6 @@ export const handleMultiSigMotionCreated: EventHandler = async (
           event,
           parsedOperation,
         );
-        break;
-      }
-      case ColonyOperations.MakePaymentFundedFromDomain: {
-        await handlePaymentMultiSig(colonyAddress, event, parsedOperation);
         break;
       }
       default: {
