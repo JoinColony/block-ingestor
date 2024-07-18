@@ -52,7 +52,7 @@ export const handleExpenditureStateChanged: EventHandler = async (event) => {
       const { storageSlot, value } = event.args;
       const keys = event.args[4];
 
-      const updatedSlot = decodeUpdatedSlot(expenditure, {
+      const updatedSlot = decodeUpdatedSlot(expenditure.slots, {
         storageSlot,
         keys,
         value,

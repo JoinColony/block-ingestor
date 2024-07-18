@@ -87,7 +87,7 @@ export const editLockedExpenditureMotionHandler: MulticallHandler = async ({
     ) {
       const [, , , storageSlot, , keys, value] = decodedFunction.args;
       if (storageSlot.eq(EXPENDITURESLOTS_SLOT)) {
-        const updatedSlot = decodeUpdatedSlot(expenditure, {
+        const updatedSlot = decodeUpdatedSlot(updatedSlots, {
           storageSlot,
           keys,
           value,
