@@ -28,3 +28,10 @@ mutation UpdateStreamingPayment($input: UpdateStreamingPaymentInput!) {
     id
   }
 }
+mutation UpdateStreamingPaymentMetadata(
+  $input: UpdateStreamingPaymentMetadataInput!
+) {
+  updateStreamingPaymentMetadata(input: $input) {
+    id
+  }
+}
