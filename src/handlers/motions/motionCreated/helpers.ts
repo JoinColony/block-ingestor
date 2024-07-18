@@ -234,6 +234,7 @@ export const createMotionInDB = async (
     blockNumber,
     rootHash,
     isMotionFinalization: false,
+    expenditureSlotIds,
     ...actionFields,
   };
 
