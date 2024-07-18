@@ -49,6 +49,8 @@ fragment ColonyMotion on ColonyMotion {
   }
   isDecision
   transactionHash
+  streamingPaymentId
+  pendingStreamingPaymentMetadataId
 }
 
 fragment VoterRecord on VoterRecord {
