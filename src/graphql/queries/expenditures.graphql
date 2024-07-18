@@ -30,3 +30,10 @@ query GetStreamingPayment($id: ID!) {
     }
   }
 }
+
+query getPendingStreamingPaymentMetadata($id: ID!) {
+  getPendingStreamingPaymentMetadata(id: $id) {
+    id
+    endCondition
+  }
+}
