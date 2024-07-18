@@ -3762,7 +3762,10 @@ export type ModelExtensionInstallationsCountConditionInput = {
   and?: InputMaybe<
     Array<InputMaybe<ModelExtensionInstallationsCountConditionInput>>
   >;
+<<<<<<< HEAD
   multiSigPermissions?: InputMaybe<ModelIntInput>;
+=======
+>>>>>>> 8442a344 (Feat: Refactor editStreamingPayment handlers and ensure colony action is created)
   not?: InputMaybe<ModelExtensionInstallationsCountConditionInput>;
   oneTxPayment?: InputMaybe<ModelIntInput>;
   or?: InputMaybe<
@@ -3980,10 +3983,14 @@ export type ModelMultiSigVoteInput = {
   ne?: InputMaybe<MultiSigVote>;
 =======
 export type ModelPendingStreamingPaymentMetadataConditionInput = {
-  and?: InputMaybe<Array<InputMaybe<ModelPendingStreamingPaymentMetadataConditionInput>>>;
+  and?: InputMaybe<
+    Array<InputMaybe<ModelPendingStreamingPaymentMetadataConditionInput>>
+  >;
   endCondition?: InputMaybe<ModelStreamingPaymentEndConditionInput>;
   not?: InputMaybe<ModelPendingStreamingPaymentMetadataConditionInput>;
-  or?: InputMaybe<Array<InputMaybe<ModelPendingStreamingPaymentMetadataConditionInput>>>;
+  or?: InputMaybe<
+    Array<InputMaybe<ModelPendingStreamingPaymentMetadataConditionInput>>
+  >;
 };
 
 export type ModelPendingStreamingPaymentMetadataConnection = {
@@ -3993,12 +4000,20 @@ export type ModelPendingStreamingPaymentMetadataConnection = {
 };
 
 export type ModelPendingStreamingPaymentMetadataFilterInput = {
-  and?: InputMaybe<Array<InputMaybe<ModelPendingStreamingPaymentMetadataFilterInput>>>;
+  and?: InputMaybe<
+    Array<InputMaybe<ModelPendingStreamingPaymentMetadataFilterInput>>
+  >;
   endCondition?: InputMaybe<ModelStreamingPaymentEndConditionInput>;
   id?: InputMaybe<ModelIdInput>;
   not?: InputMaybe<ModelPendingStreamingPaymentMetadataFilterInput>;
+<<<<<<< HEAD
   or?: InputMaybe<Array<InputMaybe<ModelPendingStreamingPaymentMetadataFilterInput>>>;
 >>>>>>> a0923563 (Feat: Add editStreamingPaymentMotion multicall handler)
+=======
+  or?: InputMaybe<
+    Array<InputMaybe<ModelPendingStreamingPaymentMetadataFilterInput>>
+  >;
+>>>>>>> 8442a344 (Feat: Refactor editStreamingPayment handlers and ensure colony action is created)
 };
 
 export type ModelNotificationsDataConditionInput = {
@@ -4476,7 +4491,10 @@ export type ModelSubscriptionColonyHistoricRoleFilterInput = {
   createdAt?: InputMaybe<ModelSubscriptionStringInput>;
   domainId?: InputMaybe<ModelSubscriptionIdInput>;
   id?: InputMaybe<ModelSubscriptionIdInput>;
+<<<<<<< HEAD
   isMultiSig?: InputMaybe<ModelSubscriptionBooleanInput>;
+=======
+>>>>>>> 8442a344 (Feat: Refactor editStreamingPayment handlers and ensure colony action is created)
   or?: InputMaybe<
     Array<InputMaybe<ModelSubscriptionColonyHistoricRoleFilterInput>>
   >;
@@ -4803,13 +4821,22 @@ export type ModelSubscriptionMultiSigUserSignatureFilterInput = {
   createdAt?: InputMaybe<ModelSubscriptionStringInput>;
 =======
 export type ModelSubscriptionPendingStreamingPaymentMetadataFilterInput = {
-  and?: InputMaybe<Array<InputMaybe<ModelSubscriptionPendingStreamingPaymentMetadataFilterInput>>>;
+  and?: InputMaybe<
+    Array<
+      InputMaybe<ModelSubscriptionPendingStreamingPaymentMetadataFilterInput>
+    >
+  >;
   endCondition?: InputMaybe<ModelSubscriptionStringInput>;
   id?: InputMaybe<ModelSubscriptionIdInput>;
-  or?: InputMaybe<Array<InputMaybe<ModelSubscriptionPendingStreamingPaymentMetadataFilterInput>>>;
+  or?: InputMaybe<
+    Array<
+      InputMaybe<ModelSubscriptionPendingStreamingPaymentMetadataFilterInput>
+    >
+  >;
 };
 
 export type ModelSubscriptionPrivateBetaInviteCodeFilterInput = {
+<<<<<<< HEAD
   and?: InputMaybe<Array<InputMaybe<ModelSubscriptionPrivateBetaInviteCodeFilterInput>>>;
 >>>>>>> a0923563 (Feat: Add editStreamingPaymentMotion multicall handler)
   id?: InputMaybe<ModelSubscriptionIdInput>;
@@ -4843,6 +4870,12 @@ export type ModelSubscriptionPrivateBetaInviteCodeFilterInput = {
     Array<InputMaybe<ModelSubscriptionPrivateBetaInviteCodeFilterInput>>
   >;
   id?: InputMaybe<ModelSubscriptionIdInput>;
+=======
+  and?: InputMaybe<
+    Array<InputMaybe<ModelSubscriptionPrivateBetaInviteCodeFilterInput>>
+  >;
+  id?: InputMaybe<ModelSubscriptionIdInput>;
+>>>>>>> 8442a344 (Feat: Refactor editStreamingPayment handlers and ensure colony action is created)
   or?: InputMaybe<
     Array<InputMaybe<ModelSubscriptionPrivateBetaInviteCodeFilterInput>>
   >;
@@ -4934,6 +4967,7 @@ export type ModelSubscriptionStreamingPaymentMetadataFilterInput = {
   endCondition?: InputMaybe<ModelSubscriptionStringInput>;
   id?: InputMaybe<ModelSubscriptionIdInput>;
 <<<<<<< HEAD
+<<<<<<< HEAD
   limitAmount?: InputMaybe<ModelSubscriptionStringInput>;
   or?: InputMaybe<
     Array<InputMaybe<ModelSubscriptionStreamingPaymentMetadataFilterInput>>
@@ -4941,6 +4975,11 @@ export type ModelSubscriptionStreamingPaymentMetadataFilterInput = {
 =======
   or?: InputMaybe<Array<InputMaybe<ModelSubscriptionStreamingPaymentMetadataFilterInput>>>;
 >>>>>>> a0923563 (Feat: Add editStreamingPaymentMotion multicall handler)
+=======
+  or?: InputMaybe<
+    Array<InputMaybe<ModelSubscriptionStreamingPaymentMetadataFilterInput>>
+  >;
+>>>>>>> 8442a344 (Feat: Refactor editStreamingPayment handlers and ensure colony action is created)
 };
 
 export type ModelSubscriptionStringInput = {
@@ -5764,12 +5803,15 @@ export type MutationCreateColonyMotionArgs = {
   input: CreateColonyMotionInput;
 };
 
+<<<<<<< HEAD
 /** Root mutation type */
 export type MutationCreateColonyMultiSigArgs = {
   condition?: InputMaybe<ModelColonyMultiSigConditionInput>;
   input: CreateColonyMultiSigInput;
 };
 
+=======
+>>>>>>> 8442a344 (Feat: Refactor editStreamingPayment handlers and ensure colony action is created)
 /** Root mutation type */
 export type MutationCreateColonyRoleArgs = {
   condition?: InputMaybe<ModelColonyRoleConditionInput>;
@@ -5854,12 +5896,15 @@ export type MutationCreateMotionMessageArgs = {
   input: CreateMotionMessageInput;
 };
 
+<<<<<<< HEAD
 /** Root mutation type */
 export type MutationCreateMultiSigUserSignatureArgs = {
   condition?: InputMaybe<ModelMultiSigUserSignatureConditionInput>;
   input: CreateMultiSigUserSignatureInput;
 };
 
+=======
+>>>>>>> 8442a344 (Feat: Refactor editStreamingPayment handlers and ensure colony action is created)
 /** Root mutation type */
 <<<<<<< HEAD
 export type MutationCreateNotificationsDataArgs = {
@@ -5873,8 +5918,11 @@ export type MutationCreatePendingStreamingPaymentMetadataArgs = {
   input: CreatePendingStreamingPaymentMetadataInput;
 };
 
+<<<<<<< HEAD
 
 >>>>>>> 7a6f2da (Feat: Add editStreamingPaymentMotion multicall handler)
+=======
+>>>>>>> 7ebe3a9 (Feat: Refactor editStreamingPayment handlers and ensure colony action is created)
 /** Root mutation type */
 export type MutationCreatePrivateBetaInviteCodeArgs = {
   condition?: InputMaybe<ModelPrivateBetaInviteCodeConditionInput>;
@@ -6047,12 +6095,15 @@ export type MutationDeleteColonyMotionArgs = {
   input: DeleteColonyMotionInput;
 };
 
+<<<<<<< HEAD
 /** Root mutation type */
 export type MutationDeleteColonyMultiSigArgs = {
   condition?: InputMaybe<ModelColonyMultiSigConditionInput>;
   input: DeleteColonyMultiSigInput;
 };
 
+=======
+>>>>>>> 8442a344 (Feat: Refactor editStreamingPayment handlers and ensure colony action is created)
 /** Root mutation type */
 export type MutationDeleteColonyRoleArgs = {
   condition?: InputMaybe<ModelColonyRoleConditionInput>;
@@ -6137,12 +6188,15 @@ export type MutationDeleteMotionMessageArgs = {
   input: DeleteMotionMessageInput;
 };
 
+<<<<<<< HEAD
 /** Root mutation type */
 export type MutationDeleteMultiSigUserSignatureArgs = {
   condition?: InputMaybe<ModelMultiSigUserSignatureConditionInput>;
   input: DeleteMultiSigUserSignatureInput;
 };
 
+=======
+>>>>>>> 8442a344 (Feat: Refactor editStreamingPayment handlers and ensure colony action is created)
 /** Root mutation type */
 <<<<<<< HEAD
 export type MutationDeleteNotificationsDataArgs = {
@@ -6156,8 +6210,11 @@ export type MutationDeletePendingStreamingPaymentMetadataArgs = {
   input: DeletePendingStreamingPaymentMetadataInput;
 };
 
+<<<<<<< HEAD
 
 >>>>>>> 7a6f2da (Feat: Add editStreamingPaymentMotion multicall handler)
+=======
+>>>>>>> 7ebe3a9 (Feat: Refactor editStreamingPayment handlers and ensure colony action is created)
 /** Root mutation type */
 export type MutationDeletePrivateBetaInviteCodeArgs = {
   condition?: InputMaybe<ModelPrivateBetaInviteCodeConditionInput>;
@@ -6242,11 +6299,14 @@ export type MutationDeleteVoterRewardsHistoryArgs = {
   input: DeleteVoterRewardsHistoryInput;
 };
 
+<<<<<<< HEAD
 /** Root mutation type */
 export type MutationInitializeUserArgs = {
   input: InitializeUserInput;
 };
 
+=======
+>>>>>>> 8442a344 (Feat: Refactor editStreamingPayment handlers and ensure colony action is created)
 /** Root mutation type */
 export type MutationUpdateAnnotationArgs = {
   condition?: InputMaybe<ModelAnnotationConditionInput>;
@@ -6325,12 +6385,15 @@ export type MutationUpdateColonyMotionArgs = {
   input: UpdateColonyMotionInput;
 };
 
+<<<<<<< HEAD
 /** Root mutation type */
 export type MutationUpdateColonyMultiSigArgs = {
   condition?: InputMaybe<ModelColonyMultiSigConditionInput>;
   input: UpdateColonyMultiSigInput;
 };
 
+=======
+>>>>>>> 8442a344 (Feat: Refactor editStreamingPayment handlers and ensure colony action is created)
 /** Root mutation type */
 export type MutationUpdateColonyRoleArgs = {
   condition?: InputMaybe<ModelColonyRoleConditionInput>;
@@ -6420,12 +6483,15 @@ export type MutationUpdateMotionMessageArgs = {
   input: UpdateMotionMessageInput;
 };
 
+<<<<<<< HEAD
 /** Root mutation type */
 export type MutationUpdateMultiSigUserSignatureArgs = {
   condition?: InputMaybe<ModelMultiSigUserSignatureConditionInput>;
   input: UpdateMultiSigUserSignatureInput;
 };
 
+=======
+>>>>>>> 8442a344 (Feat: Refactor editStreamingPayment handlers and ensure colony action is created)
 /** Root mutation type */
 <<<<<<< HEAD
 export type MutationUpdateNotificationsDataArgs = {
@@ -6439,8 +6505,11 @@ export type MutationUpdatePendingStreamingPaymentMetadataArgs = {
   input: UpdatePendingStreamingPaymentMetadataInput;
 };
 
+<<<<<<< HEAD
 
 >>>>>>> 7a6f2da (Feat: Add editStreamingPaymentMotion multicall handler)
+=======
+>>>>>>> 7ebe3a9 (Feat: Refactor editStreamingPayment handlers and ensure colony action is created)
 /** Root mutation type */
 export type MutationUpdatePrivateBetaInviteCodeArgs = {
   condition?: InputMaybe<ModelPrivateBetaInviteCodeConditionInput>;
@@ -7054,6 +7123,7 @@ export type QueryGetColonyActionByMotionIdArgs = {
   sortDirection?: InputMaybe<ModelSortDirection>;
 };
 
+<<<<<<< HEAD
 /** Root query type */
 export type QueryGetColonyActionByMultiSigIdArgs = {
   filter?: InputMaybe<ModelColonyActionFilterInput>;
@@ -7063,6 +7133,8 @@ export type QueryGetColonyActionByMultiSigIdArgs = {
   sortDirection?: InputMaybe<ModelSortDirection>;
 };
 
+=======
+>>>>>>> 8442a344 (Feat: Refactor editStreamingPayment handlers and ensure colony action is created)
 /** Root query type */
 export type QueryGetColonyActionMetadataArgs = {
   id: Scalars['ID'];
@@ -7164,11 +7236,14 @@ export type QueryGetColonyMotionArgs = {
   id: Scalars['ID'];
 };
 
+<<<<<<< HEAD
 /** Root query type */
 export type QueryGetColonyMultiSigArgs = {
   id: Scalars['ID'];
 };
 
+=======
+>>>>>>> 8442a344 (Feat: Refactor editStreamingPayment handlers and ensure colony action is created)
 /** Root query type */
 export type QueryGetColonyRoleArgs = {
   id: Scalars['ID'];
@@ -7233,6 +7308,7 @@ export type QueryGetDomainArgs = {
   id: Scalars['ID'];
 };
 
+<<<<<<< HEAD
 /** Root query type */
 export type QueryGetDomainBalanceArgs = {
   input: DomainBalanceArguments;
@@ -7248,6 +7324,8 @@ export type QueryGetDomainByNativeSkillIdArgs = {
   sortDirection?: InputMaybe<ModelSortDirection>;
 };
 
+=======
+>>>>>>> 8442a344 (Feat: Refactor editStreamingPayment handlers and ensure colony action is created)
 /** Root query type */
 export type QueryGetDomainMetadataArgs = {
   id: Scalars['ID'];
@@ -7364,7 +7442,6 @@ export type QueryGetMotionByStreamingPaymentIdArgs = {
   streamingPaymentId: Scalars['ID'];
 };
 
-
 /** Root query type */
 export type QueryGetMotionByTransactionHashArgs = {
   filter?: InputMaybe<ModelColonyMotionFilterInput>;
@@ -7409,6 +7486,7 @@ export type QueryGetMotionVoterRewardsArgs = {
   sortDirection?: InputMaybe<ModelSortDirection>;
 };
 
+<<<<<<< HEAD
 /** Root query type */
 export type QueryGetMultiSigByColonyAddressArgs = {
   colonyAddress: Scalars['ID'];
@@ -7450,6 +7528,8 @@ export type QueryGetMultiSigUserSignatureByMultiSigIdArgs = {
   sortDirection?: InputMaybe<ModelSortDirection>;
 };
 
+=======
+>>>>>>> 8442a344 (Feat: Refactor editStreamingPayment handlers and ensure colony action is created)
 /** Root query type */
 <<<<<<< HEAD
 export type QueryGetNotificationsDataArgs = {
@@ -7461,8 +7541,11 @@ export type QueryGetPendingStreamingPaymentMetadataArgs = {
   id: Scalars['ID'];
 };
 
+<<<<<<< HEAD
 
 >>>>>>> 7a6f2da (Feat: Add editStreamingPaymentMotion multicall handler)
+=======
+>>>>>>> 7ebe3a9 (Feat: Refactor editStreamingPayment handlers and ensure colony action is created)
 /** Root query type */
 export type QueryGetPrivateBetaInviteCodeArgs = {
   id: Scalars['ID'];
@@ -7496,6 +7579,7 @@ export type QueryGetReputationMiningCycleMetadataArgs = {
   id: Scalars['ID'];
 };
 
+<<<<<<< HEAD
 /** Root query type */
 export type QueryGetRoleByColonyArgs = {
   colonyAddress: Scalars['ID'];
@@ -7506,6 +7590,8 @@ export type QueryGetRoleByColonyArgs = {
   sortDirection?: InputMaybe<ModelSortDirection>;
 };
 
+=======
+>>>>>>> 8442a344 (Feat: Refactor editStreamingPayment handlers and ensure colony action is created)
 /** Root query type */
 export type QueryGetRoleByDomainAndColonyArgs = {
   colonyAddress?: InputMaybe<ModelIdKeyConditionInput>;
@@ -7609,6 +7695,19 @@ export type QueryGetTransactionsByUserAndGroupArgs = {
   sortDirection?: InputMaybe<ModelSortDirection>;
 };
 
+<<<<<<< HEAD
+=======
+/** Root query type */
+export type QueryGetTransactionsByUserAndStatusArgs = {
+  filter?: InputMaybe<ModelTransactionFilterInput>;
+  from?: InputMaybe<ModelIdKeyConditionInput>;
+  limit?: InputMaybe<Scalars['Int']>;
+  nextToken?: InputMaybe<Scalars['String']>;
+  sortDirection?: InputMaybe<ModelSortDirection>;
+  status: TransactionStatus;
+};
+
+>>>>>>> 8442a344 (Feat: Refactor editStreamingPayment handlers and ensure colony action is created)
 /** Root query type */
 export type QueryGetUserArgs = {
   id: Scalars['ID'];
@@ -7792,6 +7891,7 @@ export type QueryListColonyMotionsArgs = {
   nextToken?: InputMaybe<Scalars['String']>;
 };
 
+<<<<<<< HEAD
 /** Root query type */
 export type QueryListColonyMultiSigsArgs = {
   filter?: InputMaybe<ModelColonyMultiSigFilterInput>;
@@ -7799,6 +7899,8 @@ export type QueryListColonyMultiSigsArgs = {
   nextToken?: InputMaybe<Scalars['String']>;
 };
 
+=======
+>>>>>>> 8442a344 (Feat: Refactor editStreamingPayment handlers and ensure colony action is created)
 /** Root query type */
 export type QueryListColonyRolesArgs = {
   filter?: InputMaybe<ModelColonyRoleFilterInput>;
@@ -7897,6 +7999,7 @@ export type QueryListMotionMessagesArgs = {
   nextToken?: InputMaybe<Scalars['String']>;
 };
 
+<<<<<<< HEAD
 /** Root query type */
 export type QueryListMultiSigUserSignaturesArgs = {
   filter?: InputMaybe<ModelMultiSigUserSignatureFilterInput>;
@@ -7904,6 +8007,8 @@ export type QueryListMultiSigUserSignaturesArgs = {
   nextToken?: InputMaybe<Scalars['String']>;
 };
 
+=======
+>>>>>>> 8442a344 (Feat: Refactor editStreamingPayment handlers and ensure colony action is created)
 /** Root query type */
 <<<<<<< HEAD
 export type QueryListNotificationsDataArgs = {
@@ -7921,8 +8026,11 @@ export type QueryListPendingStreamingPaymentMetadataArgs = {
   nextToken?: InputMaybe<Scalars['String']>;
 };
 
+<<<<<<< HEAD
 
 >>>>>>> 7a6f2da (Feat: Add editStreamingPaymentMotion multicall handler)
+=======
+>>>>>>> 7ebe3a9 (Feat: Refactor editStreamingPayment handlers and ensure colony action is created)
 /** Root query type */
 export type QueryListPrivateBetaInviteCodesArgs = {
   filter?: InputMaybe<ModelPrivateBetaInviteCodeFilterInput>;
@@ -8526,7 +8634,6 @@ export type StreamingPaymentActionsArgs = {
   sortDirection?: InputMaybe<ModelSortDirection>;
 };
 
-
 export type StreamingPaymentMotionsArgs = {
   filter?: InputMaybe<ModelColonyMotionFilterInput>;
   limit?: InputMaybe<Scalars['Int']>;
@@ -8798,10 +8905,13 @@ export type SubscriptionOnCreateColonyMotionArgs = {
   filter?: InputMaybe<ModelSubscriptionColonyMotionFilterInput>;
 };
 
+<<<<<<< HEAD
 export type SubscriptionOnCreateColonyMultiSigArgs = {
   filter?: InputMaybe<ModelSubscriptionColonyMultiSigFilterInput>;
 };
 
+=======
+>>>>>>> 8442a344 (Feat: Refactor editStreamingPayment handlers and ensure colony action is created)
 export type SubscriptionOnCreateColonyRoleArgs = {
   filter?: InputMaybe<ModelSubscriptionColonyRoleFilterInput>;
 };
@@ -8858,22 +8968,31 @@ export type SubscriptionOnCreateMotionMessageArgs = {
   filter?: InputMaybe<ModelSubscriptionMotionMessageFilterInput>;
 };
 
+<<<<<<< HEAD
 export type SubscriptionOnCreateMultiSigUserSignatureArgs = {
   filter?: InputMaybe<ModelSubscriptionMultiSigUserSignatureFilterInput>;
 };
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 export type SubscriptionOnCreateNotificationsDataArgs = {
   filter?: InputMaybe<ModelSubscriptionNotificationsDataFilterInput>;
 };
 
 =======
+=======
+=======
+>>>>>>> 8442a344 (Feat: Refactor editStreamingPayment handlers and ensure colony action is created)
+>>>>>>> 7ebe3a9 (Feat: Refactor editStreamingPayment handlers and ensure colony action is created)
 export type SubscriptionOnCreatePendingStreamingPaymentMetadataArgs = {
   filter?: InputMaybe<ModelSubscriptionPendingStreamingPaymentMetadataFilterInput>;
 };
 
+<<<<<<< HEAD
 
 >>>>>>> 7a6f2da (Feat: Add editStreamingPaymentMotion multicall handler)
+=======
+>>>>>>> 7ebe3a9 (Feat: Refactor editStreamingPayment handlers and ensure colony action is created)
 export type SubscriptionOnCreatePrivateBetaInviteCodeArgs = {
   filter?: InputMaybe<ModelSubscriptionPrivateBetaInviteCodeFilterInput>;
 };
@@ -8982,10 +9101,13 @@ export type SubscriptionOnDeleteColonyMotionArgs = {
   filter?: InputMaybe<ModelSubscriptionColonyMotionFilterInput>;
 };
 
+<<<<<<< HEAD
 export type SubscriptionOnDeleteColonyMultiSigArgs = {
   filter?: InputMaybe<ModelSubscriptionColonyMultiSigFilterInput>;
 };
 
+=======
+>>>>>>> 8442a344 (Feat: Refactor editStreamingPayment handlers and ensure colony action is created)
 export type SubscriptionOnDeleteColonyRoleArgs = {
   filter?: InputMaybe<ModelSubscriptionColonyRoleFilterInput>;
 };
@@ -9042,22 +9164,31 @@ export type SubscriptionOnDeleteMotionMessageArgs = {
   filter?: InputMaybe<ModelSubscriptionMotionMessageFilterInput>;
 };
 
+<<<<<<< HEAD
 export type SubscriptionOnDeleteMultiSigUserSignatureArgs = {
   filter?: InputMaybe<ModelSubscriptionMultiSigUserSignatureFilterInput>;
 };
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 export type SubscriptionOnDeleteNotificationsDataArgs = {
   filter?: InputMaybe<ModelSubscriptionNotificationsDataFilterInput>;
 };
 
 =======
+=======
+=======
+>>>>>>> 8442a344 (Feat: Refactor editStreamingPayment handlers and ensure colony action is created)
+>>>>>>> 7ebe3a9 (Feat: Refactor editStreamingPayment handlers and ensure colony action is created)
 export type SubscriptionOnDeletePendingStreamingPaymentMetadataArgs = {
   filter?: InputMaybe<ModelSubscriptionPendingStreamingPaymentMetadataFilterInput>;
 };
 
+<<<<<<< HEAD
 
 >>>>>>> 7a6f2da (Feat: Add editStreamingPaymentMotion multicall handler)
+=======
+>>>>>>> 7ebe3a9 (Feat: Refactor editStreamingPayment handlers and ensure colony action is created)
 export type SubscriptionOnDeletePrivateBetaInviteCodeArgs = {
   filter?: InputMaybe<ModelSubscriptionPrivateBetaInviteCodeFilterInput>;
 };
@@ -9166,10 +9297,13 @@ export type SubscriptionOnUpdateColonyMotionArgs = {
   filter?: InputMaybe<ModelSubscriptionColonyMotionFilterInput>;
 };
 
+<<<<<<< HEAD
 export type SubscriptionOnUpdateColonyMultiSigArgs = {
   filter?: InputMaybe<ModelSubscriptionColonyMultiSigFilterInput>;
 };
 
+=======
+>>>>>>> 8442a344 (Feat: Refactor editStreamingPayment handlers and ensure colony action is created)
 export type SubscriptionOnUpdateColonyRoleArgs = {
   filter?: InputMaybe<ModelSubscriptionColonyRoleFilterInput>;
 };
@@ -9226,22 +9360,31 @@ export type SubscriptionOnUpdateMotionMessageArgs = {
   filter?: InputMaybe<ModelSubscriptionMotionMessageFilterInput>;
 };
 
+<<<<<<< HEAD
 export type SubscriptionOnUpdateMultiSigUserSignatureArgs = {
   filter?: InputMaybe<ModelSubscriptionMultiSigUserSignatureFilterInput>;
 };
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 export type SubscriptionOnUpdateNotificationsDataArgs = {
   filter?: InputMaybe<ModelSubscriptionNotificationsDataFilterInput>;
 };
 
 =======
+=======
+=======
+>>>>>>> 8442a344 (Feat: Refactor editStreamingPayment handlers and ensure colony action is created)
+>>>>>>> 7ebe3a9 (Feat: Refactor editStreamingPayment handlers and ensure colony action is created)
 export type SubscriptionOnUpdatePendingStreamingPaymentMetadataArgs = {
   filter?: InputMaybe<ModelSubscriptionPendingStreamingPaymentMetadataFilterInput>;
 };
 
+<<<<<<< HEAD
 
 >>>>>>> 7a6f2da (Feat: Add editStreamingPaymentMotion multicall handler)
+=======
+>>>>>>> 7ebe3a9 (Feat: Refactor editStreamingPayment handlers and ensure colony action is created)
 export type SubscriptionOnUpdatePrivateBetaInviteCodeArgs = {
   filter?: InputMaybe<ModelSubscriptionPrivateBetaInviteCodeFilterInput>;
 };
@@ -10318,6 +10461,7 @@ export type VotingReputationParamsInput = {
   voterRewardFraction: Scalars['String'];
 };
 
+<<<<<<< HEAD
 export type ActionMetadataInfoFragment = {
   __typename?: 'ColonyAction';
   id: string;
@@ -10717,6 +10861,7 @@ export type ColonyMultiSigFragment = {
   action?: { __typename?: 'ColonyAction'; type: ColonyActionType } | null;
 };
 
+<<<<<<< HEAD
 export type TokenFragment = {
   __typename?: 'Token';
   symbol: string;
@@ -10748,6 +10893,251 @@ export type NotificationsDataFragment = {
   mentionNotificationsDisabled: boolean;
   adminNotificationsDisabled: boolean;
 };
+=======
+=======
+export type ColonyFragment = {
+  __typename?: 'Colony';
+  colonyAddress: string;
+  nativeToken: { __typename?: 'Token'; tokenAddress: string };
+  tokens?: {
+    __typename?: 'ModelColonyTokensConnection';
+    items: Array<{
+      __typename?: 'ColonyTokens';
+      id: string;
+      tokenAddress: string;
+    } | null>;
+  } | null;
+  motionsWithUnclaimedStakes?: Array<{
+    __typename?: 'ColonyUnclaimedStake';
+    motionId: string;
+    unclaimedRewards: Array<{
+      __typename?: 'StakerRewards';
+      address: string;
+      isClaimed: boolean;
+      rewards: { __typename?: 'MotionStakeValues'; yay: string; nay: string };
+    }>;
+  }> | null;
+  domains?: {
+    __typename?: 'ModelDomainConnection';
+    nextToken?: string | null;
+    items: Array<{
+      __typename?: 'Domain';
+      id: string;
+      nativeSkillId: string;
+    } | null>;
+  } | null;
+};
+
+export type ColonyMetadataFragment = {
+  __typename?: 'ColonyMetadata';
+  id: string;
+  displayName: string;
+  avatar?: string | null;
+  thumbnail?: string | null;
+  description?: string | null;
+  externalLinks?: Array<{
+    __typename?: 'ExternalLink';
+    name: ExternalLinks;
+    link: string;
+  }> | null;
+  changelog?: Array<{
+    __typename?: 'ColonyMetadataChangelog';
+    transactionHash: string;
+    oldDisplayName: string;
+    newDisplayName: string;
+    hasAvatarChanged: boolean;
+    hasDescriptionChanged?: boolean | null;
+    haveExternalLinksChanged?: boolean | null;
+  }> | null;
+};
+
+export type ExpenditureBalanceFragment = {
+  __typename?: 'ExpenditureBalance';
+  tokenAddress: string;
+  amount: string;
+};
+
+export type ExpenditureFragment = {
+  __typename?: 'Expenditure';
+  id: string;
+  status: ExpenditureStatus;
+  ownerAddress: string;
+  userStakeId?: string | null;
+  createdAt: string;
+  firstEditTransactionHash?: string | null;
+  type: ExpenditureType;
+  slots: Array<{
+    __typename?: 'ExpenditureSlot';
+    id: number;
+    recipientAddress?: string | null;
+    claimDelay?: string | null;
+    payoutModifier?: number | null;
+    payouts?: Array<{
+      __typename?: 'ExpenditurePayout';
+      tokenAddress: string;
+      amount: string;
+      isClaimed: boolean;
+      networkFee?: string | null;
+    }> | null;
+  }>;
+  motions?: {
+    __typename?: 'ModelColonyMotionConnection';
+    items: Array<{
+      __typename?: 'ColonyMotion';
+      transactionHash: string;
+      action?: { __typename?: 'ColonyAction'; type: ColonyActionType } | null;
+    } | null>;
+  } | null;
+  balances?: Array<{
+    __typename?: 'ExpenditureBalance';
+    tokenAddress: string;
+    amount: string;
+  }> | null;
+};
+
+export type ExpenditureSlotFragment = {
+  __typename?: 'ExpenditureSlot';
+  id: number;
+  recipientAddress?: string | null;
+  claimDelay?: string | null;
+  payoutModifier?: number | null;
+  payouts?: Array<{
+    __typename?: 'ExpenditurePayout';
+    tokenAddress: string;
+    amount: string;
+    isClaimed: boolean;
+    networkFee?: string | null;
+  }> | null;
+};
+
+export type ExtensionFragment = {
+  __typename?: 'ColonyExtension';
+  id: string;
+  hash: string;
+  colonyId: string;
+  isInitialized: boolean;
+  version: number;
+};
+
+export type ColonyMotionFragment = {
+  __typename?: 'ColonyMotion';
+  id: string;
+  nativeMotionId: string;
+  requiredStake: string;
+  remainingStakes: Array<string>;
+  userMinStake: string;
+  nativeMotionDomainId: string;
+  isFinalized: boolean;
+  createdBy: string;
+  repSubmitted: string;
+  skillRep: string;
+  hasObjection: boolean;
+  motionDomainId: string;
+  isDecision: boolean;
+  transactionHash: string;
+  streamingPaymentId?: string | null;
+  pendingStreamingPaymentMetadataId?: string | null;
+  motionStakes: {
+    __typename?: 'MotionStakes';
+    raw: { __typename?: 'MotionStakeValues'; nay: string; yay: string };
+    percentage: { __typename?: 'MotionStakeValues'; nay: string; yay: string };
+  };
+  usersStakes: Array<{
+    __typename?: 'UserMotionStakes';
+    address: string;
+    stakes: {
+      __typename?: 'MotionStakes';
+      raw: { __typename?: 'MotionStakeValues'; yay: string; nay: string };
+      percentage: {
+        __typename?: 'MotionStakeValues';
+        yay: string;
+        nay: string;
+      };
+    };
+  }>;
+  stakerRewards: Array<{
+    __typename?: 'StakerRewards';
+    address: string;
+    isClaimed: boolean;
+    rewards: { __typename?: 'MotionStakeValues'; yay: string; nay: string };
+  }>;
+  voterRecord: Array<{
+    __typename?: 'VoterRecord';
+    address: string;
+    voteCount: string;
+    vote?: number | null;
+  }>;
+  revealedVotes: {
+    __typename?: 'MotionStakes';
+    raw: { __typename?: 'MotionStakeValues'; yay: string; nay: string };
+    percentage: { __typename?: 'MotionStakeValues'; yay: string; nay: string };
+  };
+  motionStateHistory: {
+    __typename?: 'MotionStateHistory';
+    hasVoted: boolean;
+    hasPassed: boolean;
+    hasFailed: boolean;
+    hasFailedNotFinalizable: boolean;
+    inRevealPhase: boolean;
+    yaySideFullyStakedAt?: string | null;
+    naySideFullyStakedAt?: string | null;
+    allVotesSubmittedAt?: string | null;
+    allVotesRevealedAt?: string | null;
+    endedAt?: string | null;
+    finalizedAt?: string | null;
+  };
+};
+
+export type VoterRecordFragment = {
+  __typename?: 'VoterRecord';
+  address: string;
+  voteCount: string;
+  vote?: number | null;
+};
+
+export type StakerRewardFragment = {
+  __typename?: 'StakerRewards';
+  address: string;
+  isClaimed: boolean;
+  rewards: { __typename?: 'MotionStakeValues'; yay: string; nay: string };
+};
+
+export type MotionStakesFragment = {
+  __typename?: 'MotionStakes';
+  raw: { __typename?: 'MotionStakeValues'; nay: string; yay: string };
+  percentage: { __typename?: 'MotionStakeValues'; nay: string; yay: string };
+};
+
+export type UserMotionStakesFragment = {
+  __typename?: 'UserMotionStakes';
+  address: string;
+  stakes: {
+    __typename?: 'MotionStakes';
+    raw: { __typename?: 'MotionStakeValues'; yay: string; nay: string };
+    percentage: { __typename?: 'MotionStakeValues'; yay: string; nay: string };
+  };
+};
+
+export type DomainMetadataFragment = {
+  __typename?: 'DomainMetadata';
+  name: string;
+  color: DomainColor;
+  description?: string | null;
+  changelog?: Array<{
+    __typename?: 'DomainMetadataChangelog';
+    transactionHash: string;
+    oldName: string;
+    newName: string;
+    oldColor: DomainColor;
+    newColor: DomainColor;
+    oldDescription?: string | null;
+    newDescription?: string | null;
+  }> | null;
+};
+
+>>>>>>> 8442a344 (Feat: Refactor editStreamingPayment handlers and ensure colony action is created)
+export type TokenFragment = { __typename?: 'Token'; tokenAddress: string };
+>>>>>>> 7ebe3a9 (Feat: Refactor editStreamingPayment handlers and ensure colony action is created)
 
 export type CreateColonyActionMutationVariables = Exact<{
   input: CreateColonyActionInput;
@@ -10998,8 +11388,13 @@ export type UpdateStreamingPaymentMetadataMutationVariables = Exact<{
   input: UpdateStreamingPaymentMetadataInput;
 }>;
 
-
-export type UpdateStreamingPaymentMetadataMutation = { __typename?: 'Mutation', updateStreamingPaymentMetadata?: { __typename?: 'StreamingPaymentMetadata', id: string } | null };
+export type UpdateStreamingPaymentMetadataMutation = {
+  __typename?: 'Mutation';
+  updateStreamingPaymentMetadata?: {
+    __typename?: 'StreamingPaymentMetadata';
+    id: string;
+  } | null;
+};
 
 export type CreateColonyExtensionMutationVariables = Exact<{
   input: CreateColonyExtensionInput;
@@ -11149,6 +11544,7 @@ export type CreateUserVoterRewardMutation = {
     id: string;
   } | null;
 };
+<<<<<<< HEAD
 
 export type CreateColonyMultiSigMutationVariables = Exact<{
   input: CreateColonyMultiSigInput;
@@ -11200,6 +11596,8 @@ export type RemoveMultiSigRoleMutation = {
   __typename?: 'Mutation';
   deleteColonyRole?: { __typename?: 'ColonyRole'; id: string } | null;
 };
+=======
+>>>>>>> 8442a344 (Feat: Refactor editStreamingPayment handlers and ensure colony action is created)
 
 export type CreateColonyRoleMutationVariables = Exact<{
   input: CreateColonyRoleInput;
@@ -11419,12 +11817,15 @@ export type GetColonyMetadataQuery = {
       name: ExternalLinks;
       link: string;
     }> | null;
+<<<<<<< HEAD
     objective?: {
       __typename?: 'ColonyObjective';
       title: string;
       description: string;
       progress: number;
     } | null;
+=======
+>>>>>>> 8442a344 (Feat: Refactor editStreamingPayment handlers and ensure colony action is created)
     changelog?: Array<{
       __typename?: 'ColonyMetadataChangelog';
       transactionHash: string;
@@ -11433,7 +11834,10 @@ export type GetColonyMetadataQuery = {
       hasAvatarChanged: boolean;
       hasDescriptionChanged?: boolean | null;
       haveExternalLinksChanged?: boolean | null;
+<<<<<<< HEAD
       hasObjectiveChanged?: boolean | null;
+=======
+>>>>>>> 8442a344 (Feat: Refactor editStreamingPayment handlers and ensure colony action is created)
     }> | null;
   } | null;
 };
@@ -11680,6 +12084,7 @@ export type GetDomainMetadataQuery = {
     }> | null;
   } | null;
 };
+<<<<<<< HEAD
 
 export type GetDomainByNativeSkillIdQueryVariables = Exact<{
   nativeSkillId: Scalars['String'];
@@ -11724,6 +12129,8 @@ export type GetDomainsByExtensionAddressQuery = {
     } | null>;
   } | null;
 };
+=======
+>>>>>>> 8442a344 (Feat: Refactor editStreamingPayment handlers and ensure colony action is created)
 
 export type GetContractEventQueryVariables = Exact<{
   id: Scalars['ID'];
@@ -11866,9 +12273,21 @@ export type GetStreamingPaymentQuery = {
   getStreamingPayment?: {
     __typename?: 'StreamingPayment';
     id: string;
+<<<<<<< HEAD
     endTime: string;
     tokenAddress: string;
     amount: string;
+=======
+    startTime: string;
+    endTime: string;
+    tokenAddress: string;
+    amount: string;
+    interval: string;
+    metadata?: {
+      __typename?: 'StreamingPaymentMetadata';
+      endCondition: StreamingPaymentEndCondition;
+    } | null;
+>>>>>>> 8442a344 (Feat: Refactor editStreamingPayment handlers and ensure colony action is created)
     claims?: Array<{
       __typename?: 'StreamingPaymentClaim';
       amount: string;
@@ -11881,8 +12300,14 @@ export type GetPendingStreamingPaymentMetadataQueryVariables = Exact<{
   id: Scalars['ID'];
 }>;
 
-
-export type GetPendingStreamingPaymentMetadataQuery = { __typename?: 'Query', getPendingStreamingPaymentMetadata?: { __typename?: 'PendingStreamingPaymentMetadata', id: string, endCondition: StreamingPaymentEndCondition } | null };
+export type GetPendingStreamingPaymentMetadataQuery = {
+  __typename?: 'Query';
+  getPendingStreamingPaymentMetadata?: {
+    __typename?: 'PendingStreamingPaymentMetadata';
+    id: string;
+    endCondition: StreamingPaymentEndCondition;
+  } | null;
+};
 
 export type GetColonyExtensionQueryVariables = Exact<{
   id: Scalars['ID'];
@@ -11966,6 +12391,7 @@ export type GetExtensionInstallationsCountQuery = {
     stagedExpenditure: number;
     streamingPayments: number;
     reputationWeighted: number;
+<<<<<<< HEAD
     multiSigPermissions: number;
   } | null;
 };
@@ -11991,6 +12417,8 @@ export type GetColonyExtensionByAddressQuery = {
         } | null> | null;
       } | null;
     } | null;
+=======
+>>>>>>> 8442a344 (Feat: Refactor editStreamingPayment handlers and ensure colony action is created)
   } | null;
 };
 
@@ -12086,12 +12514,15 @@ export type GetColonyActionByMotionIdQuery = {
           name: ExternalLinks;
           link: string;
         }> | null;
+<<<<<<< HEAD
         objective?: {
           __typename?: 'ColonyObjective';
           title: string;
           description: string;
           progress: number;
         } | null;
+=======
+>>>>>>> 8442a344 (Feat: Refactor editStreamingPayment handlers and ensure colony action is created)
         changelog?: Array<{
           __typename?: 'ColonyMetadataChangelog';
           transactionHash: string;
@@ -12100,7 +12531,10 @@ export type GetColonyActionByMotionIdQuery = {
           hasAvatarChanged: boolean;
           hasDescriptionChanged?: boolean | null;
           haveExternalLinksChanged?: boolean | null;
+<<<<<<< HEAD
           hasObjectiveChanged?: boolean | null;
+=======
+>>>>>>> 8442a344 (Feat: Refactor editStreamingPayment handlers and ensure colony action is created)
         }> | null;
       } | null;
       payments?: Array<{
@@ -12116,6 +12550,9 @@ export type GetColonyMotionQueryVariables = Exact<{
 }>;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 8442a344 (Feat: Refactor editStreamingPayment handlers and ensure colony action is created)
 export type GetColonyMotionQuery = {
   __typename?: 'Query';
   getColonyMotion?: {
@@ -12134,7 +12571,15 @@ export type GetColonyMotionQuery = {
     motionDomainId: string;
     isDecision: boolean;
     transactionHash: string;
+<<<<<<< HEAD
     expenditureId?: string | null;
+=======
+<<<<<<< HEAD
+=======
+    streamingPaymentId?: string | null;
+    pendingStreamingPaymentMetadataId?: string | null;
+>>>>>>> 8442a344 (Feat: Refactor editStreamingPayment handlers and ensure colony action is created)
+>>>>>>> 7ebe3a9 (Feat: Refactor editStreamingPayment handlers and ensure colony action is created)
     motionStakes: {
       __typename?: 'MotionStakes';
       raw: { __typename?: 'MotionStakeValues'; nay: string; yay: string };
@@ -12194,10 +12639,13 @@ export type GetColonyMotionQuery = {
     };
   } | null;
 };
+<<<<<<< HEAD
 =======
 
 export type GetColonyMotionQuery = { __typename?: 'Query', getColonyMotion?: { __typename?: 'ColonyMotion', id: string, nativeMotionId: string, requiredStake: string, remainingStakes: Array<string>, userMinStake: string, nativeMotionDomainId: string, isFinalized: boolean, createdBy: string, repSubmitted: string, skillRep: string, hasObjection: boolean, motionDomainId: string, isDecision: boolean, transactionHash: string, streamingPaymentId?: string | null, pendingStreamingPaymentMetadataId?: string | null, motionStakes: { __typename?: 'MotionStakes', raw: { __typename?: 'MotionStakeValues', nay: string, yay: string }, percentage: { __typename?: 'MotionStakeValues', nay: string, yay: string } }, usersStakes: Array<{ __typename?: 'UserMotionStakes', address: string, stakes: { __typename?: 'MotionStakes', raw: { __typename?: 'MotionStakeValues', yay: string, nay: string }, percentage: { __typename?: 'MotionStakeValues', yay: string, nay: string } } }>, stakerRewards: Array<{ __typename?: 'StakerRewards', address: string, isClaimed: boolean, rewards: { __typename?: 'MotionStakeValues', yay: string, nay: string } }>, voterRecord: Array<{ __typename?: 'VoterRecord', address: string, voteCount: string, vote?: number | null }>, revealedVotes: { __typename?: 'MotionStakes', raw: { __typename?: 'MotionStakeValues', yay: string, nay: string }, percentage: { __typename?: 'MotionStakeValues', yay: string, nay: string } }, motionStateHistory: { __typename?: 'MotionStateHistory', hasVoted: boolean, hasPassed: boolean, hasFailed: boolean, hasFailedNotFinalizable: boolean, inRevealPhase: boolean, yaySideFullyStakedAt?: string | null, naySideFullyStakedAt?: string | null, allVotesSubmittedAt?: string | null, allVotesRevealedAt?: string | null, endedAt?: string | null, finalizedAt?: string | null } } | null };
 >>>>>>> 2309a795 (Feat: Link pendingStreamingPaymentMetadata when a motion is finalized)
+=======
+>>>>>>> 8442a344 (Feat: Refactor editStreamingPayment handlers and ensure colony action is created)
 
 export type GetVoterRewardsQueryVariables = Exact<{
   input: GetVoterRewardsInput;
@@ -12212,6 +12660,7 @@ export type GetVoterRewardsQuery = {
     reward: string;
   } | null;
 };
+<<<<<<< HEAD
 
 export type GetColonyActionByMultiSigIdQueryVariables = Exact<{
   multiSigId: Scalars['ID'];
@@ -12375,6 +12824,8 @@ export type GetActiveColonyMultisigsQuery = {
     items: Array<{ __typename?: 'ColonyMultiSig'; id: string } | null>;
   } | null;
 };
+=======
+>>>>>>> 8442a344 (Feat: Refactor editStreamingPayment handlers and ensure colony action is created)
 
 export type GetColonyRoleQueryVariables = Exact<{
   id: Scalars['ID'];
@@ -12483,6 +12934,7 @@ export type GetTokenFromEverywhereQuery = {
 };
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 export type GetTokenByAddressQueryVariables = Exact<{
   address: Scalars['ID'];
 }>;
@@ -12525,6 +12977,8 @@ export type GetNotificationUsersQuery = {
 
 =======
 >>>>>>> 28a498d (Feat: Remove limitAmount from streamingPaymentMetadata)
+=======
+>>>>>>> 7ebe3a9 (Feat: Refactor editStreamingPayment handlers and ensure colony action is created)
 export const DomainMetadata = gql`
   fragment DomainMetadata on DomainMetadata {
     name
@@ -12540,6 +12994,45 @@ export const DomainMetadata = gql`
       newDescription
     }
   }
+=======
+export const Token = gql`
+  fragment Token on Token {
+    tokenAddress: id
+  }
+`;
+export const Colony = gql`
+  fragment Colony on Colony {
+    colonyAddress: id
+    nativeToken {
+      ...Token
+    }
+    tokens {
+      items {
+        id
+        tokenAddress: tokenID
+      }
+    }
+    motionsWithUnclaimedStakes {
+      motionId
+      unclaimedRewards {
+        address
+        rewards {
+          yay
+          nay
+        }
+        isClaimed
+      }
+    }
+    domains(limit: 1000, nextToken: $nextToken) {
+      items {
+        id
+        nativeSkillId
+      }
+      nextToken
+    }
+  }
+  ${Token}
+>>>>>>> 8442a344 (Feat: Refactor editStreamingPayment handlers and ensure colony action is created)
 `;
 export const ColonyMetadata = gql`
   fragment ColonyMetadata on ColonyMetadata {
@@ -12552,11 +13045,14 @@ export const ColonyMetadata = gql`
       name
       link
     }
+<<<<<<< HEAD
     objective {
       title
       description
       progress
     }
+=======
+>>>>>>> 8442a344 (Feat: Refactor editStreamingPayment handlers and ensure colony action is created)
     changelog {
       transactionHash
       oldDisplayName
@@ -12564,6 +13060,7 @@ export const ColonyMetadata = gql`
       hasAvatarChanged
       hasDescriptionChanged
       haveExternalLinksChanged
+<<<<<<< HEAD
       hasObjectiveChanged
     }
   }
@@ -12632,6 +13129,7 @@ export const Colony = gql`
   }
   ${Token}
 `;
+<<<<<<< HEAD
 export const NotificationsData = gql`
   fragment NotificationsData on NotificationsData {
     magicbellUserId
@@ -12663,6 +13161,13 @@ export const ColonyWithRootRoles = gql`
   }
   ${NotificationsData}
 `;
+=======
+=======
+    }
+  }
+`;
+>>>>>>> 8442a344 (Feat: Refactor editStreamingPayment handlers and ensure colony action is created)
+>>>>>>> 7ebe3a9 (Feat: Refactor editStreamingPayment handlers and ensure colony action is created)
 export const ExpenditureSlot = gql`
   fragment ExpenditureSlot on ExpenditureSlot {
     id
@@ -12746,6 +13251,7 @@ export const UserMotionStakes = gql`
     address
     stakes {
       raw {
+<<<<<<< HEAD
         yay
         nay
       }
@@ -13767,6 +14273,831 @@ export const GetColonyActionByMotionIdDocument = gql`
   }
   ${ActionMetadataInfo}
 `;
+=======
+        yay
+        nay
+      }
+      percentage {
+        yay
+        nay
+      }
+    }
+  }
+`;
+export const StakerReward = gql`
+  fragment StakerReward on StakerRewards {
+    address
+    rewards {
+      yay
+      nay
+    }
+    isClaimed
+  }
+`;
+export const VoterRecord = gql`
+  fragment VoterRecord on VoterRecord {
+    address
+    voteCount
+    vote
+  }
+`;
+export const ColonyMotion = gql`
+  fragment ColonyMotion on ColonyMotion {
+    id
+    nativeMotionId
+    motionStakes {
+      ...MotionStakes
+    }
+    requiredStake
+    remainingStakes
+    usersStakes {
+      ...UserMotionStakes
+    }
+    userMinStake
+    nativeMotionDomainId
+    stakerRewards {
+      ...StakerReward
+    }
+    isFinalized
+    createdBy
+    voterRecord {
+      ...VoterRecord
+    }
+    revealedVotes {
+      raw {
+        yay
+        nay
+      }
+      percentage {
+        yay
+        nay
+      }
+    }
+    repSubmitted
+    skillRep
+    hasObjection
+    motionDomainId
+    nativeMotionDomainId
+    motionStateHistory {
+      hasVoted
+      hasPassed
+      hasFailed
+      hasFailedNotFinalizable
+      inRevealPhase
+      yaySideFullyStakedAt
+      naySideFullyStakedAt
+      allVotesSubmittedAt
+      allVotesRevealedAt
+      endedAt
+      finalizedAt
+    }
+    isDecision
+    transactionHash
+    streamingPaymentId
+    pendingStreamingPaymentMetadataId
+  }
+  ${MotionStakes}
+  ${UserMotionStakes}
+  ${StakerReward}
+  ${VoterRecord}
+`;
+export const DomainMetadata = gql`
+  fragment DomainMetadata on DomainMetadata {
+    name
+    color
+    description
+    changelog {
+      transactionHash
+      oldName
+      newName
+      oldColor
+      newColor
+      oldDescription
+      newDescription
+    }
+  }
+`;
+export const CreateColonyActionDocument = gql`
+  mutation CreateColonyAction($input: CreateColonyActionInput!) {
+    createColonyAction(input: $input) {
+      id
+    }
+  }
+`;
+export const UpdateColonyActionDocument = gql`
+  mutation UpdateColonyAction($input: UpdateColonyActionInput!) {
+    updateColonyAction(input: $input) {
+      id
+    }
+  }
+`;
+export const UpdateColonyDocument = gql`
+  mutation UpdateColony($input: UpdateColonyInput!) {
+    updateColony(input: $input) {
+      id
+    }
+  }
+`;
+export const UpdateColonyMetadataDocument = gql`
+  mutation UpdateColonyMetadata($input: UpdateColonyMetadataInput!) {
+    updateColonyMetadata(input: $input) {
+      id
+    }
+  }
+`;
+export const CreateColonyDocument = gql`
+  mutation CreateColony(
+    $input: CreateColonyInput!
+    $condition: ModelColonyConditionInput
+  ) {
+    createColony(input: $input, condition: $condition) {
+      id
+    }
+  }
+`;
+export const CreateColonyMetadataDocument = gql`
+  mutation CreateColonyMetadata($input: CreateColonyMetadataInput!) {
+    createColonyMetadata(input: $input) {
+      id
+    }
+  }
+`;
+export const DeleteColonyMetadataDocument = gql`
+  mutation DeleteColonyMetadata($input: DeleteColonyMetadataInput!) {
+    deleteColonyMetadata(input: $input) {
+      id
+    }
+  }
+`;
+export const CreateColonyMemberInviteDocument = gql`
+  mutation CreateColonyMemberInvite(
+    $input: CreateColonyMemberInviteInput!
+    $condition: ModelColonyMemberInviteConditionInput
+  ) {
+    createColonyMemberInvite(input: $input, condition: $condition) {
+      id
+    }
+  }
+`;
+export const CreateColonyTokensDocument = gql`
+  mutation CreateColonyTokens($input: CreateColonyTokensInput!) {
+    createColonyTokens(input: $input) {
+      id
+    }
+  }
+`;
+export const CreateColonyContributorDocument = gql`
+  mutation CreateColonyContributor($input: CreateColonyContributorInput!) {
+    createColonyContributor(input: $input) {
+      id
+    }
+  }
+`;
+export const UpdateColonyContributorDocument = gql`
+  mutation UpdateColonyContributor($input: UpdateColonyContributorInput!) {
+    updateColonyContributor(input: $input) {
+      id
+    }
+  }
+`;
+export const DeleteColonyContributorDocument = gql`
+  mutation DeleteColonyContributor($input: DeleteColonyContributorInput!) {
+    deleteColonyContributor(input: $input) {
+      id
+    }
+  }
+`;
+export const CreateCurrentVersionDocument = gql`
+  mutation CreateCurrentVersion($input: CreateCurrentVersionInput!) {
+    createCurrentVersion(input: $input) {
+      id
+    }
+  }
+`;
+export const UpdateCurrentVersionDocument = gql`
+  mutation UpdateCurrentVersion($input: UpdateCurrentVersionInput!) {
+    updateCurrentVersion(input: $input) {
+      id
+    }
+  }
+`;
+export const UpdateColonyDecisionDocument = gql`
+  mutation UpdateColonyDecision($id: ID!, $showInDecisionsList: Boolean!) {
+    updateColonyDecision(
+      input: { id: $id, showInDecisionsList: $showInDecisionsList }
+    ) {
+      id
+    }
+  }
+`;
+export const CreateDomainDocument = gql`
+  mutation CreateDomain($input: CreateDomainInput!) {
+    createDomain(input: $input) {
+      id
+    }
+  }
+`;
+export const CreateDomainMetadataDocument = gql`
+  mutation CreateDomainMetadata($input: CreateDomainMetadataInput!) {
+    createDomainMetadata(input: $input) {
+      id
+    }
+  }
+`;
+export const UpdateDomainMetadataDocument = gql`
+  mutation UpdateDomainMetadata($input: UpdateDomainMetadataInput!) {
+    updateDomainMetadata(input: $input) {
+      id
+    }
+  }
+`;
+export const CreateContractEventDocument = gql`
+  mutation CreateContractEvent(
+    $input: CreateContractEventInput!
+    $condition: ModelContractEventConditionInput
+  ) {
+    createContractEvent(input: $input, condition: $condition) {
+      id
+    }
+  }
+`;
+export const CreateExpenditureDocument = gql`
+  mutation CreateExpenditure($input: CreateExpenditureInput!) {
+    createExpenditure(input: $input) {
+      id
+    }
+  }
+`;
+export const UpdateExpenditureDocument = gql`
+  mutation UpdateExpenditure($input: UpdateExpenditureInput!) {
+    updateExpenditure(input: $input) {
+      id
+      ownerAddress
+    }
+  }
+`;
+export const UpdateExpenditureMetadataDocument = gql`
+  mutation UpdateExpenditureMetadata($input: UpdateExpenditureMetadataInput!) {
+    updateExpenditureMetadata(input: $input) {
+      id
+    }
+  }
+`;
+export const CreateStreamingPaymentDocument = gql`
+  mutation CreateStreamingPayment($input: CreateStreamingPaymentInput!) {
+    createStreamingPayment(input: $input) {
+      id
+    }
+  }
+`;
+export const UpdateStreamingPaymentDocument = gql`
+  mutation UpdateStreamingPayment($input: UpdateStreamingPaymentInput!) {
+    updateStreamingPayment(input: $input) {
+      id
+    }
+  }
+`;
+export const UpdateStreamingPaymentMetadataDocument = gql`
+  mutation UpdateStreamingPaymentMetadata(
+    $input: UpdateStreamingPaymentMetadataInput!
+  ) {
+    updateStreamingPaymentMetadata(input: $input) {
+      id
+    }
+  }
+`;
+export const CreateColonyExtensionDocument = gql`
+  mutation CreateColonyExtension($input: CreateColonyExtensionInput!) {
+    createColonyExtension(input: $input) {
+      id
+    }
+  }
+`;
+export const UpdateColonyExtensionByAddressDocument = gql`
+  mutation UpdateColonyExtensionByAddress($input: UpdateColonyExtensionInput!) {
+    updateColonyExtension(input: $input) {
+      id
+      extensionHash: hash
+      colonyAddress: colonyId
+    }
+  }
+`;
+export const CreateExtensionInstallationsCountDocument = gql`
+  mutation CreateExtensionInstallationsCount(
+    $input: CreateExtensionInstallationsCountInput!
+  ) {
+    createExtensionInstallationsCount(input: $input) {
+      id
+    }
+  }
+`;
+export const UpdateExtensionInstallationsCountDocument = gql`
+  mutation UpdateExtensionInstallationsCount(
+    $input: UpdateExtensionInstallationsCountInput!
+  ) {
+    updateExtensionInstallationsCount(input: $input) {
+      id
+    }
+  }
+`;
+export const CreateColonyFundsClaimDocument = gql`
+  mutation CreateColonyFundsClaim(
+    $input: CreateColonyFundsClaimInput!
+    $condition: ModelColonyFundsClaimConditionInput
+  ) {
+    createColonyFundsClaim(input: $input, condition: $condition) {
+      id
+    }
+  }
+`;
+export const UpdateColonyFundsClaimDocument = gql`
+  mutation UpdateColonyFundsClaim(
+    $input: UpdateColonyFundsClaimInput!
+    $condition: ModelColonyFundsClaimConditionInput
+  ) {
+    updateColonyFundsClaim(input: $input, condition: $condition) {
+      id
+    }
+  }
+`;
+export const DeleteColonyFundsClaimDocument = gql`
+  mutation DeleteColonyFundsClaim(
+    $input: DeleteColonyFundsClaimInput!
+    $condition: ModelColonyFundsClaimConditionInput
+  ) {
+    deleteColonyFundsClaim(input: $input, condition: $condition) {
+      id
+    }
+  }
+`;
+export const CreateCurrentNetworkInverseFeeDocument = gql`
+  mutation CreateCurrentNetworkInverseFee(
+    $input: CreateCurrentNetworkInverseFeeInput!
+  ) {
+    createCurrentNetworkInverseFee(input: $input) {
+      id
+    }
+  }
+`;
+export const UpdateCurrentNetworkInverseFeeDocument = gql`
+  mutation UpdateCurrentNetworkInverseFee(
+    $input: UpdateCurrentNetworkInverseFeeInput!
+  ) {
+    updateCurrentNetworkInverseFee(input: $input) {
+      id
+    }
+  }
+`;
+export const CreateColonyMotionDocument = gql`
+  mutation CreateColonyMotion($input: CreateColonyMotionInput!) {
+    createColonyMotion(input: $input) {
+      id
+    }
+  }
+`;
+export const UpdateColonyMotionDocument = gql`
+  mutation UpdateColonyMotion($input: UpdateColonyMotionInput!) {
+    updateColonyMotion(input: $input) {
+      id
+    }
+  }
+`;
+export const CreateMotionMessageDocument = gql`
+  mutation CreateMotionMessage($input: CreateMotionMessageInput!) {
+    createMotionMessage(input: $input) {
+      id
+    }
+  }
+`;
+export const CreateUserVoterRewardDocument = gql`
+  mutation CreateUserVoterReward($input: CreateVoterRewardsHistoryInput!) {
+    createVoterRewardsHistory(input: $input) {
+      id
+    }
+  }
+`;
+export const CreateColonyRoleDocument = gql`
+  mutation CreateColonyRole($input: CreateColonyRoleInput!) {
+    createColonyRole(input: $input) {
+      id
+    }
+  }
+`;
+export const UpdateColonyRoleDocument = gql`
+  mutation UpdateColonyRole($input: UpdateColonyRoleInput!) {
+    updateColonyRole(input: $input) {
+      id
+    }
+  }
+`;
+export const CreateColonyHistoricRoleDocument = gql`
+  mutation CreateColonyHistoricRole($input: CreateColonyHistoricRoleInput!) {
+    createColonyHistoricRole(input: $input) {
+      id
+    }
+  }
+`;
+export const UpdateReputationMiningCycleMetadataDocument = gql`
+  mutation UpdateReputationMiningCycleMetadata(
+    $input: UpdateReputationMiningCycleMetadataInput!
+  ) {
+    updateReputationMiningCycleMetadata(input: $input) {
+      id
+    }
+  }
+`;
+export const CreateReputationMiningCycleMetadataDocument = gql`
+  mutation CreateReputationMiningCycleMetadata(
+    $input: CreateReputationMiningCycleMetadataInput!
+  ) {
+    createReputationMiningCycleMetadata(input: $input) {
+      id
+    }
+  }
+`;
+export const CreateUserStakeDocument = gql`
+  mutation CreateUserStake($input: CreateUserStakeInput!) {
+    createUserStake(input: $input) {
+      id
+    }
+  }
+`;
+export const UpdateUserStakeDocument = gql`
+  mutation UpdateUserStake($input: UpdateUserStakeInput!) {
+    updateUserStake(input: $input) {
+      id
+    }
+  }
+`;
+export const CreateStatsDocument = gql`
+  mutation CreateStats($value: String!) {
+    createIngestorStats(input: { id: "STATS", value: $value }) {
+      id
+    }
+  }
+`;
+export const UpdateStatsDocument = gql`
+  mutation UpdateStats($value: String!) {
+    updateIngestorStats(input: { id: "STATS", value: $value }) {
+      id
+    }
+  }
+`;
+export const DeleteColonyTokensDocument = gql`
+  mutation DeleteColonyTokens($input: DeleteColonyTokensInput!) {
+    deleteColonyTokens(input: $input) {
+      id
+    }
+  }
+`;
+export const GetColonyActionDocument = gql`
+  query GetColonyAction($transactionHash: ID!) {
+    getColonyAction(id: $transactionHash) {
+      id
+    }
+  }
+`;
+export const GetMotionIdFromActionDocument = gql`
+  query GetMotionIdFromAction($id: ID!) {
+    getColonyAction(id: $id) {
+      motionData {
+        id
+      }
+    }
+  }
+`;
+export const GetActionIdFromAnnotationDocument = gql`
+  query GetActionIdFromAnnotation($id: ID!) {
+    getAnnotation(id: $id) {
+      actionId
+    }
+  }
+`;
+export const GetActionByIdDocument = gql`
+  query GetActionById($id: ID!) {
+    getColonyAction(id: $id) {
+      id
+      type
+      expenditureSlotChanges {
+        oldSlots {
+          ...ExpenditureSlot
+        }
+        newSlots {
+          ...ExpenditureSlot
+        }
+      }
+    }
+  }
+  ${ExpenditureSlot}
+`;
+export const GetColonyMetadataDocument = gql`
+  query GetColonyMetadata($id: ID!) {
+    getColonyMetadata(id: $id) {
+      ...ColonyMetadata
+      etherealData {
+        colonyAvatar
+        colonyDisplayName
+        colonyName
+        colonyThumbnail
+        initiatorAddress
+        tokenAvatar
+        tokenThumbnail
+      }
+    }
+  }
+  ${ColonyMetadata}
+`;
+export const GetColonyDocument = gql`
+  query GetColony($id: ID!, $nextToken: String) {
+    getColony(id: $id) {
+      ...Colony
+    }
+    getColonyByAddress(id: $id) {
+      items {
+        id
+        name
+      }
+    }
+    getColonyByType(type: METACOLONY) {
+      items {
+        id
+        name
+      }
+    }
+  }
+  ${Colony}
+`;
+export const GetColonyByNameDocument = gql`
+  query GetColonyByName($name: String!) {
+    getColonyByName(name: $name) {
+      items {
+        id
+        name
+      }
+    }
+  }
+`;
+export const GetColonyByNativeTokenIdDocument = gql`
+  query GetColonyByNativeTokenId(
+    $nativeTokenId: ID!
+    $limit: Int
+    $nextToken: String
+  ) {
+    getColoniesByNativeTokenId(
+      nativeTokenId: $nativeTokenId
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        id
+        status {
+          nativeToken {
+            unlocked
+            unlockable
+            mintable
+          }
+          recovery
+        }
+      }
+      nextToken
+    }
+  }
+`;
+export const ListColoniesDocument = gql`
+  query ListColonies($nextToken: String) {
+    listColonies(limit: 1000, nextToken: $nextToken) {
+      nextToken
+      items {
+        id
+        nativeTokenId
+      }
+    }
+  }
+`;
+export const GetColonyContributorDocument = gql`
+  query GetColonyContributor($id: ID!) {
+    getColonyContributor(id: $id) {
+      id
+      isVerified
+    }
+  }
+`;
+export const GetCurrentVersionDocument = gql`
+  query GetCurrentVersion($key: String!) {
+    getCurrentVersionByKey(key: $key) {
+      items {
+        id
+        version
+      }
+    }
+  }
+`;
+export const GetColonyDecisionByActionIdDocument = gql`
+  query GetColonyDecisionByActionId($actionId: ID!) {
+    getColonyDecisionByActionId(actionId: $actionId) {
+      items {
+        id
+      }
+    }
+  }
+`;
+export const GetDomainMetadataDocument = gql`
+  query GetDomainMetadata($id: ID!) {
+    getDomainMetadata(id: $id) {
+      color
+      description
+      id
+      name
+      changelog {
+        newColor
+        newDescription
+        newName
+        oldColor
+        oldDescription
+        oldName
+        transactionHash
+      }
+    }
+  }
+`;
+export const GetContractEventDocument = gql`
+  query GetContractEvent($id: ID!) {
+    getContractEvent(id: $id) {
+      id
+    }
+  }
+`;
+export const GetExpenditureDocument = gql`
+  query GetExpenditure($id: ID!) {
+    getExpenditure(id: $id) {
+      ...Expenditure
+    }
+  }
+  ${Expenditure}
+`;
+export const GetExpenditureByNativeFundingPotIdAndColonyDocument = gql`
+  query GetExpenditureByNativeFundingPotIdAndColony(
+    $nativeFundingPotId: Int!
+    $colonyAddress: ID!
+  ) {
+    getExpendituresByNativeFundingPotIdAndColony(
+      nativeFundingPotId: $nativeFundingPotId
+      colonyId: { eq: $colonyAddress }
+    ) {
+      items {
+        ...Expenditure
+      }
+    }
+  }
+  ${Expenditure}
+`;
+export const GetStreamingPaymentDocument = gql`
+  query GetStreamingPayment($id: ID!) {
+    getStreamingPayment(id: $id) {
+      id
+      startTime
+      endTime
+      tokenAddress
+      amount
+      interval
+      metadata {
+        endCondition
+      }
+      claims {
+        amount
+        timestamp
+      }
+    }
+  }
+`;
+export const GetPendingStreamingPaymentMetadataDocument = gql`
+  query getPendingStreamingPaymentMetadata($id: ID!) {
+    getPendingStreamingPaymentMetadata(id: $id) {
+      id
+      endCondition
+    }
+  }
+`;
+export const GetColonyExtensionDocument = gql`
+  query GetColonyExtension($id: ID!) {
+    getColonyExtension(id: $id) {
+      ...Extension
+    }
+  }
+  ${Extension}
+`;
+export const GetColonyExtensionsByColonyAddressDocument = gql`
+  query GetColonyExtensionsByColonyAddress($colonyAddress: ID!) {
+    getExtensionByColonyAndHash(colonyId: $colonyAddress) {
+      items {
+        ...Extension
+      }
+    }
+  }
+  ${Extension}
+`;
+export const ListExtensionsDocument = gql`
+  query ListExtensions($hash: String!, $nextToken: String) {
+    getExtensionsByHash(
+      hash: $hash
+      limit: 1000
+      nextToken: $nextToken
+      filter: { isDeleted: { eq: false } }
+    ) {
+      nextToken
+      items {
+        ...Extension
+      }
+    }
+  }
+  ${Extension}
+`;
+export const GetColonyExtensionByHashAndColonyDocument = gql`
+  query GetColonyExtensionByHashAndColony(
+    $colonyAddress: ID!
+    $extensionHash: String!
+  ) {
+    getExtensionByColonyAndHash(
+      colonyId: $colonyAddress
+      hash: { eq: $extensionHash }
+      filter: { isDeleted: { eq: false } }
+    ) {
+      items {
+        id
+      }
+    }
+  }
+`;
+export const GetExtensionInstallationsCountDocument = gql`
+  query GetExtensionInstallationsCount($id: ID!) {
+    getExtensionInstallationsCount(id: $id) {
+      oneTxPayment
+      stakedExpenditure
+      stagedExpenditure
+      streamingPayments
+      reputationWeighted
+    }
+  }
+`;
+export const GetColonyUnclaimedFundsDocument = gql`
+  query GetColonyUnclaimedFunds(
+    $colonyAddress: ID!
+    $tokenAddress: ID!
+    $upToBlock: Int = 1
+  ) {
+    listColonyFundsClaims(
+      filter: {
+        colonyFundsClaimsId: { eq: $colonyAddress }
+        colonyFundsClaimTokenId: { eq: $tokenAddress }
+        createdAtBlock: { le: $upToBlock }
+        isClaimed: { ne: true }
+      }
+    ) {
+      items {
+        id
+      }
+    }
+  }
+`;
+export const GetColonyUnclaimedFundDocument = gql`
+  query GetColonyUnclaimedFund($claimId: ID!) {
+    getColonyFundsClaim(id: $claimId) {
+      id
+    }
+  }
+`;
+export const GetCurrentNetworkInverseFeeDocument = gql`
+  query GetCurrentNetworkInverseFee {
+    listCurrentNetworkInverseFees(limit: 1) {
+      items {
+        id
+        inverseFee
+      }
+    }
+  }
+`;
+export const GetColonyActionByMotionIdDocument = gql`
+  query GetColonyActionByMotionId($motionId: ID!) {
+    getColonyActionByMotionId(motionId: $motionId) {
+      items {
+        id
+        pendingDomainMetadata {
+          ...DomainMetadata
+        }
+        pendingColonyMetadata {
+          ...ColonyMetadata
+        }
+        colonyDecisionId
+        amount
+        networkFee
+        type
+      }
+    }
+  }
+  ${DomainMetadata}
+  ${ColonyMetadata}
+`;
+>>>>>>> 8442a344 (Feat: Refactor editStreamingPayment handlers and ensure colony action is created)
 export const GetColonyMotionDocument = gql`
   query GetColonyMotion($id: ID!) {
     getColonyMotion(id: $id) {
@@ -13784,6 +15115,7 @@ export const GetVoterRewardsDocument = gql`
     }
   }
 `;
+<<<<<<< HEAD
 export const GetColonyActionByMultiSigIdDocument = gql`
   query GetColonyActionByMultiSigId($multiSigId: ID!) {
     getColonyActionByMultiSigId(multiSigId: $multiSigId) {
@@ -13850,6 +15182,8 @@ export const GetActiveColonyMultisigsDocument = gql`
     }
   }
 `;
+=======
+>>>>>>> 8442a344 (Feat: Refactor editStreamingPayment handlers and ensure colony action is created)
 export const GetColonyRoleDocument = gql`
   query GetColonyRole($id: ID!) {
     getColonyRole(id: $id) {
