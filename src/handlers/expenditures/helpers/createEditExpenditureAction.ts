@@ -7,7 +7,6 @@ import {
   ExpenditurePayout,
   ExpenditureSlot,
   ExpenditureStatus,
-  ExpenditureType,
   UpdateExpenditureDocument,
   UpdateExpenditureMutation,
   UpdateExpenditureMutationVariables,
@@ -54,13 +53,13 @@ export const createEditExpenditureAction = async (
 
   if (
     !expenditure.firstEditTransactionHash ||
-    hasOneTxPaymentEvent ||
-    expenditure.type === ExpenditureType.Staged
+    expenditure.firstEditTransactionHash === transactionHash ||
+    hasOneTxPaymentEvent
   ) {
     /**
      * If expenditure doesn't have `firstEditTransactionHash` set, it means it's the first time
-     * we see an ExpenditurePayoutSet event, which is normally part of expenditure creation
-     * Only subsequent ExpenditurePayoutSet events will be considered as edit actions
+     * we see a payout set/state changed event, which is normally part of expenditure creation
+     * Only subsequent events will be considered as edit actions
      */
     throw new NotEditActionError();
   }
