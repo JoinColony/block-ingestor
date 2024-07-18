@@ -30,7 +30,7 @@ export const handleStagedPaymentReleased: EventHandler = async (
     return;
   }
 
-  const { expenditureId } = event.args;
+  const { expenditureId, agent: initiatorAddress } = event.args;
   const convertedExpenditureId = toNumber(expenditureId);
 
   const { colonyAddress } = listener as ExtensionEventListener;
@@ -78,8 +78,7 @@ export const handleStagedPaymentReleased: EventHandler = async (
 
   await writeActionFromEvent(event, colonyAddress, {
     type: ColonyActionType.ReleaseStagedPayments,
-    // @TODO: Figure out how to get the initiator address
-    initiatorAddress: '',
+    initiatorAddress,
     expenditureId: databaseId,
     expenditureSlotIds: releasedSlotIds,
   });
