@@ -2,7 +2,7 @@ import { StreamingPaymentsClientV5 } from '@colony/colony-js';
 import { utils } from 'ethers';
 import { mutate } from '~amplifyClient';
 import {
-  ColonyActionType,
+  StreamingPaymentFragment,
   UpdateStreamingPaymentDocument,
   UpdateStreamingPaymentMutation,
   UpdateStreamingPaymentMutationVariables,
@@ -15,7 +15,6 @@ import {
   mapLogToContractEvent,
   output,
   toNumber,
-  writeActionFromEvent,
 } from '~utils';
 import { getStreamingPaymentFromDB } from './getExpenditure';
 
@@ -29,12 +28,6 @@ export const createEditStreamingPaymentAction = async ({
   streamingPaymentsClient: StreamingPaymentsClientV5;
 }): Promise<void> => {
   const { transactionHash } = event;
-
-  const actionExists = await checkActionExists(transactionHash);
-
-  if (actionExists) {
-    return;
-  }
 
   const { blockNumber } = event;
   const { streamingPaymentId } = event.args;
@@ -50,6 +43,15 @@ export const createEditStreamingPaymentAction = async ({
     output(
       `Could not find streaming payment with ID: ${databaseId} in the db. This is a bug and needs investigating.`,
     );
+    return;
+  }
+
+  // If a changelog already exists with this transactionHash, then the action has already been processed
+  const changelogEntryExists = checkChangelogEntryExists(
+    transactionHash,
+    streamingPayment,
+  );
+  if (changelogEntryExists) {
     return;
   }
 
@@ -76,23 +78,18 @@ export const createEditStreamingPaymentAction = async ({
     }
   }
 
-  const oldValues = {
+  const currentValues = {
     amount: streamingPayment.amount,
     interval: streamingPayment.interval,
     startTime: streamingPayment.startTime,
     endTime: streamingPayment.endTime,
   };
 
-  const updatedStreamingPayment: {
-    amount?: string;
-    interval?: string;
-    startTime?: string;
-    endTime?: string;
-  } = {
-    amount: undefined,
-    interval: undefined,
-    startTime: undefined,
-    endTime: undefined,
+  const newValues = {
+    amount: streamingPayment.amount,
+    interval: streamingPayment.interval,
+    startTime: streamingPayment.startTime,
+    endTime: streamingPayment.endTime,
   };
 
   for (const actionEvent of actionEvents) {
@@ -100,16 +97,24 @@ export const createEditStreamingPaymentAction = async ({
       actionEvent.signature === ContractEventsSignatures.PaymentTokenUpdated
     ) {
       const { amount, interval } = actionEvent.args;
-      updatedStreamingPayment.amount = amount.toString();
-      updatedStreamingPayment.interval = interval.toString();
+      if (amount) {
+        newValues.amount = amount.toString();
+      }
+      if (interval) {
+        newValues.interval = interval.toString();
+      }
     }
     if (actionEvent.signature === ContractEventsSignatures.StartTimeSet) {
       const { startTime } = actionEvent.args;
-      updatedStreamingPayment.startTime = startTime.toString();
+      if (startTime) {
+        newValues.startTime = startTime.toString();
+      }
     }
     if (actionEvent.signature === ContractEventsSignatures.EndTimeSet) {
       const { endTime } = actionEvent.args;
-      updatedStreamingPayment.endTime = endTime.toString();
+      if (endTime) {
+        newValues.endTime = endTime.toString();
+      }
     }
   }
 
@@ -119,22 +124,30 @@ export const createEditStreamingPaymentAction = async ({
   >(UpdateStreamingPaymentDocument, {
     input: {
       id: databaseId,
-      startTime: updatedStreamingPayment.startTime,
-      endTime: updatedStreamingPayment.endTime,
-      amount: updatedStreamingPayment.amount,
-      interval: updatedStreamingPayment.interval,
+      startTime: newValues.startTime,
+      endTime: newValues.endTime,
+      amount: newValues.amount,
+      interval: newValues.interval,
+      changelog: [
+        ...(streamingPayment.changelog ?? []),
+        {
+          transactionHash,
+          oldValues: currentValues,
+          newValues,
+        },
+      ],
     },
   });
+};
 
-  const { agent: initiatorAddress } = event.args;
-
-  await writeActionFromEvent(event, colonyAddress, {
-    type: ColonyActionType.EditStreamingPayment,
-    initiatorAddress,
-    streamingPaymentId: databaseId,
-    streamingPaymentChanges: {
-      oldValues,
-      newValues: updatedStreamingPayment,
-    },
-  });
+const checkChangelogEntryExists = (
+  transactionHash: string,
+  streamingPayment: StreamingPaymentFragment,
+): boolean => {
+  if (!streamingPayment.changelog) {
+    return false;
+  }
+  return streamingPayment.changelog.some(
+    (item) => item.transactionHash === transactionHash,
+  );
 };

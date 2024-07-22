@@ -40,16 +40,11 @@ export const editStreamingPaymentMotionHandler: MulticallHandler = async ({
     return;
   }
 
-  const updatedStreamingPayment: {
-    amount?: string;
-    interval?: string;
-    startTime?: string;
-    endTime?: string;
-  } = {
-    amount: undefined,
-    interval: undefined,
-    startTime: undefined,
-    endTime: undefined,
+  const pendingStreamingPaymentChanges = {
+    amount: streamingPayment.amount,
+    interval: streamingPayment.interval,
+    startTime: streamingPayment.startTime,
+    endTime: streamingPayment.endTime,
   };
 
   for (const decodedFunction of decodedFunctions) {
@@ -64,20 +59,20 @@ export const editStreamingPaymentMotionHandler: MulticallHandler = async ({
       const amount = decodedFunction.args[7];
       const interval = decodedFunction.args[8];
 
-      updatedStreamingPayment.amount = amount.toString();
-      updatedStreamingPayment.interval = interval.toString();
+      pendingStreamingPaymentChanges.amount = amount.toString();
+      pendingStreamingPaymentChanges.interval = interval.toString();
     } else if (
       decodedFunction.signature === ContractMethodSignatures.SetStartTime
     ) {
       const [, , , startTime] = decodedFunction.args;
 
-      updatedStreamingPayment.startTime = startTime.toString();
+      pendingStreamingPaymentChanges.startTime = startTime.toString();
     } else if (
       decodedFunction.signature === ContractMethodSignatures.SetEndTime
     ) {
       const [, , , endTime] = decodedFunction.args;
 
-      updatedStreamingPayment.endTime = endTime.toString();
+      pendingStreamingPaymentChanges.endTime = endTime.toString();
     }
   }
 
@@ -89,7 +84,7 @@ export const editStreamingPaymentMotionHandler: MulticallHandler = async ({
   createMotionInDB(colonyAddress, event, {
     type: ColonyActionType.EditStreamingPaymentMotion,
     streamingPaymentId: streamingPayment.id,
-    streamingPaymentPendingChanges: updatedStreamingPayment,
     pendingStreamingPaymentMetadataId,
+    pendingStreamingPaymentChanges,
   });
 };
