@@ -244,8 +244,7 @@ type MotionFields = Omit<
     | 'expenditureSlotId'
     | 'editedExpenditureSlots'
     | 'expenditureFunding'
-    | 'streamingPaymentId'
-    | 'streamingPaymentPendingChanges'
+    | 'pendingStreamingPaymentChanges'
     | 'pendingStreamingPaymentMetadataId'
   >;
 
@@ -266,8 +265,7 @@ export const createMotionInDB = async (
     expenditureSlotId,
     editedExpenditureSlots,
     expenditureFunding,
-    streamingPaymentId,
-    streamingPaymentPendingChanges,
+    pendingStreamingPaymentChanges,
     pendingStreamingPaymentMetadataId,
     ...actionFields
   } = motionFields;
@@ -319,8 +317,8 @@ export const createMotionInDB = async (
       expenditureSlotId,
       editedExpenditureSlots,
       expenditureFunding,
-      streamingPaymentId,
-      streamingPaymentPendingChanges,
+      streamingPaymentId: actionFields.streamingPaymentId,
+      pendingStreamingPaymentChanges,
       pendingStreamingPaymentMetadataId,
     }),
     createMotionMessage(initialMotionMessage),
