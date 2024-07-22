@@ -16,9 +16,9 @@ import {
   GetColonyActionByMotionIdDocument,
   GetColonyActionByMotionIdQuery,
   GetColonyActionByMotionIdQueryVariables,
-  GetPendingStreamingPaymentMetadataDocument,
-  GetPendingStreamingPaymentMetadataQuery,
-  GetPendingStreamingPaymentMetadataQueryVariables,
+  GetStreamingPaymentMetadataDocument,
+  GetStreamingPaymentMetadataQuery,
+  GetStreamingPaymentMetadataQueryVariables,
   StakerReward,
   UpdateColonyActionDocument,
   UpdateColonyActionMutation,
@@ -198,20 +198,44 @@ export const linkPendingStreamingPaymentMetadata = async ({
   pendingStreamingPaymentMetadataId: string;
   streamingPaymentId: string;
 }): Promise<void> => {
-  const { data } =
+  const { data: pendingStreamingPaymentMetadataQuery } =
     (await query<
-      GetPendingStreamingPaymentMetadataQuery,
-      GetPendingStreamingPaymentMetadataQueryVariables
-    >(GetPendingStreamingPaymentMetadataDocument, {
+      GetStreamingPaymentMetadataQuery,
+      GetStreamingPaymentMetadataQueryVariables
+    >(GetStreamingPaymentMetadataDocument, {
       id: pendingStreamingPaymentMetadataId,
     })) ?? {};
 
   const pendingStreamingPaymentMetadata =
-    data?.getPendingStreamingPaymentMetadata;
+    pendingStreamingPaymentMetadataQuery?.getStreamingPaymentMetadata;
 
   if (!pendingStreamingPaymentMetadata) {
     output(
       `Could not find the pending streaming payment metadata with the id: ${pendingStreamingPaymentMetadataId}. This is a bug and should be investigated.`,
+    );
+    return;
+  }
+
+  if (!pendingStreamingPaymentMetadata.changelog) {
+    output(
+      `Could not find the pending streaming payment metadata changelog with the id: ${pendingStreamingPaymentMetadataId}. This is a bug and should be investigated.`,
+    );
+    return;
+  }
+
+  const { data } =
+    (await query<
+      GetStreamingPaymentMetadataQuery,
+      GetStreamingPaymentMetadataQueryVariables
+    >(GetStreamingPaymentMetadataDocument, {
+      id: streamingPaymentId,
+    })) ?? {};
+
+  const currentStreamingPaymentMetadata = data?.getStreamingPaymentMetadata;
+
+  if (!currentStreamingPaymentMetadata) {
+    output(
+      `Could not find the streaming payment metadata with the id: ${streamingPaymentId}. This is a bug and should be investigated.`,
     );
     return;
   }
@@ -223,6 +247,10 @@ export const linkPendingStreamingPaymentMetadata = async ({
     input: {
       id: streamingPaymentId,
       endCondition: pendingStreamingPaymentMetadata.endCondition,
+      changelog: [
+        ...(currentStreamingPaymentMetadata?.changelog ?? []),
+        pendingStreamingPaymentMetadata.changelog[0],
+      ],
     },
   });
 };
