@@ -320,6 +320,11 @@ export type ColonyAction = {
   showInActionsList: Scalars['Boolean'];
   /** Streaming payment associated with the action, if any */
   streamingPayment?: Maybe<StreamingPayment>;
+  /**
+   * Changes to the streaming payment associated with the action, if any
+   * Applicable to `EDIT_STREAMING_PAYMENT` action only
+   */
+  streamingPaymentChanges?: Maybe<StreamingPaymentChangeSet>;
   /** ID of the associated streaming payment, if any */
   streamingPaymentId?: Maybe<Scalars['ID']>;
   /** The target Domain of the action, if applicable */
@@ -1154,6 +1159,7 @@ export type CreateColonyActionInput = {
   roles?: InputMaybe<ColonyActionRolesInput>;
   rootHash: Scalars['String'];
   showInActionsList: Scalars['Boolean'];
+  streamingPaymentChanges?: InputMaybe<StreamingPaymentChangeSetInput>;
   streamingPaymentId?: InputMaybe<Scalars['ID']>;
   toDomainId?: InputMaybe<Scalars['ID']>;
   toPotId?: InputMaybe<Scalars['Int']>;
@@ -1501,7 +1507,6 @@ export type CreateSafeTransactionInput = {
 
 export type CreateStreamingPaymentInput = {
   amount: Scalars['String'];
-  changelog?: InputMaybe<Array<StreamingPaymentChangelogInput>>;
   claims?: InputMaybe<Array<StreamingPaymentClaimInput>>;
   createdAt?: InputMaybe<Scalars['AWSDateTime']>;
   endTime: Scalars['String'];
@@ -6906,8 +6911,6 @@ export type StreamingPayment = {
   __typename?: 'StreamingPayment';
   actions?: Maybe<ModelColonyActionConnection>;
   amount: Scalars['String'];
-  /** List of Streaming Payment changelog entries */
-  changelog?: Maybe<Array<StreamingPaymentChangelog>>;
   claims?: Maybe<Array<StreamingPaymentClaim>>;
   createdAt: Scalars['AWSDateTime'];
   endTime: Scalars['String'];
@@ -6942,20 +6945,17 @@ export type StreamingPaymentMotionsArgs = {
   sortDirection?: InputMaybe<ModelSortDirection>;
 };
 
-export type StreamingPaymentChangelog = {
-  __typename?: 'StreamingPaymentChangelog';
+export type StreamingPaymentChangeSet = {
+  __typename?: 'StreamingPaymentChangeSet';
   /** The values before the change */
   newValues: StreamingPaymentChanges;
   /** The values before the change */
   oldValues: StreamingPaymentChanges;
-  /** Transaction hash associated with the changelog entry */
-  transactionHash: Scalars['String'];
 };
 
-export type StreamingPaymentChangelogInput = {
+export type StreamingPaymentChangeSetInput = {
   newValues: StreamingPaymentChangesInput;
   oldValues: StreamingPaymentChangesInput;
-  transactionHash: Scalars['String'];
 };
 
 export type StreamingPaymentChanges = {
@@ -7831,6 +7831,7 @@ export type UpdateColonyActionInput = {
   roles?: InputMaybe<ColonyActionRolesInput>;
   rootHash?: InputMaybe<Scalars['String']>;
   showInActionsList?: InputMaybe<Scalars['Boolean']>;
+  streamingPaymentChanges?: InputMaybe<StreamingPaymentChangeSetInput>;
   streamingPaymentId?: InputMaybe<Scalars['ID']>;
   toDomainId?: InputMaybe<Scalars['ID']>;
   toPotId?: InputMaybe<Scalars['Int']>;
@@ -8184,7 +8185,6 @@ export type UpdateSafeTransactionInput = {
 
 export type UpdateStreamingPaymentInput = {
   amount?: InputMaybe<Scalars['String']>;
-  changelog?: InputMaybe<Array<StreamingPaymentChangelogInput>>;
   claims?: InputMaybe<Array<StreamingPaymentClaimInput>>;
   createdAt?: InputMaybe<Scalars['AWSDateTime']>;
   endTime?: InputMaybe<Scalars['String']>;
@@ -8611,24 +8611,6 @@ export type StreamingPaymentFragment = {
     __typename?: 'StreamingPaymentClaim';
     amount: string;
     timestamp: string;
-  }> | null;
-  changelog?: Array<{
-    __typename?: 'StreamingPaymentChangelog';
-    transactionHash: string;
-    oldValues: {
-      __typename?: 'StreamingPaymentChanges';
-      startTime: string;
-      endTime: string;
-      interval: string;
-      amount: string;
-    };
-    newValues: {
-      __typename?: 'StreamingPaymentChanges';
-      startTime: string;
-      endTime: string;
-      interval: string;
-      amount: string;
-    };
   }> | null;
 };
 
@@ -9712,24 +9694,6 @@ export type GetStreamingPaymentQuery = {
       amount: string;
       timestamp: string;
     }> | null;
-    changelog?: Array<{
-      __typename?: 'StreamingPaymentChangelog';
-      transactionHash: string;
-      oldValues: {
-        __typename?: 'StreamingPaymentChanges';
-        startTime: string;
-        endTime: string;
-        interval: string;
-        amount: string;
-      };
-      newValues: {
-        __typename?: 'StreamingPaymentChanges';
-        startTime: string;
-        endTime: string;
-        interval: string;
-        amount: string;
-      };
-    }> | null;
   } | null;
 };
 
@@ -10238,14 +10202,6 @@ export const StreamingPaymentMetadata = gql`
     }
   }
 `;
-export const StreamingPaymentChanges = gql`
-  fragment StreamingPaymentChanges on StreamingPaymentChanges {
-    startTime
-    endTime
-    interval
-    amount
-  }
-`;
 export const StreamingPayment = gql`
   fragment StreamingPayment on StreamingPayment {
     id
@@ -10261,18 +10217,16 @@ export const StreamingPayment = gql`
       amount
       timestamp
     }
-    changelog {
-      transactionHash
-      oldValues {
-        ...StreamingPaymentChanges
-      }
-      newValues {
-        ...StreamingPaymentChanges
-      }
-    }
   }
   ${StreamingPaymentMetadata}
-  ${StreamingPaymentChanges}
+`;
+export const StreamingPaymentChanges = gql`
+  fragment StreamingPaymentChanges on StreamingPaymentChanges {
+    startTime
+    endTime
+    interval
+    amount
+  }
 `;
 export const Extension = gql`
   fragment Extension on ColonyExtension {

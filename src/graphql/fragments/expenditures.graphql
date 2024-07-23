@@ -55,15 +55,6 @@ fragment StreamingPayment on StreamingPayment {
     amount
     timestamp
   }
-  changelog {
-    transactionHash
-    oldValues {
-      ...StreamingPaymentChanges
-    }
-    newValues {
-      ...StreamingPaymentChanges
-    }
-  }
 }
 
 fragment StreamingPaymentMetadata on StreamingPaymentMetadata {

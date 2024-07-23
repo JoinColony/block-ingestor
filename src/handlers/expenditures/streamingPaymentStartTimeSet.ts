@@ -1,7 +1,8 @@
 import { EventHandler } from '~types';
-import { getStreamingPaymentsClient } from '~utils';
 import { ExtensionEventListener } from '~eventListeners';
 import { createEditStreamingPaymentAction } from './helpers/createEditStreamingPaymentAction';
+import { Extension, getExtensionHash } from '@colony/colony-js';
+import { getInterfaceByExtensionHash } from '~interfaces';
 
 export const handleStreamingPaymentStartTimeSet: EventHandler = async (
   event,
@@ -13,16 +14,20 @@ export const handleStreamingPaymentStartTimeSet: EventHandler = async (
     return;
   }
 
-  const streamingPaymentsClient = await getStreamingPaymentsClient(
-    colonyAddress,
+  const streamingPaymentsExtensionHash = getExtensionHash(
+    Extension.StreamingPayments,
   );
-  if (!streamingPaymentsClient) {
+  const streamingPaymentsInterface = getInterfaceByExtensionHash(
+    streamingPaymentsExtensionHash,
+  );
+
+  if (!streamingPaymentsInterface) {
     return;
   }
 
   await createEditStreamingPaymentAction({
     event,
-    streamingPaymentsClient,
+    streamingPaymentsInterface,
     colonyAddress,
   });
 };
