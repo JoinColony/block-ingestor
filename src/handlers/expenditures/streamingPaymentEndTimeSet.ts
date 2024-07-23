@@ -10,7 +10,6 @@ import {
 import { EventHandler } from '~types';
 import {
   getExpenditureDatabaseId,
-  getStreamingPaymentsClient,
   output,
   toNumber,
   verbose,
@@ -18,6 +17,8 @@ import {
 } from '~utils';
 import { getStreamingPaymentFromDB } from './helpers';
 import { createEditStreamingPaymentAction } from './helpers/createEditStreamingPaymentAction';
+import { getInterfaceByExtensionHash } from '~interfaces';
+import { Extension, getExtensionHash } from '@colony/colony-js';
 
 export const handleStreamingPaymentEndTimeSet: EventHandler = async (
   event,
@@ -66,15 +67,19 @@ export const handleStreamingPaymentEndTimeSet: EventHandler = async (
       },
     });
   } else {
-    const streamingPaymentsClient = await getStreamingPaymentsClient(
-      colonyAddress,
+    const streamingPaymentsExtensionHash = getExtensionHash(
+      Extension.StreamingPayments,
     );
-    if (!streamingPaymentsClient) {
+    const streamingPaymentsInterface = getInterfaceByExtensionHash(
+      streamingPaymentsExtensionHash,
+    );
+
+    if (!streamingPaymentsInterface) {
       return;
     }
     await createEditStreamingPaymentAction({
       event,
-      streamingPaymentsClient,
+      streamingPaymentsInterface,
       colonyAddress,
     });
   }
