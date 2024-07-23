@@ -1,4 +1,4 @@
-import { utils } from 'ethers';
+import { BigNumber, utils } from 'ethers';
 import { mutate } from '~amplifyClient';
 import {
   ColonyActionType,
@@ -13,12 +13,13 @@ import {
   mapLogToContractEvent,
   output,
   toNumber,
+  verbose,
   writeActionFromEvent,
 } from '~utils';
 import { getStreamingPaymentFromDB } from './getExpenditure';
 import { checkActionExists } from './createEditExpenditureAction';
 
-export const createEditStreamingPaymentAction = async ({
+export const handleEditOrCancelStreamingPaymentAction = async ({
   event,
   colonyAddress,
   streamingPaymentsInterface,
@@ -35,7 +36,7 @@ export const createEditStreamingPaymentAction = async ({
     return;
   }
 
-  const { blockNumber } = event;
+  const { blockNumber, timestamp } = event;
   const { streamingPaymentId } = event.args;
 
   const convertedExpenditureId = toNumber(streamingPaymentId);
@@ -128,15 +129,31 @@ export const createEditStreamingPaymentAction = async ({
     },
   });
 
+  // When a streaming payment is cancelled, the endTime is set to the current block timestamp
+  // Therefore, if the endTime and timestamp are equal, we can assume this is a cancel action
+  const isCancelAction = BigNumber.from(timestamp).eq(newValues.endTime);
+
   const { agent: initiatorAddress } = event.args;
 
-  await writeActionFromEvent(event, colonyAddress, {
-    type: ColonyActionType.EditStreamingPayment,
-    initiatorAddress,
-    streamingPaymentId: databaseId,
-    streamingPaymentChanges: {
-      oldValues: currentValues,
-      newValues,
-    },
-  });
+  if (isCancelAction) {
+    verbose(`Streaming payment with ID ${databaseId} cancelled`);
+
+    await writeActionFromEvent(event, colonyAddress, {
+      type: ColonyActionType.CancelStreamingPayment,
+      initiatorAddress,
+      streamingPaymentId: databaseId,
+    });
+  } else {
+    verbose(`Streaming payment with ID ${databaseId} edited`);
+
+    await writeActionFromEvent(event, colonyAddress, {
+      type: ColonyActionType.EditStreamingPayment,
+      initiatorAddress,
+      streamingPaymentId: databaseId,
+      streamingPaymentChanges: {
+        oldValues: currentValues,
+        newValues,
+      },
+    });
+  }
 };
