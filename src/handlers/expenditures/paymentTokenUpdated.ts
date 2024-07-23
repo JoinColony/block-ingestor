@@ -1,7 +1,7 @@
 import { EventHandler } from '~types';
 import { ExtensionEventListener } from '~eventListeners';
 
-import { createEditStreamingPaymentAction } from './helpers/createEditStreamingPaymentAction';
+import { handleEditOrCancelStreamingPaymentAction } from './helpers/handleEditOrCancelStreamingPaymentAction';
 import { Extension, getExtensionHash } from '@colony/colony-js';
 import { getInterfaceByExtensionHash } from '~interfaces';
 
@@ -22,7 +22,7 @@ export const handlePaymentTokenUpdated: EventHandler = async (
     return;
   }
 
-  await createEditStreamingPaymentAction({
+  await handleEditOrCancelStreamingPaymentAction({
     event,
     streamingPaymentsInterface,
     colonyAddress,
