@@ -6,12 +6,12 @@ on:
   repository_dispatch: # Allows API workflow trigger
     types: [cdapp-block-ingestor]
   
-  push:
-    branches:
-      - master # Automatically deploy on commits to master
-    paths-ignore:
-      - '.github/**'
-      - '**.md'
+  # push:
+  #   branches:
+  #     - master # Automatically deploy on commits to master
+  #   paths-ignore:
+  #     - '.github/**'
+  #     - '**.md'
 
 concurrency:
   group: cdapp-block-ingestor
