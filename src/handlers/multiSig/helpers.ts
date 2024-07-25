@@ -19,6 +19,7 @@ import {
   CreateMultiSigVoteMutationVariables,
   CreateMultiSigVoteDocument,
 } from '~graphql';
+import { getBlockChainTimestampISODate } from '~utils/dates';
 import { output } from '~utils/logger';
 
 export const getMultiSigDatabaseId = (
@@ -97,6 +98,7 @@ interface addMultiSigVoteParams {
   multiSigId: string;
   role: number;
   vote: MultiSigVote.Approve | MultiSigVote.Reject;
+  timestamp: number;
 }
 
 export const addMultiSigVote = async ({
@@ -105,6 +107,7 @@ export const addMultiSigVote = async ({
   userAddress,
   colonyAddress,
   vote,
+  timestamp,
 }: addMultiSigVoteParams): Promise<void> => {
   await mutate<CreateMultiSigVoteMutation, CreateMultiSigVoteMutationVariables>(
     CreateMultiSigVoteDocument,
@@ -115,6 +118,7 @@ export const addMultiSigVote = async ({
         userAddress,
         role,
         vote,
+        createdAt: getBlockChainTimestampISODate(timestamp),
       },
     },
   );

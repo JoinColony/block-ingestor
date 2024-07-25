@@ -7,7 +7,7 @@ import {
   getCachedColonyClient,
   getColonyFromDB,
   output,
-  parseAction,
+  parseOperation,
 } from '~utils';
 import { mutate, query } from '~amplifyClient';
 import {
@@ -121,7 +121,7 @@ export const updateAmountToExcludeNetworkFee = async (
   const oneTxPaymentClient =
     (await colonyClient?.getExtensionClient(Extension.OneTxPayment)) ?? null;
 
-  const parsedAction = parseAction(action, {
+  const parsedAction = parseOperation(action, {
     colonyClient,
     oneTxPaymentClient,
   });

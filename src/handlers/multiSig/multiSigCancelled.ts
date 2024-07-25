@@ -8,6 +8,7 @@ import { EventHandler } from '~types';
 import { verbose } from '~utils';
 import { getMultiSigDatabaseId } from './helpers';
 import { getChainId } from '~provider';
+import { getBlockChainTimestampISODate } from '~utils/dates';
 
 export const handleMultiSigMotionCancelled: EventHandler = async (event) => {
   const {
@@ -34,7 +35,7 @@ export const handleMultiSigMotionCancelled: EventHandler = async (event) => {
       id: multiSigDatabaseId,
       hasActionCompleted: false,
       isRejected: true,
-      rejectedAt: new Date(timestamp * 1000).toISOString(),
+      rejectedAt: getBlockChainTimestampISODate(timestamp),
       rejectedBy: userAddress,
     },
   });

@@ -9362,6 +9362,9 @@ export type ActionMetadataInfoFragment = {
   __typename?: 'ColonyAction';
   id: string;
   colonyDecisionId?: string | null;
+  amount?: string | null;
+  networkFee?: string | null;
+  type: ColonyActionType;
   pendingDomainMetadata?: {
     __typename?: 'DomainMetadata';
     name: string;
@@ -9688,6 +9691,7 @@ export type ColonyMultiSigFragment = {
   executedBy?: string | null;
   rejectedAt?: string | null;
   rejectedBy?: string | null;
+  createdAt: string;
   signatures?: {
     __typename?: 'ModelMultiSigUserSignatureConnection';
     items: Array<{
@@ -10893,6 +10897,9 @@ export type GetColonyActionByMotionIdQuery = {
       __typename?: 'ColonyAction';
       id: string;
       colonyDecisionId?: string | null;
+      amount?: string | null;
+      networkFee?: string | null;
+      type: ColonyActionType;
       pendingDomainMetadata?: {
         __typename?: 'DomainMetadata';
         name: string;
@@ -11043,6 +11050,9 @@ export type GetVoterRewardsQuery = {
       __typename?: 'ColonyAction';
       id: string;
       colonyDecisionId?: string | null;
+      amount?: string | null;
+      networkFee?: string | null;
+      type: ColonyActionType;
       pendingDomainMetadata?: {
         __typename?: 'DomainMetadata';
         name: string;
@@ -11115,6 +11125,7 @@ export type GetColonyMultiSigQuery = {
     executedBy?: string | null;
     rejectedAt?: string | null;
     rejectedBy?: string | null;
+    createdAt: string;
     signatures?: {
       __typename?: 'ModelMultiSigUserSignatureConnection';
       items: Array<{
@@ -11321,6 +11332,11 @@ export const ColonyMetadata = gql`
       name
       link
     }
+    objective {
+      title
+      description
+      progress
+    }
     changelog {
       transactionHash
       oldDisplayName
@@ -11328,6 +11344,7 @@ export const ColonyMetadata = gql`
       hasAvatarChanged
       hasDescriptionChanged
       haveExternalLinksChanged
+      hasObjectiveChanged
     }
   }
 `;
@@ -11341,6 +11358,9 @@ export const ActionMetadataInfo = gql`
       ...ColonyMetadata
     }
     colonyDecisionId
+    amount
+    networkFee
+    type
   }
   ${DomainMetadata}
   ${ColonyMetadata}
@@ -11381,6 +11401,7 @@ export const Colony = gql`
       nextToken
     }
   }
+  ${Token}
 `;
 export const ExpenditureSlot = gql`
   fragment ExpenditureSlot on ExpenditureSlot {
@@ -11571,6 +11592,7 @@ export const ColonyMultiSig = gql`
     executedBy
     rejectedAt
     rejectedBy
+    createdAt
   }
   ${MultiSigUserSignature}
 `;

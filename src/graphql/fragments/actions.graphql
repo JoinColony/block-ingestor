@@ -7,4 +7,7 @@ fragment ActionMetadataInfo on ColonyAction {
     ...ColonyMetadata
   }
   colonyDecisionId
+  amount
+  networkFee
+  type
 }

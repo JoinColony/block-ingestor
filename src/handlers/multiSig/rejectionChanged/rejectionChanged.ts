@@ -13,7 +13,7 @@ export const handleMultiSigRejectionChanged: EventHandler = async (
   event,
   listener,
 ) => {
-  const { contractAddress: multiSigExtensionAddress } = event;
+  const { contractAddress: multiSigExtensionAddress, timestamp } = event;
 
   const { colonyAddress } = listener as ExtensionEventListener;
 
@@ -49,6 +49,7 @@ export const handleMultiSigRejectionChanged: EventHandler = async (
         userAddress,
         colonyAddress,
         vote: MultiSigVote.Reject,
+        timestamp,
       });
     }
   }
