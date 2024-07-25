@@ -4,6 +4,7 @@ import { ExtensionEventListener } from '~eventListeners';
 import { EventHandler, MotionEvents } from '~types';
 import { getVotingClient } from '~utils';
 import { linkPendingMetadata } from '~utils/colonyMetadata';
+import { getBlockChainTimestampISODate } from '~utils/dates';
 
 import {
   getMotionDatabaseId,
@@ -88,7 +89,7 @@ export const handleMotionFinalized: EventHandler = async (event, listener) => {
       isFinalized: true,
       motionStateHistory: {
         ...finalizedMotion.motionStateHistory,
-        finalizedAt: new Date(timestamp * 1000).toISOString(),
+        finalizedAt: getBlockChainTimestampISODate(timestamp),
       },
     };
 

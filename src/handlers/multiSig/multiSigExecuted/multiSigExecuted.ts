@@ -11,6 +11,7 @@ import {
 } from '../helpers';
 import { getMultiSigClient, verbose } from '~utils';
 import { linkPendingMetadata } from '~utils/colonyMetadata';
+import { getBlockChainTimestampISODate } from '~utils/dates';
 
 export const handleMultiSigMotionExecuted: EventHandler = async (
   event,
@@ -63,7 +64,7 @@ export const handleMultiSigMotionExecuted: EventHandler = async (
     // @NOTE failing execution is allowed only after 1 week so the motion doesn't end up floating around
     const updatedMultiSigData = {
       id: multiSigDatabaseId,
-      executedAt: new Date(timestamp * 1000).toISOString(),
+      executedAt: getBlockChainTimestampISODate(timestamp),
       executedBy: userAddress,
       isExecuted: true,
       hasActionCompleted: success,

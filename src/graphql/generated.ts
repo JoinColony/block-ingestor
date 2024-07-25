@@ -1079,6 +1079,7 @@ export type ColonyMultiSig = {
   action?: Maybe<ColonyAction>;
   /** Colony address the multiSig belongs to */
   colonyAddress: Scalars['ID'];
+  /** The timestamp when the motion was created at */
   createdAt: Scalars['AWSDateTime'];
   /** The timestamp when the motion was finalized */
   executedAt?: Maybe<Scalars['AWSDateTime']>;
@@ -1540,6 +1541,7 @@ export type CreateColonyMotionInput = {
 
 export type CreateColonyMultiSigInput = {
   colonyAddress: Scalars['ID'];
+  createdAt?: InputMaybe<Scalars['AWSDateTime']>;
   executedAt?: InputMaybe<Scalars['AWSDateTime']>;
   executedBy?: InputMaybe<Scalars['ID']>;
   hasActionCompleted: Scalars['Boolean'];
@@ -3044,6 +3046,7 @@ export type ModelColonyMotionFilterInput = {
 export type ModelColonyMultiSigConditionInput = {
   and?: InputMaybe<Array<InputMaybe<ModelColonyMultiSigConditionInput>>>;
   colonyAddress?: InputMaybe<ModelIdInput>;
+  createdAt?: InputMaybe<ModelStringInput>;
   executedAt?: InputMaybe<ModelStringInput>;
   executedBy?: InputMaybe<ModelIdInput>;
   hasActionCompleted?: InputMaybe<ModelBooleanInput>;
@@ -3070,6 +3073,7 @@ export type ModelColonyMultiSigConnection = {
 export type ModelColonyMultiSigFilterInput = {
   and?: InputMaybe<Array<InputMaybe<ModelColonyMultiSigFilterInput>>>;
   colonyAddress?: InputMaybe<ModelIdInput>;
+  createdAt?: InputMaybe<ModelStringInput>;
   executedAt?: InputMaybe<ModelStringInput>;
   executedBy?: InputMaybe<ModelIdInput>;
   hasActionCompleted?: InputMaybe<ModelBooleanInput>;
@@ -4141,6 +4145,7 @@ export type ModelSubscriptionColonyMultiSigFilterInput = {
     Array<InputMaybe<ModelSubscriptionColonyMultiSigFilterInput>>
   >;
   colonyAddress?: InputMaybe<ModelSubscriptionIdInput>;
+  createdAt?: InputMaybe<ModelSubscriptionStringInput>;
   executedAt?: InputMaybe<ModelSubscriptionStringInput>;
   executedBy?: InputMaybe<ModelSubscriptionIdInput>;
   hasActionCompleted?: InputMaybe<ModelSubscriptionBooleanInput>;
@@ -8632,6 +8637,7 @@ export type UpdateColonyMotionInput = {
 
 export type UpdateColonyMultiSigInput = {
   colonyAddress?: InputMaybe<Scalars['ID']>;
+  createdAt?: InputMaybe<Scalars['AWSDateTime']>;
   executedAt?: InputMaybe<Scalars['AWSDateTime']>;
   executedBy?: InputMaybe<Scalars['ID']>;
   hasActionCompleted?: InputMaybe<Scalars['Boolean']>;
@@ -9483,6 +9489,7 @@ export type ColonyMultiSigFragment = {
   executedBy?: string | null;
   rejectedAt?: string | null;
   rejectedBy?: string | null;
+  createdAt: string;
   signatures?: {
     __typename?: 'ModelMultiSigUserSignatureConnection';
     items: Array<{
@@ -10906,6 +10913,7 @@ export type GetColonyMultiSigQuery = {
     executedBy?: string | null;
     rejectedAt?: string | null;
     rejectedBy?: string | null;
+    createdAt: string;
     signatures?: {
       __typename?: 'ModelMultiSigUserSignatureConnection';
       items: Array<{
@@ -11370,6 +11378,7 @@ export const ColonyMultiSig = gql`
     executedBy
     rejectedAt
     rejectedBy
+    createdAt
   }
   ${MultiSigUserSignature}
 `;

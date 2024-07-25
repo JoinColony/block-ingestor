@@ -29,4 +29,5 @@ fragment ColonyMultiSig on ColonyMultiSig {
   executedBy
   rejectedAt
   rejectedBy
+  createdAt
 }
