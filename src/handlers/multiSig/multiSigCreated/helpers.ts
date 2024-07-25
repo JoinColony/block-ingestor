@@ -20,6 +20,7 @@ import {
   output,
   createColonyAction,
 } from '~utils';
+import { getBlockChainTimestampISODate } from '~utils/dates';
 import { getMultiSigDatabaseId } from '../helpers';
 
 const createColonyMultiSig = async (
@@ -43,6 +44,7 @@ interface GetMultiSigDataArgs {
   multiSigClient: AnyMultisigPermissionsClient;
   colonyAddress: string;
   isDecision?: boolean;
+  timestamp: number;
 }
 
 export const getMultiSigData = async ({
@@ -53,6 +55,7 @@ export const getMultiSigData = async ({
   multiSigClient,
   colonyAddress,
   isDecision = false,
+  timestamp,
 }: GetMultiSigDataArgs): Promise<ColonyMultiSig> => {
   const chainId = getChainId();
   const multiSigDatabaseId = getMultiSigDatabaseId(
@@ -73,6 +76,7 @@ export const getMultiSigData = async ({
     isRejected: false,
     isDecision,
     hasActionCompleted: false,
+    createdAt: getBlockChainTimestampISODate(timestamp),
   };
 };
 
@@ -152,6 +156,7 @@ export const createMultiSigInDB = async (
     requiredPermissions,
     colonyAddress,
     isDecision: !!input.colonyDecisionId,
+    timestamp,
   });
 
   const rootHash = await networkClient.getReputationRootHash({

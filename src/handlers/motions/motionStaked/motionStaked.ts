@@ -1,6 +1,7 @@
 import { ExtensionEventListener } from '~eventListeners';
 import { EventHandler, MotionSide } from '~types';
 import { verbose, getVotingClient } from '~utils';
+import { getBlockChainTimestampISODate } from '~utils/dates';
 import {
   getMotionDatabaseId,
   getMotionFromDB,
@@ -92,11 +93,11 @@ export const handleMotionStaked: EventHandler = async (
           ...stakedMotion.motionStateHistory,
           yaySideFullyStakedAt:
             yaySideFullyStaked && stakerSide === MotionSide.YAY
-              ? new Date(timestamp * 1000).toISOString()
+              ? getBlockChainTimestampISODate(timestamp)
               : stakedMotion.motionStateHistory.yaySideFullyStakedAt,
           naySideFullyStakedAt:
             naySideFullyStaked && stakerSide === MotionSide.NAY
-              ? new Date(timestamp * 1000).toISOString()
+              ? getBlockChainTimestampISODate(timestamp)
               : stakedMotion.motionStateHistory.naySideFullyStakedAt,
         },
       },

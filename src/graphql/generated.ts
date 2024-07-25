@@ -187,136 +187,6 @@ export type BridgeXyzQueryReturn = {
   transactionFee?: Maybe<Scalars['String']>;
 };
 
-export type BridgeCreateBankAccountInput = {
-  accountOwner: Scalars['String'];
-  address?: InputMaybe<BridgeXyzMutationAddressInput>;
-  bankName: Scalars['String'];
-  currency: Scalars['String'];
-  iban?: InputMaybe<BridgeIbanAccountInput>;
-  usAccount?: InputMaybe<BridgeUsAccountInput>;
-};
-
-export type BridgeCreateBankAccountReturn = {
-  __typename?: 'BridgeCreateBankAccountReturn';
-  success?: Maybe<Scalars['Boolean']>;
-};
-
-export type BridgeIbanAccountInput = {
-  account_number: Scalars['String'];
-  bic: Scalars['String'];
-  country: Scalars['String'];
-};
-
-export type BridgeIbanBankAccount = {
-  __typename?: 'BridgeIbanBankAccount';
-  bic: Scalars['String'];
-  country: Scalars['String'];
-  id: Scalars['String'];
-  last4: Scalars['String'];
-};
-
-export type BridgeUpdateBankAccountInput = {
-  account: BridgeCreateBankAccountInput;
-  id: Scalars['String'];
-};
-
-export type BridgeUpdateBankAccountReturn = {
-  __typename?: 'BridgeUpdateBankAccountReturn';
-  success?: Maybe<Scalars['Boolean']>;
-};
-
-export type BridgeUsAccountInput = {
-  account_number: Scalars['String'];
-  routing_number: Scalars['String'];
-};
-
-export type BridgeUsBankAccount = {
-  __typename?: 'BridgeUsBankAccount';
-  last4: Scalars['String'];
-  routingNumber: Scalars['String'];
-};
-
-export type BridgeXyzBankAccount = {
-  __typename?: 'BridgeXYZBankAccount';
-  accountOwner: Scalars['String'];
-  bankName: Scalars['String'];
-  currency: Scalars['String'];
-  iban?: Maybe<BridgeIbanBankAccount>;
-  id: Scalars['String'];
-  usAccount?: Maybe<BridgeUsBankAccount>;
-};
-
-export type BridgeXyzDrain = {
-  __typename?: 'BridgeXYZDrain';
-  amount?: Maybe<Scalars['String']>;
-  created_at?: Maybe<Scalars['String']>;
-  deposit_tx_hash?: Maybe<Scalars['String']>;
-  id?: Maybe<Scalars['String']>;
-  receipt?: Maybe<DrainReceipt>;
-  state?: Maybe<Scalars['String']>;
-};
-
-export type BridgeXyzMutationAccountInput = {
-  account_number: Scalars['String'];
-  routing_number: Scalars['String'];
-};
-
-export type BridgeXyzMutationAddressInput = {
-  city: Scalars['String'];
-  country: Scalars['String'];
-  postal_code?: InputMaybe<Scalars['String']>;
-  state?: InputMaybe<Scalars['String']>;
-  street_line_1: Scalars['String'];
-  street_line_2?: InputMaybe<Scalars['String']>;
-};
-
-export type BridgeXyzMutationBodyInput = {
-  account?: InputMaybe<BridgeXyzMutationAccountInput>;
-  address?: InputMaybe<BridgeXyzMutationAddressInput>;
-  bank_name?: InputMaybe<Scalars['String']>;
-  birth_date?: InputMaybe<Scalars['String']>;
-  currency?: InputMaybe<Scalars['String']>;
-  email?: InputMaybe<Scalars['String']>;
-  first_name?: InputMaybe<Scalars['String']>;
-  full_name?: InputMaybe<Scalars['String']>;
-  iban?: InputMaybe<BridgeXyzMutationIbanInput>;
-  last_name?: InputMaybe<Scalars['String']>;
-  signed_agreement_id?: InputMaybe<Scalars['String']>;
-  tax_identification_number?: InputMaybe<Scalars['String']>;
-};
-
-export type BridgeXyzMutationIbanInput = {
-  account_number: Scalars['String'];
-  bic: Scalars['String'];
-  country: Scalars['String'];
-};
-
-export type BridgeXyzMutationInput = {
-  body: BridgeXyzMutationBodyInput;
-  path: Scalars['String'];
-};
-
-export type BridgeXyzMutationReturn = {
-  __typename?: 'BridgeXYZMutationReturn';
-  bankAccount?: Maybe<BridgeXyzBankAccount>;
-  country?: Maybe<Scalars['String']>;
-  kycStatus?: Maybe<KycStatus>;
-  kyc_link?: Maybe<Scalars['String']>;
-  success?: Maybe<Scalars['Boolean']>;
-  tos_link?: Maybe<Scalars['String']>;
-};
-
-export type BridgeXyzQueryInput = {
-  path: Scalars['String'];
-};
-
-export type BridgeXyzQueryReturn = {
-  __typename?: 'BridgeXYZQueryReturn';
-  drains?: Maybe<Array<Maybe<BridgeXyzDrain>>>;
-  success?: Maybe<Scalars['Boolean']>;
-  transactionFee?: Maybe<Scalars['String']>;
-};
-
 /**
  * Represents metadata related to a blockchain event
  * Applies to Colonies, Tokens and Events, but not all fields are revlant to all
@@ -9300,6 +9170,9 @@ export type ActionMetadataInfoFragment = {
   __typename?: 'ColonyAction';
   id: string;
   colonyDecisionId?: string | null;
+  amount?: string | null;
+  networkFee?: string | null;
+  type: ColonyActionType;
   pendingDomainMetadata?: {
     __typename?: 'DomainMetadata';
     name: string;
@@ -9619,6 +9492,7 @@ export type ColonyMultiSigFragment = {
   executedBy?: string | null;
   rejectedAt?: string | null;
   rejectedBy?: string | null;
+  createdAt: string;
   signatures?: {
     __typename?: 'ModelMultiSigUserSignatureConnection';
     items: Array<{
@@ -10827,6 +10701,9 @@ export type GetColonyActionByMotionIdQuery = {
       __typename?: 'ColonyAction';
       id: string;
       colonyDecisionId?: string | null;
+      amount?: string | null;
+      networkFee?: string | null;
+      type: ColonyActionType;
       pendingDomainMetadata?: {
         __typename?: 'DomainMetadata';
         name: string;
@@ -10970,6 +10847,9 @@ export type GetColonyActionByMultiSigIdQuery = {
       __typename?: 'ColonyAction';
       id: string;
       colonyDecisionId?: string | null;
+      amount?: string | null;
+      networkFee?: string | null;
+      type: ColonyActionType;
       pendingDomainMetadata?: {
         __typename?: 'DomainMetadata';
         name: string;
@@ -11042,6 +10922,7 @@ export type GetColonyMultiSigQuery = {
     executedBy?: string | null;
     rejectedAt?: string | null;
     rejectedBy?: string | null;
+    createdAt: string;
     signatures?: {
       __typename?: 'ModelMultiSigUserSignatureConnection';
       items: Array<{
@@ -11248,6 +11129,11 @@ export const ColonyMetadata = gql`
       name
       link
     }
+    objective {
+      title
+      description
+      progress
+    }
     changelog {
       transactionHash
       oldDisplayName
@@ -11255,6 +11141,7 @@ export const ColonyMetadata = gql`
       hasAvatarChanged
       hasDescriptionChanged
       haveExternalLinksChanged
+      hasObjectiveChanged
     }
   }
 `;
@@ -11268,6 +11155,9 @@ export const ActionMetadataInfo = gql`
       ...ColonyMetadata
     }
     colonyDecisionId
+    amount
+    networkFee
+    type
   }
   ${DomainMetadata}
   ${ColonyMetadata}
@@ -11308,6 +11198,7 @@ export const Colony = gql`
       nextToken
     }
   }
+  ${Token}
 `;
 export const ExpenditureSlot = gql`
   fragment ExpenditureSlot on ExpenditureSlot {
@@ -11499,6 +11390,7 @@ export const ColonyMultiSig = gql`
     executedBy
     rejectedAt
     rejectedBy
+    createdAt
   }
   ${MultiSigUserSignature}
 `;
