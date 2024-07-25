@@ -240,6 +240,14 @@ export const linkPendingStreamingPaymentMetadata = async ({
     return;
   }
 
+  const hasEndConditionChanged =
+    currentStreamingPaymentMetadata.endCondition !==
+    pendingStreamingPaymentMetadata.endCondition;
+
+  if (!hasEndConditionChanged) {
+    return;
+  }
+
   await mutate<
     UpdateStreamingPaymentMetadataMutation,
     UpdateStreamingPaymentMetadataMutationVariables
