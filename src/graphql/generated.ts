@@ -56,6 +56,135 @@ export type ApprovedTokenChangesInput = {
   removed: Array<Scalars['ID']>;
   unaffected: Array<Scalars['ID']>;
 };
+export type BridgeCreateBankAccountInput = {
+  accountOwner: Scalars['String'];
+  address?: InputMaybe<BridgeXyzMutationAddressInput>;
+  bankName: Scalars['String'];
+  currency: Scalars['String'];
+  iban?: InputMaybe<BridgeIbanAccountInput>;
+  usAccount?: InputMaybe<BridgeUsAccountInput>;
+};
+
+export type BridgeCreateBankAccountReturn = {
+  __typename?: 'BridgeCreateBankAccountReturn';
+  success?: Maybe<Scalars['Boolean']>;
+};
+
+export type BridgeIbanAccountInput = {
+  account_number: Scalars['String'];
+  bic: Scalars['String'];
+  country: Scalars['String'];
+};
+
+export type BridgeIbanBankAccount = {
+  __typename?: 'BridgeIbanBankAccount';
+  bic: Scalars['String'];
+  country: Scalars['String'];
+  id: Scalars['String'];
+  last4: Scalars['String'];
+};
+
+export type BridgeUpdateBankAccountInput = {
+  account: BridgeCreateBankAccountInput;
+  id: Scalars['String'];
+};
+
+export type BridgeUpdateBankAccountReturn = {
+  __typename?: 'BridgeUpdateBankAccountReturn';
+  success?: Maybe<Scalars['Boolean']>;
+};
+
+export type BridgeUsAccountInput = {
+  account_number: Scalars['String'];
+  routing_number: Scalars['String'];
+};
+
+export type BridgeUsBankAccount = {
+  __typename?: 'BridgeUsBankAccount';
+  last4: Scalars['String'];
+  routingNumber: Scalars['String'];
+};
+
+export type BridgeXyzBankAccount = {
+  __typename?: 'BridgeXYZBankAccount';
+  accountOwner: Scalars['String'];
+  bankName: Scalars['String'];
+  currency: Scalars['String'];
+  iban?: Maybe<BridgeIbanBankAccount>;
+  id: Scalars['String'];
+  usAccount?: Maybe<BridgeUsBankAccount>;
+};
+
+export type BridgeXyzDrain = {
+  __typename?: 'BridgeXYZDrain';
+  amount?: Maybe<Scalars['String']>;
+  created_at?: Maybe<Scalars['String']>;
+  deposit_tx_hash?: Maybe<Scalars['String']>;
+  id?: Maybe<Scalars['String']>;
+  receipt?: Maybe<DrainReceipt>;
+  state?: Maybe<Scalars['String']>;
+};
+
+export type BridgeXyzMutationAccountInput = {
+  account_number: Scalars['String'];
+  routing_number: Scalars['String'];
+};
+
+export type BridgeXyzMutationAddressInput = {
+  city: Scalars['String'];
+  country: Scalars['String'];
+  postal_code?: InputMaybe<Scalars['String']>;
+  state?: InputMaybe<Scalars['String']>;
+  street_line_1: Scalars['String'];
+  street_line_2?: InputMaybe<Scalars['String']>;
+};
+
+export type BridgeXyzMutationBodyInput = {
+  account?: InputMaybe<BridgeXyzMutationAccountInput>;
+  address?: InputMaybe<BridgeXyzMutationAddressInput>;
+  bank_name?: InputMaybe<Scalars['String']>;
+  birth_date?: InputMaybe<Scalars['String']>;
+  currency?: InputMaybe<Scalars['String']>;
+  email?: InputMaybe<Scalars['String']>;
+  first_name?: InputMaybe<Scalars['String']>;
+  full_name?: InputMaybe<Scalars['String']>;
+  iban?: InputMaybe<BridgeXyzMutationIbanInput>;
+  last_name?: InputMaybe<Scalars['String']>;
+  signed_agreement_id?: InputMaybe<Scalars['String']>;
+  tax_identification_number?: InputMaybe<Scalars['String']>;
+};
+
+export type BridgeXyzMutationIbanInput = {
+  account_number: Scalars['String'];
+  bic: Scalars['String'];
+  country: Scalars['String'];
+};
+
+export type BridgeXyzMutationInput = {
+  body: BridgeXyzMutationBodyInput;
+  path: Scalars['String'];
+};
+
+export type BridgeXyzMutationReturn = {
+  __typename?: 'BridgeXYZMutationReturn';
+  bankAccount?: Maybe<BridgeXyzBankAccount>;
+  country?: Maybe<Scalars['String']>;
+  kyc_link?: Maybe<Scalars['String']>;
+  kyc_status?: Maybe<Scalars['String']>;
+  success?: Maybe<Scalars['Boolean']>;
+  tos_link?: Maybe<Scalars['String']>;
+};
+
+export type BridgeXyzQueryInput = {
+  path: Scalars['String'];
+};
+
+export type BridgeXyzQueryReturn = {
+  __typename?: 'BridgeXYZQueryReturn';
+  drains?: Maybe<Array<Maybe<BridgeXyzDrain>>>;
+  success?: Maybe<Scalars['Boolean']>;
+  transactionFee?: Maybe<Scalars['String']>;
+};
 
 export type BridgeBankAccount = {
   __typename?: 'BridgeBankAccount';
