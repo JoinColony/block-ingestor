@@ -90,8 +90,8 @@ export enum ContractEventsSignatures {
   StakeFractionSet = 'StakeFractionSet(address,uint256)',
 
   // Staged Expenditures
-  ExpenditureMadeStaged = 'ExpenditureMadeStaged(uint256,bool)',
-  StagedPaymentReleased = 'StagedPaymentReleased(uint256,uint256)',
+  ExpenditureMadeStaged = 'ExpenditureMadeStaged(address,uint256,bool)',
+  StagedPaymentReleased = 'StagedPaymentReleased(address,uint256,uint256)',
 
   // Streaming Payments
   StreamingPaymentCreated = 'StreamingPaymentCreated(address,uint256)',

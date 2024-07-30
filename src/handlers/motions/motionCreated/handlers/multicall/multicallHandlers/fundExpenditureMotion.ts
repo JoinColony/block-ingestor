@@ -16,7 +16,7 @@ export const isFundExpenditureMotion: MulticallValidator = ({
 }) => {
   return decodedFunctions.every(
     (decodedFunction) =>
-      decodedFunction.functionSignature ===
+      decodedFunction.signature ===
       ContractMethodSignatures.MoveFundsBetweenPots,
   );
 };
@@ -51,7 +51,7 @@ export const fundExpenditureMotionHandler: MulticallHandler = async ({
 
   for (const decodedFunction of decodedFunctions) {
     if (
-      decodedFunction.functionSignature !==
+      decodedFunction.signature !==
         ContractMethodSignatures.MoveFundsBetweenPots ||
       decodedFunction.args._toPot !== targetPotId
     ) {

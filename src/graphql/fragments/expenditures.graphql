@@ -24,6 +24,7 @@ fragment Expenditure on Expenditure {
   userStakeId
   createdAt
   firstEditTransactionHash
+  type
 }
 
 # It is important this fragment contains all the fields of the ExpenditureSlot type
