@@ -106,8 +106,9 @@ export const handleManagePermissionsAction: EventHandler = async (
       // We can get the msg.sender from the transaction receipt.
 
       if (!agent) {
-        const { from = '' } =
-          await provider.getTransactionReceipt(transactionHash);
+        const { from = '' } = await provider.getTransactionReceipt(
+          transactionHash,
+        );
         agent = from;
       }
       const allRoleEventsUpdates = isMultiSig
@@ -154,6 +155,7 @@ export const handleManagePermissionsAction: EventHandler = async (
           ...existingRoles,
           ...rolesFromAllUpdateEvents,
         },
+        isMultiSig,
       );
 
       const individualEvents = isMultiSig
