@@ -1,6 +1,7 @@
 export enum MetadataDeltaOperationType {
   ADD_VERIFIED_MEMBERS = 'ADD_VERIFIED_MEMBERS',
   REMOVE_VERIFIED_MEMBERS = 'REMOVE_VERIFIED_MEMBERS',
+  MANAGE_TOKENS = 'MANAGE_TOKENS',
 }
 
 export interface AddVerifiedMembersOperation {
@@ -13,6 +14,12 @@ export interface RemoveVerifiedMembersOperation {
   payload: string[];
 }
 
+export interface ManageTokensOperation {
+  type: MetadataDeltaOperationType.MANAGE_TOKENS;
+  payload: string[];
+}
+
 export type MetadataDeltaOperation =
   | AddVerifiedMembersOperation
-  | RemoveVerifiedMembersOperation;
+  | RemoveVerifiedMembersOperation
+  | ManageTokensOperation;

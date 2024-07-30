@@ -1,3 +1,4 @@
+import { constants } from 'ethers';
 import { BlockTag } from '@ethersproject/abstract-provider';
 
 import { mutate, query } from '~amplifyClient';
@@ -15,7 +16,6 @@ import {
   GetTokenFromEverywhereDocument,
   GetTokenFromEverywhereQuery,
   GetTokenFromEverywhereQueryVariables,
-  PendingModifiedTokenAddresses,
   GetColonyByNativeTokenIdDocument,
   GetColonyByNativeTokenIdQuery,
   GetColonyByNativeTokenIdQueryVariables,
@@ -43,10 +43,90 @@ export const getExistingTokenAddresses = (colony: Colony): string[] =>
     .map((tokenItem) => tokenItem?.tokenAddress)
     .filter((item): item is string => !!item) ?? [];
 
+interface ModifiedTokenAddresses {
+  added: string[];
+  removed: string[];
+}
+
+export const getModifiedTokenAddresses = (
+  colony: Colony,
+  updatedTokenAddresses?: string[] | null,
+): ModifiedTokenAddresses => {
+  const nativeTokenAddress = colony.nativeToken.tokenAddress;
+  const existingTokenAddresses = getExistingTokenAddresses(colony);
+
+  const modifiedTokenAddresses: ModifiedTokenAddresses = {
+    added: [],
+    removed: [],
+  };
+
+  if (!updatedTokenAddresses) {
+    return modifiedTokenAddresses;
+  }
+
+  const prevAddresses = new Set(existingTokenAddresses);
+  const newAddresses = new Set(updatedTokenAddresses);
+
+  // If a new address is not in the previous address set it has been added.
+  // Ignore the chain's default and colony native tokens.
+  newAddresses.forEach((address) => {
+    const hasChanged = !prevAddresses.has(address);
+    const isSecondaryToken =
+      address !== nativeTokenAddress && address !== constants.AddressZero;
+
+    if (isSecondaryToken && hasChanged) {
+      modifiedTokenAddresses.added.push(address);
+    }
+  });
+
+  // If a previous address is not in the new address set, it has been removed.
+  prevAddresses.forEach((address) => {
+    const hasChanged = !newAddresses.has(address);
+    const isSecondaryToken =
+      address !== nativeTokenAddress && address !== constants.AddressZero;
+
+    if (isSecondaryToken && hasChanged) {
+      modifiedTokenAddresses.removed.push(address);
+    }
+  });
+
+  return modifiedTokenAddresses;
+};
+
+interface ApprovedTokenChanges {
+  existingTokenAddresses: string[];
+  modifiedTokenAddresses: ModifiedTokenAddresses;
+  unaffectedTokenAddresses: string[];
+}
+
+export const getApprovedTokenChanges = ({
+  colony,
+  tokenAddresses,
+}: {
+  colony: Colony;
+  tokenAddresses: string[];
+}): ApprovedTokenChanges => {
+  const existingTokenAddresses = getExistingTokenAddresses(colony);
+  const modifiedTokenAddresses = getModifiedTokenAddresses(
+    colony,
+    tokenAddresses,
+  );
+
+  const unaffectedTokenAddresses = existingTokenAddresses.filter(
+    (address) => !modifiedTokenAddresses.removed.includes(address),
+  );
+
+  return {
+    existingTokenAddresses,
+    modifiedTokenAddresses,
+    unaffectedTokenAddresses,
+  };
+};
+
 export const updateColonyTokens = async (
   colony: Colony,
   existingTokenAddresses: string[],
-  { added, removed }: PendingModifiedTokenAddresses,
+  { added, removed }: ModifiedTokenAddresses,
 ): Promise<void> => {
   const currentAddresses = new Set(existingTokenAddresses);
   added?.forEach(async (tokenAddress) => {
