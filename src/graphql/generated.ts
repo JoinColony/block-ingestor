@@ -57,6 +57,136 @@ export type ApprovedTokenChangesInput = {
   unaffected: Array<Scalars['ID']>;
 };
 
+export type BridgeCreateBankAccountInput = {
+  accountOwner: Scalars['String'];
+  address?: InputMaybe<BridgeXyzMutationAddressInput>;
+  bankName: Scalars['String'];
+  currency: Scalars['String'];
+  iban?: InputMaybe<BridgeIbanAccountInput>;
+  usAccount?: InputMaybe<BridgeUsAccountInput>;
+};
+
+export type BridgeCreateBankAccountReturn = {
+  __typename?: 'BridgeCreateBankAccountReturn';
+  success?: Maybe<Scalars['Boolean']>;
+};
+
+export type BridgeIbanAccountInput = {
+  account_number: Scalars['String'];
+  bic: Scalars['String'];
+  country: Scalars['String'];
+};
+
+export type BridgeIbanBankAccount = {
+  __typename?: 'BridgeIbanBankAccount';
+  bic: Scalars['String'];
+  country: Scalars['String'];
+  id: Scalars['String'];
+  last4: Scalars['String'];
+};
+
+export type BridgeUpdateBankAccountInput = {
+  account: BridgeCreateBankAccountInput;
+  id: Scalars['String'];
+};
+
+export type BridgeUpdateBankAccountReturn = {
+  __typename?: 'BridgeUpdateBankAccountReturn';
+  success?: Maybe<Scalars['Boolean']>;
+};
+
+export type BridgeUsAccountInput = {
+  account_number: Scalars['String'];
+  routing_number: Scalars['String'];
+};
+
+export type BridgeUsBankAccount = {
+  __typename?: 'BridgeUsBankAccount';
+  last4: Scalars['String'];
+  routingNumber: Scalars['String'];
+};
+
+export type BridgeXyzBankAccount = {
+  __typename?: 'BridgeXYZBankAccount';
+  accountOwner: Scalars['String'];
+  bankName: Scalars['String'];
+  currency: Scalars['String'];
+  iban?: Maybe<BridgeIbanBankAccount>;
+  id: Scalars['String'];
+  usAccount?: Maybe<BridgeUsBankAccount>;
+};
+
+export type BridgeXyzDrain = {
+  __typename?: 'BridgeXYZDrain';
+  amount?: Maybe<Scalars['String']>;
+  created_at?: Maybe<Scalars['String']>;
+  deposit_tx_hash?: Maybe<Scalars['String']>;
+  id?: Maybe<Scalars['String']>;
+  receipt?: Maybe<DrainReceipt>;
+  state?: Maybe<Scalars['String']>;
+};
+
+export type BridgeXyzMutationAccountInput = {
+  account_number: Scalars['String'];
+  routing_number: Scalars['String'];
+};
+
+export type BridgeXyzMutationAddressInput = {
+  city: Scalars['String'];
+  country: Scalars['String'];
+  postal_code?: InputMaybe<Scalars['String']>;
+  state?: InputMaybe<Scalars['String']>;
+  street_line_1: Scalars['String'];
+  street_line_2?: InputMaybe<Scalars['String']>;
+};
+
+export type BridgeXyzMutationBodyInput = {
+  account?: InputMaybe<BridgeXyzMutationAccountInput>;
+  address?: InputMaybe<BridgeXyzMutationAddressInput>;
+  bank_name?: InputMaybe<Scalars['String']>;
+  birth_date?: InputMaybe<Scalars['String']>;
+  currency?: InputMaybe<Scalars['String']>;
+  email?: InputMaybe<Scalars['String']>;
+  first_name?: InputMaybe<Scalars['String']>;
+  full_name?: InputMaybe<Scalars['String']>;
+  iban?: InputMaybe<BridgeXyzMutationIbanInput>;
+  last_name?: InputMaybe<Scalars['String']>;
+  signed_agreement_id?: InputMaybe<Scalars['String']>;
+  tax_identification_number?: InputMaybe<Scalars['String']>;
+};
+
+export type BridgeXyzMutationIbanInput = {
+  account_number: Scalars['String'];
+  bic: Scalars['String'];
+  country: Scalars['String'];
+};
+
+export type BridgeXyzMutationInput = {
+  body: BridgeXyzMutationBodyInput;
+  path: Scalars['String'];
+};
+
+export type BridgeXyzMutationReturn = {
+  __typename?: 'BridgeXYZMutationReturn';
+  bankAccount?: Maybe<BridgeXyzBankAccount>;
+  country?: Maybe<Scalars['String']>;
+  kycStatus?: Maybe<KycStatus>;
+  kyc_link?: Maybe<Scalars['String']>;
+  success?: Maybe<Scalars['Boolean']>;
+  tos_link?: Maybe<Scalars['String']>;
+};
+
+export type BridgeXyzQueryInput = {
+  path: Scalars['String'];
+};
+
+export type BridgeXyzQueryReturn = {
+  __typename?: 'BridgeXYZQueryReturn';
+  drains?: Maybe<Array<Maybe<BridgeXyzDrain>>>;
+  success?: Maybe<Scalars['Boolean']>;
+  transactionFee?: Maybe<Scalars['String']>;
+};
+
 /**
  * Represents metadata related to a blockchain event
  * Applies to Colonies, Tokens and Events, but not all fields are revlant to all
@@ -100,10 +230,8 @@ export enum ClientType {
   TokenClient = 'TokenClient',
   TokenLockingClient = 'TokenLockingClient',
   TokenSupplierClient = 'TokenSupplierClient',
-  VestingSimpleClient = 'VestingSimpleClient',
   VotingReputationClient = 'VotingReputationClient',
   WhitelistClient = 'WhitelistClient',
-  WrappedTokenClient = 'WrappedTokenClient',
 }
 
 /** Represents a Colony within the Colony Network */
@@ -258,6 +386,8 @@ export type ColonyAction = {
    * Applicable to `EDIT_EXPENDITURE` action only
    */
   expenditureSlotChanges?: Maybe<ExpenditureSlotChanges>;
+  /** Ids of the staged payment slots released by the action, if any */
+  expenditureSlotIds?: Maybe<Array<Scalars['Int']>>;
   /** The source Domain of the action, if applicable */
   fromDomain?: Maybe<Domain>;
   /** The source Domain identifier, if applicable */
@@ -461,6 +591,10 @@ export enum ColonyActionType {
   PaymentMotion = 'PAYMENT_MOTION',
   /** An action related to the recovery functionality of a Colony */
   Recovery = 'RECOVERY',
+  /** An action related to a motion to release a staged payment */
+  ReleaseStagedPayments = 'RELEASE_STAGED_PAYMENTS',
+  /** An action related to a motion to release a staged payment */
+  ReleaseStagedPaymentsMotion = 'RELEASE_STAGED_PAYMENTS_MOTION',
   /** An action related to removing verified members */
   RemoveVerifiedMembers = 'REMOVE_VERIFIED_MEMBERS',
   RemoveVerifiedMembersMotion = 'REMOVE_VERIFIED_MEMBERS_MOTION',
@@ -829,8 +963,8 @@ export type ColonyMotion = {
   expenditureFunding?: Maybe<Array<ExpenditureFundingItem>>;
   /** Expenditure associated with the motion, if any */
   expenditureId?: Maybe<Scalars['ID']>;
-  /** Id of the expenditure stage payment to be released if the motion pass, if any */
-  expenditureSlotId?: Maybe<Scalars['Int']>;
+  /** Ids of the staged payment slots to be released if the motion pass, if any */
+  expenditureSlotIds?: Maybe<Array<Scalars['Int']>>;
   /**
    * An option to manually specify the amount of gas to estimate for the finalization of this motion.
    * Particularly useful for "heavy" actions, such as a multicall.
@@ -956,27 +1090,6 @@ export type ColonyRole = {
   /** Will expand to a `User` model if permission was set for a user */
   targetUser?: Maybe<User>;
   updatedAt: Scalars['AWSDateTime'];
-};
-
-/**
- * Keeps track of the current amount a user has staked in a colony
- * When a user stakes, totalAmount increases. When a user reclaims their stake, totalAmount decreases.
- */
-export type ColonyStake = {
-  __typename?: 'ColonyStake';
-  /** Unique identifier for the Colony */
-  colonyId: Scalars['ID'];
-  createdAt: Scalars['AWSDateTime'];
-  /**
-   * Unique identifier for the stake
-   * Format: `<userId>_<colonyId>`
-   */
-  id: Scalars['ID'];
-  /** Total staked amount */
-  totalAmount: Scalars['String'];
-  updatedAt: Scalars['AWSDateTime'];
-  /** Unique identifier for the user */
-  userId: Scalars['ID'];
 };
 
 /**
@@ -1120,6 +1233,7 @@ export type CreateColonyActionInput = {
   createdAt?: InputMaybe<Scalars['AWSDateTime']>;
   expenditureId?: InputMaybe<Scalars['ID']>;
   expenditureSlotChanges?: InputMaybe<ExpenditureSlotChangesInput>;
+  expenditureSlotIds?: InputMaybe<Array<Scalars['Int']>>;
   fromDomainId?: InputMaybe<Scalars['ID']>;
   fromPotId?: InputMaybe<Scalars['Int']>;
   id?: InputMaybe<Scalars['ID']>;
@@ -1278,7 +1392,7 @@ export type CreateColonyMotionInput = {
   editedExpenditureSlots?: InputMaybe<Array<ExpenditureSlotInput>>;
   expenditureFunding?: InputMaybe<Array<ExpenditureFundingItemInput>>;
   expenditureId?: InputMaybe<Scalars['ID']>;
-  expenditureSlotId?: InputMaybe<Scalars['Int']>;
+  expenditureSlotIds?: InputMaybe<Array<Scalars['Int']>>;
   gasEstimate: Scalars['String'];
   hasObjection: Scalars['Boolean'];
   id?: InputMaybe<Scalars['ID']>;
@@ -1315,13 +1429,6 @@ export type CreateColonyRoleInput = {
   role_5?: InputMaybe<Scalars['Boolean']>;
   role_6?: InputMaybe<Scalars['Boolean']>;
   targetAddress: Scalars['ID'];
-};
-
-export type CreateColonyStakeInput = {
-  colonyId: Scalars['ID'];
-  id?: InputMaybe<Scalars['ID']>;
-  totalAmount: Scalars['String'];
-  userId: Scalars['ID'];
 };
 
 export type CreateColonyTokensInput = {
@@ -1402,6 +1509,7 @@ export type CreateExpenditureInput = {
 };
 
 export type CreateExpenditureMetadataInput = {
+  distributionType?: InputMaybe<SplitPaymentDistributionType>;
   fundFromDomainNativeId: Scalars['Int'];
   id?: InputMaybe<Scalars['ID']>;
   stages?: InputMaybe<Array<ExpenditureStageInput>>;
@@ -1419,6 +1527,13 @@ export type CreateExtensionInstallationsCountInput = {
 export type CreateIngestorStatsInput = {
   id?: InputMaybe<Scalars['ID']>;
   value: Scalars['String'];
+};
+
+export type CreateLiquidationAddressInput = {
+  chainId: Scalars['Int'];
+  id?: InputMaybe<Scalars['ID']>;
+  liquidationAddress: Scalars['ID'];
+  userAddress: Scalars['ID'];
 };
 
 export type CreateMotionMessageInput = {
@@ -1444,7 +1559,9 @@ export type CreateProfileInput = {
   displayName?: InputMaybe<Scalars['String']>;
   displayNameChanged?: InputMaybe<Scalars['AWSDateTime']>;
   email?: InputMaybe<Scalars['AWSEmail']>;
+  hasCompletedKYCFlow?: InputMaybe<Scalars['Boolean']>;
   id?: InputMaybe<Scalars['ID']>;
+  isAutoOfframpEnabled?: InputMaybe<Scalars['Boolean']>;
   location?: InputMaybe<Scalars['String']>;
   meta?: InputMaybe<ProfileMetadataInput>;
   preferredCurrency?: InputMaybe<SupportedCurrencies>;
@@ -1507,6 +1624,7 @@ export type CreateTokenInput = {
   symbol: Scalars['String'];
   thumbnail?: InputMaybe<Scalars['String']>;
   type?: InputMaybe<TokenType>;
+  validated?: InputMaybe<Scalars['Boolean']>;
 };
 
 export type CreateTransactionInput = {
@@ -1522,8 +1640,8 @@ export type CreateTransactionInput = {
   from: Scalars['ID'];
   gasLimit?: InputMaybe<Scalars['String']>;
   gasPrice?: InputMaybe<Scalars['String']>;
-  group?: InputMaybe<TransactionGroupInput>;
-  groupId?: InputMaybe<Scalars['ID']>;
+  group: TransactionGroupInput;
+  groupId: Scalars['ID'];
   hash?: InputMaybe<Scalars['String']>;
   id?: InputMaybe<Scalars['ID']>;
   identifier?: InputMaybe<Scalars['String']>;
@@ -1548,6 +1666,7 @@ export type CreateUniqueUserInput = {
 };
 
 export type CreateUserInput = {
+  bridgeCustomerId?: InputMaybe<Scalars['String']>;
   id?: InputMaybe<Scalars['ID']>;
   profileId?: InputMaybe<Scalars['ID']>;
   userPrivateBetaInviteCodeId?: InputMaybe<Scalars['ID']>;
@@ -1561,6 +1680,7 @@ export type CreateUserStakeInput = {
   id?: InputMaybe<Scalars['ID']>;
   isClaimed: Scalars['Boolean'];
   isForfeited?: InputMaybe<Scalars['Boolean']>;
+  type?: InputMaybe<UserStakeType>;
   userAddress: Scalars['ID'];
 };
 
@@ -1649,10 +1769,6 @@ export type DeleteColonyRoleInput = {
   id: Scalars['ID'];
 };
 
-export type DeleteColonyStakeInput = {
-  id: Scalars['ID'];
-};
-
 export type DeleteColonyTokensInput = {
   id: Scalars['ID'];
 };
@@ -1694,6 +1810,10 @@ export type DeleteExtensionInstallationsCountInput = {
 };
 
 export type DeleteIngestorStatsInput = {
+  id: Scalars['ID'];
+};
+
+export type DeleteLiquidationAddressInput = {
   id: Scalars['ID'];
 };
 
@@ -1882,6 +2002,12 @@ export type DomainMetadataChangelogInput = {
   transactionHash: Scalars['String'];
 };
 
+export type DrainReceipt = {
+  __typename?: 'DrainReceipt';
+  destination_currency?: Maybe<Scalars['String']>;
+  url?: Maybe<Scalars['String']>;
+};
+
 export type Expenditure = {
   __typename?: 'Expenditure';
   actions?: Maybe<ModelColonyActionConnection>;
@@ -1970,6 +2096,11 @@ export type ExpenditureFundingItemInput = {
 export type ExpenditureMetadata = {
   __typename?: 'ExpenditureMetadata';
   createdAt: Scalars['AWSDateTime'];
+  /**
+   * Specifies the distribution type selected when creating a split payment
+   * Will be null for other payment types
+   */
+  distributionType?: Maybe<SplitPaymentDistributionType>;
   fundFromDomainNativeId: Scalars['Int'];
   id: Scalars['ID'];
   stages?: Maybe<Array<ExpenditureStage>>;
@@ -2031,13 +2162,11 @@ export type ExpenditureSlotInput = {
 
 export type ExpenditureStage = {
   __typename?: 'ExpenditureStage';
-  isReleased: Scalars['Boolean'];
   name: Scalars['String'];
   slotId: Scalars['Int'];
 };
 
 export type ExpenditureStageInput = {
-  isReleased: Scalars['Boolean'];
   name: Scalars['String'];
   slotId: Scalars['Int'];
 };
@@ -2238,6 +2367,31 @@ export type IngestorStats = {
   value: Scalars['String'];
 };
 
+export enum KycStatus {
+  Approved = 'APPROVED',
+  Incomplete = 'INCOMPLETE',
+  NotStarted = 'NOT_STARTED',
+  Pending = 'PENDING',
+  Rejected = 'REJECTED',
+  UnderReview = 'UNDER_REVIEW',
+}
+
+export type LiquidationAddress = {
+  __typename?: 'LiquidationAddress';
+  /** The chain id the colony is on */
+  chainId: Scalars['Int'];
+  createdAt: Scalars['AWSDateTime'];
+  /** Unique identifier for the liquidation address entry */
+  id: Scalars['ID'];
+  /** The liquidation address */
+  liquidationAddress: Scalars['ID'];
+  updatedAt: Scalars['AWSDateTime'];
+  /** The user associated */
+  user?: Maybe<User>;
+  /** The user address associated */
+  userAddress: Scalars['ID'];
+};
+
 export type ModelAnnotationConditionInput = {
   actionId?: InputMaybe<ModelIdInput>;
   and?: InputMaybe<Array<InputMaybe<ModelAnnotationConditionInput>>>;
@@ -2298,6 +2452,7 @@ export type ModelColonyActionConditionInput = {
   colonyId?: InputMaybe<ModelIdInput>;
   createdAt?: InputMaybe<ModelStringInput>;
   expenditureId?: InputMaybe<ModelIdInput>;
+  expenditureSlotIds?: InputMaybe<ModelIntInput>;
   fromDomainId?: InputMaybe<ModelIdInput>;
   fromPotId?: InputMaybe<ModelIntInput>;
   individualEvents?: InputMaybe<ModelStringInput>;
@@ -2339,6 +2494,7 @@ export type ModelColonyActionFilterInput = {
   colonyId?: InputMaybe<ModelIdInput>;
   createdAt?: InputMaybe<ModelStringInput>;
   expenditureId?: InputMaybe<ModelIdInput>;
+  expenditureSlotIds?: InputMaybe<ModelIntInput>;
   fromDomainId?: InputMaybe<ModelIdInput>;
   fromPotId?: InputMaybe<ModelIntInput>;
   id?: InputMaybe<ModelIdInput>;
@@ -2661,7 +2817,7 @@ export type ModelColonyMotionConditionInput = {
   and?: InputMaybe<Array<InputMaybe<ModelColonyMotionConditionInput>>>;
   createdBy?: InputMaybe<ModelStringInput>;
   expenditureId?: InputMaybe<ModelIdInput>;
-  expenditureSlotId?: InputMaybe<ModelIntInput>;
+  expenditureSlotIds?: InputMaybe<ModelIntInput>;
   gasEstimate?: InputMaybe<ModelStringInput>;
   hasObjection?: InputMaybe<ModelBooleanInput>;
   isDecision?: InputMaybe<ModelBooleanInput>;
@@ -2690,7 +2846,7 @@ export type ModelColonyMotionFilterInput = {
   and?: InputMaybe<Array<InputMaybe<ModelColonyMotionFilterInput>>>;
   createdBy?: InputMaybe<ModelStringInput>;
   expenditureId?: InputMaybe<ModelIdInput>;
-  expenditureSlotId?: InputMaybe<ModelIntInput>;
+  expenditureSlotIds?: InputMaybe<ModelIntInput>;
   gasEstimate?: InputMaybe<ModelStringInput>;
   hasObjection?: InputMaybe<ModelBooleanInput>;
   id?: InputMaybe<ModelIdInput>;
@@ -2749,31 +2905,6 @@ export type ModelColonyRoleFilterInput = {
   role_5?: InputMaybe<ModelBooleanInput>;
   role_6?: InputMaybe<ModelBooleanInput>;
   targetAddress?: InputMaybe<ModelIdInput>;
-};
-
-export type ModelColonyStakeConditionInput = {
-  and?: InputMaybe<Array<InputMaybe<ModelColonyStakeConditionInput>>>;
-  colonyId?: InputMaybe<ModelIdInput>;
-  not?: InputMaybe<ModelColonyStakeConditionInput>;
-  or?: InputMaybe<Array<InputMaybe<ModelColonyStakeConditionInput>>>;
-  totalAmount?: InputMaybe<ModelStringInput>;
-  userId?: InputMaybe<ModelIdInput>;
-};
-
-export type ModelColonyStakeConnection = {
-  __typename?: 'ModelColonyStakeConnection';
-  items: Array<Maybe<ColonyStake>>;
-  nextToken?: Maybe<Scalars['String']>;
-};
-
-export type ModelColonyStakeFilterInput = {
-  and?: InputMaybe<Array<InputMaybe<ModelColonyStakeFilterInput>>>;
-  colonyId?: InputMaybe<ModelIdInput>;
-  id?: InputMaybe<ModelIdInput>;
-  not?: InputMaybe<ModelColonyStakeFilterInput>;
-  or?: InputMaybe<Array<InputMaybe<ModelColonyStakeFilterInput>>>;
-  totalAmount?: InputMaybe<ModelStringInput>;
-  userId?: InputMaybe<ModelIdInput>;
 };
 
 export type ModelColonyTokensConditionInput = {
@@ -3031,6 +3162,7 @@ export type ModelExpenditureFilterInput = {
 
 export type ModelExpenditureMetadataConditionInput = {
   and?: InputMaybe<Array<InputMaybe<ModelExpenditureMetadataConditionInput>>>;
+  distributionType?: InputMaybe<ModelSplitPaymentDistributionTypeInput>;
   fundFromDomainNativeId?: InputMaybe<ModelIntInput>;
   not?: InputMaybe<ModelExpenditureMetadataConditionInput>;
   or?: InputMaybe<Array<InputMaybe<ModelExpenditureMetadataConditionInput>>>;
@@ -3044,6 +3176,7 @@ export type ModelExpenditureMetadataConnection = {
 
 export type ModelExpenditureMetadataFilterInput = {
   and?: InputMaybe<Array<InputMaybe<ModelExpenditureMetadataFilterInput>>>;
+  distributionType?: InputMaybe<ModelSplitPaymentDistributionTypeInput>;
   fundFromDomainNativeId?: InputMaybe<ModelIntInput>;
   id?: InputMaybe<ModelIdInput>;
   not?: InputMaybe<ModelExpenditureMetadataFilterInput>;
@@ -3186,6 +3319,31 @@ export type ModelIntKeyConditionInput = {
   lt?: InputMaybe<Scalars['Int']>;
 };
 
+export type ModelLiquidationAddressConditionInput = {
+  and?: InputMaybe<Array<InputMaybe<ModelLiquidationAddressConditionInput>>>;
+  chainId?: InputMaybe<ModelIntInput>;
+  liquidationAddress?: InputMaybe<ModelIdInput>;
+  not?: InputMaybe<ModelLiquidationAddressConditionInput>;
+  or?: InputMaybe<Array<InputMaybe<ModelLiquidationAddressConditionInput>>>;
+  userAddress?: InputMaybe<ModelIdInput>;
+};
+
+export type ModelLiquidationAddressConnection = {
+  __typename?: 'ModelLiquidationAddressConnection';
+  items: Array<Maybe<LiquidationAddress>>;
+  nextToken?: Maybe<Scalars['String']>;
+};
+
+export type ModelLiquidationAddressFilterInput = {
+  and?: InputMaybe<Array<InputMaybe<ModelLiquidationAddressFilterInput>>>;
+  chainId?: InputMaybe<ModelIntInput>;
+  id?: InputMaybe<ModelIdInput>;
+  liquidationAddress?: InputMaybe<ModelIdInput>;
+  not?: InputMaybe<ModelLiquidationAddressFilterInput>;
+  or?: InputMaybe<Array<InputMaybe<ModelLiquidationAddressFilterInput>>>;
+  userAddress?: InputMaybe<ModelIdInput>;
+};
+
 export type ModelMotionMessageConditionInput = {
   amount?: InputMaybe<ModelStringInput>;
   and?: InputMaybe<Array<InputMaybe<ModelMotionMessageConditionInput>>>;
@@ -3248,6 +3406,8 @@ export type ModelProfileConditionInput = {
   displayName?: InputMaybe<ModelStringInput>;
   displayNameChanged?: InputMaybe<ModelStringInput>;
   email?: InputMaybe<ModelStringInput>;
+  hasCompletedKYCFlow?: InputMaybe<ModelBooleanInput>;
+  isAutoOfframpEnabled?: InputMaybe<ModelBooleanInput>;
   location?: InputMaybe<ModelStringInput>;
   not?: InputMaybe<ModelProfileConditionInput>;
   or?: InputMaybe<Array<InputMaybe<ModelProfileConditionInput>>>;
@@ -3269,7 +3429,9 @@ export type ModelProfileFilterInput = {
   displayName?: InputMaybe<ModelStringInput>;
   displayNameChanged?: InputMaybe<ModelStringInput>;
   email?: InputMaybe<ModelStringInput>;
+  hasCompletedKYCFlow?: InputMaybe<ModelBooleanInput>;
   id?: InputMaybe<ModelIdInput>;
+  isAutoOfframpEnabled?: InputMaybe<ModelBooleanInput>;
   location?: InputMaybe<ModelStringInput>;
   not?: InputMaybe<ModelProfileFilterInput>;
   or?: InputMaybe<Array<InputMaybe<ModelProfileFilterInput>>>;
@@ -3380,6 +3542,11 @@ export enum ModelSortDirection {
   Asc = 'ASC',
   Desc = 'DESC',
 }
+
+export type ModelSplitPaymentDistributionTypeInput = {
+  eq?: InputMaybe<SplitPaymentDistributionType>;
+  ne?: InputMaybe<SplitPaymentDistributionType>;
+};
 
 export type ModelStreamingPaymentConditionInput = {
   and?: InputMaybe<Array<InputMaybe<ModelStreamingPaymentConditionInput>>>;
@@ -3495,6 +3662,7 @@ export type ModelSubscriptionColonyActionFilterInput = {
   colonyId?: InputMaybe<ModelSubscriptionIdInput>;
   createdAt?: InputMaybe<ModelSubscriptionStringInput>;
   expenditureId?: InputMaybe<ModelSubscriptionIdInput>;
+  expenditureSlotIds?: InputMaybe<ModelSubscriptionIntInput>;
   fromDomainId?: InputMaybe<ModelSubscriptionIdInput>;
   fromPotId?: InputMaybe<ModelSubscriptionIntInput>;
   id?: InputMaybe<ModelSubscriptionIdInput>;
@@ -3666,7 +3834,7 @@ export type ModelSubscriptionColonyMotionFilterInput = {
   and?: InputMaybe<Array<InputMaybe<ModelSubscriptionColonyMotionFilterInput>>>;
   createdBy?: InputMaybe<ModelSubscriptionStringInput>;
   expenditureId?: InputMaybe<ModelSubscriptionIdInput>;
-  expenditureSlotId?: InputMaybe<ModelSubscriptionIntInput>;
+  expenditureSlotIds?: InputMaybe<ModelSubscriptionIntInput>;
   gasEstimate?: InputMaybe<ModelSubscriptionStringInput>;
   hasObjection?: InputMaybe<ModelSubscriptionBooleanInput>;
   id?: InputMaybe<ModelSubscriptionIdInput>;
@@ -3699,15 +3867,6 @@ export type ModelSubscriptionColonyRoleFilterInput = {
   role_5?: InputMaybe<ModelSubscriptionBooleanInput>;
   role_6?: InputMaybe<ModelSubscriptionBooleanInput>;
   targetAddress?: InputMaybe<ModelSubscriptionIdInput>;
-};
-
-export type ModelSubscriptionColonyStakeFilterInput = {
-  and?: InputMaybe<Array<InputMaybe<ModelSubscriptionColonyStakeFilterInput>>>;
-  colonyId?: InputMaybe<ModelSubscriptionIdInput>;
-  id?: InputMaybe<ModelSubscriptionIdInput>;
-  or?: InputMaybe<Array<InputMaybe<ModelSubscriptionColonyStakeFilterInput>>>;
-  totalAmount?: InputMaybe<ModelSubscriptionStringInput>;
-  userId?: InputMaybe<ModelSubscriptionIdInput>;
 };
 
 export type ModelSubscriptionColonyTokensFilterInput = {
@@ -3817,6 +3976,7 @@ export type ModelSubscriptionExpenditureMetadataFilterInput = {
   and?: InputMaybe<
     Array<InputMaybe<ModelSubscriptionExpenditureMetadataFilterInput>>
   >;
+  distributionType?: InputMaybe<ModelSubscriptionStringInput>;
   fundFromDomainNativeId?: InputMaybe<ModelSubscriptionIntInput>;
   id?: InputMaybe<ModelSubscriptionIdInput>;
   or?: InputMaybe<
@@ -3887,6 +4047,19 @@ export type ModelSubscriptionIntInput = {
   notIn?: InputMaybe<Array<InputMaybe<Scalars['Int']>>>;
 };
 
+export type ModelSubscriptionLiquidationAddressFilterInput = {
+  and?: InputMaybe<
+    Array<InputMaybe<ModelSubscriptionLiquidationAddressFilterInput>>
+  >;
+  chainId?: InputMaybe<ModelSubscriptionIntInput>;
+  id?: InputMaybe<ModelSubscriptionIdInput>;
+  liquidationAddress?: InputMaybe<ModelSubscriptionIdInput>;
+  or?: InputMaybe<
+    Array<InputMaybe<ModelSubscriptionLiquidationAddressFilterInput>>
+  >;
+  userAddress?: InputMaybe<ModelSubscriptionIdInput>;
+};
+
 export type ModelSubscriptionMotionMessageFilterInput = {
   amount?: InputMaybe<ModelSubscriptionStringInput>;
   and?: InputMaybe<
@@ -3920,7 +4093,9 @@ export type ModelSubscriptionProfileFilterInput = {
   displayName?: InputMaybe<ModelSubscriptionStringInput>;
   displayNameChanged?: InputMaybe<ModelSubscriptionStringInput>;
   email?: InputMaybe<ModelSubscriptionStringInput>;
+  hasCompletedKYCFlow?: InputMaybe<ModelSubscriptionBooleanInput>;
   id?: InputMaybe<ModelSubscriptionIdInput>;
+  isAutoOfframpEnabled?: InputMaybe<ModelSubscriptionBooleanInput>;
   location?: InputMaybe<ModelSubscriptionStringInput>;
   or?: InputMaybe<Array<InputMaybe<ModelSubscriptionProfileFilterInput>>>;
   preferredCurrency?: InputMaybe<ModelSubscriptionStringInput>;
@@ -4022,6 +4197,7 @@ export type ModelSubscriptionTokenFilterInput = {
   symbol?: InputMaybe<ModelSubscriptionStringInput>;
   thumbnail?: InputMaybe<ModelSubscriptionStringInput>;
   type?: InputMaybe<ModelSubscriptionStringInput>;
+  validated?: InputMaybe<ModelSubscriptionBooleanInput>;
 };
 
 export type ModelSubscriptionTransactionFilterInput = {
@@ -4056,6 +4232,7 @@ export type ModelSubscriptionTransactionFilterInput = {
 
 export type ModelSubscriptionUserFilterInput = {
   and?: InputMaybe<Array<InputMaybe<ModelSubscriptionUserFilterInput>>>;
+  bridgeCustomerId?: InputMaybe<ModelSubscriptionStringInput>;
   id?: InputMaybe<ModelSubscriptionIdInput>;
   or?: InputMaybe<Array<InputMaybe<ModelSubscriptionUserFilterInput>>>;
   profileId?: InputMaybe<ModelSubscriptionIdInput>;
@@ -4071,6 +4248,7 @@ export type ModelSubscriptionUserStakeFilterInput = {
   isClaimed?: InputMaybe<ModelSubscriptionBooleanInput>;
   isForfeited?: InputMaybe<ModelSubscriptionBooleanInput>;
   or?: InputMaybe<Array<InputMaybe<ModelSubscriptionUserStakeFilterInput>>>;
+  type?: InputMaybe<ModelSubscriptionStringInput>;
   userAddress?: InputMaybe<ModelSubscriptionIdInput>;
 };
 
@@ -4098,6 +4276,7 @@ export type ModelTokenConditionInput = {
   symbol?: InputMaybe<ModelStringInput>;
   thumbnail?: InputMaybe<ModelStringInput>;
   type?: InputMaybe<ModelTokenTypeInput>;
+  validated?: InputMaybe<ModelBooleanInput>;
 };
 
 export type ModelTokenConnection = {
@@ -4118,6 +4297,7 @@ export type ModelTokenFilterInput = {
   symbol?: InputMaybe<ModelStringInput>;
   thumbnail?: InputMaybe<ModelStringInput>;
   type?: InputMaybe<ModelTokenTypeInput>;
+  validated?: InputMaybe<ModelBooleanInput>;
 };
 
 export type ModelTokenTypeInput = {
@@ -4199,6 +4379,7 @@ export type ModelTransactionStatusInput = {
 
 export type ModelUserConditionInput = {
   and?: InputMaybe<Array<InputMaybe<ModelUserConditionInput>>>;
+  bridgeCustomerId?: InputMaybe<ModelStringInput>;
   not?: InputMaybe<ModelUserConditionInput>;
   or?: InputMaybe<Array<InputMaybe<ModelUserConditionInput>>>;
   profileId?: InputMaybe<ModelIdInput>;
@@ -4213,6 +4394,7 @@ export type ModelUserConnection = {
 
 export type ModelUserFilterInput = {
   and?: InputMaybe<Array<InputMaybe<ModelUserFilterInput>>>;
+  bridgeCustomerId?: InputMaybe<ModelStringInput>;
   id?: InputMaybe<ModelIdInput>;
   not?: InputMaybe<ModelUserFilterInput>;
   or?: InputMaybe<Array<InputMaybe<ModelUserFilterInput>>>;
@@ -4230,6 +4412,7 @@ export type ModelUserStakeConditionInput = {
   isForfeited?: InputMaybe<ModelBooleanInput>;
   not?: InputMaybe<ModelUserStakeConditionInput>;
   or?: InputMaybe<Array<InputMaybe<ModelUserStakeConditionInput>>>;
+  type?: InputMaybe<ModelUserStakeTypeInput>;
   userAddress?: InputMaybe<ModelIdInput>;
 };
 
@@ -4250,7 +4433,13 @@ export type ModelUserStakeFilterInput = {
   isForfeited?: InputMaybe<ModelBooleanInput>;
   not?: InputMaybe<ModelUserStakeFilterInput>;
   or?: InputMaybe<Array<InputMaybe<ModelUserStakeFilterInput>>>;
+  type?: InputMaybe<ModelUserStakeTypeInput>;
   userAddress?: InputMaybe<ModelIdInput>;
+};
+
+export type ModelUserStakeTypeInput = {
+  eq?: InputMaybe<UserStakeType>;
+  ne?: InputMaybe<UserStakeType>;
 };
 
 export type ModelUserTokensConditionInput = {
@@ -4409,6 +4598,10 @@ export type MotionStateHistoryInput = {
 /** Root mutation type */
 export type Mutation = {
   __typename?: 'Mutation';
+  bridgeCreateBankAccount?: Maybe<BridgeCreateBankAccountReturn>;
+  bridgeUpdateBankAccount?: Maybe<BridgeUpdateBankAccountReturn>;
+  /** Post to the Bridge XYZ API */
+  bridgeXYZMutation?: Maybe<BridgeXyzMutationReturn>;
   createAnnotation?: Maybe<Annotation>;
   createColony?: Maybe<Colony>;
   createColonyAction?: Maybe<ColonyAction>;
@@ -4424,7 +4617,6 @@ export type Mutation = {
   createColonyMetadata?: Maybe<ColonyMetadata>;
   createColonyMotion?: Maybe<ColonyMotion>;
   createColonyRole?: Maybe<ColonyRole>;
-  createColonyStake?: Maybe<ColonyStake>;
   createColonyTokens?: Maybe<ColonyTokens>;
   createContractEvent?: Maybe<ContractEvent>;
   createContributorReputation?: Maybe<ContributorReputation>;
@@ -4436,6 +4628,7 @@ export type Mutation = {
   createExpenditureMetadata?: Maybe<ExpenditureMetadata>;
   createExtensionInstallationsCount?: Maybe<ExtensionInstallationsCount>;
   createIngestorStats?: Maybe<IngestorStats>;
+  createLiquidationAddress?: Maybe<LiquidationAddress>;
   createMotionMessage?: Maybe<MotionMessage>;
   createPrivateBetaInviteCode?: Maybe<PrivateBetaInviteCode>;
   createProfile?: Maybe<Profile>;
@@ -4464,7 +4657,6 @@ export type Mutation = {
   deleteColonyMetadata?: Maybe<ColonyMetadata>;
   deleteColonyMotion?: Maybe<ColonyMotion>;
   deleteColonyRole?: Maybe<ColonyRole>;
-  deleteColonyStake?: Maybe<ColonyStake>;
   deleteColonyTokens?: Maybe<ColonyTokens>;
   deleteContractEvent?: Maybe<ContractEvent>;
   deleteContributorReputation?: Maybe<ContributorReputation>;
@@ -4476,6 +4668,7 @@ export type Mutation = {
   deleteExpenditureMetadata?: Maybe<ExpenditureMetadata>;
   deleteExtensionInstallationsCount?: Maybe<ExtensionInstallationsCount>;
   deleteIngestorStats?: Maybe<IngestorStats>;
+  deleteLiquidationAddress?: Maybe<LiquidationAddress>;
   deleteMotionMessage?: Maybe<MotionMessage>;
   deletePrivateBetaInviteCode?: Maybe<PrivateBetaInviteCode>;
   deleteProfile?: Maybe<Profile>;
@@ -4502,7 +4695,6 @@ export type Mutation = {
   updateColonyMetadata?: Maybe<ColonyMetadata>;
   updateColonyMotion?: Maybe<ColonyMotion>;
   updateColonyRole?: Maybe<ColonyRole>;
-  updateColonyStake?: Maybe<ColonyStake>;
   updateColonyTokens?: Maybe<ColonyTokens>;
   updateContractEvent?: Maybe<ContractEvent>;
   updateContributorReputation?: Maybe<ContributorReputation>;
@@ -4516,6 +4708,7 @@ export type Mutation = {
   updateExpenditureMetadata?: Maybe<ExpenditureMetadata>;
   updateExtensionInstallationsCount?: Maybe<ExtensionInstallationsCount>;
   updateIngestorStats?: Maybe<IngestorStats>;
+  updateLiquidationAddress?: Maybe<LiquidationAddress>;
   updateMotionMessage?: Maybe<MotionMessage>;
   updatePrivateBetaInviteCode?: Maybe<PrivateBetaInviteCode>;
   updateProfile?: Maybe<Profile>;
@@ -4531,6 +4724,21 @@ export type Mutation = {
   updateUserTokens?: Maybe<UserTokens>;
   /** Validates the user invite code and adds the user as a colony contributor */
   validateUserInvite?: Maybe<Scalars['Boolean']>;
+};
+
+/** Root mutation type */
+export type MutationBridgeCreateBankAccountArgs = {
+  input: BridgeCreateBankAccountInput;
+};
+
+/** Root mutation type */
+export type MutationBridgeUpdateBankAccountArgs = {
+  input: BridgeUpdateBankAccountInput;
+};
+
+/** Root mutation type */
+export type MutationBridgeXyzMutationArgs = {
+  input: BridgeXyzMutationInput;
 };
 
 /** Root mutation type */
@@ -4617,12 +4825,6 @@ export type MutationCreateColonyRoleArgs = {
 };
 
 /** Root mutation type */
-export type MutationCreateColonyStakeArgs = {
-  condition?: InputMaybe<ModelColonyStakeConditionInput>;
-  input: CreateColonyStakeInput;
-};
-
-/** Root mutation type */
 export type MutationCreateColonyTokensArgs = {
   condition?: InputMaybe<ModelColonyTokensConditionInput>;
   input: CreateColonyTokensInput;
@@ -4686,6 +4888,12 @@ export type MutationCreateExtensionInstallationsCountArgs = {
 export type MutationCreateIngestorStatsArgs = {
   condition?: InputMaybe<ModelIngestorStatsConditionInput>;
   input: CreateIngestorStatsInput;
+};
+
+/** Root mutation type */
+export type MutationCreateLiquidationAddressArgs = {
+  condition?: InputMaybe<ModelLiquidationAddressConditionInput>;
+  input: CreateLiquidationAddressInput;
 };
 
 /** Root mutation type */
@@ -4850,12 +5058,6 @@ export type MutationDeleteColonyRoleArgs = {
 };
 
 /** Root mutation type */
-export type MutationDeleteColonyStakeArgs = {
-  condition?: InputMaybe<ModelColonyStakeConditionInput>;
-  input: DeleteColonyStakeInput;
-};
-
-/** Root mutation type */
 export type MutationDeleteColonyTokensArgs = {
   condition?: InputMaybe<ModelColonyTokensConditionInput>;
   input: DeleteColonyTokensInput;
@@ -4919,6 +5121,12 @@ export type MutationDeleteExtensionInstallationsCountArgs = {
 export type MutationDeleteIngestorStatsArgs = {
   condition?: InputMaybe<ModelIngestorStatsConditionInput>;
   input: DeleteIngestorStatsInput;
+};
+
+/** Root mutation type */
+export type MutationDeleteLiquidationAddressArgs = {
+  condition?: InputMaybe<ModelLiquidationAddressConditionInput>;
+  input: DeleteLiquidationAddressInput;
 };
 
 /** Root mutation type */
@@ -5078,12 +5286,6 @@ export type MutationUpdateColonyRoleArgs = {
 };
 
 /** Root mutation type */
-export type MutationUpdateColonyStakeArgs = {
-  condition?: InputMaybe<ModelColonyStakeConditionInput>;
-  input: UpdateColonyStakeInput;
-};
-
-/** Root mutation type */
 export type MutationUpdateColonyTokensArgs = {
   condition?: InputMaybe<ModelColonyTokensConditionInput>;
   input: UpdateColonyTokensInput;
@@ -5152,6 +5354,12 @@ export type MutationUpdateExtensionInstallationsCountArgs = {
 export type MutationUpdateIngestorStatsArgs = {
   condition?: InputMaybe<ModelIngestorStatsConditionInput>;
   input: UpdateIngestorStatsInput;
+};
+
+/** Root mutation type */
+export type MutationUpdateLiquidationAddressArgs = {
+  condition?: InputMaybe<ModelLiquidationAddressConditionInput>;
+  input: UpdateLiquidationAddressInput;
 };
 
 /** Root mutation type */
@@ -5368,8 +5576,15 @@ export type Profile = {
   displayNameChanged?: Maybe<Scalars['AWSDateTime']>;
   /** User's email address */
   email?: Maybe<Scalars['AWSEmail']>;
+  /**
+   * Whether the user has completed the Persona KYC Flow
+   * Note: This doesn't indicate the outcome of the KYC check
+   */
+  hasCompletedKYCFlow?: Maybe<Scalars['Boolean']>;
   /** Unique identifier for the user's profile */
   id: Scalars['ID'];
+  /** Is automatic offramp enabled */
+  isAutoOfframpEnabled?: Maybe<Scalars['Boolean']>;
   /** User's location information */
   location?: Maybe<Scalars['String']>;
   /** Metadata associated with the user's profile */
@@ -5431,6 +5646,8 @@ export type ProfileMetadataInput = {
 /** Root query type */
 export type Query = {
   __typename?: 'Query';
+  /** Fetch from the Bridge XYZ API */
+  bridgeXYZQuery?: Maybe<BridgeXyzQueryReturn>;
   getActionByExpenditureId?: Maybe<ModelColonyActionConnection>;
   getActionsByColony?: Maybe<ModelColonyActionConnection>;
   getAnnotation?: Maybe<Annotation>;
@@ -5454,8 +5671,6 @@ export type Query = {
   getColonyMetadata?: Maybe<ColonyMetadata>;
   getColonyMotion?: Maybe<ColonyMotion>;
   getColonyRole?: Maybe<ColonyRole>;
-  getColonyStake?: Maybe<ColonyStake>;
-  getColonyStakeByUserAddress?: Maybe<ModelColonyStakeConnection>;
   getColonyTokens?: Maybe<ColonyTokens>;
   getContractEvent?: Maybe<ContractEvent>;
   getContributorReputation?: Maybe<ContributorReputation>;
@@ -5474,6 +5689,8 @@ export type Query = {
   getExtensionInstallationsCount?: Maybe<ExtensionInstallationsCount>;
   getExtensionsByHash?: Maybe<ModelColonyExtensionConnection>;
   getIngestorStats?: Maybe<IngestorStats>;
+  getLiquidationAddress?: Maybe<LiquidationAddress>;
+  getLiquidationAddressesByUserAddress?: Maybe<ModelLiquidationAddressConnection>;
   getMotionByExpenditureId?: Maybe<ModelColonyMotionConnection>;
   getMotionByTransactionHash?: Maybe<ModelColonyMotionConnection>;
   getMotionMessage?: Maybe<MotionMessage>;
@@ -5502,8 +5719,11 @@ export type Query = {
   getTransaction?: Maybe<Transaction>;
   getTransactionsByUser?: Maybe<ModelTransactionConnection>;
   getTransactionsByUserAndGroup?: Maybe<ModelTransactionConnection>;
+  getTransactionsByUserAndStatus?: Maybe<ModelTransactionConnection>;
   getUser?: Maybe<User>;
   getUserByAddress?: Maybe<ModelUserConnection>;
+  getUserByBridgeCustomerId?: Maybe<ModelUserConnection>;
+  getUserByLiquidationAddress?: Maybe<ModelLiquidationAddressConnection>;
   /** Retrieve a user's reputation within a specific domain in a Colony */
   getUserReputation?: Maybe<Scalars['String']>;
   getUserReputationInColony?: Maybe<ModelContributorReputationConnection>;
@@ -5527,7 +5747,6 @@ export type Query = {
   listColonyMetadata?: Maybe<ModelColonyMetadataConnection>;
   listColonyMotions?: Maybe<ModelColonyMotionConnection>;
   listColonyRoles?: Maybe<ModelColonyRoleConnection>;
-  listColonyStakes?: Maybe<ModelColonyStakeConnection>;
   listColonyTokens?: Maybe<ModelColonyTokensConnection>;
   listContractEvents?: Maybe<ModelContractEventConnection>;
   listContributorReputations?: Maybe<ModelContributorReputationConnection>;
@@ -5539,6 +5758,7 @@ export type Query = {
   listExpenditures?: Maybe<ModelExpenditureConnection>;
   listExtensionInstallationsCounts?: Maybe<ModelExtensionInstallationsCountConnection>;
   listIngestorStats?: Maybe<ModelIngestorStatsConnection>;
+  listLiquidationAddresses?: Maybe<ModelLiquidationAddressConnection>;
   listMotionMessages?: Maybe<ModelMotionMessageConnection>;
   listPrivateBetaInviteCodes?: Maybe<ModelPrivateBetaInviteCodeConnection>;
   listProfiles?: Maybe<ModelProfileConnection>;
@@ -5554,6 +5774,11 @@ export type Query = {
   listUsers?: Maybe<ModelUserConnection>;
   searchColonyActions?: Maybe<SearchableColonyActionConnection>;
   searchColonyContributors?: Maybe<SearchableColonyContributorConnection>;
+};
+
+/** Root query type */
+export type QueryBridgeXyzQueryArgs = {
+  input: BridgeXyzQueryInput;
 };
 
 /** Root query type */
@@ -5715,21 +5940,6 @@ export type QueryGetColonyRoleArgs = {
 };
 
 /** Root query type */
-export type QueryGetColonyStakeArgs = {
-  id: Scalars['ID'];
-};
-
-/** Root query type */
-export type QueryGetColonyStakeByUserAddressArgs = {
-  colonyId?: InputMaybe<ModelIdKeyConditionInput>;
-  filter?: InputMaybe<ModelColonyStakeFilterInput>;
-  limit?: InputMaybe<Scalars['Int']>;
-  nextToken?: InputMaybe<Scalars['String']>;
-  sortDirection?: InputMaybe<ModelSortDirection>;
-  userId: Scalars['ID'];
-};
-
-/** Root query type */
 export type QueryGetColonyTokensArgs = {
   id: Scalars['ID'];
 };
@@ -5850,6 +6060,20 @@ export type QueryGetExtensionsByHashArgs = {
 /** Root query type */
 export type QueryGetIngestorStatsArgs = {
   id: Scalars['ID'];
+};
+
+/** Root query type */
+export type QueryGetLiquidationAddressArgs = {
+  id: Scalars['ID'];
+};
+
+/** Root query type */
+export type QueryGetLiquidationAddressesByUserAddressArgs = {
+  filter?: InputMaybe<ModelLiquidationAddressFilterInput>;
+  limit?: InputMaybe<Scalars['Int']>;
+  nextToken?: InputMaybe<Scalars['String']>;
+  sortDirection?: InputMaybe<ModelSortDirection>;
+  userAddress: Scalars['ID'];
 };
 
 /** Root query type */
@@ -6027,6 +6251,16 @@ export type QueryGetTransactionsByUserAndGroupArgs = {
 };
 
 /** Root query type */
+export type QueryGetTransactionsByUserAndStatusArgs = {
+  filter?: InputMaybe<ModelTransactionFilterInput>;
+  from?: InputMaybe<ModelIdKeyConditionInput>;
+  limit?: InputMaybe<Scalars['Int']>;
+  nextToken?: InputMaybe<Scalars['String']>;
+  sortDirection?: InputMaybe<ModelSortDirection>;
+  status: TransactionStatus;
+};
+
+/** Root query type */
 export type QueryGetUserArgs = {
   id: Scalars['ID'];
 };
@@ -6036,6 +6270,24 @@ export type QueryGetUserByAddressArgs = {
   filter?: InputMaybe<ModelUserFilterInput>;
   id: Scalars['ID'];
   limit?: InputMaybe<Scalars['Int']>;
+  nextToken?: InputMaybe<Scalars['String']>;
+  sortDirection?: InputMaybe<ModelSortDirection>;
+};
+
+/** Root query type */
+export type QueryGetUserByBridgeCustomerIdArgs = {
+  bridgeCustomerId: Scalars['String'];
+  filter?: InputMaybe<ModelUserFilterInput>;
+  limit?: InputMaybe<Scalars['Int']>;
+  nextToken?: InputMaybe<Scalars['String']>;
+  sortDirection?: InputMaybe<ModelSortDirection>;
+};
+
+/** Root query type */
+export type QueryGetUserByLiquidationAddressArgs = {
+  filter?: InputMaybe<ModelLiquidationAddressFilterInput>;
+  limit?: InputMaybe<Scalars['Int']>;
+  liquidationAddress: Scalars['ID'];
   nextToken?: InputMaybe<Scalars['String']>;
   sortDirection?: InputMaybe<ModelSortDirection>;
 };
@@ -6177,13 +6429,6 @@ export type QueryListColonyRolesArgs = {
 };
 
 /** Root query type */
-export type QueryListColonyStakesArgs = {
-  filter?: InputMaybe<ModelColonyStakeFilterInput>;
-  limit?: InputMaybe<Scalars['Int']>;
-  nextToken?: InputMaybe<Scalars['String']>;
-};
-
-/** Root query type */
 export type QueryListColonyTokensArgs = {
   filter?: InputMaybe<ModelColonyTokensFilterInput>;
   limit?: InputMaybe<Scalars['Int']>;
@@ -6256,6 +6501,13 @@ export type QueryListExtensionInstallationsCountsArgs = {
 /** Root query type */
 export type QueryListIngestorStatsArgs = {
   filter?: InputMaybe<ModelIngestorStatsFilterInput>;
+  limit?: InputMaybe<Scalars['Int']>;
+  nextToken?: InputMaybe<Scalars['String']>;
+};
+
+/** Root query type */
+export type QueryListLiquidationAddressesArgs = {
+  filter?: InputMaybe<ModelLiquidationAddressFilterInput>;
   limit?: InputMaybe<Scalars['Int']>;
   nextToken?: InputMaybe<Scalars['String']>;
 };
@@ -6492,6 +6744,7 @@ export enum SearchableColonyActionAggregateField {
   ColonyId = 'colonyId',
   CreatedAt = 'createdAt',
   ExpenditureId = 'expenditureId',
+  ExpenditureSlotIds = 'expenditureSlotIds',
   FromDomainId = 'fromDomainId',
   FromPotId = 'fromPotId',
   Id = 'id',
@@ -6541,6 +6794,7 @@ export type SearchableColonyActionFilterInput = {
   colonyId?: InputMaybe<SearchableIdFilterInput>;
   createdAt?: InputMaybe<SearchableStringFilterInput>;
   expenditureId?: InputMaybe<SearchableIdFilterInput>;
+  expenditureSlotIds?: InputMaybe<SearchableIntFilterInput>;
   fromDomainId?: InputMaybe<SearchableIdFilterInput>;
   fromPotId?: InputMaybe<SearchableIntFilterInput>;
   id?: InputMaybe<SearchableIdFilterInput>;
@@ -6582,6 +6836,7 @@ export enum SearchableColonyActionSortableFields {
   ColonyId = 'colonyId',
   CreatedAt = 'createdAt',
   ExpenditureId = 'expenditureId',
+  ExpenditureSlotIds = 'expenditureSlotIds',
   FromDomainId = 'fromDomainId',
   FromPotId = 'fromPotId',
   Id = 'id',
@@ -6764,6 +7019,12 @@ export enum SortingMethod {
   ByMorePermissions = 'BY_MORE_PERMISSIONS',
 }
 
+export enum SplitPaymentDistributionType {
+  Equal = 'EQUAL',
+  Reputation = 'REPUTATION',
+  Unequal = 'UNEQUAL',
+}
+
 export type StakedExpenditureParams = {
   __typename?: 'StakedExpenditureParams';
   stakeFraction: Scalars['String'];
@@ -6839,7 +7100,6 @@ export type Subscription = {
   onCreateColonyMetadata?: Maybe<ColonyMetadata>;
   onCreateColonyMotion?: Maybe<ColonyMotion>;
   onCreateColonyRole?: Maybe<ColonyRole>;
-  onCreateColonyStake?: Maybe<ColonyStake>;
   onCreateColonyTokens?: Maybe<ColonyTokens>;
   onCreateContractEvent?: Maybe<ContractEvent>;
   onCreateContributorReputation?: Maybe<ContributorReputation>;
@@ -6851,6 +7111,7 @@ export type Subscription = {
   onCreateExpenditureMetadata?: Maybe<ExpenditureMetadata>;
   onCreateExtensionInstallationsCount?: Maybe<ExtensionInstallationsCount>;
   onCreateIngestorStats?: Maybe<IngestorStats>;
+  onCreateLiquidationAddress?: Maybe<LiquidationAddress>;
   onCreateMotionMessage?: Maybe<MotionMessage>;
   onCreatePrivateBetaInviteCode?: Maybe<PrivateBetaInviteCode>;
   onCreateProfile?: Maybe<Profile>;
@@ -6877,7 +7138,6 @@ export type Subscription = {
   onDeleteColonyMetadata?: Maybe<ColonyMetadata>;
   onDeleteColonyMotion?: Maybe<ColonyMotion>;
   onDeleteColonyRole?: Maybe<ColonyRole>;
-  onDeleteColonyStake?: Maybe<ColonyStake>;
   onDeleteColonyTokens?: Maybe<ColonyTokens>;
   onDeleteContractEvent?: Maybe<ContractEvent>;
   onDeleteContributorReputation?: Maybe<ContributorReputation>;
@@ -6889,6 +7149,7 @@ export type Subscription = {
   onDeleteExpenditureMetadata?: Maybe<ExpenditureMetadata>;
   onDeleteExtensionInstallationsCount?: Maybe<ExtensionInstallationsCount>;
   onDeleteIngestorStats?: Maybe<IngestorStats>;
+  onDeleteLiquidationAddress?: Maybe<LiquidationAddress>;
   onDeleteMotionMessage?: Maybe<MotionMessage>;
   onDeletePrivateBetaInviteCode?: Maybe<PrivateBetaInviteCode>;
   onDeleteProfile?: Maybe<Profile>;
@@ -6915,7 +7176,6 @@ export type Subscription = {
   onUpdateColonyMetadata?: Maybe<ColonyMetadata>;
   onUpdateColonyMotion?: Maybe<ColonyMotion>;
   onUpdateColonyRole?: Maybe<ColonyRole>;
-  onUpdateColonyStake?: Maybe<ColonyStake>;
   onUpdateColonyTokens?: Maybe<ColonyTokens>;
   onUpdateContractEvent?: Maybe<ContractEvent>;
   onUpdateContributorReputation?: Maybe<ContributorReputation>;
@@ -6927,6 +7187,7 @@ export type Subscription = {
   onUpdateExpenditureMetadata?: Maybe<ExpenditureMetadata>;
   onUpdateExtensionInstallationsCount?: Maybe<ExtensionInstallationsCount>;
   onUpdateIngestorStats?: Maybe<IngestorStats>;
+  onUpdateLiquidationAddress?: Maybe<LiquidationAddress>;
   onUpdateMotionMessage?: Maybe<MotionMessage>;
   onUpdatePrivateBetaInviteCode?: Maybe<PrivateBetaInviteCode>;
   onUpdateProfile?: Maybe<Profile>;
@@ -6994,10 +7255,6 @@ export type SubscriptionOnCreateColonyRoleArgs = {
   filter?: InputMaybe<ModelSubscriptionColonyRoleFilterInput>;
 };
 
-export type SubscriptionOnCreateColonyStakeArgs = {
-  filter?: InputMaybe<ModelSubscriptionColonyStakeFilterInput>;
-};
-
 export type SubscriptionOnCreateColonyTokensArgs = {
   filter?: InputMaybe<ModelSubscriptionColonyTokensFilterInput>;
 };
@@ -7040,6 +7297,10 @@ export type SubscriptionOnCreateExtensionInstallationsCountArgs = {
 
 export type SubscriptionOnCreateIngestorStatsArgs = {
   filter?: InputMaybe<ModelSubscriptionIngestorStatsFilterInput>;
+};
+
+export type SubscriptionOnCreateLiquidationAddressArgs = {
+  filter?: InputMaybe<ModelSubscriptionLiquidationAddressFilterInput>;
 };
 
 export type SubscriptionOnCreateMotionMessageArgs = {
@@ -7146,10 +7407,6 @@ export type SubscriptionOnDeleteColonyRoleArgs = {
   filter?: InputMaybe<ModelSubscriptionColonyRoleFilterInput>;
 };
 
-export type SubscriptionOnDeleteColonyStakeArgs = {
-  filter?: InputMaybe<ModelSubscriptionColonyStakeFilterInput>;
-};
-
 export type SubscriptionOnDeleteColonyTokensArgs = {
   filter?: InputMaybe<ModelSubscriptionColonyTokensFilterInput>;
 };
@@ -7192,6 +7449,10 @@ export type SubscriptionOnDeleteExtensionInstallationsCountArgs = {
 
 export type SubscriptionOnDeleteIngestorStatsArgs = {
   filter?: InputMaybe<ModelSubscriptionIngestorStatsFilterInput>;
+};
+
+export type SubscriptionOnDeleteLiquidationAddressArgs = {
+  filter?: InputMaybe<ModelSubscriptionLiquidationAddressFilterInput>;
 };
 
 export type SubscriptionOnDeleteMotionMessageArgs = {
@@ -7298,10 +7559,6 @@ export type SubscriptionOnUpdateColonyRoleArgs = {
   filter?: InputMaybe<ModelSubscriptionColonyRoleFilterInput>;
 };
 
-export type SubscriptionOnUpdateColonyStakeArgs = {
-  filter?: InputMaybe<ModelSubscriptionColonyStakeFilterInput>;
-};
-
 export type SubscriptionOnUpdateColonyTokensArgs = {
   filter?: InputMaybe<ModelSubscriptionColonyTokensFilterInput>;
 };
@@ -7344,6 +7601,10 @@ export type SubscriptionOnUpdateExtensionInstallationsCountArgs = {
 
 export type SubscriptionOnUpdateIngestorStatsArgs = {
   filter?: InputMaybe<ModelSubscriptionIngestorStatsFilterInput>;
+};
+
+export type SubscriptionOnUpdateLiquidationAddressArgs = {
+  filter?: InputMaybe<ModelSubscriptionLiquidationAddressFilterInput>;
 };
 
 export type SubscriptionOnUpdateMotionMessageArgs = {
@@ -7436,6 +7697,8 @@ export type Token = {
   type?: Maybe<TokenType>;
   updatedAt: Scalars['AWSDateTime'];
   users?: Maybe<ModelUserTokensConnection>;
+  /** If the token was validated by the Colony Team, meaning it shows up in the manage tokens list to add to your colony */
+  validated?: Maybe<Scalars['Boolean']>;
 };
 
 /** Represents an ERC20-compatible token that is used by Colonies and users */
@@ -7518,10 +7781,10 @@ export type Transaction = {
   gasLimit?: Maybe<Scalars['String']>;
   /** The transaction's gas price */
   gasPrice?: Maybe<Scalars['String']>;
-  /** The group to which the transaction belongs, if any */
-  group?: Maybe<TransactionGroup>;
-  /** The id of the group to which the transaction belongs, if any */
-  groupId?: Maybe<Scalars['ID']>;
+  /** The group to which the transaction belongs */
+  group: TransactionGroup;
+  /** The id of the group to which the transaction belongs */
+  groupId: Scalars['ID'];
   /** The transaction hash */
   hash?: Maybe<Scalars['String']>;
   /** Transaction id */
@@ -7619,6 +7882,7 @@ export type UpdateColonyActionInput = {
   createdAt?: InputMaybe<Scalars['AWSDateTime']>;
   expenditureId?: InputMaybe<Scalars['ID']>;
   expenditureSlotChanges?: InputMaybe<ExpenditureSlotChangesInput>;
+  expenditureSlotIds?: InputMaybe<Array<Scalars['Int']>>;
   fromDomainId?: InputMaybe<Scalars['ID']>;
   fromPotId?: InputMaybe<Scalars['Int']>;
   id: Scalars['ID'];
@@ -7755,7 +8019,7 @@ export type UpdateColonyMotionInput = {
   editedExpenditureSlots?: InputMaybe<Array<ExpenditureSlotInput>>;
   expenditureFunding?: InputMaybe<Array<ExpenditureFundingItemInput>>;
   expenditureId?: InputMaybe<Scalars['ID']>;
-  expenditureSlotId?: InputMaybe<Scalars['Int']>;
+  expenditureSlotIds?: InputMaybe<Array<Scalars['Int']>>;
   gasEstimate?: InputMaybe<Scalars['String']>;
   hasObjection?: InputMaybe<Scalars['Boolean']>;
   id: Scalars['ID'];
@@ -7792,13 +8056,6 @@ export type UpdateColonyRoleInput = {
   role_5?: InputMaybe<Scalars['Boolean']>;
   role_6?: InputMaybe<Scalars['Boolean']>;
   targetAddress?: InputMaybe<Scalars['ID']>;
-};
-
-export type UpdateColonyStakeInput = {
-  colonyId?: InputMaybe<Scalars['ID']>;
-  id: Scalars['ID'];
-  totalAmount?: InputMaybe<Scalars['String']>;
-  userId?: InputMaybe<Scalars['ID']>;
 };
 
 export type UpdateColonyTokensInput = {
@@ -7884,6 +8141,7 @@ export type UpdateExpenditureInput = {
 };
 
 export type UpdateExpenditureMetadataInput = {
+  distributionType?: InputMaybe<SplitPaymentDistributionType>;
   fundFromDomainNativeId?: InputMaybe<Scalars['Int']>;
   id: Scalars['ID'];
   stages?: InputMaybe<Array<ExpenditureStageInput>>;
@@ -7926,6 +8184,13 @@ export type UpdateIngestorStatsInput = {
   value?: InputMaybe<Scalars['String']>;
 };
 
+export type UpdateLiquidationAddressInput = {
+  chainId?: InputMaybe<Scalars['Int']>;
+  id: Scalars['ID'];
+  liquidationAddress?: InputMaybe<Scalars['ID']>;
+  userAddress?: InputMaybe<Scalars['ID']>;
+};
+
 export type UpdateMotionMessageInput = {
   amount?: InputMaybe<Scalars['String']>;
   createdAt?: InputMaybe<Scalars['AWSDateTime']>;
@@ -7949,7 +8214,9 @@ export type UpdateProfileInput = {
   displayName?: InputMaybe<Scalars['String']>;
   displayNameChanged?: InputMaybe<Scalars['AWSDateTime']>;
   email?: InputMaybe<Scalars['AWSEmail']>;
+  hasCompletedKYCFlow?: InputMaybe<Scalars['Boolean']>;
   id: Scalars['ID'];
+  isAutoOfframpEnabled?: InputMaybe<Scalars['Boolean']>;
   location?: InputMaybe<Scalars['String']>;
   meta?: InputMaybe<ProfileMetadataInput>;
   preferredCurrency?: InputMaybe<SupportedCurrencies>;
@@ -8012,6 +8279,7 @@ export type UpdateTokenInput = {
   symbol?: InputMaybe<Scalars['String']>;
   thumbnail?: InputMaybe<Scalars['String']>;
   type?: InputMaybe<TokenType>;
+  validated?: InputMaybe<Scalars['Boolean']>;
 };
 
 export type UpdateTransactionInput = {
@@ -8045,6 +8313,7 @@ export type UpdateTransactionInput = {
 };
 
 export type UpdateUserInput = {
+  bridgeCustomerId?: InputMaybe<Scalars['String']>;
   id: Scalars['ID'];
   profileId?: InputMaybe<Scalars['ID']>;
   userPrivateBetaInviteCodeId?: InputMaybe<Scalars['ID']>;
@@ -8058,6 +8327,7 @@ export type UpdateUserStakeInput = {
   id: Scalars['ID'];
   isClaimed?: InputMaybe<Scalars['Boolean']>;
   isForfeited?: InputMaybe<Scalars['Boolean']>;
+  type?: InputMaybe<UserStakeType>;
   userAddress?: InputMaybe<Scalars['ID']>;
 };
 
@@ -8070,9 +8340,12 @@ export type UpdateUserTokensInput = {
 /** Represents a User within the Colony Network */
 export type User = {
   __typename?: 'User';
+  /** Bridge customer id */
+  bridgeCustomerId?: Maybe<Scalars['String']>;
   createdAt: Scalars['AWSDateTime'];
   /** Unique identifier for the user (wallet address) */
   id: Scalars['ID'];
+  liquidationAddresses?: Maybe<ModelLiquidationAddressConnection>;
   /** A user who has been invited by colony will be able to pass on the private beta invite */
   privateBetaInviteCode?: Maybe<PrivateBetaInviteCode>;
   /** Profile information of the user */
@@ -8080,7 +8353,6 @@ export type User = {
   /** Profile ID associated with the user */
   profileId?: Maybe<Scalars['ID']>;
   roles?: Maybe<ModelColonyRoleConnection>;
-  stakes?: Maybe<ModelColonyStakeConnection>;
   tokens?: Maybe<ModelUserTokensConnection>;
   transactionHistory?: Maybe<ModelTransactionConnection>;
   updatedAt: Scalars['AWSDateTime'];
@@ -8088,18 +8360,17 @@ export type User = {
 };
 
 /** Represents a User within the Colony Network */
-export type UserRolesArgs = {
-  colonyAddress?: InputMaybe<ModelIdKeyConditionInput>;
-  filter?: InputMaybe<ModelColonyRoleFilterInput>;
+export type UserLiquidationAddressesArgs = {
+  filter?: InputMaybe<ModelLiquidationAddressFilterInput>;
   limit?: InputMaybe<Scalars['Int']>;
   nextToken?: InputMaybe<Scalars['String']>;
   sortDirection?: InputMaybe<ModelSortDirection>;
 };
 
 /** Represents a User within the Colony Network */
-export type UserStakesArgs = {
-  colonyId?: InputMaybe<ModelIdKeyConditionInput>;
-  filter?: InputMaybe<ModelColonyStakeFilterInput>;
+export type UserRolesArgs = {
+  colonyAddress?: InputMaybe<ModelIdKeyConditionInput>;
+  filter?: InputMaybe<ModelColonyRoleFilterInput>;
   limit?: InputMaybe<Scalars['Int']>;
   nextToken?: InputMaybe<Scalars['String']>;
   sortDirection?: InputMaybe<ModelSortDirection>;
@@ -8151,10 +8422,17 @@ export type UserStake = {
   isClaimed: Scalars['Boolean'];
   /** Only applicable for expenditure stakes, indicates if the creator's stake was forfeited when expenditure was cancelled */
   isForfeited?: Maybe<Scalars['Boolean']>;
+  type?: Maybe<UserStakeType>;
   updatedAt: Scalars['AWSDateTime'];
   user: User;
   userAddress: Scalars['ID'];
 };
+
+/** Type of stake a user can make */
+export enum UserStakeType {
+  Motion = 'MOTION',
+  StakedExpenditure = 'STAKED_EXPENDITURE',
+}
 
 export type UserTokens = {
   __typename?: 'UserTokens';
@@ -8328,6 +8606,7 @@ export type ExpenditureFragment = {
   userStakeId?: string | null;
   createdAt: string;
   firstEditTransactionHash?: string | null;
+  type: ExpenditureType;
   slots: Array<{
     __typename?: 'ExpenditureSlot';
     id: number;
@@ -8978,28 +9257,6 @@ export type DeleteColonyTokensMutation = {
   deleteColonyTokens?: { __typename?: 'ColonyTokens'; id: string } | null;
 };
 
-export type CreateColonyStakeMutationVariables = Exact<{
-  colonyStakeId: Scalars['ID'];
-  userAddress: Scalars['ID'];
-  colonyAddress: Scalars['ID'];
-  totalAmount: Scalars['String'];
-}>;
-
-export type CreateColonyStakeMutation = {
-  __typename?: 'Mutation';
-  createColonyStake?: { __typename?: 'ColonyStake'; id: string } | null;
-};
-
-export type UpdateColonyStakeMutationVariables = Exact<{
-  colonyStakeId: Scalars['ID'];
-  totalAmount: Scalars['String'];
-}>;
-
-export type UpdateColonyStakeMutation = {
-  __typename?: 'Mutation';
-  updateColonyStake?: { __typename?: 'ColonyStake'; id: string } | null;
-};
-
 export type GetColonyActionQueryVariables = Exact<{
   transactionHash: Scalars['ID'];
 }>;
@@ -9309,6 +9566,7 @@ export type GetExpenditureQuery = {
     userStakeId?: string | null;
     createdAt: string;
     firstEditTransactionHash?: string | null;
+    type: ExpenditureType;
     slots: Array<{
       __typename?: 'ExpenditureSlot';
       id: number;
@@ -9356,6 +9614,7 @@ export type GetExpenditureByNativeFundingPotIdAndColonyQuery = {
       userStakeId?: string | null;
       createdAt: string;
       firstEditTransactionHash?: string | null;
+      type: ExpenditureType;
       slots: Array<{
         __typename?: 'ExpenditureSlot';
         id: number;
@@ -9387,23 +9646,6 @@ export type GetExpenditureByNativeFundingPotIdAndColonyQuery = {
         amount: string;
       }> | null;
     } | null>;
-  } | null;
-};
-
-export type GetExpenditureMetadataQueryVariables = Exact<{
-  id: Scalars['ID'];
-}>;
-
-export type GetExpenditureMetadataQuery = {
-  __typename?: 'Query';
-  getExpenditureMetadata?: {
-    __typename?: 'ExpenditureMetadata';
-    stages?: Array<{
-      __typename?: 'ExpenditureStage';
-      name: string;
-      slotId: number;
-      isReleased: boolean;
-    }> | null;
   } | null;
 };
 
@@ -9791,15 +10033,6 @@ export type GetTokenFromEverywhereQuery = {
   } | null;
 };
 
-export type GetColonyStakeQueryVariables = Exact<{
-  colonyStakeId: Scalars['ID'];
-}>;
-
-export type GetColonyStakeQuery = {
-  __typename?: 'Query';
-  getColonyStake?: { __typename?: 'ColonyStake'; totalAmount: string } | null;
-};
-
 export const Token = gql`
   fragment Token on Token {
     tokenAddress: id
@@ -9901,6 +10134,7 @@ export const Expenditure = gql`
     userStakeId
     createdAt
     firstEditTransactionHash
+    type
   }
   ${ExpenditureSlot}
   ${ExpenditureBalance}
@@ -10389,34 +10623,6 @@ export const DeleteColonyTokensDocument = gql`
     }
   }
 `;
-export const CreateColonyStakeDocument = gql`
-  mutation CreateColonyStake(
-    $colonyStakeId: ID!
-    $userAddress: ID!
-    $colonyAddress: ID!
-    $totalAmount: String!
-  ) {
-    createColonyStake(
-      input: {
-        id: $colonyStakeId
-        userId: $userAddress
-        colonyId: $colonyAddress
-        totalAmount: $totalAmount
-      }
-    ) {
-      id
-    }
-  }
-`;
-export const UpdateColonyStakeDocument = gql`
-  mutation UpdateColonyStake($colonyStakeId: ID!, $totalAmount: String!) {
-    updateColonyStake(
-      input: { id: $colonyStakeId, totalAmount: $totalAmount }
-    ) {
-      id
-    }
-  }
-`;
 export const GetColonyActionDocument = gql`
   query GetColonyAction($transactionHash: ID!) {
     getColonyAction(id: $transactionHash) {
@@ -10617,17 +10823,6 @@ export const GetExpenditureByNativeFundingPotIdAndColonyDocument = gql`
     }
   }
   ${Expenditure}
-`;
-export const GetExpenditureMetadataDocument = gql`
-  query GetExpenditureMetadata($id: ID!) {
-    getExpenditureMetadata(id: $id) {
-      stages {
-        name
-        slotId
-        isReleased
-      }
-    }
-  }
 `;
 export const GetStreamingPaymentDocument = gql`
   query GetStreamingPayment($id: ID!) {
@@ -10839,13 +11034,6 @@ export const GetTokenFromEverywhereDocument = gql`
       items {
         id
       }
-    }
-  }
-`;
-export const GetColonyStakeDocument = gql`
-  query GetColonyStake($colonyStakeId: ID!) {
-    getColonyStake(id: $colonyStakeId) {
-      totalAmount
     }
   }
 `;

@@ -10,6 +10,7 @@ import {
   UpdateExpenditureDocument,
   UpdateExpenditureMutation,
   UpdateExpenditureMutationVariables,
+  UserStakeType,
 } from '~graphql';
 import { EventHandler } from '~types';
 import { getExpenditureDatabaseId, output, toNumber, verbose } from '~utils';
@@ -65,6 +66,7 @@ export const handleExpenditureMadeViaStake: EventHandler = async (
         userAddress: creator,
         colonyAddress,
         isClaimed: false,
+        type: UserStakeType.StakedExpenditure,
       },
     },
   );

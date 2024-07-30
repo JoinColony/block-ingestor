@@ -1,25 +1,15 @@
-import { BigNumber } from 'ethers';
-import { mutate, query } from '~amplifyClient';
+import { mutate } from '~amplifyClient';
 import {
-  GetColonyStakeDocument,
-  GetColonyStakeQuery,
-  GetColonyStakeQueryVariables,
   StakerReward,
   UpdateColonyDocument,
   UpdateColonyMutation,
   UpdateColonyMutationVariables,
-  UpdateColonyStakeDocument,
-  UpdateColonyStakeMutation,
-  UpdateColonyStakeMutationVariables,
   UpdateUserStakeDocument,
   UpdateUserStakeMutation,
   UpdateUserStakeMutationVariables,
-  UserMotionStakes,
 } from '~graphql';
 import { getColonyFromDB, output } from '~utils';
 import { getUserStakeDatabaseId } from '~utils/stakes';
-
-import { getColonyStakeId } from '../helpers';
 
 export const getUpdatedStakerRewards = (
   stakerRewards: StakerReward[],
@@ -106,42 +96,8 @@ export const updateColonyUnclaimedStakes = async (
  */
 export const reclaimUserStake = async (
   userAddress: string,
-  colonyAddress: string,
-  reclaimAmount: BigNumber,
   motionTransactionHash: string,
 ): Promise<void> => {
-  const colonyStakeId = getColonyStakeId(userAddress, colonyAddress);
-  const { data } =
-    (await query<GetColonyStakeQuery, GetColonyStakeQueryVariables>(
-      GetColonyStakeDocument,
-      {
-        colonyStakeId,
-      },
-    )) ?? {};
-
-  if (!data?.getColonyStake) {
-    output(
-      `Could not find user stake for user ${userAddress} in colony ${colonyAddress}. This is a bug and should be investigated.`,
-    );
-    return;
-  }
-
-  const totalAmount = data.getColonyStake.totalAmount;
-  let updatedAmount = BigNumber.from(totalAmount).sub(reclaimAmount);
-
-  // Should never be negative, but just in case.
-  if (updatedAmount.isNegative()) {
-    updatedAmount = BigNumber.from(0);
-  }
-
-  await mutate<UpdateColonyStakeMutation, UpdateColonyStakeMutationVariables>(
-    UpdateColonyStakeDocument,
-    {
-      colonyStakeId,
-      totalAmount: updatedAmount.toString(),
-    },
-  );
-
   // Update user stake status
   await mutate<UpdateUserStakeMutation, UpdateUserStakeMutationVariables>(
     UpdateUserStakeDocument,
@@ -151,23 +107,5 @@ export const reclaimUserStake = async (
         isClaimed: true,
       },
     },
-  );
-};
-
-export const getUserMotionStake = (
-  usersStakes: UserMotionStakes[],
-  userAddress: string,
-): BigNumber => {
-  const userStakes = usersStakes.find(({ address }) => address === userAddress);
-
-  if (!userStakes) {
-    output(
-      `Could not find the stakes for user ${userAddress}. This is a bug and should be investigated.`,
-    );
-    return BigNumber.from(0);
-  }
-
-  return BigNumber.from(userStakes.stakes.raw.yay).add(
-    userStakes.stakes.raw.nay,
   );
 };

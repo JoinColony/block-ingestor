@@ -1,4 +1,4 @@
-import { BigNumber, constants } from 'ethers';
+import { BigNumber, constants, utils } from 'ethers';
 import { StaticJsonRpcProvider } from '@ethersproject/providers';
 
 import { ColonyOperations, EventHandler } from '~types';
@@ -9,8 +9,9 @@ import {
   getOneTxPaymentClient,
   getVotingClient,
   verbose,
+  output,
 } from '~utils';
-import { SimpleTransactionDescription, parseAction } from './helpers';
+import { SimpleTransactionDescription, parseMotionAction } from './helpers';
 import {
   handleEditDomainMotion,
   handleAddDomainMotion,
@@ -29,6 +30,7 @@ import {
   handleMetadataDeltaMotion,
   handleCancelExpenditureViaArbitrationMotion,
   handleFinalizeExpenditureViaArbitrationMotion,
+  handleReleaseStagedPaymentViaArbitration,
 } from './handlers';
 import { ExtensionEventListener } from '~eventListeners';
 
@@ -62,12 +64,24 @@ export const handleMotionCreated: EventHandler = async (
   const motion = await votingReputationClient.getMotion(motionId, {
     blockTag: blockNumber,
   });
-  const parsedAction = parseAction(motion.action, {
-    colonyClient,
-    oneTxPaymentClient,
-    stakedExpenditureClient,
-    stagedExpenditureClient,
-  });
+
+  /**
+   * @NOTE: This is not good, we should use ABIs from @colony/abis instead.
+   * It would avoid having to make network calls each time the motion is created
+   */
+  const interfaces = [
+    colonyClient.interface,
+    oneTxPaymentClient?.interface,
+    stakedExpenditureClient?.interface,
+    stagedExpenditureClient?.interface,
+  ].filter(Boolean) as utils.Interface[]; // Casting seems necessary as TS does not pick up the .filter()
+
+  const parsedAction = parseMotionAction(motion.action, interfaces);
+
+  if (!parsedAction) {
+    output(`Failed to parse motion action: ${motion.action}`);
+    return;
+  }
 
   let gasEstimate: BigNumber;
 
@@ -237,6 +251,7 @@ export const handleMotionCreated: EventHandler = async (
           event,
           parsedAction,
           gasEstimate,
+          interfaces,
         );
         break;
       }
@@ -294,6 +309,16 @@ export const handleMotionCreated: EventHandler = async (
 
       case ColonyOperations.FinalizeExpenditureViaArbitration: {
         await handleFinalizeExpenditureViaArbitrationMotion(
+          colonyAddress,
+          event,
+          parsedAction,
+          gasEstimate,
+        );
+        break;
+      }
+
+      case ColonyOperations.ReleaseStagedPaymentViaArbitration: {
+        await handleReleaseStagedPaymentViaArbitration(
           colonyAddress,
           event,
           parsedAction,
