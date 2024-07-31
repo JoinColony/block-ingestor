@@ -959,11 +959,6 @@ export type ColonyMotion = {
   expenditureId?: Maybe<Scalars['ID']>;
   /** Id of the expenditure stage payment to be released if the motion pass, if any */
   expenditureSlotId?: Maybe<Scalars['Int']>;
-  /**
-   * An option to manually specify the amount of gas to estimate for the finalization of this motion.
-   * Particularly useful for "heavy" actions, such as a multicall.
-   */
-  gasEstimate: Scalars['String'];
   /** Simple flag indicating whether both sides of staking have been activated */
   hasObjection: Scalars['Boolean'];
   /**
@@ -1407,7 +1402,6 @@ export type CreateColonyMotionInput = {
   expenditureFunding?: InputMaybe<Array<ExpenditureFundingItemInput>>;
   expenditureId?: InputMaybe<Scalars['ID']>;
   expenditureSlotId?: InputMaybe<Scalars['Int']>;
-  gasEstimate: Scalars['String'];
   hasObjection: Scalars['Boolean'];
   id?: InputMaybe<Scalars['ID']>;
   isDecision: Scalars['Boolean'];
@@ -2835,7 +2829,6 @@ export type ModelColonyMotionConditionInput = {
   createdBy?: InputMaybe<ModelStringInput>;
   expenditureId?: InputMaybe<ModelIdInput>;
   expenditureSlotId?: InputMaybe<ModelIntInput>;
-  gasEstimate?: InputMaybe<ModelStringInput>;
   hasObjection?: InputMaybe<ModelBooleanInput>;
   isDecision?: InputMaybe<ModelBooleanInput>;
   isFinalized?: InputMaybe<ModelBooleanInput>;
@@ -2864,7 +2857,6 @@ export type ModelColonyMotionFilterInput = {
   createdBy?: InputMaybe<ModelStringInput>;
   expenditureId?: InputMaybe<ModelIdInput>;
   expenditureSlotId?: InputMaybe<ModelIntInput>;
-  gasEstimate?: InputMaybe<ModelStringInput>;
   hasObjection?: InputMaybe<ModelBooleanInput>;
   id?: InputMaybe<ModelIdInput>;
   isDecision?: InputMaybe<ModelBooleanInput>;
@@ -3869,7 +3861,6 @@ export type ModelSubscriptionColonyMotionFilterInput = {
   createdBy?: InputMaybe<ModelSubscriptionStringInput>;
   expenditureId?: InputMaybe<ModelSubscriptionIdInput>;
   expenditureSlotId?: InputMaybe<ModelSubscriptionIntInput>;
-  gasEstimate?: InputMaybe<ModelSubscriptionStringInput>;
   hasObjection?: InputMaybe<ModelSubscriptionBooleanInput>;
   id?: InputMaybe<ModelSubscriptionIdInput>;
   isDecision?: InputMaybe<ModelSubscriptionBooleanInput>;
@@ -8100,7 +8091,6 @@ export type UpdateColonyMotionInput = {
   expenditureFunding?: InputMaybe<Array<ExpenditureFundingItemInput>>;
   expenditureId?: InputMaybe<Scalars['ID']>;
   expenditureSlotId?: InputMaybe<Scalars['Int']>;
-  gasEstimate?: InputMaybe<Scalars['String']>;
   hasObjection?: InputMaybe<Scalars['Boolean']>;
   id: Scalars['ID'];
   isDecision?: InputMaybe<Scalars['Boolean']>;

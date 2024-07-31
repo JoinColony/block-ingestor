@@ -1,6 +1,5 @@
 import { TransactionDescription } from 'ethers/lib/utils';
 import { Id } from '@colony/colony-js';
-import { BigNumber } from 'ethers';
 import { ContractEvent, motionNameMapping } from '~types';
 import { getDomainDatabaseId } from '~utils';
 
@@ -10,7 +9,6 @@ export const handleMakeArbitraryTransactionsMotion = async (
   colonyAddress: string,
   event: ContractEvent,
   parsedAction: TransactionDescription,
-  gasEstimate: BigNumber,
 ): Promise<void> => {
   const { name, args: actionArgs } = parsedAction;
   const [recipients] = actionArgs;
@@ -19,6 +17,5 @@ export const handleMakeArbitraryTransactionsMotion = async (
     type: motionNameMapping[name],
     recipientAddress: recipients[0],
     fromDomainId: getDomainDatabaseId(colonyAddress, Id.RootDomain),
-    gasEstimate: gasEstimate.toString(),
   });
 };

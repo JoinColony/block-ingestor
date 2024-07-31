@@ -1,5 +1,4 @@
 import { TransactionDescription } from 'ethers/lib/utils';
-import { BigNumber } from 'ethers';
 
 import { ContractEvent, motionNameMapping } from '~types';
 import { getDomainDatabaseId, toNumber } from '~utils';
@@ -13,7 +12,6 @@ export const handlePaymentMotion = async (
   colonyAddress: string,
   event: ContractEvent,
   parsedAction: TransactionDescription,
-  gasEstimate: BigNumber,
 ): Promise<void> => {
   const { name, args: actionArgs } = parsedAction;
   const [, , , , recipients, tokenAddresses, amounts, fromDomainId] =
@@ -26,7 +24,6 @@ export const handlePaymentMotion = async (
       tokenAddress: tokenAddresses[0],
       amount: amounts[0].toString(),
       recipientAddress: recipients[0],
-      gasEstimate: gasEstimate.toString(),
     });
   } else {
     const payments = (recipients as string[]).map((recipient, idx) => {
@@ -42,7 +39,6 @@ export const handlePaymentMotion = async (
       type: ColonyActionType.MultiplePaymentMotion,
       fromDomainId: getDomainDatabaseId(colonyAddress, toNumber(fromDomainId)),
       payments,
-      gasEstimate: gasEstimate.toString(),
     });
   }
 };
