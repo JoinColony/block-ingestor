@@ -18,8 +18,6 @@ import {
 } from '~graphql';
 import { getDomainDatabaseId } from './domains';
 import { output } from './logger';
-import { getColonyFromDB } from './colonyClient';
-import { getExistingTokenAddresses, updateColonyTokens } from './tokens';
 import {
   getCachedColonyClient,
   getStagedExpenditureClient,
@@ -146,7 +144,6 @@ const linkPendingColonyMetadataWithColony = async (
 
   const {
     hasObjectiveChanged,
-    haveTokensChanged,
     hasAvatarChanged,
     newDisplayName,
     oldDisplayName,
@@ -184,21 +181,6 @@ const linkPendingColonyMetadataWithColony = async (
 
   if (hasObjectiveChanged) {
     updatedMetadata.objective = pendingColonyMetadata.objective;
-  }
-
-  if (haveTokensChanged && pendingColonyMetadata.modifiedTokenAddresses) {
-    // If tokens have changed, update colony tokens
-    const colony = await getColonyFromDB(colonyAddress);
-
-    if (colony) {
-      const existingTokenAddresses = getExistingTokenAddresses(colony);
-
-      await updateColonyTokens(
-        colony,
-        existingTokenAddresses,
-        pendingColonyMetadata.modifiedTokenAddresses,
-      );
-    }
   }
 
   await mutate(UpdateColonyMetadataDocument, {
