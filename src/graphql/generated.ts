@@ -56,6 +56,7 @@ export type ApprovedTokenChangesInput = {
   removed: Array<Scalars['ID']>;
   unaffected: Array<Scalars['ID']>;
 };
+
 export type BridgeCreateBankAccountInput = {
   accountOwner: Scalars['String'];
   address?: InputMaybe<BridgeXyzMutationAddressInput>;
@@ -169,8 +170,8 @@ export type BridgeXyzMutationReturn = {
   __typename?: 'BridgeXYZMutationReturn';
   bankAccount?: Maybe<BridgeXyzBankAccount>;
   country?: Maybe<Scalars['String']>;
+  kycStatus?: Maybe<KycStatus>;
   kyc_link?: Maybe<Scalars['String']>;
-  kyc_status?: Maybe<Scalars['String']>;
   success?: Maybe<Scalars['Boolean']>;
   tos_link?: Maybe<Scalars['String']>;
 };
@@ -11380,7 +11381,6 @@ export const Colony = gql`
       nextToken
     }
   }
-  ${Token}
 `;
 export const ExpenditureSlot = gql`
   fragment ExpenditureSlot on ExpenditureSlot {
