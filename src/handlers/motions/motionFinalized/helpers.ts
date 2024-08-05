@@ -14,6 +14,7 @@ import {
 } from '~utils';
 import { query, mutate } from '~amplifyClient';
 import {
+  ColonyActionType,
   ColonyMetadata,
   ColonyMotion,
   CreateDomainMetadataDocument,
@@ -28,11 +29,15 @@ import {
   GetDomainMetadataQuery,
   GetDomainMetadataQueryVariables,
   StakerReward,
+  UpdateColonyActionDocument,
+  UpdateColonyActionMutation,
+  UpdateColonyActionMutationVariables,
   UpdateColonyDocument,
   UpdateColonyMetadataDocument,
   UpdateDomainMetadataDocument,
 } from '~graphql';
 import { parseAction } from '../motionCreated/helpers';
+import { getAmountLessFee, getNetworkInverseFee } from '~utils/networkFee';
 
 export const getStakerReward = async (
   motionId: string,
@@ -349,6 +354,81 @@ export const updateColonyUnclaimedStakes = async (
       input: {
         id: colonyAddress,
         motionsWithUnclaimedStakes,
+      },
+    });
+  }
+};
+
+/*
+ * When a Simple Payment motion is finalized, we want to update the action in the database
+ * to include the networkFee and the amount excluding the fee at the time of finalization
+ */
+export const updateAmountToExcludeNetworkFee = async (
+  action: string,
+  colonyAddress: string,
+  finalizedMotion: ColonyMotion,
+): Promise<void> => {
+  const colonyClient = await getCachedColonyClient(colonyAddress);
+  const oneTxPaymentClient =
+    (await colonyClient?.getExtensionClient(Extension.OneTxPayment)) ?? null;
+
+  const parsedAction = parseAction(action, {
+    colonyClient,
+    oneTxPaymentClient,
+  });
+
+  if (!parsedAction) {
+    return;
+  }
+
+  if (parsedAction.name !== ColonyOperations.MakePaymentFundedFromDomain) {
+    return;
+  }
+
+  const { data } =
+    (await query<
+      GetColonyActionByMotionIdQuery,
+      GetColonyActionByMotionIdQueryVariables
+    >(GetColonyActionByMotionIdDocument, {
+      motionId: finalizedMotion.id,
+    })) ?? {};
+
+  const colonyAction = data?.getColonyActionByMotionId?.items[0];
+
+  if (!colonyAction) {
+    return;
+  }
+
+  if (colonyAction.type === ColonyActionType.PaymentMotion) {
+    if (colonyAction.networkFee) {
+      return;
+    }
+
+    if (!colonyAction.amount) {
+      return;
+    }
+
+    const networkInverseFee = await getNetworkInverseFee();
+    if (!networkInverseFee) {
+      output(
+        'Network inverse fee not found. This is a bug and should be investigated.',
+      );
+      return;
+    }
+
+    const amountWithFee = colonyAction.amount;
+
+    const amountLessFee = getAmountLessFee(amountWithFee, networkInverseFee);
+    const networkFee = BigNumber.from(amountWithFee).sub(amountLessFee);
+
+    await mutate<
+      UpdateColonyActionMutation,
+      UpdateColonyActionMutationVariables
+    >(UpdateColonyActionDocument, {
+      input: {
+        id: colonyAction.id,
+        amount: amountLessFee.toString(),
+        networkFee: networkFee.toString(),
       },
     });
   }

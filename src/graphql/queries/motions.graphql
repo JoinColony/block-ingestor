@@ -9,6 +9,9 @@ query GetColonyActionByMotionId($motionId: ID!) {
         ...ColonyMetadata
       }
       colonyDecisionId
+      amount
+      networkFee
+      type
     }
   }
 }
