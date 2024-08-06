@@ -1,41 +1,30 @@
-import { getExpenditureDatabaseId, output, toNumber, verbose } from '~utils';
-import { mutate } from '~amplifyClient';
-import {
-  UpdateStreamingPaymentDocument,
-  UpdateStreamingPaymentMutation,
-  UpdateStreamingPaymentMutationVariables,
-} from '~graphql';
 import { EventHandler } from '~types';
 import { ExtensionEventListener } from '~eventListeners';
 
-import { getStreamingPaymentFromDB } from './helpers';
+import { handleEditOrCancelStreamingPaymentAction } from './helpers/handleEditOrCancelStreamingPaymentAction';
+import { Extension, getExtensionHash } from '@colony/colony-js';
+import { getInterfaceByExtensionHash } from '~interfaces';
 
 export const handlePaymentTokenUpdated: EventHandler = async (
   event,
   listener,
 ) => {
-  const { streamingPaymentId, amount, interval } = event.args;
-  const convertedNativeId = toNumber(streamingPaymentId);
   const { colonyAddress } = listener as ExtensionEventListener;
 
-  const databaseId = getExpenditureDatabaseId(colonyAddress, convertedNativeId);
-  const streamingPayment = await getStreamingPaymentFromDB(databaseId);
+  const streamingPaymentsExtensionHash = getExtensionHash(
+    Extension.StreamingPayments,
+  );
+  const streamingPaymentsInterface = getInterfaceByExtensionHash(
+    streamingPaymentsExtensionHash,
+  );
 
-  if (!streamingPayment) {
-    output(`Streaming payment with ID ${databaseId} not found in the database`);
+  if (!streamingPaymentsInterface) {
     return;
   }
 
-  verbose(`Payment token updated for streaming payment with ID ${databaseId}`);
-
-  await mutate<
-    UpdateStreamingPaymentMutation,
-    UpdateStreamingPaymentMutationVariables
-  >(UpdateStreamingPaymentDocument, {
-    input: {
-      id: databaseId,
-      amount: amount.toString(),
-      interval: interval.toString(),
-    },
+  await handleEditOrCancelStreamingPaymentAction({
+    event,
+    streamingPaymentsInterface,
+    colonyAddress,
   });
 };

@@ -1,13 +1,8 @@
-import { mutate } from '~amplifyClient';
-import {
-  UpdateStreamingPaymentDocument,
-  UpdateStreamingPaymentMutation,
-  UpdateStreamingPaymentMutationVariables,
-} from '~graphql';
 import { EventHandler } from '~types';
-import { getExpenditureDatabaseId, output, toNumber, verbose } from '~utils';
-import { getStreamingPaymentFromDB } from './helpers';
 import { ExtensionEventListener } from '~eventListeners';
+import { handleEditOrCancelStreamingPaymentAction } from './helpers/handleEditOrCancelStreamingPaymentAction';
+import { Extension, getExtensionHash } from '@colony/colony-js';
+import { getInterfaceByExtensionHash } from '~interfaces';
 
 export const handleStreamingPaymentStartTimeSet: EventHandler = async (
   event,
@@ -15,31 +10,24 @@ export const handleStreamingPaymentStartTimeSet: EventHandler = async (
 ) => {
   const { colonyAddress } = listener as ExtensionEventListener;
 
-  const { streamingPaymentId, startTime } = event.args;
-  const convertedNativeId = toNumber(streamingPaymentId);
-
   if (!colonyAddress) {
     return;
   }
 
-  const databaseId = getExpenditureDatabaseId(colonyAddress, convertedNativeId);
-  const streamingPayment = await getStreamingPaymentFromDB(databaseId);
-  if (!streamingPayment) {
-    output(
-      `Could not find streaming payment with ID: ${databaseId} in the db. This is a bug and needs investigating.`,
-    );
+  const streamingPaymentsExtensionHash = getExtensionHash(
+    Extension.StreamingPayments,
+  );
+  const streamingPaymentsInterface = getInterfaceByExtensionHash(
+    streamingPaymentsExtensionHash,
+  );
+
+  if (!streamingPaymentsInterface) {
     return;
   }
 
-  verbose(`Start time set for streaming payment with ID ${databaseId}`);
-
-  await mutate<
-    UpdateStreamingPaymentMutation,
-    UpdateStreamingPaymentMutationVariables
-  >(UpdateStreamingPaymentDocument, {
-    input: {
-      id: databaseId,
-      startTime: startTime.toString(),
-    },
+  await handleEditOrCancelStreamingPaymentAction({
+    event,
+    streamingPaymentsInterface,
+    colonyAddress,
   });
 };
