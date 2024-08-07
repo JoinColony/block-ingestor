@@ -15,6 +15,7 @@ import {
   getStakerReward,
   linkPendingMetadata,
   updateColonyUnclaimedStakes,
+  updateAmountToExcludeNetworkFee,
 } from './helpers';
 
 export const handleMotionFinalized: EventHandler = async (event, listener) => {
@@ -57,6 +58,11 @@ export const handleMotionFinalized: EventHandler = async (event, listener) => {
 
     if (yayWon) {
       await linkPendingMetadata(action, colonyAddress, finalizedMotion);
+      await updateAmountToExcludeNetworkFee(
+        action,
+        colonyAddress,
+        finalizedMotion,
+      );
     }
 
     const updatedStakerRewards = await Promise.all(
