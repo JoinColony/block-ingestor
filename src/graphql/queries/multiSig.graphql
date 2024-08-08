@@ -1,0 +1,49 @@
+query GetColonyActionByMultiSigId($multiSigId: ID!) {
+  getColonyActionByMultiSigId(multiSigId: $multiSigId) {
+    items {
+      ...ActionMetadataInfo
+    }
+  }
+}
+
+query GetColonyMultiSig($id: ID!) {
+  getColonyMultiSig(id: $id) {
+    ...ColonyMultiSig
+  }
+}
+
+query GetUserMultiSigSignature($multiSigId: ID!, $userAddress: ID!, $vote: MultiSigVote!, $role: Int!) {
+  getMultiSigUserSignatureByMultiSigId(
+    filter: {userAddress: {eq: $userAddress}, vote: {eq: $vote}, role: {eq: $role}},
+    multiSigId: $multiSigId
+  ) {
+    items {
+      ...MultiSigUserSignature
+    }
+  }
+}
+
+query GetAllMultiSigRoles($colonyAddress: ID!) {
+  getRoleByColony(
+    # This is a workaround to get as many as possible, will need to do pagination down the line 
+    colonyAddress: $colonyAddress
+    limit: 9999
+    filter: {isMultiSig: {eq: true}}
+  ) {
+    items {
+      id
+    }
+  }
+}
+
+query GetActiveColonyMultisigs($colonyAddress: ID!){
+  getMultiSigByColonyAddress(
+    colonyAddress: $colonyAddress
+    filter: {isExecuted: {eq: false}, isRejected: {eq: false}}
+    limit: 9999
+  ) {
+    items {
+      id
+    }
+  }
+}

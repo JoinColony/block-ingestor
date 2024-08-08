@@ -6,7 +6,7 @@ import {
   isAddVerifiedMembersOperation,
   isManageTokensOperation,
   isRemoveVerifiedMembersOperation,
-  parseOperation,
+  parseMetadataDeltaOperation,
   verbose,
 } from '~utils';
 import { createMotionInDB } from '../helpers';
@@ -26,7 +26,7 @@ export const handleMetadataDeltaMotion = async (
       return;
     }
 
-    const operation = parseOperation(operationString);
+    const operation = parseMetadataDeltaOperation(operationString);
 
     if (operation === null) {
       return;

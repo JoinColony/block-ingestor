@@ -40,6 +40,11 @@ fragment ColonyMetadata on ColonyMetadata {
     name
     link
   }
+  objective {
+    title
+    description
+    progress
+  }
   changelog {
     transactionHash
     oldDisplayName
@@ -47,5 +52,6 @@ fragment ColonyMetadata on ColonyMetadata {
     hasAvatarChanged
     hasDescriptionChanged
     haveExternalLinksChanged
+    hasObjectiveChanged
   }
 }

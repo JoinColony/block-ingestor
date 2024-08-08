@@ -7,6 +7,7 @@ import {
   StagedExpenditureEvents__factory as StagedExpenditureEventsFactory,
   OneTxPaymentEvents__factory as OneTxPaymentEventsFactory,
   StreamingPaymentsEvents__factory as StreamingPaymentsEventsFactory,
+  MultisigPermissionsEvents__factory as MultisigPermissionsEventsFactory,
 } from '@colony/events';
 import { Extension, getExtensionHash } from '@colony/colony-js';
 
@@ -54,6 +55,12 @@ const getInterfaceByExtensionHash = (
     }
     case getExtensionHash(Extension.VotingReputation): {
       return VotingReputationEventsFactory.connect(
+        constants.AddressZero,
+        provider,
+      ).interface;
+    }
+    case getExtensionHash(Extension.MultisigPermissions): {
+      return MultisigPermissionsEventsFactory.connect(
         constants.AddressZero,
         provider,
       ).interface;

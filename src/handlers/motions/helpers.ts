@@ -4,52 +4,21 @@ import {
   ColonyMotion,
   CreateMotionMessageDocument,
   CreateMotionMessageInput,
-  GetColonyActionByMotionIdDocument,
-  GetColonyActionByMotionIdQuery,
-  GetColonyActionByMotionIdQueryVariables,
-  GetColonyDecisionByActionIdDocument,
-  GetColonyDecisionByActionIdQuery,
-  GetColonyDecisionByActionIdQueryVariables,
   GetColonyMotionDocument,
   GetColonyMotionQuery,
   GetColonyMotionQueryVariables,
   UpdateColonyActionDocument,
-  UpdateColonyDecisionDocument,
-  UpdateColonyDecisionMutation,
-  UpdateColonyDecisionMutationVariables,
   UpdateColonyMotionDocument,
 } from '~graphql';
 import { MotionSide, MotionVote } from '~types';
 import { verbose, output } from '~utils';
+import { getActionByMotionId } from '~utils/actions';
+import { updateDecisionInDB } from '~utils/decisions';
 
 export * from './motionStaked/helpers';
 
 export const getMotionSide = (vote: BigNumber): MotionSide =>
   vote.eq(MotionVote.YAY) ? MotionSide.YAY : MotionSide.NAY;
-
-const updateDecisionInDB = async (
-  actionId: string,
-  decisionData: Omit<UpdateColonyDecisionMutationVariables, 'id'>,
-): Promise<void> => {
-  const { data } =
-    (await query<
-      GetColonyDecisionByActionIdQuery,
-      GetColonyDecisionByActionIdQueryVariables
-    >(GetColonyDecisionByActionIdDocument, {
-      actionId,
-    })) ?? {};
-
-  const decision = data?.getColonyDecisionByActionId?.items[0];
-
-  if (decision)
-    await mutate<
-      UpdateColonyDecisionMutation,
-      UpdateColonyDecisionMutationVariables
-    >(UpdateColonyDecisionDocument, {
-      id: decision.id,
-      ...decisionData,
-    });
-};
 
 export const updateMotionInDB = async (
   motionData: ColonyMotion,
@@ -73,15 +42,7 @@ export const updateMotionInDB = async (
   }
 
   if (showInActionsList !== undefined) {
-    const { data } =
-      (await query<
-        GetColonyActionByMotionIdQuery,
-        GetColonyActionByMotionIdQueryVariables
-      >(GetColonyActionByMotionIdDocument, {
-        motionId: motionData.id,
-      })) ?? {};
-
-    const colonyAction = data?.getColonyActionByMotionId?.items[0];
+    const colonyAction = await getActionByMotionId(motionData.id);
 
     if (!colonyAction) {
       verbose(

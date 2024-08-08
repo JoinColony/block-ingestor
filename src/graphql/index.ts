@@ -1,5 +1,6 @@
 import {
   ColonyFragment,
+  ColonyMultiSigFragment,
   ColonyMetadataFragment,
   ColonyMotionFragment,
   DomainMetadataFragment,
@@ -12,6 +13,7 @@ import {
 export * from './generated';
 
 export type ColonyMotion = ColonyMotionFragment;
+export type ColonyMultiSig = ColonyMultiSigFragment;
 export type StakerReward = StakerRewardFragment;
 export type DomainMetadata = DomainMetadataFragment;
 export type ColonyMetadata = ColonyMetadataFragment;

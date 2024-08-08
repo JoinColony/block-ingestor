@@ -7,3 +7,4 @@ export * from './expenditures';
 export * from './reputationMiningCycle';
 export * from './tokens';
 export * from './metadataDelta';
+export * from './multiSig';

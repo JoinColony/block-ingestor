@@ -1,0 +1,13 @@
+fragment ActionMetadataInfo on ColonyAction {
+  id
+  pendingDomainMetadata {
+    ...DomainMetadata
+  }
+  pendingColonyMetadata {
+    ...ColonyMetadata
+  }
+  colonyDecisionId
+  amount
+  networkFee
+  type
+}

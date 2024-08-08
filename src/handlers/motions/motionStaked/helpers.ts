@@ -27,6 +27,7 @@ import {
 import { mutate, query } from '~amplifyClient';
 import { getUserStakeDatabaseId } from '~utils/stakes';
 import { getMotionSide, getColonyStakeId } from '../helpers';
+import { getBlockChainTimestampISODate } from '~utils/dates';
 
 export const getRequiredStake = (
   skillRep: BigNumber,
@@ -382,7 +383,7 @@ export const updateUserStake = async (
           actionId: transactionHash,
           amount: amount.toString(),
           isClaimed: false,
-          createdAt: new Date(timestamp * 1000).toISOString(),
+          createdAt: getBlockChainTimestampISODate(timestamp),
         },
       },
     );
