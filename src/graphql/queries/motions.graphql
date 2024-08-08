@@ -21,3 +21,11 @@ query GetColonyMotion($id: ID!) {
     ...ColonyMotion
   }
 }
+
+query GetVoterRewards($input: GetVoterRewardsInput!) {
+  getVoterRewards(input: $input) {
+    min
+    max
+    reward
+  }
+}
