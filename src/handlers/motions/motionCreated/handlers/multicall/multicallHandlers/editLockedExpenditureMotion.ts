@@ -27,7 +27,6 @@ export const isEditLockedExpenditureMotion: MulticallValidator = ({
 export const editLockedExpenditureMotionHandler: MulticallHandler = async ({
   colonyAddress,
   event,
-  gasEstimate,
   decodedFunctions,
 }) => {
   /**
@@ -106,7 +105,6 @@ export const editLockedExpenditureMotionHandler: MulticallHandler = async ({
 
   createMotionInDB(colonyAddress, event, {
     type: ColonyActionType.EditExpenditureMotion,
-    gasEstimate,
     expenditureId: expenditure.id,
     editedExpenditureSlots: updatedSlots,
   });

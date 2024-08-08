@@ -1,4 +1,3 @@
-import { BigNumber } from 'ethers';
 import { TransactionDescription } from 'ethers/lib/utils';
 import { ContractEvent, motionNameMapping } from '~types';
 import { getColonyTokenAddress, getDomainDatabaseId } from '~utils';
@@ -8,7 +7,6 @@ export const handleMintTokensMotion = async (
   colonyAddress: string,
   event: ContractEvent,
   parsedAction: TransactionDescription,
-  gasEstimate: BigNumber,
 ): Promise<void> => {
   const {
     args: { domainId },
@@ -26,6 +24,5 @@ export const handleMintTokensMotion = async (
     tokenAddress,
     fromDomainId: getDomainDatabaseId(colonyAddress, domainId),
     amount,
-    gasEstimate: gasEstimate.toString(),
   });
 };

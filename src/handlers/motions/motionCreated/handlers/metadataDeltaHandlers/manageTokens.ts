@@ -6,17 +6,14 @@ import {
 import { createMotionInDB } from '../../helpers';
 import { ColonyActionType } from '~graphql';
 import { ContractEvent } from '~types';
-import { BigNumber } from 'ethers';
 
 export const manageTokensMotionHandler = async ({
   colonyAddress,
   event,
-  gasEstimate,
   operation,
 }: {
   colonyAddress: string;
   event: ContractEvent;
-  gasEstimate: BigNumber;
   operation: MetadataDeltaOperation;
 }): Promise<void> => {
   const tokenAddresses = operation.payload;
@@ -40,6 +37,5 @@ export const manageTokensMotionHandler = async ({
       removed: modifiedTokenAddresses.removed,
       unaffected: unaffectedTokenAddresses,
     },
-    gasEstimate: gasEstimate.toString(),
   });
 };

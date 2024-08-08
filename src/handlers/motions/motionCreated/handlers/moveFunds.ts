@@ -15,7 +15,6 @@ export const handleMoveFundsMotion = async (
   colonyAddress: string,
   event: ContractEvent,
   parsedAction: TransactionDescription,
-  gasEstimate: BigNumber,
 ): Promise<void> => {
   const { blockNumber } = event;
 
@@ -64,6 +63,5 @@ export const handleMoveFundsMotion = async (
     toDomainId: toDomainId
       ? getDomainDatabaseId(colonyAddress, toNumber(toDomainId))
       : undefined,
-    gasEstimate: gasEstimate.toString(),
   });
 };

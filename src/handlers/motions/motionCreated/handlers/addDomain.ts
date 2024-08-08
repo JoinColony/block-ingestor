@@ -1,4 +1,3 @@
-import { BigNumber } from 'ethers';
 import { TransactionDescription } from 'ethers/lib/utils';
 import { ContractEvent, motionNameMapping } from '~types';
 import { getPendingMetadataDatabaseId } from '~utils';
@@ -8,7 +7,6 @@ export const handleAddDomainMotion = async (
   colonyAddress: string,
   event: ContractEvent,
   parsedAction: TransactionDescription,
-  gasEstimate: BigNumber,
 ): Promise<void> => {
   const { transactionHash } = event;
   if (!colonyAddress) {
@@ -25,6 +23,5 @@ export const handleAddDomainMotion = async (
   await createMotionInDB(colonyAddress, event, {
     type: motionNameMapping[name],
     pendingDomainMetadataId,
-    gasEstimate: gasEstimate.toString(),
   });
 };

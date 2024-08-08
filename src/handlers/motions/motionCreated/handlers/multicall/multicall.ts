@@ -1,5 +1,5 @@
 import { Result, TransactionDescription } from 'ethers/lib/utils';
-import { BigNumber, utils } from 'ethers';
+import { utils } from 'ethers';
 import { getCachedColonyClient, output } from '~utils';
 import { ContractEvent, ContractMethodSignatures } from '~types';
 import { AnyColonyClient } from '@colony/colony-js';
@@ -52,7 +52,6 @@ export const handleMulticallMotion = async (
   colonyAddress: string,
   event: ContractEvent,
   parsedAction: TransactionDescription,
-  gasEstimate: BigNumber,
 ): Promise<void> => {
   const colonyClient = await getCachedColonyClient(colonyAddress);
 
@@ -63,12 +62,6 @@ export const handleMulticallMotion = async (
   // Multicall takes an array of an array of encoded function calls
   const encodedFunctions = parsedAction.args[0];
 
-  // Multicall can have an arbitrary number of underlying function calls. Difficult to predict in advance how much
-  // gas executing this action will consume. Let's start by assuming 100k gas per action.
-  const updatedGasEstimate = gasEstimate
-    .add(BigNumber.from(encodedFunctions.length ?? 0).mul(100000))
-    .toString();
-
   // We need to determine which multicallMotion this is and pass it to the appropriate handler
   const decodedFunctions = decodeFunctions(encodedFunctions, colonyClient);
 
@@ -78,7 +71,6 @@ export const handleMulticallMotion = async (
         colonyAddress,
         event,
         decodedFunctions,
-        gasEstimate: updatedGasEstimate,
       });
 
       return;

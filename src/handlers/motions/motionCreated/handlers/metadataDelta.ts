@@ -1,4 +1,3 @@
-import { BigNumber } from 'ethers';
 import { TransactionDescription } from 'ethers/lib/utils';
 import { ColonyActionType } from '~graphql';
 import { ContractEvent } from '~types';
@@ -16,7 +15,6 @@ export const handleMetadataDeltaMotion = async (
   colonyAddress: string,
   event: ContractEvent,
   desc: TransactionDescription,
-  gasEstimate: BigNumber,
 ): Promise<void> => {
   try {
     const operationString = desc.args[0];
@@ -36,7 +34,6 @@ export const handleMetadataDeltaMotion = async (
       await createMotionInDB(colonyAddress, event, {
         type: ColonyActionType.AddVerifiedMembersMotion,
         members: operation.payload,
-        gasEstimate: gasEstimate.toString(),
       });
     }
 
@@ -44,7 +41,6 @@ export const handleMetadataDeltaMotion = async (
       await createMotionInDB(colonyAddress, event, {
         type: ColonyActionType.RemoveVerifiedMembersMotion,
         members: operation.payload,
-        gasEstimate: gasEstimate.toString(),
       });
     }
 
@@ -52,7 +48,6 @@ export const handleMetadataDeltaMotion = async (
       await manageTokensMotionHandler({
         colonyAddress,
         event,
-        gasEstimate,
         operation,
       });
     }
