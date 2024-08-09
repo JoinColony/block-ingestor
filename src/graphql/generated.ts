@@ -71,6 +71,21 @@ export type BridgeCreateBankAccountReturn = {
   success?: Maybe<Scalars['Boolean']>;
 };
 
+export type BridgeDrain = {
+  __typename?: 'BridgeDrain';
+  amount: Scalars['String'];
+  createdAt: Scalars['String'];
+  currency: Scalars['String'];
+  id: Scalars['String'];
+  receipt: BridgeDrainReceipt;
+  state: Scalars['String'];
+};
+
+export type BridgeDrainReceipt = {
+  __typename?: 'BridgeDrainReceipt';
+  url: Scalars['String'];
+};
+
 export type BridgeIbanAccountInput = {
   account_number: Scalars['String'];
   bic: Scalars['String'];
@@ -114,16 +129,6 @@ export type BridgeXyzBankAccount = {
   iban?: Maybe<BridgeIbanBankAccount>;
   id: Scalars['String'];
   usAccount?: Maybe<BridgeUsBankAccount>;
-};
-
-export type BridgeXyzDrain = {
-  __typename?: 'BridgeXYZDrain';
-  amount?: Maybe<Scalars['String']>;
-  created_at?: Maybe<Scalars['String']>;
-  deposit_tx_hash?: Maybe<Scalars['String']>;
-  id?: Maybe<Scalars['String']>;
-  receipt?: Maybe<DrainReceipt>;
-  state?: Maybe<Scalars['String']>;
 };
 
 export type BridgeXyzMutationAccountInput = {
@@ -182,7 +187,6 @@ export type BridgeXyzQueryInput = {
 
 export type BridgeXyzQueryReturn = {
   __typename?: 'BridgeXYZQueryReturn';
-  drains?: Maybe<Array<Maybe<BridgeXyzDrain>>>;
   success?: Maybe<Scalars['Boolean']>;
   transactionFee?: Maybe<Scalars['String']>;
 };
@@ -594,8 +598,8 @@ export enum ColonyActionType {
   MakeArbitraryTransactionsMultisig = 'MAKE_ARBITRARY_TRANSACTIONS_MULTISIG',
   /** An action related to adding / removing approved colony tokens */
   ManageTokens = 'MANAGE_TOKENS',
-  /** An action related to adding / removing approved colony tokens */
   ManageTokensMotion = 'MANAGE_TOKENS_MOTION',
+  ManageTokensMultisig = 'MANAGE_TOKENS_MULTISIG',
   /** An action related to minting tokens within a Colony */
   MintTokens = 'MINT_TOKENS',
   /** An action related to minting tokens within a Colony via a motion */
@@ -2170,12 +2174,6 @@ export type DomainMetadataChangelogInput = {
   oldDescription?: InputMaybe<Scalars['String']>;
   oldName: Scalars['String'];
   transactionHash: Scalars['String'];
-};
-
-export type DrainReceipt = {
-  __typename?: 'DrainReceipt';
-  destination_currency?: Maybe<Scalars['String']>;
-  url?: Maybe<Scalars['String']>;
 };
 
 export type Expenditure = {
@@ -6077,6 +6075,7 @@ export type ProfileMetadataInput = {
 /** Root query type */
 export type Query = {
   __typename?: 'Query';
+  bridgeGetDrainsHistory?: Maybe<Array<BridgeDrain>>;
   /** Fetch from the Bridge XYZ API */
   bridgeXYZQuery?: Maybe<BridgeXyzQueryReturn>;
   getActionByExpenditureId?: Maybe<ModelColonyActionConnection>;

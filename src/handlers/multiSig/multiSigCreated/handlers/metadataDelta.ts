@@ -3,11 +3,13 @@ import { ColonyActionType } from '~graphql';
 import { ContractEvent } from '~types';
 import {
   isAddVerifiedMembersOperation,
+  isManageTokensOperation,
   isRemoveVerifiedMembersOperation,
   parseMetadataDeltaOperation,
   verbose,
 } from '~utils';
 import { createMultiSigInDB } from '../helpers';
+import { manageTokensMultisigHandler } from './metadataDeltaHandlers/manageTokens';
 
 export const handleMetadataDeltaMultiSig = async (
   colonyAddress: string,
@@ -39,6 +41,14 @@ export const handleMetadataDeltaMultiSig = async (
       await createMultiSigInDB(colonyAddress, event, {
         type: ColonyActionType.RemoveVerifiedMembersMultisig,
         members: operation.payload,
+      });
+    }
+
+    if (isManageTokensOperation(operation)) {
+      await manageTokensMultisigHandler({
+        colonyAddress,
+        event,
+        operation,
       });
     }
   } catch (error) {
