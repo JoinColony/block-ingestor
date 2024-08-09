@@ -57,136 +57,6 @@ export type ApprovedTokenChangesInput = {
   unaffected: Array<Scalars['ID']>;
 };
 
-export type BridgeCreateBankAccountInput = {
-  accountOwner: Scalars['String'];
-  address?: InputMaybe<BridgeXyzMutationAddressInput>;
-  bankName: Scalars['String'];
-  currency: Scalars['String'];
-  iban?: InputMaybe<BridgeIbanAccountInput>;
-  usAccount?: InputMaybe<BridgeUsAccountInput>;
-};
-
-export type BridgeCreateBankAccountReturn = {
-  __typename?: 'BridgeCreateBankAccountReturn';
-  success?: Maybe<Scalars['Boolean']>;
-};
-
-export type BridgeIbanAccountInput = {
-  account_number: Scalars['String'];
-  bic: Scalars['String'];
-  country: Scalars['String'];
-};
-
-export type BridgeIbanBankAccount = {
-  __typename?: 'BridgeIbanBankAccount';
-  bic: Scalars['String'];
-  country: Scalars['String'];
-  id: Scalars['String'];
-  last4: Scalars['String'];
-};
-
-export type BridgeUpdateBankAccountInput = {
-  account: BridgeCreateBankAccountInput;
-  id: Scalars['String'];
-};
-
-export type BridgeUpdateBankAccountReturn = {
-  __typename?: 'BridgeUpdateBankAccountReturn';
-  success?: Maybe<Scalars['Boolean']>;
-};
-
-export type BridgeUsAccountInput = {
-  account_number: Scalars['String'];
-  routing_number: Scalars['String'];
-};
-
-export type BridgeUsBankAccount = {
-  __typename?: 'BridgeUsBankAccount';
-  last4: Scalars['String'];
-  routingNumber: Scalars['String'];
-};
-
-export type BridgeXyzBankAccount = {
-  __typename?: 'BridgeXYZBankAccount';
-  accountOwner: Scalars['String'];
-  bankName: Scalars['String'];
-  currency: Scalars['String'];
-  iban?: Maybe<BridgeIbanBankAccount>;
-  id: Scalars['String'];
-  usAccount?: Maybe<BridgeUsBankAccount>;
-};
-
-export type BridgeXyzDrain = {
-  __typename?: 'BridgeXYZDrain';
-  amount?: Maybe<Scalars['String']>;
-  created_at?: Maybe<Scalars['String']>;
-  deposit_tx_hash?: Maybe<Scalars['String']>;
-  id?: Maybe<Scalars['String']>;
-  receipt?: Maybe<DrainReceipt>;
-  state?: Maybe<Scalars['String']>;
-};
-
-export type BridgeXyzMutationAccountInput = {
-  account_number: Scalars['String'];
-  routing_number: Scalars['String'];
-};
-
-export type BridgeXyzMutationAddressInput = {
-  city: Scalars['String'];
-  country: Scalars['String'];
-  postal_code?: InputMaybe<Scalars['String']>;
-  state?: InputMaybe<Scalars['String']>;
-  street_line_1: Scalars['String'];
-  street_line_2?: InputMaybe<Scalars['String']>;
-};
-
-export type BridgeXyzMutationBodyInput = {
-  account?: InputMaybe<BridgeXyzMutationAccountInput>;
-  address?: InputMaybe<BridgeXyzMutationAddressInput>;
-  bank_name?: InputMaybe<Scalars['String']>;
-  birth_date?: InputMaybe<Scalars['String']>;
-  currency?: InputMaybe<Scalars['String']>;
-  email?: InputMaybe<Scalars['String']>;
-  first_name?: InputMaybe<Scalars['String']>;
-  full_name?: InputMaybe<Scalars['String']>;
-  iban?: InputMaybe<BridgeXyzMutationIbanInput>;
-  last_name?: InputMaybe<Scalars['String']>;
-  signed_agreement_id?: InputMaybe<Scalars['String']>;
-  tax_identification_number?: InputMaybe<Scalars['String']>;
-};
-
-export type BridgeXyzMutationIbanInput = {
-  account_number: Scalars['String'];
-  bic: Scalars['String'];
-  country: Scalars['String'];
-};
-
-export type BridgeXyzMutationInput = {
-  body: BridgeXyzMutationBodyInput;
-  path: Scalars['String'];
-};
-
-export type BridgeXyzMutationReturn = {
-  __typename?: 'BridgeXYZMutationReturn';
-  bankAccount?: Maybe<BridgeXyzBankAccount>;
-  country?: Maybe<Scalars['String']>;
-  kycStatus?: Maybe<KycStatus>;
-  kyc_link?: Maybe<Scalars['String']>;
-  success?: Maybe<Scalars['Boolean']>;
-  tos_link?: Maybe<Scalars['String']>;
-};
-
-export type BridgeXyzQueryInput = {
-  path: Scalars['String'];
-};
-
-export type BridgeXyzQueryReturn = {
-  __typename?: 'BridgeXYZQueryReturn';
-  drains?: Maybe<Array<Maybe<BridgeXyzDrain>>>;
-  success?: Maybe<Scalars['Boolean']>;
-  transactionFee?: Maybe<Scalars['String']>;
-};
-
 export type BridgeBankAccount = {
   __typename?: 'BridgeBankAccount';
   accountOwner: Scalars['String'];
@@ -724,8 +594,8 @@ export enum ColonyActionType {
   MakeArbitraryTransactionsMultisig = 'MAKE_ARBITRARY_TRANSACTIONS_MULTISIG',
   /** An action related to adding / removing approved colony tokens */
   ManageTokens = 'MANAGE_TOKENS',
-  /** An action related to adding / removing approved colony tokens */
   ManageTokensMotion = 'MANAGE_TOKENS_MOTION',
+  ManageTokensMultisig = 'MANAGE_TOKENS_MULTISIG',
   /** An action related to minting tokens within a Colony */
   MintTokens = 'MINT_TOKENS',
   /** An action related to minting tokens within a Colony via a motion */
@@ -1206,6 +1076,55 @@ export type ColonyMotionVoterRewardsArgs = {
   limit?: InputMaybe<Scalars['Int']>;
   nextToken?: InputMaybe<Scalars['String']>;
   sortDirection?: InputMaybe<ModelSortDirection>;
+};
+
+/** Represents a MultiSig motion within a Colony */
+export type ColonyMultiSig = {
+  __typename?: 'ColonyMultiSig';
+  action?: Maybe<ColonyAction>;
+  /** Colony address the multiSig belongs to */
+  colonyAddress: Scalars['ID'];
+  /** The timestamp when the motion was created at */
+  createdAt: Scalars['AWSDateTime'];
+  /** The timestamp when the motion was finalized */
+  executedAt?: Maybe<Scalars['AWSDateTime']>;
+  /** Wallet address of the user finalizing the motion */
+  executedBy?: Maybe<Scalars['ID']>;
+  /** Extended user object for given executedBy */
+  executedByUser?: Maybe<User>;
+  /** Whether the underlying action completed */
+  hasActionCompleted: Scalars['Boolean'];
+  /**
+   * The internal database id of the multiSig
+   * To ensure uniqueness, we format as: `chainId-multiSigExtnAddress_nativeMultiSigId`
+   */
+  id: Scalars['ID'];
+  /** Whether the multiSig is a Simple Decision */
+  isDecision: Scalars['Boolean'];
+  /** Whether the multiSig was executed or not */
+  isExecuted: Scalars['Boolean'];
+  /** Whether the multiSig was cancelled or not */
+  isRejected: Scalars['Boolean'];
+  /** Expanded domain in which the multiSig was created */
+  multiSigDomain: Domain;
+  /** Unique identifier of the multiSigs domain in the database */
+  multiSigDomainId: Scalars['ID'];
+  /** The on chain id of the domain associated with the motion */
+  nativeMultiSigDomainId: Scalars['String'];
+  /** The on chain id of the multiSig */
+  nativeMultiSigId: Scalars['ID'];
+  /** The timestamp when the motion was rejected */
+  rejectedAt?: Maybe<Scalars['AWSDateTime']>;
+  /** Wallet address of the user rejecting the motion */
+  rejectedBy?: Maybe<Scalars['ID']>;
+  /** Extended user object for given rejectedBy */
+  rejectedByUser?: Maybe<User>;
+  /** Required role for signing */
+  requiredPermissions: Scalars['Int'];
+  signatures?: Maybe<ModelMultiSigUserSignatureConnection>;
+  /** The transaction hash of the creteMotion (multisig) action */
+  transactionHash: Scalars['ID'];
+  updatedAt: Scalars['AWSDateTime'];
 };
 
 /** Represents a MultiSig motion within a Colony */
@@ -1783,6 +1702,7 @@ export type CreateMotionMessageInput = {
 };
 
 export type CreateMultiSigUserSignatureInput = {
+  colonyAddress: Scalars['ID'];
   createdAt?: InputMaybe<Scalars['AWSDateTime']>;
   id?: InputMaybe<Scalars['ID']>;
   multiSigId: Scalars['ID'];
@@ -3724,6 +3644,7 @@ export type ModelMotionMessageFilterInput = {
 
 export type ModelMultiSigUserSignatureConditionInput = {
   and?: InputMaybe<Array<InputMaybe<ModelMultiSigUserSignatureConditionInput>>>;
+  colonyAddress?: InputMaybe<ModelIdInput>;
   createdAt?: InputMaybe<ModelStringInput>;
   multiSigId?: InputMaybe<ModelIdInput>;
   not?: InputMaybe<ModelMultiSigUserSignatureConditionInput>;
@@ -3741,6 +3662,7 @@ export type ModelMultiSigUserSignatureConnection = {
 
 export type ModelMultiSigUserSignatureFilterInput = {
   and?: InputMaybe<Array<InputMaybe<ModelMultiSigUserSignatureFilterInput>>>;
+  colonyAddress?: InputMaybe<ModelIdInput>;
   createdAt?: InputMaybe<ModelStringInput>;
   id?: InputMaybe<ModelIdInput>;
   multiSigId?: InputMaybe<ModelIdInput>;
@@ -4490,6 +4412,7 @@ export type ModelSubscriptionMultiSigUserSignatureFilterInput = {
   and?: InputMaybe<
     Array<InputMaybe<ModelSubscriptionMultiSigUserSignatureFilterInput>>
   >;
+  colonyAddress?: InputMaybe<ModelSubscriptionIdInput>;
   createdAt?: InputMaybe<ModelSubscriptionStringInput>;
   id?: InputMaybe<ModelSubscriptionIdInput>;
   multiSigId?: InputMaybe<ModelSubscriptionIdInput>;
@@ -5079,6 +5002,7 @@ export type MultiSigParamsInput = {
 
 export type MultiSigUserSignature = {
   __typename?: 'MultiSigUserSignature';
+  colonyAddress: Scalars['ID'];
   createdAt: Scalars['AWSDateTime'];
   id: Scalars['ID'];
   multiSigId: Scalars['ID'];
@@ -6293,6 +6217,10 @@ export type Query = {
   /** Get the timeout for the current period of a motion */
   getMotionTimeoutPeriods?: Maybe<GetMotionTimeoutPeriodsReturn>;
   getMotionVoterRewards?: Maybe<ModelVoterRewardsHistoryConnection>;
+  getMultiSigByColonyAddress?: Maybe<ModelColonyMultiSigConnection>;
+  getMultiSigByTransactionHash?: Maybe<ModelColonyMultiSigConnection>;
+  getMultiSigUserSignature?: Maybe<MultiSigUserSignature>;
+  getMultiSigUserSignatureByMultiSigId?: Maybe<ModelMultiSigUserSignatureConnection>;
   getPrivateBetaInviteCode?: Maybe<PrivateBetaInviteCode>;
   getProfile?: Maybe<Profile>;
   getProfileByEmail?: Maybe<ModelProfileConnection>;
@@ -6765,6 +6693,38 @@ export type QueryGetMotionVoterRewardsArgs = {
   filter?: InputMaybe<ModelVoterRewardsHistoryFilterInput>;
   limit?: InputMaybe<Scalars['Int']>;
   motionId: Scalars['ID'];
+  nextToken?: InputMaybe<Scalars['String']>;
+  sortDirection?: InputMaybe<ModelSortDirection>;
+};
+
+/** Root query type */
+export type QueryGetMultiSigByColonyAddressArgs = {
+  colonyAddress: Scalars['ID'];
+  filter?: InputMaybe<ModelColonyMultiSigFilterInput>;
+  limit?: InputMaybe<Scalars['Int']>;
+  nextToken?: InputMaybe<Scalars['String']>;
+  sortDirection?: InputMaybe<ModelSortDirection>;
+};
+
+/** Root query type */
+export type QueryGetMultiSigByTransactionHashArgs = {
+  filter?: InputMaybe<ModelColonyMultiSigFilterInput>;
+  limit?: InputMaybe<Scalars['Int']>;
+  nextToken?: InputMaybe<Scalars['String']>;
+  sortDirection?: InputMaybe<ModelSortDirection>;
+  transactionHash: Scalars['ID'];
+};
+
+/** Root query type */
+export type QueryGetMultiSigUserSignatureArgs = {
+  id: Scalars['ID'];
+};
+
+/** Root query type */
+export type QueryGetMultiSigUserSignatureByMultiSigIdArgs = {
+  filter?: InputMaybe<ModelMultiSigUserSignatureFilterInput>;
+  limit?: InputMaybe<Scalars['Int']>;
+  multiSigId: Scalars['ID'];
   nextToken?: InputMaybe<Scalars['String']>;
   sortDirection?: InputMaybe<ModelSortDirection>;
 };
@@ -8993,6 +8953,7 @@ export type UpdateMotionMessageInput = {
 };
 
 export type UpdateMultiSigUserSignatureInput = {
+  colonyAddress?: InputMaybe<Scalars['ID']>;
   createdAt?: InputMaybe<Scalars['AWSDateTime']>;
   id: Scalars['ID'];
   multiSigId?: InputMaybe<Scalars['ID']>;
@@ -9656,19 +9617,12 @@ export type DomainMetadataFragment = {
   }> | null;
 };
 
-<<<<<<< HEAD
-export type TokenFragment = { __typename?: 'Token'; tokenAddress: string };
-<<<<<<< HEAD
->>>>>>> ce9a82c (feat: handle multisig approval changed)
-=======
-=======
-=======
->>>>>>> e196e1f (feat: unify naming of parseAction to parseOperation, renamed metadata delta parseOperation, code review alignment)
 export type MultiSigUserSignatureFragment = {
   __typename?: 'MultiSigUserSignature';
   id: string;
   multiSigId: string;
   role: number;
+  colonyAddress: string;
   userAddress: string;
   vote: MultiSigVote;
   createdAt: string;
@@ -9699,19 +9653,15 @@ export type ColonyMultiSigFragment = {
       id: string;
       multiSigId: string;
       role: number;
+      colonyAddress: string;
       userAddress: string;
       vote: MultiSigVote;
       createdAt: string;
     } | null>;
   } | null;
 };
-<<<<<<< HEAD
->>>>>>> 51c39ba (feat: implement mint tokens multisig creation and groundwork for more multisig motions)
->>>>>>> b53281d (feat: implement multisig vote removal)
-=======
 
 export type TokenFragment = { __typename?: 'Token'; tokenAddress: string };
->>>>>>> e196e1f (feat: unify naming of parseAction to parseOperation, renamed metadata delta parseOperation, code review alignment)
 
 export type CreateColonyActionMutationVariables = Exact<{
   input: CreateColonyActionInput;
@@ -10105,6 +10055,24 @@ export type CreateUserVoterRewardMutation = {
     __typename?: 'VoterRewardsHistory';
     id: string;
   } | null;
+};
+
+export type CreateColonyMultiSigMutationVariables = Exact<{
+  input: CreateColonyMultiSigInput;
+}>;
+
+export type CreateColonyMultiSigMutation = {
+  __typename?: 'Mutation';
+  createColonyMultiSig?: { __typename?: 'ColonyMultiSig'; id: string } | null;
+};
+
+export type UpdateColonyMultiSigMutationVariables = Exact<{
+  input: UpdateColonyMultiSigInput;
+}>;
+
+export type UpdateColonyMultiSigMutation = {
+  __typename?: 'Mutation';
+  updateColonyMultiSig?: { __typename?: 'ColonyMultiSig'; id: string } | null;
 };
 
 export type CreateMultiSigVoteMutationVariables = Exact<{
@@ -10556,6 +10524,7 @@ export type GetDomainMetadataQuery = {
 
 export type GetDomainByNativeSkillIdQueryVariables = Exact<{
   nativeSkillId: Scalars['String'];
+  colonyAddress: Scalars['ID'];
 }>;
 
 export type GetDomainByNativeSkillIdQuery = {
@@ -11037,13 +11006,20 @@ export type GetVoterRewardsQueryVariables = Exact<{
 
 export type GetVoterRewardsQuery = {
   __typename?: 'Query';
-<<<<<<< HEAD
   getVoterRewards?: {
     __typename?: 'VoterRewardsReturn';
     min: string;
     max: string;
     reward: string;
-=======
+  } | null;
+};
+
+export type GetColonyActionByMultiSigIdQueryVariables = Exact<{
+  multiSigId: Scalars['ID'];
+}>;
+
+export type GetColonyActionByMultiSigIdQuery = {
+  __typename?: 'Query';
   getColonyActionByMultiSigId?: {
     __typename?: 'ModelColonyActionConnection';
     items: Array<{
@@ -11139,7 +11115,6 @@ export type GetColonyMultiSigQuery = {
         createdAt: string;
       } | null>;
     } | null;
->>>>>>> e196e1f (feat: unify naming of parseAction to parseOperation, renamed metadata delta parseOperation, code review alignment)
   } | null;
 };
 
@@ -11159,6 +11134,7 @@ export type GetUserMultiSigSignatureQuery = {
       id: string;
       multiSigId: string;
       role: number;
+      colonyAddress: string;
       userAddress: string;
       vote: MultiSigVote;
       createdAt: string;
@@ -11565,6 +11541,7 @@ export const MultiSigUserSignature = gql`
     id
     multiSigId
     role
+    colonyAddress
     userAddress
     vote
     createdAt
@@ -11886,6 +11863,20 @@ export const CreateUserVoterRewardDocument = gql`
     }
   }
 `;
+export const CreateColonyMultiSigDocument = gql`
+  mutation CreateColonyMultiSig($input: CreateColonyMultiSigInput!) {
+    createColonyMultiSig(input: $input) {
+      id
+    }
+  }
+`;
+export const UpdateColonyMultiSigDocument = gql`
+  mutation UpdateColonyMultiSig($input: UpdateColonyMultiSigInput!) {
+    updateColonyMultiSig(input: $input) {
+      id
+    }
+  }
+`;
 export const CreateMultiSigVoteDocument = gql`
   mutation CreateMultiSigVote($input: CreateMultiSigUserSignatureInput!) {
     createMultiSigUserSignature(input: $input) {
@@ -12180,8 +12171,11 @@ export const GetDomainMetadataDocument = gql`
   }
 `;
 export const GetDomainByNativeSkillIdDocument = gql`
-  query GetDomainByNativeSkillId($nativeSkillId: String!) {
-    getDomainByNativeSkillId(nativeSkillId: $nativeSkillId) {
+  query GetDomainByNativeSkillId($nativeSkillId: String!, $colonyAddress: ID!) {
+    getDomainByNativeSkillId(
+      nativeSkillId: $nativeSkillId
+      filter: { colonyId: { eq: $colonyAddress } }
+    ) {
       items {
         id
         nativeSkillId
@@ -12394,7 +12388,6 @@ export const GetColonyMotionDocument = gql`
   }
   ${ColonyMotion}
 `;
-<<<<<<< HEAD
 export const GetVoterRewardsDocument = gql`
   query GetVoterRewards($input: GetVoterRewardsInput!) {
     getVoterRewards(input: $input) {
@@ -12403,7 +12396,7 @@ export const GetVoterRewardsDocument = gql`
       reward
     }
   }
-=======
+`;
 export const GetColonyActionByMultiSigIdDocument = gql`
   query GetColonyActionByMultiSigId($multiSigId: ID!) {
     getColonyActionByMultiSigId(multiSigId: $multiSigId) {
@@ -12421,7 +12414,6 @@ export const GetColonyMultiSigDocument = gql`
     }
   }
   ${ColonyMultiSig}
->>>>>>> e196e1f (feat: unify naming of parseAction to parseOperation, renamed metadata delta parseOperation, code review alignment)
 `;
 export const GetUserMultiSigSignatureDocument = gql`
   query GetUserMultiSigSignature(
