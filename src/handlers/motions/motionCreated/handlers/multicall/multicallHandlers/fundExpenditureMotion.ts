@@ -25,7 +25,6 @@ export const fundExpenditureMotionHandler: MulticallHandler = async ({
   colonyAddress,
   event,
   decodedFunctions,
-  gasEstimate,
 }) => {
   // @NOTE: We get the target pot ID from the first multicall function
   // This means if the multicall funds multiple expenditures, we will only create a motion for the first one
@@ -66,7 +65,6 @@ export const fundExpenditureMotionHandler: MulticallHandler = async ({
 
   await createMotionInDB(colonyAddress, event, {
     type: ColonyActionType.FundExpenditureMotion,
-    gasEstimate,
     expenditureId: expenditure.id,
     expenditureFunding: fundingItems,
   });

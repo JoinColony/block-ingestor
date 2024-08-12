@@ -238,10 +238,7 @@ type MotionFields = Omit<
 > &
   Pick<
     CreateColonyMotionInput,
-    | 'gasEstimate'
-    | 'expenditureSlotId'
-    | 'editedExpenditureSlots'
-    | 'expenditureFunding'
+    'expenditureSlotId' | 'editedExpenditureSlots' | 'expenditureFunding'
   >;
 
 export const createMotionInDB = async (
@@ -257,7 +254,6 @@ export const createMotionInDB = async (
     timestamp,
   } = event;
   const {
-    gasEstimate,
     expenditureSlotId,
     editedExpenditureSlots,
     expenditureFunding,
@@ -306,7 +302,6 @@ export const createMotionInDB = async (
   await Promise.all([
     createColonyMotion({
       ...motionData,
-      gasEstimate,
       expenditureId: actionFields.expenditureId,
       expenditureSlotId,
       editedExpenditureSlots,

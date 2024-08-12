@@ -1,4 +1,3 @@
-import { BigNumber } from 'ethers';
 import { TransactionDescription } from 'ethers/lib/utils';
 import { ContractEvent, motionNameMapping } from '~types';
 import { getDomainDatabaseId, getPendingMetadataDatabaseId } from '~utils';
@@ -8,7 +7,6 @@ export const handleEditDomainMotion = async (
   colonyAddress: string,
   event: ContractEvent,
   parsedAction: TransactionDescription,
-  gasEstimate: BigNumber,
 ): Promise<void> => {
   const { transactionHash } = event;
   if (!colonyAddress) {
@@ -27,6 +25,5 @@ export const handleEditDomainMotion = async (
     type: motionNameMapping[name],
     pendingDomainMetadataId,
     fromDomainId: getDomainDatabaseId(colonyAddress, nativeDomainId),
-    gasEstimate: gasEstimate.toString(),
   });
 };
