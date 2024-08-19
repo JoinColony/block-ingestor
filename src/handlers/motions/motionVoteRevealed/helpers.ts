@@ -1,9 +1,9 @@
 import { BigNumber } from 'ethers';
 import { mutate, query } from '~amplifyClient';
 import {
-  CreateUserMotionRewardDocument,
-  CreateUserMotionRewardMutation,
-  CreateUserMotionRewardMutationVariables,
+  CreateUserVoterRewardDocument,
+  CreateUserVoterRewardMutation,
+  CreateUserVoterRewardMutationVariables,
   GetVoterRewardsDocument,
   GetVoterRewardsQuery,
   GetVoterRewardsQueryVariables,
@@ -47,9 +47,9 @@ export const createUserReward = async ({
   }
 
   await mutate<
-    CreateUserMotionRewardMutation,
-    CreateUserMotionRewardMutationVariables
-  >(CreateUserMotionRewardDocument, {
+    CreateUserVoterRewardMutation,
+    CreateUserVoterRewardMutationVariables
+  >(CreateUserVoterRewardDocument, {
     input: {
       userAddress,
       colonyAddress,

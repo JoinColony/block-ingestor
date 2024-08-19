@@ -16,8 +16,8 @@ mutation CreateMotionMessage($input: CreateMotionMessageInput!) {
   }
 }
 
-mutation CreateUserMotionReward($input: CreateUserMotionRewardInput!) {
-  createUserMotionReward(input: $input) {
+mutation CreateUserVoterReward($input: CreateVoterRewardsHistoryInput!) {
+  createVoterRewardsHistory(input: $input) {
     id
   }
 }

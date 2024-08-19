@@ -57,6 +57,25 @@ export type ApprovedTokenChangesInput = {
   unaffected: Array<Scalars['ID']>;
 };
 
+export type BridgeBankAccount = {
+  __typename?: 'BridgeBankAccount';
+  accountOwner: Scalars['String'];
+  bankName: Scalars['String'];
+  currency: Scalars['String'];
+  iban?: Maybe<BridgeIbanBankAccount>;
+  id: Scalars['String'];
+  usAccount?: Maybe<BridgeUsBankAccount>;
+};
+
+export type BridgeCheckKycReturn = {
+  __typename?: 'BridgeCheckKYCReturn';
+  bankAccount?: Maybe<BridgeBankAccount>;
+  kycLink?: Maybe<Scalars['String']>;
+  kycStatus?: Maybe<KycStatus>;
+  liquidationAddress?: Maybe<Scalars['String']>;
+  tosLink?: Maybe<Scalars['String']>;
+};
+
 export type BridgeCreateBankAccountInput = {
   accountOwner: Scalars['String'];
   address?: InputMaybe<BridgeXyzMutationAddressInput>;
@@ -69,6 +88,21 @@ export type BridgeCreateBankAccountInput = {
 export type BridgeCreateBankAccountReturn = {
   __typename?: 'BridgeCreateBankAccountReturn';
   success?: Maybe<Scalars['Boolean']>;
+};
+
+export type BridgeDrain = {
+  __typename?: 'BridgeDrain';
+  amount: Scalars['String'];
+  createdAt: Scalars['String'];
+  currency: Scalars['String'];
+  id: Scalars['String'];
+  receipt: BridgeDrainReceipt;
+  state: Scalars['String'];
+};
+
+export type BridgeDrainReceipt = {
+  __typename?: 'BridgeDrainReceipt';
+  url: Scalars['String'];
 };
 
 export type BridgeIbanAccountInput = {
@@ -104,26 +138,6 @@ export type BridgeUsBankAccount = {
   __typename?: 'BridgeUsBankAccount';
   last4: Scalars['String'];
   routingNumber: Scalars['String'];
-};
-
-export type BridgeXyzBankAccount = {
-  __typename?: 'BridgeXYZBankAccount';
-  accountOwner: Scalars['String'];
-  bankName: Scalars['String'];
-  currency: Scalars['String'];
-  iban?: Maybe<BridgeIbanBankAccount>;
-  id: Scalars['String'];
-  usAccount?: Maybe<BridgeUsBankAccount>;
-};
-
-export type BridgeXyzDrain = {
-  __typename?: 'BridgeXYZDrain';
-  amount?: Maybe<Scalars['String']>;
-  created_at?: Maybe<Scalars['String']>;
-  deposit_tx_hash?: Maybe<Scalars['String']>;
-  id?: Maybe<Scalars['String']>;
-  receipt?: Maybe<DrainReceipt>;
-  state?: Maybe<Scalars['String']>;
 };
 
 export type BridgeXyzMutationAccountInput = {
@@ -168,23 +182,9 @@ export type BridgeXyzMutationInput = {
 
 export type BridgeXyzMutationReturn = {
   __typename?: 'BridgeXYZMutationReturn';
-  bankAccount?: Maybe<BridgeXyzBankAccount>;
-  country?: Maybe<Scalars['String']>;
-  kycStatus?: Maybe<KycStatus>;
   kyc_link?: Maybe<Scalars['String']>;
   success?: Maybe<Scalars['Boolean']>;
   tos_link?: Maybe<Scalars['String']>;
-};
-
-export type BridgeXyzQueryInput = {
-  path: Scalars['String'];
-};
-
-export type BridgeXyzQueryReturn = {
-  __typename?: 'BridgeXYZQueryReturn';
-  drains?: Maybe<Array<Maybe<BridgeXyzDrain>>>;
-  success?: Maybe<Scalars['Boolean']>;
-  transactionFee?: Maybe<Scalars['String']>;
 };
 
 /**
@@ -1007,11 +1007,11 @@ export type ColonyMotion = {
   updatedAt: Scalars['AWSDateTime'];
   /** The minimum stake that a user has to provide for it to be accepted */
   userMinStake: Scalars['String'];
-  userRewards?: Maybe<ModelUserMotionRewardConnection>;
   /** List of stakes that users have made for a motion */
   usersStakes: Array<UserMotionStakes>;
   /** A list of all of the votes cast within in the motion */
   voterRecord: Array<VoterRecord>;
+  voterRewards?: Maybe<ModelVoterRewardsHistoryConnection>;
 };
 
 /** Represents a Motion within a Colony */
@@ -1024,9 +1024,9 @@ export type ColonyMotionMessagesArgs = {
 };
 
 /** Represents a Motion within a Colony */
-export type ColonyMotionUserRewardsArgs = {
+export type ColonyMotionVoterRewardsArgs = {
   createdAt?: InputMaybe<ModelStringKeyConditionInput>;
-  filter?: InputMaybe<ModelUserMotionRewardFilterInput>;
+  filter?: InputMaybe<ModelVoterRewardsHistoryFilterInput>;
   limit?: InputMaybe<Scalars['Int']>;
   nextToken?: InputMaybe<Scalars['String']>;
   sortDirection?: InputMaybe<ModelSortDirection>;
@@ -1695,15 +1695,6 @@ export type CreateUserInput = {
   userPrivateBetaInviteCodeId?: InputMaybe<Scalars['ID']>;
 };
 
-export type CreateUserMotionRewardInput = {
-  amount: Scalars['String'];
-  colonyAddress: Scalars['ID'];
-  createdAt?: InputMaybe<Scalars['AWSDateTime']>;
-  id?: InputMaybe<Scalars['ID']>;
-  motionId: Scalars['ID'];
-  userAddress: Scalars['ID'];
-};
-
 export type CreateUserStakeInput = {
   actionId: Scalars['ID'];
   amount: Scalars['String'];
@@ -1719,6 +1710,15 @@ export type CreateUserTokensInput = {
   id?: InputMaybe<Scalars['ID']>;
   tokenID: Scalars['ID'];
   userID: Scalars['ID'];
+};
+
+export type CreateVoterRewardsHistoryInput = {
+  amount: Scalars['String'];
+  colonyAddress: Scalars['ID'];
+  createdAt?: InputMaybe<Scalars['AWSDateTime']>;
+  id?: InputMaybe<Scalars['ID']>;
+  motionId: Scalars['ID'];
+  userAddress: Scalars['ID'];
 };
 
 /**
@@ -1896,15 +1896,15 @@ export type DeleteUserInput = {
   id: Scalars['ID'];
 };
 
-export type DeleteUserMotionRewardInput = {
-  id: Scalars['ID'];
-};
-
 export type DeleteUserStakeInput = {
   id: Scalars['ID'];
 };
 
 export type DeleteUserTokensInput = {
+  id: Scalars['ID'];
+};
+
+export type DeleteVoterRewardsHistoryInput = {
   id: Scalars['ID'];
 };
 
@@ -2039,12 +2039,6 @@ export type DomainMetadataChangelogInput = {
   oldDescription?: InputMaybe<Scalars['String']>;
   oldName: Scalars['String'];
   transactionHash: Scalars['String'];
-};
-
-export type DrainReceipt = {
-  __typename?: 'DrainReceipt';
-  destination_currency?: Maybe<Scalars['String']>;
-  url?: Maybe<Scalars['String']>;
 };
 
 export type Expenditure = {
@@ -2412,6 +2406,10 @@ export enum KycStatus {
   UnderReview = 'UNDER_REVIEW',
 }
 
+/**
+ * NOTE: This model should only be used to lookup users by liquidation address
+ * To get the liquidation address of a user, use the `bridgeGetUserLiquidationAddress` query instead
+ */
 export type LiquidationAddress = {
   __typename?: 'LiquidationAddress';
   /** The chain id the colony is on */
@@ -4293,21 +4291,6 @@ export type ModelSubscriptionUserFilterInput = {
   profileId?: InputMaybe<ModelSubscriptionIdInput>;
 };
 
-export type ModelSubscriptionUserMotionRewardFilterInput = {
-  amount?: InputMaybe<ModelSubscriptionStringInput>;
-  and?: InputMaybe<
-    Array<InputMaybe<ModelSubscriptionUserMotionRewardFilterInput>>
-  >;
-  colonyAddress?: InputMaybe<ModelSubscriptionIdInput>;
-  createdAt?: InputMaybe<ModelSubscriptionStringInput>;
-  id?: InputMaybe<ModelSubscriptionIdInput>;
-  motionId?: InputMaybe<ModelSubscriptionIdInput>;
-  or?: InputMaybe<
-    Array<InputMaybe<ModelSubscriptionUserMotionRewardFilterInput>>
-  >;
-  userAddress?: InputMaybe<ModelSubscriptionIdInput>;
-};
-
 export type ModelSubscriptionUserStakeFilterInput = {
   actionId?: InputMaybe<ModelSubscriptionIdInput>;
   amount?: InputMaybe<ModelSubscriptionStringInput>;
@@ -4327,6 +4310,21 @@ export type ModelSubscriptionUserTokensFilterInput = {
   or?: InputMaybe<Array<InputMaybe<ModelSubscriptionUserTokensFilterInput>>>;
   tokenID?: InputMaybe<ModelSubscriptionIdInput>;
   userID?: InputMaybe<ModelSubscriptionIdInput>;
+};
+
+export type ModelSubscriptionVoterRewardsHistoryFilterInput = {
+  amount?: InputMaybe<ModelSubscriptionStringInput>;
+  and?: InputMaybe<
+    Array<InputMaybe<ModelSubscriptionVoterRewardsHistoryFilterInput>>
+  >;
+  colonyAddress?: InputMaybe<ModelSubscriptionIdInput>;
+  createdAt?: InputMaybe<ModelSubscriptionStringInput>;
+  id?: InputMaybe<ModelSubscriptionIdInput>;
+  motionId?: InputMaybe<ModelSubscriptionIdInput>;
+  or?: InputMaybe<
+    Array<InputMaybe<ModelSubscriptionVoterRewardsHistoryFilterInput>>
+  >;
+  userAddress?: InputMaybe<ModelSubscriptionIdInput>;
 };
 
 export type ModelSupportedCurrenciesInput = {
@@ -4469,35 +4467,6 @@ export type ModelUserFilterInput = {
   userPrivateBetaInviteCodeId?: InputMaybe<ModelIdInput>;
 };
 
-export type ModelUserMotionRewardConditionInput = {
-  amount?: InputMaybe<ModelStringInput>;
-  and?: InputMaybe<Array<InputMaybe<ModelUserMotionRewardConditionInput>>>;
-  colonyAddress?: InputMaybe<ModelIdInput>;
-  createdAt?: InputMaybe<ModelStringInput>;
-  motionId?: InputMaybe<ModelIdInput>;
-  not?: InputMaybe<ModelUserMotionRewardConditionInput>;
-  or?: InputMaybe<Array<InputMaybe<ModelUserMotionRewardConditionInput>>>;
-  userAddress?: InputMaybe<ModelIdInput>;
-};
-
-export type ModelUserMotionRewardConnection = {
-  __typename?: 'ModelUserMotionRewardConnection';
-  items: Array<Maybe<UserMotionReward>>;
-  nextToken?: Maybe<Scalars['String']>;
-};
-
-export type ModelUserMotionRewardFilterInput = {
-  amount?: InputMaybe<ModelStringInput>;
-  and?: InputMaybe<Array<InputMaybe<ModelUserMotionRewardFilterInput>>>;
-  colonyAddress?: InputMaybe<ModelIdInput>;
-  createdAt?: InputMaybe<ModelStringInput>;
-  id?: InputMaybe<ModelIdInput>;
-  motionId?: InputMaybe<ModelIdInput>;
-  not?: InputMaybe<ModelUserMotionRewardFilterInput>;
-  or?: InputMaybe<Array<InputMaybe<ModelUserMotionRewardFilterInput>>>;
-  userAddress?: InputMaybe<ModelIdInput>;
-};
-
 export type ModelUserStakeConditionInput = {
   actionId?: InputMaybe<ModelIdInput>;
   amount?: InputMaybe<ModelStringInput>;
@@ -4552,6 +4521,35 @@ export type ModelUserTokensFilterInput = {
   or?: InputMaybe<Array<InputMaybe<ModelUserTokensFilterInput>>>;
   tokenID?: InputMaybe<ModelIdInput>;
   userID?: InputMaybe<ModelIdInput>;
+};
+
+export type ModelVoterRewardsHistoryConditionInput = {
+  amount?: InputMaybe<ModelStringInput>;
+  and?: InputMaybe<Array<InputMaybe<ModelVoterRewardsHistoryConditionInput>>>;
+  colonyAddress?: InputMaybe<ModelIdInput>;
+  createdAt?: InputMaybe<ModelStringInput>;
+  motionId?: InputMaybe<ModelIdInput>;
+  not?: InputMaybe<ModelVoterRewardsHistoryConditionInput>;
+  or?: InputMaybe<Array<InputMaybe<ModelVoterRewardsHistoryConditionInput>>>;
+  userAddress?: InputMaybe<ModelIdInput>;
+};
+
+export type ModelVoterRewardsHistoryConnection = {
+  __typename?: 'ModelVoterRewardsHistoryConnection';
+  items: Array<Maybe<VoterRewardsHistory>>;
+  nextToken?: Maybe<Scalars['String']>;
+};
+
+export type ModelVoterRewardsHistoryFilterInput = {
+  amount?: InputMaybe<ModelStringInput>;
+  and?: InputMaybe<Array<InputMaybe<ModelVoterRewardsHistoryFilterInput>>>;
+  colonyAddress?: InputMaybe<ModelIdInput>;
+  createdAt?: InputMaybe<ModelStringInput>;
+  id?: InputMaybe<ModelIdInput>;
+  motionId?: InputMaybe<ModelIdInput>;
+  not?: InputMaybe<ModelVoterRewardsHistoryFilterInput>;
+  or?: InputMaybe<Array<InputMaybe<ModelVoterRewardsHistoryFilterInput>>>;
+  userAddress?: InputMaybe<ModelIdInput>;
 };
 
 /** A status update message for a motion (will appear in the motion's timeline) */
@@ -4732,9 +4730,9 @@ export type Mutation = {
   /** Create a unique user within the Colony Network. Use this instead of the automatically generated `createUser` mutation */
   createUniqueUser?: Maybe<User>;
   createUser?: Maybe<User>;
-  createUserMotionReward?: Maybe<UserMotionReward>;
   createUserStake?: Maybe<UserStake>;
   createUserTokens?: Maybe<UserTokens>;
+  createVoterRewardsHistory?: Maybe<VoterRewardsHistory>;
   deleteAnnotation?: Maybe<Annotation>;
   deleteColony?: Maybe<Colony>;
   deleteColonyAction?: Maybe<ColonyAction>;
@@ -4772,9 +4770,9 @@ export type Mutation = {
   deleteToken?: Maybe<Token>;
   deleteTransaction?: Maybe<Transaction>;
   deleteUser?: Maybe<User>;
-  deleteUserMotionReward?: Maybe<UserMotionReward>;
   deleteUserStake?: Maybe<UserStake>;
   deleteUserTokens?: Maybe<UserTokens>;
+  deleteVoterRewardsHistory?: Maybe<VoterRewardsHistory>;
   updateAnnotation?: Maybe<Annotation>;
   updateColony?: Maybe<Colony>;
   updateColonyAction?: Maybe<ColonyAction>;
@@ -4814,9 +4812,9 @@ export type Mutation = {
   updateToken?: Maybe<Token>;
   updateTransaction?: Maybe<Transaction>;
   updateUser?: Maybe<User>;
-  updateUserMotionReward?: Maybe<UserMotionReward>;
   updateUserStake?: Maybe<UserStake>;
   updateUserTokens?: Maybe<UserTokens>;
+  updateVoterRewardsHistory?: Maybe<VoterRewardsHistory>;
   /** Validates the user invite code and adds the user as a colony contributor */
   validateUserInvite?: Maybe<Scalars['Boolean']>;
 };
@@ -5069,12 +5067,6 @@ export type MutationCreateUserArgs = {
 };
 
 /** Root mutation type */
-export type MutationCreateUserMotionRewardArgs = {
-  condition?: InputMaybe<ModelUserMotionRewardConditionInput>;
-  input: CreateUserMotionRewardInput;
-};
-
-/** Root mutation type */
 export type MutationCreateUserStakeArgs = {
   condition?: InputMaybe<ModelUserStakeConditionInput>;
   input: CreateUserStakeInput;
@@ -5084,6 +5076,12 @@ export type MutationCreateUserStakeArgs = {
 export type MutationCreateUserTokensArgs = {
   condition?: InputMaybe<ModelUserTokensConditionInput>;
   input: CreateUserTokensInput;
+};
+
+/** Root mutation type */
+export type MutationCreateVoterRewardsHistoryArgs = {
+  condition?: InputMaybe<ModelVoterRewardsHistoryConditionInput>;
+  input: CreateVoterRewardsHistoryInput;
 };
 
 /** Root mutation type */
@@ -5309,12 +5307,6 @@ export type MutationDeleteUserArgs = {
 };
 
 /** Root mutation type */
-export type MutationDeleteUserMotionRewardArgs = {
-  condition?: InputMaybe<ModelUserMotionRewardConditionInput>;
-  input: DeleteUserMotionRewardInput;
-};
-
-/** Root mutation type */
 export type MutationDeleteUserStakeArgs = {
   condition?: InputMaybe<ModelUserStakeConditionInput>;
   input: DeleteUserStakeInput;
@@ -5324,6 +5316,12 @@ export type MutationDeleteUserStakeArgs = {
 export type MutationDeleteUserTokensArgs = {
   condition?: InputMaybe<ModelUserTokensConditionInput>;
   input: DeleteUserTokensInput;
+};
+
+/** Root mutation type */
+export type MutationDeleteVoterRewardsHistoryArgs = {
+  condition?: InputMaybe<ModelVoterRewardsHistoryConditionInput>;
+  input: DeleteVoterRewardsHistoryInput;
 };
 
 /** Root mutation type */
@@ -5554,12 +5552,6 @@ export type MutationUpdateUserArgs = {
 };
 
 /** Root mutation type */
-export type MutationUpdateUserMotionRewardArgs = {
-  condition?: InputMaybe<ModelUserMotionRewardConditionInput>;
-  input: UpdateUserMotionRewardInput;
-};
-
-/** Root mutation type */
 export type MutationUpdateUserStakeArgs = {
   condition?: InputMaybe<ModelUserStakeConditionInput>;
   input: UpdateUserStakeInput;
@@ -5569,6 +5561,12 @@ export type MutationUpdateUserStakeArgs = {
 export type MutationUpdateUserTokensArgs = {
   condition?: InputMaybe<ModelUserTokensConditionInput>;
   input: UpdateUserTokensInput;
+};
+
+/** Root mutation type */
+export type MutationUpdateVoterRewardsHistoryArgs = {
+  condition?: InputMaybe<ModelVoterRewardsHistoryConditionInput>;
+  input: UpdateVoterRewardsHistoryInput;
 };
 
 /** Root mutation type */
@@ -5777,8 +5775,12 @@ export type ProfileMetadataInput = {
 /** Root query type */
 export type Query = {
   __typename?: 'Query';
-  /** Fetch from the Bridge XYZ API */
-  bridgeXYZQuery?: Maybe<BridgeXyzQueryReturn>;
+  /** Check bridge KYC status for the current user */
+  bridgeCheckKYC?: Maybe<BridgeCheckKycReturn>;
+  /** Get drains history for the current user */
+  bridgeGetDrainsHistory?: Maybe<Array<BridgeDrain>>;
+  /** Get liquidation address of a given user */
+  bridgeGetUserLiquidationAddress?: Maybe<Scalars['String']>;
   getActionByExpenditureId?: Maybe<ModelColonyActionConnection>;
   getActionsByColony?: Maybe<ModelColonyActionConnection>;
   getAnnotation?: Maybe<Annotation>;
@@ -5832,7 +5834,7 @@ export type Query = {
   getMotionState: Scalars['Int'];
   /** Get the timeout for the current period of a motion */
   getMotionTimeoutPeriods?: Maybe<GetMotionTimeoutPeriodsReturn>;
-  getMotionUserRewards?: Maybe<ModelUserMotionRewardConnection>;
+  getMotionVoterRewards?: Maybe<ModelVoterRewardsHistoryConnection>;
   getPrivateBetaInviteCode?: Maybe<PrivateBetaInviteCode>;
   getProfile?: Maybe<Profile>;
   getProfileByEmail?: Maybe<ModelProfileConnection>;
@@ -5858,18 +5860,18 @@ export type Query = {
   getUserByAddress?: Maybe<ModelUserConnection>;
   getUserByBridgeCustomerId?: Maybe<ModelUserConnection>;
   getUserByLiquidationAddress?: Maybe<ModelLiquidationAddressConnection>;
-  getUserMotionReward?: Maybe<UserMotionReward>;
   /** Retrieve a user's reputation within a specific domain in a Colony */
   getUserReputation?: Maybe<Scalars['String']>;
   getUserReputationInColony?: Maybe<ModelContributorReputationConnection>;
-  getUserRewards?: Maybe<ModelUserMotionRewardConnection>;
   getUserStake?: Maybe<UserStake>;
   getUserStakes?: Maybe<ModelUserStakeConnection>;
   /** Retrieve a user's token balance for a specific token */
   getUserTokenBalance?: Maybe<GetUserTokenBalanceReturn>;
   getUserTokens?: Maybe<UserTokens>;
+  getUserVoterRewards?: Maybe<ModelVoterRewardsHistoryConnection>;
   /** Get the voting reward for a user and a motion */
   getVoterRewards?: Maybe<VoterRewardsReturn>;
+  getVoterRewardsHistory?: Maybe<VoterRewardsHistory>;
   listAnnotations?: Maybe<ModelAnnotationConnection>;
   listColonies?: Maybe<ModelColonyConnection>;
   listColonyActionMetadata?: Maybe<ModelColonyActionMetadataConnection>;
@@ -5906,17 +5908,17 @@ export type Query = {
   listStreamingPayments?: Maybe<ModelStreamingPaymentConnection>;
   listTokens?: Maybe<ModelTokenConnection>;
   listTransactions?: Maybe<ModelTransactionConnection>;
-  listUserMotionRewards?: Maybe<ModelUserMotionRewardConnection>;
   listUserStakes?: Maybe<ModelUserStakeConnection>;
   listUserTokens?: Maybe<ModelUserTokensConnection>;
   listUsers?: Maybe<ModelUserConnection>;
+  listVoterRewardsHistories?: Maybe<ModelVoterRewardsHistoryConnection>;
   searchColonyActions?: Maybe<SearchableColonyActionConnection>;
   searchColonyContributors?: Maybe<SearchableColonyContributorConnection>;
 };
 
 /** Root query type */
-export type QueryBridgeXyzQueryArgs = {
-  input: BridgeXyzQueryInput;
+export type QueryBridgeGetUserLiquidationAddressArgs = {
+  userAddress: Scalars['String'];
 };
 
 /** Root query type */
@@ -6273,9 +6275,9 @@ export type QueryGetMotionTimeoutPeriodsArgs = {
 };
 
 /** Root query type */
-export type QueryGetMotionUserRewardsArgs = {
+export type QueryGetMotionVoterRewardsArgs = {
   createdAt?: InputMaybe<ModelStringKeyConditionInput>;
-  filter?: InputMaybe<ModelUserMotionRewardFilterInput>;
+  filter?: InputMaybe<ModelVoterRewardsHistoryFilterInput>;
   limit?: InputMaybe<Scalars['Int']>;
   motionId: Scalars['ID'];
   nextToken?: InputMaybe<Scalars['String']>;
@@ -6456,11 +6458,6 @@ export type QueryGetUserByLiquidationAddressArgs = {
 };
 
 /** Root query type */
-export type QueryGetUserMotionRewardArgs = {
-  id: Scalars['ID'];
-};
-
-/** Root query type */
 export type QueryGetUserReputationArgs = {
   input?: InputMaybe<GetUserReputationInput>;
 };
@@ -6473,16 +6470,6 @@ export type QueryGetUserReputationInColonyArgs = {
   limit?: InputMaybe<Scalars['Int']>;
   nextToken?: InputMaybe<Scalars['String']>;
   sortDirection?: InputMaybe<ModelSortDirection>;
-};
-
-/** Root query type */
-export type QueryGetUserRewardsArgs = {
-  createdAt?: InputMaybe<ModelStringKeyConditionInput>;
-  filter?: InputMaybe<ModelUserMotionRewardFilterInput>;
-  limit?: InputMaybe<Scalars['Int']>;
-  nextToken?: InputMaybe<Scalars['String']>;
-  sortDirection?: InputMaybe<ModelSortDirection>;
-  userAddress: Scalars['ID'];
 };
 
 /** Root query type */
@@ -6511,8 +6498,23 @@ export type QueryGetUserTokensArgs = {
 };
 
 /** Root query type */
+export type QueryGetUserVoterRewardsArgs = {
+  createdAt?: InputMaybe<ModelStringKeyConditionInput>;
+  filter?: InputMaybe<ModelVoterRewardsHistoryFilterInput>;
+  limit?: InputMaybe<Scalars['Int']>;
+  nextToken?: InputMaybe<Scalars['String']>;
+  sortDirection?: InputMaybe<ModelSortDirection>;
+  userAddress: Scalars['ID'];
+};
+
+/** Root query type */
 export type QueryGetVoterRewardsArgs = {
   input?: InputMaybe<GetVoterRewardsInput>;
+};
+
+/** Root query type */
+export type QueryGetVoterRewardsHistoryArgs = {
+  id: Scalars['ID'];
 };
 
 /** Root query type */
@@ -6768,13 +6770,6 @@ export type QueryListTransactionsArgs = {
 };
 
 /** Root query type */
-export type QueryListUserMotionRewardsArgs = {
-  filter?: InputMaybe<ModelUserMotionRewardFilterInput>;
-  limit?: InputMaybe<Scalars['Int']>;
-  nextToken?: InputMaybe<Scalars['String']>;
-};
-
-/** Root query type */
 export type QueryListUserStakesArgs = {
   filter?: InputMaybe<ModelUserStakeFilterInput>;
   limit?: InputMaybe<Scalars['Int']>;
@@ -6791,6 +6786,13 @@ export type QueryListUserTokensArgs = {
 /** Root query type */
 export type QueryListUsersArgs = {
   filter?: InputMaybe<ModelUserFilterInput>;
+  limit?: InputMaybe<Scalars['Int']>;
+  nextToken?: InputMaybe<Scalars['String']>;
+};
+
+/** Root query type */
+export type QueryListVoterRewardsHistoriesArgs = {
+  filter?: InputMaybe<ModelVoterRewardsHistoryFilterInput>;
   limit?: InputMaybe<Scalars['Int']>;
   nextToken?: InputMaybe<Scalars['String']>;
 };
@@ -7307,9 +7309,9 @@ export type Subscription = {
   onCreateToken?: Maybe<Token>;
   onCreateTransaction?: Maybe<Transaction>;
   onCreateUser?: Maybe<User>;
-  onCreateUserMotionReward?: Maybe<UserMotionReward>;
   onCreateUserStake?: Maybe<UserStake>;
   onCreateUserTokens?: Maybe<UserTokens>;
+  onCreateVoterRewardsHistory?: Maybe<VoterRewardsHistory>;
   onDeleteAnnotation?: Maybe<Annotation>;
   onDeleteColony?: Maybe<Colony>;
   onDeleteColonyAction?: Maybe<ColonyAction>;
@@ -7347,9 +7349,9 @@ export type Subscription = {
   onDeleteToken?: Maybe<Token>;
   onDeleteTransaction?: Maybe<Transaction>;
   onDeleteUser?: Maybe<User>;
-  onDeleteUserMotionReward?: Maybe<UserMotionReward>;
   onDeleteUserStake?: Maybe<UserStake>;
   onDeleteUserTokens?: Maybe<UserTokens>;
+  onDeleteVoterRewardsHistory?: Maybe<VoterRewardsHistory>;
   onUpdateAnnotation?: Maybe<Annotation>;
   onUpdateColony?: Maybe<Colony>;
   onUpdateColonyAction?: Maybe<ColonyAction>;
@@ -7387,9 +7389,9 @@ export type Subscription = {
   onUpdateToken?: Maybe<Token>;
   onUpdateTransaction?: Maybe<Transaction>;
   onUpdateUser?: Maybe<User>;
-  onUpdateUserMotionReward?: Maybe<UserMotionReward>;
   onUpdateUserStake?: Maybe<UserStake>;
   onUpdateUserTokens?: Maybe<UserTokens>;
+  onUpdateVoterRewardsHistory?: Maybe<VoterRewardsHistory>;
 };
 
 export type SubscriptionOnCreateAnnotationArgs = {
@@ -7540,16 +7542,16 @@ export type SubscriptionOnCreateUserArgs = {
   filter?: InputMaybe<ModelSubscriptionUserFilterInput>;
 };
 
-export type SubscriptionOnCreateUserMotionRewardArgs = {
-  filter?: InputMaybe<ModelSubscriptionUserMotionRewardFilterInput>;
-};
-
 export type SubscriptionOnCreateUserStakeArgs = {
   filter?: InputMaybe<ModelSubscriptionUserStakeFilterInput>;
 };
 
 export type SubscriptionOnCreateUserTokensArgs = {
   filter?: InputMaybe<ModelSubscriptionUserTokensFilterInput>;
+};
+
+export type SubscriptionOnCreateVoterRewardsHistoryArgs = {
+  filter?: InputMaybe<ModelSubscriptionVoterRewardsHistoryFilterInput>;
 };
 
 export type SubscriptionOnDeleteAnnotationArgs = {
@@ -7700,16 +7702,16 @@ export type SubscriptionOnDeleteUserArgs = {
   filter?: InputMaybe<ModelSubscriptionUserFilterInput>;
 };
 
-export type SubscriptionOnDeleteUserMotionRewardArgs = {
-  filter?: InputMaybe<ModelSubscriptionUserMotionRewardFilterInput>;
-};
-
 export type SubscriptionOnDeleteUserStakeArgs = {
   filter?: InputMaybe<ModelSubscriptionUserStakeFilterInput>;
 };
 
 export type SubscriptionOnDeleteUserTokensArgs = {
   filter?: InputMaybe<ModelSubscriptionUserTokensFilterInput>;
+};
+
+export type SubscriptionOnDeleteVoterRewardsHistoryArgs = {
+  filter?: InputMaybe<ModelSubscriptionVoterRewardsHistoryFilterInput>;
 };
 
 export type SubscriptionOnUpdateAnnotationArgs = {
@@ -7860,16 +7862,16 @@ export type SubscriptionOnUpdateUserArgs = {
   filter?: InputMaybe<ModelSubscriptionUserFilterInput>;
 };
 
-export type SubscriptionOnUpdateUserMotionRewardArgs = {
-  filter?: InputMaybe<ModelSubscriptionUserMotionRewardFilterInput>;
-};
-
 export type SubscriptionOnUpdateUserStakeArgs = {
   filter?: InputMaybe<ModelSubscriptionUserStakeFilterInput>;
 };
 
 export type SubscriptionOnUpdateUserTokensArgs = {
   filter?: InputMaybe<ModelSubscriptionUserTokensFilterInput>;
+};
+
+export type SubscriptionOnUpdateVoterRewardsHistoryArgs = {
+  filter?: InputMaybe<ModelSubscriptionVoterRewardsHistoryFilterInput>;
 };
 
 /** Represents the currencies/tokens that users' balances can be converted to (for display purposes) */
@@ -8533,15 +8535,6 @@ export type UpdateUserInput = {
   userPrivateBetaInviteCodeId?: InputMaybe<Scalars['ID']>;
 };
 
-export type UpdateUserMotionRewardInput = {
-  amount?: InputMaybe<Scalars['String']>;
-  colonyAddress?: InputMaybe<Scalars['ID']>;
-  createdAt?: InputMaybe<Scalars['AWSDateTime']>;
-  id: Scalars['ID'];
-  motionId?: InputMaybe<Scalars['ID']>;
-  userAddress?: InputMaybe<Scalars['ID']>;
-};
-
 export type UpdateUserStakeInput = {
   actionId?: InputMaybe<Scalars['ID']>;
   amount?: InputMaybe<Scalars['String']>;
@@ -8557,6 +8550,15 @@ export type UpdateUserTokensInput = {
   id: Scalars['ID'];
   tokenID?: InputMaybe<Scalars['ID']>;
   userID?: InputMaybe<Scalars['ID']>;
+};
+
+export type UpdateVoterRewardsHistoryInput = {
+  amount?: InputMaybe<Scalars['String']>;
+  colonyAddress?: InputMaybe<Scalars['ID']>;
+  createdAt?: InputMaybe<Scalars['AWSDateTime']>;
+  id: Scalars['ID'];
+  motionId?: InputMaybe<Scalars['ID']>;
+  userAddress?: InputMaybe<Scalars['ID']>;
 };
 
 /** Represents a User within the Colony Network */
@@ -8623,19 +8625,6 @@ export type UserTransactionHistoryArgs = {
   limit?: InputMaybe<Scalars['Int']>;
   nextToken?: InputMaybe<Scalars['String']>;
   sortDirection?: InputMaybe<ModelSortDirection>;
-};
-
-/** Other user motion rewards such as voting */
-export type UserMotionReward = {
-  __typename?: 'UserMotionReward';
-  amount: Scalars['String'];
-  colonyAddress: Scalars['ID'];
-  createdAt: Scalars['AWSDateTime'];
-  id: Scalars['ID'];
-  motionId: Scalars['ID'];
-  updatedAt: Scalars['AWSDateTime'];
-  user: User;
-  userAddress: Scalars['ID'];
 };
 
 /** Stakes that a user has made for a motion */
@@ -8717,6 +8706,19 @@ export type VoterRecordInput = {
   vote?: InputMaybe<Scalars['Int']>;
   /** The voting weight denominated by the user's reputation */
   voteCount: Scalars['String'];
+};
+
+/** Other motion voting rewards */
+export type VoterRewardsHistory = {
+  __typename?: 'VoterRewardsHistory';
+  amount: Scalars['String'];
+  colonyAddress: Scalars['ID'];
+  createdAt: Scalars['AWSDateTime'];
+  id: Scalars['ID'];
+  motionId: Scalars['ID'];
+  updatedAt: Scalars['AWSDateTime'];
+  user: User;
+  userAddress: Scalars['ID'];
 };
 
 /**
@@ -9395,14 +9397,14 @@ export type CreateMotionMessageMutation = {
   createMotionMessage?: { __typename?: 'MotionMessage'; id: string } | null;
 };
 
-export type CreateUserMotionRewardMutationVariables = Exact<{
-  input: CreateUserMotionRewardInput;
+export type CreateUserVoterRewardMutationVariables = Exact<{
+  input: CreateVoterRewardsHistoryInput;
 }>;
 
-export type CreateUserMotionRewardMutation = {
+export type CreateUserVoterRewardMutation = {
   __typename?: 'Mutation';
-  createUserMotionReward?: {
-    __typename?: 'UserMotionReward';
+  createVoterRewardsHistory?: {
+    __typename?: 'VoterRewardsHistory';
     id: string;
   } | null;
 };
@@ -10860,9 +10862,9 @@ export const CreateMotionMessageDocument = gql`
     }
   }
 `;
-export const CreateUserMotionRewardDocument = gql`
-  mutation CreateUserMotionReward($input: CreateUserMotionRewardInput!) {
-    createUserMotionReward(input: $input) {
+export const CreateUserVoterRewardDocument = gql`
+  mutation CreateUserVoterReward($input: CreateVoterRewardsHistoryInput!) {
+    createVoterRewardsHistory(input: $input) {
       id
     }
   }
