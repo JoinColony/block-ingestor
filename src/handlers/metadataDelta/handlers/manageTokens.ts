@@ -1,9 +1,11 @@
+import { Id } from '@colony/colony-js';
 import { ColonyActionType } from '~graphql';
 import { ContractEvent } from '~types';
 import {
   ManageTokensOperation,
   getApprovedTokenChanges,
   getColonyFromDB,
+  getDomainDatabaseId,
   updateColonyTokens,
   writeActionFromEvent,
 } from '~utils';
@@ -46,5 +48,6 @@ export const handleManageTokens = async (
       removed: modifiedTokenAddresses.removed,
       unaffected: unaffectedTokenAddresses,
     },
+    fromDomainId: getDomainDatabaseId(colonyAddress, Id.RootDomain),
   });
 };
