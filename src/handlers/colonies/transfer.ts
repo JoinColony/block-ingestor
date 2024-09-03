@@ -82,12 +82,14 @@ export default async (event: ContractEvent): Promise<void> => {
         : '',
     );
 
+    let tokenAddressFromDb: string | undefined;
+
     /**
      * Call the GetTokenFromEverywhere query to ensure the token
      * gets added to the DB if it doesn't already exist
      */
     try {
-      await query<
+      const dbTokenQuery = await query<
         GetTokenFromEverywhereQuery,
         GetTokenFromEverywhereQueryVariables
       >(GetTokenFromEverywhereDocument, {
@@ -95,14 +97,21 @@ export default async (event: ContractEvent): Promise<void> => {
           tokenAddress,
         },
       });
+      const [dbToken] = dbTokenQuery?.data?.getTokenFromEverywhere?.items ?? [];
+      tokenAddressFromDb = dbToken?.id;
     } catch {
       output(
         `Token ${tokenAddress} not found on chain while handling Transfer event to colony ${dst}`,
       );
     }
 
-    // Don't add zero transfer claims in the database
-    if (!existingClaim && amount !== '0') {
+    /*
+     * 1. Don't add claims that are already in the database
+     * 2. Don't add claims that are zero
+     * 3. Don't add claims that don't have a token address in the database -- this is important since it prevents spam tokens (or contracts mascarading as tokens)
+     * from being added to the database, breaking the colony query
+     */
+    if (!existingClaim && amount !== '0' && tokenAddressFromDb) {
       createFundsClaim({
         colonyAddress: dst,
         tokenAddress,
