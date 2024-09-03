@@ -27,6 +27,7 @@
   "dependencies": {
     "@colony/colony-js": "7.2.0",
     "@colony/events": "3.0.0",
+    "@magicbell/core": "^5.0.16",
     "aws-amplify": "^4.3.43",
     "cross-fetch": "^4.0.0",
     "dotenv": "^16.0.3",
