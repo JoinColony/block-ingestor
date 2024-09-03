@@ -7,6 +7,7 @@ import { ColonyActionType } from '~graphql';
 import { MultiPayment } from '~handlers/actions/oneTxPayment';
 
 import { createMultiSigInDB } from '../helpers';
+import { sendMentionNotifications } from '~utils/notifications';
 
 export const handlePaymentMultiSig = async (
   colonyAddress: string,
@@ -41,4 +42,11 @@ export const handlePaymentMultiSig = async (
       payments,
     });
   }
+
+  sendMentionNotifications({
+    colonyAddress,
+    creator: event.args.agent,
+    transactionHash: event.transactionHash,
+    recipients,
+  });
 };

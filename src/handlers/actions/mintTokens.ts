@@ -38,7 +38,7 @@ export default async (event: ContractEvent): Promise<void> => {
       creator: initiatorAddress,
       colonyAddress,
       transactionHash,
-      notificationCategory: NotificationCategory.Admin,
+      notificationCategory: NotificationCategory.Payment,
     });
   } else {
     verbose(

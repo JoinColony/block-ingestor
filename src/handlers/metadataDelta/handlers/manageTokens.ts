@@ -59,6 +59,6 @@ export const handleManageTokens = async (
     creator: initiatorAddress,
     colonyAddress,
     transactionHash,
-    notificationCategory: NotificationCategory.Admin,
+    notificationCategory: NotificationCategory.Payment,
   });
 };
