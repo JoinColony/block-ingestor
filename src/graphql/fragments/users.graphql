@@ -1,0 +1,13 @@
+fragment NotificationUser on ColonyContributor {
+  user {
+    notificationsData {
+      ...NotificationsData
+    }
+  }
+}
+
+fragment NotificationsData on NotificationsData {
+  magicbellUserId
+  notificationsDisabled
+  mutedColonyAddresses
+}

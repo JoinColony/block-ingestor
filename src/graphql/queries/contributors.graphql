@@ -4,3 +4,26 @@ query GetColonyContributor($id: ID!) {
     isVerified
   }
 }
+
+query GetColonyContributorsNotificationData(
+  $colonyAddress: ID!
+  $sortDirection: ModelSortDirection = ASC
+  $limit: Int = 100
+  $nextToken: String
+) {
+  getContributorsByColony(
+    colonyAddress: $colonyAddress
+    sortDirection: $sortDirection
+    limit: $limit
+    nextToken: $nextToken
+  ) {
+    items {
+      user {
+        notificationsData {
+          ...NotificationsData
+        }
+      }
+    }
+    nextToken
+  }
+}
