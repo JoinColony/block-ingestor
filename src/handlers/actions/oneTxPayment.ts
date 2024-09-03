@@ -1,6 +1,5 @@
 import { AnyColonyClient } from '@colony/colony-js';
 import { BigNumber, utils } from 'ethers';
-
 import { query } from '~amplifyClient';
 import {
   ColonyActionType,
@@ -22,6 +21,10 @@ import {
   createFundsClaim,
 } from '~utils';
 import { getAmountLessFee, getNetworkInverseFee } from '~utils/networkFee';
+import {
+  NotificationType,
+  sendActionNotifications,
+} from '~utils/notifications';
 
 const PAYOUT_CLAIMED_SIGNATURE_HASH = utils.id(
   ContractEventsSignatures.PayoutClaimed,
@@ -225,7 +228,7 @@ const handlerV6 = async (
   colonyClient: AnyColonyClient,
   networkFee: string,
 ): Promise<void> => {
-  const { blockNumber } = event;
+  const { blockNumber, transactionHash } = event;
   const [initiatorAddress, expenditureId] = event.args;
   const receipt = await provider.getTransactionReceipt(event.transactionHash);
 
@@ -297,4 +300,18 @@ const handlerV6 = async (
   }
 
   await writeActionFromEvent(event, colonyAddress, actionFields);
+
+  const firstPaymentData = payments?.[0];
+  if (firstPaymentData) {
+    sendActionNotifications({
+      title: 'Simple Payment',
+      notificationType: NotificationType.SimplePayment,
+      mentions: [firstPaymentData.recipientAddress],
+      creator: initiatorAddress,
+      colonyAddress,
+      transactionHash,
+      amount: firstPaymentData.amount,
+      tokenAddress: firstPaymentData.tokenAddress,
+    });
+  }
 };

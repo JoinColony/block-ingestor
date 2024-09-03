@@ -1711,6 +1711,13 @@ export type CreateMultiSigUserSignatureInput = {
   vote: MultiSigVote;
 };
 
+export type CreateNotificationsDataInput = {
+  magicbellUserId: Scalars['ID'];
+  mutedColonyAddresses: Array<InputMaybe<Scalars['String']>>;
+  notificationsDisabled: Scalars['Boolean'];
+  userAddress: Scalars['ID'];
+};
+
 export type CreatePrivateBetaInviteCodeInput = {
   id?: InputMaybe<Scalars['ID']>;
   shareableInvites?: InputMaybe<Scalars['Int']>;
@@ -1833,6 +1840,12 @@ export type CreateUserInput = {
   id?: InputMaybe<Scalars['ID']>;
   profileId?: InputMaybe<Scalars['ID']>;
   userPrivateBetaInviteCodeId?: InputMaybe<Scalars['ID']>;
+};
+
+/** Input data for creating notifications data for a user */
+export type CreateUserNotificationsDataInput = {
+  /** Unique identifier for the user. This is the user's wallet address */
+  id: Scalars['ID'];
 };
 
 export type CreateUserStakeInput = {
@@ -2002,6 +2015,10 @@ export type DeleteMotionMessageInput = {
 
 export type DeleteMultiSigUserSignatureInput = {
   id: Scalars['ID'];
+};
+
+export type DeleteNotificationsDataInput = {
+  userAddress: Scalars['ID'];
 };
 
 export type DeletePrivateBetaInviteCodeInput = {
@@ -3678,6 +3695,31 @@ export type ModelMultiSigVoteInput = {
   ne?: InputMaybe<MultiSigVote>;
 };
 
+export type ModelNotificationsDataConditionInput = {
+  and?: InputMaybe<Array<InputMaybe<ModelNotificationsDataConditionInput>>>;
+  magicbellUserId?: InputMaybe<ModelIdInput>;
+  mutedColonyAddresses?: InputMaybe<ModelStringInput>;
+  not?: InputMaybe<ModelNotificationsDataConditionInput>;
+  notificationsDisabled?: InputMaybe<ModelBooleanInput>;
+  or?: InputMaybe<Array<InputMaybe<ModelNotificationsDataConditionInput>>>;
+};
+
+export type ModelNotificationsDataConnection = {
+  __typename?: 'ModelNotificationsDataConnection';
+  items: Array<Maybe<NotificationsData>>;
+  nextToken?: Maybe<Scalars['String']>;
+};
+
+export type ModelNotificationsDataFilterInput = {
+  and?: InputMaybe<Array<InputMaybe<ModelNotificationsDataFilterInput>>>;
+  magicbellUserId?: InputMaybe<ModelIdInput>;
+  mutedColonyAddresses?: InputMaybe<ModelStringInput>;
+  not?: InputMaybe<ModelNotificationsDataFilterInput>;
+  notificationsDisabled?: InputMaybe<ModelBooleanInput>;
+  or?: InputMaybe<Array<InputMaybe<ModelNotificationsDataFilterInput>>>;
+  userAddress?: InputMaybe<ModelIdInput>;
+};
+
 export type ModelPrivateBetaInviteCodeConditionInput = {
   and?: InputMaybe<Array<InputMaybe<ModelPrivateBetaInviteCodeConditionInput>>>;
   not?: InputMaybe<ModelPrivateBetaInviteCodeConditionInput>;
@@ -4424,6 +4466,19 @@ export type ModelSubscriptionMultiSigUserSignatureFilterInput = {
   vote?: InputMaybe<ModelSubscriptionStringInput>;
 };
 
+export type ModelSubscriptionNotificationsDataFilterInput = {
+  and?: InputMaybe<
+    Array<InputMaybe<ModelSubscriptionNotificationsDataFilterInput>>
+  >;
+  magicbellUserId?: InputMaybe<ModelSubscriptionIdInput>;
+  mutedColonyAddresses?: InputMaybe<ModelSubscriptionStringInput>;
+  notificationsDisabled?: InputMaybe<ModelSubscriptionBooleanInput>;
+  or?: InputMaybe<
+    Array<InputMaybe<ModelSubscriptionNotificationsDataFilterInput>>
+  >;
+  userAddress?: InputMaybe<ModelSubscriptionIdInput>;
+};
+
 export type ModelSubscriptionPrivateBetaInviteCodeFilterInput = {
   and?: InputMaybe<
     Array<InputMaybe<ModelSubscriptionPrivateBetaInviteCodeFilterInput>>
@@ -5057,6 +5112,7 @@ export type Mutation = {
   createLiquidationAddress?: Maybe<LiquidationAddress>;
   createMotionMessage?: Maybe<MotionMessage>;
   createMultiSigUserSignature?: Maybe<MultiSigUserSignature>;
+  createNotificationsData?: Maybe<NotificationsData>;
   createPrivateBetaInviteCode?: Maybe<PrivateBetaInviteCode>;
   createProfile?: Maybe<Profile>;
   createReputationMiningCycleMetadata?: Maybe<ReputationMiningCycleMetadata>;
@@ -5069,6 +5125,8 @@ export type Mutation = {
   /** Create a unique user within the Colony Network. Use this instead of the automatically generated `createUser` mutation */
   createUniqueUser?: Maybe<User>;
   createUser?: Maybe<User>;
+  /** Create notification data for a user */
+  createUserNotificationsData?: Maybe<NotificationsData>;
   createUserStake?: Maybe<UserStake>;
   createUserTokens?: Maybe<UserTokens>;
   createVoterRewardsHistory?: Maybe<VoterRewardsHistory>;
@@ -5101,6 +5159,7 @@ export type Mutation = {
   deleteLiquidationAddress?: Maybe<LiquidationAddress>;
   deleteMotionMessage?: Maybe<MotionMessage>;
   deleteMultiSigUserSignature?: Maybe<MultiSigUserSignature>;
+  deleteNotificationsData?: Maybe<NotificationsData>;
   deletePrivateBetaInviteCode?: Maybe<PrivateBetaInviteCode>;
   deleteProfile?: Maybe<Profile>;
   deleteReputationMiningCycleMetadata?: Maybe<ReputationMiningCycleMetadata>;
@@ -5145,6 +5204,7 @@ export type Mutation = {
   updateLiquidationAddress?: Maybe<LiquidationAddress>;
   updateMotionMessage?: Maybe<MotionMessage>;
   updateMultiSigUserSignature?: Maybe<MultiSigUserSignature>;
+  updateNotificationsData?: Maybe<NotificationsData>;
   updatePrivateBetaInviteCode?: Maybe<PrivateBetaInviteCode>;
   updateProfile?: Maybe<Profile>;
   updateReputationMiningCycleMetadata?: Maybe<ReputationMiningCycleMetadata>;
@@ -5356,6 +5416,11 @@ export type MutationCreateMultiSigUserSignatureArgs = {
   input: CreateMultiSigUserSignatureInput;
 };
 
+export type MutationCreateNotificationsDataArgs = {
+  condition?: InputMaybe<ModelNotificationsDataConditionInput>;
+  input: CreateNotificationsDataInput;
+};
+
 /** Root mutation type */
 export type MutationCreatePrivateBetaInviteCodeArgs = {
   condition?: InputMaybe<ModelPrivateBetaInviteCodeConditionInput>;
@@ -5419,6 +5484,11 @@ export type MutationCreateUniqueUserArgs = {
 export type MutationCreateUserArgs = {
   condition?: InputMaybe<ModelUserConditionInput>;
   input: CreateUserInput;
+};
+
+/** Root mutation type */
+export type MutationCreateUserNotificationsDataArgs = {
+  input: CreateUserNotificationsDataInput;
 };
 
 /** Root mutation type */
@@ -5611,6 +5681,11 @@ export type MutationDeleteMotionMessageArgs = {
 export type MutationDeleteMultiSigUserSignatureArgs = {
   condition?: InputMaybe<ModelMultiSigUserSignatureConditionInput>;
   input: DeleteMultiSigUserSignatureInput;
+};
+
+export type MutationDeleteNotificationsDataArgs = {
+  condition?: InputMaybe<ModelNotificationsDataConditionInput>;
+  input: DeleteNotificationsDataInput;
 };
 
 /** Root mutation type */
@@ -5870,6 +5945,11 @@ export type MutationUpdateMultiSigUserSignatureArgs = {
   input: UpdateMultiSigUserSignatureInput;
 };
 
+export type MutationUpdateNotificationsDataArgs = {
+  condition?: InputMaybe<ModelNotificationsDataConditionInput>;
+  input: UpdateNotificationsDataInput;
+};
+
 /** Root mutation type */
 export type MutationUpdatePrivateBetaInviteCodeArgs = {
   condition?: InputMaybe<ModelPrivateBetaInviteCodeConditionInput>;
@@ -6037,6 +6117,21 @@ export enum Network {
   /** Ethereum Mainnet */
   Mainnet = 'MAINNET',
 }
+
+/** Holds the notifications data for the user, such as their unique Magicbell user id, and their notifications preferences. */
+export type NotificationsData = {
+  __typename?: 'NotificationsData';
+  createdAt: Scalars['AWSDateTime'];
+  /** Unique identifier for the user in Magicbell */
+  magicbellUserId: Scalars['ID'];
+  /** List of addresses of colonies that the user has muted */
+  mutedColonyAddresses: Array<Maybe<Scalars['String']>>;
+  /** Boolean to indicate if the user has disabled notifications app wide */
+  notificationsDisabled: Scalars['Boolean'];
+  updatedAt: Scalars['AWSDateTime'];
+  /** Unique identifier for the user */
+  userAddress: Scalars['ID'];
+};
 
 export type Payment = {
   __typename?: 'Payment';
@@ -6221,6 +6316,7 @@ export type Query = {
   getMultiSigByTransactionHash?: Maybe<ModelColonyMultiSigConnection>;
   getMultiSigUserSignature?: Maybe<MultiSigUserSignature>;
   getMultiSigUserSignatureByMultiSigId?: Maybe<ModelMultiSigUserSignatureConnection>;
+  getNotificationsData?: Maybe<NotificationsData>;
   getPrivateBetaInviteCode?: Maybe<PrivateBetaInviteCode>;
   getProfile?: Maybe<Profile>;
   getProfileByEmail?: Maybe<ModelProfileConnection>;
@@ -6288,6 +6384,7 @@ export type Query = {
   listLiquidationAddresses?: Maybe<ModelLiquidationAddressConnection>;
   listMotionMessages?: Maybe<ModelMotionMessageConnection>;
   listMultiSigUserSignatures?: Maybe<ModelMultiSigUserSignatureConnection>;
+  listNotificationsData?: Maybe<ModelNotificationsDataConnection>;
   listPrivateBetaInviteCodes?: Maybe<ModelPrivateBetaInviteCodeConnection>;
   listProfiles?: Maybe<ModelProfileConnection>;
   listReputationMiningCycleMetadata?: Maybe<ModelReputationMiningCycleMetadataConnection>;
@@ -6727,6 +6824,10 @@ export type QueryGetMultiSigUserSignatureByMultiSigIdArgs = {
   multiSigId: Scalars['ID'];
   nextToken?: InputMaybe<Scalars['String']>;
   sortDirection?: InputMaybe<ModelSortDirection>;
+};
+
+export type QueryGetNotificationsDataArgs = {
+  userAddress: Scalars['ID'];
 };
 
 /** Root query type */
@@ -7173,6 +7274,14 @@ export type QueryListMultiSigUserSignaturesArgs = {
   filter?: InputMaybe<ModelMultiSigUserSignatureFilterInput>;
   limit?: InputMaybe<Scalars['Int']>;
   nextToken?: InputMaybe<Scalars['String']>;
+};
+
+export type QueryListNotificationsDataArgs = {
+  filter?: InputMaybe<ModelNotificationsDataFilterInput>;
+  limit?: InputMaybe<Scalars['Int']>;
+  nextToken?: InputMaybe<Scalars['String']>;
+  sortDirection?: InputMaybe<ModelSortDirection>;
+  userAddress?: InputMaybe<Scalars['ID']>;
 };
 
 /** Root query type */
@@ -7779,6 +7888,7 @@ export type Subscription = {
   onCreateLiquidationAddress?: Maybe<LiquidationAddress>;
   onCreateMotionMessage?: Maybe<MotionMessage>;
   onCreateMultiSigUserSignature?: Maybe<MultiSigUserSignature>;
+  onCreateNotificationsData?: Maybe<NotificationsData>;
   onCreatePrivateBetaInviteCode?: Maybe<PrivateBetaInviteCode>;
   onCreateProfile?: Maybe<Profile>;
   onCreateReputationMiningCycleMetadata?: Maybe<ReputationMiningCycleMetadata>;
@@ -7821,6 +7931,7 @@ export type Subscription = {
   onDeleteLiquidationAddress?: Maybe<LiquidationAddress>;
   onDeleteMotionMessage?: Maybe<MotionMessage>;
   onDeleteMultiSigUserSignature?: Maybe<MultiSigUserSignature>;
+  onDeleteNotificationsData?: Maybe<NotificationsData>;
   onDeletePrivateBetaInviteCode?: Maybe<PrivateBetaInviteCode>;
   onDeleteProfile?: Maybe<Profile>;
   onDeleteReputationMiningCycleMetadata?: Maybe<ReputationMiningCycleMetadata>;
@@ -7863,6 +7974,7 @@ export type Subscription = {
   onUpdateLiquidationAddress?: Maybe<LiquidationAddress>;
   onUpdateMotionMessage?: Maybe<MotionMessage>;
   onUpdateMultiSigUserSignature?: Maybe<MultiSigUserSignature>;
+  onUpdateNotificationsData?: Maybe<NotificationsData>;
   onUpdatePrivateBetaInviteCode?: Maybe<PrivateBetaInviteCode>;
   onUpdateProfile?: Maybe<Profile>;
   onUpdateReputationMiningCycleMetadata?: Maybe<ReputationMiningCycleMetadata>;
@@ -7992,6 +8104,10 @@ export type SubscriptionOnCreateMotionMessageArgs = {
 
 export type SubscriptionOnCreateMultiSigUserSignatureArgs = {
   filter?: InputMaybe<ModelSubscriptionMultiSigUserSignatureFilterInput>;
+};
+
+export type SubscriptionOnCreateNotificationsDataArgs = {
+  filter?: InputMaybe<ModelSubscriptionNotificationsDataFilterInput>;
 };
 
 export type SubscriptionOnCreatePrivateBetaInviteCodeArgs = {
@@ -8162,6 +8278,10 @@ export type SubscriptionOnDeleteMultiSigUserSignatureArgs = {
   filter?: InputMaybe<ModelSubscriptionMultiSigUserSignatureFilterInput>;
 };
 
+export type SubscriptionOnDeleteNotificationsDataArgs = {
+  filter?: InputMaybe<ModelSubscriptionNotificationsDataFilterInput>;
+};
+
 export type SubscriptionOnDeletePrivateBetaInviteCodeArgs = {
   filter?: InputMaybe<ModelSubscriptionPrivateBetaInviteCodeFilterInput>;
 };
@@ -8328,6 +8448,10 @@ export type SubscriptionOnUpdateMotionMessageArgs = {
 
 export type SubscriptionOnUpdateMultiSigUserSignatureArgs = {
   filter?: InputMaybe<ModelSubscriptionMultiSigUserSignatureFilterInput>;
+};
+
+export type SubscriptionOnUpdateNotificationsDataArgs = {
+  filter?: InputMaybe<ModelSubscriptionNotificationsDataFilterInput>;
 };
 
 export type SubscriptionOnUpdatePrivateBetaInviteCodeArgs = {
@@ -8962,6 +9086,13 @@ export type UpdateMultiSigUserSignatureInput = {
   vote?: InputMaybe<MultiSigVote>;
 };
 
+export type UpdateNotificationsDataInput = {
+  magicbellUserId?: InputMaybe<Scalars['ID']>;
+  mutedColonyAddresses?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;
+  notificationsDisabled?: InputMaybe<Scalars['Boolean']>;
+  userAddress: Scalars['ID'];
+};
+
 export type UpdatePrivateBetaInviteCodeInput = {
   id: Scalars['ID'];
   shareableInvites?: InputMaybe<Scalars['Int']>;
@@ -9113,6 +9244,8 @@ export type User = {
   /** Unique identifier for the user (wallet address) */
   id: Scalars['ID'];
   liquidationAddresses?: Maybe<ModelLiquidationAddressConnection>;
+  /** Notifications data for the user */
+  notificationsData?: Maybe<NotificationsData>;
   /** A user who has been invited by colony will be able to pass on the private beta invite */
   privateBetaInviteCode?: Maybe<PrivateBetaInviteCode>;
   /** Profile information of the user */
@@ -9662,6 +9795,26 @@ export type ColonyMultiSigFragment = {
 };
 
 export type TokenFragment = { __typename?: 'Token'; tokenAddress: string };
+
+export type NotificationUserFragment = {
+  __typename?: 'ColonyContributor';
+  user?: {
+    __typename?: 'User';
+    notificationsData?: {
+      __typename?: 'NotificationsData';
+      magicbellUserId: string;
+      notificationsDisabled: boolean;
+      mutedColonyAddresses: Array<string | null>;
+    } | null;
+  } | null;
+};
+
+export type NotificationsDataFragment = {
+  __typename?: 'NotificationsData';
+  magicbellUserId: string;
+  notificationsDisabled: boolean;
+  mutedColonyAddresses: Array<string | null>;
+};
 
 export type CreateColonyActionMutationVariables = Exact<{
   input: CreateColonyActionInput;
@@ -10466,6 +10619,33 @@ export type GetColonyContributorQuery = {
     __typename?: 'ColonyContributor';
     id: string;
     isVerified: boolean;
+  } | null;
+};
+
+export type GetColonyContributorsNotificationDataQueryVariables = Exact<{
+  colonyAddress: Scalars['ID'];
+  sortDirection?: InputMaybe<ModelSortDirection>;
+  limit?: InputMaybe<Scalars['Int']>;
+  nextToken?: InputMaybe<Scalars['String']>;
+}>;
+
+export type GetColonyContributorsNotificationDataQuery = {
+  __typename?: 'Query';
+  getContributorsByColony?: {
+    __typename?: 'ModelColonyContributorConnection';
+    nextToken?: string | null;
+    items: Array<{
+      __typename?: 'ColonyContributor';
+      user?: {
+        __typename?: 'User';
+        notificationsData?: {
+          __typename?: 'NotificationsData';
+          magicbellUserId: string;
+          notificationsDisabled: boolean;
+          mutedColonyAddresses: Array<string | null>;
+        } | null;
+      } | null;
+    } | null>;
   } | null;
 };
 
@@ -11573,6 +11753,24 @@ export const ColonyMultiSig = gql`
   }
   ${MultiSigUserSignature}
 `;
+
+export const NotificationsData = gql`
+  fragment NotificationsData on NotificationsData {
+    magicbellUserId
+    notificationsDisabled
+    mutedColonyAddresses
+  }
+`;
+export const NotificationUser = gql`
+  fragment NotificationUser on ColonyContributor {
+    user {
+      notificationsData {
+        ...NotificationsData
+      }
+    }
+  }
+  ${NotificationsData}
+`;
 export const CreateColonyActionDocument = gql`
   mutation CreateColonyAction($input: CreateColonyActionInput!) {
     createColonyAction(input: $input) {
@@ -12131,6 +12329,31 @@ export const GetColonyContributorDocument = gql`
       isVerified
     }
   }
+`;
+export const GetColonyContributorsNotificationDataDocument = gql`
+  query GetColonyContributorsNotificationData(
+    $colonyAddress: ID!
+    $sortDirection: ModelSortDirection = ASC
+    $limit: Int = 100
+    $nextToken: String
+  ) {
+    getContributorsByColony(
+      colonyAddress: $colonyAddress
+      sortDirection: $sortDirection
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        user {
+          notificationsData {
+            ...NotificationsData
+          }
+        }
+      }
+      nextToken
+    }
+  }
+  ${NotificationsData}
 `;
 export const GetCurrentVersionDocument = gql`
   query GetCurrentVersion($key: String!) {
