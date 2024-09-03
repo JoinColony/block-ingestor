@@ -1,0 +1,5 @@
+fragment NotificationsData on NotificationsData {
+  magicbellUserId
+  notificationsDisabled
+  mutedColonyAddresses
+}
