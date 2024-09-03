@@ -5,9 +5,16 @@ import { EventHandler } from '~types';
 import {
   addMultiSigVote,
   getMultiSigDatabaseId,
+  getMultiSigFromDB,
+  getMultisigNotificationCategory,
   getUserMultiSigSignature,
   removeMultiSigVote,
 } from '../helpers';
+import { getMultiSigClient } from '~utils';
+import {
+  NotificationType,
+  sendMultisigActionNotifications,
+} from '~utils/notifications';
 
 export const handleMultiSigApprovalChanged: EventHandler = async (
   event,
@@ -19,6 +26,8 @@ export const handleMultiSigApprovalChanged: EventHandler = async (
 
   const chainId = getChainId();
   const { agent: userAddress, motionId, role, approval } = event.args;
+
+  const multiSigClient = await getMultiSigClient(colonyAddress);
 
   const multiSigId = getMultiSigDatabaseId(
     chainId,
@@ -46,6 +55,29 @@ export const handleMultiSigApprovalChanged: EventHandler = async (
         colonyAddress,
         vote: MultiSigVote.Approve,
         timestamp,
+      });
+    }
+  }
+
+  if (multiSigClient) {
+    const motion = await multiSigClient.getMotion(motionId);
+    const multiSigFromDB = await getMultiSigFromDB(multiSigId);
+
+    if (!multiSigFromDB) {
+      return;
+    }
+
+    const notificationCategory = await getMultisigNotificationCategory(
+      multiSigId,
+    );
+
+    if (notificationCategory && !motion.overallApprovalTimestamp.isZero()) {
+      sendMultisigActionNotifications({
+        colonyAddress,
+        creator: userAddress,
+        notificationCategory,
+        notificationType: NotificationType.MultiSigActionApproved,
+        transactionHash: multiSigFromDB?.transactionHash,
       });
     }
   }

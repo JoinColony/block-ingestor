@@ -7,11 +7,16 @@ import { EventHandler } from '~types';
 import {
   getMultiSigDatabaseId,
   getMultiSigFromDB,
+  getMultisigNotificationCategory,
   updateMultiSigInDB,
 } from '../helpers';
 import { getMultiSigClient, verbose } from '~utils';
 import { linkPendingMetadata } from '~utils/colonyMetadata';
 import { getBlockChainTimestampISODate } from '~utils/dates';
+import {
+  NotificationType,
+  sendMultisigActionNotifications,
+} from '~utils/notifications';
 
 export const handleMultiSigMotionExecuted: EventHandler = async (
   event,
@@ -71,5 +76,19 @@ export const handleMultiSigMotionExecuted: EventHandler = async (
     };
 
     await updateMultiSigInDB(updatedMultiSigData);
+
+    const notificationCategory = await getMultisigNotificationCategory(
+      multiSigDatabaseId,
+    );
+
+    if (notificationCategory) {
+      sendMultisigActionNotifications({
+        colonyAddress,
+        creator: userAddress,
+        notificationCategory,
+        notificationType: NotificationType.MultiSigActionFinalized,
+        transactionHash: finalizedMultiSig.transactionHash,
+      });
+    }
   }
 };

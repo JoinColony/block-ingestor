@@ -18,9 +18,12 @@ import {
   CreateMultiSigVoteMutation,
   CreateMultiSigVoteMutationVariables,
   CreateMultiSigVoteDocument,
+  ColonyActionType,
 } from '~graphql';
+import { getActionByMultiSigId } from '~utils';
 import { getBlockChainTimestampISODate } from '~utils/dates';
 import { output } from '~utils/logger';
+import { NotificationCategory } from '~utils/notifications';
 
 export const getMultiSigDatabaseId = (
   chainId: string,
@@ -129,4 +132,101 @@ export const removeMultiSigVote = async (id: string): Promise<void> => {
     RemoveMultiSigVoteDocument,
     { id },
   );
+};
+
+export const getMultisigNotificationCategory = async (
+  multiSigId: string,
+): Promise<NotificationCategory | null> => {
+  const colonyAction = await getActionByMultiSigId(multiSigId);
+
+  let notificationCategory: NotificationCategory | null;
+
+  switch (colonyAction?.type) {
+    case ColonyActionType.AddVerifiedMembersMultisig: {
+      notificationCategory = NotificationCategory.Admin;
+      break;
+    }
+    case ColonyActionType.CancelStakedExpenditureMultisig: {
+      notificationCategory = NotificationCategory.Payment;
+      break;
+    }
+    case ColonyActionType.ColonyEditMultisig: {
+      notificationCategory = NotificationCategory.Admin;
+      break;
+    }
+    case ColonyActionType.CreateDecisionMultisig: {
+      notificationCategory = NotificationCategory.Admin;
+      break;
+    }
+    case ColonyActionType.CreateDomainMultisig: {
+      notificationCategory = NotificationCategory.Admin;
+      break;
+    }
+    case ColonyActionType.EditDomainMultisig: {
+      notificationCategory = NotificationCategory.Admin;
+      break;
+    }
+    case ColonyActionType.EmitDomainReputationPenaltyMultisig: {
+      notificationCategory = NotificationCategory.Admin;
+      break;
+    }
+    case ColonyActionType.EmitDomainReputationRewardMultisig: {
+      notificationCategory = NotificationCategory.Admin;
+      break;
+    }
+    case ColonyActionType.FundExpenditureMultisig: {
+      notificationCategory = NotificationCategory.Payment;
+      break;
+    }
+    case ColonyActionType.MakeArbitraryTransactionsMultisig: {
+      notificationCategory = NotificationCategory.Admin;
+      break;
+    }
+    case ColonyActionType.ManageTokensMultisig: {
+      notificationCategory = NotificationCategory.Payment;
+      break;
+    }
+    case ColonyActionType.MintTokensMultisig: {
+      notificationCategory = NotificationCategory.Payment;
+      break;
+    }
+    case ColonyActionType.MoveFundsMultisig: {
+      notificationCategory = NotificationCategory.Payment;
+      break;
+    }
+    case ColonyActionType.MultiplePaymentMultisig: {
+      notificationCategory = NotificationCategory.Payment;
+      break;
+    }
+    case ColonyActionType.PaymentMultisig: {
+      notificationCategory = NotificationCategory.Payment;
+      break;
+    }
+    case ColonyActionType.UnlockTokenMultisig: {
+      notificationCategory = NotificationCategory.Payment;
+      break;
+    }
+    case ColonyActionType.SetUserRolesMultisig: {
+      notificationCategory = NotificationCategory.Admin;
+      break;
+    }
+    case ColonyActionType.VersionUpgradeMultisig: {
+      notificationCategory = NotificationCategory.Admin;
+      break;
+    }
+    case ColonyActionType.SetExpenditureStateMultisig: {
+      notificationCategory = NotificationCategory.Payment;
+      break;
+    }
+    case ColonyActionType.RemoveVerifiedMembersMultisig: {
+      notificationCategory = NotificationCategory.Admin;
+      break;
+    }
+    default: {
+      notificationCategory = null;
+      break;
+    }
+  }
+
+  return notificationCategory;
 };

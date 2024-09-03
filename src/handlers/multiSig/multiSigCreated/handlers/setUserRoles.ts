@@ -7,6 +7,7 @@ import {
   getRolesMapFromHexString,
 } from '~utils';
 import { createMultiSigInDB } from '../helpers';
+import { sendMentionNotifications } from '~utils/notifications';
 
 export const handleSetUserRolesMultiSig = async (
   colonyAddress: string,
@@ -42,5 +43,12 @@ export const handleSetUserRolesMultiSig = async (
     recipientAddress: userAddress,
     roles,
     rolesAreMultiSig: isMultiSig ? true : null,
+  });
+
+  sendMentionNotifications({
+    colonyAddress,
+    creator: event.args.agent,
+    transactionHash: event.transactionHash,
+    recipients: [userAddress],
   });
 };
