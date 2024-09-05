@@ -12,6 +12,8 @@ import {
   mapLogToContractEvent,
   writeActionFromEvent,
   isAddressExtension,
+  getMultiSigClient,
+  toNumber,
 } from '~utils';
 import {
   GetColonyHistoricRoleQuery,
@@ -30,7 +32,7 @@ import {
 } from '~graphql';
 import { createColonyContributor, isAlreadyContributor } from './contributors';
 
-const BASE_ROLES_MAP = {
+export const BASE_ROLES_MAP = {
   [`role_${ColonyRole.Recovery}`]: null,
   [`role_${ColonyRole.Root}`]: null,
   [`role_${ColonyRole.Arbitration}`]: null,
@@ -43,15 +45,22 @@ export const getColonyRolesDatabaseId = (
   colonyAddress: string,
   nativeDomainId: number,
   userAddress: string,
-): string => `${colonyAddress}_${nativeDomainId}_${userAddress}_roles`;
+  isMultiSigRole: boolean = false,
+): string =>
+  `${colonyAddress}_${nativeDomainId}_${userAddress}${
+    isMultiSigRole ? '_multisig' : ''
+  }_roles`;
 
 export const getColonyHistoricRolesDatabaseId = (
   colonyAddress: string,
   nativeDomainId: number,
   userAddress: string,
   blockNumber: number,
+  isMultiSigRole: boolean = false,
 ): string =>
-  `${colonyAddress}_${nativeDomainId}_${userAddress}_${blockNumber}_roles`;
+  `${colonyAddress}_${nativeDomainId}_${userAddress}_${blockNumber}${
+    isMultiSigRole ? '_multisig' : ''
+  }_roles`;
 
 export const getAllRoleEventsFromTransaction = async (
   transactionHash: string,
@@ -103,6 +112,47 @@ export const getAllRoleEventsFromTransaction = async (
   return filteredEvents as ContractEvent[];
 };
 
+export const getAllMultiSigRoleEventsFromTransaction = async (
+  transactionHash: string,
+  colonyAddress: string,
+): Promise<ContractEvent[]> => {
+  const multiSigRoleSetEventName =
+    ContractEventsSignatures.MultisigRoleSet.slice(
+      0,
+      ContractEventsSignatures.MultisigRoleSet.indexOf('('),
+    );
+
+  const colonyClient = await getCachedColonyClient(colonyAddress);
+  const multiSigClient = await getMultiSigClient(colonyAddress);
+
+  if (!colonyClient || !multiSigClient) {
+    return [];
+  }
+
+  const transactionReceipt = await colonyClient.provider.getTransactionReceipt(
+    transactionHash,
+  );
+
+  const events = await Promise.all(
+    transactionReceipt.logs.map((log) =>
+      mapLogToContractEvent(log, multiSigClient.interface),
+    ),
+  );
+
+  const filteredEvents = events.filter((event) => {
+    if (!event || !(event.name === multiSigRoleSetEventName)) {
+      return false;
+    }
+    return true;
+  });
+
+  /*
+   * Typecasting since apparently TS doesn't realize we are actually filtering
+   * to ensure that the Array only contains proper events
+   */
+  return filteredEvents as ContractEvent[];
+};
+
 export const getRolesMapFromEvents = (
   roleEvents: ContractEvent[],
   setToNull: boolean = true,
@@ -128,6 +178,26 @@ export const getRolesMapFromEvents = (
       [`role_${
         signature === ContractEventsSignatures.RecoveryRoleSet ? 0 : role
       }`]: setTo || (setToNull ? null : setTo),
+    };
+    roleMap = {
+      ...roleMap,
+      ...roleValue,
+    };
+    return undefined;
+  });
+
+  return roleMap;
+};
+
+export const getMultiSigRolesMapFromEvents = (
+  roleEvents: ContractEvent[],
+  setToNull: boolean = true,
+): Record<string, boolean | null> => {
+  let roleMap = {};
+
+  roleEvents.map(({ args: { roleId, setTo } }) => {
+    const roleValue = {
+      [`role_${toNumber(roleId)}`]: setTo || (setToNull ? null : setTo),
     };
     roleMap = {
       ...roleMap,
@@ -374,6 +444,169 @@ export const createInitialColonyRolesDatabaseEntry = async (
   }
 };
 
+export const createInitialMultiSigRolesDatabaseEntry = async (
+  colonyAddress: string,
+  nativeDomainId: number,
+  targetAddress: string,
+  transactionHash: string,
+): Promise<void> => {
+  const rolesDatabaseId = getColonyRolesDatabaseId(
+    colonyAddress,
+    nativeDomainId,
+    targetAddress,
+    true,
+  );
+  const domainDatabaseId = getDomainDatabaseId(colonyAddress, nativeDomainId);
+
+  const multiSigClient = await getMultiSigClient(colonyAddress);
+
+  if (!multiSigClient) {
+    return;
+  }
+
+  const userRoles = await multiSigClient.getUserRoles(
+    targetAddress,
+    nativeDomainId,
+  );
+
+  const colonyRolesDatabaseId = getColonyRolesDatabaseId(
+    colonyAddress,
+    nativeDomainId,
+    targetAddress,
+    true,
+  );
+
+  const { role_0, role_1, role_2, role_3, role_5, role_6 } =
+    await getRolesMapFromHexString(userRoles, colonyRolesDatabaseId);
+
+  const events = await getAllMultiSigRoleEventsFromTransaction(
+    transactionHash,
+    colonyAddress,
+  );
+  const firstRoleSetEvent = events.find(
+    ({ signature }) => signature === ContractEventsSignatures.MultisigRoleSet,
+  );
+  const blockNumber = firstRoleSetEvent?.blockNumber ?? 0;
+
+  await mutate<CreateColonyRoleMutation, CreateColonyRoleMutationVariables>(
+    CreateColonyRoleDocument,
+    {
+      input: {
+        id: rolesDatabaseId,
+        latestBlock: blockNumber,
+        // Link the Domain Model
+        domainId: domainDatabaseId,
+        // Link the Colony Model
+        colonyRolesId: colonyAddress,
+        colonyAddress,
+        /*
+         * @NOTE Link the target
+         *
+         * Note that this handler will fire even for events where the target
+         * is something or someone not in the database.
+         *
+         * We try to account for this, by linking address to either a user, colony, or
+         * extension via the target address, but it can happen regardless as the
+         * address can be totally random
+         *
+         * Make sure to be aware of that when fetching the query (you can still fetch
+         * the "targetAddress" value manually, and linking it yourself to the
+         * appropriate entity)
+         */
+        targetAddress,
+
+        // Set the permissions
+        ...BASE_ROLES_MAP,
+        role_0,
+        role_1,
+        role_2,
+        role_3,
+        role_5,
+        role_6,
+        isMultiSig: true,
+      },
+    },
+  );
+
+  verbose(
+    `Create new multi sig Roles entry for ${targetAddress} in colony ${colonyAddress}, under domain ${nativeDomainId}`,
+  );
+
+  /*
+   * Create the historic role entry
+   */
+  await createColonyHistoricRoleDatabaseEntry(
+    colonyAddress,
+    nativeDomainId,
+    targetAddress,
+    blockNumber,
+    {
+      ...BASE_ROLES_MAP,
+      role_0,
+      role_1,
+      role_2,
+      role_3,
+      role_5,
+      role_6,
+    },
+    true,
+  );
+
+  if (
+    firstRoleSetEvent?.signature === ContractEventsSignatures.MultisigRoleSet
+  ) {
+    /*
+     * Create the action
+     */
+    await writeActionFromEvent(firstRoleSetEvent, colonyAddress, {
+      type: ColonyActionType.SetUserRoles,
+      fromDomainId: domainDatabaseId,
+      initiatorAddress: firstRoleSetEvent?.args.agent,
+      recipientAddress: targetAddress,
+      roles: {
+        ...BASE_ROLES_MAP,
+        role_0,
+        role_1,
+        role_2,
+        role_3,
+        role_5,
+        role_6,
+      },
+      rolesAreMultiSig: true,
+      individualEvents: JSON.stringify([
+        ...events.map(
+          ({ name, args: { roleId, setTo }, transactionHash, logIndex }) => ({
+            id: `${transactionHash}_${logIndex}`,
+            type: name,
+            role: toNumber(roleId),
+            setTo,
+          }),
+        ),
+      ]),
+    });
+  }
+
+  /*
+   * Create contributor if necessary
+   */
+
+  const isContributor = await isAlreadyContributor({
+    colonyAddress,
+    contributorAddress: targetAddress,
+  });
+
+  const isExtension = await isAddressExtension(targetAddress);
+
+  if (!isContributor && !isExtension) {
+    await createColonyContributor({
+      colonyAddress,
+      contributorAddress: targetAddress,
+      colonyReputationPercentage: 0,
+      isVerified: false,
+    });
+  }
+};
+
 /*
  * This is designed to run at the time a new colony has been created
  * and it expects to be passed the ColonyAdded event
@@ -416,12 +649,14 @@ export const createColonyHistoricRoleDatabaseEntry = async (
   targetAddress: string,
   blockNumber: number,
   roles: Record<string, boolean | null> = BASE_ROLES_MAP,
+  isMultiSig?: boolean,
 ): Promise<void> => {
   const id = getColonyHistoricRolesDatabaseId(
     colonyAddress,
     nativeDomainId,
     targetAddress,
     blockNumber,
+    isMultiSig,
   );
   const domainDatabaseId = getDomainDatabaseId(colonyAddress, nativeDomainId);
 
@@ -465,6 +700,7 @@ export const createColonyHistoricRoleDatabaseEntry = async (
 
         // Set the permissions
         ...roles,
+        isMultiSig,
       },
     });
 

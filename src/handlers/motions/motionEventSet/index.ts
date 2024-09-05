@@ -1,6 +1,7 @@
 import { ExtensionEventListener } from '~eventListeners';
 import { EventHandler } from '~types';
 import { verbose, getVotingClient } from '~utils';
+import { getBlockChainTimestampISODate } from '~utils/dates';
 
 import {
   getMotionDatabaseId,
@@ -35,10 +36,10 @@ export const handleMotionEventSet: EventHandler = async (event, listener) => {
       motionStateHistory: {
         ...motion.motionStateHistory,
         allVotesSubmittedAt: eventIndex.eq(1)
-          ? new Date(timestamp * 1000).toISOString()
+          ? getBlockChainTimestampISODate(timestamp)
           : motion.motionStateHistory.allVotesSubmittedAt,
         allVotesRevealedAt: eventIndex.eq(2)
-          ? new Date(timestamp * 1000).toISOString()
+          ? getBlockChainTimestampISODate(timestamp)
           : motion.motionStateHistory.allVotesRevealedAt,
       },
     });

@@ -14,6 +14,7 @@ import {
 import { toNumber, verbose, getColonyExtensions } from '~utils';
 import { ContractEvent } from '~types';
 import networkClient from '~networkClient';
+import { getBlockChainTimestampISODate } from '~utils/dates';
 
 export type ActionFields = Omit<
   CreateColonyActionInput,
@@ -60,7 +61,7 @@ export const writeActionFromEvent = async (
         id: transactionHash,
         colonyId: colonyAddress,
         blockNumber,
-        createdAt: new Date(timestamp * 1000).toISOString(),
+        createdAt: getBlockChainTimestampISODate(timestamp),
         showInActionsList,
         rootHash,
         isMotionFinalization,
@@ -127,5 +128,20 @@ const isActionMotionFinalization = async (
   return (
     !!initiatorExtension &&
     initiatorExtension.hash === getExtensionHash(Extension.VotingReputation)
+  );
+};
+
+export const createColonyAction = async (
+  actionData: CreateColonyActionInput,
+  blockTimestamp: number,
+): Promise<void> => {
+  await mutate<CreateColonyActionMutation, CreateColonyActionMutationVariables>(
+    CreateColonyActionDocument,
+    {
+      input: {
+        ...actionData,
+        createdAt: getBlockChainTimestampISODate(blockTimestamp),
+      },
+    },
   );
 };

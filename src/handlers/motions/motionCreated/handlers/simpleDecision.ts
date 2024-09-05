@@ -1,7 +1,8 @@
 import { ContractEvent, motionNameMapping } from '~types';
+import { SimpleTransactionDescription } from '~utils';
 import { getColonyDecisionId } from '~utils/decisions';
 
-import { SimpleTransactionDescription, createMotionInDB } from '../helpers';
+import { createMotionInDB } from '../helpers';
 
 export const handleSimpleDecisionMotion = async (
   colonyAddress: string,

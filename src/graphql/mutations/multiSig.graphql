@@ -1,0 +1,29 @@
+mutation CreateColonyMultiSig($input: CreateColonyMultiSigInput!) {
+  createColonyMultiSig(input: $input) {
+    id
+  }
+}
+
+mutation UpdateColonyMultiSig($input: UpdateColonyMultiSigInput!) {
+  updateColonyMultiSig(input: $input) {
+    id
+  }
+}
+
+mutation CreateMultiSigVote($input: CreateMultiSigUserSignatureInput!) {
+  createMultiSigUserSignature(input: $input) {
+    id
+  }
+}
+
+mutation RemoveMultiSigVote($id: ID!) {
+  deleteMultiSigUserSignature(input: {id: $id}) {
+    id
+  }
+}
+
+mutation RemoveMultiSigRole($id: ID!) {
+  deleteColonyRole(input: {id: $id}) {
+    id
+  }
+}

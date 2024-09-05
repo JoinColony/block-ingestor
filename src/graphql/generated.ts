@@ -221,6 +221,7 @@ export enum ClientType {
   FundingQueueClient = 'FundingQueueClient',
   LightTokenClient = 'LightTokenClient',
   MotionTargetClient = 'MotionTargetClient',
+  MultisigPermissionsClient = 'MultisigPermissionsClient',
   NetworkClient = 'NetworkClient',
   OneTxPaymentClient = 'OneTxPaymentClient',
   ReputationBootstrapperClient = 'ReputationBootstrapperClient',
@@ -413,6 +414,8 @@ export type ColonyAction = {
    * @TODO: Make this field non-nullable
    */
   isMotionFinalization?: Maybe<Scalars['Boolean']>;
+  /** Will be true if the action is a multiSig motion */
+  isMultiSig?: Maybe<Scalars['Boolean']>;
   /** Members impacted by the action (used for add/remove verified members) */
   members?: Maybe<Array<Scalars['ID']>>;
   /** Metadata associated with the action (Eg. Custom action title) */
@@ -423,6 +426,10 @@ export type ColonyAction = {
   motionDomainId?: Maybe<Scalars['Int']>;
   /** The internal database id of the motion */
   motionId?: Maybe<Scalars['ID']>;
+  /** Expanded `ColonyMultiSig` for the corresponding `multiSigId` */
+  multiSigData?: Maybe<ColonyMultiSig>;
+  /** The internal database id of the multiSig */
+  multiSigId?: Maybe<Scalars['ID']>;
   /** The network fee amount, if applicable */
   networkFee?: Maybe<Scalars['String']>;
   /** The resulting new Colony version, if applicable */
@@ -451,6 +458,8 @@ export type ColonyAction = {
   recipientUser?: Maybe<User>;
   /** Colony roles that are associated with the action */
   roles?: Maybe<ColonyActionRoles>;
+  /** Colony roles that are associated with the action are multi sig roles */
+  rolesAreMultiSig?: Maybe<Scalars['Boolean']>;
   /** The reputation root hash at the time of the creation of the action */
   rootHash: Scalars['String'];
   /** Safe transactions associated with the action */
@@ -520,26 +529,37 @@ export enum ColonyActionType {
   /** An action related to adding verified members */
   AddVerifiedMembers = 'ADD_VERIFIED_MEMBERS',
   AddVerifiedMembersMotion = 'ADD_VERIFIED_MEMBERS_MOTION',
+  AddVerifiedMembersMultisig = 'ADD_VERIFIED_MEMBERS_MULTISIG',
   /** An action related to canceling an expenditure */
   CancelExpenditure = 'CANCEL_EXPENDITURE',
   /** An action related to a motion to cancel an expenditure */
   CancelExpenditureMotion = 'CANCEL_EXPENDITURE_MOTION',
+  /** An action related to a multiSig to cancel a staked expenditure */
+  CancelStakedExpenditureMultisig = 'CANCEL_STAKED_EXPENDITURE_MULTISIG',
   /** An action related to editing a Colony's details */
   ColonyEdit = 'COLONY_EDIT',
   /** An action related to editing a Colony's details via a motion */
   ColonyEditMotion = 'COLONY_EDIT_MOTION',
+  /** An action related to editing a Colony's details via multiSig */
+  ColonyEditMultisig = 'COLONY_EDIT_MULTISIG',
   /** An action related to a creating a Decision within a Colony via a motion */
   CreateDecisionMotion = 'CREATE_DECISION_MOTION',
+  /** An action related to a creating a Decision within a Colony via multiSig */
+  CreateDecisionMultisig = 'CREATE_DECISION_MULTISIG',
   /** An action related to creating a domain within a Colony */
   CreateDomain = 'CREATE_DOMAIN',
   /** An action related to creating a domain within a Colony via a motion */
   CreateDomainMotion = 'CREATE_DOMAIN_MOTION',
+  /** An action related to creating a domain within a Colony via multiSig */
+  CreateDomainMultisig = 'CREATE_DOMAIN_MULTISIG',
   /** An action related to creating an expenditure (advanced payment) */
   CreateExpenditure = 'CREATE_EXPENDITURE',
   /** An action related to editing a domain's details */
   EditDomain = 'EDIT_DOMAIN',
   /** An action related to editing a domain's details via a motion */
   EditDomainMotion = 'EDIT_DOMAIN_MOTION',
+  /** An action related to editing a domain's details via multiSig */
+  EditDomainMultisig = 'EDIT_DOMAIN_MULTISIG',
   /** An action related to editing an expenditure */
   EditExpenditure = 'EDIT_EXPENDITURE',
   /** An action related to creating a motion to edit an expenditure */
@@ -548,16 +568,22 @@ export enum ColonyActionType {
   EmitDomainReputationPenalty = 'EMIT_DOMAIN_REPUTATION_PENALTY',
   /** An action related to a domain reputation penalty within a Colony (smite) via a motion */
   EmitDomainReputationPenaltyMotion = 'EMIT_DOMAIN_REPUTATION_PENALTY_MOTION',
+  /** An action related to a domain reputation penalty within a Colony (smite) via multiSig */
+  EmitDomainReputationPenaltyMultisig = 'EMIT_DOMAIN_REPUTATION_PENALTY_MULTISIG',
   /** An action related to a domain reputation reward within a Colony */
   EmitDomainReputationReward = 'EMIT_DOMAIN_REPUTATION_REWARD',
   /** An action related to a domain reputation reward within a Colony via a motion */
   EmitDomainReputationRewardMotion = 'EMIT_DOMAIN_REPUTATION_REWARD_MOTION',
+  /** An action related to a domain reputation reward within a Colony via multiSig */
+  EmitDomainReputationRewardMultisig = 'EMIT_DOMAIN_REPUTATION_REWARD_MULTISIG',
   /** An action related to finalizing an expenditure */
   FinalizeExpenditure = 'FINALIZE_EXPENDITURE',
   /** An action related to finalizing an expenditure via a motion */
   FinalizeExpenditureMotion = 'FINALIZE_EXPENDITURE_MOTION',
   /** An action related to creating a motion for funding an expenditure */
   FundExpenditureMotion = 'FUND_EXPENDITURE_MOTION',
+  /** An action related to creating a multiSig for funding an expenditure */
+  FundExpenditureMultisig = 'FUND_EXPENDITURE_MULTISIG',
   /** A generic or unspecified Colony action */
   Generic = 'GENERIC',
   /** An action related to locking an expenditure */
@@ -565,47 +591,65 @@ export enum ColonyActionType {
   /** An action related to the creation of safe transactions via Safe Control */
   MakeArbitraryTransaction = 'MAKE_ARBITRARY_TRANSACTION',
   MakeArbitraryTransactionsMotion = 'MAKE_ARBITRARY_TRANSACTIONS_MOTION',
+  MakeArbitraryTransactionsMultisig = 'MAKE_ARBITRARY_TRANSACTIONS_MULTISIG',
   /** An action related to adding / removing approved colony tokens */
   ManageTokens = 'MANAGE_TOKENS',
-  /** An action related to adding / removing approved colony tokens */
   ManageTokensMotion = 'MANAGE_TOKENS_MOTION',
+  ManageTokensMultisig = 'MANAGE_TOKENS_MULTISIG',
   /** An action related to minting tokens within a Colony */
   MintTokens = 'MINT_TOKENS',
   /** An action related to minting tokens within a Colony via a motion */
   MintTokensMotion = 'MINT_TOKENS_MOTION',
+  /** An action related to minting tokens within a Colony via multiSig */
+  MintTokensMultisig = 'MINT_TOKENS_MULTISIG',
   /** An action related to moving funds between domains */
   MoveFunds = 'MOVE_FUNDS',
   /** An action related to moving funds between domains via a motion */
   MoveFundsMotion = 'MOVE_FUNDS_MOTION',
+  /** An action related to moving funds between domains via multiSig */
+  MoveFundsMultisig = 'MOVE_FUNDS_MULTISIG',
   /** An action related to making multiple payments within a Colony */
   MultiplePayment = 'MULTIPLE_PAYMENT',
   /** An action related to making multiple payments within a Colony */
   MultiplePaymentMotion = 'MULTIPLE_PAYMENT_MOTION',
+  /** A multiSig action related to making multiple payments within a Colony */
+  MultiplePaymentMultisig = 'MULTIPLE_PAYMENT_MULTISIG',
   /** An motion action placeholder that should not be used */
   NullMotion = 'NULL_MOTION',
   /** An action related to a payment within a Colony */
   Payment = 'PAYMENT',
   /** An action related to a payment that was created via a motion within a Colony */
   PaymentMotion = 'PAYMENT_MOTION',
+  /** An action related to a payment that was created via multiSig within a Colony */
+  PaymentMultisig = 'PAYMENT_MULTISIG',
   /** An action related to the recovery functionality of a Colony */
   Recovery = 'RECOVERY',
   /** An action related to removing verified members */
   RemoveVerifiedMembers = 'REMOVE_VERIFIED_MEMBERS',
   RemoveVerifiedMembersMotion = 'REMOVE_VERIFIED_MEMBERS_MOTION',
+  RemoveVerifiedMembersMultisig = 'REMOVE_VERIFIED_MEMBERS_MULTISIG',
   /** An action related to creating a motion to release an expenditure stage */
   SetExpenditureStateMotion = 'SET_EXPENDITURE_STATE_MOTION',
+  /** An action related to creating a multiSig to release an expenditure stage */
+  SetExpenditureStateMultisig = 'SET_EXPENDITURE_STATE_MULTISIG',
   /** An action related to setting user roles within a Colony */
   SetUserRoles = 'SET_USER_ROLES',
   /** An action related to setting user roles within a Colony via a motion */
   SetUserRolesMotion = 'SET_USER_ROLES_MOTION',
+  /** An action related to setting user roles within a Colony via multiSig */
+  SetUserRolesMultisig = 'SET_USER_ROLES_MULTISIG',
   /** An action related to unlocking a token within a Colony */
   UnlockToken = 'UNLOCK_TOKEN',
   /** An action related to unlocking a token within a Colony via a motion */
   UnlockTokenMotion = 'UNLOCK_TOKEN_MOTION',
+  /** An action related to unlocking a token within a Colony via multiSig */
+  UnlockTokenMultisig = 'UNLOCK_TOKEN_MULTISIG',
   /** An action related to upgrading a Colony's version */
   VersionUpgrade = 'VERSION_UPGRADE',
   /** An action related to upgrading a Colony's version via a motion */
   VersionUpgradeMotion = 'VERSION_UPGRADE_MOTION',
+  /** An action related to upgrading a Colony's version via multiSig */
+  VersionUpgradeMultisig = 'VERSION_UPGRADE_MULTISIG',
   /** An action unrelated to the currently viewed Colony */
   WrongColony = 'WRONG_COLONY',
 }
@@ -809,9 +853,11 @@ export type ColonyHistoricRole = {
   domainId: Scalars['ID'];
   /**
    * Unique identifier for the role snapshot
-   * Format: `colonyAddress_domainNativeId_userAddress_blockNumber_roles`
+   * Format: `<colonyAddress>_<domainNativeId>_<userAddress>_<blockNumber>_roles`  or `<colonyAddress>_<domainNativeId>_<userAddress>_<blockNumber>_multisig_roles`
    */
   id: Scalars['ID'];
+  /** Will be true if the colony role is a multi sig role */
+  isMultiSig?: Maybe<Scalars['Boolean']>;
   /** Recovery role */
   role_0?: Maybe<Scalars['Boolean']>;
   /** Root role */
@@ -992,7 +1038,7 @@ export type ColonyMotion = {
    * It's a tuple: `[nayRemaining, yayRemaining]`
    */
   remainingStakes: Array<Scalars['String']>;
-  /** The amount of reputation that has submitted a vote */
+  /** The amount of reputaion that has submitted a vote */
   repSubmitted: Scalars['String'];
   /** The total required stake for one side to be activated */
   requiredStake: Scalars['String'];
@@ -1032,6 +1078,63 @@ export type ColonyMotionVoterRewardsArgs = {
   sortDirection?: InputMaybe<ModelSortDirection>;
 };
 
+/** Represents a MultiSig motion within a Colony */
+export type ColonyMultiSig = {
+  __typename?: 'ColonyMultiSig';
+  action?: Maybe<ColonyAction>;
+  /** Colony address the multiSig belongs to */
+  colonyAddress: Scalars['ID'];
+  /** The timestamp when the motion was created at */
+  createdAt: Scalars['AWSDateTime'];
+  /** The timestamp when the motion was finalized */
+  executedAt?: Maybe<Scalars['AWSDateTime']>;
+  /** Wallet address of the user finalizing the motion */
+  executedBy?: Maybe<Scalars['ID']>;
+  /** Extended user object for given executedBy */
+  executedByUser?: Maybe<User>;
+  /** Whether the underlying action completed */
+  hasActionCompleted: Scalars['Boolean'];
+  /**
+   * The internal database id of the multiSig
+   * To ensure uniqueness, we format as: `chainId-multiSigExtnAddress_nativeMultiSigId`
+   */
+  id: Scalars['ID'];
+  /** Whether the multiSig is a Simple Decision */
+  isDecision: Scalars['Boolean'];
+  /** Whether the multiSig was executed or not */
+  isExecuted: Scalars['Boolean'];
+  /** Whether the multiSig was cancelled or not */
+  isRejected: Scalars['Boolean'];
+  /** Expanded domain in which the multiSig was created */
+  multiSigDomain: Domain;
+  /** Unique identifier of the multiSigs domain in the database */
+  multiSigDomainId: Scalars['ID'];
+  /** The on chain id of the domain associated with the motion */
+  nativeMultiSigDomainId: Scalars['String'];
+  /** The on chain id of the multiSig */
+  nativeMultiSigId: Scalars['ID'];
+  /** The timestamp when the motion was rejected */
+  rejectedAt?: Maybe<Scalars['AWSDateTime']>;
+  /** Wallet address of the user rejecting the motion */
+  rejectedBy?: Maybe<Scalars['ID']>;
+  /** Extended user object for given rejectedBy */
+  rejectedByUser?: Maybe<User>;
+  /** Required role for signing */
+  requiredPermissions: Scalars['Int'];
+  signatures?: Maybe<ModelMultiSigUserSignatureConnection>;
+  /** The transaction hash of the creteMotion (multisig) action */
+  transactionHash: Scalars['ID'];
+  updatedAt: Scalars['AWSDateTime'];
+};
+
+/** Represents a MultiSig motion within a Colony */
+export type ColonyMultiSigSignaturesArgs = {
+  filter?: InputMaybe<ModelMultiSigUserSignatureFilterInput>;
+  limit?: InputMaybe<Scalars['Int']>;
+  nextToken?: InputMaybe<Scalars['String']>;
+  sortDirection?: InputMaybe<ModelSortDirection>;
+};
+
 export type ColonyObjective = {
   __typename?: 'ColonyObjective';
   /** Description of the objective with a limit of 120 characters */
@@ -1061,9 +1164,11 @@ export type ColonyRole = {
   domainId: Scalars['ID'];
   /**
    * Unique identifier for the role snapshot
-   * Format: `<colonyAddress>_<domainNativeId>_<userAddress>_roles`
+   * Format: `<colonyAddress>_<domainNativeId>_<userAddress>_roles` or `<colonyAddress>_<domainNativeId>_<userAddress>_multisig_roles`
    */
   id: Scalars['ID'];
+  /** Will be true if the colony role is a multi sig role */
+  isMultiSig?: Maybe<Scalars['Boolean']>;
   /** Block at which permissions were update last */
   latestBlock: Scalars['Int'];
   /** Recovery role */
@@ -1260,9 +1365,11 @@ export type CreateColonyActionInput = {
   initiatorAddress: Scalars['ID'];
   isMotion?: InputMaybe<Scalars['Boolean']>;
   isMotionFinalization?: InputMaybe<Scalars['Boolean']>;
+  isMultiSig?: InputMaybe<Scalars['Boolean']>;
   members?: InputMaybe<Array<Scalars['ID']>>;
   motionDomainId?: InputMaybe<Scalars['Int']>;
   motionId?: InputMaybe<Scalars['ID']>;
+  multiSigId?: InputMaybe<Scalars['ID']>;
   networkFee?: InputMaybe<Scalars['String']>;
   newColonyVersion?: InputMaybe<Scalars['Int']>;
   paymentId?: InputMaybe<Scalars['Int']>;
@@ -1271,6 +1378,7 @@ export type CreateColonyActionInput = {
   pendingDomainMetadataId?: InputMaybe<Scalars['ID']>;
   recipientAddress?: InputMaybe<Scalars['ID']>;
   roles?: InputMaybe<ColonyActionRolesInput>;
+  rolesAreMultiSig?: InputMaybe<Scalars['Boolean']>;
   rootHash: Scalars['String'];
   showInActionsList: Scalars['Boolean'];
   toDomainId?: InputMaybe<Scalars['ID']>;
@@ -1359,6 +1467,7 @@ export type CreateColonyHistoricRoleInput = {
   createdAt?: InputMaybe<Scalars['AWSDateTime']>;
   domainId: Scalars['ID'];
   id?: InputMaybe<Scalars['ID']>;
+  isMultiSig?: InputMaybe<Scalars['Boolean']>;
   role_0?: InputMaybe<Scalars['Boolean']>;
   role_1?: InputMaybe<Scalars['Boolean']>;
   role_2?: InputMaybe<Scalars['Boolean']>;
@@ -1434,11 +1543,31 @@ export type CreateColonyMotionInput = {
   voterRecord: Array<VoterRecordInput>;
 };
 
+export type CreateColonyMultiSigInput = {
+  colonyAddress: Scalars['ID'];
+  createdAt?: InputMaybe<Scalars['AWSDateTime']>;
+  executedAt?: InputMaybe<Scalars['AWSDateTime']>;
+  executedBy?: InputMaybe<Scalars['ID']>;
+  hasActionCompleted: Scalars['Boolean'];
+  id?: InputMaybe<Scalars['ID']>;
+  isDecision: Scalars['Boolean'];
+  isExecuted: Scalars['Boolean'];
+  isRejected: Scalars['Boolean'];
+  multiSigDomainId: Scalars['ID'];
+  nativeMultiSigDomainId: Scalars['String'];
+  nativeMultiSigId: Scalars['ID'];
+  rejectedAt?: InputMaybe<Scalars['AWSDateTime']>;
+  rejectedBy?: InputMaybe<Scalars['ID']>;
+  requiredPermissions: Scalars['Int'];
+  transactionHash: Scalars['ID'];
+};
+
 export type CreateColonyRoleInput = {
   colonyAddress: Scalars['ID'];
   colonyRolesId?: InputMaybe<Scalars['ID']>;
   domainId: Scalars['ID'];
   id?: InputMaybe<Scalars['ID']>;
+  isMultiSig?: InputMaybe<Scalars['Boolean']>;
   latestBlock: Scalars['Int'];
   role_0?: InputMaybe<Scalars['Boolean']>;
   role_1?: InputMaybe<Scalars['Boolean']>;
@@ -1541,6 +1670,7 @@ export type CreateExpenditureMetadataInput = {
 
 export type CreateExtensionInstallationsCountInput = {
   id?: InputMaybe<Scalars['ID']>;
+  multiSigPermissions: Scalars['Int'];
   oneTxPayment: Scalars['Int'];
   reputationWeighted: Scalars['Int'];
   stagedExpenditure: Scalars['Int'];
@@ -1569,6 +1699,16 @@ export type CreateMotionMessageInput = {
   motionId: Scalars['ID'];
   name: Scalars['String'];
   vote?: InputMaybe<Scalars['String']>;
+};
+
+export type CreateMultiSigUserSignatureInput = {
+  colonyAddress: Scalars['ID'];
+  createdAt?: InputMaybe<Scalars['AWSDateTime']>;
+  id?: InputMaybe<Scalars['ID']>;
+  multiSigId: Scalars['ID'];
+  role: Scalars['Int'];
+  userAddress: Scalars['ID'];
+  vote: MultiSigVote;
 };
 
 export type CreatePrivateBetaInviteCodeInput = {
@@ -1796,6 +1936,10 @@ export type DeleteColonyMotionInput = {
   id: Scalars['ID'];
 };
 
+export type DeleteColonyMultiSigInput = {
+  id: Scalars['ID'];
+};
+
 export type DeleteColonyRoleInput = {
   id: Scalars['ID'];
 };
@@ -1853,6 +1997,10 @@ export type DeleteLiquidationAddressInput = {
 };
 
 export type DeleteMotionMessageInput = {
+  id: Scalars['ID'];
+};
+
+export type DeleteMultiSigUserSignatureInput = {
   id: Scalars['ID'];
 };
 
@@ -2218,6 +2366,7 @@ export type ExtensionInstallationsCount = {
   createdAt: Scalars['AWSDateTime'];
   /** The model id. It's the chain id the of the colony the extension belongs to */
   id: Scalars['ID'];
+  multiSigPermissions: Scalars['Int'];
   oneTxPayment: Scalars['Int'];
   reputationWeighted: Scalars['Int'];
   stagedExpenditure: Scalars['Int'];
@@ -2229,6 +2378,8 @@ export type ExtensionInstallationsCount = {
 /** Map of parameters that extensions are initialised with */
 export type ExtensionParams = {
   __typename?: 'ExtensionParams';
+  /** Params for MultiSig */
+  multiSig?: Maybe<MultiSigParams>;
   /** Initialization parameters for the `StakedExpenditure` extension */
   stakedExpenditure?: Maybe<StakedExpenditureParams>;
   /** Initialization parameters for the `VotingReputation` extension */
@@ -2236,6 +2387,7 @@ export type ExtensionParams = {
 };
 
 export type ExtensionParamsInput = {
+  multiSig?: InputMaybe<MultiSigParamsInput>;
   stakedExpenditure?: InputMaybe<StakedExpenditureParamsInput>;
   votingReputation?: InputMaybe<VotingReputationParamsInput>;
 };
@@ -2492,9 +2644,11 @@ export type ModelColonyActionConditionInput = {
   initiatorAddress?: InputMaybe<ModelIdInput>;
   isMotion?: InputMaybe<ModelBooleanInput>;
   isMotionFinalization?: InputMaybe<ModelBooleanInput>;
+  isMultiSig?: InputMaybe<ModelBooleanInput>;
   members?: InputMaybe<ModelIdInput>;
   motionDomainId?: InputMaybe<ModelIntInput>;
   motionId?: InputMaybe<ModelIdInput>;
+  multiSigId?: InputMaybe<ModelIdInput>;
   networkFee?: InputMaybe<ModelStringInput>;
   newColonyVersion?: InputMaybe<ModelIntInput>;
   not?: InputMaybe<ModelColonyActionConditionInput>;
@@ -2503,6 +2657,7 @@ export type ModelColonyActionConditionInput = {
   pendingColonyMetadataId?: InputMaybe<ModelIdInput>;
   pendingDomainMetadataId?: InputMaybe<ModelIdInput>;
   recipientAddress?: InputMaybe<ModelIdInput>;
+  rolesAreMultiSig?: InputMaybe<ModelBooleanInput>;
   rootHash?: InputMaybe<ModelStringInput>;
   showInActionsList?: InputMaybe<ModelBooleanInput>;
   toDomainId?: InputMaybe<ModelIdInput>;
@@ -2534,9 +2689,11 @@ export type ModelColonyActionFilterInput = {
   initiatorAddress?: InputMaybe<ModelIdInput>;
   isMotion?: InputMaybe<ModelBooleanInput>;
   isMotionFinalization?: InputMaybe<ModelBooleanInput>;
+  isMultiSig?: InputMaybe<ModelBooleanInput>;
   members?: InputMaybe<ModelIdInput>;
   motionDomainId?: InputMaybe<ModelIntInput>;
   motionId?: InputMaybe<ModelIdInput>;
+  multiSigId?: InputMaybe<ModelIdInput>;
   networkFee?: InputMaybe<ModelStringInput>;
   newColonyVersion?: InputMaybe<ModelIntInput>;
   not?: InputMaybe<ModelColonyActionFilterInput>;
@@ -2545,6 +2702,7 @@ export type ModelColonyActionFilterInput = {
   pendingColonyMetadataId?: InputMaybe<ModelIdInput>;
   pendingDomainMetadataId?: InputMaybe<ModelIdInput>;
   recipientAddress?: InputMaybe<ModelIdInput>;
+  rolesAreMultiSig?: InputMaybe<ModelBooleanInput>;
   rootHash?: InputMaybe<ModelStringInput>;
   showInActionsList?: InputMaybe<ModelBooleanInput>;
   toDomainId?: InputMaybe<ModelIdInput>;
@@ -2758,6 +2916,7 @@ export type ModelColonyHistoricRoleConditionInput = {
   colonyId?: InputMaybe<ModelIdInput>;
   createdAt?: InputMaybe<ModelStringInput>;
   domainId?: InputMaybe<ModelIdInput>;
+  isMultiSig?: InputMaybe<ModelBooleanInput>;
   not?: InputMaybe<ModelColonyHistoricRoleConditionInput>;
   or?: InputMaybe<Array<InputMaybe<ModelColonyHistoricRoleConditionInput>>>;
   role_0?: InputMaybe<ModelBooleanInput>;
@@ -2783,6 +2942,7 @@ export type ModelColonyHistoricRoleFilterInput = {
   createdAt?: InputMaybe<ModelStringInput>;
   domainId?: InputMaybe<ModelIdInput>;
   id?: InputMaybe<ModelIdInput>;
+  isMultiSig?: InputMaybe<ModelBooleanInput>;
   not?: InputMaybe<ModelColonyHistoricRoleFilterInput>;
   or?: InputMaybe<Array<InputMaybe<ModelColonyHistoricRoleFilterInput>>>;
   role_0?: InputMaybe<ModelBooleanInput>;
@@ -2896,11 +3056,61 @@ export type ModelColonyMotionFilterInput = {
   userMinStake?: InputMaybe<ModelStringInput>;
 };
 
+export type ModelColonyMultiSigConditionInput = {
+  and?: InputMaybe<Array<InputMaybe<ModelColonyMultiSigConditionInput>>>;
+  colonyAddress?: InputMaybe<ModelIdInput>;
+  createdAt?: InputMaybe<ModelStringInput>;
+  executedAt?: InputMaybe<ModelStringInput>;
+  executedBy?: InputMaybe<ModelIdInput>;
+  hasActionCompleted?: InputMaybe<ModelBooleanInput>;
+  isDecision?: InputMaybe<ModelBooleanInput>;
+  isExecuted?: InputMaybe<ModelBooleanInput>;
+  isRejected?: InputMaybe<ModelBooleanInput>;
+  multiSigDomainId?: InputMaybe<ModelIdInput>;
+  nativeMultiSigDomainId?: InputMaybe<ModelStringInput>;
+  nativeMultiSigId?: InputMaybe<ModelIdInput>;
+  not?: InputMaybe<ModelColonyMultiSigConditionInput>;
+  or?: InputMaybe<Array<InputMaybe<ModelColonyMultiSigConditionInput>>>;
+  rejectedAt?: InputMaybe<ModelStringInput>;
+  rejectedBy?: InputMaybe<ModelIdInput>;
+  requiredPermissions?: InputMaybe<ModelIntInput>;
+  transactionHash?: InputMaybe<ModelIdInput>;
+};
+
+export type ModelColonyMultiSigConnection = {
+  __typename?: 'ModelColonyMultiSigConnection';
+  items: Array<Maybe<ColonyMultiSig>>;
+  nextToken?: Maybe<Scalars['String']>;
+};
+
+export type ModelColonyMultiSigFilterInput = {
+  and?: InputMaybe<Array<InputMaybe<ModelColonyMultiSigFilterInput>>>;
+  colonyAddress?: InputMaybe<ModelIdInput>;
+  createdAt?: InputMaybe<ModelStringInput>;
+  executedAt?: InputMaybe<ModelStringInput>;
+  executedBy?: InputMaybe<ModelIdInput>;
+  hasActionCompleted?: InputMaybe<ModelBooleanInput>;
+  id?: InputMaybe<ModelIdInput>;
+  isDecision?: InputMaybe<ModelBooleanInput>;
+  isExecuted?: InputMaybe<ModelBooleanInput>;
+  isRejected?: InputMaybe<ModelBooleanInput>;
+  multiSigDomainId?: InputMaybe<ModelIdInput>;
+  nativeMultiSigDomainId?: InputMaybe<ModelStringInput>;
+  nativeMultiSigId?: InputMaybe<ModelIdInput>;
+  not?: InputMaybe<ModelColonyMultiSigFilterInput>;
+  or?: InputMaybe<Array<InputMaybe<ModelColonyMultiSigFilterInput>>>;
+  rejectedAt?: InputMaybe<ModelStringInput>;
+  rejectedBy?: InputMaybe<ModelIdInput>;
+  requiredPermissions?: InputMaybe<ModelIntInput>;
+  transactionHash?: InputMaybe<ModelIdInput>;
+};
+
 export type ModelColonyRoleConditionInput = {
   and?: InputMaybe<Array<InputMaybe<ModelColonyRoleConditionInput>>>;
   colonyAddress?: InputMaybe<ModelIdInput>;
   colonyRolesId?: InputMaybe<ModelIdInput>;
   domainId?: InputMaybe<ModelIdInput>;
+  isMultiSig?: InputMaybe<ModelBooleanInput>;
   latestBlock?: InputMaybe<ModelIntInput>;
   not?: InputMaybe<ModelColonyRoleConditionInput>;
   or?: InputMaybe<Array<InputMaybe<ModelColonyRoleConditionInput>>>;
@@ -2925,6 +3135,7 @@ export type ModelColonyRoleFilterInput = {
   colonyRolesId?: InputMaybe<ModelIdInput>;
   domainId?: InputMaybe<ModelIdInput>;
   id?: InputMaybe<ModelIdInput>;
+  isMultiSig?: InputMaybe<ModelBooleanInput>;
   latestBlock?: InputMaybe<ModelIntInput>;
   not?: InputMaybe<ModelColonyRoleFilterInput>;
   or?: InputMaybe<Array<InputMaybe<ModelColonyRoleFilterInput>>>;
@@ -3250,6 +3461,7 @@ export type ModelExtensionInstallationsCountConditionInput = {
   and?: InputMaybe<
     Array<InputMaybe<ModelExtensionInstallationsCountConditionInput>>
   >;
+  multiSigPermissions?: InputMaybe<ModelIntInput>;
   not?: InputMaybe<ModelExtensionInstallationsCountConditionInput>;
   oneTxPayment?: InputMaybe<ModelIntInput>;
   or?: InputMaybe<
@@ -3272,6 +3484,7 @@ export type ModelExtensionInstallationsCountFilterInput = {
     Array<InputMaybe<ModelExtensionInstallationsCountFilterInput>>
   >;
   id?: InputMaybe<ModelIdInput>;
+  multiSigPermissions?: InputMaybe<ModelIntInput>;
   not?: InputMaybe<ModelExtensionInstallationsCountFilterInput>;
   oneTxPayment?: InputMaybe<ModelIntInput>;
   or?: InputMaybe<
@@ -3427,6 +3640,42 @@ export type ModelMotionMessageFilterInput = {
   not?: InputMaybe<ModelMotionMessageFilterInput>;
   or?: InputMaybe<Array<InputMaybe<ModelMotionMessageFilterInput>>>;
   vote?: InputMaybe<ModelStringInput>;
+};
+
+export type ModelMultiSigUserSignatureConditionInput = {
+  and?: InputMaybe<Array<InputMaybe<ModelMultiSigUserSignatureConditionInput>>>;
+  colonyAddress?: InputMaybe<ModelIdInput>;
+  createdAt?: InputMaybe<ModelStringInput>;
+  multiSigId?: InputMaybe<ModelIdInput>;
+  not?: InputMaybe<ModelMultiSigUserSignatureConditionInput>;
+  or?: InputMaybe<Array<InputMaybe<ModelMultiSigUserSignatureConditionInput>>>;
+  role?: InputMaybe<ModelIntInput>;
+  userAddress?: InputMaybe<ModelIdInput>;
+  vote?: InputMaybe<ModelMultiSigVoteInput>;
+};
+
+export type ModelMultiSigUserSignatureConnection = {
+  __typename?: 'ModelMultiSigUserSignatureConnection';
+  items: Array<Maybe<MultiSigUserSignature>>;
+  nextToken?: Maybe<Scalars['String']>;
+};
+
+export type ModelMultiSigUserSignatureFilterInput = {
+  and?: InputMaybe<Array<InputMaybe<ModelMultiSigUserSignatureFilterInput>>>;
+  colonyAddress?: InputMaybe<ModelIdInput>;
+  createdAt?: InputMaybe<ModelStringInput>;
+  id?: InputMaybe<ModelIdInput>;
+  multiSigId?: InputMaybe<ModelIdInput>;
+  not?: InputMaybe<ModelMultiSigUserSignatureFilterInput>;
+  or?: InputMaybe<Array<InputMaybe<ModelMultiSigUserSignatureFilterInput>>>;
+  role?: InputMaybe<ModelIntInput>;
+  userAddress?: InputMaybe<ModelIdInput>;
+  vote?: InputMaybe<ModelMultiSigVoteInput>;
+};
+
+export type ModelMultiSigVoteInput = {
+  eq?: InputMaybe<MultiSigVote>;
+  ne?: InputMaybe<MultiSigVote>;
 };
 
 export type ModelPrivateBetaInviteCodeConditionInput = {
@@ -3717,9 +3966,11 @@ export type ModelSubscriptionColonyActionFilterInput = {
   initiatorAddress?: InputMaybe<ModelSubscriptionIdInput>;
   isMotion?: InputMaybe<ModelSubscriptionBooleanInput>;
   isMotionFinalization?: InputMaybe<ModelSubscriptionBooleanInput>;
+  isMultiSig?: InputMaybe<ModelSubscriptionBooleanInput>;
   members?: InputMaybe<ModelSubscriptionIdInput>;
   motionDomainId?: InputMaybe<ModelSubscriptionIntInput>;
   motionId?: InputMaybe<ModelSubscriptionIdInput>;
+  multiSigId?: InputMaybe<ModelSubscriptionIdInput>;
   networkFee?: InputMaybe<ModelSubscriptionStringInput>;
   newColonyVersion?: InputMaybe<ModelSubscriptionIntInput>;
   or?: InputMaybe<Array<InputMaybe<ModelSubscriptionColonyActionFilterInput>>>;
@@ -3727,6 +3978,7 @@ export type ModelSubscriptionColonyActionFilterInput = {
   pendingColonyMetadataId?: InputMaybe<ModelSubscriptionIdInput>;
   pendingDomainMetadataId?: InputMaybe<ModelSubscriptionIdInput>;
   recipientAddress?: InputMaybe<ModelSubscriptionIdInput>;
+  rolesAreMultiSig?: InputMaybe<ModelSubscriptionBooleanInput>;
   rootHash?: InputMaybe<ModelSubscriptionStringInput>;
   showInActionsList?: InputMaybe<ModelSubscriptionBooleanInput>;
   toDomainId?: InputMaybe<ModelSubscriptionIdInput>;
@@ -3838,6 +4090,7 @@ export type ModelSubscriptionColonyHistoricRoleFilterInput = {
   createdAt?: InputMaybe<ModelSubscriptionStringInput>;
   domainId?: InputMaybe<ModelSubscriptionIdInput>;
   id?: InputMaybe<ModelSubscriptionIdInput>;
+  isMultiSig?: InputMaybe<ModelSubscriptionBooleanInput>;
   or?: InputMaybe<
     Array<InputMaybe<ModelSubscriptionColonyHistoricRoleFilterInput>>
   >;
@@ -3899,11 +4152,37 @@ export type ModelSubscriptionColonyMotionFilterInput = {
   userMinStake?: InputMaybe<ModelSubscriptionStringInput>;
 };
 
+export type ModelSubscriptionColonyMultiSigFilterInput = {
+  and?: InputMaybe<
+    Array<InputMaybe<ModelSubscriptionColonyMultiSigFilterInput>>
+  >;
+  colonyAddress?: InputMaybe<ModelSubscriptionIdInput>;
+  createdAt?: InputMaybe<ModelSubscriptionStringInput>;
+  executedAt?: InputMaybe<ModelSubscriptionStringInput>;
+  executedBy?: InputMaybe<ModelSubscriptionIdInput>;
+  hasActionCompleted?: InputMaybe<ModelSubscriptionBooleanInput>;
+  id?: InputMaybe<ModelSubscriptionIdInput>;
+  isDecision?: InputMaybe<ModelSubscriptionBooleanInput>;
+  isExecuted?: InputMaybe<ModelSubscriptionBooleanInput>;
+  isRejected?: InputMaybe<ModelSubscriptionBooleanInput>;
+  multiSigDomainId?: InputMaybe<ModelSubscriptionIdInput>;
+  nativeMultiSigDomainId?: InputMaybe<ModelSubscriptionStringInput>;
+  nativeMultiSigId?: InputMaybe<ModelSubscriptionIdInput>;
+  or?: InputMaybe<
+    Array<InputMaybe<ModelSubscriptionColonyMultiSigFilterInput>>
+  >;
+  rejectedAt?: InputMaybe<ModelSubscriptionStringInput>;
+  rejectedBy?: InputMaybe<ModelSubscriptionIdInput>;
+  requiredPermissions?: InputMaybe<ModelSubscriptionIntInput>;
+  transactionHash?: InputMaybe<ModelSubscriptionIdInput>;
+};
+
 export type ModelSubscriptionColonyRoleFilterInput = {
   and?: InputMaybe<Array<InputMaybe<ModelSubscriptionColonyRoleFilterInput>>>;
   colonyAddress?: InputMaybe<ModelSubscriptionIdInput>;
   domainId?: InputMaybe<ModelSubscriptionIdInput>;
   id?: InputMaybe<ModelSubscriptionIdInput>;
+  isMultiSig?: InputMaybe<ModelSubscriptionBooleanInput>;
   latestBlock?: InputMaybe<ModelSubscriptionIntInput>;
   or?: InputMaybe<Array<InputMaybe<ModelSubscriptionColonyRoleFilterInput>>>;
   role_0?: InputMaybe<ModelSubscriptionBooleanInput>;
@@ -4043,6 +4322,7 @@ export type ModelSubscriptionExtensionInstallationsCountFilterInput = {
     Array<InputMaybe<ModelSubscriptionExtensionInstallationsCountFilterInput>>
   >;
   id?: InputMaybe<ModelSubscriptionIdInput>;
+  multiSigPermissions?: InputMaybe<ModelSubscriptionIntInput>;
   oneTxPayment?: InputMaybe<ModelSubscriptionIntInput>;
   or?: InputMaybe<
     Array<InputMaybe<ModelSubscriptionExtensionInstallationsCountFilterInput>>
@@ -4125,6 +4405,22 @@ export type ModelSubscriptionMotionMessageFilterInput = {
   motionId?: InputMaybe<ModelSubscriptionIdInput>;
   name?: InputMaybe<ModelSubscriptionStringInput>;
   or?: InputMaybe<Array<InputMaybe<ModelSubscriptionMotionMessageFilterInput>>>;
+  vote?: InputMaybe<ModelSubscriptionStringInput>;
+};
+
+export type ModelSubscriptionMultiSigUserSignatureFilterInput = {
+  and?: InputMaybe<
+    Array<InputMaybe<ModelSubscriptionMultiSigUserSignatureFilterInput>>
+  >;
+  colonyAddress?: InputMaybe<ModelSubscriptionIdInput>;
+  createdAt?: InputMaybe<ModelSubscriptionStringInput>;
+  id?: InputMaybe<ModelSubscriptionIdInput>;
+  multiSigId?: InputMaybe<ModelSubscriptionIdInput>;
+  or?: InputMaybe<
+    Array<InputMaybe<ModelSubscriptionMultiSigUserSignatureFilterInput>>
+  >;
+  role?: InputMaybe<ModelSubscriptionIntInput>;
+  userAddress?: InputMaybe<ModelSubscriptionIdInput>;
   vote?: InputMaybe<ModelSubscriptionStringInput>;
 };
 
@@ -4682,6 +4978,47 @@ export type MotionStateHistoryInput = {
   yaySideFullyStakedAt?: InputMaybe<Scalars['AWSDateTime']>;
 };
 
+export type MultiSigDomainConfig = {
+  __typename?: 'MultiSigDomainConfig';
+  domainId: Scalars['ID'];
+  domainThreshold: Scalars['Int'];
+};
+
+export type MultiSigDomainConfigInput = {
+  domainId: Scalars['ID'];
+  domainThreshold: Scalars['Int'];
+};
+
+export type MultiSigParams = {
+  __typename?: 'MultiSigParams';
+  colonyThreshold: Scalars['Int'];
+  domainThresholds?: Maybe<Array<Maybe<MultiSigDomainConfig>>>;
+};
+
+export type MultiSigParamsInput = {
+  colonyThreshold: Scalars['Int'];
+  domainThresholds?: InputMaybe<Array<InputMaybe<MultiSigDomainConfigInput>>>;
+};
+
+export type MultiSigUserSignature = {
+  __typename?: 'MultiSigUserSignature';
+  colonyAddress: Scalars['ID'];
+  createdAt: Scalars['AWSDateTime'];
+  id: Scalars['ID'];
+  multiSigId: Scalars['ID'];
+  role: Scalars['Int'];
+  updatedAt: Scalars['AWSDateTime'];
+  user: User;
+  userAddress: Scalars['ID'];
+  vote: MultiSigVote;
+};
+
+export enum MultiSigVote {
+  Approve = 'Approve',
+  None = 'None',
+  Reject = 'Reject',
+}
+
 /** Root mutation type */
 export type Mutation = {
   __typename?: 'Mutation';
@@ -4703,6 +5040,7 @@ export type Mutation = {
   createColonyMemberInvite?: Maybe<ColonyMemberInvite>;
   createColonyMetadata?: Maybe<ColonyMetadata>;
   createColonyMotion?: Maybe<ColonyMotion>;
+  createColonyMultiSig?: Maybe<ColonyMultiSig>;
   createColonyRole?: Maybe<ColonyRole>;
   createColonyStake?: Maybe<ColonyStake>;
   createColonyTokens?: Maybe<ColonyTokens>;
@@ -4718,6 +5056,7 @@ export type Mutation = {
   createIngestorStats?: Maybe<IngestorStats>;
   createLiquidationAddress?: Maybe<LiquidationAddress>;
   createMotionMessage?: Maybe<MotionMessage>;
+  createMultiSigUserSignature?: Maybe<MultiSigUserSignature>;
   createPrivateBetaInviteCode?: Maybe<PrivateBetaInviteCode>;
   createProfile?: Maybe<Profile>;
   createReputationMiningCycleMetadata?: Maybe<ReputationMiningCycleMetadata>;
@@ -4745,6 +5084,7 @@ export type Mutation = {
   deleteColonyMemberInvite?: Maybe<ColonyMemberInvite>;
   deleteColonyMetadata?: Maybe<ColonyMetadata>;
   deleteColonyMotion?: Maybe<ColonyMotion>;
+  deleteColonyMultiSig?: Maybe<ColonyMultiSig>;
   deleteColonyRole?: Maybe<ColonyRole>;
   deleteColonyStake?: Maybe<ColonyStake>;
   deleteColonyTokens?: Maybe<ColonyTokens>;
@@ -4760,6 +5100,7 @@ export type Mutation = {
   deleteIngestorStats?: Maybe<IngestorStats>;
   deleteLiquidationAddress?: Maybe<LiquidationAddress>;
   deleteMotionMessage?: Maybe<MotionMessage>;
+  deleteMultiSigUserSignature?: Maybe<MultiSigUserSignature>;
   deletePrivateBetaInviteCode?: Maybe<PrivateBetaInviteCode>;
   deleteProfile?: Maybe<Profile>;
   deleteReputationMiningCycleMetadata?: Maybe<ReputationMiningCycleMetadata>;
@@ -4785,6 +5126,7 @@ export type Mutation = {
   updateColonyMemberInvite?: Maybe<ColonyMemberInvite>;
   updateColonyMetadata?: Maybe<ColonyMetadata>;
   updateColonyMotion?: Maybe<ColonyMotion>;
+  updateColonyMultiSig?: Maybe<ColonyMultiSig>;
   updateColonyRole?: Maybe<ColonyRole>;
   updateColonyStake?: Maybe<ColonyStake>;
   updateColonyTokens?: Maybe<ColonyTokens>;
@@ -4802,6 +5144,7 @@ export type Mutation = {
   updateIngestorStats?: Maybe<IngestorStats>;
   updateLiquidationAddress?: Maybe<LiquidationAddress>;
   updateMotionMessage?: Maybe<MotionMessage>;
+  updateMultiSigUserSignature?: Maybe<MultiSigUserSignature>;
   updatePrivateBetaInviteCode?: Maybe<PrivateBetaInviteCode>;
   updateProfile?: Maybe<Profile>;
   updateReputationMiningCycleMetadata?: Maybe<ReputationMiningCycleMetadata>;
@@ -4912,6 +5255,12 @@ export type MutationCreateColonyMotionArgs = {
 };
 
 /** Root mutation type */
+export type MutationCreateColonyMultiSigArgs = {
+  condition?: InputMaybe<ModelColonyMultiSigConditionInput>;
+  input: CreateColonyMultiSigInput;
+};
+
+/** Root mutation type */
 export type MutationCreateColonyRoleArgs = {
   condition?: InputMaybe<ModelColonyRoleConditionInput>;
   input: CreateColonyRoleInput;
@@ -4999,6 +5348,12 @@ export type MutationCreateLiquidationAddressArgs = {
 export type MutationCreateMotionMessageArgs = {
   condition?: InputMaybe<ModelMotionMessageConditionInput>;
   input: CreateMotionMessageInput;
+};
+
+/** Root mutation type */
+export type MutationCreateMultiSigUserSignatureArgs = {
+  condition?: InputMaybe<ModelMultiSigUserSignatureConditionInput>;
+  input: CreateMultiSigUserSignatureInput;
 };
 
 /** Root mutation type */
@@ -5157,6 +5512,12 @@ export type MutationDeleteColonyMotionArgs = {
 };
 
 /** Root mutation type */
+export type MutationDeleteColonyMultiSigArgs = {
+  condition?: InputMaybe<ModelColonyMultiSigConditionInput>;
+  input: DeleteColonyMultiSigInput;
+};
+
+/** Root mutation type */
 export type MutationDeleteColonyRoleArgs = {
   condition?: InputMaybe<ModelColonyRoleConditionInput>;
   input: DeleteColonyRoleInput;
@@ -5244,6 +5605,12 @@ export type MutationDeleteLiquidationAddressArgs = {
 export type MutationDeleteMotionMessageArgs = {
   condition?: InputMaybe<ModelMotionMessageConditionInput>;
   input: DeleteMotionMessageInput;
+};
+
+/** Root mutation type */
+export type MutationDeleteMultiSigUserSignatureArgs = {
+  condition?: InputMaybe<ModelMultiSigUserSignatureConditionInput>;
+  input: DeleteMultiSigUserSignatureInput;
 };
 
 /** Root mutation type */
@@ -5397,6 +5764,12 @@ export type MutationUpdateColonyMotionArgs = {
 };
 
 /** Root mutation type */
+export type MutationUpdateColonyMultiSigArgs = {
+  condition?: InputMaybe<ModelColonyMultiSigConditionInput>;
+  input: UpdateColonyMultiSigInput;
+};
+
+/** Root mutation type */
 export type MutationUpdateColonyRoleArgs = {
   condition?: InputMaybe<ModelColonyRoleConditionInput>;
   input: UpdateColonyRoleInput;
@@ -5489,6 +5862,12 @@ export type MutationUpdateLiquidationAddressArgs = {
 export type MutationUpdateMotionMessageArgs = {
   condition?: InputMaybe<ModelMotionMessageConditionInput>;
   input: UpdateMotionMessageInput;
+};
+
+/** Root mutation type */
+export type MutationUpdateMultiSigUserSignatureArgs = {
+  condition?: InputMaybe<ModelMultiSigUserSignatureConditionInput>;
+  input: UpdateMultiSigUserSignatureInput;
 };
 
 /** Root mutation type */
@@ -5788,6 +6167,7 @@ export type Query = {
   getColony?: Maybe<Colony>;
   getColonyAction?: Maybe<ColonyAction>;
   getColonyActionByMotionId?: Maybe<ModelColonyActionConnection>;
+  getColonyActionByMultiSigId?: Maybe<ModelColonyActionConnection>;
   getColonyActionMetadata?: Maybe<ColonyActionMetadata>;
   getColonyByAddress?: Maybe<ModelColonyConnection>;
   getColonyByName?: Maybe<ModelColonyConnection>;
@@ -5803,6 +6183,7 @@ export type Query = {
   getColonyMemberInvite?: Maybe<ColonyMemberInvite>;
   getColonyMetadata?: Maybe<ColonyMetadata>;
   getColonyMotion?: Maybe<ColonyMotion>;
+  getColonyMultiSig?: Maybe<ColonyMultiSig>;
   getColonyRole?: Maybe<ColonyRole>;
   getColonyStake?: Maybe<ColonyStake>;
   getColonyStakeByUserAddress?: Maybe<ModelColonyStakeConnection>;
@@ -5815,6 +6196,7 @@ export type Query = {
   getCurrentVersion?: Maybe<CurrentVersion>;
   getCurrentVersionByKey?: Maybe<ModelCurrentVersionConnection>;
   getDomain?: Maybe<Domain>;
+  getDomainByNativeSkillId?: Maybe<ModelDomainConnection>;
   getDomainMetadata?: Maybe<DomainMetadata>;
   getExpenditure?: Maybe<Expenditure>;
   getExpenditureMetadata?: Maybe<ExpenditureMetadata>;
@@ -5835,11 +6217,16 @@ export type Query = {
   /** Get the timeout for the current period of a motion */
   getMotionTimeoutPeriods?: Maybe<GetMotionTimeoutPeriodsReturn>;
   getMotionVoterRewards?: Maybe<ModelVoterRewardsHistoryConnection>;
+  getMultiSigByColonyAddress?: Maybe<ModelColonyMultiSigConnection>;
+  getMultiSigByTransactionHash?: Maybe<ModelColonyMultiSigConnection>;
+  getMultiSigUserSignature?: Maybe<MultiSigUserSignature>;
+  getMultiSigUserSignatureByMultiSigId?: Maybe<ModelMultiSigUserSignatureConnection>;
   getPrivateBetaInviteCode?: Maybe<PrivateBetaInviteCode>;
   getProfile?: Maybe<Profile>;
   getProfileByEmail?: Maybe<ModelProfileConnection>;
   getProfileByUsername?: Maybe<ModelProfileConnection>;
   getReputationMiningCycleMetadata?: Maybe<ReputationMiningCycleMetadata>;
+  getRoleByColony?: Maybe<ModelColonyRoleConnection>;
   getRoleByDomainAndColony?: Maybe<ModelColonyRoleConnection>;
   getRoleByTargetAddressAndColony?: Maybe<ModelColonyRoleConnection>;
   getSafeTransaction?: Maybe<SafeTransaction>;
@@ -5884,6 +6271,7 @@ export type Query = {
   listColonyMemberInvites?: Maybe<ModelColonyMemberInviteConnection>;
   listColonyMetadata?: Maybe<ModelColonyMetadataConnection>;
   listColonyMotions?: Maybe<ModelColonyMotionConnection>;
+  listColonyMultiSigs?: Maybe<ModelColonyMultiSigConnection>;
   listColonyRoles?: Maybe<ModelColonyRoleConnection>;
   listColonyStakes?: Maybe<ModelColonyStakeConnection>;
   listColonyTokens?: Maybe<ModelColonyTokensConnection>;
@@ -5899,6 +6287,7 @@ export type Query = {
   listIngestorStats?: Maybe<ModelIngestorStatsConnection>;
   listLiquidationAddresses?: Maybe<ModelLiquidationAddressConnection>;
   listMotionMessages?: Maybe<ModelMotionMessageConnection>;
+  listMultiSigUserSignatures?: Maybe<ModelMultiSigUserSignatureConnection>;
   listPrivateBetaInviteCodes?: Maybe<ModelPrivateBetaInviteCodeConnection>;
   listProfiles?: Maybe<ModelProfileConnection>;
   listReputationMiningCycleMetadata?: Maybe<ModelReputationMiningCycleMetadataConnection>;
@@ -5969,6 +6358,15 @@ export type QueryGetColonyActionByMotionIdArgs = {
   filter?: InputMaybe<ModelColonyActionFilterInput>;
   limit?: InputMaybe<Scalars['Int']>;
   motionId: Scalars['ID'];
+  nextToken?: InputMaybe<Scalars['String']>;
+  sortDirection?: InputMaybe<ModelSortDirection>;
+};
+
+/** Root query type */
+export type QueryGetColonyActionByMultiSigIdArgs = {
+  filter?: InputMaybe<ModelColonyActionFilterInput>;
+  limit?: InputMaybe<Scalars['Int']>;
+  multiSigId: Scalars['ID'];
   nextToken?: InputMaybe<Scalars['String']>;
   sortDirection?: InputMaybe<ModelSortDirection>;
 };
@@ -6075,6 +6473,11 @@ export type QueryGetColonyMotionArgs = {
 };
 
 /** Root query type */
+export type QueryGetColonyMultiSigArgs = {
+  id: Scalars['ID'];
+};
+
+/** Root query type */
 export type QueryGetColonyRoleArgs = {
   id: Scalars['ID'];
 };
@@ -6151,6 +6554,16 @@ export type QueryGetCurrentVersionByKeyArgs = {
 /** Root query type */
 export type QueryGetDomainArgs = {
   id: Scalars['ID'];
+};
+
+/** Root query type */
+export type QueryGetDomainByNativeSkillIdArgs = {
+  filter?: InputMaybe<ModelDomainFilterInput>;
+  limit?: InputMaybe<Scalars['Int']>;
+  nativeId?: InputMaybe<ModelIntKeyConditionInput>;
+  nativeSkillId: Scalars['String'];
+  nextToken?: InputMaybe<Scalars['String']>;
+  sortDirection?: InputMaybe<ModelSortDirection>;
 };
 
 /** Root query type */
@@ -6285,6 +6698,38 @@ export type QueryGetMotionVoterRewardsArgs = {
 };
 
 /** Root query type */
+export type QueryGetMultiSigByColonyAddressArgs = {
+  colonyAddress: Scalars['ID'];
+  filter?: InputMaybe<ModelColonyMultiSigFilterInput>;
+  limit?: InputMaybe<Scalars['Int']>;
+  nextToken?: InputMaybe<Scalars['String']>;
+  sortDirection?: InputMaybe<ModelSortDirection>;
+};
+
+/** Root query type */
+export type QueryGetMultiSigByTransactionHashArgs = {
+  filter?: InputMaybe<ModelColonyMultiSigFilterInput>;
+  limit?: InputMaybe<Scalars['Int']>;
+  nextToken?: InputMaybe<Scalars['String']>;
+  sortDirection?: InputMaybe<ModelSortDirection>;
+  transactionHash: Scalars['ID'];
+};
+
+/** Root query type */
+export type QueryGetMultiSigUserSignatureArgs = {
+  id: Scalars['ID'];
+};
+
+/** Root query type */
+export type QueryGetMultiSigUserSignatureByMultiSigIdArgs = {
+  filter?: InputMaybe<ModelMultiSigUserSignatureFilterInput>;
+  limit?: InputMaybe<Scalars['Int']>;
+  multiSigId: Scalars['ID'];
+  nextToken?: InputMaybe<Scalars['String']>;
+  sortDirection?: InputMaybe<ModelSortDirection>;
+};
+
+/** Root query type */
 export type QueryGetPrivateBetaInviteCodeArgs = {
   id: Scalars['ID'];
 };
@@ -6315,6 +6760,16 @@ export type QueryGetProfileByUsernameArgs = {
 /** Root query type */
 export type QueryGetReputationMiningCycleMetadataArgs = {
   id: Scalars['ID'];
+};
+
+/** Root query type */
+export type QueryGetRoleByColonyArgs = {
+  colonyAddress: Scalars['ID'];
+  domainId?: InputMaybe<ModelIdKeyConditionInput>;
+  filter?: InputMaybe<ModelColonyRoleFilterInput>;
+  limit?: InputMaybe<Scalars['Int']>;
+  nextToken?: InputMaybe<Scalars['String']>;
+  sortDirection?: InputMaybe<ModelSortDirection>;
 };
 
 /** Root query type */
@@ -6602,6 +7057,13 @@ export type QueryListColonyMotionsArgs = {
 };
 
 /** Root query type */
+export type QueryListColonyMultiSigsArgs = {
+  filter?: InputMaybe<ModelColonyMultiSigFilterInput>;
+  limit?: InputMaybe<Scalars['Int']>;
+  nextToken?: InputMaybe<Scalars['String']>;
+};
+
+/** Root query type */
 export type QueryListColonyRolesArgs = {
   filter?: InputMaybe<ModelColonyRoleFilterInput>;
   limit?: InputMaybe<Scalars['Int']>;
@@ -6702,6 +7164,13 @@ export type QueryListLiquidationAddressesArgs = {
 /** Root query type */
 export type QueryListMotionMessagesArgs = {
   filter?: InputMaybe<ModelMotionMessageFilterInput>;
+  limit?: InputMaybe<Scalars['Int']>;
+  nextToken?: InputMaybe<Scalars['String']>;
+};
+
+/** Root query type */
+export type QueryListMultiSigUserSignaturesArgs = {
+  filter?: InputMaybe<ModelMultiSigUserSignatureFilterInput>;
   limit?: InputMaybe<Scalars['Int']>;
   nextToken?: InputMaybe<Scalars['String']>;
 };
@@ -6945,15 +7414,18 @@ export enum SearchableColonyActionAggregateField {
   InitiatorAddress = 'initiatorAddress',
   IsMotion = 'isMotion',
   IsMotionFinalization = 'isMotionFinalization',
+  IsMultiSig = 'isMultiSig',
   Members = 'members',
   MotionDomainId = 'motionDomainId',
   MotionId = 'motionId',
+  MultiSigId = 'multiSigId',
   NetworkFee = 'networkFee',
   NewColonyVersion = 'newColonyVersion',
   PaymentId = 'paymentId',
   PendingColonyMetadataId = 'pendingColonyMetadataId',
   PendingDomainMetadataId = 'pendingDomainMetadataId',
   RecipientAddress = 'recipientAddress',
+  RolesAreMultiSig = 'rolesAreMultiSig',
   RootHash = 'rootHash',
   ShowInActionsList = 'showInActionsList',
   ToDomainId = 'toDomainId',
@@ -6994,9 +7466,11 @@ export type SearchableColonyActionFilterInput = {
   initiatorAddress?: InputMaybe<SearchableIdFilterInput>;
   isMotion?: InputMaybe<SearchableBooleanFilterInput>;
   isMotionFinalization?: InputMaybe<SearchableBooleanFilterInput>;
+  isMultiSig?: InputMaybe<SearchableBooleanFilterInput>;
   members?: InputMaybe<SearchableIdFilterInput>;
   motionDomainId?: InputMaybe<SearchableIntFilterInput>;
   motionId?: InputMaybe<SearchableIdFilterInput>;
+  multiSigId?: InputMaybe<SearchableIdFilterInput>;
   networkFee?: InputMaybe<SearchableStringFilterInput>;
   newColonyVersion?: InputMaybe<SearchableIntFilterInput>;
   not?: InputMaybe<SearchableColonyActionFilterInput>;
@@ -7005,6 +7479,7 @@ export type SearchableColonyActionFilterInput = {
   pendingColonyMetadataId?: InputMaybe<SearchableIdFilterInput>;
   pendingDomainMetadataId?: InputMaybe<SearchableIdFilterInput>;
   recipientAddress?: InputMaybe<SearchableIdFilterInput>;
+  rolesAreMultiSig?: InputMaybe<SearchableBooleanFilterInput>;
   rootHash?: InputMaybe<SearchableStringFilterInput>;
   showInActionsList?: InputMaybe<SearchableBooleanFilterInput>;
   toDomainId?: InputMaybe<SearchableIdFilterInput>;
@@ -7035,15 +7510,18 @@ export enum SearchableColonyActionSortableFields {
   InitiatorAddress = 'initiatorAddress',
   IsMotion = 'isMotion',
   IsMotionFinalization = 'isMotionFinalization',
+  IsMultiSig = 'isMultiSig',
   Members = 'members',
   MotionDomainId = 'motionDomainId',
   MotionId = 'motionId',
+  MultiSigId = 'multiSigId',
   NetworkFee = 'networkFee',
   NewColonyVersion = 'newColonyVersion',
   PaymentId = 'paymentId',
   PendingColonyMetadataId = 'pendingColonyMetadataId',
   PendingDomainMetadataId = 'pendingDomainMetadataId',
   RecipientAddress = 'recipientAddress',
+  RolesAreMultiSig = 'rolesAreMultiSig',
   RootHash = 'rootHash',
   ShowInActionsList = 'showInActionsList',
   ToDomainId = 'toDomainId',
@@ -7284,6 +7762,7 @@ export type Subscription = {
   onCreateColonyMemberInvite?: Maybe<ColonyMemberInvite>;
   onCreateColonyMetadata?: Maybe<ColonyMetadata>;
   onCreateColonyMotion?: Maybe<ColonyMotion>;
+  onCreateColonyMultiSig?: Maybe<ColonyMultiSig>;
   onCreateColonyRole?: Maybe<ColonyRole>;
   onCreateColonyStake?: Maybe<ColonyStake>;
   onCreateColonyTokens?: Maybe<ColonyTokens>;
@@ -7299,6 +7778,7 @@ export type Subscription = {
   onCreateIngestorStats?: Maybe<IngestorStats>;
   onCreateLiquidationAddress?: Maybe<LiquidationAddress>;
   onCreateMotionMessage?: Maybe<MotionMessage>;
+  onCreateMultiSigUserSignature?: Maybe<MultiSigUserSignature>;
   onCreatePrivateBetaInviteCode?: Maybe<PrivateBetaInviteCode>;
   onCreateProfile?: Maybe<Profile>;
   onCreateReputationMiningCycleMetadata?: Maybe<ReputationMiningCycleMetadata>;
@@ -7324,6 +7804,7 @@ export type Subscription = {
   onDeleteColonyMemberInvite?: Maybe<ColonyMemberInvite>;
   onDeleteColonyMetadata?: Maybe<ColonyMetadata>;
   onDeleteColonyMotion?: Maybe<ColonyMotion>;
+  onDeleteColonyMultiSig?: Maybe<ColonyMultiSig>;
   onDeleteColonyRole?: Maybe<ColonyRole>;
   onDeleteColonyStake?: Maybe<ColonyStake>;
   onDeleteColonyTokens?: Maybe<ColonyTokens>;
@@ -7339,6 +7820,7 @@ export type Subscription = {
   onDeleteIngestorStats?: Maybe<IngestorStats>;
   onDeleteLiquidationAddress?: Maybe<LiquidationAddress>;
   onDeleteMotionMessage?: Maybe<MotionMessage>;
+  onDeleteMultiSigUserSignature?: Maybe<MultiSigUserSignature>;
   onDeletePrivateBetaInviteCode?: Maybe<PrivateBetaInviteCode>;
   onDeleteProfile?: Maybe<Profile>;
   onDeleteReputationMiningCycleMetadata?: Maybe<ReputationMiningCycleMetadata>;
@@ -7364,6 +7846,7 @@ export type Subscription = {
   onUpdateColonyMemberInvite?: Maybe<ColonyMemberInvite>;
   onUpdateColonyMetadata?: Maybe<ColonyMetadata>;
   onUpdateColonyMotion?: Maybe<ColonyMotion>;
+  onUpdateColonyMultiSig?: Maybe<ColonyMultiSig>;
   onUpdateColonyRole?: Maybe<ColonyRole>;
   onUpdateColonyStake?: Maybe<ColonyStake>;
   onUpdateColonyTokens?: Maybe<ColonyTokens>;
@@ -7379,6 +7862,7 @@ export type Subscription = {
   onUpdateIngestorStats?: Maybe<IngestorStats>;
   onUpdateLiquidationAddress?: Maybe<LiquidationAddress>;
   onUpdateMotionMessage?: Maybe<MotionMessage>;
+  onUpdateMultiSigUserSignature?: Maybe<MultiSigUserSignature>;
   onUpdatePrivateBetaInviteCode?: Maybe<PrivateBetaInviteCode>;
   onUpdateProfile?: Maybe<Profile>;
   onUpdateReputationMiningCycleMetadata?: Maybe<ReputationMiningCycleMetadata>;
@@ -7442,6 +7926,10 @@ export type SubscriptionOnCreateColonyMotionArgs = {
   filter?: InputMaybe<ModelSubscriptionColonyMotionFilterInput>;
 };
 
+export type SubscriptionOnCreateColonyMultiSigArgs = {
+  filter?: InputMaybe<ModelSubscriptionColonyMultiSigFilterInput>;
+};
+
 export type SubscriptionOnCreateColonyRoleArgs = {
   filter?: InputMaybe<ModelSubscriptionColonyRoleFilterInput>;
 };
@@ -7500,6 +7988,10 @@ export type SubscriptionOnCreateLiquidationAddressArgs = {
 
 export type SubscriptionOnCreateMotionMessageArgs = {
   filter?: InputMaybe<ModelSubscriptionMotionMessageFilterInput>;
+};
+
+export type SubscriptionOnCreateMultiSigUserSignatureArgs = {
+  filter?: InputMaybe<ModelSubscriptionMultiSigUserSignatureFilterInput>;
 };
 
 export type SubscriptionOnCreatePrivateBetaInviteCodeArgs = {
@@ -7602,6 +8094,10 @@ export type SubscriptionOnDeleteColonyMotionArgs = {
   filter?: InputMaybe<ModelSubscriptionColonyMotionFilterInput>;
 };
 
+export type SubscriptionOnDeleteColonyMultiSigArgs = {
+  filter?: InputMaybe<ModelSubscriptionColonyMultiSigFilterInput>;
+};
+
 export type SubscriptionOnDeleteColonyRoleArgs = {
   filter?: InputMaybe<ModelSubscriptionColonyRoleFilterInput>;
 };
@@ -7660,6 +8156,10 @@ export type SubscriptionOnDeleteLiquidationAddressArgs = {
 
 export type SubscriptionOnDeleteMotionMessageArgs = {
   filter?: InputMaybe<ModelSubscriptionMotionMessageFilterInput>;
+};
+
+export type SubscriptionOnDeleteMultiSigUserSignatureArgs = {
+  filter?: InputMaybe<ModelSubscriptionMultiSigUserSignatureFilterInput>;
 };
 
 export type SubscriptionOnDeletePrivateBetaInviteCodeArgs = {
@@ -7762,6 +8262,10 @@ export type SubscriptionOnUpdateColonyMotionArgs = {
   filter?: InputMaybe<ModelSubscriptionColonyMotionFilterInput>;
 };
 
+export type SubscriptionOnUpdateColonyMultiSigArgs = {
+  filter?: InputMaybe<ModelSubscriptionColonyMultiSigFilterInput>;
+};
+
 export type SubscriptionOnUpdateColonyRoleArgs = {
   filter?: InputMaybe<ModelSubscriptionColonyRoleFilterInput>;
 };
@@ -7820,6 +8324,10 @@ export type SubscriptionOnUpdateLiquidationAddressArgs = {
 
 export type SubscriptionOnUpdateMotionMessageArgs = {
   filter?: InputMaybe<ModelSubscriptionMotionMessageFilterInput>;
+};
+
+export type SubscriptionOnUpdateMultiSigUserSignatureArgs = {
+  filter?: InputMaybe<ModelSubscriptionMultiSigUserSignatureFilterInput>;
 };
 
 export type SubscriptionOnUpdatePrivateBetaInviteCodeArgs = {
@@ -8102,9 +8610,11 @@ export type UpdateColonyActionInput = {
   initiatorAddress?: InputMaybe<Scalars['ID']>;
   isMotion?: InputMaybe<Scalars['Boolean']>;
   isMotionFinalization?: InputMaybe<Scalars['Boolean']>;
+  isMultiSig?: InputMaybe<Scalars['Boolean']>;
   members?: InputMaybe<Array<Scalars['ID']>>;
   motionDomainId?: InputMaybe<Scalars['Int']>;
   motionId?: InputMaybe<Scalars['ID']>;
+  multiSigId?: InputMaybe<Scalars['ID']>;
   networkFee?: InputMaybe<Scalars['String']>;
   newColonyVersion?: InputMaybe<Scalars['Int']>;
   paymentId?: InputMaybe<Scalars['Int']>;
@@ -8113,6 +8623,7 @@ export type UpdateColonyActionInput = {
   pendingDomainMetadataId?: InputMaybe<Scalars['ID']>;
   recipientAddress?: InputMaybe<Scalars['ID']>;
   roles?: InputMaybe<ColonyActionRolesInput>;
+  rolesAreMultiSig?: InputMaybe<Scalars['Boolean']>;
   rootHash?: InputMaybe<Scalars['String']>;
   showInActionsList?: InputMaybe<Scalars['Boolean']>;
   toDomainId?: InputMaybe<Scalars['ID']>;
@@ -8179,6 +8690,7 @@ export type UpdateColonyHistoricRoleInput = {
   createdAt?: InputMaybe<Scalars['AWSDateTime']>;
   domainId?: InputMaybe<Scalars['ID']>;
   id: Scalars['ID'];
+  isMultiSig?: InputMaybe<Scalars['Boolean']>;
   role_0?: InputMaybe<Scalars['Boolean']>;
   role_1?: InputMaybe<Scalars['Boolean']>;
   role_2?: InputMaybe<Scalars['Boolean']>;
@@ -8254,11 +8766,31 @@ export type UpdateColonyMotionInput = {
   voterRecord?: InputMaybe<Array<VoterRecordInput>>;
 };
 
+export type UpdateColonyMultiSigInput = {
+  colonyAddress?: InputMaybe<Scalars['ID']>;
+  createdAt?: InputMaybe<Scalars['AWSDateTime']>;
+  executedAt?: InputMaybe<Scalars['AWSDateTime']>;
+  executedBy?: InputMaybe<Scalars['ID']>;
+  hasActionCompleted?: InputMaybe<Scalars['Boolean']>;
+  id: Scalars['ID'];
+  isDecision?: InputMaybe<Scalars['Boolean']>;
+  isExecuted?: InputMaybe<Scalars['Boolean']>;
+  isRejected?: InputMaybe<Scalars['Boolean']>;
+  multiSigDomainId?: InputMaybe<Scalars['ID']>;
+  nativeMultiSigDomainId?: InputMaybe<Scalars['String']>;
+  nativeMultiSigId?: InputMaybe<Scalars['ID']>;
+  rejectedAt?: InputMaybe<Scalars['AWSDateTime']>;
+  rejectedBy?: InputMaybe<Scalars['ID']>;
+  requiredPermissions?: InputMaybe<Scalars['Int']>;
+  transactionHash?: InputMaybe<Scalars['ID']>;
+};
+
 export type UpdateColonyRoleInput = {
   colonyAddress?: InputMaybe<Scalars['ID']>;
   colonyRolesId?: InputMaybe<Scalars['ID']>;
   domainId?: InputMaybe<Scalars['ID']>;
   id: Scalars['ID'];
+  isMultiSig?: InputMaybe<Scalars['Boolean']>;
   latestBlock?: InputMaybe<Scalars['Int']>;
   role_0?: InputMaybe<Scalars['Boolean']>;
   role_1?: InputMaybe<Scalars['Boolean']>;
@@ -8389,6 +8921,7 @@ export type UpdateExtensionByColonyAndHashInput = {
 
 export type UpdateExtensionInstallationsCountInput = {
   id: Scalars['ID'];
+  multiSigPermissions?: InputMaybe<Scalars['Int']>;
   oneTxPayment?: InputMaybe<Scalars['Int']>;
   reputationWeighted?: InputMaybe<Scalars['Int']>;
   stagedExpenditure?: InputMaybe<Scalars['Int']>;
@@ -8417,6 +8950,16 @@ export type UpdateMotionMessageInput = {
   motionId?: InputMaybe<Scalars['ID']>;
   name?: InputMaybe<Scalars['String']>;
   vote?: InputMaybe<Scalars['String']>;
+};
+
+export type UpdateMultiSigUserSignatureInput = {
+  colonyAddress?: InputMaybe<Scalars['ID']>;
+  createdAt?: InputMaybe<Scalars['AWSDateTime']>;
+  id: Scalars['ID'];
+  multiSigId?: InputMaybe<Scalars['ID']>;
+  role?: InputMaybe<Scalars['Int']>;
+  userAddress?: InputMaybe<Scalars['ID']>;
+  vote?: InputMaybe<MultiSigVote>;
 };
 
 export type UpdatePrivateBetaInviteCodeInput = {
@@ -8776,6 +9319,60 @@ export type VotingReputationParamsInput = {
   voterRewardFraction: Scalars['String'];
 };
 
+export type ActionMetadataInfoFragment = {
+  __typename?: 'ColonyAction';
+  id: string;
+  colonyDecisionId?: string | null;
+  amount?: string | null;
+  networkFee?: string | null;
+  type: ColonyActionType;
+  pendingDomainMetadata?: {
+    __typename?: 'DomainMetadata';
+    name: string;
+    color: DomainColor;
+    description?: string | null;
+    changelog?: Array<{
+      __typename?: 'DomainMetadataChangelog';
+      transactionHash: string;
+      oldName: string;
+      newName: string;
+      oldColor: DomainColor;
+      newColor: DomainColor;
+      oldDescription?: string | null;
+      newDescription?: string | null;
+    }> | null;
+  } | null;
+  pendingColonyMetadata?: {
+    __typename?: 'ColonyMetadata';
+    id: string;
+    displayName: string;
+    avatar?: string | null;
+    thumbnail?: string | null;
+    description?: string | null;
+    externalLinks?: Array<{
+      __typename?: 'ExternalLink';
+      name: ExternalLinks;
+      link: string;
+    }> | null;
+    objective?: {
+      __typename?: 'ColonyObjective';
+      title: string;
+      description: string;
+      progress: number;
+    } | null;
+    changelog?: Array<{
+      __typename?: 'ColonyMetadataChangelog';
+      transactionHash: string;
+      oldDisplayName: string;
+      newDisplayName: string;
+      hasAvatarChanged: boolean;
+      hasDescriptionChanged?: boolean | null;
+      haveExternalLinksChanged?: boolean | null;
+      hasObjectiveChanged?: boolean | null;
+    }> | null;
+  } | null;
+};
+
 export type ColonyFragment = {
   __typename?: 'Colony';
   colonyAddress: string;
@@ -8821,6 +9418,12 @@ export type ColonyMetadataFragment = {
     name: ExternalLinks;
     link: string;
   }> | null;
+  objective?: {
+    __typename?: 'ColonyObjective';
+    title: string;
+    description: string;
+    progress: number;
+  } | null;
   changelog?: Array<{
     __typename?: 'ColonyMetadataChangelog';
     transactionHash: string;
@@ -8829,6 +9432,7 @@ export type ColonyMetadataFragment = {
     hasAvatarChanged: boolean;
     hasDescriptionChanged?: boolean | null;
     haveExternalLinksChanged?: boolean | null;
+    hasObjectiveChanged?: boolean | null;
   }> | null;
 };
 
@@ -9011,6 +9615,50 @@ export type DomainMetadataFragment = {
     oldDescription?: string | null;
     newDescription?: string | null;
   }> | null;
+};
+
+export type MultiSigUserSignatureFragment = {
+  __typename?: 'MultiSigUserSignature';
+  id: string;
+  multiSigId: string;
+  role: number;
+  colonyAddress: string;
+  userAddress: string;
+  vote: MultiSigVote;
+  createdAt: string;
+};
+
+export type ColonyMultiSigFragment = {
+  __typename?: 'ColonyMultiSig';
+  id: string;
+  colonyAddress: string;
+  nativeMultiSigId: string;
+  multiSigDomainId: string;
+  nativeMultiSigDomainId: string;
+  requiredPermissions: number;
+  transactionHash: string;
+  isExecuted: boolean;
+  isRejected: boolean;
+  isDecision: boolean;
+  hasActionCompleted: boolean;
+  executedAt?: string | null;
+  executedBy?: string | null;
+  rejectedAt?: string | null;
+  rejectedBy?: string | null;
+  createdAt: string;
+  signatures?: {
+    __typename?: 'ModelMultiSigUserSignatureConnection';
+    items: Array<{
+      __typename?: 'MultiSigUserSignature';
+      id: string;
+      multiSigId: string;
+      role: number;
+      colonyAddress: string;
+      userAddress: string;
+      vote: MultiSigVote;
+      createdAt: string;
+    } | null>;
+  } | null;
 };
 
 export type TokenFragment = { __typename?: 'Token'; tokenAddress: string };
@@ -9409,6 +10057,57 @@ export type CreateUserVoterRewardMutation = {
   } | null;
 };
 
+export type CreateColonyMultiSigMutationVariables = Exact<{
+  input: CreateColonyMultiSigInput;
+}>;
+
+export type CreateColonyMultiSigMutation = {
+  __typename?: 'Mutation';
+  createColonyMultiSig?: { __typename?: 'ColonyMultiSig'; id: string } | null;
+};
+
+export type UpdateColonyMultiSigMutationVariables = Exact<{
+  input: UpdateColonyMultiSigInput;
+}>;
+
+export type UpdateColonyMultiSigMutation = {
+  __typename?: 'Mutation';
+  updateColonyMultiSig?: { __typename?: 'ColonyMultiSig'; id: string } | null;
+};
+
+export type CreateMultiSigVoteMutationVariables = Exact<{
+  input: CreateMultiSigUserSignatureInput;
+}>;
+
+export type CreateMultiSigVoteMutation = {
+  __typename?: 'Mutation';
+  createMultiSigUserSignature?: {
+    __typename?: 'MultiSigUserSignature';
+    id: string;
+  } | null;
+};
+
+export type RemoveMultiSigVoteMutationVariables = Exact<{
+  id: Scalars['ID'];
+}>;
+
+export type RemoveMultiSigVoteMutation = {
+  __typename?: 'Mutation';
+  deleteMultiSigUserSignature?: {
+    __typename?: 'MultiSigUserSignature';
+    id: string;
+  } | null;
+};
+
+export type RemoveMultiSigRoleMutationVariables = Exact<{
+  id: Scalars['ID'];
+}>;
+
+export type RemoveMultiSigRoleMutation = {
+  __typename?: 'Mutation';
+  deleteColonyRole?: { __typename?: 'ColonyRole'; id: string } | null;
+};
+
 export type CreateColonyRoleMutationVariables = Exact<{
   input: CreateColonyRoleInput;
 }>;
@@ -9632,6 +10331,12 @@ export type GetColonyMetadataQuery = {
       name: ExternalLinks;
       link: string;
     }> | null;
+    objective?: {
+      __typename?: 'ColonyObjective';
+      title: string;
+      description: string;
+      progress: number;
+    } | null;
     changelog?: Array<{
       __typename?: 'ColonyMetadataChangelog';
       transactionHash: string;
@@ -9640,6 +10345,7 @@ export type GetColonyMetadataQuery = {
       hasAvatarChanged: boolean;
       hasDescriptionChanged?: boolean | null;
       haveExternalLinksChanged?: boolean | null;
+      hasObjectiveChanged?: boolean | null;
     }> | null;
   } | null;
 };
@@ -9813,6 +10519,50 @@ export type GetDomainMetadataQuery = {
       oldName: string;
       transactionHash: string;
     }> | null;
+  } | null;
+};
+
+export type GetDomainByNativeSkillIdQueryVariables = Exact<{
+  nativeSkillId: Scalars['String'];
+  colonyAddress: Scalars['ID'];
+}>;
+
+export type GetDomainByNativeSkillIdQuery = {
+  __typename?: 'Query';
+  getDomainByNativeSkillId?: {
+    __typename?: 'ModelDomainConnection';
+    items: Array<{
+      __typename?: 'Domain';
+      id: string;
+      nativeSkillId: string;
+      nativeId: number;
+    } | null>;
+  } | null;
+};
+
+export type GetDomainsByExtensionAddressQueryVariables = Exact<{
+  extensionAddress: Scalars['ID'];
+}>;
+
+export type GetDomainsByExtensionAddressQuery = {
+  __typename?: 'Query';
+  listColonyExtensions?: {
+    __typename?: 'ModelColonyExtensionConnection';
+    items: Array<{
+      __typename?: 'ColonyExtension';
+      colony: {
+        __typename?: 'Colony';
+        id: string;
+        domains?: {
+          __typename?: 'ModelDomainConnection';
+          items: Array<{
+            __typename?: 'Domain';
+            nativeSkillId: string;
+            nativeId: number;
+          } | null>;
+        } | null;
+      };
+    } | null>;
   } | null;
 };
 
@@ -10037,6 +10787,31 @@ export type GetExtensionInstallationsCountQuery = {
     stagedExpenditure: number;
     streamingPayments: number;
     reputationWeighted: number;
+    multiSigPermissions: number;
+  } | null;
+};
+
+export type GetColonyExtensionByAddressQueryVariables = Exact<{
+  extensionAddress: Scalars['ID'];
+}>;
+
+export type GetColonyExtensionByAddressQuery = {
+  __typename?: 'Query';
+  getColonyExtension?: {
+    __typename?: 'ColonyExtension';
+    colonyId: string;
+    params?: {
+      __typename?: 'ExtensionParams';
+      multiSig?: {
+        __typename?: 'MultiSigParams';
+        colonyThreshold: number;
+        domainThresholds?: Array<{
+          __typename?: 'MultiSigDomainConfig';
+          domainId: string;
+          domainThreshold: number;
+        } | null> | null;
+      } | null;
+    } | null;
   } | null;
 };
 
@@ -10122,6 +10897,12 @@ export type GetColonyActionByMotionIdQuery = {
           name: ExternalLinks;
           link: string;
         }> | null;
+        objective?: {
+          __typename?: 'ColonyObjective';
+          title: string;
+          description: string;
+          progress: number;
+        } | null;
         changelog?: Array<{
           __typename?: 'ColonyMetadataChangelog';
           transactionHash: string;
@@ -10130,6 +10911,7 @@ export type GetColonyActionByMotionIdQuery = {
           hasAvatarChanged: boolean;
           hasDescriptionChanged?: boolean | null;
           haveExternalLinksChanged?: boolean | null;
+          hasObjectiveChanged?: boolean | null;
         }> | null;
       } | null;
     } | null>;
@@ -10229,6 +11011,158 @@ export type GetVoterRewardsQuery = {
     min: string;
     max: string;
     reward: string;
+  } | null;
+};
+
+export type GetColonyActionByMultiSigIdQueryVariables = Exact<{
+  multiSigId: Scalars['ID'];
+}>;
+
+export type GetColonyActionByMultiSigIdQuery = {
+  __typename?: 'Query';
+  getColonyActionByMultiSigId?: {
+    __typename?: 'ModelColonyActionConnection';
+    items: Array<{
+      __typename?: 'ColonyAction';
+      id: string;
+      colonyDecisionId?: string | null;
+      amount?: string | null;
+      networkFee?: string | null;
+      type: ColonyActionType;
+      pendingDomainMetadata?: {
+        __typename?: 'DomainMetadata';
+        name: string;
+        color: DomainColor;
+        description?: string | null;
+        changelog?: Array<{
+          __typename?: 'DomainMetadataChangelog';
+          transactionHash: string;
+          oldName: string;
+          newName: string;
+          oldColor: DomainColor;
+          newColor: DomainColor;
+          oldDescription?: string | null;
+          newDescription?: string | null;
+        }> | null;
+      } | null;
+      pendingColonyMetadata?: {
+        __typename?: 'ColonyMetadata';
+        id: string;
+        displayName: string;
+        avatar?: string | null;
+        thumbnail?: string | null;
+        description?: string | null;
+        externalLinks?: Array<{
+          __typename?: 'ExternalLink';
+          name: ExternalLinks;
+          link: string;
+        }> | null;
+        objective?: {
+          __typename?: 'ColonyObjective';
+          title: string;
+          description: string;
+          progress: number;
+        } | null;
+        changelog?: Array<{
+          __typename?: 'ColonyMetadataChangelog';
+          transactionHash: string;
+          oldDisplayName: string;
+          newDisplayName: string;
+          hasAvatarChanged: boolean;
+          hasDescriptionChanged?: boolean | null;
+          haveExternalLinksChanged?: boolean | null;
+          hasObjectiveChanged?: boolean | null;
+        }> | null;
+      } | null;
+    } | null>;
+  } | null;
+};
+
+export type GetColonyMultiSigQueryVariables = Exact<{
+  id: Scalars['ID'];
+}>;
+
+export type GetColonyMultiSigQuery = {
+  __typename?: 'Query';
+  getColonyMultiSig?: {
+    __typename?: 'ColonyMultiSig';
+    id: string;
+    colonyAddress: string;
+    nativeMultiSigId: string;
+    multiSigDomainId: string;
+    nativeMultiSigDomainId: string;
+    requiredPermissions: number;
+    transactionHash: string;
+    isExecuted: boolean;
+    isRejected: boolean;
+    isDecision: boolean;
+    hasActionCompleted: boolean;
+    executedAt?: string | null;
+    executedBy?: string | null;
+    rejectedAt?: string | null;
+    rejectedBy?: string | null;
+    createdAt: string;
+    signatures?: {
+      __typename?: 'ModelMultiSigUserSignatureConnection';
+      items: Array<{
+        __typename?: 'MultiSigUserSignature';
+        id: string;
+        multiSigId: string;
+        role: number;
+        colonyAddress: string;
+        userAddress: string;
+        vote: MultiSigVote;
+        createdAt: string;
+      } | null>;
+    } | null;
+  } | null;
+};
+
+export type GetUserMultiSigSignatureQueryVariables = Exact<{
+  multiSigId: Scalars['ID'];
+  userAddress: Scalars['ID'];
+  vote: MultiSigVote;
+  role: Scalars['Int'];
+}>;
+
+export type GetUserMultiSigSignatureQuery = {
+  __typename?: 'Query';
+  getMultiSigUserSignatureByMultiSigId?: {
+    __typename?: 'ModelMultiSigUserSignatureConnection';
+    items: Array<{
+      __typename?: 'MultiSigUserSignature';
+      id: string;
+      multiSigId: string;
+      role: number;
+      colonyAddress: string;
+      userAddress: string;
+      vote: MultiSigVote;
+      createdAt: string;
+    } | null>;
+  } | null;
+};
+
+export type GetAllMultiSigRolesQueryVariables = Exact<{
+  colonyAddress: Scalars['ID'];
+}>;
+
+export type GetAllMultiSigRolesQuery = {
+  __typename?: 'Query';
+  getRoleByColony?: {
+    __typename?: 'ModelColonyRoleConnection';
+    items: Array<{ __typename?: 'ColonyRole'; id: string } | null>;
+  } | null;
+};
+
+export type GetActiveColonyMultisigsQueryVariables = Exact<{
+  colonyAddress: Scalars['ID'];
+}>;
+
+export type GetActiveColonyMultisigsQuery = {
+  __typename?: 'Query';
+  getMultiSigByColonyAddress?: {
+    __typename?: 'ModelColonyMultiSigConnection';
+    items: Array<{ __typename?: 'ColonyMultiSig'; id: string } | null>;
   } | null;
 };
 
@@ -10347,6 +11281,66 @@ export type GetColonyStakeQuery = {
   getColonyStake?: { __typename?: 'ColonyStake'; totalAmount: string } | null;
 };
 
+export const DomainMetadata = gql`
+  fragment DomainMetadata on DomainMetadata {
+    name
+    color
+    description
+    changelog {
+      transactionHash
+      oldName
+      newName
+      oldColor
+      newColor
+      oldDescription
+      newDescription
+    }
+  }
+`;
+export const ColonyMetadata = gql`
+  fragment ColonyMetadata on ColonyMetadata {
+    id
+    displayName
+    avatar
+    thumbnail
+    description
+    externalLinks {
+      name
+      link
+    }
+    objective {
+      title
+      description
+      progress
+    }
+    changelog {
+      transactionHash
+      oldDisplayName
+      newDisplayName
+      hasAvatarChanged
+      hasDescriptionChanged
+      haveExternalLinksChanged
+      hasObjectiveChanged
+    }
+  }
+`;
+export const ActionMetadataInfo = gql`
+  fragment ActionMetadataInfo on ColonyAction {
+    id
+    pendingDomainMetadata {
+      ...DomainMetadata
+    }
+    pendingColonyMetadata {
+      ...ColonyMetadata
+    }
+    colonyDecisionId
+    amount
+    networkFee
+    type
+  }
+  ${DomainMetadata}
+  ${ColonyMetadata}
+`;
 export const Token = gql`
   fragment Token on Token {
     tokenAddress: id
@@ -10384,27 +11378,6 @@ export const Colony = gql`
     }
   }
   ${Token}
-`;
-export const ColonyMetadata = gql`
-  fragment ColonyMetadata on ColonyMetadata {
-    id
-    displayName
-    avatar
-    thumbnail
-    description
-    externalLinks {
-      name
-      link
-    }
-    changelog {
-      transactionHash
-      oldDisplayName
-      newDisplayName
-      hasAvatarChanged
-      hasDescriptionChanged
-      haveExternalLinksChanged
-    }
-  }
 `;
 export const ExpenditureSlot = gql`
   fragment ExpenditureSlot on ExpenditureSlot {
@@ -10563,21 +11536,42 @@ export const ColonyMotion = gql`
   ${StakerReward}
   ${VoterRecord}
 `;
-export const DomainMetadata = gql`
-  fragment DomainMetadata on DomainMetadata {
-    name
-    color
-    description
-    changelog {
-      transactionHash
-      oldName
-      newName
-      oldColor
-      newColor
-      oldDescription
-      newDescription
-    }
+export const MultiSigUserSignature = gql`
+  fragment MultiSigUserSignature on MultiSigUserSignature {
+    id
+    multiSigId
+    role
+    colonyAddress
+    userAddress
+    vote
+    createdAt
   }
+`;
+export const ColonyMultiSig = gql`
+  fragment ColonyMultiSig on ColonyMultiSig {
+    id
+    colonyAddress
+    nativeMultiSigId
+    multiSigDomainId
+    nativeMultiSigDomainId
+    requiredPermissions
+    transactionHash
+    isExecuted
+    isRejected
+    isDecision
+    hasActionCompleted
+    signatures {
+      items {
+        ...MultiSigUserSignature
+      }
+    }
+    executedAt
+    executedBy
+    rejectedAt
+    rejectedBy
+    createdAt
+  }
+  ${MultiSigUserSignature}
 `;
 export const CreateColonyActionDocument = gql`
   mutation CreateColonyAction($input: CreateColonyActionInput!) {
@@ -10869,6 +11863,41 @@ export const CreateUserVoterRewardDocument = gql`
     }
   }
 `;
+export const CreateColonyMultiSigDocument = gql`
+  mutation CreateColonyMultiSig($input: CreateColonyMultiSigInput!) {
+    createColonyMultiSig(input: $input) {
+      id
+    }
+  }
+`;
+export const UpdateColonyMultiSigDocument = gql`
+  mutation UpdateColonyMultiSig($input: UpdateColonyMultiSigInput!) {
+    updateColonyMultiSig(input: $input) {
+      id
+    }
+  }
+`;
+export const CreateMultiSigVoteDocument = gql`
+  mutation CreateMultiSigVote($input: CreateMultiSigUserSignatureInput!) {
+    createMultiSigUserSignature(input: $input) {
+      id
+    }
+  }
+`;
+export const RemoveMultiSigVoteDocument = gql`
+  mutation RemoveMultiSigVote($id: ID!) {
+    deleteMultiSigUserSignature(input: { id: $id }) {
+      id
+    }
+  }
+`;
+export const RemoveMultiSigRoleDocument = gql`
+  mutation RemoveMultiSigRole($id: ID!) {
+    deleteColonyRole(input: { id: $id }) {
+      id
+    }
+  }
+`;
 export const CreateColonyRoleDocument = gql`
   mutation CreateColonyRole($input: CreateColonyRoleInput!) {
     createColonyRole(input: $input) {
@@ -11141,6 +12170,37 @@ export const GetDomainMetadataDocument = gql`
     }
   }
 `;
+export const GetDomainByNativeSkillIdDocument = gql`
+  query GetDomainByNativeSkillId($nativeSkillId: String!, $colonyAddress: ID!) {
+    getDomainByNativeSkillId(
+      nativeSkillId: $nativeSkillId
+      filter: { colonyId: { eq: $colonyAddress } }
+    ) {
+      items {
+        id
+        nativeSkillId
+        nativeId
+      }
+    }
+  }
+`;
+export const GetDomainsByExtensionAddressDocument = gql`
+  query GetDomainsByExtensionAddress($extensionAddress: ID!) {
+    listColonyExtensions(filter: { id: { eq: $extensionAddress } }) {
+      items {
+        colony {
+          domains {
+            items {
+              nativeSkillId
+              nativeId
+            }
+          }
+          id
+        }
+      }
+    }
+  }
+`;
 export const GetContractEventDocument = gql`
   query GetContractEvent($id: ID!) {
     getContractEvent(id: $id) {
@@ -11253,6 +12313,23 @@ export const GetExtensionInstallationsCountDocument = gql`
       stagedExpenditure
       streamingPayments
       reputationWeighted
+      multiSigPermissions
+    }
+  }
+`;
+export const GetColonyExtensionByAddressDocument = gql`
+  query GetColonyExtensionByAddress($extensionAddress: ID!) {
+    getColonyExtension(id: $extensionAddress) {
+      params {
+        multiSig {
+          colonyThreshold
+          domainThresholds {
+            domainId
+            domainThreshold
+          }
+        }
+      }
+      colonyId
     }
   }
 `;
@@ -11297,22 +12374,11 @@ export const GetColonyActionByMotionIdDocument = gql`
   query GetColonyActionByMotionId($motionId: ID!) {
     getColonyActionByMotionId(motionId: $motionId) {
       items {
-        id
-        pendingDomainMetadata {
-          ...DomainMetadata
-        }
-        pendingColonyMetadata {
-          ...ColonyMetadata
-        }
-        colonyDecisionId
-        amount
-        networkFee
-        type
+        ...ActionMetadataInfo
       }
     }
   }
-  ${DomainMetadata}
-  ${ColonyMetadata}
+  ${ActionMetadataInfo}
 `;
 export const GetColonyMotionDocument = gql`
   query GetColonyMotion($id: ID!) {
@@ -11328,6 +12394,72 @@ export const GetVoterRewardsDocument = gql`
       min
       max
       reward
+    }
+  }
+`;
+export const GetColonyActionByMultiSigIdDocument = gql`
+  query GetColonyActionByMultiSigId($multiSigId: ID!) {
+    getColonyActionByMultiSigId(multiSigId: $multiSigId) {
+      items {
+        ...ActionMetadataInfo
+      }
+    }
+  }
+  ${ActionMetadataInfo}
+`;
+export const GetColonyMultiSigDocument = gql`
+  query GetColonyMultiSig($id: ID!) {
+    getColonyMultiSig(id: $id) {
+      ...ColonyMultiSig
+    }
+  }
+  ${ColonyMultiSig}
+`;
+export const GetUserMultiSigSignatureDocument = gql`
+  query GetUserMultiSigSignature(
+    $multiSigId: ID!
+    $userAddress: ID!
+    $vote: MultiSigVote!
+    $role: Int!
+  ) {
+    getMultiSigUserSignatureByMultiSigId(
+      filter: {
+        userAddress: { eq: $userAddress }
+        vote: { eq: $vote }
+        role: { eq: $role }
+      }
+      multiSigId: $multiSigId
+    ) {
+      items {
+        ...MultiSigUserSignature
+      }
+    }
+  }
+  ${MultiSigUserSignature}
+`;
+export const GetAllMultiSigRolesDocument = gql`
+  query GetAllMultiSigRoles($colonyAddress: ID!) {
+    getRoleByColony(
+      colonyAddress: $colonyAddress
+      limit: 9999
+      filter: { isMultiSig: { eq: true } }
+    ) {
+      items {
+        id
+      }
+    }
+  }
+`;
+export const GetActiveColonyMultisigsDocument = gql`
+  query GetActiveColonyMultisigs($colonyAddress: ID!) {
+    getMultiSigByColonyAddress(
+      colonyAddress: $colonyAddress
+      filter: { isExecuted: { eq: false }, isRejected: { eq: false } }
+      limit: 9999
+    ) {
+      items {
+        id
+      }
     }
   }
 `;

@@ -6,8 +6,9 @@ import {
   getOneTxPaymentClient,
   getVotingClient,
   verbose,
+  SimpleTransactionDescription,
+  parseOperation,
 } from '~utils';
-import { SimpleTransactionDescription, parseAction } from './helpers';
 import {
   handleEditDomainMotion,
   handleAddDomainMotion,
@@ -59,48 +60,48 @@ export const handleMotionCreated: EventHandler = async (
   const motion = await votingReputationClient.getMotion(motionId, {
     blockTag: blockNumber,
   });
-  const parsedAction = parseAction(motion.action, {
+  const parsedOperation = parseOperation(motion.action, {
     colonyClient,
     oneTxPaymentClient,
     stakedExpenditureClient,
     stagedExpenditureClient,
   });
 
-  if (parsedAction) {
-    const contractOperation = parsedAction.name;
+  if (parsedOperation) {
+    const contractOperation = parsedOperation.name;
     /* Handle the action type-specific mutation here */
     switch (contractOperation) {
       case ColonyOperations.MintTokens: {
-        await handleMintTokensMotion(colonyAddress, event, parsedAction);
+        await handleMintTokensMotion(colonyAddress, event, parsedOperation);
         break;
       }
       case ColonyOperations.AddDomain: {
-        await handleAddDomainMotion(colonyAddress, event, parsedAction);
+        await handleAddDomainMotion(colonyAddress, event, parsedOperation);
         break;
       }
 
       case ColonyOperations.EditDomain: {
-        await handleEditDomainMotion(colonyAddress, event, parsedAction);
+        await handleEditDomainMotion(colonyAddress, event, parsedOperation);
         break;
       }
 
       case ColonyOperations.Upgrade: {
-        await handleNetworkUpgradeMotion(colonyAddress, event, parsedAction);
+        await handleNetworkUpgradeMotion(colonyAddress, event, parsedOperation);
         break;
       }
 
       case ColonyOperations.UnlockToken: {
-        await handleUnlockTokenMotion(colonyAddress, event, parsedAction);
+        await handleUnlockTokenMotion(colonyAddress, event, parsedOperation);
         break;
       }
 
       case ColonyOperations.MakePaymentFundedFromDomain: {
-        await handlePaymentMotion(colonyAddress, event, parsedAction);
+        await handlePaymentMotion(colonyAddress, event, parsedOperation);
         break;
       }
 
       case ColonyOperations.MoveFundsBetweenPots: {
-        await handleMoveFundsMotion(colonyAddress, event, parsedAction);
+        await handleMoveFundsMotion(colonyAddress, event, parsedOperation);
         break;
       }
 
@@ -109,23 +110,28 @@ export const handleMotionCreated: EventHandler = async (
         await handleDomainEditReputationMotion(
           colonyAddress,
           event,
-          parsedAction,
+          parsedOperation,
         );
         break;
       }
 
       case ColonyOperations.EditColony: {
-        await handleEditColonyMotion(colonyAddress, event, parsedAction);
+        await handleEditColonyMotion(colonyAddress, event, parsedOperation);
         break;
       }
 
       case ColonyOperations.SetUserRoles: {
-        await handleSetUserRolesMotion(colonyAddress, event, parsedAction);
+        await handleSetUserRolesMotion(
+          colonyAddress,
+          event,
+          parsedOperation,
+          motion.altTarget,
+        );
         break;
       }
 
       case ColonyOperations.Multicall: {
-        await handleMulticallMotion(colonyAddress, event, parsedAction);
+        await handleMulticallMotion(colonyAddress, event, parsedOperation);
         break;
       }
 
@@ -133,7 +139,7 @@ export const handleMotionCreated: EventHandler = async (
         await handleSimpleDecisionMotion(
           colonyAddress,
           event,
-          parsedAction as SimpleTransactionDescription,
+          parsedOperation as SimpleTransactionDescription,
         );
         break;
       }
@@ -142,7 +148,7 @@ export const handleMotionCreated: EventHandler = async (
         await handleMakeArbitraryTransactionsMotion(
           colonyAddress,
           event,
-          parsedAction,
+          parsedOperation,
         );
 
         break;
@@ -152,13 +158,13 @@ export const handleMotionCreated: EventHandler = async (
         await handleCancelStakedExpenditureMotion(
           colonyAddress,
           event,
-          parsedAction,
+          parsedOperation,
         );
         break;
       }
 
       case ColonyOperations.EditColonyByDelta: {
-        await handleMetadataDeltaMotion(colonyAddress, event, parsedAction);
+        await handleMetadataDeltaMotion(colonyAddress, event, parsedOperation);
         break;
       }
 
@@ -166,7 +172,7 @@ export const handleMotionCreated: EventHandler = async (
         await handleCancelExpenditureViaArbitrationMotion(
           colonyAddress,
           event,
-          parsedAction,
+          parsedOperation,
         );
         break;
       }
@@ -175,7 +181,7 @@ export const handleMotionCreated: EventHandler = async (
         await handleFinalizeExpenditureViaArbitrationMotion(
           colonyAddress,
           event,
-          parsedAction,
+          parsedOperation,
         );
         break;
       }

@@ -1,7 +1,7 @@
 import { BigNumber } from 'ethers';
 import { Id } from '@colony/colony-js';
 import { mutate, query } from '~amplifyClient';
-import { ContractEvent } from '~types';
+import { ContractEventsSignatures, EventHandler } from '~types';
 import {
   getColonyRolesDatabaseId,
   getDomainDatabaseId,
@@ -12,6 +12,10 @@ import {
   verbose,
   writeActionFromEvent,
   isAddressExtension,
+  getAllMultiSigRoleEventsFromTransaction,
+  getMultiSigRolesMapFromEvents,
+  toNumber,
+  createInitialMultiSigRolesDatabaseEntry,
 } from '~utils';
 import {
   GetColonyRoleQuery,
@@ -24,14 +28,26 @@ import {
 } from '~graphql';
 import provider from '~provider';
 import { updateColonyContributor } from '~utils/contributors';
+import { ExtensionEventListener } from '~eventListeners';
 
-export default async (event: ContractEvent): Promise<void> => {
-  const {
-    args,
-    contractAddress: colonyAddress,
-    blockNumber,
-    transactionHash,
-  } = event;
+export const handleManagePermissionsAction: EventHandler = async (
+  event,
+  listener,
+) => {
+  const { args, contractAddress, blockNumber, transactionHash } = event;
+
+  const { colonyAddress: eventColonyAddress } =
+    listener as ExtensionEventListener;
+
+  const isMultiSig =
+    event.signature === ContractEventsSignatures.MultisigRoleSet;
+
+  const colonyAddress = isMultiSig ? eventColonyAddress : contractAddress;
+
+  if (!colonyAddress) {
+    return;
+  }
+
   const {
     user: targetAddress,
     /*
@@ -47,6 +63,7 @@ export default async (event: ContractEvent): Promise<void> => {
     colonyAddress,
     domainId.toString(),
     targetAddress,
+    isMultiSig,
   );
   const domainDatabaseId = getDomainDatabaseId(
     colonyAddress,
@@ -94,16 +111,20 @@ export default async (event: ContractEvent): Promise<void> => {
         );
         agent = from;
       }
-      const allRoleEventsUpdates = await getAllRoleEventsFromTransaction(
-        transactionHash,
-        colonyAddress,
-      );
-      const rolesFromAllUpdateEvents =
-        getRolesMapFromEvents(allRoleEventsUpdates);
-      const rolesFromAllUpdateEventsForAction = getRolesMapFromEvents(
-        allRoleEventsUpdates,
-        false,
-      );
+      const allRoleEventsUpdates = isMultiSig
+        ? await getAllMultiSigRoleEventsFromTransaction(
+            transactionHash,
+            colonyAddress,
+          )
+        : await getAllRoleEventsFromTransaction(transactionHash, colonyAddress);
+
+      const rolesFromAllUpdateEvents = isMultiSig
+        ? getMultiSigRolesMapFromEvents(allRoleEventsUpdates)
+        : getRolesMapFromEvents(allRoleEventsUpdates);
+
+      const rolesFromAllUpdateEventsForAction = isMultiSig
+        ? getMultiSigRolesMapFromEvents(allRoleEventsUpdates, false)
+        : getRolesMapFromEvents(allRoleEventsUpdates, false);
 
       await mutate<UpdateColonyRoleMutation, UpdateColonyRoleMutationVariables>(
         UpdateColonyRoleDocument,
@@ -117,7 +138,9 @@ export default async (event: ContractEvent): Promise<void> => {
       );
 
       verbose(
-        `Update the Roles entry for ${targetAddress} in colony ${colonyAddress}, under domain ${domainId.toNumber()}`,
+        `Update the${
+          isMultiSig ? 'multi sig ' : ' '
+        }Roles entry for ${targetAddress} in colony ${colonyAddress}, under domain ${domainId.toNumber()}`,
       );
 
       /*
@@ -132,7 +155,35 @@ export default async (event: ContractEvent): Promise<void> => {
           ...existingRoles,
           ...rolesFromAllUpdateEvents,
         },
+        isMultiSig,
       );
+
+      const individualEvents = isMultiSig
+        ? JSON.stringify(
+            allRoleEventsUpdates.map(
+              ({
+                name,
+                args: { roleId, setTo },
+                transactionHash,
+                logIndex,
+              }) => ({
+                id: `${transactionHash}_${logIndex}`,
+                type: name,
+                role: toNumber(roleId),
+                setTo,
+              }),
+            ),
+          )
+        : JSON.stringify(
+            allRoleEventsUpdates.map(
+              ({ name, args: { role, setTo }, transactionHash, logIndex }) => ({
+                id: `${transactionHash}_${logIndex}`,
+                type: name,
+                role,
+                setTo,
+              }),
+            ),
+          );
 
       /*
        * Create the action
@@ -145,16 +196,8 @@ export default async (event: ContractEvent): Promise<void> => {
         roles: {
           ...rolesFromAllUpdateEventsForAction,
         },
-        individualEvents: JSON.stringify(
-          allRoleEventsUpdates.map(
-            ({ name, args: { role, setTo }, transactionHash, logIndex }) => ({
-              id: `${transactionHash}_${logIndex}`,
-              type: name,
-              role,
-              setTo,
-            }),
-          ),
-        ),
+        rolesAreMultiSig: isMultiSig ? true : null,
+        individualEvents,
       });
     }
     /*
@@ -174,12 +217,19 @@ export default async (event: ContractEvent): Promise<void> => {
      * - creating the action entry
      */
 
-    await createInitialColonyRolesDatabaseEntry(
-      colonyAddress,
-      domainId.toNumber(),
-      targetAddress,
-      transactionHash,
-    );
+    isMultiSig
+      ? await createInitialMultiSigRolesDatabaseEntry(
+          colonyAddress,
+          domainId.toNumber(),
+          targetAddress,
+          transactionHash,
+        )
+      : await createInitialColonyRolesDatabaseEntry(
+          colonyAddress,
+          domainId.toNumber(),
+          targetAddress,
+          transactionHash,
+        );
   }
 
   const isExtension = await isAddressExtension(targetAddress);
