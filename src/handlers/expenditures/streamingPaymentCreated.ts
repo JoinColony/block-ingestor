@@ -77,5 +77,6 @@ export const handleStreamingPaymentCreated: EventHandler = async (
     initiatorAddress,
     expenditureId: databaseId,
     fromDomainId: getDomainDatabaseId(colonyAddress, toNumber(domainId)),
+    recipientAddress,
   });
 };
