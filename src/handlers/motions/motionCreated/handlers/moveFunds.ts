@@ -5,6 +5,7 @@ import { ContractEvent, motionNameMapping } from '~types';
 import {
   getCachedColonyClient,
   getDomainDatabaseId,
+  getExpenditureByFundingPot,
   isDomainFromFundingPotSupported,
   toNumber,
 } from '~utils';
@@ -53,6 +54,12 @@ export const handleMoveFundsMotion = async (
     });
   }
 
+  // Check if the target pot belongs to an expenditure
+  const targetExpenditure = await getExpenditureByFundingPot(
+    colonyAddress,
+    toNumber(toPot),
+  );
+
   await createMotionInDB(colonyAddress, event, {
     type: motionNameMapping[name],
     tokenAddress,
@@ -63,5 +70,6 @@ export const handleMoveFundsMotion = async (
     toDomainId: toDomainId
       ? getDomainDatabaseId(colonyAddress, toNumber(toDomainId))
       : undefined,
+    expenditureId: targetExpenditure?.id,
   });
 };

@@ -1,6 +1,13 @@
 import { BigNumber, utils } from 'ethers';
+import { query } from '~amplifyClient';
 
-import { ExpenditureBalance } from '~graphql';
+import {
+  ExpenditureBalance,
+  ExpenditureFragment,
+  GetExpenditureByNativeFundingPotIdAndColonyDocument,
+  GetExpenditureByNativeFundingPotIdAndColonyQuery,
+  GetExpenditureByNativeFundingPotIdAndColonyQueryVariables,
+} from '~graphql';
 
 import { insertAtIndex } from './arrays';
 
@@ -47,4 +54,23 @@ export const getUpdatedExpenditureBalances = (
   );
 
   return updatedBalances;
+};
+
+export const getExpenditureByFundingPot = async (
+  colonyAddress: string,
+  fundingPotId: number,
+): Promise<ExpenditureFragment | null> => {
+  const response = await query<
+    GetExpenditureByNativeFundingPotIdAndColonyQuery,
+    GetExpenditureByNativeFundingPotIdAndColonyQueryVariables
+  >(GetExpenditureByNativeFundingPotIdAndColonyDocument, {
+    colonyAddress,
+    nativeFundingPotId: fundingPotId,
+  });
+
+  const expenditure =
+    response?.data?.getExpendituresByNativeFundingPotIdAndColony?.items?.[0] ??
+    null;
+
+  return expenditure;
 };
