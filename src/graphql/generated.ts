@@ -9153,6 +9153,19 @@ export type DomainMetadataFragment = {
 
 export type TokenFragment = { __typename?: 'Token'; tokenAddress: string };
 
+export type NotificationUserFragment = {
+  __typename?: 'ColonyContributor';
+  user?: {
+    __typename?: 'User';
+    notificationsData?: {
+      __typename?: 'NotificationsData';
+      magicbellUserId: string;
+      notificationsDisabled: boolean;
+      mutedColonyAddresses: Array<string | null>;
+    } | null;
+  } | null;
+};
+
 export type NotificationsDataFragment = {
   __typename?: 'NotificationsData';
   magicbellUserId: string;
@@ -10757,6 +10770,16 @@ export const NotificationsData = gql`
     notificationsDisabled
     mutedColonyAddresses
   }
+`;
+export const NotificationUser = gql`
+  fragment NotificationUser on ColonyContributor {
+    user {
+      notificationsData {
+        ...NotificationsData
+      }
+    }
+  }
+  ${NotificationsData}
 `;
 export const CreateColonyActionDocument = gql`
   mutation CreateColonyAction($input: CreateColonyActionInput!) {

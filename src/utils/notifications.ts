@@ -5,7 +5,9 @@ import {
   GetColonyContributorsNotificationDataQuery,
   GetColonyContributorsNotificationDataQueryVariables,
   NotificationsDataFragment,
+  NotificationUserFragment,
 } from '~graphql';
+import { getAllPagesOfData, GetDataFn } from './graphql';
 
 export enum NotificationType {
   SimplePayment = 'SimplePayment',
@@ -23,12 +25,20 @@ interface NotificationVariables {
   mentions?: string[];
 }
 
+interface Recipient {
+  external_id: string;
+}
+
 // Set up the notification client
 export const setupNotificationsClient = async (): Promise<void> => {
-  await MagicBellClient.createInstance({
-    apiKey: process.env.MAGICBELL_API_KEY as string,
-    apiSecret: process.env.MAGICBELL_API_SECRET as string,
-  });
+  try {
+    await MagicBellClient.createInstance({
+      apiKey: process.env.MAGICBELL_API_KEY as string,
+      apiSecret: process.env.MAGICBELL_API_SECRET as string,
+    });
+  } catch (error) {
+    console.log('Error creating notification client: ', error);
+  }
 };
 
 // Check if notifications should be sent to a recipient from a colony.
@@ -43,51 +53,51 @@ const shouldSendNotificationToRecipient = (
   );
 };
 
+const getMembersData: GetDataFn<
+  NotificationUserFragment,
+  { colonyAddress: string }
+> = async ({ colonyAddress }, nextToken) => {
+  const response = await query<
+    GetColonyContributorsNotificationDataQuery,
+    GetColonyContributorsNotificationDataQueryVariables
+  >(GetColonyContributorsNotificationDataDocument, {
+    colonyAddress,
+    limit: 100,
+    ...(nextToken ? { nextToken } : {}),
+  });
+
+  return response?.data?.getContributorsByColony;
+};
+
 // Get all the recipients of a colony wide notification in the format Magicbell expects.
 const getRecipientsOfColonyWideNotification = async (
   colonyAddress: string,
-): Promise<Array<{ external_id: string }>> => {
-  const recipients: Array<{ external_id: string }> = [];
-  let nextToken: string | null | undefined;
+): Promise<Recipient[]> => {
+  const recipients: Recipient[] = [];
 
-  do {
-    const members = await query<
-      GetColonyContributorsNotificationDataQuery,
-      GetColonyContributorsNotificationDataQueryVariables
-    >(GetColonyContributorsNotificationDataDocument, {
-      colonyAddress,
-      limit: 100,
-      ...(nextToken ? { nextToken } : {}),
-    });
+  const members = await getAllPagesOfData(getMembersData, { colonyAddress });
 
-    if (members?.data?.getContributorsByColony) {
-      members.data.getContributorsByColony.items.forEach((member) => {
-        const notificationsData = member?.user?.notificationsData;
-
-        if (!notificationsData) {
-          return;
-        }
-
-        if (
-          shouldSendNotificationToRecipient(notificationsData, colonyAddress)
-        ) {
-          recipients.push({
-            external_id: notificationsData.magicbellUserId,
-          });
-        }
-      });
-
-      nextToken = members?.data?.getContributorsByColony?.nextToken;
-    } else {
-      nextToken = null;
+  members.forEach((member) => {
+    if (!member?.user?.notificationsData) {
+      return;
     }
-  } while (nextToken);
+    if (
+      shouldSendNotificationToRecipient(
+        member.user.notificationsData,
+        colonyAddress,
+      )
+    ) {
+      recipients.push({
+        external_id: member.user.notificationsData.magicbellUserId,
+      });
+    }
+  });
 
   return recipients;
 };
 
 // Send a notification when an action is made.
-export const sendActionNotification = async ({
+export const sendActionNotifications = async ({
   title,
   creator,
   colonyAddress,
@@ -105,9 +115,7 @@ export const sendActionNotification = async ({
   }
 
   // Send the colony wide notifications.
-  await Notification.create({
-    title,
-    recipients,
+  await sendNotification(title, recipients, {
     custom_attributes: {
       notificationType,
       creator,
@@ -127,18 +135,30 @@ export const sendActionNotification = async ({
 
     // send the mention notification to them.
     if (mentionRecipients) {
-      await Notification.create({
-        title: `${title} - Mention`,
-        recipients: mentionRecipients,
-        custom_attributes: {
-          notificationType: NotificationType.Mention,
-          creator,
-          colonyAddress,
-          transactionHash,
-          ...(amount ? { amount } : {}),
-          ...(tokenAddress ? { tokenAddress } : {}),
-        },
+      await sendNotification(`${title} - Mention`, mentionRecipients, {
+        notificationType: NotificationType.Mention,
+        creator,
+        colonyAddress,
+        transactionHash,
+        ...(amount ? { amount } : {}),
+        ...(tokenAddress ? { tokenAddress } : {}),
       });
     }
+  }
+};
+
+export const sendNotification = async (
+  title: string,
+  recipients: Recipient[],
+  customAttributes: Record<string, any>,
+): Promise<void> => {
+  try {
+    await Notification.create({
+      title,
+      recipients,
+      custom_attributes: customAttributes,
+    });
+  } catch (err) {
+    console.log(`Unable to create notification "${title}": `, err);
   }
 };

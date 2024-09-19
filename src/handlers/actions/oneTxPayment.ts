@@ -21,7 +21,10 @@ import {
   createFundsClaim,
 } from '~utils';
 import { getAmountLessFee, getNetworkInverseFee } from '~utils/networkFee';
-import { NotificationType, sendActionNotification } from '~utils/notifications';
+import {
+  NotificationType,
+  sendActionNotifications,
+} from '~utils/notifications';
 
 const PAYOUT_CLAIMED_SIGNATURE_HASH = utils.id(
   ContractEventsSignatures.PayoutClaimed,
@@ -298,14 +301,17 @@ const handlerV6 = async (
 
   await writeActionFromEvent(event, colonyAddress, actionFields);
 
-  sendActionNotification({
-    title: 'Simple Payment',
-    notificationType: NotificationType.SimplePayment,
-    mentions: [payments[0].recipientAddress],
-    creator: initiatorAddress,
-    colonyAddress,
-    transactionHash,
-    amount: payments[0].amount,
-    tokenAddress: payments[0].tokenAddress,
-  });
+  const firstPaymentData = payments?.[0];
+  if (firstPaymentData) {
+    sendActionNotifications({
+      title: 'Simple Payment',
+      notificationType: NotificationType.SimplePayment,
+      mentions: [firstPaymentData.recipientAddress],
+      creator: initiatorAddress,
+      colonyAddress,
+      transactionHash,
+      amount: firstPaymentData.amount,
+      tokenAddress: firstPaymentData.tokenAddress,
+    });
+  }
 };

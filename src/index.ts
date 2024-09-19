@@ -23,7 +23,7 @@ const start = async (): Promise<void> => {
   /**
    * Setup the notifications provider so that notifications can be sent when needed
    */
-  setupNotificationsClient();
+  await setupNotificationsClient();
 
   /**
    * Start express server providing stats and fetch existing stats from the DB
