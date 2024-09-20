@@ -105,6 +105,12 @@ export type BridgeDrainReceipt = {
   url: Scalars['String'];
 };
 
+export type BridgeGatewayFeeReturn = {
+  __typename?: 'BridgeGatewayFeeReturn';
+  success?: Maybe<Scalars['Boolean']>;
+  transactionFeePercentage?: Maybe<Scalars['Float']>;
+};
+
 export type BridgeIbanAccountInput = {
   account_number: Scalars['String'];
   bic: Scalars['String'];
@@ -1663,6 +1669,8 @@ export type CreateExpenditureInput = {
 };
 
 export type CreateExpenditureMetadataInput = {
+  expectedNumberOfPayouts?: InputMaybe<Scalars['Int']>;
+  expectedNumberOfTokens?: InputMaybe<Scalars['Int']>;
   fundFromDomainNativeId: Scalars['Int'];
   id?: InputMaybe<Scalars['ID']>;
   stages?: InputMaybe<Array<ExpenditureStageInput>>;
@@ -1713,7 +1721,7 @@ export type CreateMultiSigUserSignatureInput = {
 
 export type CreateNotificationsDataInput = {
   magicbellUserId: Scalars['ID'];
-  mutedColonyAddresses: Array<InputMaybe<Scalars['String']>>;
+  mutedColonyAddresses: Array<Scalars['ID']>;
   notificationsDisabled: Scalars['Boolean'];
   userAddress: Scalars['ID'];
 };
@@ -2294,6 +2302,8 @@ export type ExpenditureFundingItemInput = {
 export type ExpenditureMetadata = {
   __typename?: 'ExpenditureMetadata';
   createdAt: Scalars['AWSDateTime'];
+  expectedNumberOfPayouts?: Maybe<Scalars['Int']>;
+  expectedNumberOfTokens?: Maybe<Scalars['Int']>;
   fundFromDomainNativeId: Scalars['Int'];
   id: Scalars['ID'];
   stages?: Maybe<Array<ExpenditureStage>>;
@@ -2378,6 +2388,10 @@ export enum ExpenditureType {
   Staged = 'STAGED',
 }
 
+export enum ExtendedSupportedCurrencies {
+  Usdc = 'USDC',
+}
+
 export type ExtensionInstallationsCount = {
   __typename?: 'ExtensionInstallationsCount';
   createdAt: Scalars['AWSDateTime'];
@@ -2431,6 +2445,14 @@ export enum ExternalLinks {
   Whitepaper = 'Whitepaper',
   Youtube = 'Youtube',
 }
+
+export type FailedTransaction = {
+  __typename?: 'FailedTransaction';
+  /** Transaction id */
+  id: Scalars['ID'];
+  /** The current status of the transaction */
+  status: TransactionStatus;
+};
 
 export enum FilteringMethod {
   /** Apply an intersection filter */
@@ -2564,6 +2586,16 @@ export type IngestorStats = {
   updatedAt: Scalars['AWSDateTime'];
   /** JSON string to pass custom, dynamic values */
   value: Scalars['String'];
+};
+
+export type InitializeUserInput = {
+  /** The user's wallet address */
+  userAddress: Scalars['ID'];
+};
+
+export type InitializeUserReturn = {
+  __typename?: 'InitializeUserReturn';
+  failedTransactions: Array<FailedTransaction>;
 };
 
 export enum KycStatus {
@@ -3445,6 +3477,8 @@ export type ModelExpenditureFilterInput = {
 
 export type ModelExpenditureMetadataConditionInput = {
   and?: InputMaybe<Array<InputMaybe<ModelExpenditureMetadataConditionInput>>>;
+  expectedNumberOfPayouts?: InputMaybe<ModelIntInput>;
+  expectedNumberOfTokens?: InputMaybe<ModelIntInput>;
   fundFromDomainNativeId?: InputMaybe<ModelIntInput>;
   not?: InputMaybe<ModelExpenditureMetadataConditionInput>;
   or?: InputMaybe<Array<InputMaybe<ModelExpenditureMetadataConditionInput>>>;
@@ -3458,6 +3492,8 @@ export type ModelExpenditureMetadataConnection = {
 
 export type ModelExpenditureMetadataFilterInput = {
   and?: InputMaybe<Array<InputMaybe<ModelExpenditureMetadataFilterInput>>>;
+  expectedNumberOfPayouts?: InputMaybe<ModelIntInput>;
+  expectedNumberOfTokens?: InputMaybe<ModelIntInput>;
   fundFromDomainNativeId?: InputMaybe<ModelIntInput>;
   id?: InputMaybe<ModelIdInput>;
   not?: InputMaybe<ModelExpenditureMetadataFilterInput>;
@@ -3698,7 +3734,7 @@ export type ModelMultiSigVoteInput = {
 export type ModelNotificationsDataConditionInput = {
   and?: InputMaybe<Array<InputMaybe<ModelNotificationsDataConditionInput>>>;
   magicbellUserId?: InputMaybe<ModelIdInput>;
-  mutedColonyAddresses?: InputMaybe<ModelStringInput>;
+  mutedColonyAddresses?: InputMaybe<ModelIdInput>;
   not?: InputMaybe<ModelNotificationsDataConditionInput>;
   notificationsDisabled?: InputMaybe<ModelBooleanInput>;
   or?: InputMaybe<Array<InputMaybe<ModelNotificationsDataConditionInput>>>;
@@ -3713,7 +3749,7 @@ export type ModelNotificationsDataConnection = {
 export type ModelNotificationsDataFilterInput = {
   and?: InputMaybe<Array<InputMaybe<ModelNotificationsDataFilterInput>>>;
   magicbellUserId?: InputMaybe<ModelIdInput>;
-  mutedColonyAddresses?: InputMaybe<ModelStringInput>;
+  mutedColonyAddresses?: InputMaybe<ModelIdInput>;
   not?: InputMaybe<ModelNotificationsDataFilterInput>;
   notificationsDisabled?: InputMaybe<ModelBooleanInput>;
   or?: InputMaybe<Array<InputMaybe<ModelNotificationsDataFilterInput>>>;
@@ -4352,6 +4388,8 @@ export type ModelSubscriptionExpenditureMetadataFilterInput = {
   and?: InputMaybe<
     Array<InputMaybe<ModelSubscriptionExpenditureMetadataFilterInput>>
   >;
+  expectedNumberOfPayouts?: InputMaybe<ModelSubscriptionIntInput>;
+  expectedNumberOfTokens?: InputMaybe<ModelSubscriptionIntInput>;
   fundFromDomainNativeId?: InputMaybe<ModelSubscriptionIntInput>;
   id?: InputMaybe<ModelSubscriptionIdInput>;
   or?: InputMaybe<
@@ -4471,7 +4509,7 @@ export type ModelSubscriptionNotificationsDataFilterInput = {
     Array<InputMaybe<ModelSubscriptionNotificationsDataFilterInput>>
   >;
   magicbellUserId?: InputMaybe<ModelSubscriptionIdInput>;
-  mutedColonyAddresses?: InputMaybe<ModelSubscriptionStringInput>;
+  mutedColonyAddresses?: InputMaybe<ModelSubscriptionIdInput>;
   notificationsDisabled?: InputMaybe<ModelSubscriptionBooleanInput>;
   or?: InputMaybe<
     Array<InputMaybe<ModelSubscriptionNotificationsDataFilterInput>>
@@ -5077,7 +5115,9 @@ export enum MultiSigVote {
 /** Root mutation type */
 export type Mutation = {
   __typename?: 'Mutation';
+  /** Create a Bridge XYZ Bank Account */
   bridgeCreateBankAccount?: Maybe<BridgeCreateBankAccountReturn>;
+  /** Update a Bridge XYZ Bank Account */
   bridgeUpdateBankAccount?: Maybe<BridgeUpdateBankAccountReturn>;
   /** Post to the Bridge XYZ API */
   bridgeXYZMutation?: Maybe<BridgeXyzMutationReturn>;
@@ -5173,6 +5213,8 @@ export type Mutation = {
   deleteUserStake?: Maybe<UserStake>;
   deleteUserTokens?: Maybe<UserTokens>;
   deleteVoterRewardsHistory?: Maybe<VoterRewardsHistory>;
+  /** Initialize user (for now only cancels pending transactions) */
+  initializeUser: InitializeUserReturn;
   updateAnnotation?: Maybe<Annotation>;
   updateColony?: Maybe<Colony>;
   updateColonyAction?: Maybe<ColonyAction>;
@@ -5416,6 +5458,7 @@ export type MutationCreateMultiSigUserSignatureArgs = {
   input: CreateMultiSigUserSignatureInput;
 };
 
+/** Root mutation type */
 export type MutationCreateNotificationsDataArgs = {
   condition?: InputMaybe<ModelNotificationsDataConditionInput>;
   input: CreateNotificationsDataInput;
@@ -5683,6 +5726,7 @@ export type MutationDeleteMultiSigUserSignatureArgs = {
   input: DeleteMultiSigUserSignatureInput;
 };
 
+/** Root mutation type */
 export type MutationDeleteNotificationsDataArgs = {
   condition?: InputMaybe<ModelNotificationsDataConditionInput>;
   input: DeleteNotificationsDataInput;
@@ -5764,6 +5808,11 @@ export type MutationDeleteUserTokensArgs = {
 export type MutationDeleteVoterRewardsHistoryArgs = {
   condition?: InputMaybe<ModelVoterRewardsHistoryConditionInput>;
   input: DeleteVoterRewardsHistoryInput;
+};
+
+/** Root mutation type */
+export type MutationInitializeUserArgs = {
+  input: InitializeUserInput;
 };
 
 /** Root mutation type */
@@ -5945,6 +5994,7 @@ export type MutationUpdateMultiSigUserSignatureArgs = {
   input: UpdateMultiSigUserSignatureInput;
 };
 
+/** Root mutation type */
 export type MutationUpdateNotificationsDataArgs = {
   condition?: InputMaybe<ModelNotificationsDataConditionInput>;
   input: UpdateNotificationsDataInput;
@@ -6125,7 +6175,7 @@ export type NotificationsData = {
   /** Unique identifier for the user in Magicbell */
   magicbellUserId: Scalars['ID'];
   /** List of addresses of colonies that the user has muted */
-  mutedColonyAddresses: Array<Maybe<Scalars['String']>>;
+  mutedColonyAddresses: Array<Scalars['ID']>;
   /** Boolean to indicate if the user has disabled notifications app wide */
   notificationsDisabled: Scalars['Boolean'];
   updatedAt: Scalars['AWSDateTime'];
@@ -6253,6 +6303,8 @@ export type Query = {
   bridgeCheckKYC?: Maybe<BridgeCheckKycReturn>;
   /** Get drains history for the current user */
   bridgeGetDrainsHistory?: Maybe<Array<BridgeDrain>>;
+  /** Get bridge gateway fee */
+  bridgeGetGatewayFee?: Maybe<BridgeGatewayFeeReturn>;
   /** Get liquidation address of a given user */
   bridgeGetUserLiquidationAddress?: Maybe<Scalars['String']>;
   getActionByExpenditureId?: Maybe<ModelColonyActionConnection>;
@@ -6338,7 +6390,6 @@ export type Query = {
   getTransaction?: Maybe<Transaction>;
   getTransactionsByUser?: Maybe<ModelTransactionConnection>;
   getTransactionsByUserAndGroup?: Maybe<ModelTransactionConnection>;
-  getTransactionsByUserAndStatus?: Maybe<ModelTransactionConnection>;
   getUser?: Maybe<User>;
   getUserByAddress?: Maybe<ModelUserConnection>;
   getUserByBridgeCustomerId?: Maybe<ModelUserConnection>;
@@ -6826,6 +6877,7 @@ export type QueryGetMultiSigUserSignatureByMultiSigIdArgs = {
   sortDirection?: InputMaybe<ModelSortDirection>;
 };
 
+/** Root query type */
 export type QueryGetNotificationsDataArgs = {
   userAddress: Scalars['ID'];
 };
@@ -6969,16 +7021,6 @@ export type QueryGetTransactionsByUserAndGroupArgs = {
   limit?: InputMaybe<Scalars['Int']>;
   nextToken?: InputMaybe<Scalars['String']>;
   sortDirection?: InputMaybe<ModelSortDirection>;
-};
-
-/** Root query type */
-export type QueryGetTransactionsByUserAndStatusArgs = {
-  filter?: InputMaybe<ModelTransactionFilterInput>;
-  from?: InputMaybe<ModelIdKeyConditionInput>;
-  limit?: InputMaybe<Scalars['Int']>;
-  nextToken?: InputMaybe<Scalars['String']>;
-  sortDirection?: InputMaybe<ModelSortDirection>;
-  status: TransactionStatus;
 };
 
 /** Root query type */
@@ -7276,6 +7318,7 @@ export type QueryListMultiSigUserSignaturesArgs = {
   nextToken?: InputMaybe<Scalars['String']>;
 };
 
+/** Root query type */
 export type QueryListNotificationsDataArgs = {
   filter?: InputMaybe<ModelNotificationsDataFilterInput>;
   limit?: InputMaybe<Scalars['Int']>;
@@ -9015,6 +9058,8 @@ export type UpdateExpenditureInput = {
 };
 
 export type UpdateExpenditureMetadataInput = {
+  expectedNumberOfPayouts?: InputMaybe<Scalars['Int']>;
+  expectedNumberOfTokens?: InputMaybe<Scalars['Int']>;
   fundFromDomainNativeId?: InputMaybe<Scalars['Int']>;
   id: Scalars['ID'];
   stages?: InputMaybe<Array<ExpenditureStageInput>>;
@@ -9088,7 +9133,7 @@ export type UpdateMultiSigUserSignatureInput = {
 
 export type UpdateNotificationsDataInput = {
   magicbellUserId?: InputMaybe<Scalars['ID']>;
-  mutedColonyAddresses?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;
+  mutedColonyAddresses?: InputMaybe<Array<Scalars['ID']>>;
   notificationsDisabled?: InputMaybe<Scalars['Boolean']>;
   userAddress: Scalars['ID'];
 };
@@ -9804,7 +9849,7 @@ export type NotificationUserFragment = {
       __typename?: 'NotificationsData';
       magicbellUserId: string;
       notificationsDisabled: boolean;
-      mutedColonyAddresses: Array<string | null>;
+      mutedColonyAddresses: Array<string>;
     } | null;
   } | null;
 };
@@ -9813,7 +9858,7 @@ export type NotificationsDataFragment = {
   __typename?: 'NotificationsData';
   magicbellUserId: string;
   notificationsDisabled: boolean;
-  mutedColonyAddresses: Array<string | null>;
+  mutedColonyAddresses: Array<string>;
 };
 
 export type CreateColonyActionMutationVariables = Exact<{
@@ -10642,7 +10687,7 @@ export type GetColonyContributorsNotificationDataQuery = {
           __typename?: 'NotificationsData';
           magicbellUserId: string;
           notificationsDisabled: boolean;
-          mutedColonyAddresses: Array<string | null>;
+          mutedColonyAddresses: Array<string>;
         } | null;
       } | null;
     } | null>;
@@ -11753,7 +11798,6 @@ export const ColonyMultiSig = gql`
   }
   ${MultiSigUserSignature}
 `;
-
 export const NotificationsData = gql`
   fragment NotificationsData on NotificationsData {
     magicbellUserId
