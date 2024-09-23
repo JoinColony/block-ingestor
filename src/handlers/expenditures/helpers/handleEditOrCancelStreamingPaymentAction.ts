@@ -116,6 +116,10 @@ export const handleEditOrCancelStreamingPaymentAction = async ({
     }
   }
 
+  // When a streaming payment is cancelled, the endTime is set to the current block timestamp
+  // Therefore, if the endTime and timestamp are equal, we can assume this is a cancel action
+  const isCancelAction = BigNumber.from(timestamp).eq(newValues.endTime);
+
   await mutate<
     UpdateStreamingPaymentMutation,
     UpdateStreamingPaymentMutationVariables
@@ -126,12 +130,9 @@ export const handleEditOrCancelStreamingPaymentAction = async ({
       endTime: newValues.endTime,
       amount: newValues.amount,
       interval: newValues.interval,
+      isCancelled: isCancelAction || undefined,
     },
   });
-
-  // When a streaming payment is cancelled, the endTime is set to the current block timestamp
-  // Therefore, if the endTime and timestamp are equal, we can assume this is a cancel action
-  const isCancelAction = BigNumber.from(timestamp).eq(newValues.endTime);
 
   const { agent: initiatorAddress } = event.args;
 
