@@ -132,7 +132,7 @@ export const sendActionNotifications = async ({
     );
 
     // send the mention notification to them.
-    if (mentionRecipients) {
+    if (mentionRecipients.length) {
       await sendNotification(`${title} - Mention`, mentionRecipients, {
         notificationType: NotificationType.Mention,
         creator,
@@ -155,6 +155,11 @@ export const sendNotification = async (
       title,
       recipients,
       custom_attributes: customAttributes,
+      ...(process.env.NODE_ENV === 'development'
+        ? {
+            category: process.env.MAGICBELL_DEV_KEY,
+          }
+        : {}),
     });
   } catch (err) {
     console.log(`Unable to create notification "${title}": `, err);
