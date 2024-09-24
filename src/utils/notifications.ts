@@ -116,14 +116,12 @@ export const sendActionNotifications = async ({
 
   // Send the colony wide notifications.
   await sendNotification(title, recipients, {
-    custom_attributes: {
-      notificationType,
-      creator,
-      colonyAddress,
-      transactionHash,
-      ...(amount ? { amount } : {}),
-      ...(tokenAddress ? { tokenAddress } : {}),
-    },
+    notificationType,
+    creator,
+    colonyAddress,
+    transactionHash,
+    ...(amount ? { amount } : {}),
+    ...(tokenAddress ? { tokenAddress } : {}),
   });
 
   // If any colony members should also recieve a specific "mention" notification...
@@ -150,7 +148,7 @@ export const sendActionNotifications = async ({
 export const sendNotification = async (
   title: string,
   recipients: Recipient[],
-  customAttributes: Record<string, any>,
+  customAttributes: Record<string, string>,
 ): Promise<void> => {
   try {
     await Notification.create({
