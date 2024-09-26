@@ -21,12 +21,13 @@ import {
   createColonyContributor,
   getColonyContributorId,
 } from '~utils/contributors';
+import { sendActionNotifications } from '~utils/notifications';
 
 export const handleAddVerifiedMembers = async (
   event: ContractEvent,
   operation: AddVerifiedMembersOperation,
 ): Promise<void> => {
-  const { contractAddress: colonyAddress } = event;
+  const { contractAddress: colonyAddress, transactionHash } = event;
   const { agent: initiatorAddress } = event.args;
 
   await Promise.allSettled(
@@ -82,5 +83,12 @@ export const handleAddVerifiedMembers = async (
     initiatorAddress,
     members: operation.payload,
     fromDomainId: getDomainDatabaseId(colonyAddress, Id.RootDomain),
+  });
+
+  sendActionNotifications({
+    mentions: operation.payload,
+    creator: initiatorAddress,
+    colonyAddress,
+    transactionHash,
   });
 };

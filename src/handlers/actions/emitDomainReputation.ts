@@ -14,6 +14,7 @@ import {
   GetColonyQueryVariables,
 } from '~graphql';
 import { query } from '~amplifyClient';
+import { sendActionNotifications } from '~utils/notifications';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { contractAddress: colonyAddress, transactionHash } = event;
@@ -80,5 +81,12 @@ export default async (event: ContractEvent): Promise<void> => {
     recipientAddress: userAddress,
     amount: amount.toString(),
     fromDomainId: domain.id,
+  });
+
+  sendActionNotifications({
+    mentions: [userAddress],
+    creator: initiatorAddress,
+    colonyAddress,
+    transactionHash,
   });
 };

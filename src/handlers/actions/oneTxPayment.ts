@@ -298,13 +298,10 @@ const handlerV6 = async (
 
   await writeActionFromEvent(event, colonyAddress, actionFields);
 
-  const firstPaymentData = payments?.[0];
-  if (firstPaymentData) {
-    sendActionNotifications({
-      mentions: [firstPaymentData.recipientAddress],
-      creator: initiatorAddress,
-      colonyAddress,
-      transactionHash,
-    });
-  }
+  sendActionNotifications({
+    mentions: payments.map((payment) => payment.recipientAddress),
+    creator: initiatorAddress,
+    colonyAddress,
+    transactionHash,
+  });
 };

@@ -12,9 +12,14 @@ import {
   getDomainDatabaseId,
   getCachedColonyClient,
 } from '~utils';
+import { sendActionNotifications } from '~utils/notifications';
 
 export default async (event: ContractEvent): Promise<void> => {
-  const { contractAddress: colonyAddress, blockNumber } = event;
+  const {
+    contractAddress: colonyAddress,
+    blockNumber,
+    transactionHash,
+  } = event;
   const { domainId, agent: initiatorAddress } = event.args;
   const nativeDomainId = toNumber(domainId);
   const databaseDomainId = getDomainDatabaseId(colonyAddress, nativeDomainId);
@@ -47,5 +52,11 @@ export default async (event: ContractEvent): Promise<void> => {
     type: ColonyActionType.CreateDomain,
     fromDomainId: databaseDomainId,
     initiatorAddress,
+  });
+
+  sendActionNotifications({
+    creator: initiatorAddress,
+    colonyAddress,
+    transactionHash,
   });
 };
