@@ -20,6 +20,7 @@ import {
   UpdateExpenditureMutationVariables,
 } from '~graphql';
 import { mutate } from '~amplifyClient';
+import { sendActionNotifications } from '~utils/notifications';
 
 export default async (event: ContractEvent): Promise<void> => {
   const {
@@ -92,6 +93,12 @@ export default async (event: ContractEvent): Promise<void> => {
       `Attempted to find expenditure with funding pot ID: ${toPotId} in colony ${colonyAddress} but it wasn't found. It may be because the transfer was to a domain, or there was a bug.`,
     );
   }
+
+  sendActionNotifications({
+    creator: initiatorAddress,
+    colonyAddress,
+    transactionHash,
+  });
 };
 
 const updateExpenditureBalances = async (

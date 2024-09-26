@@ -8,9 +8,10 @@ import {
   getDomainDatabaseId,
   verbose,
 } from '~utils';
+import { sendActionNotifications } from '~utils/notifications';
 
 export default async (event: ContractEvent): Promise<void> => {
-  const { contractAddress: colonyAddress } = event;
+  const { contractAddress: colonyAddress, transactionHash } = event;
   const { agent: initiatorAddress, who: recipientAddress, amount } = event.args;
 
   const tokenAddress = await getColonyTokenAddress(colonyAddress);
@@ -28,6 +29,12 @@ export default async (event: ContractEvent): Promise<void> => {
       amount: amount.toString(),
       tokenAddress,
       fromDomainId: getDomainDatabaseId(colonyAddress, Id.RootDomain),
+    });
+
+    sendActionNotifications({
+      creator: initiatorAddress,
+      colonyAddress,
+      transactionHash,
     });
   } else {
     verbose(
