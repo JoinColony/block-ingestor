@@ -29,6 +29,7 @@ import {
 import provider from '~provider';
 import { updateColonyContributor } from '~utils/contributors';
 import { ExtensionEventListener } from '~eventListeners';
+import { sendActionNotifications } from '~utils/notifications';
 
 export const handleManagePermissionsAction: EventHandler = async (
   event,
@@ -234,11 +235,22 @@ export const handleManagePermissionsAction: EventHandler = async (
 
   const isExtension = await isAddressExtension(targetAddress);
 
+  const notificationMentions = [];
+
   // We don't create contributor entries for extensions
   if (!isExtension) {
     await updateColonyContributor({
       colonyAddress,
       contributorAddress: targetAddress,
     });
+
+    notificationMentions.push(targetAddress);
   }
+
+  sendActionNotifications({
+    mentions: notificationMentions,
+    creator: agent,
+    colonyAddress,
+    transactionHash,
+  });
 };

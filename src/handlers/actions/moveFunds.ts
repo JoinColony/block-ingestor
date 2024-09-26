@@ -21,6 +21,7 @@ import {
   UpdateExpenditureMutationVariables,
 } from '~graphql';
 import { mutate, query } from '~amplifyClient';
+import { sendActionNotifications } from '~utils/notifications';
 
 export default async (event: ContractEvent): Promise<void> => {
   const {
@@ -88,6 +89,12 @@ export default async (event: ContractEvent): Promise<void> => {
   if (targetExpenditure) {
     await updateExpenditureBalances(targetExpenditure, tokenAddress, amount);
   }
+
+  sendActionNotifications({
+    creator: initiatorAddress,
+    colonyAddress,
+    transactionHash,
+  });
 };
 
 const getExpenditureByFundingPot = async (

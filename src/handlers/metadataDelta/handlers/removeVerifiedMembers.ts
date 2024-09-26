@@ -18,12 +18,13 @@ import {
 } from '~utils';
 
 import { getColonyContributorId } from '~utils/contributors';
+import { sendActionNotifications } from '~utils/notifications';
 
 export const handleRemoveVerifiedMembers = async (
   event: ContractEvent,
   operation: RemoveVerifiedMembersOperation,
 ): Promise<void> => {
-  const { contractAddress: colonyAddress } = event;
+  const { contractAddress: colonyAddress, transactionHash } = event;
   const { agent: initiatorAddress } = event.args;
 
   await Promise.allSettled(
@@ -65,5 +66,12 @@ export const handleRemoveVerifiedMembers = async (
     initiatorAddress,
     members: operation.payload,
     fromDomainId: getDomainDatabaseId(colonyAddress, Id.RootDomain),
+  });
+
+  sendActionNotifications({
+    mentions: operation.payload,
+    creator: initiatorAddress,
+    colonyAddress,
+    transactionHash,
   });
 };

@@ -8,9 +8,14 @@ import {
   getCachedColonyClient,
   updateColoniesNativeTokenStatuses,
 } from '~utils';
+import { sendActionNotifications } from '~utils/notifications';
 
 export default async (event: ContractEvent): Promise<void> => {
-  const { contractAddress: colonyAddress, blockNumber } = event;
+  const {
+    contractAddress: colonyAddress,
+    blockNumber,
+    transactionHash,
+  } = event;
   const { agent: initiatorAddress } = event.args;
 
   const colonyClient = await getCachedColonyClient(colonyAddress);
@@ -29,5 +34,11 @@ export default async (event: ContractEvent): Promise<void> => {
     initiatorAddress,
     tokenAddress,
     fromDomainId: getDomainDatabaseId(colonyAddress, Id.RootDomain),
+  });
+
+  sendActionNotifications({
+    creator: initiatorAddress,
+    colonyAddress,
+    transactionHash,
   });
 };

@@ -7,9 +7,10 @@ import {
 } from '~graphql';
 import { ContractEvent } from '~types';
 import { toNumber, verbose, writeActionFromEvent } from '~utils';
+import { sendActionNotifications } from '~utils/notifications';
 
 export default async (event: ContractEvent): Promise<void> => {
-  const { contractAddress: colonyAddress } = event;
+  const { contractAddress: colonyAddress, transactionHash } = event;
   const { newVersion, agent: initiatorAddress } = event.args;
   const convertedVersion = toNumber(newVersion);
 
@@ -26,9 +27,15 @@ export default async (event: ContractEvent): Promise<void> => {
     },
   );
 
-  writeActionFromEvent(event, colonyAddress, {
+  await writeActionFromEvent(event, colonyAddress, {
     type: ColonyActionType.VersionUpgrade,
     initiatorAddress,
     newColonyVersion: convertedVersion,
+  });
+
+  sendActionNotifications({
+    creator: initiatorAddress,
+    colonyAddress,
+    transactionHash,
   });
 };
