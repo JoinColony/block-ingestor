@@ -15,7 +15,6 @@ import {
 
 import {
   getStakerReward,
-  linkPendingMetadata,
   linkPendingStreamingPaymentMetadata,
   updateColonyUnclaimedStakes,
   updateAmountToExcludeNetworkFee,
