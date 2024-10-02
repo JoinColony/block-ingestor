@@ -94,11 +94,13 @@ export default async (event: ContractEvent): Promise<void> => {
     );
   }
 
-  sendActionNotifications({
-    creator: initiatorAddress,
-    colonyAddress,
-    transactionHash,
-  });
+  if (!hasOneTxPaymentEvent) {
+    sendActionNotifications({
+      creator: initiatorAddress,
+      colonyAddress,
+      transactionHash,
+    });
+  }
 };
 
 const updateExpenditureBalances = async (
