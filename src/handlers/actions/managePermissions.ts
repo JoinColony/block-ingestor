@@ -29,7 +29,10 @@ import {
 import provider from '~provider';
 import { updateColonyContributor } from '~utils/contributors';
 import { ExtensionEventListener } from '~eventListeners';
-import { sendActionNotifications } from '~utils/notifications';
+import {
+  NotificationCategory,
+  sendPermissionsActionNotifications,
+} from '~utils/notifications';
 
 export const handleManagePermissionsAction: EventHandler = async (
   event,
@@ -205,11 +208,12 @@ export const handleManagePermissionsAction: EventHandler = async (
 
       // We don't send notifications for extensions
       if (!isExtension) {
-        sendActionNotifications({
+        sendPermissionsActionNotifications({
           mentions: [targetAddress],
           creator: agent,
           colonyAddress,
           transactionHash,
+          notificationCategory: NotificationCategory.Admin,
         });
       }
     }

@@ -7,7 +7,10 @@ import {
 } from '~graphql';
 import { ContractEvent } from '~types';
 import { toNumber, verbose, writeActionFromEvent } from '~utils';
-import { sendActionNotifications } from '~utils/notifications';
+import {
+  NotificationCategory,
+  sendPermissionsActionNotifications,
+} from '~utils/notifications';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { contractAddress: colonyAddress, transactionHash } = event;
@@ -33,9 +36,10 @@ export default async (event: ContractEvent): Promise<void> => {
     newColonyVersion: convertedVersion,
   });
 
-  sendActionNotifications({
+  sendPermissionsActionNotifications({
     creator: initiatorAddress,
     colonyAddress,
     transactionHash,
+    notificationCategory: NotificationCategory.Admin,
   });
 };
