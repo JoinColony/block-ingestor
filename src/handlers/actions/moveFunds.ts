@@ -88,11 +88,13 @@ export default async (event: ContractEvent): Promise<void> => {
     await updateExpenditureBalances(targetExpenditure, tokenAddress, amount);
   }
 
-  sendActionNotifications({
-    creator: initiatorAddress,
-    colonyAddress,
-    transactionHash,
-  });
+  if (!hasOneTxPaymentEvent) {
+    sendActionNotifications({
+      creator: initiatorAddress,
+      colonyAddress,
+      transactionHash,
+    });
+  }
 };
 
 const updateExpenditureBalances = async (
