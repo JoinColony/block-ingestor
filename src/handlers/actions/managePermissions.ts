@@ -88,6 +88,8 @@ export const handleManagePermissionsAction: EventHandler = async (
     )
   )?.data?.getColonyRole ?? {};
 
+  const isExtension = await isAddressExtension(targetAddress);
+
   /*
    * update the entry
    */
@@ -200,6 +202,16 @@ export const handleManagePermissionsAction: EventHandler = async (
         rolesAreMultiSig: isMultiSig ? true : null,
         individualEvents,
       });
+
+      // We don't send notifications for extensions
+      if (!isExtension) {
+        sendActionNotifications({
+          mentions: [targetAddress],
+          creator: agent,
+          colonyAddress,
+          transactionHash,
+        });
+      }
     }
     /*
      * create a new entry
@@ -233,24 +245,11 @@ export const handleManagePermissionsAction: EventHandler = async (
         );
   }
 
-  const isExtension = await isAddressExtension(targetAddress);
-
-  const notificationMentions = [];
-
   // We don't create contributor entries for extensions
   if (!isExtension) {
     await updateColonyContributor({
       colonyAddress,
       contributorAddress: targetAddress,
     });
-
-    notificationMentions.push(targetAddress);
   }
-
-  sendActionNotifications({
-    mentions: notificationMentions,
-    creator: agent,
-    colonyAddress,
-    transactionHash,
-  });
 };
