@@ -12,6 +12,7 @@ import {
 } from '~utils';
 import {
   ColonyActionType,
+  ExpenditureBalance,
   ExpenditureFragment,
   GetExpenditureByNativeFundingPotIdAndColonyDocument,
   GetExpenditureByNativeFundingPotIdAndColonyQuery,
@@ -21,7 +22,12 @@ import {
   UpdateExpenditureMutationVariables,
 } from '~graphql';
 import { mutate, query } from '~amplifyClient';
-import { sendActionNotifications } from '~utils/notifications';
+import {
+  NotificationCategory,
+  NotificationType,
+  sendExpenditureUpdateNotifications,
+  sendPermissionsActionNotifications,
+} from '~utils/notifications';
 
 export default async (event: ContractEvent): Promise<void> => {
   const {
@@ -87,14 +93,22 @@ export default async (event: ContractEvent): Promise<void> => {
   }
 
   if (targetExpenditure) {
-    await updateExpenditureBalances(targetExpenditure, tokenAddress, amount);
+    await updateExpenditureBalances({
+      expenditure: targetExpenditure,
+      tokenAddress,
+      amount,
+      colonyAddress,
+      initiatorAddress,
+      isPartOfOneTxPayment: hasOneTxPaymentEvent,
+    });
   }
 
   if (!hasOneTxPaymentEvent) {
-    sendActionNotifications({
+    sendPermissionsActionNotifications({
       creator: initiatorAddress,
       colonyAddress,
       transactionHash,
+      notificationCategory: NotificationCategory.Payment,
     });
   }
 };
@@ -118,11 +132,23 @@ const getExpenditureByFundingPot = async (
   return expenditure;
 };
 
-const updateExpenditureBalances = async (
-  expenditure: ExpenditureFragment,
-  tokenAddress: string,
-  amount: string,
-): Promise<void> => {
+interface UpdateExpenditureBalancesArgs {
+  expenditure: ExpenditureFragment;
+  tokenAddress: string;
+  amount: string;
+  colonyAddress: string;
+  initiatorAddress: string;
+  isPartOfOneTxPayment: boolean;
+}
+
+const updateExpenditureBalances = async ({
+  expenditure,
+  tokenAddress,
+  amount,
+  colonyAddress,
+  initiatorAddress,
+  isPartOfOneTxPayment,
+}: UpdateExpenditureBalancesArgs): Promise<void> => {
   const updatedBalances = getUpdatedExpenditureBalances(
     expenditure.balances ?? [],
     tokenAddress,
@@ -138,4 +164,57 @@ const updateExpenditureBalances = async (
       },
     },
   );
+
+  if (
+    !isPartOfOneTxPayment &&
+    isExpenditureFullyFunded(expenditure, updatedBalances)
+  ) {
+    sendExpenditureUpdateNotifications({
+      colonyAddress,
+      creator: initiatorAddress,
+      notificationType: NotificationType.ExpenditureReadyForRelease,
+      expenditureID: expenditure.id,
+    });
+  }
+};
+
+/**
+ * Returns a boolean indicating whether the expenditure is fully funded,
+ * i.e. the balance of each token is greater than or equal to the sum of its payouts
+ */
+export const isExpenditureFullyFunded = (
+  expenditure: ExpenditureFragment,
+  newBalances: ExpenditureBalance[],
+): boolean => {
+  const slotAmountsByToken = expenditure.slots.flatMap((slot) => {
+    const amounts: Array<{ tokenAddress: string; amount: BigNumber }> = [];
+
+    slot.payouts?.forEach((payout) => {
+      if (!payout.isClaimed) {
+        const existingAmountIndex = amounts.findIndex(
+          (item) => item.tokenAddress === payout.tokenAddress,
+        );
+        if (existingAmountIndex !== -1) {
+          amounts[existingAmountIndex].amount = BigNumber.from(
+            amounts[existingAmountIndex].amount ?? 0,
+          ).add(payout.amount);
+        } else {
+          amounts.push({
+            tokenAddress: payout.tokenAddress,
+            amount: BigNumber.from(payout.amount),
+          });
+        }
+      }
+    });
+
+    return amounts;
+  });
+
+  return slotAmountsByToken.every(({ tokenAddress, amount }) => {
+    const tokenBalance = newBalances?.find(
+      (balance) => balance.tokenAddress === tokenAddress,
+    );
+
+    return amount.lte(tokenBalance?.amount ?? 0);
+  });
 };
