@@ -1,0 +1,9 @@
+query GetNotificationUsers($filter: ModelUserFilterInput, $limit: Int) {
+  listUsers(filter: $filter, limit: $limit) {
+    items {
+      notificationsData {
+        ...NotificationsData
+      }
+    }
+  }
+}

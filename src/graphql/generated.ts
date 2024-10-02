@@ -9506,6 +9506,14 @@ export type ExpenditureFragment = {
     tokenAddress: string;
     amount: string;
   }> | null;
+  actions?: {
+    __typename?: 'ModelColonyActionConnection';
+    items: Array<{
+      __typename?: 'ColonyAction';
+      type: ColonyActionType;
+      id: string;
+    } | null>;
+  } | null;
 };
 
 export type ExpenditureSlotFragment = {
@@ -10671,6 +10679,14 @@ export type GetExpenditureQuery = {
       tokenAddress: string;
       amount: string;
     }> | null;
+    actions?: {
+      __typename?: 'ModelColonyActionConnection';
+      items: Array<{
+        __typename?: 'ColonyAction';
+        type: ColonyActionType;
+        id: string;
+      } | null>;
+    } | null;
   } | null;
 };
 
@@ -10722,6 +10738,14 @@ export type GetExpenditureByNativeFundingPotIdAndColonyQuery = {
         tokenAddress: string;
         amount: string;
       }> | null;
+      actions?: {
+        __typename?: 'ModelColonyActionConnection';
+        items: Array<{
+          __typename?: 'ColonyAction';
+          type: ColonyActionType;
+          id: string;
+        } | null>;
+      } | null;
     } | null>;
   } | null;
 };
