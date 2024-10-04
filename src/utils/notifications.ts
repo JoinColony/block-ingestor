@@ -25,6 +25,7 @@ export enum NotificationType {
   ExpenditureFinalized = 'ExpenditureFinalized',
   ExpenditureCancelled = 'ExpenditureCancelled',
   PermissionsAction = 'PermissionsAction',
+  FundsClaimed = 'FundsClaimed',
   Mention = 'Mention',
 }
 
@@ -35,6 +36,8 @@ interface NotificationVariables {
   notificationCategory: NotificationCategory;
   transactionHash?: string;
   expenditureID?: string;
+  tokenAmount?: string;
+  tokenAddress?: string;
 }
 
 interface MentionNotificationVariables
@@ -48,6 +51,13 @@ interface MentionNotificationVariables
 interface PermissionsActionNotificationVariables
   extends Omit<NotificationVariables, 'notificationType'> {
   mentions?: string[];
+}
+
+interface FundsClaimedNotificationVariables
+  extends Pick<NotificationVariables, 'colonyAddress' | 'creator'> {
+  tokenSymbol: string;
+  tokenAmount: string;
+  tokenAddress: string;
 }
 
 interface ExpenditureUpdateNotificationVariables
@@ -245,6 +255,35 @@ export const sendMentionNotifications = async ({
       expenditureID,
     });
   }
+};
+
+export const sendFundsClaimedNotifications = async ({
+  creator,
+  colonyAddress,
+  tokenAddress,
+  tokenAmount,
+  tokenSymbol,
+}: FundsClaimedNotificationVariables): Promise<void> => {
+  // Get the recipients of the colony wide notifications.
+  const recipients = await getRecipientsOfColonyWideNotification(colonyAddress);
+
+  if (!recipients.length) {
+    return;
+  }
+
+  // Send the colony wide notifications.
+  await sendNotification(
+    `Incoming funds claimed: ${tokenAmount} ${tokenSymbol}`,
+    recipients,
+    {
+      notificationType: NotificationType.FundsClaimed,
+      notificationCategory: NotificationCategory.Payment,
+      creator,
+      colonyAddress,
+      tokenAmount,
+      tokenAddress,
+    },
+  );
 };
 
 export const sendNotification = async (
