@@ -9,12 +9,13 @@ import {
   updateColonyTokens,
   writeActionFromEvent,
 } from '~utils';
+import { sendActionNotifications } from '~utils/notifications';
 
 export const handleManageTokens = async (
   event: ContractEvent,
   operation: ManageTokensOperation,
 ): Promise<void> => {
-  const { contractAddress: colonyAddress } = event;
+  const { contractAddress: colonyAddress, transactionHash } = event;
   const { agent: initiatorAddress } = event.args;
 
   const tokenAddresses = operation.payload;
@@ -49,5 +50,11 @@ export const handleManageTokens = async (
       unaffected: unaffectedTokenAddresses,
     },
     fromDomainId: getDomainDatabaseId(colonyAddress, Id.RootDomain),
+  });
+
+  sendActionNotifications({
+    creator: initiatorAddress,
+    colonyAddress,
+    transactionHash,
   });
 };

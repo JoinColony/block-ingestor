@@ -29,6 +29,7 @@ import {
 import provider from '~provider';
 import { updateColonyContributor } from '~utils/contributors';
 import { ExtensionEventListener } from '~eventListeners';
+import { sendActionNotifications } from '~utils/notifications';
 
 export const handleManagePermissionsAction: EventHandler = async (
   event,
@@ -86,6 +87,8 @@ export const handleManagePermissionsAction: EventHandler = async (
       { id },
     )
   )?.data?.getColonyRole ?? {};
+
+  const isExtension = await isAddressExtension(targetAddress);
 
   /*
    * update the entry
@@ -199,6 +202,16 @@ export const handleManagePermissionsAction: EventHandler = async (
         rolesAreMultiSig: isMultiSig ? true : null,
         individualEvents,
       });
+
+      // We don't send notifications for extensions
+      if (!isExtension) {
+        sendActionNotifications({
+          mentions: [targetAddress],
+          creator: agent,
+          colonyAddress,
+          transactionHash,
+        });
+      }
     }
     /*
      * create a new entry
@@ -231,8 +244,6 @@ export const handleManagePermissionsAction: EventHandler = async (
           transactionHash,
         );
   }
-
-  const isExtension = await isAddressExtension(targetAddress);
 
   // We don't create contributor entries for extensions
   if (!isExtension) {
