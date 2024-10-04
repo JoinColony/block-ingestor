@@ -1799,6 +1799,7 @@ export type CreateStreamingPaymentInput = {
   claims?: InputMaybe<Array<StreamingPaymentClaimInput>>;
   colonyId: Scalars['ID'];
   createdAt?: InputMaybe<Scalars['AWSDateTime']>;
+  creatorAddress: Scalars['ID'];
   endTime: Scalars['String'];
   id?: InputMaybe<Scalars['ID']>;
   interval: Scalars['String'];
@@ -3907,6 +3908,7 @@ export type ModelStreamingPaymentConditionInput = {
   and?: InputMaybe<Array<InputMaybe<ModelStreamingPaymentConditionInput>>>;
   colonyId?: InputMaybe<ModelIdInput>;
   createdAt?: InputMaybe<ModelStringInput>;
+  creatorAddress?: InputMaybe<ModelIdInput>;
   endTime?: InputMaybe<ModelStringInput>;
   interval?: InputMaybe<ModelStringInput>;
   isCancelled?: InputMaybe<ModelBooleanInput>;
@@ -3936,6 +3938,7 @@ export type ModelStreamingPaymentFilterInput = {
   and?: InputMaybe<Array<InputMaybe<ModelStreamingPaymentFilterInput>>>;
   colonyId?: InputMaybe<ModelIdInput>;
   createdAt?: InputMaybe<ModelStringInput>;
+  creatorAddress?: InputMaybe<ModelIdInput>;
   endTime?: InputMaybe<ModelStringInput>;
   id?: InputMaybe<ModelIdInput>;
   interval?: InputMaybe<ModelStringInput>;
@@ -4562,6 +4565,7 @@ export type ModelSubscriptionStreamingPaymentFilterInput = {
   >;
   colonyId?: InputMaybe<ModelSubscriptionIdInput>;
   createdAt?: InputMaybe<ModelSubscriptionStringInput>;
+  creatorAddress?: InputMaybe<ModelSubscriptionIdInput>;
   endTime?: InputMaybe<ModelSubscriptionStringInput>;
   id?: InputMaybe<ModelSubscriptionIdInput>;
   interval?: InputMaybe<ModelSubscriptionStringInput>;
@@ -7800,6 +7804,8 @@ export type StreamingPayment = {
   /** Colony ID (address) to which the expenditure belongs */
   colonyId: Scalars['ID'];
   createdAt: Scalars['AWSDateTime'];
+  /** Address of the stream creator, can be a user or an extension */
+  creatorAddress: Scalars['ID'];
   endTime: Scalars['String'];
   id: Scalars['ID'];
   interval: Scalars['String'];
@@ -9160,6 +9166,7 @@ export type UpdateStreamingPaymentInput = {
   claims?: InputMaybe<Array<StreamingPaymentClaimInput>>;
   colonyId?: InputMaybe<Scalars['ID']>;
   createdAt?: InputMaybe<Scalars['AWSDateTime']>;
+  creatorAddress?: InputMaybe<Scalars['ID']>;
   endTime?: InputMaybe<Scalars['String']>;
   id: Scalars['ID'];
   interval?: InputMaybe<Scalars['String']>;

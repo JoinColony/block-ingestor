@@ -69,6 +69,7 @@ export const handleStreamingPaymentCreated: EventHandler = async (
       tokenAddress,
       amount: amount.toString(),
       colonyId: colonyAddress,
+      creatorAddress: initiatorAddress,
     },
   });
 
