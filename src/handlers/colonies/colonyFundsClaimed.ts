@@ -11,10 +11,11 @@ import {
   GetColonyUnclaimedFundsQuery,
   GetColonyUnclaimedFundsQueryVariables,
 } from '~graphql';
+import { sendFundsClaimedNotifications } from '~utils/notifications';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { contractAddress: colonyAddress, blockNumber } = event;
-  const { token: tokenAddress, payoutRemainder } = event.args;
+  const { initiatorAddress, token: tokenAddress, payoutRemainder } = event.args;
 
   /*
    * We're not handling native chain token claims from here, so no point
@@ -53,14 +54,22 @@ export default async (event: ContractEvent): Promise<void> => {
      */
     if (colonyHasUnclaimedFunds) {
       await Promise.all(
-        unclaimedFunds.filter(notNull).map(({ id }) =>
-          mutate<
+        unclaimedFunds.filter(notNull).map(async ({ id, token, amount }) => {
+          await mutate<
             UpdateColonyFundsClaimMutation,
             UpdateColonyFundsClaimMutationVariables
           >(UpdateColonyFundsClaimDocument, {
             input: { id, isClaimed: true },
-          }),
-        ),
+          });
+
+          await sendFundsClaimedNotifications({
+            tokenSymbol: token.symbol,
+            tokenAmount: amount,
+            tokenAddress,
+            creator: initiatorAddress,
+            colonyAddress,
+          });
+        }),
       );
     }
   } else {

@@ -9460,7 +9460,7 @@ export type ActionMetadataInfoFragment = {
 export type ColonyFragment = {
   __typename?: 'Colony';
   colonyAddress: string;
-  nativeToken: { __typename?: 'Token'; tokenAddress: string };
+  nativeToken: { __typename?: 'Token'; symbol: string; tokenAddress: string };
   tokens?: {
     __typename?: 'ModelColonyTokensConnection';
     items: Array<{
@@ -9754,7 +9754,11 @@ export type ColonyMultiSigFragment = {
   } | null;
 };
 
-export type TokenFragment = { __typename?: 'Token'; tokenAddress: string };
+export type TokenFragment = {
+  __typename?: 'Token';
+  symbol: string;
+  tokenAddress: string;
+};
 
 export type NotificationUserFragment = {
   __typename?: 'ColonyContributor';
@@ -10451,7 +10455,7 @@ export type GetColonyQuery = {
   getColony?: {
     __typename?: 'Colony';
     colonyAddress: string;
-    nativeToken: { __typename?: 'Token'; tokenAddress: string };
+    nativeToken: { __typename?: 'Token'; symbol: string; tokenAddress: string };
     tokens?: {
       __typename?: 'ModelColonyTokensConnection';
       items: Array<{
@@ -10944,7 +10948,12 @@ export type GetColonyUnclaimedFundsQuery = {
   __typename?: 'Query';
   listColonyFundsClaims?: {
     __typename?: 'ModelColonyFundsClaimConnection';
-    items: Array<{ __typename?: 'ColonyFundsClaim'; id: string } | null>;
+    items: Array<{
+      __typename?: 'ColonyFundsClaim';
+      id: string;
+      amount: string;
+      token: { __typename?: 'Token'; symbol: string; tokenAddress: string };
+    } | null>;
   } | null;
 };
 
@@ -11475,6 +11484,7 @@ export const ActionMetadataInfo = gql`
 export const Token = gql`
   fragment Token on Token {
     tokenAddress: id
+    symbol
   }
 `;
 export const Colony = gql`
@@ -12490,9 +12500,14 @@ export const GetColonyUnclaimedFundsDocument = gql`
     ) {
       items {
         id
+        token {
+          ...Token
+        }
+        amount
       }
     }
   }
+  ${Token}
 `;
 export const GetColonyUnclaimedFundDocument = gql`
   query GetColonyUnclaimedFund($claimId: ID!) {
