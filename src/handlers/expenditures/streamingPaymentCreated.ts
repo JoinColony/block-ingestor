@@ -76,7 +76,7 @@ export const handleStreamingPaymentCreated: EventHandler = async (
   await writeActionFromEvent(event, colonyAddress, {
     type: ColonyActionType.CreateStreamingPayment,
     initiatorAddress,
-    expenditureId: databaseId,
+    streamingPaymentId: databaseId,
     fromDomainId: getDomainDatabaseId(colonyAddress, toNumber(domainId)),
     recipientAddress,
   });
