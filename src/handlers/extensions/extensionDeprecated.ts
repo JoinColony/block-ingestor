@@ -1,14 +1,21 @@
+import { constants } from 'ethers';
 import { query } from '~amplifyClient';
 import {
   GetColonyExtensionByHashAndColonyDocument,
   GetColonyExtensionByHashAndColonyQuery,
   GetColonyExtensionByHashAndColonyQueryVariables,
 } from '~graphql';
+import networkClient from '~networkClient';
 import { ContractEvent } from '~types';
 import { verbose } from '~utils';
 import { updateExtension } from '~utils/extensions/updateExtension';
+import {
+  NotificationType,
+  sendExtensionUpdateNotifications,
+} from '~utils/notifications';
 
 export default async (event: ContractEvent): Promise<void> => {
+  const { transactionHash } = event;
   const { extensionId: extensionHash, colony, deprecated } = event.args;
 
   verbose(
@@ -18,6 +25,19 @@ export default async (event: ContractEvent): Promise<void> => {
     'in Colony:',
     colony,
   );
+
+  const receipt = await networkClient.provider.getTransactionReceipt(
+    transactionHash,
+  );
+
+  sendExtensionUpdateNotifications({
+    colonyAddress: colony,
+    creator: receipt.from || constants.AddressZero,
+    notificationType: deprecated
+      ? NotificationType.ExtensionDeprecated
+      : NotificationType.ExtensionEnabled,
+    extensionHash,
+  });
 
   const { data } =
     (await query<
