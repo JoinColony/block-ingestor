@@ -7,7 +7,10 @@ import {
   getDomainDatabaseId,
   transactionHasEvent,
 } from '~utils';
-import { sendActionNotifications } from '~utils/notifications';
+import {
+  NotificationCategory,
+  sendPermissionsActionNotifications,
+} from '~utils/notifications';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { args, contractAddress: colonyAddress, transactionHash } = event;
@@ -33,9 +36,10 @@ export default async (event: ContractEvent): Promise<void> => {
     fromDomainId: getDomainDatabaseId(colonyAddress, nativeDomainId),
   });
 
-  sendActionNotifications({
+  sendPermissionsActionNotifications({
     creator: initiatorAddress,
     colonyAddress,
     transactionHash,
+    notificationCategory: NotificationCategory.Admin,
   });
 };

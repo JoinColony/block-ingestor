@@ -9,7 +9,10 @@ import {
   updateColonyTokens,
   writeActionFromEvent,
 } from '~utils';
-import { sendActionNotifications } from '~utils/notifications';
+import {
+  NotificationCategory,
+  sendPermissionsActionNotifications,
+} from '~utils/notifications';
 
 export const handleManageTokens = async (
   event: ContractEvent,
@@ -52,9 +55,10 @@ export const handleManageTokens = async (
     fromDomainId: getDomainDatabaseId(colonyAddress, Id.RootDomain),
   });
 
-  sendActionNotifications({
+  sendPermissionsActionNotifications({
     creator: initiatorAddress,
     colonyAddress,
     transactionHash,
+    notificationCategory: NotificationCategory.Admin,
   });
 };

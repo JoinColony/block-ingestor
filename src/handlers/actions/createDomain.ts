@@ -12,7 +12,10 @@ import {
   getDomainDatabaseId,
   getCachedColonyClient,
 } from '~utils';
-import { sendActionNotifications } from '~utils/notifications';
+import {
+  NotificationCategory,
+  sendPermissionsActionNotifications,
+} from '~utils/notifications';
 
 export default async (event: ContractEvent): Promise<void> => {
   const {
@@ -54,9 +57,10 @@ export default async (event: ContractEvent): Promise<void> => {
     initiatorAddress,
   });
 
-  sendActionNotifications({
+  sendPermissionsActionNotifications({
     creator: initiatorAddress,
     colonyAddress,
     transactionHash,
+    notificationCategory: NotificationCategory.Admin,
   });
 };

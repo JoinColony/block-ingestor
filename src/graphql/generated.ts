@@ -9655,6 +9655,14 @@ export type ExpenditureFragment = {
     tokenAddress: string;
     amount: string;
   }> | null;
+  actions?: {
+    __typename?: 'ModelColonyActionConnection';
+    items: Array<{
+      __typename?: 'ColonyAction';
+      type: ColonyActionType;
+      id: string;
+    } | null>;
+  } | null;
 };
 
 export type ExpenditureSlotFragment = {
@@ -10841,6 +10849,14 @@ export type GetExpenditureQuery = {
       tokenAddress: string;
       amount: string;
     }> | null;
+    actions?: {
+      __typename?: 'ModelColonyActionConnection';
+      items: Array<{
+        __typename?: 'ColonyAction';
+        type: ColonyActionType;
+        id: string;
+      } | null>;
+    } | null;
   } | null;
 };
 
@@ -10891,6 +10907,14 @@ export type GetExpenditureByNativeFundingPotIdAndColonyQuery = {
         tokenAddress: string;
         amount: string;
       }> | null;
+      actions?: {
+        __typename?: 'ModelColonyActionConnection';
+        items: Array<{
+          __typename?: 'ColonyAction';
+          type: ColonyActionType;
+          id: string;
+        } | null>;
+      } | null;
     } | null>;
   } | null;
 };
@@ -11506,6 +11530,27 @@ export type GetColonyStakeQuery = {
   getColonyStake?: { __typename?: 'ColonyStake'; totalAmount: string } | null;
 };
 
+export type GetNotificationUsersQueryVariables = Exact<{
+  filter?: InputMaybe<ModelUserFilterInput>;
+  limit?: InputMaybe<Scalars['Int']>;
+}>;
+
+export type GetNotificationUsersQuery = {
+  __typename?: 'Query';
+  listUsers?: {
+    __typename?: 'ModelUserConnection';
+    items: Array<{
+      __typename?: 'User';
+      notificationsData?: {
+        __typename?: 'NotificationsData';
+        magicbellUserId: string;
+        notificationsDisabled: boolean;
+        mutedColonyAddresses: Array<string>;
+      } | null;
+    } | null>;
+  } | null;
+};
+
 export const DomainMetadata = gql`
   fragment DomainMetadata on DomainMetadata {
     name
@@ -11646,6 +11691,12 @@ export const Expenditure = gql`
     userStakeId
     createdAt
     firstEditTransactionHash
+    actions {
+      items {
+        type
+        id
+      }
+    }
   }
   ${ExpenditureSlot}
   ${ExpenditureBalance}
@@ -12813,4 +12864,16 @@ export const GetColonyStakeDocument = gql`
       totalAmount
     }
   }
+`;
+export const GetNotificationUsersDocument = gql`
+  query GetNotificationUsers($filter: ModelUserFilterInput, $limit: Int) {
+    listUsers(filter: $filter, limit: $limit) {
+      items {
+        notificationsData {
+          ...NotificationsData
+        }
+      }
+    }
+  }
+  ${NotificationsData}
 `;

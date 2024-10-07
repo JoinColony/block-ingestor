@@ -3,7 +3,10 @@ import { Id } from '@colony/colony-js';
 import { ColonyActionType } from '~graphql';
 import { ContractEvent } from '~types';
 import { getDomainDatabaseId, writeActionFromEvent } from '~utils';
-import { sendActionNotifications } from '~utils/notifications';
+import {
+  NotificationCategory,
+  sendPermissionsActionNotifications,
+} from '~utils/notifications';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { contractAddress: colonyAddress, transactionHash } = event;
@@ -15,9 +18,10 @@ export default async (event: ContractEvent): Promise<void> => {
     fromDomainId: getDomainDatabaseId(colonyAddress, Id.RootDomain),
   });
 
-  sendActionNotifications({
+  sendPermissionsActionNotifications({
     creator: initiatorAddress,
     colonyAddress,
     transactionHash,
+    notificationCategory: NotificationCategory.Admin,
   });
 };

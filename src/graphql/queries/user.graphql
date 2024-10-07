@@ -3,3 +3,13 @@ query GetColonyStake($colonyStakeId: ID!) {
     totalAmount
   }
 }
+
+query GetNotificationUsers($filter: ModelUserFilterInput, $limit: Int) {
+  listUsers(filter: $filter, limit: $limit) {
+    items {
+      notificationsData {
+        ...NotificationsData
+      }
+    }
+  }
+}

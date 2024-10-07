@@ -4,13 +4,27 @@ import {
   GetColonyContributorsNotificationDataDocument,
   GetColonyContributorsNotificationDataQuery,
   GetColonyContributorsNotificationDataQueryVariables,
+  GetNotificationUsersDocument,
+  GetNotificationUsersQuery,
+  GetNotificationUsersQueryVariables,
   NotificationsDataFragment,
   NotificationUserFragment,
 } from '~graphql';
 import { getAllPagesOfData, GetDataFn } from './graphql';
 
+export enum NotificationCategory {
+  Mention = 'Mention',
+  Payment = 'Payment',
+  Admin = 'Admin',
+}
+
 export enum NotificationType {
-  Action = 'Action',
+  ExpenditureReadyForReview = 'ExpenditureReadyForReview',
+  ExpenditureReadyForFunding = 'ExpenditureReadyForFunding',
+  ExpenditureReadyForRelease = 'ExpenditureReadyForRelease',
+  ExpenditureFinalized = 'ExpenditureFinalized',
+  ExpenditureCancelled = 'ExpenditureCancelled',
+  PermissionsAction = 'PermissionsAction',
   Mention = 'Mention',
 }
 
@@ -18,12 +32,36 @@ interface NotificationVariables {
   colonyAddress: string;
   creator: string;
   notificationType: NotificationType;
-  transactionHash: string;
+  notificationCategory: NotificationCategory;
+  transactionHash?: string;
+  expenditureID?: string;
 }
 
-interface ActionNotificationVariables
+interface MentionNotificationVariables
+  extends Omit<
+    NotificationVariables,
+    'notificationType' | 'notificationCategory'
+  > {
+  recipients: string[];
+}
+
+interface PermissionsActionNotificationVariables
   extends Omit<NotificationVariables, 'notificationType'> {
   mentions?: string[];
+}
+
+interface ExpenditureUpdateNotificationVariables
+  extends Omit<
+    NotificationVariables,
+    'notificationType' | 'notificationCategory' | 'expenditureID'
+  > {
+  expenditureID: string;
+  notificationType:
+    | NotificationType.ExpenditureReadyForReview
+    | NotificationType.ExpenditureReadyForFunding
+    | NotificationType.ExpenditureReadyForRelease
+    | NotificationType.ExpenditureFinalized
+    | NotificationType.ExpenditureCancelled;
 }
 
 interface Recipient {
@@ -71,7 +109,7 @@ const getMembersData: GetDataFn<
 };
 
 // Get all the recipients of a colony wide notification in the format Magicbell expects.
-const getRecipientsOfColonyWideNotification = async (
+export const getRecipientsOfColonyWideNotification = async (
   colonyAddress: string,
 ): Promise<Recipient[]> => {
   const recipients: Recipient[] = [];
@@ -97,13 +135,14 @@ const getRecipientsOfColonyWideNotification = async (
   return recipients;
 };
 
-// Send a notification when an action is made.
-export const sendActionNotifications = async ({
+// Send a notification when an permissions action is made.
+export const sendPermissionsActionNotifications = async ({
   creator,
   colonyAddress,
   transactionHash,
   mentions,
-}: ActionNotificationVariables): Promise<void> => {
+  notificationCategory,
+}: PermissionsActionNotificationVariables): Promise<void> => {
   // Get the recipients of the colony wide notifications.
   const recipients = await getRecipientsOfColonyWideNotification(colonyAddress);
 
@@ -112,29 +151,99 @@ export const sendActionNotifications = async ({
   }
 
   // Send the colony wide notifications.
-  await sendNotification(`Action: ${transactionHash}`, recipients, {
-    notificationType: NotificationType.Action,
+  await sendNotification(
+    `Permissions action created: ${transactionHash}`,
+    recipients,
+    {
+      notificationType: NotificationType.PermissionsAction,
+      notificationCategory,
+      creator,
+      colonyAddress,
+      transactionHash,
+    },
+  );
+
+  // If any colony members should also recieve a specific "mention" notification...
+  if (mentions?.length) {
+    sendMentionNotifications({
+      colonyAddress,
+      creator,
+      transactionHash,
+      recipients: mentions,
+    });
+  }
+};
+
+// Send a notification when an expenditure is updated.
+export const sendExpenditureUpdateNotifications = async ({
+  creator,
+  colonyAddress,
+  transactionHash,
+  expenditureID,
+  notificationType,
+}: ExpenditureUpdateNotificationVariables): Promise<void> => {
+  // Get the recipients of the colony wide notifications.
+  const recipients = await getRecipientsOfColonyWideNotification(colonyAddress);
+
+  if (!recipients.length) {
+    return;
+  }
+
+  // Send the colony wide notifications.
+  await sendNotification(`Expenditure: ${expenditureID}`, recipients, {
+    notificationType,
+    notificationCategory: NotificationCategory.Payment,
     creator,
     colonyAddress,
     transactionHash,
+    expenditureID,
+  });
+};
+
+// Send a notification when a user is mentioned.
+export const sendMentionNotifications = async ({
+  creator,
+  colonyAddress,
+  transactionHash,
+  expenditureID,
+  recipients,
+}: MentionNotificationVariables): Promise<void> => {
+  if (!recipients.length) {
+    return;
+  }
+
+  const response = await query<
+    GetNotificationUsersQuery,
+    GetNotificationUsersQueryVariables
+  >(GetNotificationUsersDocument, {
+    filter: {
+      or: recipients.map((address) => ({ id: { eq: address } })),
+    },
+    limit: 9999,
   });
 
-  // If any colony members should also recieve a specific "mention" notification...
-  if (mentions) {
-    // ...and they are valid (ie. have not muted notifications app wide or for this colony)...
-    const mentionRecipients = recipients.filter((recipient) =>
-      mentions.includes(recipient.external_id),
-    );
+  const validRecipients: Recipient[] = [];
 
-    // send the mention notification to them.
-    if (mentionRecipients.length) {
-      await sendNotification(`Mention: ${transactionHash}`, mentionRecipients, {
-        notificationType: NotificationType.Mention,
-        creator,
-        colonyAddress,
-        transactionHash,
+  (response?.data?.listUsers?.items ?? []).forEach((user) => {
+    if (
+      user?.notificationsData &&
+      shouldSendNotificationToRecipient(user.notificationsData, colonyAddress)
+    ) {
+      validRecipients.push({
+        external_id: user.notificationsData.magicbellUserId,
       });
     }
+  });
+
+  if (validRecipients.length) {
+    await sendNotification(`Mention: ${transactionHash}`, validRecipients, {
+      notificationType: NotificationType.Mention,
+      notificationCategory: NotificationCategory.Mention,
+      creator,
+      colonyAddress,
+      transactionHash,
+      expenditureID,
+    });
   }
 };
 

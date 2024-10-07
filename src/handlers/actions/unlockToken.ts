@@ -8,7 +8,10 @@ import {
   getCachedColonyClient,
   updateColoniesNativeTokenStatuses,
 } from '~utils';
-import { sendActionNotifications } from '~utils/notifications';
+import {
+  NotificationCategory,
+  sendPermissionsActionNotifications,
+} from '~utils/notifications';
 
 export default async (event: ContractEvent): Promise<void> => {
   const {
@@ -36,9 +39,10 @@ export default async (event: ContractEvent): Promise<void> => {
     fromDomainId: getDomainDatabaseId(colonyAddress, Id.RootDomain),
   });
 
-  sendActionNotifications({
+  sendPermissionsActionNotifications({
     creator: initiatorAddress,
     colonyAddress,
     transactionHash,
+    notificationCategory: NotificationCategory.Admin,
   });
 };

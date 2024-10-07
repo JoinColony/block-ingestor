@@ -1,5 +1,6 @@
 import { mutate } from '~amplifyClient';
 import {
+  ColonyActionType,
   UpdateExpenditureDocument,
   UpdateExpenditureMutation,
   UpdateExpenditureMutationVariables,
@@ -8,6 +9,7 @@ import { ContractEvent } from '~types';
 import { getExpenditureDatabaseId, output, toNumber, verbose } from '~utils';
 
 import { getExpenditureFromDB, getUpdatedExpenditureSlots } from './helpers';
+import { sendMentionNotifications } from '~utils/notifications';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { contractAddress: colonyAddress } = event;
@@ -49,4 +51,33 @@ export default async (event: ContractEvent): Promise<void> => {
       },
     },
   );
+
+  const mentionRecipients: string[] = [];
+  updatedSlots.forEach((updatedSlot) => {
+    if (!updatedSlot.recipientAddress) {
+      return;
+    }
+
+    // Only send a mention if this recipient is a newly added recipient.
+    const recipientAlreadyExisted = !!expenditure.slots.find(
+      (slot) => slot.recipientAddress === updatedSlot.recipientAddress,
+    );
+    if (!recipientAlreadyExisted) {
+      mentionRecipients.push(updatedSlot.recipientAddress);
+    }
+  });
+
+  const expenditureCreatedAction = expenditure.actions?.items.find(
+    (action) => action?.type === ColonyActionType.CreateExpenditure,
+  );
+
+  if (mentionRecipients.length && expenditureCreatedAction) {
+    sendMentionNotifications({
+      colonyAddress,
+      creator: expenditure.ownerAddress,
+      recipients: mentionRecipients,
+      expenditureID: expenditure.id,
+      transactionHash: expenditureCreatedAction.id,
+    });
+  }
 };

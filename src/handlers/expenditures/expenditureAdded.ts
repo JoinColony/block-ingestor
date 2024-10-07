@@ -19,9 +19,13 @@ import {
 } from '~utils';
 
 import { getExpenditure } from './helpers';
+import {
+  NotificationType,
+  sendExpenditureUpdateNotifications,
+} from '~utils/notifications';
 
 export default async (event: ContractEvent): Promise<void> => {
-  const { contractAddress: colonyAddress } = event;
+  const { contractAddress: colonyAddress, transactionHash } = event;
   const { agent: ownerAddress, expenditureId } = event.args;
   const convertedExpenditureId = toNumber(expenditureId);
 
@@ -74,7 +78,7 @@ export default async (event: ContractEvent): Promise<void> => {
    * @NOTE: Only create a `CREATE_EXPENDITURE` action if the expenditure was not created as part of a OneTxPayment
    */
   const hasOneTxPaymentEvent = await transactionHasEvent(
-    event.transactionHash,
+    transactionHash,
     ContractEventsSignatures.OneTxPaymentMade,
   );
 
@@ -84,6 +88,14 @@ export default async (event: ContractEvent): Promise<void> => {
       initiatorAddress: ownerAddress,
       expenditureId: databaseId,
       fromDomainId: getDomainDatabaseId(colonyAddress, domainId),
+    });
+
+    sendExpenditureUpdateNotifications({
+      colonyAddress,
+      creator: ownerAddress,
+      notificationType: NotificationType.ExpenditureReadyForReview,
+      transactionHash,
+      expenditureID: databaseId,
     });
   }
 };
