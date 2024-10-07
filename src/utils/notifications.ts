@@ -17,6 +17,7 @@ export enum NotificationCategory {
   Mention = 'Mention',
   Payment = 'Payment',
   Admin = 'Admin',
+  Extension = 'Extension',
 }
 
 export enum NotificationType {
@@ -41,6 +42,13 @@ export enum NotificationType {
 
   // Actions made with permissions
   PermissionsAction = 'PermissionsAction',
+
+  // Extensions
+  ExtensionInstalled = 'ExtensionInstalled',
+  ExtensionUpgraded = 'ExtensionUpgraded',
+  ExtensionEnabled = 'ExtensionEnabled',
+  ExtensionDeprecated = 'ExtensionDeprecated',
+  ExtensionUninstalled = 'ExtensionUninstalled',
 }
 
 interface NotificationVariables {
@@ -52,6 +60,7 @@ interface NotificationVariables {
   expenditureID?: string;
   tokenAmount?: string;
   tokenAddress?: string;
+  extensionHash?: string;
 }
 
 interface MentionNotificationVariables
@@ -95,6 +104,20 @@ interface MultisigActionNotificationVariables
     | NotificationType.MultiSigActionFinalized
     | NotificationType.MultiSigActionApproved
     | NotificationType.MultiSigActionRejected;
+  }
+  
+interface ExtensionUpdateNotificationVariables
+  extends Omit<
+    NotificationVariables,
+    'notificationType' | 'notificationCategory'
+  > {
+  extensionHash?: string;
+  notificationType:
+    | NotificationType.ExtensionInstalled
+    | NotificationType.ExtensionUpgraded
+    | NotificationType.ExtensionEnabled
+    | NotificationType.ExtensionDeprecated
+    | NotificationType.ExtensionUninstalled;
 }
 
 interface Recipient {
@@ -261,6 +284,32 @@ export const sendMultisigActionNotifications = async ({
     creator,
     colonyAddress,
     transactionHash,
+  });
+};
+
+// Send a notification when an extension is updated.
+export const sendExtensionUpdateNotifications = async ({
+  colonyAddress,
+  transactionHash,
+  creator,
+  extensionHash,
+  notificationType,
+}: ExtensionUpdateNotificationVariables): Promise<void> => {
+  // Get the recipients of the colony wide notifications.
+  const recipients = await getRecipientsOfColonyWideNotification(colonyAddress);
+
+  if (!recipients.length) {
+    return;
+  }
+
+  // Send the colony wide notifications.
+  await sendNotification(`Extension: ${extensionHash}`, recipients, {
+    notificationType,
+    creator,
+    notificationCategory: NotificationCategory.Extension,
+    colonyAddress,
+    transactionHash,
+    extensionHash,
   });
 };
 

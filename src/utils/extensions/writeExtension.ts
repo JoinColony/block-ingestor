@@ -20,6 +20,10 @@ import {
   CreateColonyExtensionInput,
 } from '~graphql';
 import { updateCurrentVersion } from '~utils/currentVersion';
+import {
+  NotificationType,
+  sendExtensionUpdateNotifications,
+} from '~utils/notifications';
 
 /**
  * Function writing the extension version to the db based on the ExtensionAddedToNetwork event payload
@@ -131,6 +135,13 @@ const createOrUpdateColonyExtension = async (
 
   // If extension record doesn't exist, try to create one
   if (!extension) {
+    sendExtensionUpdateNotifications({
+      colonyAddress: input.colonyId,
+      creator: input.installedBy,
+      notificationType: NotificationType.ExtensionInstalled,
+      extensionHash: input.hash,
+    });
+
     await mutate<
       CreateColonyExtensionMutation,
       CreateColonyExtensionMutationVariables
@@ -142,6 +153,14 @@ const createOrUpdateColonyExtension = async (
     });
   } else {
     // Otherwise, update the existing extension
+
+    sendExtensionUpdateNotifications({
+      colonyAddress: input.colonyId,
+      creator: input.installedBy,
+      notificationType: NotificationType.ExtensionUpgraded,
+      extensionHash: input.hash,
+    });
+
     await mutate<
       UpdateColonyExtensionByAddressMutation,
       UpdateColonyExtensionByAddressMutationVariables
