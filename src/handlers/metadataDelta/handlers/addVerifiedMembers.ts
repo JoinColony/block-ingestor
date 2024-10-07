@@ -21,7 +21,10 @@ import {
   createColonyContributor,
   getColonyContributorId,
 } from '~utils/contributors';
-import { sendActionNotifications } from '~utils/notifications';
+import {
+  NotificationCategory,
+  sendPermissionsActionNotifications,
+} from '~utils/notifications';
 
 export const handleAddVerifiedMembers = async (
   event: ContractEvent,
@@ -85,10 +88,11 @@ export const handleAddVerifiedMembers = async (
     fromDomainId: getDomainDatabaseId(colonyAddress, Id.RootDomain),
   });
 
-  sendActionNotifications({
+  sendPermissionsActionNotifications({
     mentions: operation.payload,
     creator: initiatorAddress,
     colonyAddress,
     transactionHash,
+    notificationCategory: NotificationCategory.Admin,
   });
 };
