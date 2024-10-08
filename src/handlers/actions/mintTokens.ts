@@ -2,16 +2,14 @@ import { Id } from '@colony/colony-js';
 
 import { ColonyActionType } from '~graphql';
 import { ContractEvent } from '~types';
+import { NotificationCategory } from '~types/notifications';
 import {
   writeActionFromEvent,
   getColonyTokenAddress,
   getDomainDatabaseId,
   verbose,
 } from '~utils';
-import {
-  NotificationCategory,
-  sendPermissionsActionNotifications,
-} from '~utils/notifications';
+import { sendPermissionsActionNotifications } from '~utils/notifications';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { contractAddress: colonyAddress, transactionHash } = event;

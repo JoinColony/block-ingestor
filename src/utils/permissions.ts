@@ -31,10 +31,8 @@ import {
   ColonyActionType,
 } from '~graphql';
 import { createColonyContributor, isAlreadyContributor } from './contributors';
-import {
-  NotificationCategory,
-  sendPermissionsActionNotifications,
-} from './notifications';
+import { sendPermissionsActionNotifications } from './notifications';
+import { NotificationCategory } from '~types/notifications';
 
 export const BASE_ROLES_MAP = {
   [`role_${ColonyRole.Recovery}`]: null,

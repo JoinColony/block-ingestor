@@ -4,14 +4,12 @@ import {
   GetColonyExtensionByAddressDocument,
   GetColonyExtensionByAddressQuery,
   GetColonyExtensionByAddressQueryVariables,
+  NotificationType,
 } from '~graphql';
 import networkClient from '~networkClient';
 import { EventHandler } from '~types';
 import { updateExtension } from '~utils/extensions/updateExtension';
-import {
-  NotificationType,
-  sendExtensionUpdateNotifications,
-} from '~utils/notifications';
+import { sendExtensionUpdateNotifications } from '~utils/notifications';
 
 export const handleMultiSigGlobalThresholdSet: EventHandler = async (event) => {
   const { contractAddress: multiSigAddress, transactionHash } = event;

@@ -49,6 +49,7 @@ fragment ColonyMotion on ColonyMotion {
   }
   isDecision
   transactionHash
+  expenditureId
 }
 
 fragment VoterRecord on VoterRecord {
