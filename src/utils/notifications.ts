@@ -12,6 +12,7 @@ import {
   NotificationType,
   NotificationUserFragment,
 } from '~graphql';
+import { getAllColoniesWithRootPermissionHolders } from './colony';
 import { getAllPagesOfData, GetDataFn } from './graphql';
 import { isAddressExtension } from './extensions';
 import {
@@ -349,6 +350,51 @@ export const sendFundsClaimedNotifications = async ({
       tokenAmount,
       tokenAddress,
     },
+  );
+};
+
+export const sendColonyVersionAddedNotifications = async (
+  newVersion: number,
+): Promise<void> => {
+  const allColonies = await getAllColoniesWithRootPermissionHolders();
+
+  await Promise.all(
+    allColonies.map(async (colony) => {
+      const recipients: Recipient[] = [];
+
+      if (!colony.roles?.items) {
+        return;
+      }
+
+      for (const roleItem of colony.roles.items) {
+        if (
+          !!roleItem?.targetUser?.notificationsData &&
+          shouldSendNotificationToRecipient(
+            roleItem.targetUser.notificationsData,
+            colony.id,
+            NotificationCategory.Admin,
+          )
+        ) {
+          recipients.push({
+            external_id: roleItem.targetUser.notificationsData.magicbellUserId,
+          });
+        }
+      }
+
+      if (recipients.length > 0) {
+        await sendNotification(
+          `New colony version: ${newVersion}`,
+          recipients,
+          {
+            notificationType: NotificationType.NewColonyVersion,
+            notificationCategory: NotificationCategory.Admin,
+            colonyAddress: colony.id,
+            creator: colony.id, // who's the creator of this??
+            newColonyVersion: newVersion.toString(),
+          },
+        );
+      }
+    }),
   );
 };
 
