@@ -10,6 +10,7 @@ import {
   NotificationsDataFragment,
   NotificationUserFragment,
 } from '~graphql';
+import { getAllColoniesWithRootPermissionHolders } from './colony';
 import { getAllPagesOfData, GetDataFn } from './graphql';
 
 export enum NotificationCategory {
@@ -26,6 +27,7 @@ export enum NotificationType {
   ExpenditureCancelled = 'ExpenditureCancelled',
   PermissionsAction = 'PermissionsAction',
   Mention = 'Mention',
+  NewColonyVersion = 'NewColonyVersion',
 }
 
 interface NotificationVariables {
@@ -35,6 +37,7 @@ interface NotificationVariables {
   notificationCategory: NotificationCategory;
   transactionHash?: string;
   expenditureID?: string;
+  newColonyVersion?: string;
 }
 
 interface MentionNotificationVariables
@@ -245,6 +248,50 @@ export const sendMentionNotifications = async ({
       expenditureID,
     });
   }
+};
+
+export const sendColonyVersionAddedNotifications = async (
+  newVersion: number,
+): Promise<void> => {
+  const allColonies = await getAllColoniesWithRootPermissionHolders();
+
+  await Promise.all(
+    allColonies.map(async (colony) => {
+      const recipients: Recipient[] = [];
+
+      if (!colony.roles?.items) {
+        return;
+      }
+
+      for (const roleItem of colony.roles.items) {
+        if (
+          !!roleItem?.targetUser?.notificationsData &&
+          shouldSendNotificationToRecipient(
+            roleItem.targetUser.notificationsData,
+            colony.id,
+          )
+        ) {
+          recipients.push({
+            external_id: roleItem.targetUser.notificationsData.magicbellUserId,
+          });
+        }
+      }
+
+      if (recipients.length > 0) {
+        await sendNotification(
+          `New colony version: ${newVersion}`,
+          recipients,
+          {
+            notificationType: NotificationType.NewColonyVersion,
+            notificationCategory: NotificationCategory.Mention,
+            colonyAddress: colony.id,
+            creator: colony.id, // who's the creator of this??
+            newColonyVersion: newVersion.toString(),
+          },
+        );
+      }
+    }),
+  );
 };
 
 export const sendNotification = async (
