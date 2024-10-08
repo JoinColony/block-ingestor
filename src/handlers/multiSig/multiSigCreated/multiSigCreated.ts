@@ -22,11 +22,9 @@ import {
   handleColonyVersionUpgrade,
 } from './handlers';
 import { handlePaymentMultiSig } from './handlers/payment';
-import {
-  NotificationCategory,
-  NotificationType,
-  sendMultisigActionNotifications,
-} from '~utils/notifications';
+import { sendMultisigActionNotifications } from '~utils/notifications';
+import { NotificationCategory } from '~types/notifications';
+import { NotificationType } from '~graphql';
 
 export const handleMultiSigMotionCreated: EventHandler = async (
   event,
@@ -174,7 +172,7 @@ export const handleMultiSigMotionCreated: EventHandler = async (
         colonyAddress,
         creator: initiatorAddress,
         notificationCategory,
-        notificationType: NotificationType.MultiSigActionCreated,
+        notificationType: NotificationType.MultisigActionCreated,
         transactionHash,
       });
     }

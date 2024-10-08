@@ -1,12 +1,14 @@
 import { BigNumber } from 'ethers';
 import { mutate, query } from '~amplifyClient';
 import {
+  ColonyActionType,
   ColonyMotion,
   CreateMotionMessageDocument,
   CreateMotionMessageInput,
   GetColonyMotionDocument,
   GetColonyMotionQuery,
   GetColonyMotionQueryVariables,
+  NotificationType,
   UpdateColonyActionDocument,
   UpdateColonyMotionDocument,
 } from '~graphql';
@@ -14,6 +16,10 @@ import { MotionSide, MotionVote } from '~types';
 import { verbose, output } from '~utils';
 import { getActionByMotionId } from '~utils/actions';
 import { updateDecisionInDB } from '~utils/decisions';
+import {
+  getNotificationCategory,
+  sendMotionNotifications,
+} from '~utils/notifications';
 
 export * from './motionStaked/helpers';
 
@@ -60,6 +66,25 @@ export const updateMotionInDB = async (
       if (colonyAction.colonyDecisionId) {
         await updateDecisionInDB(colonyAction.id, {
           showInDecisionsList: showInActionsList,
+        });
+      }
+
+      const notificationCategory = getNotificationCategory(colonyAction?.type);
+
+      // If the motion is newly being shown in the list, we can assume that it has just been staked
+      // to at least 10%, which is also the threshold for sending a notification.
+      if (
+        !colonyAction.showInActionsList &&
+        showInActionsList &&
+        notificationCategory &&
+        colonyAction.type !== ColonyActionType.FundExpenditureMotion
+      ) {
+        sendMotionNotifications({
+          colonyAddress: colonyAction.colonyId,
+          creator: colonyAction.initiatorAddress,
+          notificationCategory,
+          notificationType: NotificationType.MotionCreated,
+          transactionHash: colonyAction.id,
         });
       }
     }

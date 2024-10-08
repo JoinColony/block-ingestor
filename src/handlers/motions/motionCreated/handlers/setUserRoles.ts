@@ -9,6 +9,7 @@ import {
 } from '~utils';
 
 import { createMotionInDB } from '../helpers';
+import { sendMentionNotifications } from '~utils/notifications';
 
 export const handleSetUserRolesMotion = async (
   colonyAddress: string,
@@ -37,5 +38,12 @@ export const handleSetUserRolesMotion = async (
     recipientAddress: userAddress,
     roles,
     rolesAreMultiSig: isMultiSig ? true : null,
+  });
+
+  sendMentionNotifications({
+    colonyAddress,
+    creator: event.args.agent,
+    transactionHash: event.transactionHash,
+    recipients: [userAddress],
   });
 };

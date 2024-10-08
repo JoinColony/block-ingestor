@@ -1,18 +1,17 @@
 import { ExtensionEventListener } from '~eventListeners';
-import { MultiSigVote } from '~graphql';
+import { MultiSigVote, NotificationType } from '~graphql';
 import { getChainId } from '~provider';
 import { EventHandler } from '~types';
 import {
   addMultiSigVote,
   getMultiSigDatabaseId,
   getMultiSigFromDB,
-  getMultisigNotificationCategory,
   getUserMultiSigSignature,
   removeMultiSigVote,
 } from '../helpers';
 import { getMultiSigClient } from '~utils';
 import {
-  NotificationType,
+  getNotificationCategory,
   sendMultisigActionNotifications,
 } from '~utils/notifications';
 
@@ -63,7 +62,7 @@ export const handleMultiSigApprovalChanged: EventHandler = async (
     const motion = await multiSigClient.getMotion(motionId);
     const multiSigFromDB = await getMultiSigFromDB(multiSigId);
 
-    const notificationCategory = await getMultisigNotificationCategory(
+    const notificationCategory = getNotificationCategory(
       multiSigFromDB?.action?.type,
     );
 
@@ -72,7 +71,7 @@ export const handleMultiSigApprovalChanged: EventHandler = async (
         colonyAddress,
         creator: userAddress,
         notificationCategory,
-        notificationType: NotificationType.MultiSigActionApproved,
+        notificationType: NotificationType.MultisigActionApproved,
         transactionHash: multiSigFromDB?.transactionHash,
       });
     }

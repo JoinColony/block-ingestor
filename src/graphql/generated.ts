@@ -6112,6 +6112,28 @@ export enum Network {
   Mainnet = 'MAINNET',
 }
 
+/** Type of notifications that can be sent */
+export enum NotificationType {
+  ExpenditureCancelled = 'EXPENDITURE_CANCELLED',
+  ExpenditureFinalized = 'EXPENDITURE_FINALIZED',
+  ExpenditureReadyForFunding = 'EXPENDITURE_READY_FOR_FUNDING',
+  ExpenditureReadyForRelease = 'EXPENDITURE_READY_FOR_RELEASE',
+  ExpenditureReadyForReview = 'EXPENDITURE_READY_FOR_REVIEW',
+  FundsClaimed = 'FUNDS_CLAIMED',
+  Mention = 'MENTION',
+  MotionCreated = 'MOTION_CREATED',
+  MotionFinalized = 'MOTION_FINALIZED',
+  MotionOpposed = 'MOTION_OPPOSED',
+  MotionReveal = 'MOTION_REVEAL',
+  MotionSupported = 'MOTION_SUPPORTED',
+  MotionVoting = 'MOTION_VOTING',
+  MultisigActionApproved = 'MULTISIG_ACTION_APPROVED',
+  MultisigActionCreated = 'MULTISIG_ACTION_CREATED',
+  MultisigActionFinalized = 'MULTISIG_ACTION_FINALIZED',
+  MultisigActionRejected = 'MULTISIG_ACTION_REJECTED',
+  PermissionsAction = 'PERMISSIONS_ACTION',
+}
+
 /** Holds the notifications data for the user, such as their unique Magicbell user id, and their notifications preferences. */
 export type NotificationsData = {
   __typename?: 'NotificationsData';
@@ -9410,6 +9432,9 @@ export type ActionMetadataInfoFragment = {
   amount?: string | null;
   networkFee?: string | null;
   type: ColonyActionType;
+  showInActionsList: boolean;
+  colonyId: string;
+  initiatorAddress: string;
   pendingDomainMetadata?: {
     __typename?: 'DomainMetadata';
     name: string;
@@ -9612,6 +9637,7 @@ export type ColonyMotionFragment = {
   motionDomainId: string;
   isDecision: boolean;
   transactionHash: string;
+  expenditureId?: string | null;
   motionStakes: {
     __typename?: 'MotionStakes';
     raw: { __typename?: 'MotionStakeValues'; nay: string; yay: string };
@@ -10998,6 +11024,9 @@ export type GetColonyActionByMotionIdQuery = {
       amount?: string | null;
       networkFee?: string | null;
       type: ColonyActionType;
+      showInActionsList: boolean;
+      colonyId: string;
+      initiatorAddress: string;
       pendingDomainMetadata?: {
         __typename?: 'DomainMetadata';
         name: string;
@@ -11069,6 +11098,7 @@ export type GetColonyMotionQuery = {
     motionDomainId: string;
     isDecision: boolean;
     transactionHash: string;
+    expenditureId?: string | null;
     motionStakes: {
       __typename?: 'MotionStakes';
       raw: { __typename?: 'MotionStakeValues'; nay: string; yay: string };
@@ -11158,6 +11188,9 @@ export type GetColonyActionByMultiSigIdQuery = {
       amount?: string | null;
       networkFee?: string | null;
       type: ColonyActionType;
+      showInActionsList: boolean;
+      colonyId: string;
+      initiatorAddress: string;
       pendingDomainMetadata?: {
         __typename?: 'DomainMetadata';
         name: string;
@@ -11479,6 +11512,9 @@ export const ActionMetadataInfo = gql`
     amount
     networkFee
     type
+    showInActionsList
+    colonyId
+    initiatorAddress
   }
   ${DomainMetadata}
   ${ColonyMetadata}
@@ -11680,6 +11716,7 @@ export const ColonyMotion = gql`
     }
     isDecision
     transactionHash
+    expenditureId
   }
   ${MotionStakes}
   ${UserMotionStakes}
