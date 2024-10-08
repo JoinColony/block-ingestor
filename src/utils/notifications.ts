@@ -1,6 +1,7 @@
 import MagicBellClient, { Notification } from '@magicbell/core';
 import { query } from '~amplifyClient';
 import {
+  ColonyActionType,
   GetColonyContributorsNotificationDataDocument,
   GetColonyContributorsNotificationDataQuery,
   GetColonyContributorsNotificationDataQueryVariables,
@@ -8,122 +9,23 @@ import {
   GetNotificationUsersQuery,
   GetNotificationUsersQueryVariables,
   NotificationsDataFragment,
+  NotificationType,
   NotificationUserFragment,
 } from '~graphql';
 import { getAllPagesOfData, GetDataFn } from './graphql';
 import { isAddressExtension } from './extensions';
-
-export enum NotificationCategory {
-  Mention = 'Mention',
-  Payment = 'Payment',
-  Admin = 'Admin',
-}
-
-export enum NotificationType {
-  // Expenditures
-  ExpenditureReadyForReview = 'ExpenditureReadyForReview',
-  ExpenditureReadyForFunding = 'ExpenditureReadyForFunding',
-  ExpenditureReadyForRelease = 'ExpenditureReadyForRelease',
-  ExpenditureFinalized = 'ExpenditureFinalized',
-  ExpenditureCancelled = 'ExpenditureCancelled',
-
-  // Funds
-  FundsClaimed = 'FundsClaimed',
-
-  // Mentions
-  Mention = 'Mention',
-
-  // Multisig
-  MultiSigActionCreated = 'MultiSigActionCreated',
-  MultiSigActionFinalized = 'MultiSigActionFinalized',
-  MultiSigActionApproved = 'MultiSigActionApproved',
-  MultiSigActionRejected = 'MultiSigActionRejected',
-
-  // Actions made with permissions
-  PermissionsAction = 'PermissionsAction',
-
-  // Extensions
-  ExtensionInstalled = 'ExtensionInstalled',
-  ExtensionUpgraded = 'ExtensionUpgraded',
-  ExtensionEnabled = 'ExtensionEnabled',
-  ExtensionDeprecated = 'ExtensionDeprecated',
-  ExtensionUninstalled = 'ExtensionUninstalled',
-  ExtensionSettingsChanged = 'ExtensionSettingsChanged',
-}
-
-interface NotificationVariables {
-  colonyAddress: string;
-  creator: string;
-  notificationType: NotificationType;
-  notificationCategory: NotificationCategory;
-  transactionHash?: string;
-  expenditureID?: string;
-  tokenAmount?: string;
-  tokenAddress?: string;
-  extensionHash?: string;
-}
-
-interface MentionNotificationVariables
-  extends Omit<
-    NotificationVariables,
-    'notificationType' | 'notificationCategory'
-  > {
-  recipients: string[];
-}
-
-interface PermissionsActionNotificationVariables
-  extends Omit<NotificationVariables, 'notificationType'> {
-  mentions?: string[];
-}
-
-interface FundsClaimedNotificationVariables
-  extends Pick<NotificationVariables, 'colonyAddress' | 'creator'> {
-  tokenSymbol: string;
-  tokenAmount: string;
-  tokenAddress: string;
-}
-
-interface ExpenditureUpdateNotificationVariables
-  extends Omit<
-    NotificationVariables,
-    'notificationType' | 'notificationCategory' | 'expenditureID'
-  > {
-  expenditureID: string;
-  notificationType:
-    | NotificationType.ExpenditureReadyForReview
-    | NotificationType.ExpenditureReadyForFunding
-    | NotificationType.ExpenditureReadyForRelease
-    | NotificationType.ExpenditureFinalized
-    | NotificationType.ExpenditureCancelled;
-}
-
-interface MultisigActionNotificationVariables
-  extends Omit<NotificationVariables, 'notificationType'> {
-  notificationType:
-    | NotificationType.MultiSigActionCreated
-    | NotificationType.MultiSigActionFinalized
-    | NotificationType.MultiSigActionApproved
-    | NotificationType.MultiSigActionRejected;
-}
-
-interface ExtensionUpdateNotificationVariables
-  extends Omit<
-    NotificationVariables,
-    'notificationType' | 'notificationCategory'
-  > {
-  extensionHash?: string;
-  notificationType:
-    | NotificationType.ExtensionInstalled
-    | NotificationType.ExtensionUpgraded
-    | NotificationType.ExtensionEnabled
-    | NotificationType.ExtensionDeprecated
-    | NotificationType.ExtensionUninstalled
-    | NotificationType.ExtensionSettingsChanged;
-}
-
-interface Recipient {
-  external_id: string;
-}
+import {
+  Recipient,
+  PermissionsActionNotificationVariables,
+  ExpenditureUpdateNotificationVariables,
+  NotificationCategory,
+  MultisigActionNotificationVariables,
+  MentionNotificationVariables,
+  NotificationVariables,
+  MotionNotificationVariables,
+  FundsClaimedNotificationVariables,
+  ExtensionUpdateNotificationVariables,
+} from '~types/notifications';
 
 // Set up the notification client
 export const setupNotificationsClient = async (): Promise<void> => {
@@ -288,6 +190,31 @@ export const sendMultisigActionNotifications = async ({
   });
 };
 
+// Send a notification when a motion is created / updated.
+export const sendMotionNotifications = async ({
+  creator,
+  colonyAddress,
+  transactionHash,
+  notificationType,
+  notificationCategory,
+}: MotionNotificationVariables): Promise<void> => {
+  // Get the recipients of the colony wide notifications.
+  const recipients = await getRecipientsOfColonyWideNotification(colonyAddress);
+
+  if (!recipients.length) {
+    return;
+  }
+
+  // Send the colony wide notifications.
+  await sendNotification(`Motion: ${transactionHash}`, recipients, {
+    notificationType,
+    notificationCategory,
+    creator,
+    colonyAddress,
+    transactionHash,
+  });
+};
+
 // Send a notification when an extension is updated.
 export const sendExtensionUpdateNotifications = async ({
   colonyAddress,
@@ -411,4 +338,92 @@ export const sendNotification = async (
   } catch (err) {
     console.log(`Unable to create notification "${title}": `, err);
   }
+};
+
+export const getNotificationCategory = (
+  actionType: ColonyActionType | null | undefined,
+): NotificationCategory | null => {
+  let notificationCategory: NotificationCategory | null;
+
+  switch (actionType) {
+    case ColonyActionType.AddVerifiedMembers:
+    case ColonyActionType.AddVerifiedMembersMotion:
+    case ColonyActionType.AddVerifiedMembersMultisig:
+    case ColonyActionType.ColonyEdit:
+    case ColonyActionType.ColonyEditMotion:
+    case ColonyActionType.ColonyEditMultisig:
+    case ColonyActionType.CreateDecisionMotion:
+    case ColonyActionType.CreateDecisionMultisig:
+    case ColonyActionType.CreateDomain:
+    case ColonyActionType.CreateDomainMotion:
+    case ColonyActionType.CreateDomainMultisig:
+    case ColonyActionType.EditDomain:
+    case ColonyActionType.EditDomainMotion:
+    case ColonyActionType.EditDomainMultisig:
+    case ColonyActionType.EmitDomainReputationPenalty:
+    case ColonyActionType.EmitDomainReputationPenaltyMotion:
+    case ColonyActionType.EmitDomainReputationPenaltyMultisig:
+    case ColonyActionType.EmitDomainReputationReward:
+    case ColonyActionType.EmitDomainReputationRewardMotion:
+    case ColonyActionType.EmitDomainReputationRewardMultisig:
+    case ColonyActionType.Generic:
+    case ColonyActionType.MakeArbitraryTransaction:
+    case ColonyActionType.MakeArbitraryTransactionsMotion:
+    case ColonyActionType.MakeArbitraryTransactionsMultisig:
+    case ColonyActionType.Recovery:
+    case ColonyActionType.RemoveVerifiedMembers:
+    case ColonyActionType.RemoveVerifiedMembersMotion:
+    case ColonyActionType.RemoveVerifiedMembersMultisig:
+    case ColonyActionType.SetUserRoles:
+    case ColonyActionType.SetUserRolesMotion:
+    case ColonyActionType.SetUserRolesMultisig:
+    case ColonyActionType.VersionUpgrade:
+    case ColonyActionType.VersionUpgradeMotion:
+    case ColonyActionType.VersionUpgradeMultisig:
+    case ColonyActionType.WrongColony: {
+      notificationCategory = NotificationCategory.Admin;
+      break;
+    }
+    case ColonyActionType.CancelExpenditure:
+    case ColonyActionType.CancelExpenditureMotion:
+    case ColonyActionType.CancelStakedExpenditureMultisig:
+    case ColonyActionType.CreateExpenditure:
+    case ColonyActionType.EditExpenditure:
+    case ColonyActionType.EditExpenditureMotion:
+    case ColonyActionType.FinalizeExpenditure:
+    case ColonyActionType.FinalizeExpenditureMotion:
+    case ColonyActionType.FundExpenditureMotion:
+    case ColonyActionType.FundExpenditureMultisig:
+    case ColonyActionType.LockExpenditure:
+    case ColonyActionType.ManageTokens:
+    case ColonyActionType.ManageTokensMotion:
+    case ColonyActionType.ManageTokensMultisig:
+    case ColonyActionType.MintTokens:
+    case ColonyActionType.MintTokensMotion:
+    case ColonyActionType.MintTokensMultisig:
+    case ColonyActionType.MoveFunds:
+    case ColonyActionType.MoveFundsMotion:
+    case ColonyActionType.MoveFundsMultisig:
+    case ColonyActionType.MultiplePayment:
+    case ColonyActionType.MultiplePaymentMotion:
+    case ColonyActionType.MultiplePaymentMultisig:
+    case ColonyActionType.Payment:
+    case ColonyActionType.PaymentMotion:
+    case ColonyActionType.PaymentMultisig:
+    case ColonyActionType.SetExpenditureStateMotion:
+    case ColonyActionType.SetExpenditureStateMultisig:
+    case ColonyActionType.UnlockToken:
+    case ColonyActionType.UnlockTokenMotion:
+    case ColonyActionType.UnlockTokenMultisig: {
+      notificationCategory = NotificationCategory.Payment;
+      break;
+    }
+    case ColonyActionType.NullMotion:
+    default: {
+      notificationCategory = null;
+      break;
+    }
+  }
+
+  return notificationCategory;
 };

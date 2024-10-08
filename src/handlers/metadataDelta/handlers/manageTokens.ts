@@ -1,6 +1,7 @@
 import { Id } from '@colony/colony-js';
 import { ColonyActionType } from '~graphql';
 import { ContractEvent } from '~types';
+import { NotificationCategory } from '~types/notifications';
 import {
   ManageTokensOperation,
   getApprovedTokenChanges,
@@ -9,10 +10,7 @@ import {
   updateColonyTokens,
   writeActionFromEvent,
 } from '~utils';
-import {
-  NotificationCategory,
-  sendPermissionsActionNotifications,
-} from '~utils/notifications';
+import { sendPermissionsActionNotifications } from '~utils/notifications';
 
 export const handleManageTokens = async (
   event: ContractEvent,

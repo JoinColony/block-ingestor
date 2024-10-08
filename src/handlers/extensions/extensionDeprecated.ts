@@ -4,15 +4,13 @@ import {
   GetColonyExtensionByHashAndColonyDocument,
   GetColonyExtensionByHashAndColonyQuery,
   GetColonyExtensionByHashAndColonyQueryVariables,
+  NotificationType,
 } from '~graphql';
 import networkClient from '~networkClient';
 import { ContractEvent } from '~types';
 import { verbose } from '~utils';
 import { updateExtension } from '~utils/extensions/updateExtension';
-import {
-  NotificationType,
-  sendExtensionUpdateNotifications,
-} from '~utils/notifications';
+import { sendExtensionUpdateNotifications } from '~utils/notifications';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { transactionHash } = event;

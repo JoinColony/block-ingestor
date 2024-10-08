@@ -6,13 +6,11 @@ import {
   setupListenersForStakedExpenditure,
   setupMotionsListeners,
 } from '~eventListeners';
-import {
-  NotificationType,
-  sendExtensionUpdateNotifications,
-} from '~utils/notifications';
+import { sendExtensionUpdateNotifications } from '~utils/notifications';
 import networkClient from '~networkClient';
 import { constants } from 'ethers';
 import { updateExtension } from '~utils/extensions/updateExtension';
+import { NotificationType } from '~graphql';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { contractAddress: extensionAddress, transactionHash } = event;
