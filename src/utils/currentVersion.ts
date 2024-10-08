@@ -17,6 +17,7 @@ import {
 export const updateCurrentVersion = async (
   key: string,
   version: number,
+  onVersionUpdated?: () => Promise<void>,
 ): Promise<void> => {
   const response = await query<
     GetCurrentVersionQuery,
@@ -52,5 +53,6 @@ export const updateCurrentVersion = async (
         version,
       },
     });
+    onVersionUpdated?.();
   }
 };

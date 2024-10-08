@@ -74,3 +74,13 @@ query ListColonies($nextToken: String) {
     }
   }
 }
+
+# for now getting 1000 role holders should suffice?
+query ListColoniesWithRootPermissionHolders($nextToken: String) {
+  listColonies(limit: 1000, nextToken: $nextToken) {
+    nextToken
+    items {
+      ...ColonyWithRootRoles
+    }
+  }
+}

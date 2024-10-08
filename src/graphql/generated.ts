@@ -6149,6 +6149,7 @@ export enum NotificationType {
   MultisigActionCreated = 'MULTISIG_ACTION_CREATED',
   MultisigActionFinalized = 'MULTISIG_ACTION_FINALIZED',
   MultisigActionRejected = 'MULTISIG_ACTION_REJECTED',
+  NewColonyVersion = 'NEW_COLONY_VERSION',
   PermissionsAction = 'PERMISSIONS_ACTION',
 }
 
@@ -9575,6 +9576,36 @@ export type ColonyMetadataFragment = {
   }> | null;
 };
 
+export type ColonyWithRootRolesFragment = {
+  __typename?: 'Colony';
+  id: string;
+  roles?: {
+    __typename?: 'ModelColonyRoleConnection';
+    items: Array<{
+      __typename?: 'ColonyRole';
+      id: string;
+      targetUser?: {
+        __typename?: 'User';
+        id: string;
+        profile?: {
+          __typename?: 'Profile';
+          displayName?: string | null;
+          id: string;
+        } | null;
+        notificationsData?: {
+          __typename?: 'NotificationsData';
+          magicbellUserId: string;
+          notificationsDisabled: boolean;
+          mutedColonyAddresses: Array<string>;
+          paymentNotificationsDisabled: boolean;
+          mentionNotificationsDisabled: boolean;
+          adminNotificationsDisabled: boolean;
+        } | null;
+      } | null;
+    } | null>;
+  } | null;
+};
+
 export type ExpenditureBalanceFragment = {
   __typename?: 'ExpenditureBalance';
   tokenAddress: string;
@@ -10614,6 +10645,47 @@ export type ListColoniesQuery = {
   } | null;
 };
 
+export type ListColoniesWithRootPermissionHoldersQueryVariables = Exact<{
+  nextToken?: InputMaybe<Scalars['String']>;
+}>;
+
+export type ListColoniesWithRootPermissionHoldersQuery = {
+  __typename?: 'Query';
+  listColonies?: {
+    __typename?: 'ModelColonyConnection';
+    nextToken?: string | null;
+    items: Array<{
+      __typename?: 'Colony';
+      id: string;
+      roles?: {
+        __typename?: 'ModelColonyRoleConnection';
+        items: Array<{
+          __typename?: 'ColonyRole';
+          id: string;
+          targetUser?: {
+            __typename?: 'User';
+            id: string;
+            profile?: {
+              __typename?: 'Profile';
+              displayName?: string | null;
+              id: string;
+            } | null;
+            notificationsData?: {
+              __typename?: 'NotificationsData';
+              magicbellUserId: string;
+              notificationsDisabled: boolean;
+              mutedColonyAddresses: Array<string>;
+              paymentNotificationsDisabled: boolean;
+              mentionNotificationsDisabled: boolean;
+              adminNotificationsDisabled: boolean;
+            } | null;
+          } | null;
+        } | null>;
+      } | null;
+    } | null>;
+  } | null;
+};
+
 export type GetColonyContributorQueryVariables = Exact<{
   id: Scalars['ID'];
 }>;
@@ -11617,6 +11689,37 @@ export const Colony = gql`
   }
   ${Token}
 `;
+export const NotificationsData = gql`
+  fragment NotificationsData on NotificationsData {
+    magicbellUserId
+    notificationsDisabled
+    mutedColonyAddresses
+    paymentNotificationsDisabled
+    mentionNotificationsDisabled
+    adminNotificationsDisabled
+  }
+`;
+export const ColonyWithRootRoles = gql`
+  fragment ColonyWithRootRoles on Colony {
+    id
+    roles(filter: { role_1: { eq: true } }, limit: 1000) {
+      items {
+        id
+        targetUser {
+          id
+          profile {
+            displayName
+            id
+          }
+          notificationsData {
+            ...NotificationsData
+          }
+        }
+      }
+    }
+  }
+  ${NotificationsData}
+`;
 export const ExpenditureSlot = gql`
   fragment ExpenditureSlot on ExpenditureSlot {
     id
@@ -11821,16 +11924,6 @@ export const ColonyMultiSig = gql`
     }
   }
   ${MultiSigUserSignature}
-`;
-export const NotificationsData = gql`
-  fragment NotificationsData on NotificationsData {
-    magicbellUserId
-    notificationsDisabled
-    mutedColonyAddresses
-    paymentNotificationsDisabled
-    mentionNotificationsDisabled
-    adminNotificationsDisabled
-  }
 `;
 export const NotificationUser = gql`
   fragment NotificationUser on ColonyContributor {
@@ -12364,6 +12457,17 @@ export const ListColoniesDocument = gql`
       }
     }
   }
+`;
+export const ListColoniesWithRootPermissionHoldersDocument = gql`
+  query ListColoniesWithRootPermissionHolders($nextToken: String) {
+    listColonies(limit: 1000, nextToken: $nextToken) {
+      nextToken
+      items {
+        ...ColonyWithRootRoles
+      }
+    }
+  }
+  ${ColonyWithRootRoles}
 `;
 export const GetColonyContributorDocument = gql`
   query GetColonyContributor($id: ID!) {

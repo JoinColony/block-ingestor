@@ -16,6 +16,7 @@ export interface NotificationVariables {
   tokenAmount?: string;
   tokenAddress?: string;
   extensionHash?: string;
+  newColonyVersion?: string;
 }
 
 export interface MentionNotificationVariables
