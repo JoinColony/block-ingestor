@@ -78,7 +78,7 @@ export default async (event: ContractEvent): Promise<void> => {
   ).toString();
 
   const updatedBalances = getUpdatedExpenditureBalances(
-    expenditure.balances ?? [],
+    expenditure,
     tokenAddress,
     amountWithFee,
     true,
