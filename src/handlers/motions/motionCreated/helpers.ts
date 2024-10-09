@@ -176,7 +176,7 @@ type MotionFields = Omit<
 > &
   Pick<
     CreateColonyMotionInput,
-    'expenditureSlotId' | 'editedExpenditureSlots' | 'expenditureFunding'
+    'expenditureSlotIds' | 'editedExpenditureSlots' | 'expenditureFunding'
   >;
 
 export const createMotionInDB = async (
@@ -192,7 +192,7 @@ export const createMotionInDB = async (
     timestamp,
   } = event;
   const {
-    expenditureSlotId,
+    expenditureSlotIds,
     editedExpenditureSlots,
     expenditureFunding,
     ...actionFields
@@ -234,6 +234,7 @@ export const createMotionInDB = async (
     blockNumber,
     rootHash,
     isMotionFinalization: false,
+    expenditureSlotIds,
     ...actionFields,
   };
 
@@ -241,7 +242,7 @@ export const createMotionInDB = async (
     createColonyMotion({
       ...motionData,
       expenditureId: actionFields.expenditureId,
-      expenditureSlotId,
+      expenditureSlotIds,
       editedExpenditureSlots,
       expenditureFunding,
     }),

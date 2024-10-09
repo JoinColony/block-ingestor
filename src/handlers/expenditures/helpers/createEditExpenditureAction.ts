@@ -1,15 +1,14 @@
 import { AnyColonyClient } from '@colony/colony-js';
 import { utils } from 'ethers';
-import { mutate, query } from '~amplifyClient';
+import { isEqual, omit } from 'lodash';
+import { mutate } from '~amplifyClient';
 import {
   ColonyActionType,
   ExpenditureFragment,
   ExpenditurePayout,
   ExpenditureSlot,
   ExpenditureStatus,
-  GetActionByIdDocument,
-  GetActionByIdQuery,
-  GetActionByIdQueryVariables,
+  ExpenditureType,
   UpdateExpenditureDocument,
   UpdateExpenditureMutation,
   UpdateExpenditureMutationVariables,
@@ -17,6 +16,7 @@ import {
 import provider from '~provider';
 import { ContractEvent, ContractEventsSignatures } from '~types';
 import {
+  checkActionExists,
   getExpenditureDatabaseId,
   mapLogToContractEvent,
   toNumber,
@@ -40,6 +40,7 @@ export class NotEditActionError extends Error {
  * This function gets called for both `ExpenditureStateChanged` and `ExpenditurePayoutSet` events
  * It determines whether the event is part of an edit action and creates it in the DB
  * Otherwise, it returns a result allowing the handler to continue processing as normal
+ * @TODO: Refactor once multicall limitations are resolved
  */
 export const createEditExpenditureAction = async (
   event: ContractEvent,
@@ -53,11 +54,18 @@ export const createEditExpenditureAction = async (
     ContractEventsSignatures.OneTxPaymentMade,
   );
 
-  if (!expenditure.firstEditTransactionHash || hasOneTxPaymentEvent) {
+  if (hasOneTxPaymentEvent) {
+    throw new NotEditActionError();
+  }
+
+  if (
+    !expenditure.firstEditTransactionHash ||
+    expenditure.firstEditTransactionHash === transactionHash
+  ) {
     /**
-     * If expenditure doesn't have `firstEditTransactionHash` set, it means it's the first time
-     * we see an ExpenditurePayoutSet event, which is normally part of expenditure creation
-     * Only subsequent ExpenditurePayoutSet events will be considered as edit actions
+     * If this is the first transaction containing the relevant events, it is
+     * part of expenditure creation
+     * Only subsequent events will be considered as edit actions
      */
     throw new NotEditActionError();
   }
@@ -101,8 +109,9 @@ export const createEditExpenditureAction = async (
    * Determine changes to the expenditure after all relevant events have been processed
    */
   let updatedSlots: ExpenditureSlot[] = expenditure.slots;
-  let hasUpdatedSlots = false;
   let updatedStatus: ExpenditureStatus | undefined;
+
+  let shouldCreateAction = false;
 
   for (const actionEvent of actionEvents) {
     if (
@@ -111,20 +120,42 @@ export const createEditExpenditureAction = async (
       const { storageSlot, value } = actionEvent.args;
       const keys = actionEvent.args[4];
 
-      const updatedSlot = decodeUpdatedSlot(expenditure, {
+      const updatedSlot = decodeUpdatedSlot(updatedSlots, {
         storageSlot,
         keys,
         value,
       });
 
       if (updatedSlot) {
+        const preUpdateSlot = updatedSlots.find(
+          ({ id }) => id === updatedSlot?.id,
+        );
+
         updatedSlots = getUpdatedExpenditureSlots(
           updatedSlots,
           updatedSlot.id,
           updatedSlot,
         );
 
-        hasUpdatedSlots = true;
+        /**
+         * Special case for staged expenditure
+         * If the only change was claim delay set to 0, we assume it was a stage release
+         * Otherwise, we set the flag to create an action
+         */
+        const hasClaimDelayChangedToZero =
+          preUpdateSlot?.claimDelay !== '0' && updatedSlot.claimDelay === '0';
+        const hasOtherChanges = !isEqual(
+          omit(preUpdateSlot, 'claimDelay'),
+          omit(updatedSlot, 'claimDelay'),
+        );
+
+        if (
+          expenditure.type !== ExpenditureType.Staged ||
+          !hasClaimDelayChangedToZero ||
+          hasOtherChanges
+        ) {
+          shouldCreateAction = true;
+        }
       }
 
       const decodedStatus = decodeUpdatedStatus(actionEvent);
@@ -163,7 +194,7 @@ export const createEditExpenditureAction = async (
         payouts: updatedPayouts,
       });
 
-      hasUpdatedSlots = true;
+      shouldCreateAction = true;
     }
   }
 
@@ -178,7 +209,7 @@ export const createEditExpenditureAction = async (
     },
   );
 
-  if (hasUpdatedSlots) {
+  if (shouldCreateAction) {
     const { agent: initiatorAddress } = event.args;
 
     await writeActionFromEvent(event, colonyAddress, {
@@ -191,15 +222,4 @@ export const createEditExpenditureAction = async (
       },
     });
   }
-};
-
-const checkActionExists = async (transactionHash: string): Promise<boolean> => {
-  const existingActionQuery = await query<
-    GetActionByIdQuery,
-    GetActionByIdQueryVariables
-  >(GetActionByIdDocument, {
-    id: transactionHash,
-  });
-
-  return !!existingActionQuery?.data?.getColonyAction;
 };

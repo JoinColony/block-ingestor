@@ -18,16 +18,6 @@ query GetExpenditureByNativeFundingPotIdAndColony(
   }
 }
 
-query GetExpenditureMetadata($id: ID!) {
-  getExpenditureMetadata(id: $id) {
-    stages {
-      name
-      slotId
-      isReleased
-    }
-  }
-}
-
 query GetStreamingPayment($id: ID!) {
   getStreamingPayment(id: $id) {
     id

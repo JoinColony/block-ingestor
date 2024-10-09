@@ -1,8 +1,7 @@
 import { BigNumber, BigNumberish, utils } from 'ethers';
 
 import {
-  ExpenditureFragment,
-  ExpenditureSlot,
+  ExpenditureSlotFragment as ExpenditureSlot,
   ExpenditureStatus,
 } from '~graphql';
 import { toNumber } from '~utils';
@@ -33,18 +32,17 @@ interface SetExpenditureStateParams {
  * If there were no changes to the expenditure slot, it returns undefined
  */
 export const decodeUpdatedSlot = (
-  expenditure: ExpenditureFragment,
+  expenditureSlots: ExpenditureSlot[],
   params: SetExpenditureStateParams,
 ): ExpenditureSlot | undefined => {
   const { storageSlot, value, keys } = params;
-  // The unfortunate naming of the `keys` property means we have to access it like so
 
   let updatedSlot: ExpenditureSlot | undefined;
 
   if (BigNumber.from(storageSlot).eq(EXPENDITURESLOTS_SLOT)) {
     const slotId = toNumber(keys[0]);
 
-    const existingSlot = expenditure.slots.find(
+    const existingSlot = expenditureSlots.find(
       ({ id }) => id === toNumber(keys[0]),
     );
 
@@ -53,27 +51,33 @@ export const decodeUpdatedSlot = (
         .decode(['address'], value)
         .toString();
 
-      updatedSlot = {
-        ...existingSlot,
-        id: slotId,
-        recipientAddress,
-      };
+      if (recipientAddress !== existingSlot?.recipientAddress) {
+        updatedSlot = {
+          ...existingSlot,
+          id: slotId,
+          recipientAddress,
+        };
+      }
     } else if (keys[1] === EXPENDITURESLOT_CLAIMDELAY) {
       const claimDelay = BigNumber.from(value).toString();
 
-      updatedSlot = {
-        ...existingSlot,
-        id: slotId,
-        claimDelay,
-      };
+      if (claimDelay !== existingSlot?.claimDelay) {
+        updatedSlot = {
+          ...existingSlot,
+          id: slotId,
+          claimDelay,
+        };
+      }
     } else if (keys[1] === EXPENDITURESLOT_PAYOUTMODIFIER) {
       const payoutModifier = toNumber(value);
 
-      updatedSlot = {
-        ...existingSlot,
-        id: slotId,
-        payoutModifier,
-      };
+      if (payoutModifier !== existingSlot?.payoutModifier) {
+        updatedSlot = {
+          ...existingSlot,
+          id: slotId,
+          payoutModifier,
+        };
+      }
     }
   }
 

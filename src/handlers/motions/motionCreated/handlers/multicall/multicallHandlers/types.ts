@@ -1,10 +1,10 @@
+import { TransactionDescription } from 'ethers/lib/utils';
 import { ContractEvent } from '~types';
-import { DecodedFunction } from '../multicall';
 
 interface MulticallHandlerParams {
   colonyAddress: string;
   event: ContractEvent;
-  decodedFunctions: DecodedFunction[];
+  decodedFunctions: TransactionDescription[];
 }
 
 export type MulticallHandler = ({
@@ -15,5 +15,5 @@ export type MulticallHandler = ({
 export type MulticallValidator = ({
   decodedFunctions,
 }: {
-  decodedFunctions: DecodedFunction[];
+  decodedFunctions: TransactionDescription[];
 }) => boolean;

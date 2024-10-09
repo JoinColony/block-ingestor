@@ -11,10 +11,8 @@ export interface BaseEventListener {
 export enum EventListenerType {
   Colony = 'Colony',
   Network = 'Network',
-  VotingReputation = 'VotingReputation',
   Extension = 'Extension',
   Token = 'Token',
-  OneTxPayment = 'OneTxPayment',
   MultisigPermissions = 'MultisigPermissions',
 }
 

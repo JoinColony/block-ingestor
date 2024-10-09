@@ -13,7 +13,6 @@ import {
   getUpdatedMessages,
   updateMotionInDB,
   getMessageKey,
-  updateUserColonyStake,
   updateUserStake,
 } from '../helpers';
 
@@ -29,8 +28,6 @@ export const handleMotionStaked: EventHandler = async (
     blockNumber,
   } = event;
   const { colonyAddress } = listener as ExtensionEventListener;
-
-  await updateUserColonyStake(staker, colonyAddress, amount);
 
   const votingClient = await getVotingClient(colonyAddress);
 

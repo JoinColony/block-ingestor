@@ -9,18 +9,16 @@ import {
   isDomainFromFundingPotSupported,
   getUpdatedExpenditureBalances,
   transactionHasEvent,
+  getExpenditureByFundingPot,
 } from '~utils';
 import {
   ColonyActionType,
   ExpenditureFragment,
-  GetExpenditureByNativeFundingPotIdAndColonyDocument,
-  GetExpenditureByNativeFundingPotIdAndColonyQuery,
-  GetExpenditureByNativeFundingPotIdAndColonyQueryVariables,
   UpdateExpenditureDocument,
   UpdateExpenditureMutation,
   UpdateExpenditureMutationVariables,
 } from '~graphql';
-import { mutate, query } from '~amplifyClient';
+import { mutate } from '~amplifyClient';
 
 export default async (event: ContractEvent): Promise<void> => {
   const {
@@ -88,25 +86,6 @@ export default async (event: ContractEvent): Promise<void> => {
   if (targetExpenditure) {
     await updateExpenditureBalances(targetExpenditure, tokenAddress, amount);
   }
-};
-
-const getExpenditureByFundingPot = async (
-  colonyAddress: string,
-  fundingPotId: number,
-): Promise<ExpenditureFragment | null> => {
-  const response = await query<
-    GetExpenditureByNativeFundingPotIdAndColonyQuery,
-    GetExpenditureByNativeFundingPotIdAndColonyQueryVariables
-  >(GetExpenditureByNativeFundingPotIdAndColonyDocument, {
-    colonyAddress,
-    nativeFundingPotId: fundingPotId,
-  });
-
-  const expenditure =
-    response?.data?.getExpendituresByNativeFundingPotIdAndColony?.items?.[0] ??
-    null;
-
-  return expenditure;
 };
 
 const updateExpenditureBalances = async (

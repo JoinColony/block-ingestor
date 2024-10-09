@@ -1,14 +1,12 @@
-import { mutate, query } from '~amplifyClient';
+import { query } from '~amplifyClient';
 import {
   GetColonyExtensionByHashAndColonyDocument,
   GetColonyExtensionByHashAndColonyQuery,
   GetColonyExtensionByHashAndColonyQueryVariables,
-  UpdateColonyExtensionByAddressDocument,
-  UpdateColonyExtensionByAddressMutation,
-  UpdateColonyExtensionByAddressMutationVariables,
 } from '~graphql';
 import { ContractEvent } from '~types';
 import { verbose } from '~utils';
+import { updateExtension } from '~utils/extensions/updateExtension';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { extensionId: extensionHash, colony, deprecated } = event.args;
@@ -33,14 +31,6 @@ export default async (event: ContractEvent): Promise<void> => {
   const extensionId = data?.getExtensionByColonyAndHash?.items[0]?.id;
 
   if (extensionId) {
-    await mutate<
-      UpdateColonyExtensionByAddressMutation,
-      UpdateColonyExtensionByAddressMutationVariables
-    >(UpdateColonyExtensionByAddressDocument, {
-      input: {
-        id: extensionId,
-        isDeprecated: deprecated,
-      },
-    });
+    await updateExtension(extensionId, { isDeprecated: deprecated });
   }
 };

@@ -3,6 +3,7 @@ import { ContractEvent, multiSigNameMapping } from '~types';
 import {
   getCachedColonyClient,
   getDomainDatabaseId,
+  getExpenditureByFundingPot,
   isDomainFromFundingPotSupported,
   toNumber,
 } from '~utils';
@@ -54,6 +55,12 @@ export const handleMoveFundsMultiSig = async (
     });
   }
 
+  // Check if the target pot belongs to an expenditure
+  const targetExpenditure = await getExpenditureByFundingPot(
+    colonyAddress,
+    toNumber(toPot),
+  );
+
   await createMultiSigInDB(colonyAddress, event, {
     type: multiSigNameMapping[name],
     tokenAddress,
@@ -64,5 +71,6 @@ export const handleMoveFundsMultiSig = async (
     toDomainId: toDomainId
       ? getDomainDatabaseId(colonyAddress, toNumber(toDomainId))
       : undefined,
+    expenditureId: targetExpenditure?.id,
   });
 };

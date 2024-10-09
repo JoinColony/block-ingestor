@@ -1,5 +1,4 @@
 import { TransactionDescription } from 'ethers/lib/utils';
-import { Extension } from '@colony/colony-js';
 
 import { ColonyOperations } from '~types';
 import { query, mutate } from '~amplifyClient';
@@ -18,16 +17,9 @@ import {
 } from '~graphql';
 import { getDomainDatabaseId } from './domains';
 import { output } from './logger';
-import {
-  getCachedColonyClient,
-  getStagedExpenditureClient,
-  getStakedExpenditureClient,
-} from './clients';
-import {
-  getActionByMotionId,
-  getActionByMultiSigId,
-  parseOperation,
-} from './actions';
+import { getCachedColonyClient } from './clients';
+import { getActionByMotionId, getActionByMultiSigId } from './actions';
+import { parseFunctionData } from './parseFunction';
 
 const linkPendingDomainMetadataWithDomain = async (
   pendingDomainMetadata: DomainMetadata,
@@ -201,33 +193,23 @@ export const linkPendingMetadata = async (
   isMultiSig: boolean,
 ): Promise<void> => {
   const colonyClient = await getCachedColonyClient(colonyAddress);
-  const oneTxPaymentClient =
-    (await colonyClient?.getExtensionClient(Extension.OneTxPayment)) ?? null;
-  const stakedExpenditureClient = await getStakedExpenditureClient(
-    colonyAddress,
-  );
 
-  const stagedExpenditureClient = await getStagedExpenditureClient(
-    colonyAddress,
-  );
+  if (!colonyClient) {
+    return;
+  }
 
-  const parsedOperation = parseOperation(action, {
-    colonyClient,
-    oneTxPaymentClient,
-    stakedExpenditureClient,
-    stagedExpenditureClient,
-  });
-
-  if (!parsedOperation) {
+  // @NOTE: We only care about handful of events from Colony contract so not passing all the interfaces
+  const parsedAction = parseFunctionData(action, [colonyClient.interface]);
+  if (!parsedAction) {
     return;
   }
 
   const isMotionAddingADomain =
-    parsedOperation.name === ColonyOperations.AddDomain;
+    parsedAction.name === ColonyOperations.AddDomain;
   const isMotionEditingADomain =
-    parsedOperation.name === ColonyOperations.EditDomain;
+    parsedAction.name === ColonyOperations.EditDomain;
   const isMotionEditingAColony =
-    parsedOperation.name === ColonyOperations.EditColony;
+    parsedAction.name === ColonyOperations.EditColony;
 
   if (
     isMotionAddingADomain ||
@@ -255,7 +237,7 @@ export const linkPendingMetadata = async (
         colonyAction.pendingDomainMetadata,
         colonyAddress,
         isMotionEditingADomain,
-        parsedOperation,
+        parsedAction,
       );
     } else if (isMotionEditingAColony && colonyAction?.pendingColonyMetadata) {
       await linkPendingColonyMetadataWithColony(
