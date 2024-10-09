@@ -47,12 +47,14 @@ export const getUpdatedExpenditureBalances = (
     );
     updatedAmount = BigNumber.from(0);
 
-    fetch('https://hooks.zapier.com/hooks/catch/20362233/2mnk4h2', {
-      method: 'POST',
-      body: JSON.stringify({
-        message: `Balance of expenditure ${expenditure.id} for token ${tokenAddress} would go negative. This is a bug and needs investigating.`,
-      }),
-    });
+    if (process.env.NODE_ENV !== 'development') {
+      fetch('https://hooks.zapier.com/hooks/catch/20362233/2mnk4h2', {
+        method: 'POST',
+        body: JSON.stringify({
+          message: `Balance of expenditure ${expenditure.id} for token ${tokenAddress} would go negative. This is a bug and needs investigating.`,
+        }),
+      });
+    }
   }
 
   const updatedBalance = {
