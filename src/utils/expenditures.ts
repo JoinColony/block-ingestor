@@ -9,6 +9,7 @@ import {
   GetExpenditureByNativeFundingPotIdAndColonyQueryVariables,
 } from '~graphql';
 
+import { output } from './logger';
 import { insertAtIndex } from './arrays';
 
 export const getExpenditureDatabaseId = (
@@ -26,18 +27,40 @@ export const getExpenditureDatabaseId = (
 };
 
 export const getUpdatedExpenditureBalances = (
-  balances: ExpenditureBalance[],
+  expenditure: ExpenditureFragment,
   tokenAddress: string,
   amount: string,
   subtract: boolean = false,
 ): ExpenditureBalance[] => {
+  const balances = expenditure.balances ?? [];
+
   const balanceIndex = balances.findIndex(
     (balance) => balance.tokenAddress === tokenAddress,
   );
   const balance = balanceIndex !== -1 ? balances[balanceIndex] : undefined;
 
   const amountToAdd = BigNumber.from(amount).mul(subtract ? -1 : 1);
-  const updatedAmount = BigNumber.from(balance?.amount ?? 0).add(amountToAdd);
+  let updatedAmount = BigNumber.from(balance?.amount ?? 0).add(amountToAdd);
+
+  if (updatedAmount.lt(0)) {
+    /**
+     * @NOTE: This is a temporary fix to prevent negative balances
+     * The current theory is that when the move funds event is picked up
+     * straight after the expenditure was created, it does not
+     * get returned by DynamoDB yet
+     */
+    output(
+      `Balance of expenditure ${expenditure.id} for token ${tokenAddress} would go negative. This is a bug and needs investigating.`,
+    );
+    updatedAmount = BigNumber.from(0);
+
+    fetch('https://hooks.zapier.com/hooks/catch/20362233/2mnk4h2', {
+      method: 'POST',
+      body: JSON.stringify({
+        message: `Balance of expenditure ${expenditure.id} for token ${tokenAddress} would go negative. This is a bug and needs investigating.`,
+      }),
+    });
+  }
 
   const updatedBalance = {
     ...balance,

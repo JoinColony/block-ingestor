@@ -10,6 +10,7 @@ import {
   getUpdatedExpenditureBalances,
   transactionHasEvent,
   getExpenditureByFundingPot,
+  verbose,
 } from '~utils';
 import {
   ColonyActionType,
@@ -85,6 +86,11 @@ export default async (event: ContractEvent): Promise<void> => {
 
   if (targetExpenditure) {
     await updateExpenditureBalances(targetExpenditure, tokenAddress, amount);
+  } else {
+    // @NOTE: Temporary log until issue with negative balances is resolved
+    verbose(
+      `Attempted to find expenditure with funding pot ID: ${toPotId} in colony ${colonyAddress} but it wasn't found. It may be because the transfer was to a domain, or there was a bug.`,
+    );
   }
 };
 
@@ -94,7 +100,7 @@ const updateExpenditureBalances = async (
   amount: string,
 ): Promise<void> => {
   const updatedBalances = getUpdatedExpenditureBalances(
-    expenditure.balances ?? [],
+    expenditure,
     tokenAddress,
     amount,
   );
