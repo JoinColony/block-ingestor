@@ -63,12 +63,8 @@ export const handleMultiSigApprovalChanged: EventHandler = async (
     const motion = await multiSigClient.getMotion(motionId);
     const multiSigFromDB = await getMultiSigFromDB(multiSigId);
 
-    if (!multiSigFromDB) {
-      return;
-    }
-
     const notificationCategory = await getMultisigNotificationCategory(
-      multiSigId,
+      multiSigFromDB?.action?.type,
     );
 
     if (notificationCategory && !motion.overallApprovalTimestamp.isZero()) {

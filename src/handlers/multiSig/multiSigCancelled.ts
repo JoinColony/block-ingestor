@@ -56,12 +56,8 @@ export const handleMultiSigMotionCancelled: EventHandler = async (
 
   const multiSigFromDB = await getMultiSigFromDB(multiSigDatabaseId);
 
-  if (!multiSigFromDB) {
-    return;
-  }
-
   const notificationCategory = await getMultisigNotificationCategory(
-    multiSigDatabaseId,
+    multiSigFromDB?.action?.type,
   );
 
   if (notificationCategory) {

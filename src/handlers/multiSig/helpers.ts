@@ -20,7 +20,6 @@ import {
   CreateMultiSigVoteDocument,
   ColonyActionType,
 } from '~graphql';
-import { getActionByMultiSigId } from '~utils';
 import { getBlockChainTimestampISODate } from '~utils/dates';
 import { output } from '~utils/logger';
 import { NotificationCategory } from '~utils/notifications';
@@ -135,13 +134,11 @@ export const removeMultiSigVote = async (id: string): Promise<void> => {
 };
 
 export const getMultisigNotificationCategory = async (
-  multiSigId: string,
+  type: ColonyActionType | undefined,
 ): Promise<NotificationCategory | null> => {
-  const colonyAction = await getActionByMultiSigId(multiSigId);
-
   let notificationCategory: NotificationCategory | null;
 
-  switch (colonyAction?.type) {
+  switch (type) {
     case ColonyActionType.AddVerifiedMembersMultisig: {
       notificationCategory = NotificationCategory.Admin;
       break;

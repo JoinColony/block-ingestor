@@ -9752,6 +9752,7 @@ export type ColonyMultiSigFragment = {
       createdAt: string;
     } | null>;
   } | null;
+  action?: { __typename?: 'ColonyAction'; type: ColonyActionType } | null;
 };
 
 export type TokenFragment = {
@@ -11243,6 +11244,7 @@ export type GetColonyMultiSigQuery = {
         createdAt: string;
       } | null>;
     } | null;
+    action?: { __typename?: 'ColonyAction'; type: ColonyActionType } | null;
   } | null;
 };
 
@@ -11718,6 +11720,9 @@ export const ColonyMultiSig = gql`
     rejectedAt
     rejectedBy
     createdAt
+    action {
+      type
+    }
   }
   ${MultiSigUserSignature}
 `;

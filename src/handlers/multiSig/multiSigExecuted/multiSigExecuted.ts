@@ -78,7 +78,7 @@ export const handleMultiSigMotionExecuted: EventHandler = async (
     await updateMultiSigInDB(updatedMultiSigData);
 
     const notificationCategory = await getMultisigNotificationCategory(
-      multiSigDatabaseId,
+      finalizedMultiSig.action?.type,
     );
 
     if (notificationCategory) {
