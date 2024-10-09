@@ -1649,6 +1649,8 @@ export type CreateExpenditureInput = {
 
 export type CreateExpenditureMetadataInput = {
   distributionType?: InputMaybe<SplitPaymentDistributionType>;
+  expectedNumberOfPayouts?: InputMaybe<Scalars['Int']>;
+  expectedNumberOfTokens?: InputMaybe<Scalars['Int']>;
   fundFromDomainNativeId: Scalars['Int'];
   id?: InputMaybe<Scalars['ID']>;
   stages?: InputMaybe<Array<ExpenditureStageInput>>;
@@ -2282,6 +2284,8 @@ export type ExpenditureMetadata = {
    * Will be null for other payment types
    */
   distributionType?: Maybe<SplitPaymentDistributionType>;
+  expectedNumberOfPayouts?: Maybe<Scalars['Int']>;
+  expectedNumberOfTokens?: Maybe<Scalars['Int']>;
   fundFromDomainNativeId: Scalars['Int'];
   id: Scalars['ID'];
   stages?: Maybe<Array<ExpenditureStage>>;
@@ -3431,6 +3435,8 @@ export type ModelExpenditureFilterInput = {
 export type ModelExpenditureMetadataConditionInput = {
   and?: InputMaybe<Array<InputMaybe<ModelExpenditureMetadataConditionInput>>>;
   distributionType?: InputMaybe<ModelSplitPaymentDistributionTypeInput>;
+  expectedNumberOfPayouts?: InputMaybe<ModelIntInput>;
+  expectedNumberOfTokens?: InputMaybe<ModelIntInput>;
   fundFromDomainNativeId?: InputMaybe<ModelIntInput>;
   not?: InputMaybe<ModelExpenditureMetadataConditionInput>;
   or?: InputMaybe<Array<InputMaybe<ModelExpenditureMetadataConditionInput>>>;
@@ -3445,6 +3451,8 @@ export type ModelExpenditureMetadataConnection = {
 export type ModelExpenditureMetadataFilterInput = {
   and?: InputMaybe<Array<InputMaybe<ModelExpenditureMetadataFilterInput>>>;
   distributionType?: InputMaybe<ModelSplitPaymentDistributionTypeInput>;
+  expectedNumberOfPayouts?: InputMaybe<ModelIntInput>;
+  expectedNumberOfTokens?: InputMaybe<ModelIntInput>;
   fundFromDomainNativeId?: InputMaybe<ModelIntInput>;
   id?: InputMaybe<ModelIdInput>;
   not?: InputMaybe<ModelExpenditureMetadataFilterInput>;
@@ -4337,6 +4345,8 @@ export type ModelSubscriptionExpenditureMetadataFilterInput = {
     Array<InputMaybe<ModelSubscriptionExpenditureMetadataFilterInput>>
   >;
   distributionType?: InputMaybe<ModelSubscriptionStringInput>;
+  expectedNumberOfPayouts?: InputMaybe<ModelSubscriptionIntInput>;
+  expectedNumberOfTokens?: InputMaybe<ModelSubscriptionIntInput>;
   fundFromDomainNativeId?: InputMaybe<ModelSubscriptionIntInput>;
   id?: InputMaybe<ModelSubscriptionIdInput>;
   or?: InputMaybe<
@@ -5405,6 +5415,12 @@ export type MutationCreateMultiSigUserSignatureArgs = {
 };
 
 /** Root mutation type */
+export type MutationCreateNotificationsDataArgs = {
+  condition?: InputMaybe<ModelNotificationsDataConditionInput>;
+  input: CreateNotificationsDataInput;
+};
+
+/** Root mutation type */
 export type MutationCreatePrivateBetaInviteCodeArgs = {
   condition?: InputMaybe<ModelPrivateBetaInviteCodeConditionInput>;
   input: CreatePrivateBetaInviteCodeInput;
@@ -5661,6 +5677,12 @@ export type MutationDeleteMultiSigUserSignatureArgs = {
 };
 
 /** Root mutation type */
+export type MutationDeleteNotificationsDataArgs = {
+  condition?: InputMaybe<ModelNotificationsDataConditionInput>;
+  input: DeleteNotificationsDataInput;
+};
+
+/** Root mutation type */
 export type MutationDeletePrivateBetaInviteCodeArgs = {
   condition?: InputMaybe<ModelPrivateBetaInviteCodeConditionInput>;
   input: DeletePrivateBetaInviteCodeInput;
@@ -5914,6 +5936,12 @@ export type MutationUpdateMotionMessageArgs = {
 export type MutationUpdateMultiSigUserSignatureArgs = {
   condition?: InputMaybe<ModelMultiSigUserSignatureConditionInput>;
   input: UpdateMultiSigUserSignatureInput;
+};
+
+/** Root mutation type */
+export type MutationUpdateNotificationsDataArgs = {
+  condition?: InputMaybe<ModelNotificationsDataConditionInput>;
+  input: UpdateNotificationsDataInput;
 };
 
 /** Root mutation type */
@@ -6776,6 +6804,11 @@ export type QueryGetMultiSigUserSignatureByMultiSigIdArgs = {
 };
 
 /** Root query type */
+export type QueryGetNotificationsDataArgs = {
+  userAddress: Scalars['ID'];
+};
+
+/** Root query type */
 export type QueryGetPrivateBetaInviteCodeArgs = {
   id: Scalars['ID'];
 };
@@ -7202,6 +7235,15 @@ export type QueryListMultiSigUserSignaturesArgs = {
   filter?: InputMaybe<ModelMultiSigUserSignatureFilterInput>;
   limit?: InputMaybe<Scalars['Int']>;
   nextToken?: InputMaybe<Scalars['String']>;
+};
+
+/** Root query type */
+export type QueryListNotificationsDataArgs = {
+  filter?: InputMaybe<ModelNotificationsDataFilterInput>;
+  limit?: InputMaybe<Scalars['Int']>;
+  nextToken?: InputMaybe<Scalars['String']>;
+  sortDirection?: InputMaybe<ModelSortDirection>;
+  userAddress?: InputMaybe<Scalars['ID']>;
 };
 
 /** Root query type */
@@ -8028,6 +8070,10 @@ export type SubscriptionOnCreateMultiSigUserSignatureArgs = {
   filter?: InputMaybe<ModelSubscriptionMultiSigUserSignatureFilterInput>;
 };
 
+export type SubscriptionOnCreateNotificationsDataArgs = {
+  filter?: InputMaybe<ModelSubscriptionNotificationsDataFilterInput>;
+};
+
 export type SubscriptionOnCreatePrivateBetaInviteCodeArgs = {
   filter?: InputMaybe<ModelSubscriptionPrivateBetaInviteCodeFilterInput>;
 };
@@ -8192,6 +8238,10 @@ export type SubscriptionOnDeleteMultiSigUserSignatureArgs = {
   filter?: InputMaybe<ModelSubscriptionMultiSigUserSignatureFilterInput>;
 };
 
+export type SubscriptionOnDeleteNotificationsDataArgs = {
+  filter?: InputMaybe<ModelSubscriptionNotificationsDataFilterInput>;
+};
+
 export type SubscriptionOnDeletePrivateBetaInviteCodeArgs = {
   filter?: InputMaybe<ModelSubscriptionPrivateBetaInviteCodeFilterInput>;
 };
@@ -8354,6 +8404,10 @@ export type SubscriptionOnUpdateMotionMessageArgs = {
 
 export type SubscriptionOnUpdateMultiSigUserSignatureArgs = {
   filter?: InputMaybe<ModelSubscriptionMultiSigUserSignatureFilterInput>;
+};
+
+export type SubscriptionOnUpdateNotificationsDataArgs = {
+  filter?: InputMaybe<ModelSubscriptionNotificationsDataFilterInput>;
 };
 
 export type SubscriptionOnUpdatePrivateBetaInviteCodeArgs = {
@@ -8912,6 +8966,8 @@ export type UpdateExpenditureInput = {
 
 export type UpdateExpenditureMetadataInput = {
   distributionType?: InputMaybe<SplitPaymentDistributionType>;
+  expectedNumberOfPayouts?: InputMaybe<Scalars['Int']>;
+  expectedNumberOfTokens?: InputMaybe<Scalars['Int']>;
   fundFromDomainNativeId?: InputMaybe<Scalars['Int']>;
   id: Scalars['ID'];
   stages?: InputMaybe<Array<ExpenditureStageInput>>;
@@ -11335,6 +11391,27 @@ export type GetTokenFromEverywhereQuery = {
   } | null;
 };
 
+export type GetNotificationUsersQueryVariables = Exact<{
+  filter?: InputMaybe<ModelUserFilterInput>;
+  limit?: InputMaybe<Scalars['Int']>;
+}>;
+
+export type GetNotificationUsersQuery = {
+  __typename?: 'Query';
+  listUsers?: {
+    __typename?: 'ModelUserConnection';
+    items: Array<{
+      __typename?: 'User';
+      notificationsData?: {
+        __typename?: 'NotificationsData';
+        magicbellUserId: string;
+        notificationsDisabled: boolean;
+        mutedColonyAddresses: Array<string>;
+      } | null;
+    } | null>;
+  } | null;
+};
+
 export const DomainMetadata = gql`
   fragment DomainMetadata on DomainMetadata {
     name
@@ -11476,6 +11553,12 @@ export const Expenditure = gql`
     createdAt
     firstEditTransactionHash
     type
+    actions {
+      items {
+        type
+        id
+      }
+    }
   }
   ${ExpenditureSlot}
   ${ExpenditureBalance}
@@ -11627,6 +11710,23 @@ export const ColonyMultiSig = gql`
     createdAt
   }
   ${MultiSigUserSignature}
+`;
+export const NotificationsData = gql`
+  fragment NotificationsData on NotificationsData {
+    magicbellUserId
+    notificationsDisabled
+    mutedColonyAddresses
+  }
+`;
+export const NotificationUser = gql`
+  fragment NotificationUser on ColonyContributor {
+    user {
+      notificationsData {
+        ...NotificationsData
+      }
+    }
+  }
+  ${NotificationsData}
 `;
 export const CreateColonyActionDocument = gql`
   mutation CreateColonyAction($input: CreateColonyActionInput!) {
@@ -12159,6 +12259,31 @@ export const GetColonyContributorDocument = gql`
     }
   }
 `;
+export const GetColonyContributorsNotificationDataDocument = gql`
+  query GetColonyContributorsNotificationData(
+    $colonyAddress: ID!
+    $sortDirection: ModelSortDirection = ASC
+    $limit: Int = 100
+    $nextToken: String
+  ) {
+    getContributorsByColony(
+      colonyAddress: $colonyAddress
+      sortDirection: $sortDirection
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        user {
+          notificationsData {
+            ...NotificationsData
+          }
+        }
+      }
+      nextToken
+    }
+  }
+  ${NotificationsData}
+`;
 export const GetCurrentVersionDocument = gql`
   query GetCurrentVersion($key: String!) {
     getCurrentVersionByKey(key: $key) {
@@ -12555,4 +12680,16 @@ export const GetTokenFromEverywhereDocument = gql`
       }
     }
   }
+`;
+export const GetNotificationUsersDocument = gql`
+  query GetNotificationUsers($filter: ModelUserFilterInput, $limit: Int) {
+    listUsers(filter: $filter, limit: $limit) {
+      items {
+        notificationsData {
+          ...NotificationsData
+        }
+      }
+    }
+  }
+  ${NotificationsData}
 `;
