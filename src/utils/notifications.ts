@@ -27,6 +27,17 @@ import {
   ExtensionUpdateNotificationVariables,
 } from '~types/notifications';
 
+const categoryToApiKey: Record<
+  NotificationCategory,
+  | 'adminNotificationsDisabled'
+  | 'mentionNotificationsDisabled'
+  | 'paymentNotificationsDisabled'
+> = {
+  [NotificationCategory.Admin]: 'adminNotificationsDisabled',
+  [NotificationCategory.Mention]: 'mentionNotificationsDisabled',
+  [NotificationCategory.Payment]: 'paymentNotificationsDisabled',
+};
+
 // Set up the notification client
 export const setupNotificationsClient = async (): Promise<void> => {
   try {
@@ -43,11 +54,13 @@ export const setupNotificationsClient = async (): Promise<void> => {
 const shouldSendNotificationToRecipient = (
   notificationsData: NotificationsDataFragment,
   colonyAddress: string,
+  noticationCategory: NotificationCategory,
 ): boolean => {
   return (
     !!notificationsData.magicbellUserId && // User has a magicbell user account made
     !notificationsData.notificationsDisabled && // User has not disabled notifications app-wide
-    !notificationsData.mutedColonyAddresses.includes(colonyAddress) // User has not muted the colony that the notification is in
+    !notificationsData.mutedColonyAddresses.includes(colonyAddress) && // User has not muted the colony that the notification is in
+    !notificationsData[categoryToApiKey[noticationCategory]] // User doesn't have notifications for this category disabled
   );
 };
 
@@ -70,6 +83,7 @@ const getMembersData: GetDataFn<
 // Get all the recipients of a colony wide notification in the format Magicbell expects.
 export const getRecipientsOfColonyWideNotification = async (
   colonyAddress: string,
+  noticationCategory: NotificationCategory,
 ): Promise<Recipient[]> => {
   const recipients: Recipient[] = [];
 
@@ -83,6 +97,7 @@ export const getRecipientsOfColonyWideNotification = async (
       shouldSendNotificationToRecipient(
         member.user.notificationsData,
         colonyAddress,
+        noticationCategory,
       )
     ) {
       recipients.push({
@@ -109,7 +124,10 @@ export const sendPermissionsActionNotifications = async ({
   }
 
   // Get the recipients of the colony wide notifications.
-  const recipients = await getRecipientsOfColonyWideNotification(colonyAddress);
+  const recipients = await getRecipientsOfColonyWideNotification(
+    colonyAddress,
+    notificationCategory,
+  );
 
   if (!recipients.length) {
     return;
@@ -148,7 +166,10 @@ export const sendExpenditureUpdateNotifications = async ({
   notificationType,
 }: ExpenditureUpdateNotificationVariables): Promise<void> => {
   // Get the recipients of the colony wide notifications.
-  const recipients = await getRecipientsOfColonyWideNotification(colonyAddress);
+  const recipients = await getRecipientsOfColonyWideNotification(
+    colonyAddress,
+    NotificationCategory.Payment,
+  );
 
   if (!recipients.length) {
     return;
@@ -174,7 +195,10 @@ export const sendMultisigActionNotifications = async ({
   notificationCategory,
 }: MultisigActionNotificationVariables): Promise<void> => {
   // Get the recipients of the colony wide notifications.
-  const recipients = await getRecipientsOfColonyWideNotification(colonyAddress);
+  const recipients = await getRecipientsOfColonyWideNotification(
+    colonyAddress,
+    notificationCategory,
+  );
 
   if (!recipients.length) {
     return;
@@ -268,7 +292,11 @@ export const sendMentionNotifications = async ({
   (response?.data?.listUsers?.items ?? []).forEach((user) => {
     if (
       user?.notificationsData &&
-      shouldSendNotificationToRecipient(user.notificationsData, colonyAddress)
+      shouldSendNotificationToRecipient(
+        user.notificationsData,
+        colonyAddress,
+        NotificationCategory.Mention,
+      )
     ) {
       validRecipients.push({
         external_id: user.notificationsData.magicbellUserId,
@@ -296,7 +324,10 @@ export const sendFundsClaimedNotifications = async ({
   tokenSymbol,
 }: FundsClaimedNotificationVariables): Promise<void> => {
   // Get the recipients of the colony wide notifications.
-  const recipients = await getRecipientsOfColonyWideNotification(colonyAddress);
+  const recipients = await getRecipientsOfColonyWideNotification(
+    colonyAddress,
+    NotificationCategory.Payment,
+  );
 
   if (!recipients.length) {
     return;
