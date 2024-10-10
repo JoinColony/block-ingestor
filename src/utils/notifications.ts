@@ -32,6 +32,7 @@ export enum NotificationType {
   ExtensionEnabled = 'ExtensionEnabled',
   ExtensionDeprecated = 'ExtensionDeprecated',
   ExtensionUninstalled = 'ExtensionUninstalled',
+  ExtensionSettingsChanged = 'ExtensionSettingsChanged',
 }
 
 interface NotificationVariables {
@@ -82,7 +83,8 @@ interface ExtensionUpdateNotificationVariables
     | NotificationType.ExtensionUpgraded
     | NotificationType.ExtensionEnabled
     | NotificationType.ExtensionDeprecated
-    | NotificationType.ExtensionUninstalled;
+    | NotificationType.ExtensionUninstalled
+    | NotificationType.ExtensionSettingsChanged;
 }
 
 interface Recipient {
@@ -235,8 +237,6 @@ export const sendExtensionUpdateNotifications = async ({
   if (!recipients.length) {
     return;
   }
-
-  console.log('notificationType', notificationType);
 
   // Send the colony wide notifications.
   await sendNotification(`Extension: ${extensionHash}`, recipients, {
