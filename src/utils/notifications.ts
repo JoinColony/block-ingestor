@@ -11,6 +11,7 @@ import {
   NotificationUserFragment,
 } from '~graphql';
 import { getAllPagesOfData, GetDataFn } from './graphql';
+import { isAddressExtension } from './extensions';
 
 export enum NotificationCategory {
   Mention = 'Mention',
@@ -19,14 +20,27 @@ export enum NotificationCategory {
 }
 
 export enum NotificationType {
+  // Expenditures
   ExpenditureReadyForReview = 'ExpenditureReadyForReview',
   ExpenditureReadyForFunding = 'ExpenditureReadyForFunding',
   ExpenditureReadyForRelease = 'ExpenditureReadyForRelease',
   ExpenditureFinalized = 'ExpenditureFinalized',
   ExpenditureCancelled = 'ExpenditureCancelled',
-  PermissionsAction = 'PermissionsAction',
+
+  // Funds
   FundsClaimed = 'FundsClaimed',
+
+  // Mentions
   Mention = 'Mention',
+
+  // Multisig
+  MultiSigActionCreated = 'MultiSigActionCreated',
+  MultiSigActionFinalized = 'MultiSigActionFinalized',
+  MultiSigActionApproved = 'MultiSigActionApproved',
+  MultiSigActionRejected = 'MultiSigActionRejected',
+
+  // Actions made with permissions
+  PermissionsAction = 'PermissionsAction',
 }
 
 interface NotificationVariables {
@@ -72,6 +86,15 @@ interface ExpenditureUpdateNotificationVariables
     | NotificationType.ExpenditureReadyForRelease
     | NotificationType.ExpenditureFinalized
     | NotificationType.ExpenditureCancelled;
+}
+
+interface MultisigActionNotificationVariables
+  extends Omit<NotificationVariables, 'notificationType'> {
+  notificationType:
+    | NotificationType.MultiSigActionCreated
+    | NotificationType.MultiSigActionFinalized
+    | NotificationType.MultiSigActionApproved
+    | NotificationType.MultiSigActionRejected;
 }
 
 interface Recipient {
@@ -153,6 +176,12 @@ export const sendPermissionsActionNotifications = async ({
   mentions,
   notificationCategory,
 }: PermissionsActionNotificationVariables): Promise<void> => {
+  // Don't send notifications for permissions actions done by extensions. These will be motion finalizations.
+  const isExtension = await isAddressExtension(creator);
+  if (isExtension) {
+    return;
+  }
+
   // Get the recipients of the colony wide notifications.
   const recipients = await getRecipientsOfColonyWideNotification(colonyAddress);
 
@@ -184,7 +213,7 @@ export const sendPermissionsActionNotifications = async ({
   }
 };
 
-// Send a notification when an expenditure is updated.
+// Send a notification when an expenditure is created / updated.
 export const sendExpenditureUpdateNotifications = async ({
   creator,
   colonyAddress,
@@ -207,6 +236,31 @@ export const sendExpenditureUpdateNotifications = async ({
     colonyAddress,
     transactionHash,
     expenditureID,
+  });
+};
+
+// Send a notification when a multisig action is created / updated.
+export const sendMultisigActionNotifications = async ({
+  creator,
+  colonyAddress,
+  transactionHash,
+  notificationType,
+  notificationCategory,
+}: MultisigActionNotificationVariables): Promise<void> => {
+  // Get the recipients of the colony wide notifications.
+  const recipients = await getRecipientsOfColonyWideNotification(colonyAddress);
+
+  if (!recipients.length) {
+    return;
+  }
+
+  // Send the colony wide notifications.
+  await sendNotification(`Multisig: ${transactionHash}`, recipients, {
+    notificationType,
+    notificationCategory,
+    creator,
+    colonyAddress,
+    transactionHash,
   });
 };
 

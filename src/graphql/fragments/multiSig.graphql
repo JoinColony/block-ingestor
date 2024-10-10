@@ -30,4 +30,7 @@ fragment ColonyMultiSig on ColonyMultiSig {
   rejectedAt
   rejectedBy
   createdAt
+  action {
+    type
+  }
 }

@@ -6,16 +6,30 @@ import {
 } from '~graphql';
 import { EventHandler } from '~types';
 import { verbose } from '~utils';
-import { getMultiSigDatabaseId } from './helpers';
+import {
+  getMultiSigDatabaseId,
+  getMultiSigFromDB,
+  getMultisigNotificationCategory,
+} from './helpers';
 import { getChainId } from '~provider';
 import { getBlockChainTimestampISODate } from '~utils/dates';
+import {
+  NotificationType,
+  sendMultisigActionNotifications,
+} from '~utils/notifications';
+import { ExtensionEventListener } from '~eventListeners';
 
-export const handleMultiSigMotionCancelled: EventHandler = async (event) => {
+export const handleMultiSigMotionCancelled: EventHandler = async (
+  event,
+  listener,
+) => {
   const {
     args: { motionId, agent: userAddress },
     contractAddress: multiSigExtensionAddress,
     timestamp,
   } = event;
+
+  const { colonyAddress } = listener as ExtensionEventListener;
 
   const chainId = getChainId();
 
@@ -39,4 +53,20 @@ export const handleMultiSigMotionCancelled: EventHandler = async (event) => {
       rejectedBy: userAddress,
     },
   });
+
+  const multiSigFromDB = await getMultiSigFromDB(multiSigDatabaseId);
+
+  const notificationCategory = await getMultisigNotificationCategory(
+    multiSigFromDB?.action?.type,
+  );
+
+  if (notificationCategory) {
+    sendMultisigActionNotifications({
+      colonyAddress,
+      creator: userAddress,
+      notificationCategory,
+      notificationType: NotificationType.MultiSigActionRejected,
+      transactionHash: multiSigFromDB?.transactionHash,
+    });
+  }
 };
