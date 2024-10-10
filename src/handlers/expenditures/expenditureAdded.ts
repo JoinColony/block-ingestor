@@ -6,6 +6,7 @@ import {
   CreateExpenditureMutationVariables,
   ExpenditureStatus,
   ExpenditureType,
+  NotificationType,
 } from '~graphql';
 import { ContractEvent, ContractEventsSignatures } from '~types';
 import {
@@ -19,10 +20,7 @@ import {
 } from '~utils';
 
 import { getExpenditure } from './helpers';
-import {
-  NotificationType,
-  sendExpenditureUpdateNotifications,
-} from '~utils/notifications';
+import { sendExpenditureUpdateNotifications } from '~utils/notifications';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { contractAddress: colonyAddress, transactionHash } = event;

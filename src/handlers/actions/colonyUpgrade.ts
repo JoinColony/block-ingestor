@@ -6,11 +6,9 @@ import {
   UpdateColonyMutationVariables,
 } from '~graphql';
 import { ContractEvent } from '~types';
+import { NotificationCategory } from '~types/notifications';
 import { toNumber, verbose, writeActionFromEvent } from '~utils';
-import {
-  NotificationCategory,
-  sendPermissionsActionNotifications,
-} from '~utils/notifications';
+import { sendPermissionsActionNotifications } from '~utils/notifications';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { contractAddress: colonyAddress, transactionHash } = event;

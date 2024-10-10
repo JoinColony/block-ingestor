@@ -3,6 +3,7 @@ import { ContractEvent, motionNameMapping } from '~types';
 import { getDomainDatabaseId } from '~utils';
 
 import { createMotionInDB } from '../helpers';
+import { sendMentionNotifications } from '~utils/notifications';
 
 export const handleDomainEditReputationMotion = async (
   colonyAddress: string,
@@ -16,5 +17,12 @@ export const handleDomainEditReputationMotion = async (
     recipientAddress: userAddress,
     amount: amount.toString(),
     fromDomainId: getDomainDatabaseId(colonyAddress, domainId),
+  });
+
+  sendMentionNotifications({
+    colonyAddress,
+    creator: event.args.agent,
+    transactionHash: event.transactionHash,
+    recipients: [userAddress],
   });
 };

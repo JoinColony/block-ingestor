@@ -9,6 +9,7 @@ import {
 } from '~graphql';
 import provider from '~provider';
 import { ContractEvent, ContractEventsSignatures } from '~types';
+import { NotificationCategory } from '~types/notifications';
 import {
   getCachedColonyClient,
   getDomainDatabaseId,
@@ -21,10 +22,7 @@ import {
   createFundsClaim,
 } from '~utils';
 import { getAmountLessFee, getNetworkInverseFee } from '~utils/networkFee';
-import {
-  NotificationCategory,
-  sendPermissionsActionNotifications,
-} from '~utils/notifications';
+import { sendPermissionsActionNotifications } from '~utils/notifications';
 
 const PAYOUT_CLAIMED_SIGNATURE_HASH = utils.id(
   ContractEventsSignatures.PayoutClaimed,

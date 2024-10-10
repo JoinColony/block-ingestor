@@ -1,20 +1,17 @@
 import { mutate } from '~amplifyClient';
 import {
+  NotificationType,
   UpdateColonyMultiSigDocument,
   UpdateColonyMultiSigInput,
   UpdateColonyMultiSigMutationVariables,
 } from '~graphql';
 import { EventHandler } from '~types';
 import { verbose } from '~utils';
-import {
-  getMultiSigDatabaseId,
-  getMultiSigFromDB,
-  getMultisigNotificationCategory,
-} from './helpers';
+import { getMultiSigDatabaseId, getMultiSigFromDB } from './helpers';
 import { getChainId } from '~provider';
 import { getBlockChainTimestampISODate } from '~utils/dates';
 import {
-  NotificationType,
+  getNotificationCategory,
   sendMultisigActionNotifications,
 } from '~utils/notifications';
 import { ExtensionEventListener } from '~eventListeners';
@@ -56,7 +53,7 @@ export const handleMultiSigMotionCancelled: EventHandler = async (
 
   const multiSigFromDB = await getMultiSigFromDB(multiSigDatabaseId);
 
-  const notificationCategory = await getMultisigNotificationCategory(
+  const notificationCategory = getNotificationCategory(
     multiSigFromDB?.action?.type,
   );
 
@@ -65,7 +62,7 @@ export const handleMultiSigMotionCancelled: EventHandler = async (
       colonyAddress,
       creator: userAddress,
       notificationCategory,
-      notificationType: NotificationType.MultiSigActionRejected,
+      notificationType: NotificationType.MultisigActionRejected,
       transactionHash: multiSigFromDB?.transactionHash,
     });
   }

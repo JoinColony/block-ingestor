@@ -29,10 +29,8 @@ import {
 import provider from '~provider';
 import { updateColonyContributor } from '~utils/contributors';
 import { ExtensionEventListener } from '~eventListeners';
-import {
-  NotificationCategory,
-  sendPermissionsActionNotifications,
-} from '~utils/notifications';
+import { sendPermissionsActionNotifications } from '~utils/notifications';
+import { NotificationCategory } from '~types/notifications';
 
 export const handleManagePermissionsAction: EventHandler = async (
   event,
