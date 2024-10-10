@@ -11,9 +11,6 @@ import {
   GetColonyExtensionQuery,
   GetColonyExtensionQueryVariables,
   GetColonyExtensionDocument,
-  UpdateColonyExtensionByAddressDocument,
-  UpdateColonyExtensionByAddressMutation,
-  UpdateColonyExtensionByAddressMutationVariables,
   GetColonyExtensionByHashAndColonyDocument,
   GetColonyExtensionByHashAndColonyQuery,
   GetColonyExtensionByHashAndColonyQueryVariables,
@@ -24,6 +21,7 @@ import {
   NotificationType,
   sendExtensionUpdateNotifications,
 } from '~utils/notifications';
+import { updateExtension } from './updateExtension';
 
 /**
  * Function writing the extension version to the db based on the ExtensionAddedToNetwork event payload
@@ -105,14 +103,8 @@ export const deleteExtensionFromEvent = async (
   const extensionId = data?.getExtensionByColonyAndHash?.items[0]?.id;
 
   if (extensionId) {
-    await mutate<
-      UpdateColonyExtensionByAddressMutation,
-      UpdateColonyExtensionByAddressMutationVariables
-    >(UpdateColonyExtensionByAddressDocument, {
-      input: {
-        id: extensionId,
-        isDeleted: true,
-      },
+    await updateExtension(extensionId, {
+      isDeleted: true,
     });
   }
 };
@@ -161,17 +153,11 @@ const createOrUpdateColonyExtension = async (
       extensionHash: input.hash,
     });
 
-    await mutate<
-      UpdateColonyExtensionByAddressMutation,
-      UpdateColonyExtensionByAddressMutationVariables
-    >(UpdateColonyExtensionByAddressDocument, {
-      input: {
-        id: extensionAddress,
-        isDeprecated,
-        isDeleted,
-        isInitialized,
-        version,
-      },
+    await updateExtension(extensionAddress, {
+      isDeprecated,
+      isDeleted,
+      isInitialized,
+      version,
     });
   }
 };
