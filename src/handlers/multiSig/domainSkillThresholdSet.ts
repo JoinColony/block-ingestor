@@ -1,4 +1,4 @@
-import { mutate, query } from '~amplifyClient';
+import { query } from '~amplifyClient';
 import {
   GetColonyExtensionByAddressDocument,
   GetColonyExtensionByAddressQuery,
@@ -6,12 +6,10 @@ import {
   GetDomainsByExtensionAddressDocument,
   GetDomainsByExtensionAddressQuery,
   GetDomainsByExtensionAddressQueryVariables,
-  UpdateColonyExtensionByAddressDocument,
-  UpdateColonyExtensionByAddressMutation,
-  UpdateColonyExtensionByAddressMutationVariables,
 } from '~graphql';
 import { ContractEvent, EventHandler } from '~types';
 import { getCachedColonyClient, toNumber } from '~utils';
+import { updateExtension } from '~utils/extensions/updateExtension';
 
 export const handleMultiSigDomainSkillThresholdSet: EventHandler = async (
   event: ContractEvent,
@@ -73,17 +71,11 @@ export const handleMultiSigDomainSkillThresholdSet: EventHandler = async (
       }
     }
 
-    await mutate<
-      UpdateColonyExtensionByAddressMutation,
-      UpdateColonyExtensionByAddressMutationVariables
-    >(UpdateColonyExtensionByAddressDocument, {
-      input: {
-        id: multiSigAddress,
-        params: {
-          multiSig: {
-            ...multiSig,
-            domainThresholds: updatedDomainThresholds,
-          },
+    await updateExtension(multiSigAddress, {
+      params: {
+        multiSig: {
+          ...multiSig,
+          domainThresholds: updatedDomainThresholds,
         },
       },
     });

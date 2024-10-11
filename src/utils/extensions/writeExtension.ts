@@ -11,15 +11,17 @@ import {
   GetColonyExtensionQuery,
   GetColonyExtensionQueryVariables,
   GetColonyExtensionDocument,
-  UpdateColonyExtensionByAddressDocument,
-  UpdateColonyExtensionByAddressMutation,
-  UpdateColonyExtensionByAddressMutationVariables,
   GetColonyExtensionByHashAndColonyDocument,
   GetColonyExtensionByHashAndColonyQuery,
   GetColonyExtensionByHashAndColonyQueryVariables,
   CreateColonyExtensionInput,
 } from '~graphql';
 import { updateCurrentVersion } from '~utils/currentVersion';
+import {
+  NotificationType,
+  sendExtensionUpdateNotifications,
+} from '~utils/notifications';
+import { updateExtension } from './updateExtension';
 
 /**
  * Function writing the extension version to the db based on the ExtensionAddedToNetwork event payload
@@ -101,14 +103,8 @@ export const deleteExtensionFromEvent = async (
   const extensionId = data?.getExtensionByColonyAndHash?.items[0]?.id;
 
   if (extensionId) {
-    await mutate<
-      UpdateColonyExtensionByAddressMutation,
-      UpdateColonyExtensionByAddressMutationVariables
-    >(UpdateColonyExtensionByAddressDocument, {
-      input: {
-        id: extensionId,
-        isDeleted: true,
-      },
+    await updateExtension(extensionId, {
+      isDeleted: true,
     });
   }
 };
@@ -131,6 +127,13 @@ const createOrUpdateColonyExtension = async (
 
   // If extension record doesn't exist, try to create one
   if (!extension) {
+    sendExtensionUpdateNotifications({
+      colonyAddress: input.colonyId,
+      creator: input.installedBy,
+      notificationType: NotificationType.ExtensionInstalled,
+      extensionHash: input.hash,
+    });
+
     await mutate<
       CreateColonyExtensionMutation,
       CreateColonyExtensionMutationVariables
@@ -142,17 +145,19 @@ const createOrUpdateColonyExtension = async (
     });
   } else {
     // Otherwise, update the existing extension
-    await mutate<
-      UpdateColonyExtensionByAddressMutation,
-      UpdateColonyExtensionByAddressMutationVariables
-    >(UpdateColonyExtensionByAddressDocument, {
-      input: {
-        id: extensionAddress,
-        isDeprecated,
-        isDeleted,
-        isInitialized,
-        version,
-      },
+
+    sendExtensionUpdateNotifications({
+      colonyAddress: input.colonyId,
+      creator: input.installedBy,
+      notificationType: NotificationType.ExtensionUpgraded,
+      extensionHash: input.hash,
+    });
+
+    await updateExtension(extensionAddress, {
+      isDeprecated,
+      isDeleted,
+      isInitialized,
+      version,
     });
   }
 };

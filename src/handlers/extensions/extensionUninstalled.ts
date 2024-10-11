@@ -1,15 +1,32 @@
 import { Extension, getExtensionHash } from '@colony/colony-js';
+import { constants } from 'ethers';
 import { removeExtensionEventListeners } from '~eventListeners';
 import { handleMultiSigUninstalled } from '~eventListeners/extension/multiSig';
+import networkClient from '~networkClient';
 import { ContractEvent } from '~types';
 import { deleteExtensionFromEvent } from '~utils';
+import {
+  NotificationType,
+  sendExtensionUpdateNotifications,
+} from '~utils/notifications';
 
 export default async (event: ContractEvent): Promise<void> => {
-  const { contractAddress: extensionAddress } = event;
+  const { contractAddress: extensionAddress, transactionHash } = event;
   const { extensionId: extensionHash, colony: colonyAddress } = event.args;
 
   await deleteExtensionFromEvent(event);
   removeExtensionEventListeners(extensionAddress);
+
+  const receipt = await networkClient.provider.getTransactionReceipt(
+    transactionHash,
+  );
+
+  sendExtensionUpdateNotifications({
+    colonyAddress,
+    creator: receipt.from || constants.AddressZero,
+    notificationType: NotificationType.ExtensionUninstalled,
+    extensionHash,
+  });
 
   if (extensionHash === getExtensionHash(Extension.MultisigPermissions)) {
     await handleMultiSigUninstalled(colonyAddress);
