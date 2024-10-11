@@ -17,7 +17,6 @@ export enum NotificationCategory {
   Mention = 'Mention',
   Payment = 'Payment',
   Admin = 'Admin',
-  Extension = 'Extension',
 }
 
 export enum NotificationType {
@@ -105,8 +104,8 @@ interface MultisigActionNotificationVariables
     | NotificationType.MultiSigActionFinalized
     | NotificationType.MultiSigActionApproved
     | NotificationType.MultiSigActionRejected;
-  }
-  
+}
+
 interface ExtensionUpdateNotificationVariables
   extends Omit<
     NotificationVariables,
@@ -308,7 +307,7 @@ export const sendExtensionUpdateNotifications = async ({
   await sendNotification(`Extension: ${extensionHash}`, recipients, {
     notificationType,
     creator,
-    notificationCategory: NotificationCategory.Extension,
+    notificationCategory: NotificationCategory.Admin,
     colonyAddress,
     transactionHash,
     extensionHash,
