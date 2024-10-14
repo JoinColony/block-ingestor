@@ -129,22 +129,20 @@ export const sendPermissionsActionNotifications = async ({
     notificationCategory,
   );
 
-  if (!recipients.length) {
-    return;
+  if (recipients.length > 0) {
+    // Send the colony wide notifications.
+    await sendNotification(
+      `Permissions action created: ${transactionHash}`,
+      recipients,
+      {
+        notificationType: NotificationType.PermissionsAction,
+        notificationCategory,
+        creator,
+        colonyAddress,
+        transactionHash,
+      },
+    );
   }
-
-  // Send the colony wide notifications.
-  await sendNotification(
-    `Permissions action created: ${transactionHash}`,
-    recipients,
-    {
-      notificationType: NotificationType.PermissionsAction,
-      notificationCategory,
-      creator,
-      colonyAddress,
-      transactionHash,
-    },
-  );
 
   // If any colony members should also recieve a specific "mention" notification...
   if (mentions?.length) {
@@ -223,7 +221,10 @@ export const sendMotionNotifications = async ({
   notificationCategory,
 }: MotionNotificationVariables): Promise<void> => {
   // Get the recipients of the colony wide notifications.
-  const recipients = await getRecipientsOfColonyWideNotification(colonyAddress);
+  const recipients = await getRecipientsOfColonyWideNotification(
+    colonyAddress,
+    notificationCategory,
+  );
 
   if (!recipients.length) {
     return;
@@ -248,7 +249,10 @@ export const sendExtensionUpdateNotifications = async ({
   notificationType,
 }: ExtensionUpdateNotificationVariables): Promise<void> => {
   // Get the recipients of the colony wide notifications.
-  const recipients = await getRecipientsOfColonyWideNotification(colonyAddress);
+  const recipients = await getRecipientsOfColonyWideNotification(
+    colonyAddress,
+    NotificationCategory.Admin,
+  );
 
   if (!recipients.length) {
     return;
