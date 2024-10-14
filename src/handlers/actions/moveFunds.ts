@@ -107,7 +107,7 @@ export default async (event: ContractEvent): Promise<void> => {
     );
   }
 
-  if (!hasOneTxPaymentEvent) {
+  if (!targetExpenditure && !hasOneTxPaymentEvent) {
     sendPermissionsActionNotifications({
       creator: initiatorAddress,
       colonyAddress,
