@@ -15,17 +15,17 @@ import {
   ColonyActionType,
   ExpenditureBalance,
   ExpenditureFragment,
+  NotificationType,
   UpdateExpenditureDocument,
   UpdateExpenditureMutation,
   UpdateExpenditureMutationVariables,
 } from '~graphql';
 import { mutate } from '~amplifyClient';
 import {
-  NotificationCategory,
-  NotificationType,
   sendExpenditureUpdateNotifications,
   sendPermissionsActionNotifications,
 } from '~utils/notifications';
+import { NotificationCategory } from '~types/notifications';
 
 export default async (event: ContractEvent): Promise<void> => {
   const {
@@ -101,7 +101,7 @@ export default async (event: ContractEvent): Promise<void> => {
     });
   }
 
-  if (!hasOneTxPaymentEvent) {
+  if (!targetExpenditure && !hasOneTxPaymentEvent) {
     sendPermissionsActionNotifications({
       creator: initiatorAddress,
       colonyAddress,

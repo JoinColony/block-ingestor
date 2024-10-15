@@ -2,13 +2,11 @@ import { Extension, getExtensionHash } from '@colony/colony-js';
 import { constants } from 'ethers';
 import { removeExtensionEventListeners } from '~eventListeners';
 import { handleMultiSigUninstalled } from '~eventListeners/extension/multiSig';
+import { NotificationType } from '~graphql';
 import networkClient from '~networkClient';
 import { ContractEvent } from '~types';
 import { deleteExtensionFromEvent } from '~utils';
-import {
-  NotificationType,
-  sendExtensionUpdateNotifications,
-} from '~utils/notifications';
+import { sendExtensionUpdateNotifications } from '~utils/notifications';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { contractAddress: extensionAddress, transactionHash } = event;

@@ -2,7 +2,7 @@ import { BigNumber, constants } from 'ethers';
 import { ExtensionEventListener } from '~eventListeners';
 
 import { EventHandler, MotionEvents } from '~types';
-import { getVotingClient } from '~utils';
+import { getActionByMotionId, getVotingClient } from '~utils';
 import { linkPendingMetadata } from '~utils/colonyMetadata';
 import { getBlockChainTimestampISODate } from '~utils/dates';
 
@@ -18,6 +18,11 @@ import {
   updateColonyUnclaimedStakes,
   updateAmountToExcludeNetworkFee,
 } from './helpers';
+import {
+  getNotificationCategory,
+  sendMotionNotifications,
+} from '~utils/notifications';
+import { ColonyActionType, NotificationType } from '~graphql';
 
 export const handleMotionFinalized: EventHandler = async (event, listener) => {
   const {
@@ -109,5 +114,22 @@ export const handleMotionFinalized: EventHandler = async (event, listener) => {
       motionDatabaseId,
       updatedStakerRewards,
     );
+
+    const colonyAction = await getActionByMotionId(finalizedMotion.id);
+    const notificationCategory = getNotificationCategory(colonyAction?.type);
+
+    if (
+      notificationCategory &&
+      colonyAction &&
+      colonyAction.type !== ColonyActionType.FundExpenditureMotion
+    ) {
+      sendMotionNotifications({
+        colonyAddress,
+        creator: colonyAction.initiatorAddress,
+        notificationCategory,
+        notificationType: NotificationType.MotionFinalized,
+        transactionHash: finalizedMotion.transactionHash,
+      });
+    }
   }
 };

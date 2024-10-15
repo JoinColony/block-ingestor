@@ -11,6 +11,7 @@ import {
   UpdateColonyContributorMutationVariables,
 } from '~graphql';
 import { ContractEvent } from '~types';
+import { NotificationCategory } from '~types/notifications';
 import {
   getDomainDatabaseId,
   RemoveVerifiedMembersOperation,
@@ -18,10 +19,7 @@ import {
 } from '~utils';
 
 import { getColonyContributorId } from '~utils/contributors';
-import {
-  NotificationCategory,
-  sendPermissionsActionNotifications,
-} from '~utils/notifications';
+import { sendPermissionsActionNotifications } from '~utils/notifications';
 
 export const handleRemoveVerifiedMembers = async (
   event: ContractEvent,

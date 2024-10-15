@@ -15,12 +15,10 @@ import {
   GetColonyExtensionByHashAndColonyQuery,
   GetColonyExtensionByHashAndColonyQueryVariables,
   CreateColonyExtensionInput,
+  NotificationType,
 } from '~graphql';
 import { updateCurrentVersion } from '~utils/currentVersion';
-import {
-  NotificationType,
-  sendExtensionUpdateNotifications,
-} from '~utils/notifications';
+import { sendExtensionUpdateNotifications } from '~utils/notifications';
 import { updateExtension } from './updateExtension';
 
 /**
