@@ -26,6 +26,7 @@ import {
   MotionNotificationVariables,
   FundsClaimedNotificationVariables,
   ExtensionUpdateNotificationVariables,
+  ExtensionVersionAddedNotificationVariables,
 } from '~types/notifications';
 
 const categoryToApiKey: Record<
@@ -391,6 +392,53 @@ export const sendColonyVersionAddedNotifications = async (
             colonyAddress: colony.id,
             creator: colony.id, // who's the creator of this??
             newColonyVersion: newVersion.toString(),
+          },
+        );
+      }
+    }),
+  );
+};
+
+export const sendExtensionVersionAddedNotifications = async ({
+  newVersion,
+  extensionHash,
+}: ExtensionVersionAddedNotificationVariables): Promise<void> => {
+  const allColonies = await getAllColoniesWithRootPermissionHolders();
+
+  await Promise.all(
+    allColonies.map(async (colony) => {
+      const recipients: Recipient[] = [];
+
+      if (!colony.roles?.items) {
+        return;
+      }
+
+      for (const roleItem of colony.roles.items) {
+        if (
+          !!roleItem?.targetUser?.notificationsData &&
+          shouldSendNotificationToRecipient(
+            roleItem.targetUser.notificationsData,
+            colony.id,
+            NotificationCategory.Admin,
+          )
+        ) {
+          recipients.push({
+            external_id: roleItem.targetUser.notificationsData.magicbellUserId,
+          });
+        }
+      }
+
+      if (recipients.length > 0) {
+        await sendNotification(
+          `Extension ${extensionHash} new version: ${newVersion}`,
+          recipients,
+          {
+            notificationType: NotificationType.NewExtensionVersion,
+            notificationCategory: NotificationCategory.Admin,
+            colonyAddress: colony.id,
+            creator: colony.id,
+            extensionHash,
+            newExtensionVersion: newVersion.toString(),
           },
         );
       }
