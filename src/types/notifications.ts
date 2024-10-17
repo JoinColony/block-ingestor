@@ -17,6 +17,7 @@ export interface NotificationVariables {
   tokenAddress?: string;
   extensionHash?: string;
   newColonyVersion?: string;
+  newExtensionVersion?: string;
 }
 
 export interface MentionNotificationVariables
@@ -86,6 +87,11 @@ export interface ExtensionUpdateNotificationVariables
     | NotificationType.ExtensionDeprecated
     | NotificationType.ExtensionUninstalled
     | NotificationType.ExtensionSettingsChanged;
+}
+
+export interface ExtensionVersionAddedNotificationVariables {
+  extensionHash: string;
+  newVersion: number;
 }
 
 export interface Recipient {
