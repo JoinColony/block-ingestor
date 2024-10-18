@@ -43,6 +43,7 @@ export interface ExpenditureUpdateNotificationVariables
     | NotificationType.ExpenditureReadyForReview
     | NotificationType.ExpenditureReadyForFunding
     | NotificationType.ExpenditureReadyForRelease
+    | NotificationType.ExpenditurePayoutClaimed
     | NotificationType.ExpenditureFinalized
     | NotificationType.ExpenditureCancelled;
 }
