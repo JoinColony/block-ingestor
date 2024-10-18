@@ -279,7 +279,11 @@ export const sendMentionNotifications = async ({
   expenditureID,
   recipients,
 }: MentionNotificationVariables): Promise<void> => {
-  if (!recipients.length) {
+  const nonSelfRecipients = recipients.filter(
+    (recipient) => recipient !== creator,
+  );
+
+  if (!nonSelfRecipients.length) {
     return;
   }
 
@@ -288,7 +292,7 @@ export const sendMentionNotifications = async ({
     GetNotificationUsersQueryVariables
   >(GetNotificationUsersDocument, {
     filter: {
-      or: recipients.map((address) => ({ id: { eq: address } })),
+      or: nonSelfRecipients.map((address) => ({ id: { eq: address } })),
     },
     limit: 9999,
   });
