@@ -21,7 +21,7 @@ export const handleExpenditureMadeViaStake: EventHandler = async (
   event,
   listener,
 ) => {
-  const { transactionHash } = event;
+  const { transactionHash, contractAddress } = event;
   const { expenditureId, stake, creator } = event.args;
   const convertedExpenditureId = toNumber(expenditureId);
   const { colonyAddress } = listener as ExtensionEventListener;
@@ -52,6 +52,7 @@ export const handleExpenditureMadeViaStake: EventHandler = async (
         id: databaseId,
         isStaked: true,
         userStakeId: stakeDatabaseId,
+        stakedExpenditureAddress: contractAddress,
       },
     },
   );
