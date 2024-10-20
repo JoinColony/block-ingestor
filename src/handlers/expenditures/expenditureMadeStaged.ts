@@ -29,6 +29,7 @@ export const handleExpenditureMadeStaged: EventHandler = async (
       input: {
         id: getExpenditureDatabaseId(colonyAddress, convertedExpenditureId),
         type: ExpenditureType.Staged,
+        stagedExpenditureAddress: event.contractAddress,
       },
     },
   );
