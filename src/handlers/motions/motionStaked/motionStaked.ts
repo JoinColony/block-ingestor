@@ -20,7 +20,7 @@ import {
   sendMotionNotifications,
 } from '~utils/notifications';
 import { MotionNotificationVariables } from '~types/notifications';
-import { ColonyActionType, NotificationType } from '~graphql';
+import { NotificationType } from '~graphql';
 
 export const handleMotionStaked: EventHandler = async (
   event,
@@ -145,18 +145,14 @@ export const handleMotionStaked: EventHandler = async (
         notificationType = NotificationType.MotionVoting;
       }
 
-      if (
-        notificationCategory &&
-        notificationType &&
-        colonyAction &&
-        colonyAction.type !== ColonyActionType.FundExpenditureMotion
-      ) {
+      if (notificationCategory && notificationType && colonyAction) {
         sendMotionNotifications({
           colonyAddress,
           creator: colonyAction.initiatorAddress,
           notificationCategory,
           notificationType,
           transactionHash: stakedMotion.transactionHash,
+          expenditureID: stakedMotion.expenditureId ?? undefined,
         });
       }
     }

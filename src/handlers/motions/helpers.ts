@@ -77,8 +77,7 @@ export const updateMotionInDB = async (
       if (
         !colonyAction.showInActionsList &&
         showInActionsList &&
-        notificationCategory &&
-        colonyAction.type !== ColonyActionType.FundExpenditureMotion
+        notificationCategory
       ) {
         sendMotionNotifications({
           colonyAddress: colonyAction.colonyId,
@@ -86,6 +85,7 @@ export const updateMotionInDB = async (
           notificationCategory,
           notificationType: NotificationType.MotionCreated,
           transactionHash: colonyAction.id,
+          expenditureID: motionData?.expenditureId ?? undefined,
         });
 
         let recipients: string[] = [];
