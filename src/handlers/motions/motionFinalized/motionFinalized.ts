@@ -22,7 +22,7 @@ import {
   getNotificationCategory,
   sendMotionNotifications,
 } from '~utils/notifications';
-import { ColonyActionType, NotificationType } from '~graphql';
+import { NotificationType } from '~graphql';
 
 export const handleMotionFinalized: EventHandler = async (event, listener) => {
   const {
@@ -118,17 +118,14 @@ export const handleMotionFinalized: EventHandler = async (event, listener) => {
     const colonyAction = await getActionByMotionId(finalizedMotion.id);
     const notificationCategory = getNotificationCategory(colonyAction?.type);
 
-    if (
-      notificationCategory &&
-      colonyAction &&
-      colonyAction.type !== ColonyActionType.FundExpenditureMotion
-    ) {
+    if (notificationCategory && colonyAction) {
       sendMotionNotifications({
         colonyAddress,
         creator: colonyAction.initiatorAddress,
         notificationCategory,
         notificationType: NotificationType.MotionFinalized,
         transactionHash: finalizedMotion.transactionHash,
+        expenditureID: finalizedMotion.expenditureId ?? undefined,
       });
     }
   }

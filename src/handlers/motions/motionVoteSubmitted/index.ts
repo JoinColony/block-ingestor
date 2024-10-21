@@ -12,7 +12,7 @@ import {
   getNotificationCategory,
   sendMotionNotifications,
 } from '~utils/notifications';
-import { ColonyActionType, NotificationType } from '~graphql';
+import { NotificationType } from '~graphql';
 
 export const handleMotionVoteSubmitted: EventHandler = async (
   event,
@@ -65,17 +65,14 @@ export const handleMotionVoteSubmitted: EventHandler = async (
       const colonyAction = await getActionByMotionId(votedMotion.id);
       const notificationCategory = getNotificationCategory(colonyAction?.type);
 
-      if (
-        notificationCategory &&
-        colonyAction &&
-        colonyAction.type !== ColonyActionType.FundExpenditureMotion
-      ) {
+      if (notificationCategory && colonyAction) {
         sendMotionNotifications({
           colonyAddress,
           creator: colonyAction.initiatorAddress,
           notificationCategory,
           notificationType: NotificationType.MotionReveal,
           transactionHash: votedMotion.transactionHash,
+          expenditureID: votedMotion.expenditureId ?? undefined,
         });
       }
     }

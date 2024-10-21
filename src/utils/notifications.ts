@@ -221,6 +221,7 @@ export const sendMotionNotifications = async ({
   transactionHash,
   notificationType,
   notificationCategory,
+  expenditureID,
 }: MotionNotificationVariables): Promise<void> => {
   // Get the recipients of the colony wide notifications.
   const recipients = await getRecipientsOfColonyWideNotification(
@@ -239,6 +240,7 @@ export const sendMotionNotifications = async ({
     creator,
     colonyAddress,
     transactionHash,
+    expenditureID,
   });
 };
 
