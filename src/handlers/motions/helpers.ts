@@ -88,6 +88,11 @@ export const updateMotionInDB = async (
           expenditureID: motionData?.expenditureId ?? undefined,
         });
 
+        // We don't want to send mention notifications if we have a FundExpenditureMotion motion
+        if (colonyAction.type === ColonyActionType.FundExpenditureMotion) {
+          return;
+        }
+
         let recipients: string[] = [];
 
         if (
