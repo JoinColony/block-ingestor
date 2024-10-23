@@ -11,6 +11,8 @@ import {
   setLastBlockNumber,
 } from '~utils';
 import { BLOCK_PAGING_SIZE } from '~constants';
+import { ContractEventsSignatures } from '~types';
+import { handleMintTokensAction } from '~actions/actionHandlers';
 
 let isProcessing = false;
 const blockLogs = new Map<number, Log[]>();
@@ -176,6 +178,8 @@ export const processNextBlock = async (): Promise<void> => {
       }
     }
 
+    const blockEvents = [];
+
     for (const log of logs) {
       // Find listeners that match the log
       const listeners = getMatchingListeners(log.topics, log.address);
@@ -201,10 +205,19 @@ export const processNextBlock = async (): Promise<void> => {
           continue;
         }
 
+        blockEvents.push(event);
+
         // Call the handler in a blocking way to ensure events get processed sequentially
         await listener.handler(event, listener);
       }
     }
+
+    const actionMatchers = [
+      {
+        eventSignatures: [ContractEventsSignatures.TokensMinted],
+        handler: handleMintTokensAction,
+      },
+    ];
 
     verbose('processed block', currentBlockNumber);
 
