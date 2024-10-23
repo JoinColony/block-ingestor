@@ -1,10 +1,11 @@
-import { ContractEvent } from '~types';
+import { ContractEvent, ContractEventsSignatures } from '~types';
 import {
   getExpenditureDatabaseId,
   getUpdatedExpenditureBalances,
   insertAtIndex,
   output,
   toNumber,
+  transactionHasEvent,
   verbose,
 } from '~utils';
 import {
@@ -100,10 +101,17 @@ export default async (event: ContractEvent): Promise<void> => {
     },
   );
 
-  sendExpenditureUpdateNotifications({
-    colonyAddress,
-    creator: initiatorAddress,
-    notificationType: NotificationType.ExpenditurePayoutClaimed,
-    expenditureID: databaseId,
-  });
+  const hasOneTxPaymentEvent = await transactionHasEvent(
+    event.transactionHash,
+    ContractEventsSignatures.OneTxPaymentMade,
+  );
+
+  if (!hasOneTxPaymentEvent) {
+    sendExpenditureUpdateNotifications({
+      colonyAddress,
+      creator: initiatorAddress,
+      notificationType: NotificationType.ExpenditurePayoutClaimed,
+      expenditureID: databaseId,
+    });
+  }
 };
