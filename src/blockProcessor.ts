@@ -19,6 +19,41 @@ const blockLogs = new Map<number, Log[]>();
 let timeNow = Date.now();
 let timePrev = 0;
 
+const processEvents = async (blockEvents: ContractEvent[]): Promise<void> => {
+  console.log(`Processing ${blockEvents.length} events`);
+
+  for (const event of blockEvents) {
+    const matchingMatchers = actionMatchers.filter((matcher) =>
+      matcher.eventSignatures.includes(event.eventSignature),
+    );
+
+    for (const matcher of matchingMatchers) {
+      console.log(`Matched event: ${event.eventSignature}`);
+      console.log(
+        `Contract: ${event.contractAddress}, TX: ${event.transactionHash}`,
+      );
+
+      try {
+        await matcher.handler(event);
+        console.log('Action handler completed successfully');
+      } catch (error) {
+        console.error('Error in action handler:', error);
+      }
+    }
+  }
+
+  console.log(`Processed ${blockEvents.length} events`);
+  console.log(
+    `Matched events: ${
+      blockEvents.filter((event) =>
+        actionMatchers.some((matcher) =>
+          matcher.eventSignatures.includes(event.eventSignature),
+        ),
+      ).length
+    }`,
+  );
+};
+
 export const processNextBlock = async (): Promise<void> => {
   if (isProcessing) {
     return;
@@ -212,97 +247,7 @@ export const processNextBlock = async (): Promise<void> => {
       }
     }
 
-    const actionMatchers = [
-      {
-        eventSignatures: [ContractEventsSignatures.TokensMinted],
-        handler: handleMintTokensAction,
-      },
-    ];
-
-    // Simulate matching events to action matchers
-    console.log('Starting to match events to action matchers');
-    console.log(`Total number of events in this block: ${blockEvents.length}`);
-    console.log(`Total number of action matchers: ${actionMatchers.length}`);
-
-    for (let i = 0; i < blockEvents.length; i++) {
-      const event = blockEvents[i];
-      console.log(`Processing event ${i + 1} of ${blockEvents.length}`);
-      console.log(`Event signature: ${event.eventSignature}`);
-
-      for (let j = 0; j < actionMatchers.length; j++) {
-        const matcher = actionMatchers[j];
-        console.log(`Checking matcher ${j + 1} of ${actionMatchers.length}`);
-        console.log(
-          `Matcher event signatures: ${matcher.eventSignatures.join(', ')}`,
-        );
-
-        const isMatch = matcher.eventSignatures.includes(event.eventSignature);
-        console.log(`Is this a match? ${isMatch ? 'Yes' : 'No'}`);
-
-        if (isMatch) {
-          console.log('Match found! Preparing to handle the action...');
-          console.log('Event details:');
-          console.log(`- Contract Address: ${event.contractAddress}`);
-          console.log(`- Transaction Hash: ${event.transactionHash}`);
-          console.log(`- Block Number: ${event.blockNumber}`);
-          console.log(`- Log Index: ${event.logIndex}`);
-
-          console.log('Parsing event arguments...');
-          for (const [key, value] of Object.entries(event.args)) {
-            console.log(`- ${key}: ${value}`);
-          }
-
-          console.log('Calling the action handler...');
-          try {
-            await matcher.handler(event);
-            console.log('Action handler completed successfully');
-          } catch (error) {
-            console.error('Error in action handler:', error);
-            console.error('Stack trace:', error.stack);
-          }
-
-          console.log('Performing post-handler operations...');
-          console.log('Updating internal state...');
-          console.log('Preparing for the next event...');
-
-          console.log('Match processing complete');
-        } else {
-          console.log(
-            'No match found for this matcher, moving to the next one',
-          );
-        }
-
-        console.log('---');
-      }
-
-      console.log('Finished processing all matchers for this event');
-      console.log('==========');
-    }
-
-    console.log('Completed matching all events to action matchers');
-    console.log(`Total events processed: ${blockEvents.length}`);
-    console.log(`Total action matchers checked: ${actionMatchers.length}`);
-
-    if (blockEvents.length > 0) {
-      console.log('Summary of matched events:');
-      const matchedEvents = blockEvents.filter((event) =>
-        actionMatchers.some((matcher) =>
-          matcher.eventSignatures.includes(event.eventSignature),
-        ),
-      );
-      console.log(`Total matched events: ${matchedEvents.length}`);
-      matchedEvents.forEach((event, index) => {
-        console.log(`Matched Event ${index + 1}:`);
-        console.log(`- Event Signature: ${event.eventSignature}`);
-        console.log(`- Contract Address: ${event.contractAddress}`);
-        console.log(`- Transaction Hash: ${event.transactionHash}`);
-      });
-    } else {
-      console.log('No events were processed in this block');
-    }
-
-    console.log('Performing final cleanup and state updates...');
-    console.log('Preparing for the next block...');
+    await processEvents(blockEvents);
 
     verbose('processed block', currentBlockNumber);
 
