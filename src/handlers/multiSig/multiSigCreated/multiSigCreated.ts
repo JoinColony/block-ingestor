@@ -22,14 +22,18 @@ import {
   handleColonyVersionUpgrade,
 } from './handlers';
 import { handlePaymentMultiSig } from './handlers/payment';
+import { sendMultisigActionNotifications } from '~utils/notifications';
+import { NotificationCategory } from '~types/notifications';
+import { NotificationType } from '~graphql';
 
 export const handleMultiSigMotionCreated: EventHandler = async (
   event,
   listener,
 ) => {
   const {
-    args: { motionId },
+    args: { agent: initiatorAddress, motionId },
     blockNumber,
+    transactionHash,
   } = event;
 
   const { colonyAddress } = listener as ExtensionEventListener;
@@ -75,11 +79,14 @@ export const handleMultiSigMotionCreated: EventHandler = async (
   const parsedOperation = parseMotionAction(actionData, interfaces);
 
   if (parsedOperation) {
+    let notificationCategory: NotificationCategory | null;
+
     const contractOperation = parsedOperation.name;
     /* Handle the action type-specific mutation here */
     switch (contractOperation) {
       case ColonyOperations.EditColony: {
         await handleEditColonyMultiSig(colonyAddress, event, parsedOperation);
+        notificationCategory = NotificationCategory.Admin;
         break;
       }
       case ColonyOperations.EmitDomainReputationPenalty: {
@@ -88,6 +95,7 @@ export const handleMultiSigMotionCreated: EventHandler = async (
           event,
           parsedOperation,
         );
+        notificationCategory = NotificationCategory.Admin;
         break;
       }
       case ColonyOperations.EmitDomainReputationReward: {
@@ -96,18 +104,22 @@ export const handleMultiSigMotionCreated: EventHandler = async (
           event,
           parsedOperation,
         );
+        notificationCategory = NotificationCategory.Admin;
         break;
       }
       case ColonyOperations.MintTokens: {
         await handleMintTokensMultiSig(colonyAddress, event, parsedOperation);
+        notificationCategory = NotificationCategory.Payment;
         break;
       }
       case ColonyOperations.MoveFundsBetweenPots: {
         await handleMoveFundsMultiSig(colonyAddress, event, parsedOperation);
+        notificationCategory = NotificationCategory.Payment;
         break;
       }
       case ColonyOperations.UnlockToken: {
         await handleUnlockTokenMultiSig(colonyAddress, event, parsedOperation);
+        notificationCategory = NotificationCategory.Payment;
         break;
       }
       case ColonyOperations.SetUserRoles: {
@@ -117,6 +129,7 @@ export const handleMultiSigMotionCreated: EventHandler = async (
           parsedOperation,
           actionTarget,
         );
+        notificationCategory = NotificationCategory.Admin;
         break;
       }
       case ColonyOperations.AddDomain:
@@ -126,6 +139,7 @@ export const handleMultiSigMotionCreated: EventHandler = async (
           event,
           parsedOperation,
         );
+        notificationCategory = NotificationCategory.Admin;
         break;
       }
       case ColonyOperations.EditColonyByDelta: {
@@ -134,19 +148,33 @@ export const handleMultiSigMotionCreated: EventHandler = async (
           event,
           parsedOperation,
         );
+        notificationCategory = NotificationCategory.Admin;
         break;
       }
       case ColonyOperations.MakePaymentFundedFromDomain: {
         await handlePaymentMultiSig(colonyAddress, event, parsedOperation);
+        notificationCategory = NotificationCategory.Payment;
         break;
       }
       case ColonyOperations.Upgrade: {
         await handleColonyVersionUpgrade(colonyAddress, event, parsedOperation);
+        notificationCategory = NotificationCategory.Admin;
         break;
       }
       default: {
+        notificationCategory = null;
         break;
       }
+    }
+
+    if (notificationCategory) {
+      sendMultisigActionNotifications({
+        colonyAddress,
+        creator: initiatorAddress,
+        notificationCategory,
+        notificationType: NotificationType.MultisigActionCreated,
+        transactionHash,
+      });
     }
 
     verbose(`${contractOperation} MultiSig Created`);

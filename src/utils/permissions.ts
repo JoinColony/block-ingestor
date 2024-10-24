@@ -31,6 +31,8 @@ import {
   ColonyActionType,
 } from '~graphql';
 import { createColonyContributor, isAlreadyContributor } from './contributors';
+import { sendPermissionsActionNotifications } from './notifications';
+import { NotificationCategory } from '~types/notifications';
 
 export const BASE_ROLES_MAP = {
   [`role_${ColonyRole.Recovery}`]: null,
@@ -420,6 +422,19 @@ export const createInitialColonyRolesDatabaseEntry = async (
           : []),
       ]),
     });
+
+    const isExtension = await isAddressExtension(targetAddress);
+
+    // Don't send a notification if the permissions are being edited for an extension.
+    if (firstRoleSetEvent && !isExtension) {
+      sendPermissionsActionNotifications({
+        mentions: [targetAddress],
+        creator: firstRoleSetEvent.args.agent,
+        colonyAddress,
+        transactionHash,
+        notificationCategory: NotificationCategory.Admin,
+      });
+    }
   }
 
   /*
@@ -584,6 +599,19 @@ export const createInitialMultiSigRolesDatabaseEntry = async (
         ),
       ]),
     });
+
+    const isExtension = await isAddressExtension(targetAddress);
+
+    // Don't send a notification if the permissions are being edited for an extension.
+    if (firstRoleSetEvent && !isExtension) {
+      sendPermissionsActionNotifications({
+        mentions: [targetAddress],
+        creator: firstRoleSetEvent.args.agent,
+        colonyAddress,
+        transactionHash,
+        notificationCategory: NotificationCategory.Admin,
+      });
+    }
   }
 
   /*

@@ -1,5 +1,6 @@
 import { ColonyActionType } from '~graphql';
 import { ContractEvent, ContractEventsSignatures } from '~types';
+import { NotificationCategory } from '~types/notifications';
 import {
   toNumber,
   verbose,
@@ -7,10 +8,13 @@ import {
   getDomainDatabaseId,
   transactionHasEvent,
 } from '~utils';
+import { sendPermissionsActionNotifications } from '~utils/notifications';
 
 export default async (event: ContractEvent): Promise<void> => {
+  const { args, contractAddress: colonyAddress, transactionHash } = event;
+
   const hasDomainAddedEvent = await transactionHasEvent(
-    event.transactionHash,
+    transactionHash,
     ContractEventsSignatures.DomainAdded,
   );
 
@@ -21,13 +25,19 @@ export default async (event: ContractEvent): Promise<void> => {
     return;
   }
 
-  const { contractAddress: colonyAddress } = event;
-  const { agent: initiatorAddress, domainId } = event.args;
+  const { agent: initiatorAddress, domainId } = args;
   const nativeDomainId = toNumber(domainId);
 
   await writeActionFromEvent(event, colonyAddress, {
     type: ColonyActionType.EditDomain,
     initiatorAddress,
     fromDomainId: getDomainDatabaseId(colonyAddress, nativeDomainId),
+  });
+
+  sendPermissionsActionNotifications({
+    creator: initiatorAddress,
+    colonyAddress,
+    transactionHash,
+    notificationCategory: NotificationCategory.Admin,
   });
 };

@@ -10,4 +10,12 @@ fragment ActionMetadataInfo on ColonyAction {
   amount
   networkFee
   type
+  showInActionsList
+  colonyId
+  initiatorAddress
+  recipientAddress
+  payments {
+    recipientAddress
+  }
+  members
 }

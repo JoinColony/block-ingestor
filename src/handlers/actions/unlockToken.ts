@@ -2,15 +2,21 @@ import { Id } from '@colony/colony-js';
 
 import { ColonyActionType } from '~graphql';
 import { ContractEvent } from '~types';
+import { NotificationCategory } from '~types/notifications';
 import {
   writeActionFromEvent,
   getDomainDatabaseId,
   getCachedColonyClient,
   updateColoniesNativeTokenStatuses,
 } from '~utils';
+import { sendPermissionsActionNotifications } from '~utils/notifications';
 
 export default async (event: ContractEvent): Promise<void> => {
-  const { contractAddress: colonyAddress, blockNumber } = event;
+  const {
+    contractAddress: colonyAddress,
+    blockNumber,
+    transactionHash,
+  } = event;
   const { agent: initiatorAddress } = event.args;
 
   const colonyClient = await getCachedColonyClient(colonyAddress);
@@ -29,5 +35,12 @@ export default async (event: ContractEvent): Promise<void> => {
     initiatorAddress,
     tokenAddress,
     fromDomainId: getDomainDatabaseId(colonyAddress, Id.RootDomain),
+  });
+
+  sendPermissionsActionNotifications({
+    creator: initiatorAddress,
+    colonyAddress,
+    transactionHash,
+    notificationCategory: NotificationCategory.Payment,
   });
 };

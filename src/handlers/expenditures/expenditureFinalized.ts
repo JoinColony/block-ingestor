@@ -2,6 +2,7 @@ import { mutate } from '~amplifyClient';
 import {
   ColonyActionType,
   ExpenditureStatus,
+  NotificationType,
   UpdateExpenditureDocument,
   UpdateExpenditureMutation,
   UpdateExpenditureMutationVariables,
@@ -14,6 +15,7 @@ import {
   verbose,
   writeActionFromEvent,
 } from '~utils';
+import { sendExpenditureUpdateNotifications } from '~utils/notifications';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { contractAddress: colonyAddress } = event;
@@ -56,6 +58,13 @@ export default async (event: ContractEvent): Promise<void> => {
       type: ColonyActionType.FinalizeExpenditure,
       initiatorAddress,
       expenditureId: databaseId,
+    });
+
+    sendExpenditureUpdateNotifications({
+      colonyAddress,
+      creator: initiatorAddress,
+      notificationType: NotificationType.ExpenditureFinalized,
+      expenditureID: databaseId,
     });
   }
 };

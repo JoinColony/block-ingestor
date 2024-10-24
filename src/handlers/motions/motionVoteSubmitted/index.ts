@@ -1,12 +1,18 @@
 import { ExtensionEventListener } from '~eventListeners';
 import { EventHandler } from '~types';
-import { getVotingClient, verbose } from '~utils';
+import { getActionByMotionId, getVotingClient, verbose } from '~utils';
 import {
   getMotionDatabaseId,
   getMotionFromDB,
   updateMotionInDB,
 } from '../helpers';
 import { getUpdatedVoterRecord } from './helpers';
+import { MotionState } from '@colony/colony-js';
+import {
+  getNotificationCategory,
+  sendMotionNotifications,
+} from '~utils/notifications';
+import { NotificationType } from '~graphql';
 
 export const handleMotionVoteSubmitted: EventHandler = async (
   event,
@@ -48,6 +54,28 @@ export const handleMotionVoteSubmitted: EventHandler = async (
         hasVoted: true,
       },
     });
+
+    const motionState = await votingClient.getMotionState(motionId);
+
+    // If this vote has pushed the motion into the reveal stage, trigger the reveal notification.
+    if (
+      motionState === MotionState.Reveal &&
+      !votedMotion.motionStateHistory.inRevealPhase
+    ) {
+      const colonyAction = await getActionByMotionId(votedMotion.id);
+      const notificationCategory = getNotificationCategory(colonyAction?.type);
+
+      if (notificationCategory && colonyAction) {
+        sendMotionNotifications({
+          colonyAddress,
+          creator: colonyAction.initiatorAddress,
+          notificationCategory,
+          notificationType: NotificationType.MotionReveal,
+          transactionHash: votedMotion.transactionHash,
+          expenditureID: votedMotion.expenditureId ?? undefined,
+        });
+      }
+    }
 
     verbose(`User: ${voter} voted on motion ${motionId.toString()}`);
   }

@@ -9,11 +9,13 @@ import { mutate } from '~amplifyClient';
 import {
   ColonyActionType,
   ExpenditureStatus,
+  NotificationType,
   UpdateExpenditureDocument,
   UpdateExpenditureMutation,
   UpdateExpenditureMutationVariables,
 } from '~graphql';
 import { EventListenerType } from '~eventListeners';
+import { sendExpenditureUpdateNotifications } from '~utils/notifications';
 
 export const handleExpenditureCancelled: EventHandler = async (
   event,
@@ -57,5 +59,12 @@ export const handleExpenditureCancelled: EventHandler = async (
     type: ColonyActionType.CancelExpenditure,
     initiatorAddress,
     expenditureId: databaseId,
+  });
+
+  sendExpenditureUpdateNotifications({
+    colonyAddress,
+    creator: initiatorAddress,
+    notificationType: NotificationType.ExpenditureCancelled,
+    expenditureID: databaseId,
   });
 };

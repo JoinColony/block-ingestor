@@ -2,6 +2,7 @@ import { TransactionDescription } from 'ethers/lib/utils';
 import { ContractEvent, multiSigNameMapping } from '~types';
 import { createMultiSigInDB } from '../helpers';
 import { getDomainDatabaseId } from '~utils';
+import { sendMentionNotifications } from '~utils/notifications';
 
 export const handleManageReputationMultiSig = async (
   colonyAddress: string,
@@ -19,5 +20,12 @@ export const handleManageReputationMultiSig = async (
     recipientAddress: userAddress,
     amount: amount.toString(),
     fromDomainId: getDomainDatabaseId(colonyAddress, domainId),
+  });
+
+  sendMentionNotifications({
+    colonyAddress,
+    creator: event.args.agent,
+    transactionHash: event.transactionHash,
+    recipients: [userAddress],
   });
 };

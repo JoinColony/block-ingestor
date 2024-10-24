@@ -1,3 +1,4 @@
 fragment Token on Token {
   tokenAddress: id
+  symbol
 }

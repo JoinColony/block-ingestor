@@ -14,6 +14,8 @@ import {
   GetColonyQueryVariables,
 } from '~graphql';
 import { query } from '~amplifyClient';
+import { sendPermissionsActionNotifications } from '~utils/notifications';
+import { NotificationCategory } from '~types/notifications';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { contractAddress: colonyAddress, transactionHash } = event;
@@ -80,5 +82,13 @@ export default async (event: ContractEvent): Promise<void> => {
     recipientAddress: userAddress,
     amount: amount.toString(),
     fromDomainId: domain.id,
+  });
+
+  sendPermissionsActionNotifications({
+    mentions: [userAddress],
+    creator: initiatorAddress,
+    colonyAddress,
+    transactionHash,
+    notificationCategory: NotificationCategory.Admin,
   });
 };

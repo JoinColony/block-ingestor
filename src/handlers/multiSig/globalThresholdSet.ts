@@ -1,16 +1,18 @@
-import { mutate, query } from '~amplifyClient';
+import { constants } from 'ethers';
+import { query } from '~amplifyClient';
 import {
   GetColonyExtensionByAddressDocument,
   GetColonyExtensionByAddressQuery,
   GetColonyExtensionByAddressQueryVariables,
-  UpdateColonyExtensionByAddressDocument,
-  UpdateColonyExtensionByAddressMutation,
-  UpdateColonyExtensionByAddressMutationVariables,
+  NotificationType,
 } from '~graphql';
+import networkClient from '~networkClient';
 import { EventHandler } from '~types';
+import { updateExtension } from '~utils/extensions/updateExtension';
+import { sendExtensionUpdateNotifications } from '~utils/notifications';
 
 export const handleMultiSigGlobalThresholdSet: EventHandler = async (event) => {
-  const { contractAddress: multiSigAddress } = event;
+  const { contractAddress: multiSigAddress, transactionHash } = event;
   const { globalThreshold } = event.args;
 
   const colonyExtensionsResponse = await query<
@@ -29,18 +31,30 @@ export const handleMultiSigGlobalThresholdSet: EventHandler = async (event) => {
     colonyDomains = [...(multiSig.domainThresholds ?? [])];
   }
 
-  await mutate<
-    UpdateColonyExtensionByAddressMutation,
-    UpdateColonyExtensionByAddressMutationVariables
-  >(UpdateColonyExtensionByAddressDocument, {
-    input: {
-      id: multiSigAddress,
-      params: {
-        multiSig: {
-          colonyThreshold: globalThreshold.toNumber(),
-          domainThresholds: colonyDomains,
-        },
+  const mutationResult = await updateExtension(multiSigAddress, {
+    params: {
+      multiSig: {
+        colonyThreshold: globalThreshold.toNumber(),
+        domainThresholds: colonyDomains,
       },
     },
+  });
+
+  const extensionHash = mutationResult?.updateColonyExtension?.extensionHash;
+  const colonyAddress = mutationResult?.updateColonyExtension?.colonyAddress;
+
+  if (!colonyAddress) {
+    return;
+  }
+
+  const receipt = await networkClient.provider.getTransactionReceipt(
+    transactionHash,
+  );
+
+  sendExtensionUpdateNotifications({
+    colonyAddress,
+    creator: receipt.from || constants.AddressZero,
+    notificationType: NotificationType.ExtensionSettingsChanged,
+    extensionHash,
   });
 };

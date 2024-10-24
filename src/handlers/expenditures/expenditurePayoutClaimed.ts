@@ -1,14 +1,16 @@
-import { ContractEvent } from '~types';
+import { ContractEvent, ContractEventsSignatures } from '~types';
 import {
   getExpenditureDatabaseId,
   getUpdatedExpenditureBalances,
   insertAtIndex,
   output,
   toNumber,
+  transactionHasEvent,
   verbose,
 } from '~utils';
 import {
   ExpenditurePayout,
+  NotificationType,
   UpdateExpenditureDocument,
   UpdateExpenditureMutation,
   UpdateExpenditureMutationVariables,
@@ -17,6 +19,7 @@ import { mutate } from '~amplifyClient';
 import { getAmountWithFee, getNetworkInverseFee } from '~utils/networkFee';
 
 import { getExpenditureFromDB } from './helpers';
+import { sendExpenditureUpdateNotifications } from '~utils/notifications';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { contractAddress: colonyAddress } = event;
@@ -25,6 +28,7 @@ export default async (event: ContractEvent): Promise<void> => {
     slot,
     token: tokenAddress,
     tokenPayout: amountWithoutFee,
+    agent: initiatorAddress,
   } = event.args;
   const convertedExpenditureId = toNumber(expenditureId);
   const convertedSlotId = toNumber(slot);
@@ -96,4 +100,18 @@ export default async (event: ContractEvent): Promise<void> => {
       },
     },
   );
+
+  const hasOneTxPaymentEvent = await transactionHasEvent(
+    event.transactionHash,
+    ContractEventsSignatures.OneTxPaymentMade,
+  );
+
+  if (!hasOneTxPaymentEvent) {
+    sendExpenditureUpdateNotifications({
+      colonyAddress,
+      creator: initiatorAddress,
+      notificationType: NotificationType.ExpenditurePayoutClaimed,
+      expenditureID: databaseId,
+    });
+  }
 };

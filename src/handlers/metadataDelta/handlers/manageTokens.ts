@@ -1,6 +1,7 @@
 import { Id } from '@colony/colony-js';
 import { ColonyActionType } from '~graphql';
 import { ContractEvent } from '~types';
+import { NotificationCategory } from '~types/notifications';
 import {
   ManageTokensOperation,
   getApprovedTokenChanges,
@@ -9,12 +10,13 @@ import {
   updateColonyTokens,
   writeActionFromEvent,
 } from '~utils';
+import { sendPermissionsActionNotifications } from '~utils/notifications';
 
 export const handleManageTokens = async (
   event: ContractEvent,
   operation: ManageTokensOperation,
 ): Promise<void> => {
-  const { contractAddress: colonyAddress } = event;
+  const { contractAddress: colonyAddress, transactionHash } = event;
   const { agent: initiatorAddress } = event.args;
 
   const tokenAddresses = operation.payload;
@@ -49,5 +51,12 @@ export const handleManageTokens = async (
       unaffected: unaffectedTokenAddresses,
     },
     fromDomainId: getDomainDatabaseId(colonyAddress, Id.RootDomain),
+  });
+
+  sendPermissionsActionNotifications({
+    creator: initiatorAddress,
+    colonyAddress,
+    transactionHash,
+    notificationCategory: NotificationCategory.Payment,
   });
 };

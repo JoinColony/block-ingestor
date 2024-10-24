@@ -9,8 +9,8 @@ import {
 export const updateExtension = async (
   extensionAddress: string,
   fieldsToUpdate: Omit<UpdateColonyExtensionInput, 'id'>,
-): Promise<void> => {
-  await mutate<
+): Promise<UpdateColonyExtensionByAddressMutation | undefined> => {
+  const result = await mutate<
     UpdateColonyExtensionByAddressMutation,
     UpdateColonyExtensionByAddressMutationVariables
   >(UpdateColonyExtensionByAddressDocument, {
@@ -19,4 +19,5 @@ export const updateExtension = async (
       ...fieldsToUpdate,
     },
   });
+  return result?.data;
 };

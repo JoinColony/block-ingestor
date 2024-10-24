@@ -12,6 +12,11 @@ import {
 import { getMultiSigClient, verbose } from '~utils';
 import { linkPendingMetadata } from '~utils/colonyMetadata';
 import { getBlockChainTimestampISODate } from '~utils/dates';
+import {
+  getNotificationCategory,
+  sendMultisigActionNotifications,
+} from '~utils/notifications';
+import { NotificationType } from '~graphql';
 
 export const handleMultiSigMotionExecuted: EventHandler = async (
   event,
@@ -71,5 +76,19 @@ export const handleMultiSigMotionExecuted: EventHandler = async (
     };
 
     await updateMultiSigInDB(updatedMultiSigData);
+
+    const notificationCategory = getNotificationCategory(
+      finalizedMultiSig.action?.type,
+    );
+
+    if (notificationCategory) {
+      sendMultisigActionNotifications({
+        colonyAddress,
+        creator: userAddress,
+        notificationCategory,
+        notificationType: NotificationType.MultisigActionFinalized,
+        transactionHash: finalizedMultiSig.transactionHash,
+      });
+    }
   }
 };

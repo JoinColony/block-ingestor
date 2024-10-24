@@ -12,12 +12,18 @@ import {
   setupListenersForExtensions,
 } from '~eventListeners';
 import { seedDB } from '~utils';
+import { setupNotificationsClient } from '~utils/notifications';
 
 dotenv.config();
 utils.Logger.setLogLevel(utils.Logger.levels.ERROR);
 
 const start = async (): Promise<void> => {
   amplifyClientSetup();
+
+  /**
+   * Setup the notifications provider so that notifications can be sent when needed
+   */
+  await setupNotificationsClient();
 
   /**
    * Start express server providing stats and fetch existing stats from the DB

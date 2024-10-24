@@ -55,3 +55,22 @@ fragment ColonyMetadata on ColonyMetadata {
     hasObjectiveChanged
   }
 }
+
+fragment ColonyWithRootRoles on Colony {
+  id
+  roles(filter: {role_1: {eq: true}}, limit: 1000) {
+    items {
+      id
+      targetUser {
+        id
+        profile {
+          displayName
+          id
+        }
+        notificationsData {
+          ...NotificationsData
+        }
+      }
+    }
+  }
+}

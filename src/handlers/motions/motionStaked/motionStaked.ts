@@ -1,6 +1,6 @@
 import { ExtensionEventListener } from '~eventListeners';
 import { EventHandler, MotionSide } from '~types';
-import { verbose, getVotingClient } from '~utils';
+import { verbose, getVotingClient, getActionByMotionId } from '~utils';
 import { getBlockChainTimestampISODate } from '~utils/dates';
 import {
   getMotionDatabaseId,
@@ -15,6 +15,12 @@ import {
   getMessageKey,
   updateUserStake,
 } from '../helpers';
+import {
+  getNotificationCategory,
+  sendMotionNotifications,
+} from '~utils/notifications';
+import { MotionNotificationVariables } from '~types/notifications';
+import { NotificationType } from '~graphql';
 
 export const handleMotionStaked: EventHandler = async (
   event,
@@ -109,6 +115,47 @@ export const handleMotionStaked: EventHandler = async (
       amount,
       timestamp,
     );
+
+    const newlyFullySupported =
+      !stakedMotion.motionStateHistory.yaySideFullyStakedAt &&
+      yaySideFullyStaked;
+    const newlyFullyOpposed =
+      !stakedMotion.motionStateHistory.naySideFullyStakedAt &&
+      naySideFullyStaked;
+    const newlyInVoting =
+      (!!stakedMotion.motionStateHistory.naySideFullyStakedAt ||
+        !!stakedMotion.motionStateHistory.yaySideFullyStakedAt) &&
+      yaySideFullyStaked &&
+      naySideFullyStaked;
+
+    if (newlyFullySupported || newlyFullyOpposed || newlyInVoting) {
+      const colonyAction = await getActionByMotionId(stakedMotion.id);
+      const notificationCategory = getNotificationCategory(colonyAction?.type);
+      let notificationType:
+        | MotionNotificationVariables['notificationType']
+        | null = null;
+
+      if (newlyFullyOpposed) {
+        notificationType = NotificationType.MotionOpposed;
+      }
+      if (newlyFullySupported) {
+        notificationType = NotificationType.MotionSupported;
+      }
+      if (newlyInVoting) {
+        notificationType = NotificationType.MotionVoting;
+      }
+
+      if (notificationCategory && notificationType && colonyAction) {
+        sendMotionNotifications({
+          colonyAddress,
+          creator: colonyAction.initiatorAddress,
+          notificationCategory,
+          notificationType,
+          transactionHash: stakedMotion.transactionHash,
+          expenditureID: stakedMotion.expenditureId ?? undefined,
+        });
+      }
+    }
 
     verbose(
       `User: ${staker} staked motion ${motionId.toString()} by ${amount.toString()} on side ${stakerSide}`,

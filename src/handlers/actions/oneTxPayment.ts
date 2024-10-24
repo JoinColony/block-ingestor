@@ -1,6 +1,5 @@
 import { AnyColonyClient } from '@colony/colony-js';
 import { BigNumber, utils } from 'ethers';
-
 import { query } from '~amplifyClient';
 import {
   ColonyActionType,
@@ -10,6 +9,7 @@ import {
 } from '~graphql';
 import provider from '~provider';
 import { ContractEvent, ContractEventsSignatures } from '~types';
+import { NotificationCategory } from '~types/notifications';
 import {
   getCachedColonyClient,
   getDomainDatabaseId,
@@ -22,6 +22,7 @@ import {
   createFundsClaim,
 } from '~utils';
 import { getAmountLessFee, getNetworkInverseFee } from '~utils/networkFee';
+import { sendPermissionsActionNotifications } from '~utils/notifications';
 
 const PAYOUT_CLAIMED_SIGNATURE_HASH = utils.id(
   ContractEventsSignatures.PayoutClaimed,
@@ -225,7 +226,7 @@ const handlerV6 = async (
   colonyClient: AnyColonyClient,
   networkFee: string,
 ): Promise<void> => {
-  const { blockNumber } = event;
+  const { blockNumber, transactionHash } = event;
   const [initiatorAddress, expenditureId] = event.args;
   const receipt = await provider.getTransactionReceipt(event.transactionHash);
 
@@ -297,4 +298,15 @@ const handlerV6 = async (
   }
 
   await writeActionFromEvent(event, colonyAddress, actionFields);
+
+  const firstPaymentData = payments?.[0];
+  if (firstPaymentData) {
+    sendPermissionsActionNotifications({
+      mentions: [firstPaymentData.recipientAddress],
+      creator: initiatorAddress,
+      colonyAddress,
+      transactionHash,
+      notificationCategory: NotificationCategory.Payment,
+    });
+  }
 };
