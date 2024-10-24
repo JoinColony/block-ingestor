@@ -11,11 +11,48 @@ import {
   setLastBlockNumber,
 } from '~utils';
 import { BLOCK_PAGING_SIZE } from '~constants';
+import { ContractEventsSignatures } from '~types';
+import { handleMintTokensAction } from '~actions/handlers';
 
 let isProcessing = false;
 const blockLogs = new Map<number, Log[]>();
 let timeNow = Date.now();
 let timePrev = 0;
+
+const processEvents = async (blockEvents: ContractEvent[]): Promise<void> => {
+  console.log(`Processing ${blockEvents.length} events`);
+
+  for (const event of blockEvents) {
+    const matchingMatchers = actionMatchers.filter((matcher) =>
+      matcher.eventSignatures.includes(event.eventSignature),
+    );
+
+    for (const matcher of matchingMatchers) {
+      console.log(`Matched event: ${event.eventSignature}`);
+      console.log(
+        `Contract: ${event.contractAddress}, TX: ${event.transactionHash}`,
+      );
+
+      try {
+        await matcher.handler(event);
+        console.log('Action handler completed successfully');
+      } catch (error) {
+        console.error('Error in action handler:', error);
+      }
+    }
+  }
+
+  console.log(`Processed ${blockEvents.length} events`);
+  console.log(
+    `Matched events: ${
+      blockEvents.filter((event) =>
+        actionMatchers.some((matcher) =>
+          matcher.eventSignatures.includes(event.eventSignature),
+        ),
+      ).length
+    }`,
+  );
+};
 
 export const processNextBlock = async (): Promise<void> => {
   if (isProcessing) {
@@ -176,6 +213,8 @@ export const processNextBlock = async (): Promise<void> => {
       }
     }
 
+    const blockEvents = [];
+
     for (const log of logs) {
       // Find listeners that match the log
       const listeners = getMatchingListeners(log.topics, log.address);
@@ -201,10 +240,14 @@ export const processNextBlock = async (): Promise<void> => {
           continue;
         }
 
+        blockEvents.push(event);
+
         // Call the handler in a blocking way to ensure events get processed sequentially
         await listener.handler(event, listener);
       }
     }
+
+    await processEvents(blockEvents);
 
     verbose('processed block', currentBlockNumber);
 
