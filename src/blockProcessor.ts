@@ -12,7 +12,7 @@ import {
 } from '~utils';
 import { BLOCK_PAGING_SIZE } from '~constants';
 import { ContractEventsSignatures } from '~types';
-import { handleMintTokensAction } from '~actions/actionHandlers';
+import { handleMintTokensAction } from '~actions/handlers';
 
 let isProcessing = false;
 const blockLogs = new Map<number, Log[]>();
