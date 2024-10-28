@@ -2,11 +2,7 @@ import { TransactionDescription } from 'ethers/lib/utils';
 import { constants } from 'ethers';
 
 import { ContractEvent, motionNameMapping } from '~types';
-import {
-  getColonyRolesDatabaseId,
-  getDomainDatabaseId,
-  getRolesMapFromHexString,
-} from '~utils';
+import { getDomainDatabaseId, getRolesMapFromHexString } from '~utils';
 
 import { createMotionInDB } from '../helpers';
 
@@ -20,16 +16,7 @@ export const handleSetUserRolesMotion = async (
 
   const { name, args: actionArgs } = parsedAction;
   const [userAddress, domainId, zeroPadHexString] = actionArgs.slice(-3);
-  const colonyRolesDatabaseId = getColonyRolesDatabaseId(
-    colonyAddress,
-    domainId,
-    userAddress,
-    isMultiSig,
-  );
-  const roles = await getRolesMapFromHexString(
-    zeroPadHexString,
-    colonyRolesDatabaseId,
-  );
+  const roles = getRolesMapFromHexString(zeroPadHexString);
 
   await createMotionInDB(colonyAddress, event, {
     type: motionNameMapping[name],
