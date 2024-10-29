@@ -1140,6 +1140,11 @@ export type ColonyMultiSig = {
   executedBy?: Maybe<Scalars['ID']>;
   /** Extended user object for given executedBy */
   executedByUser?: Maybe<User>;
+  /**
+   * In case of multiple multisig actions in a motion, when funding an expenditure, array containing
+   * the details of tokens and amounts to be funded
+   */
+  expenditureFunding?: Maybe<Array<ExpenditureFundingItem>>;
   /** Whether the underlying action completed */
   hasActionCompleted: Scalars['Boolean'];
   /**
@@ -1588,6 +1593,7 @@ export type CreateColonyMultiSigInput = {
   createdAt?: InputMaybe<Scalars['AWSDateTime']>;
   executedAt?: InputMaybe<Scalars['AWSDateTime']>;
   executedBy?: InputMaybe<Scalars['ID']>;
+  expenditureFunding?: InputMaybe<Array<ExpenditureFundingItemInput>>;
   hasActionCompleted: Scalars['Boolean'];
   id?: InputMaybe<Scalars['ID']>;
   isDecision: Scalars['Boolean'];
@@ -9339,6 +9345,7 @@ export type UpdateColonyMultiSigInput = {
   createdAt?: InputMaybe<Scalars['AWSDateTime']>;
   executedAt?: InputMaybe<Scalars['AWSDateTime']>;
   executedBy?: InputMaybe<Scalars['ID']>;
+  expenditureFunding?: InputMaybe<Array<ExpenditureFundingItemInput>>;
   hasActionCompleted?: InputMaybe<Scalars['Boolean']>;
   id: Scalars['ID'];
   isDecision?: InputMaybe<Scalars['Boolean']>;

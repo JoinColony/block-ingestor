@@ -116,6 +116,7 @@ const showActionInActionsList = async (
 /**
  * Determines whether the action is a result of a motion being finalized
  * by checking if its initiator was the Voting Reputation extension
+ * or the Multi-sig extension
  */
 const isActionMotionFinalization = async (
   initiatorAddress: string,
@@ -127,7 +128,9 @@ const isActionMotionFinalization = async (
 
   return (
     !!initiatorExtension &&
-    initiatorExtension.hash === getExtensionHash(Extension.VotingReputation)
+    (initiatorExtension.hash === getExtensionHash(Extension.VotingReputation) ||
+      initiatorExtension.hash ===
+        getExtensionHash(Extension.MultisigPermissions))
   );
 };
 

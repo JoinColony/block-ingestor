@@ -1,4 +1,3 @@
-import { utils } from 'ethers';
 import { ExtensionEventListener } from '~eventListeners';
 import { ColonyOperations, EventHandler } from '~types';
 import {
@@ -10,6 +9,7 @@ import {
   parseMotionAction,
   verbose,
 } from '~utils';
+import { handleMultisigMultipleFunctions } from './multipleFunctions';
 import {
   handleEditColonyMultiSig,
   handleMetadataDeltaMultiSig,
@@ -20,26 +20,32 @@ import {
   handleUnlockTokenMultiSig,
   handleAddOrEditDomainMultiSig,
   handleColonyVersionUpgrade,
-} from './handlers';
-import { handlePaymentMultiSig } from './handlers/payment';
+  handlePaymentMultiSig,
+} from './handlers/index';
 import { sendMultisigActionNotifications } from '~utils/notifications';
 import { NotificationCategory } from '~types/notifications';
 import { NotificationType } from '~graphql';
+import { utils } from 'ethers';
 
 export const handleMultiSigMotionCreated: EventHandler = async (
   event,
   listener,
 ) => {
+  const { colonyAddress } = listener as ExtensionEventListener;
+
   const {
-    args: { agent: initiatorAddress, motionId },
+    args: { motionId, agent: initiatorAddress },
     blockNumber,
     transactionHash,
   } = event;
 
-  const { colonyAddress } = listener as ExtensionEventListener;
-
   const colonyClient = await getCachedColonyClient(colonyAddress);
   const multiSigClient = await getMultiSigClient(colonyAddress);
+
+  if (!colonyClient || !multiSigClient) {
+    return;
+  }
+
   const oneTxPaymentClient = await getOneTxPaymentClient(colonyAddress);
 
   const stakedExpenditureClient = await getStakedExpenditureClient(
@@ -49,21 +55,6 @@ export const handleMultiSigMotionCreated: EventHandler = async (
   const stagedExpenditureClient = await getStagedExpenditureClient(
     colonyAddress,
   );
-
-  if (!colonyClient || !multiSigClient) {
-    return;
-  }
-
-  const motion = await multiSigClient.getMotion(motionId, {
-    blockTag: blockNumber,
-  });
-
-  const actionData = motion.data[0];
-  const actionTarget = motion.targets[0];
-
-  if (!actionData) {
-    verbose(`No action data in multiSig motion: ${motionId}`);
-  }
 
   /**
    * @NOTE: This is not good, we should use ABIs from @colony/abis instead.
@@ -76,9 +67,29 @@ export const handleMultiSigMotionCreated: EventHandler = async (
     stagedExpenditureClient?.interface,
   ].filter(Boolean) as utils.Interface[]; // Casting seems necessary as TS does not pick up the .filter()
 
-  const parsedOperation = parseMotionAction(actionData, interfaces);
+  const motion = await multiSigClient.getMotion(motionId, {
+    blockTag: blockNumber,
+  });
 
-  if (parsedOperation) {
+  const actions = motion.data;
+  const actionTargets = motion.targets;
+
+  if (!actions[0]) {
+    verbose(`No action data in multiSig motion: ${motionId}`);
+    return;
+  }
+
+  console.log('hendlamo single function a');
+  // the motion data and targets are the same length as it's enforced on the contracts so we can check whichever
+  if (actions.length === 1) {
+    const actionData = actions[0];
+    const actionTarget = actionTargets[0];
+
+    const parsedOperation = parseMotionAction(actionData, interfaces);
+    if (!parsedOperation) {
+      return;
+    }
+
     let notificationCategory: NotificationCategory | null;
 
     const contractOperation = parsedOperation.name;
@@ -114,7 +125,9 @@ export const handleMultiSigMotionCreated: EventHandler = async (
       }
       case ColonyOperations.MoveFundsBetweenPots: {
         await handleMoveFundsMultiSig(colonyAddress, event, parsedOperation);
-        notificationCategory = NotificationCategory.Payment;
+        // @NOTE, an edge case can occur if we are funding an expenditure with only 1 recipient, this will get called
+        // so we handle notifications there specifically
+        notificationCategory = null;
         break;
       }
       case ColonyOperations.UnlockToken: {
@@ -178,5 +191,12 @@ export const handleMultiSigMotionCreated: EventHandler = async (
     }
 
     verbose(`${contractOperation} MultiSig Created`);
+  } else {
+    await handleMultisigMultipleFunctions({
+      event,
+      colonyAddress,
+      actionData: actions,
+      actionTargets,
+    });
   }
 };

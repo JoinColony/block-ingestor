@@ -99,29 +99,28 @@ const getDomainIdByNativeSkillId = async (
   return null;
 };
 
+type MultiSigFields = Omit<
+  CreateColonyActionInput,
+  | 'id'
+  | 'colonyId'
+  | 'showInActionsList'
+  | 'isMotion'
+  | 'motionId'
+  | 'initiatorAddress'
+  | 'blockNumber'
+  | 'rootHash'
+> &
+  Pick<CreateColonyMultiSigInput, 'expenditureFunding'>;
+
 export const createMultiSigInDB = async (
   colonyAddress: string,
   {
     transactionHash,
     blockNumber,
-    logIndex,
     args: { motionId: multiSigId },
     timestamp,
   }: ContractEvent,
-  {
-    fromDomainId,
-    ...input
-  }: Omit<
-    CreateColonyActionInput,
-    | 'id'
-    | 'colonyId'
-    | 'showInActionsList'
-    | 'isMultiSig'
-    | 'multiSigId'
-    | 'initiatorAddress'
-    | 'blockNumber'
-    | 'rootHash'
-  >,
+  { fromDomainId, expenditureFunding, ...input }: MultiSigFields,
 ): Promise<GraphQLFnReturn<CreateColonyMultiSigInput> | undefined> => {
   if (!colonyAddress) {
     return;
@@ -177,7 +176,7 @@ export const createMultiSigInDB = async (
   };
 
   await Promise.all([
-    createColonyMultiSig(multiSigData),
+    createColonyMultiSig({ ...multiSigData, expenditureFunding }),
     createColonyAction(actionData, timestamp),
   ]);
 };
