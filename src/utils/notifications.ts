@@ -131,8 +131,20 @@ export const sendPermissionsActionNotifications = async ({
     notificationCategory,
   );
 
-  if (recipients.length > 0) {
-    // Send the colony wide notifications.
+  // Check if there are no mentions
+  // OR
+  // Check if the creator is not mentioned and verify that all mention items are not
+  // present in the recipient list.
+  const shouldSendColonyWideNotification =
+    !mentions ||
+    (!mentions.includes(creator) &&
+      mentions.some(
+        (item) =>
+          !recipients.map((recipient) => recipient.external_id).includes(item),
+      ));
+
+  if (shouldSendColonyWideNotification) {
+    // If the above condition is met, send the Colony-wide notification
     await sendNotification(
       `Permissions action created: ${transactionHash}`,
       recipients,
