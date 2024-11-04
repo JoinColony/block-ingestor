@@ -19,11 +19,15 @@ fragment Expenditure on Expenditure {
   balances {
     ...ExpenditureBalance
   }
+  metadata {
+    distributionType
+  }
   status
   ownerAddress
   userStakeId
   createdAt
   firstEditTransactionHash
+  splitPaymentPayoutClaimedNotificationSent
   type
   actions {
     items {

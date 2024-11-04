@@ -90,6 +90,8 @@ export default async (event: ContractEvent): Promise<void> => {
 
   verbose(`Payout claimed in expenditure with ID ${databaseId}`);
 
+  const isSplitPayment = !!expenditure.metadata?.distributionType;
+
   await mutate<UpdateExpenditureMutation, UpdateExpenditureMutationVariables>(
     UpdateExpenditureDocument,
     {
@@ -97,6 +99,8 @@ export default async (event: ContractEvent): Promise<void> => {
         id: databaseId,
         slots: updatedSlots,
         balances: updatedBalances,
+        // Assume the send notification function will succeed to avoid extra mutations
+        splitPaymentPayoutClaimedNotificationSent: isSplitPayment || undefined,
       },
     },
   );
@@ -106,7 +110,15 @@ export default async (event: ContractEvent): Promise<void> => {
     ContractEventsSignatures.OneTxPaymentMade,
   );
 
-  if (!hasOneTxPaymentEvent) {
+  // Only send notification on the first split payment payout claimed event
+  const shouldSendSplitPayoutClaimedNotification =
+    isSplitPayment && !expenditure.splitPaymentPayoutClaimedNotificationSent;
+
+  const shouldSendNotification =
+    !hasOneTxPaymentEvent &&
+    (!isSplitPayment || shouldSendSplitPayoutClaimedNotification);
+
+  if (shouldSendNotification) {
     sendExpenditureUpdateNotifications({
       colonyAddress,
       creator: initiatorAddress,
