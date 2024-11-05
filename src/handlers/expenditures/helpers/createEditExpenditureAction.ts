@@ -173,8 +173,7 @@ export const createEditExpenditureAction = async (
 
       const convertedSlot = toNumber(slot);
       const existingPayouts =
-        expenditure.slots.find((slot) => slot.id === convertedSlot)?.payouts ??
-        [];
+        updatedSlots.find((slot) => slot.id === convertedSlot)?.payouts ?? [];
 
       const [amountLessFee, feeAmount] = await splitAmountAndFee(amountWithFee);
 
