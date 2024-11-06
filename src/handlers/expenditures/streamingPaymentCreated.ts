@@ -15,12 +15,13 @@ import {
   verbose,
   writeActionFromEvent,
 } from '~utils';
+import { getBlockChainTimestampISODate } from '~utils/dates';
 
 export const handleStreamingPaymentCreated: EventHandler = async (
   event,
   listener,
 ) => {
-  const { blockNumber } = event;
+  const { blockNumber, timestamp } = event;
   const { streamingPaymentId, agent: initiatorAddress } = event.args;
   const convertedNativeId = toNumber(streamingPaymentId);
   const { colonyAddress } = listener as ExtensionEventListener;
@@ -70,6 +71,7 @@ export const handleStreamingPaymentCreated: EventHandler = async (
       amount: amount.toString(),
       colonyId: colonyAddress,
       creatorAddress: initiatorAddress,
+      createdAt: getBlockChainTimestampISODate(timestamp),
     },
   });
 
