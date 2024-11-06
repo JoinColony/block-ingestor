@@ -45,7 +45,7 @@ export const getInterfaceByListener = (
   }
 };
 
-const getInterfaceByExtensionHash = (
+export const getInterfaceByExtensionHash = (
   extensionHash: string,
 ): utils.Interface | null => {
   switch (extensionHash) {
