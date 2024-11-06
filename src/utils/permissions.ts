@@ -25,9 +25,6 @@ import {
   CreateColonyHistoricRoleMutation,
   CreateColonyHistoricRoleMutationVariables,
   CreateColonyHistoricRoleDocument,
-  GetColonyRoleQuery,
-  GetColonyRoleQueryVariables,
-  GetColonyRoleDocument,
   ColonyActionType,
 } from '~graphql';
 import { createColonyContributor, isAlreadyContributor } from './contributors';
@@ -211,29 +208,16 @@ export const getMultiSigRolesMapFromEvents = (
   return roleMap;
 };
 
-export const getRolesMapFromHexString = async (
+export const getRolesMapFromHexString = (
   rolesHexString: string,
-  colonyRolesDatabaseId: string,
-): Promise<Record<string, boolean | null>> => {
+): Record<string, boolean | null> => {
   const roleMap: Record<string, boolean | null> = {};
   const roleBitMask = parseInt(hexStripZeros(rolesHexString), 16).toString(2);
   const roleBitMaskArray = roleBitMask.split('').reverse();
 
-  const getColonyRoleData =
-    (
-      await query<GetColonyRoleQuery, GetColonyRoleQueryVariables>(
-        GetColonyRoleDocument,
-        { id: colonyRolesDatabaseId },
-      )
-    )?.data?.getColonyRole ?? {};
-
   Object.keys(BASE_ROLES_MAP).forEach((role) => {
-    const currentRoleValue =
-      !!getColonyRoleData[role as keyof typeof getColonyRoleData];
     const motionRoleValue = roleBitMaskArray[Number(role.slice(-1))] === '1';
-    if (currentRoleValue !== motionRoleValue) {
-      roleMap[role] = motionRoleValue;
-    }
+    roleMap[role] = motionRoleValue;
   });
 
   return roleMap;
@@ -484,15 +468,8 @@ export const createInitialMultiSigRolesDatabaseEntry = async (
     nativeDomainId,
   );
 
-  const colonyRolesDatabaseId = getColonyRolesDatabaseId(
-    colonyAddress,
-    nativeDomainId,
-    targetAddress,
-    true,
-  );
-
   const { role_0, role_1, role_2, role_3, role_5, role_6 } =
-    await getRolesMapFromHexString(userRoles, colonyRolesDatabaseId);
+    getRolesMapFromHexString(userRoles);
 
   const events = await getAllMultiSigRoleEventsFromTransaction(
     transactionHash,

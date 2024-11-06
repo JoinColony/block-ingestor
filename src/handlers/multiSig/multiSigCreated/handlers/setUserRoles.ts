@@ -1,13 +1,10 @@
 import { TransactionDescription } from 'ethers/lib/utils';
 
 import { ContractEvent, multiSigNameMapping } from '~types';
-import {
-  getColonyRolesDatabaseId,
-  getDomainDatabaseId,
-  getRolesMapFromHexString,
-} from '~utils';
+import { getDomainDatabaseId, getRolesMapFromHexString } from '~utils';
 import { createMultiSigInDB } from '../helpers';
 import { sendMentionNotifications } from '~utils/notifications';
+import { constants } from 'ethers';
 
 export const handleSetUserRolesMultiSig = async (
   colonyAddress: string,
@@ -20,22 +17,12 @@ export const handleSetUserRolesMultiSig = async (
   }
   // When setting 'Own' authority, the action target will be the colonyAddress
   // When setting 'Multisig' authority, the action target will be the multisig extension address
-  const isMultiSig = actionTarget !== colonyAddress;
+  const isMultiSig = actionTarget !== constants.AddressZero;
 
   const { name, args: actionArgs } = parsedAction;
   const [userAddress, domainId, zeroPadHexString] = actionArgs.slice(-3);
 
-  const colonyRolesDatabaseId = getColonyRolesDatabaseId(
-    colonyAddress,
-    domainId,
-    userAddress,
-    isMultiSig,
-  );
-
-  const roles = await getRolesMapFromHexString(
-    zeroPadHexString,
-    colonyRolesDatabaseId,
-  );
+  const roles = getRolesMapFromHexString(zeroPadHexString);
 
   await createMultiSigInDB(colonyAddress, event, {
     type: multiSigNameMapping[name],
