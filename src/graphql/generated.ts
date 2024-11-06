@@ -2538,8 +2538,6 @@ export enum ExpenditureType {
 }
 
 export enum ExtendedSupportedCurrencies {
-<<<<<<< HEAD
-<<<<<<< HEAD
   Brl = 'BRL',
   Cad = 'CAD',
   Clny = 'CLNY',
@@ -2551,12 +2549,6 @@ export enum ExtendedSupportedCurrencies {
   Krw = 'KRW',
   Usd = 'USD',
   Usdc = 'USDC',
-=======
-  Usdc = 'USDC'
->>>>>>> 01b6f83 (Feat: Added changelog to streaming payment and streaming payment metadata)
-=======
-  Usdc = 'USDC',
->>>>>>> 0e735b0 (Chore: fix rebase issues)
 }
 
 export type ExtensionInstallationsCount = {
@@ -4391,20 +4383,10 @@ export type ModelSubscriptionColonyFilterInput = {
 
 export type ModelSubscriptionColonyFundsClaimFilterInput = {
   amount?: InputMaybe<ModelSubscriptionStringInput>;
-<<<<<<< HEAD
-<<<<<<< HEAD
   and?: InputMaybe<
     Array<InputMaybe<ModelSubscriptionColonyFundsClaimFilterInput>>
   >;
   colonyFundsClaimsId?: InputMaybe<ModelSubscriptionIdInput>;
-=======
-  and?: InputMaybe<Array<InputMaybe<ModelSubscriptionColonyFundsClaimFilterInput>>>;
->>>>>>> 01b6f83 (Feat: Added changelog to streaming payment and streaming payment metadata)
-=======
-  and?: InputMaybe<
-    Array<InputMaybe<ModelSubscriptionColonyFundsClaimFilterInput>>
-  >;
->>>>>>> 0e735b0 (Chore: fix rebase issues)
   createdAt?: InputMaybe<ModelSubscriptionStringInput>;
   createdAtBlock?: InputMaybe<ModelSubscriptionIntInput>;
   id?: InputMaybe<ModelSubscriptionIdInput>;
@@ -5457,16 +5439,7 @@ export type Mutation = {
   createLiquidationAddress?: Maybe<LiquidationAddress>;
   createMotionMessage?: Maybe<MotionMessage>;
   createMultiSigUserSignature?: Maybe<MultiSigUserSignature>;
-<<<<<<< HEAD
-<<<<<<< HEAD
   createNotificationsData?: Maybe<NotificationsData>;
-=======
-=======
-  createPendingStreamingPaymentMetadata?: Maybe<PendingStreamingPaymentMetadata>;
->>>>>>> a0923563 (Feat: Add editStreamingPaymentMotion multicall handler)
->>>>>>> 7a6f2da (Feat: Add editStreamingPaymentMotion multicall handler)
-=======
->>>>>>> 01b6f83 (Feat: Added changelog to streaming payment and streaming payment metadata)
   createPrivateBetaInviteCode?: Maybe<PrivateBetaInviteCode>;
   createProfile?: Maybe<Profile>;
   createReputationMiningCycleMetadata?: Maybe<ReputationMiningCycleMetadata>;
@@ -5514,16 +5487,7 @@ export type Mutation = {
   deleteLiquidationAddress?: Maybe<LiquidationAddress>;
   deleteMotionMessage?: Maybe<MotionMessage>;
   deleteMultiSigUserSignature?: Maybe<MultiSigUserSignature>;
-<<<<<<< HEAD
-<<<<<<< HEAD
   deleteNotificationsData?: Maybe<NotificationsData>;
-=======
-=======
-  deletePendingStreamingPaymentMetadata?: Maybe<PendingStreamingPaymentMetadata>;
->>>>>>> a0923563 (Feat: Add editStreamingPaymentMotion multicall handler)
->>>>>>> 7a6f2da (Feat: Add editStreamingPaymentMotion multicall handler)
-=======
->>>>>>> 01b6f83 (Feat: Added changelog to streaming payment and streaming payment metadata)
   deletePrivateBetaInviteCode?: Maybe<PrivateBetaInviteCode>;
   deleteProfile?: Maybe<Profile>;
   deleteReputationMiningCycleMetadata?: Maybe<ReputationMiningCycleMetadata>;
@@ -5571,16 +5535,7 @@ export type Mutation = {
   updateLiquidationAddress?: Maybe<LiquidationAddress>;
   updateMotionMessage?: Maybe<MotionMessage>;
   updateMultiSigUserSignature?: Maybe<MultiSigUserSignature>;
-<<<<<<< HEAD
-<<<<<<< HEAD
   updateNotificationsData?: Maybe<NotificationsData>;
-=======
-=======
-  updatePendingStreamingPaymentMetadata?: Maybe<PendingStreamingPaymentMetadata>;
->>>>>>> a0923563 (Feat: Add editStreamingPaymentMotion multicall handler)
->>>>>>> 7a6f2da (Feat: Add editStreamingPaymentMotion multicall handler)
-=======
->>>>>>> 01b6f83 (Feat: Added changelog to streaming payment and streaming payment metadata)
   updatePrivateBetaInviteCode?: Maybe<PrivateBetaInviteCode>;
   updateProfile?: Maybe<Profile>;
   updateReputationMiningCycleMetadata?: Maybe<ReputationMiningCycleMetadata>;
@@ -5793,32 +5748,12 @@ export type MutationCreateMultiSigUserSignatureArgs = {
   input: CreateMultiSigUserSignatureInput;
 };
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 8442a344 (Feat: Refactor editStreamingPayment handlers and ensure colony action is created)
 /** Root mutation type */
-<<<<<<< HEAD
 export type MutationCreateNotificationsDataArgs = {
   condition?: InputMaybe<ModelNotificationsDataConditionInput>;
   input: CreateNotificationsDataInput;
 };
 
-=======
-export type MutationCreatePendingStreamingPaymentMetadataArgs = {
-  condition?: InputMaybe<ModelPendingStreamingPaymentMetadataConditionInput>;
-  input: CreatePendingStreamingPaymentMetadataInput;
-};
-=======
->>>>>>> 01b6f83 (Feat: Added changelog to streaming payment and streaming payment metadata)
-
-<<<<<<< HEAD
-
->>>>>>> 7a6f2da (Feat: Add editStreamingPaymentMotion multicall handler)
-=======
->>>>>>> 7ebe3a9 (Feat: Refactor editStreamingPayment handlers and ensure colony action is created)
-=======
->>>>>>> 0e735b0 (Chore: fix rebase issues)
 /** Root mutation type */
 export type MutationCreatePrivateBetaInviteCodeArgs = {
   condition?: InputMaybe<ModelPrivateBetaInviteCodeConditionInput>;
@@ -6087,32 +6022,12 @@ export type MutationDeleteMultiSigUserSignatureArgs = {
   input: DeleteMultiSigUserSignatureInput;
 };
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 8442a344 (Feat: Refactor editStreamingPayment handlers and ensure colony action is created)
 /** Root mutation type */
-<<<<<<< HEAD
 export type MutationDeleteNotificationsDataArgs = {
   condition?: InputMaybe<ModelNotificationsDataConditionInput>;
   input: DeleteNotificationsDataInput;
 };
 
-=======
-export type MutationDeletePendingStreamingPaymentMetadataArgs = {
-  condition?: InputMaybe<ModelPendingStreamingPaymentMetadataConditionInput>;
-  input: DeletePendingStreamingPaymentMetadataInput;
-};
-=======
->>>>>>> 01b6f83 (Feat: Added changelog to streaming payment and streaming payment metadata)
-
-<<<<<<< HEAD
-
->>>>>>> 7a6f2da (Feat: Add editStreamingPaymentMotion multicall handler)
-=======
->>>>>>> 7ebe3a9 (Feat: Refactor editStreamingPayment handlers and ensure colony action is created)
-=======
->>>>>>> 0e735b0 (Chore: fix rebase issues)
 /** Root mutation type */
 export type MutationDeletePrivateBetaInviteCodeArgs = {
   condition?: InputMaybe<ModelPrivateBetaInviteCodeConditionInput>;
@@ -6381,32 +6296,12 @@ export type MutationUpdateMultiSigUserSignatureArgs = {
   input: UpdateMultiSigUserSignatureInput;
 };
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 8442a344 (Feat: Refactor editStreamingPayment handlers and ensure colony action is created)
 /** Root mutation type */
-<<<<<<< HEAD
 export type MutationUpdateNotificationsDataArgs = {
   condition?: InputMaybe<ModelNotificationsDataConditionInput>;
   input: UpdateNotificationsDataInput;
 };
 
-=======
-export type MutationUpdatePendingStreamingPaymentMetadataArgs = {
-  condition?: InputMaybe<ModelPendingStreamingPaymentMetadataConditionInput>;
-  input: UpdatePendingStreamingPaymentMetadataInput;
-};
-=======
->>>>>>> 01b6f83 (Feat: Added changelog to streaming payment and streaming payment metadata)
-
-<<<<<<< HEAD
-
->>>>>>> 7a6f2da (Feat: Add editStreamingPaymentMotion multicall handler)
-=======
->>>>>>> 7ebe3a9 (Feat: Refactor editStreamingPayment handlers and ensure colony action is created)
-=======
->>>>>>> 0e735b0 (Chore: fix rebase issues)
 /** Root mutation type */
 export type MutationUpdatePrivateBetaInviteCodeArgs = {
   condition?: InputMaybe<ModelPrivateBetaInviteCodeConditionInput>;
@@ -6826,16 +6721,7 @@ export type Query = {
   getMultiSigByTransactionHash?: Maybe<ModelColonyMultiSigConnection>;
   getMultiSigUserSignature?: Maybe<MultiSigUserSignature>;
   getMultiSigUserSignatureByMultiSigId?: Maybe<ModelMultiSigUserSignatureConnection>;
-<<<<<<< HEAD
-<<<<<<< HEAD
   getNotificationsData?: Maybe<NotificationsData>;
-=======
-=======
-  getPendingStreamingPaymentMetadata?: Maybe<PendingStreamingPaymentMetadata>;
->>>>>>> a0923563 (Feat: Add editStreamingPaymentMotion multicall handler)
->>>>>>> 7a6f2da (Feat: Add editStreamingPaymentMotion multicall handler)
-=======
->>>>>>> 01b6f83 (Feat: Added changelog to streaming payment and streaming payment metadata)
   getPrivateBetaInviteCode?: Maybe<PrivateBetaInviteCode>;
   getProfile?: Maybe<Profile>;
   getProfileByEmail?: Maybe<ModelProfileConnection>;
@@ -6906,16 +6792,7 @@ export type Query = {
   listLiquidationAddresses?: Maybe<ModelLiquidationAddressConnection>;
   listMotionMessages?: Maybe<ModelMotionMessageConnection>;
   listMultiSigUserSignatures?: Maybe<ModelMultiSigUserSignatureConnection>;
-<<<<<<< HEAD
-<<<<<<< HEAD
   listNotificationsData?: Maybe<ModelNotificationsDataConnection>;
-=======
-=======
-  listPendingStreamingPaymentMetadata?: Maybe<ModelPendingStreamingPaymentMetadataConnection>;
->>>>>>> a0923563 (Feat: Add editStreamingPaymentMotion multicall handler)
->>>>>>> 7a6f2da (Feat: Add editStreamingPaymentMotion multicall handler)
-=======
->>>>>>> 01b6f83 (Feat: Added changelog to streaming payment and streaming payment metadata)
   listPrivateBetaInviteCodes?: Maybe<ModelPrivateBetaInviteCodeConnection>;
   listProfiles?: Maybe<ModelProfileConnection>;
   listReputationMiningCycleMetadata?: Maybe<ModelReputationMiningCycleMetadataConnection>;
@@ -6932,6 +6809,7 @@ export type Query = {
   listVoterRewardsHistories?: Maybe<ModelVoterRewardsHistoryConnection>;
   searchColonyActions?: Maybe<SearchableColonyActionConnection>;
   searchColonyContributors?: Maybe<SearchableColonyContributorConnection>;
+  searchStreamingPayments?: Maybe<SearchableStreamingPaymentConnection>;
   tokenExhangeRateByTokenId?: Maybe<ModelTokenExchangeRateConnection>;
 };
 
@@ -7402,30 +7280,11 @@ export type QueryGetMultiSigUserSignatureByMultiSigIdArgs = {
   sortDirection?: InputMaybe<ModelSortDirection>;
 };
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 8442a344 (Feat: Refactor editStreamingPayment handlers and ensure colony action is created)
 /** Root query type */
-<<<<<<< HEAD
 export type QueryGetNotificationsDataArgs = {
   userAddress: Scalars['ID'];
 };
 
-=======
-export type QueryGetPendingStreamingPaymentMetadataArgs = {
-  id: Scalars['ID'];
-};
-=======
->>>>>>> 01b6f83 (Feat: Added changelog to streaming payment and streaming payment metadata)
-
-<<<<<<< HEAD
-
->>>>>>> 7a6f2da (Feat: Add editStreamingPaymentMotion multicall handler)
-=======
->>>>>>> 7ebe3a9 (Feat: Refactor editStreamingPayment handlers and ensure colony action is created)
-=======
->>>>>>> 0e735b0 (Chore: fix rebase issues)
 /** Root query type */
 export type QueryGetPrivateBetaInviteCodeArgs = {
   id: Scalars['ID'];
@@ -7877,12 +7736,7 @@ export type QueryListMultiSigUserSignaturesArgs = {
   nextToken?: InputMaybe<Scalars['String']>;
 };
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 8442a344 (Feat: Refactor editStreamingPayment handlers and ensure colony action is created)
 /** Root query type */
-<<<<<<< HEAD
 export type QueryListNotificationsDataArgs = {
   filter?: InputMaybe<ModelNotificationsDataFilterInput>;
   limit?: InputMaybe<Scalars['Int']>;
@@ -7891,22 +7745,6 @@ export type QueryListNotificationsDataArgs = {
   userAddress?: InputMaybe<Scalars['ID']>;
 };
 
-=======
-export type QueryListPendingStreamingPaymentMetadataArgs = {
-  filter?: InputMaybe<ModelPendingStreamingPaymentMetadataFilterInput>;
-  limit?: InputMaybe<Scalars['Int']>;
-  nextToken?: InputMaybe<Scalars['String']>;
-};
-=======
->>>>>>> 01b6f83 (Feat: Added changelog to streaming payment and streaming payment metadata)
-
-<<<<<<< HEAD
-
->>>>>>> 7a6f2da (Feat: Add editStreamingPaymentMotion multicall handler)
-=======
->>>>>>> 7ebe3a9 (Feat: Refactor editStreamingPayment handlers and ensure colony action is created)
-=======
->>>>>>> 0e735b0 (Chore: fix rebase issues)
 /** Root query type */
 export type QueryListPrivateBetaInviteCodesArgs = {
   filter?: InputMaybe<ModelPrivateBetaInviteCodeFilterInput>;
@@ -8027,6 +7865,18 @@ export type QuerySearchColonyContributorsArgs = {
   limit?: InputMaybe<Scalars['Int']>;
   nextToken?: InputMaybe<Scalars['String']>;
   sort?: InputMaybe<Array<InputMaybe<SearchableColonyContributorSortInput>>>;
+};
+
+/** Root query type */
+export type QuerySearchStreamingPaymentsArgs = {
+  aggregates?: InputMaybe<
+    Array<InputMaybe<SearchableStreamingPaymentAggregationInput>>
+  >;
+  filter?: InputMaybe<SearchableStreamingPaymentFilterInput>;
+  from?: InputMaybe<Scalars['Int']>;
+  limit?: InputMaybe<Scalars['Int']>;
+  nextToken?: InputMaybe<Scalars['String']>;
+  sort?: InputMaybe<Array<InputMaybe<SearchableStreamingPaymentSortInput>>>;
 };
 
 /** Root query type */
@@ -8390,6 +8240,82 @@ export enum SearchableSortDirection {
   Desc = 'desc',
 }
 
+export enum SearchableStreamingPaymentAggregateField {
+  Amount = 'amount',
+  ColonyId = 'colonyId',
+  CreatedAt = 'createdAt',
+  CreatorAddress = 'creatorAddress',
+  EndTime = 'endTime',
+  Id = 'id',
+  Interval = 'interval',
+  IsCancelled = 'isCancelled',
+  IsWaived = 'isWaived',
+  NativeDomainId = 'nativeDomainId',
+  NativeId = 'nativeId',
+  RecipientAddress = 'recipientAddress',
+  StartTime = 'startTime',
+  TokenAddress = 'tokenAddress',
+  UpdatedAt = 'updatedAt',
+}
+
+export type SearchableStreamingPaymentAggregationInput = {
+  field: SearchableStreamingPaymentAggregateField;
+  name: Scalars['String'];
+  type: SearchableAggregateType;
+};
+
+export type SearchableStreamingPaymentConnection = {
+  __typename?: 'SearchableStreamingPaymentConnection';
+  aggregateItems: Array<Maybe<SearchableAggregateResult>>;
+  items: Array<Maybe<StreamingPayment>>;
+  nextToken?: Maybe<Scalars['String']>;
+  total?: Maybe<Scalars['Int']>;
+};
+
+export type SearchableStreamingPaymentFilterInput = {
+  amount?: InputMaybe<SearchableStringFilterInput>;
+  and?: InputMaybe<Array<InputMaybe<SearchableStreamingPaymentFilterInput>>>;
+  colonyId?: InputMaybe<SearchableIdFilterInput>;
+  createdAt?: InputMaybe<SearchableStringFilterInput>;
+  creatorAddress?: InputMaybe<SearchableIdFilterInput>;
+  endTime?: InputMaybe<SearchableStringFilterInput>;
+  id?: InputMaybe<SearchableIdFilterInput>;
+  interval?: InputMaybe<SearchableStringFilterInput>;
+  isCancelled?: InputMaybe<SearchableBooleanFilterInput>;
+  isWaived?: InputMaybe<SearchableBooleanFilterInput>;
+  nativeDomainId?: InputMaybe<SearchableIntFilterInput>;
+  nativeId?: InputMaybe<SearchableIntFilterInput>;
+  not?: InputMaybe<SearchableStreamingPaymentFilterInput>;
+  or?: InputMaybe<Array<InputMaybe<SearchableStreamingPaymentFilterInput>>>;
+  recipientAddress?: InputMaybe<SearchableStringFilterInput>;
+  startTime?: InputMaybe<SearchableStringFilterInput>;
+  tokenAddress?: InputMaybe<SearchableIdFilterInput>;
+  updatedAt?: InputMaybe<SearchableStringFilterInput>;
+};
+
+export type SearchableStreamingPaymentSortInput = {
+  direction?: InputMaybe<SearchableSortDirection>;
+  field?: InputMaybe<SearchableStreamingPaymentSortableFields>;
+};
+
+export enum SearchableStreamingPaymentSortableFields {
+  Amount = 'amount',
+  ColonyId = 'colonyId',
+  CreatedAt = 'createdAt',
+  CreatorAddress = 'creatorAddress',
+  EndTime = 'endTime',
+  Id = 'id',
+  Interval = 'interval',
+  IsCancelled = 'isCancelled',
+  IsWaived = 'isWaived',
+  NativeDomainId = 'nativeDomainId',
+  NativeId = 'nativeId',
+  RecipientAddress = 'recipientAddress',
+  StartTime = 'startTime',
+  TokenAddress = 'tokenAddress',
+  UpdatedAt = 'updatedAt',
+}
+
 export type SearchableStringFilterInput = {
   eq?: InputMaybe<Scalars['String']>;
   exists?: InputMaybe<Scalars['Boolean']>;
@@ -8627,16 +8553,7 @@ export type Subscription = {
   onCreateLiquidationAddress?: Maybe<LiquidationAddress>;
   onCreateMotionMessage?: Maybe<MotionMessage>;
   onCreateMultiSigUserSignature?: Maybe<MultiSigUserSignature>;
-<<<<<<< HEAD
-<<<<<<< HEAD
   onCreateNotificationsData?: Maybe<NotificationsData>;
-=======
-=======
-  onCreatePendingStreamingPaymentMetadata?: Maybe<PendingStreamingPaymentMetadata>;
->>>>>>> a0923563 (Feat: Add editStreamingPaymentMotion multicall handler)
->>>>>>> 7a6f2da (Feat: Add editStreamingPaymentMotion multicall handler)
-=======
->>>>>>> 01b6f83 (Feat: Added changelog to streaming payment and streaming payment metadata)
   onCreatePrivateBetaInviteCode?: Maybe<PrivateBetaInviteCode>;
   onCreateProfile?: Maybe<Profile>;
   onCreateReputationMiningCycleMetadata?: Maybe<ReputationMiningCycleMetadata>;
@@ -8680,16 +8597,7 @@ export type Subscription = {
   onDeleteLiquidationAddress?: Maybe<LiquidationAddress>;
   onDeleteMotionMessage?: Maybe<MotionMessage>;
   onDeleteMultiSigUserSignature?: Maybe<MultiSigUserSignature>;
-<<<<<<< HEAD
-<<<<<<< HEAD
   onDeleteNotificationsData?: Maybe<NotificationsData>;
-=======
-=======
-  onDeletePendingStreamingPaymentMetadata?: Maybe<PendingStreamingPaymentMetadata>;
->>>>>>> a0923563 (Feat: Add editStreamingPaymentMotion multicall handler)
->>>>>>> 7a6f2da (Feat: Add editStreamingPaymentMotion multicall handler)
-=======
->>>>>>> 01b6f83 (Feat: Added changelog to streaming payment and streaming payment metadata)
   onDeletePrivateBetaInviteCode?: Maybe<PrivateBetaInviteCode>;
   onDeleteProfile?: Maybe<Profile>;
   onDeleteReputationMiningCycleMetadata?: Maybe<ReputationMiningCycleMetadata>;
@@ -8733,16 +8641,7 @@ export type Subscription = {
   onUpdateLiquidationAddress?: Maybe<LiquidationAddress>;
   onUpdateMotionMessage?: Maybe<MotionMessage>;
   onUpdateMultiSigUserSignature?: Maybe<MultiSigUserSignature>;
-<<<<<<< HEAD
-<<<<<<< HEAD
   onUpdateNotificationsData?: Maybe<NotificationsData>;
-=======
-=======
-  onUpdatePendingStreamingPaymentMetadata?: Maybe<PendingStreamingPaymentMetadata>;
->>>>>>> a0923563 (Feat: Add editStreamingPaymentMotion multicall handler)
->>>>>>> 7a6f2da (Feat: Add editStreamingPaymentMotion multicall handler)
-=======
->>>>>>> 01b6f83 (Feat: Added changelog to streaming payment and streaming payment metadata)
   onUpdatePrivateBetaInviteCode?: Maybe<PrivateBetaInviteCode>;
   onUpdateProfile?: Maybe<Profile>;
   onUpdateReputationMiningCycleMetadata?: Maybe<ReputationMiningCycleMetadata>;
@@ -8763,16 +8662,10 @@ export type SubscriptionOnCreateAnnotationArgs = {
   filter?: InputMaybe<ModelSubscriptionAnnotationFilterInput>;
 };
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 export type SubscriptionOnCreateCacheTotalBalanceArgs = {
   filter?: InputMaybe<ModelSubscriptionCacheTotalBalanceFilterInput>;
 };
-=======
->>>>>>> 01b6f83 (Feat: Added changelog to streaming payment and streaming payment metadata)
 
-=======
->>>>>>> 0e735b0 (Chore: fix rebase issues)
 export type SubscriptionOnCreateColonyArgs = {
   filter?: InputMaybe<ModelSubscriptionColonyFilterInput>;
 };
@@ -8881,32 +8774,10 @@ export type SubscriptionOnCreateMultiSigUserSignatureArgs = {
   filter?: InputMaybe<ModelSubscriptionMultiSigUserSignatureFilterInput>;
 };
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
 export type SubscriptionOnCreateNotificationsDataArgs = {
   filter?: InputMaybe<ModelSubscriptionNotificationsDataFilterInput>;
 };
 
-=======
-=======
-=======
->>>>>>> 8442a344 (Feat: Refactor editStreamingPayment handlers and ensure colony action is created)
->>>>>>> 7ebe3a9 (Feat: Refactor editStreamingPayment handlers and ensure colony action is created)
-export type SubscriptionOnCreatePendingStreamingPaymentMetadataArgs = {
-  filter?: InputMaybe<ModelSubscriptionPendingStreamingPaymentMetadataFilterInput>;
-};
-=======
->>>>>>> 01b6f83 (Feat: Added changelog to streaming payment and streaming payment metadata)
-
-<<<<<<< HEAD
-
->>>>>>> 7a6f2da (Feat: Add editStreamingPaymentMotion multicall handler)
-=======
->>>>>>> 7ebe3a9 (Feat: Refactor editStreamingPayment handlers and ensure colony action is created)
-=======
->>>>>>> 0e735b0 (Chore: fix rebase issues)
 export type SubscriptionOnCreatePrivateBetaInviteCodeArgs = {
   filter?: InputMaybe<ModelSubscriptionPrivateBetaInviteCodeFilterInput>;
 };
@@ -8939,16 +8810,10 @@ export type SubscriptionOnCreateTokenArgs = {
   filter?: InputMaybe<ModelSubscriptionTokenFilterInput>;
 };
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 export type SubscriptionOnCreateTokenExchangeRateArgs = {
   filter?: InputMaybe<ModelSubscriptionTokenExchangeRateFilterInput>;
 };
-=======
->>>>>>> 01b6f83 (Feat: Added changelog to streaming payment and streaming payment metadata)
 
-=======
->>>>>>> 0e735b0 (Chore: fix rebase issues)
 export type SubscriptionOnCreateTransactionArgs = {
   filter?: InputMaybe<ModelSubscriptionTransactionFilterInput>;
 };
@@ -8973,16 +8838,10 @@ export type SubscriptionOnDeleteAnnotationArgs = {
   filter?: InputMaybe<ModelSubscriptionAnnotationFilterInput>;
 };
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 export type SubscriptionOnDeleteCacheTotalBalanceArgs = {
   filter?: InputMaybe<ModelSubscriptionCacheTotalBalanceFilterInput>;
 };
-=======
->>>>>>> 01b6f83 (Feat: Added changelog to streaming payment and streaming payment metadata)
 
-=======
->>>>>>> 0e735b0 (Chore: fix rebase issues)
 export type SubscriptionOnDeleteColonyArgs = {
   filter?: InputMaybe<ModelSubscriptionColonyFilterInput>;
 };
@@ -9091,32 +8950,10 @@ export type SubscriptionOnDeleteMultiSigUserSignatureArgs = {
   filter?: InputMaybe<ModelSubscriptionMultiSigUserSignatureFilterInput>;
 };
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
 export type SubscriptionOnDeleteNotificationsDataArgs = {
   filter?: InputMaybe<ModelSubscriptionNotificationsDataFilterInput>;
 };
 
-=======
-=======
-=======
->>>>>>> 8442a344 (Feat: Refactor editStreamingPayment handlers and ensure colony action is created)
->>>>>>> 7ebe3a9 (Feat: Refactor editStreamingPayment handlers and ensure colony action is created)
-export type SubscriptionOnDeletePendingStreamingPaymentMetadataArgs = {
-  filter?: InputMaybe<ModelSubscriptionPendingStreamingPaymentMetadataFilterInput>;
-};
-=======
->>>>>>> 01b6f83 (Feat: Added changelog to streaming payment and streaming payment metadata)
-
-<<<<<<< HEAD
-
->>>>>>> 7a6f2da (Feat: Add editStreamingPaymentMotion multicall handler)
-=======
->>>>>>> 7ebe3a9 (Feat: Refactor editStreamingPayment handlers and ensure colony action is created)
-=======
->>>>>>> 0e735b0 (Chore: fix rebase issues)
 export type SubscriptionOnDeletePrivateBetaInviteCodeArgs = {
   filter?: InputMaybe<ModelSubscriptionPrivateBetaInviteCodeFilterInput>;
 };
@@ -9149,16 +8986,10 @@ export type SubscriptionOnDeleteTokenArgs = {
   filter?: InputMaybe<ModelSubscriptionTokenFilterInput>;
 };
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 export type SubscriptionOnDeleteTokenExchangeRateArgs = {
   filter?: InputMaybe<ModelSubscriptionTokenExchangeRateFilterInput>;
 };
-=======
->>>>>>> 01b6f83 (Feat: Added changelog to streaming payment and streaming payment metadata)
 
-=======
->>>>>>> 0e735b0 (Chore: fix rebase issues)
 export type SubscriptionOnDeleteTransactionArgs = {
   filter?: InputMaybe<ModelSubscriptionTransactionFilterInput>;
 };
@@ -9183,16 +9014,10 @@ export type SubscriptionOnUpdateAnnotationArgs = {
   filter?: InputMaybe<ModelSubscriptionAnnotationFilterInput>;
 };
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 export type SubscriptionOnUpdateCacheTotalBalanceArgs = {
   filter?: InputMaybe<ModelSubscriptionCacheTotalBalanceFilterInput>;
 };
-=======
->>>>>>> 01b6f83 (Feat: Added changelog to streaming payment and streaming payment metadata)
 
-=======
->>>>>>> 0e735b0 (Chore: fix rebase issues)
 export type SubscriptionOnUpdateColonyArgs = {
   filter?: InputMaybe<ModelSubscriptionColonyFilterInput>;
 };
@@ -9301,32 +9126,10 @@ export type SubscriptionOnUpdateMultiSigUserSignatureArgs = {
   filter?: InputMaybe<ModelSubscriptionMultiSigUserSignatureFilterInput>;
 };
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
 export type SubscriptionOnUpdateNotificationsDataArgs = {
   filter?: InputMaybe<ModelSubscriptionNotificationsDataFilterInput>;
 };
 
-=======
-=======
-=======
->>>>>>> 8442a344 (Feat: Refactor editStreamingPayment handlers and ensure colony action is created)
->>>>>>> 7ebe3a9 (Feat: Refactor editStreamingPayment handlers and ensure colony action is created)
-export type SubscriptionOnUpdatePendingStreamingPaymentMetadataArgs = {
-  filter?: InputMaybe<ModelSubscriptionPendingStreamingPaymentMetadataFilterInput>;
-};
-=======
->>>>>>> 01b6f83 (Feat: Added changelog to streaming payment and streaming payment metadata)
-
-<<<<<<< HEAD
-
->>>>>>> 7a6f2da (Feat: Add editStreamingPaymentMotion multicall handler)
-=======
->>>>>>> 7ebe3a9 (Feat: Refactor editStreamingPayment handlers and ensure colony action is created)
-=======
->>>>>>> 0e735b0 (Chore: fix rebase issues)
 export type SubscriptionOnUpdatePrivateBetaInviteCodeArgs = {
   filter?: InputMaybe<ModelSubscriptionPrivateBetaInviteCodeFilterInput>;
 };
@@ -9359,16 +9162,10 @@ export type SubscriptionOnUpdateTokenArgs = {
   filter?: InputMaybe<ModelSubscriptionTokenFilterInput>;
 };
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 export type SubscriptionOnUpdateTokenExchangeRateArgs = {
   filter?: InputMaybe<ModelSubscriptionTokenExchangeRateFilterInput>;
 };
-=======
->>>>>>> 01b6f83 (Feat: Added changelog to streaming payment and streaming payment metadata)
 
-=======
->>>>>>> 0e735b0 (Chore: fix rebase issues)
 export type SubscriptionOnUpdateTransactionArgs = {
   filter?: InputMaybe<ModelSubscriptionTransactionFilterInput>;
 };
@@ -10396,11 +10193,6 @@ export type VotingReputationParamsInput = {
   voterRewardFraction: Scalars['String'];
 };
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 0e735b0 (Chore: fix rebase issues)
 export type ActionMetadataInfoFragment = {
   __typename?: 'ColonyAction';
   id: string;
@@ -10408,14 +10200,11 @@ export type ActionMetadataInfoFragment = {
   amount?: string | null;
   networkFee?: string | null;
   type: ColonyActionType;
-<<<<<<< HEAD
   showInActionsList: boolean;
   colonyId: string;
   initiatorAddress: string;
   recipientAddress?: string | null;
   members?: Array<string> | null;
-=======
->>>>>>> 0e735b0 (Chore: fix rebase issues)
   pendingDomainMetadata?: {
     __typename?: 'DomainMetadata';
     name: string;
@@ -10461,7 +10250,6 @@ export type ActionMetadataInfoFragment = {
       hasObjectiveChanged?: boolean | null;
     }> | null;
   } | null;
-<<<<<<< HEAD
   payments?: Array<{ __typename?: 'Payment'; recipientAddress: string }> | null;
 };
 
@@ -10497,47 +10285,6 @@ export type ColonyFragment = {
     } | null>;
   } | null;
 };
-=======
-export type ActionMetadataInfoFragment = { __typename?: 'ColonyAction', id: string, colonyDecisionId?: string | null, amount?: string | null, networkFee?: string | null, type: ColonyActionType, pendingDomainMetadata?: { __typename?: 'DomainMetadata', name: string, color: DomainColor, description?: string | null, changelog?: Array<{ __typename?: 'DomainMetadataChangelog', transactionHash: string, oldName: string, newName: string, oldColor: DomainColor, newColor: DomainColor, oldDescription?: string | null, newDescription?: string | null }> | null } | null, pendingColonyMetadata?: { __typename?: 'ColonyMetadata', id: string, displayName: string, avatar?: string | null, thumbnail?: string | null, description?: string | null, externalLinks?: Array<{ __typename?: 'ExternalLink', name: ExternalLinks, link: string }> | null, objective?: { __typename?: 'ColonyObjective', title: string, description: string, progress: number } | null, changelog?: Array<{ __typename?: 'ColonyMetadataChangelog', transactionHash: string, oldDisplayName: string, newDisplayName: string, hasAvatarChanged: boolean, hasDescriptionChanged?: boolean | null, haveExternalLinksChanged?: boolean | null, hasObjectiveChanged?: boolean | null }> | null } | null };
-
-export type ColonyFragment = { __typename?: 'Colony', colonyAddress: string, nativeToken: { __typename?: 'Token', tokenAddress: string }, tokens?: { __typename?: 'ModelColonyTokensConnection', items: Array<{ __typename?: 'ColonyTokens', id: string, tokenAddress: string } | null> } | null, motionsWithUnclaimedStakes?: Array<{ __typename?: 'ColonyUnclaimedStake', motionId: string, unclaimedRewards: Array<{ __typename?: 'StakerRewards', address: string, isClaimed: boolean, rewards: { __typename?: 'MotionStakeValues', yay: string, nay: string } }> }> | null, domains?: { __typename?: 'ModelDomainConnection', nextToken?: string | null, items: Array<{ __typename?: 'Domain', id: string, nativeSkillId: string } | null> } | null };
->>>>>>> 01b6f83 (Feat: Added changelog to streaming payment and streaming payment metadata)
-=======
-};
-
-export type ColonyFragment = {
-  __typename?: 'Colony';
-  colonyAddress: string;
-  nativeToken: { __typename?: 'Token'; tokenAddress: string };
-  tokens?: {
-    __typename?: 'ModelColonyTokensConnection';
-    items: Array<{
-      __typename?: 'ColonyTokens';
-      id: string;
-      tokenAddress: string;
-    } | null>;
-  } | null;
-  motionsWithUnclaimedStakes?: Array<{
-    __typename?: 'ColonyUnclaimedStake';
-    motionId: string;
-    unclaimedRewards: Array<{
-      __typename?: 'StakerRewards';
-      address: string;
-      isClaimed: boolean;
-      rewards: { __typename?: 'MotionStakeValues'; yay: string; nay: string };
-    }>;
-  }> | null;
-  domains?: {
-    __typename?: 'ModelDomainConnection';
-    nextToken?: string | null;
-    items: Array<{
-      __typename?: 'Domain';
-      id: string;
-      nativeSkillId: string;
-    } | null>;
-  } | null;
-};
->>>>>>> 0e735b0 (Chore: fix rebase issues)
 
 export type ColonyMetadataFragment = {
   __typename?: 'ColonyMetadata';
@@ -10569,8 +10316,6 @@ export type ColonyMetadataFragment = {
   }> | null;
 };
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 export type ColonyWithRootRolesFragment = {
   __typename?: 'Colony';
   id: string;
@@ -10601,14 +10346,11 @@ export type ColonyWithRootRolesFragment = {
   } | null;
 };
 
-=======
->>>>>>> 0e735b0 (Chore: fix rebase issues)
 export type ExpenditureBalanceFragment = {
   __typename?: 'ExpenditureBalance';
   tokenAddress: string;
   amount: string;
 };
-<<<<<<< HEAD
 
 export type ExpenditureFragment = {
   __typename?: 'Expenditure';
@@ -10655,51 +10397,6 @@ export type ExpenditureFragment = {
     } | null>;
   } | null;
 };
-=======
-export type ExpenditureBalanceFragment = { __typename?: 'ExpenditureBalance', tokenAddress: string, amount: string };
-
-export type ExpenditureFragment = { __typename?: 'Expenditure', id: string, status: ExpenditureStatus, ownerAddress: string, userStakeId?: string | null, createdAt: string, firstEditTransactionHash?: string | null, type: ExpenditureType, slots: Array<{ __typename?: 'ExpenditureSlot', id: number, recipientAddress?: string | null, claimDelay?: string | null, payoutModifier?: number | null, payouts?: Array<{ __typename?: 'ExpenditurePayout', tokenAddress: string, amount: string, isClaimed: boolean, networkFee?: string | null }> | null }>, motions?: { __typename?: 'ModelColonyMotionConnection', items: Array<{ __typename?: 'ColonyMotion', transactionHash: string, action?: { __typename?: 'ColonyAction', type: ColonyActionType } | null } | null> } | null, balances?: Array<{ __typename?: 'ExpenditureBalance', tokenAddress: string, amount: string }> | null };
->>>>>>> 01b6f83 (Feat: Added changelog to streaming payment and streaming payment metadata)
-=======
-
-export type ExpenditureFragment = {
-  __typename?: 'Expenditure';
-  id: string;
-  status: ExpenditureStatus;
-  ownerAddress: string;
-  userStakeId?: string | null;
-  createdAt: string;
-  firstEditTransactionHash?: string | null;
-  type: ExpenditureType;
-  slots: Array<{
-    __typename?: 'ExpenditureSlot';
-    id: number;
-    recipientAddress?: string | null;
-    claimDelay?: string | null;
-    payoutModifier?: number | null;
-    payouts?: Array<{
-      __typename?: 'ExpenditurePayout';
-      tokenAddress: string;
-      amount: string;
-      isClaimed: boolean;
-      networkFee?: string | null;
-    }> | null;
-  }>;
-  motions?: {
-    __typename?: 'ModelColonyMotionConnection';
-    items: Array<{
-      __typename?: 'ColonyMotion';
-      transactionHash: string;
-      action?: { __typename?: 'ColonyAction'; type: ColonyActionType } | null;
-    } | null>;
-  } | null;
-  balances?: Array<{
-    __typename?: 'ExpenditureBalance';
-    tokenAddress: string;
-    amount: string;
-  }> | null;
-};
->>>>>>> 0e735b0 (Chore: fix rebase issues)
 
 export type ExpenditureSlotFragment = {
   __typename?: 'ExpenditureSlot';
@@ -10787,6 +10484,7 @@ export type ColonyMotionFragment = {
   motionDomainId: string;
   isDecision: boolean;
   transactionHash: string;
+  expenditureId?: string | null;
   streamingPaymentId?: string | null;
   pendingStreamingPaymentMetadataId?: string | null;
   motionStakes: {
@@ -10840,86 +10538,12 @@ export type ColonyMotionFragment = {
   };
 };
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-export type ColonyMotionFragment = {
-  __typename?: 'ColonyMotion';
-  id: string;
-  nativeMotionId: string;
-  requiredStake: string;
-  remainingStakes: Array<string>;
-  userMinStake: string;
-  nativeMotionDomainId: string;
-  isFinalized: boolean;
-  createdBy: string;
-  repSubmitted: string;
-  skillRep: string;
-  hasObjection: boolean;
-  motionDomainId: string;
-  isDecision: boolean;
-  transactionHash: string;
-  expenditureId?: string | null;
-  motionStakes: {
-    __typename?: 'MotionStakes';
-    raw: { __typename?: 'MotionStakeValues'; nay: string; yay: string };
-    percentage: { __typename?: 'MotionStakeValues'; nay: string; yay: string };
-  };
-  usersStakes: Array<{
-    __typename?: 'UserMotionStakes';
-    address: string;
-    stakes: {
-      __typename?: 'MotionStakes';
-      raw: { __typename?: 'MotionStakeValues'; yay: string; nay: string };
-      percentage: {
-        __typename?: 'MotionStakeValues';
-        yay: string;
-        nay: string;
-      };
-    };
-  }>;
-  stakerRewards: Array<{
-    __typename?: 'StakerRewards';
-    address: string;
-    isClaimed: boolean;
-    rewards: { __typename?: 'MotionStakeValues'; yay: string; nay: string };
-  }>;
-  voterRecord: Array<{
-    __typename?: 'VoterRecord';
-    address: string;
-    voteCount: string;
-    vote?: number | null;
-  }>;
-  revealedVotes: {
-    __typename?: 'MotionStakes';
-    raw: { __typename?: 'MotionStakeValues'; yay: string; nay: string };
-    percentage: { __typename?: 'MotionStakeValues'; yay: string; nay: string };
-  };
-  motionStateHistory: {
-    __typename?: 'MotionStateHistory';
-    hasVoted: boolean;
-    hasPassed: boolean;
-    hasFailed: boolean;
-    hasFailedNotFinalizable: boolean;
-    inRevealPhase: boolean;
-    yaySideFullyStakedAt?: string | null;
-    naySideFullyStakedAt?: string | null;
-    allVotesSubmittedAt?: string | null;
-    allVotesRevealedAt?: string | null;
-    endedAt?: string | null;
-    finalizedAt?: string | null;
-  };
-};
-=======
-export type VoterRecordFragment = { __typename?: 'VoterRecord', address: string, voteCount: string, vote?: number | null };
->>>>>>> 01b6f83 (Feat: Added changelog to streaming payment and streaming payment metadata)
-=======
 export type VoterRecordFragment = {
   __typename?: 'VoterRecord';
   address: string;
   voteCount: string;
   vote?: number | null;
 };
->>>>>>> 0e735b0 (Chore: fix rebase issues)
 
 export type StakerRewardFragment = {
   __typename?: 'StakerRewards';
@@ -11003,45 +10627,9 @@ export type ColonyMultiSigFragment = {
       createdAt: string;
     } | null>;
   } | null;
-};
-
-<<<<<<< HEAD
-<<<<<<< HEAD
-export type ColonyMultiSigFragment = {
-  __typename?: 'ColonyMultiSig';
-  id: string;
-  colonyAddress: string;
-  nativeMultiSigId: string;
-  multiSigDomainId: string;
-  nativeMultiSigDomainId: string;
-  requiredPermissions: number;
-  transactionHash: string;
-  isExecuted: boolean;
-  isRejected: boolean;
-  isDecision: boolean;
-  hasActionCompleted: boolean;
-  executedAt?: string | null;
-  executedBy?: string | null;
-  rejectedAt?: string | null;
-  rejectedBy?: string | null;
-  createdAt: string;
-  signatures?: {
-    __typename?: 'ModelMultiSigUserSignatureConnection';
-    items: Array<{
-      __typename?: 'MultiSigUserSignature';
-      id: string;
-      multiSigId: string;
-      role: number;
-      colonyAddress: string;
-      userAddress: string;
-      vote: MultiSigVote;
-      createdAt: string;
-    } | null>;
-  } | null;
   action?: { __typename?: 'ColonyAction'; type: ColonyActionType } | null;
 };
 
-<<<<<<< HEAD
 export type TokenFragment = {
   __typename?: 'Token';
   symbol: string;
@@ -11073,257 +10661,6 @@ export type NotificationsDataFragment = {
   mentionNotificationsDisabled: boolean;
   adminNotificationsDisabled: boolean;
 };
-=======
-=======
-export type ColonyFragment = {
-  __typename?: 'Colony';
-  colonyAddress: string;
-  nativeToken: { __typename?: 'Token'; tokenAddress: string };
-  tokens?: {
-    __typename?: 'ModelColonyTokensConnection';
-    items: Array<{
-      __typename?: 'ColonyTokens';
-      id: string;
-      tokenAddress: string;
-    } | null>;
-  } | null;
-  motionsWithUnclaimedStakes?: Array<{
-    __typename?: 'ColonyUnclaimedStake';
-    motionId: string;
-    unclaimedRewards: Array<{
-      __typename?: 'StakerRewards';
-      address: string;
-      isClaimed: boolean;
-      rewards: { __typename?: 'MotionStakeValues'; yay: string; nay: string };
-    }>;
-  }> | null;
-  domains?: {
-    __typename?: 'ModelDomainConnection';
-    nextToken?: string | null;
-    items: Array<{
-      __typename?: 'Domain';
-      id: string;
-      nativeSkillId: string;
-    } | null>;
-  } | null;
-};
-
-export type ColonyMetadataFragment = {
-  __typename?: 'ColonyMetadata';
-  id: string;
-  displayName: string;
-  avatar?: string | null;
-  thumbnail?: string | null;
-  description?: string | null;
-  externalLinks?: Array<{
-    __typename?: 'ExternalLink';
-    name: ExternalLinks;
-    link: string;
-  }> | null;
-  changelog?: Array<{
-    __typename?: 'ColonyMetadataChangelog';
-    transactionHash: string;
-    oldDisplayName: string;
-    newDisplayName: string;
-    hasAvatarChanged: boolean;
-    hasDescriptionChanged?: boolean | null;
-    haveExternalLinksChanged?: boolean | null;
-  }> | null;
-};
-
-export type ExpenditureBalanceFragment = {
-  __typename?: 'ExpenditureBalance';
-  tokenAddress: string;
-  amount: string;
-};
-
-export type ExpenditureFragment = {
-  __typename?: 'Expenditure';
-  id: string;
-  status: ExpenditureStatus;
-  ownerAddress: string;
-  userStakeId?: string | null;
-  createdAt: string;
-  firstEditTransactionHash?: string | null;
-  type: ExpenditureType;
-  slots: Array<{
-    __typename?: 'ExpenditureSlot';
-    id: number;
-    recipientAddress?: string | null;
-    claimDelay?: string | null;
-    payoutModifier?: number | null;
-    payouts?: Array<{
-      __typename?: 'ExpenditurePayout';
-      tokenAddress: string;
-      amount: string;
-      isClaimed: boolean;
-      networkFee?: string | null;
-    }> | null;
-  }>;
-  motions?: {
-    __typename?: 'ModelColonyMotionConnection';
-    items: Array<{
-      __typename?: 'ColonyMotion';
-      transactionHash: string;
-      action?: { __typename?: 'ColonyAction'; type: ColonyActionType } | null;
-    } | null>;
-  } | null;
-  balances?: Array<{
-    __typename?: 'ExpenditureBalance';
-    tokenAddress: string;
-    amount: string;
-  }> | null;
-};
-
-export type ExpenditureSlotFragment = {
-  __typename?: 'ExpenditureSlot';
-  id: number;
-  recipientAddress?: string | null;
-  claimDelay?: string | null;
-  payoutModifier?: number | null;
-  payouts?: Array<{
-    __typename?: 'ExpenditurePayout';
-    tokenAddress: string;
-    amount: string;
-    isClaimed: boolean;
-    networkFee?: string | null;
-  }> | null;
-};
-
-export type ExtensionFragment = {
-  __typename?: 'ColonyExtension';
-  id: string;
-  hash: string;
-  colonyId: string;
-  isInitialized: boolean;
-  version: number;
-};
-
-export type ColonyMotionFragment = {
-  __typename?: 'ColonyMotion';
-  id: string;
-  nativeMotionId: string;
-  requiredStake: string;
-  remainingStakes: Array<string>;
-  userMinStake: string;
-  nativeMotionDomainId: string;
-  isFinalized: boolean;
-  createdBy: string;
-  repSubmitted: string;
-  skillRep: string;
-  hasObjection: boolean;
-  motionDomainId: string;
-  isDecision: boolean;
-  transactionHash: string;
-  streamingPaymentId?: string | null;
-  pendingStreamingPaymentMetadataId?: string | null;
-  motionStakes: {
-    __typename?: 'MotionStakes';
-    raw: { __typename?: 'MotionStakeValues'; nay: string; yay: string };
-    percentage: { __typename?: 'MotionStakeValues'; nay: string; yay: string };
-  };
-  usersStakes: Array<{
-    __typename?: 'UserMotionStakes';
-    address: string;
-    stakes: {
-      __typename?: 'MotionStakes';
-      raw: { __typename?: 'MotionStakeValues'; yay: string; nay: string };
-      percentage: {
-        __typename?: 'MotionStakeValues';
-        yay: string;
-        nay: string;
-      };
-    };
-  }>;
-  stakerRewards: Array<{
-    __typename?: 'StakerRewards';
-    address: string;
-    isClaimed: boolean;
-    rewards: { __typename?: 'MotionStakeValues'; yay: string; nay: string };
-  }>;
-  voterRecord: Array<{
-    __typename?: 'VoterRecord';
-    address: string;
-    voteCount: string;
-    vote?: number | null;
-  }>;
-  revealedVotes: {
-    __typename?: 'MotionStakes';
-    raw: { __typename?: 'MotionStakeValues'; yay: string; nay: string };
-    percentage: { __typename?: 'MotionStakeValues'; yay: string; nay: string };
-  };
-  motionStateHistory: {
-    __typename?: 'MotionStateHistory';
-    hasVoted: boolean;
-    hasPassed: boolean;
-    hasFailed: boolean;
-    hasFailedNotFinalizable: boolean;
-    inRevealPhase: boolean;
-    yaySideFullyStakedAt?: string | null;
-    naySideFullyStakedAt?: string | null;
-    allVotesSubmittedAt?: string | null;
-    allVotesRevealedAt?: string | null;
-    endedAt?: string | null;
-    finalizedAt?: string | null;
-  };
-};
-
-export type VoterRecordFragment = {
-  __typename?: 'VoterRecord';
-  address: string;
-  voteCount: string;
-  vote?: number | null;
-};
-
-export type StakerRewardFragment = {
-  __typename?: 'StakerRewards';
-  address: string;
-  isClaimed: boolean;
-  rewards: { __typename?: 'MotionStakeValues'; yay: string; nay: string };
-};
-
-export type MotionStakesFragment = {
-  __typename?: 'MotionStakes';
-  raw: { __typename?: 'MotionStakeValues'; nay: string; yay: string };
-  percentage: { __typename?: 'MotionStakeValues'; nay: string; yay: string };
-};
-
-export type UserMotionStakesFragment = {
-  __typename?: 'UserMotionStakes';
-  address: string;
-  stakes: {
-    __typename?: 'MotionStakes';
-    raw: { __typename?: 'MotionStakeValues'; yay: string; nay: string };
-    percentage: { __typename?: 'MotionStakeValues'; yay: string; nay: string };
-  };
-};
-
-export type DomainMetadataFragment = {
-  __typename?: 'DomainMetadata';
-  name: string;
-  color: DomainColor;
-  description?: string | null;
-  changelog?: Array<{
-    __typename?: 'DomainMetadataChangelog';
-    transactionHash: string;
-    oldName: string;
-    newName: string;
-    oldColor: DomainColor;
-    newColor: DomainColor;
-    oldDescription?: string | null;
-    newDescription?: string | null;
-  }> | null;
-};
-
->>>>>>> 8442a344 (Feat: Refactor editStreamingPayment handlers and ensure colony action is created)
-export type TokenFragment = { __typename?: 'Token'; tokenAddress: string };
->>>>>>> 7ebe3a9 (Feat: Refactor editStreamingPayment handlers and ensure colony action is created)
-=======
-export type TokenFragment = { __typename?: 'Token', tokenAddress: string };
->>>>>>> 01b6f83 (Feat: Added changelog to streaming payment and streaming payment metadata)
-=======
-export type TokenFragment = { __typename?: 'Token'; tokenAddress: string };
->>>>>>> 0e735b0 (Chore: fix rebase issues)
 
 export type CreateColonyActionMutationVariables = Exact<{
   input: CreateColonyActionInput;
@@ -12007,20 +11344,12 @@ export type GetColonyQueryVariables = Exact<{
   nextToken?: InputMaybe<Scalars['String']>;
 }>;
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 0e735b0 (Chore: fix rebase issues)
 export type GetColonyQuery = {
   __typename?: 'Query';
   getColony?: {
     __typename?: 'Colony';
     colonyAddress: string;
-<<<<<<< HEAD
     nativeToken: { __typename?: 'Token'; symbol: string; tokenAddress: string };
-=======
-    nativeToken: { __typename?: 'Token'; tokenAddress: string };
->>>>>>> 0e735b0 (Chore: fix rebase issues)
     tokens?: {
       __typename?: 'ModelColonyTokensConnection';
       items: Array<{
@@ -12058,13 +11387,6 @@ export type GetColonyQuery = {
     items: Array<{ __typename?: 'Colony'; id: string; name: string } | null>;
   } | null;
 };
-<<<<<<< HEAD
-=======
-
-export type GetColonyQuery = { __typename?: 'Query', getColony?: { __typename?: 'Colony', colonyAddress: string, nativeToken: { __typename?: 'Token', tokenAddress: string }, tokens?: { __typename?: 'ModelColonyTokensConnection', items: Array<{ __typename?: 'ColonyTokens', id: string, tokenAddress: string } | null> } | null, motionsWithUnclaimedStakes?: Array<{ __typename?: 'ColonyUnclaimedStake', motionId: string, unclaimedRewards: Array<{ __typename?: 'StakerRewards', address: string, isClaimed: boolean, rewards: { __typename?: 'MotionStakeValues', yay: string, nay: string } }> }> | null, domains?: { __typename?: 'ModelDomainConnection', nextToken?: string | null, items: Array<{ __typename?: 'Domain', id: string, nativeSkillId: string } | null> } | null } | null, getColonyByAddress?: { __typename?: 'ModelColonyConnection', items: Array<{ __typename?: 'Colony', id: string, name: string } | null> } | null, getColonyByType?: { __typename?: 'ModelColonyConnection', items: Array<{ __typename?: 'Colony', id: string, name: string } | null> } | null };
->>>>>>> 01b6f83 (Feat: Added changelog to streaming payment and streaming payment metadata)
-=======
->>>>>>> 0e735b0 (Chore: fix rebase issues)
 
 export type GetColonyByNameQueryVariables = Exact<{
   name: Scalars['String'];
@@ -12317,10 +11639,6 @@ export type GetExpenditureQueryVariables = Exact<{
   id: Scalars['ID'];
 }>;
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 0e735b0 (Chore: fix rebase issues)
 export type GetExpenditureQuery = {
   __typename?: 'Query';
   getExpenditure?: {
@@ -12359,7 +11677,6 @@ export type GetExpenditureQuery = {
       tokenAddress: string;
       amount: string;
     }> | null;
-<<<<<<< HEAD
     actions?: {
       __typename?: 'ModelColonyActionConnection';
       items: Array<{
@@ -12370,24 +11687,12 @@ export type GetExpenditureQuery = {
     } | null;
   } | null;
 };
-=======
-
-export type GetExpenditureQuery = { __typename?: 'Query', getExpenditure?: { __typename?: 'Expenditure', id: string, status: ExpenditureStatus, ownerAddress: string, userStakeId?: string | null, createdAt: string, firstEditTransactionHash?: string | null, type: ExpenditureType, slots: Array<{ __typename?: 'ExpenditureSlot', id: number, recipientAddress?: string | null, claimDelay?: string | null, payoutModifier?: number | null, payouts?: Array<{ __typename?: 'ExpenditurePayout', tokenAddress: string, amount: string, isClaimed: boolean, networkFee?: string | null }> | null }>, motions?: { __typename?: 'ModelColonyMotionConnection', items: Array<{ __typename?: 'ColonyMotion', transactionHash: string, action?: { __typename?: 'ColonyAction', type: ColonyActionType } | null } | null> } | null, balances?: Array<{ __typename?: 'ExpenditureBalance', tokenAddress: string, amount: string }> | null } | null };
->>>>>>> 01b6f83 (Feat: Added changelog to streaming payment and streaming payment metadata)
-=======
-  } | null;
-};
->>>>>>> 0e735b0 (Chore: fix rebase issues)
 
 export type GetExpenditureByNativeFundingPotIdAndColonyQueryVariables = Exact<{
   nativeFundingPotId: Scalars['Int'];
   colonyAddress: Scalars['ID'];
 }>;
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 0e735b0 (Chore: fix rebase issues)
 export type GetExpenditureByNativeFundingPotIdAndColonyQuery = {
   __typename?: 'Query';
   getExpendituresByNativeFundingPotIdAndColony?: {
@@ -12431,7 +11736,6 @@ export type GetExpenditureByNativeFundingPotIdAndColonyQuery = {
         tokenAddress: string;
         amount: string;
       }> | null;
-<<<<<<< HEAD
       actions?: {
         __typename?: 'ModelColonyActionConnection';
         items: Array<{
@@ -12443,15 +11747,6 @@ export type GetExpenditureByNativeFundingPotIdAndColonyQuery = {
     } | null>;
   } | null;
 };
-=======
-
-export type GetExpenditureByNativeFundingPotIdAndColonyQuery = { __typename?: 'Query', getExpendituresByNativeFundingPotIdAndColony?: { __typename?: 'ModelExpenditureConnection', items: Array<{ __typename?: 'Expenditure', id: string, status: ExpenditureStatus, ownerAddress: string, userStakeId?: string | null, createdAt: string, firstEditTransactionHash?: string | null, type: ExpenditureType, slots: Array<{ __typename?: 'ExpenditureSlot', id: number, recipientAddress?: string | null, claimDelay?: string | null, payoutModifier?: number | null, payouts?: Array<{ __typename?: 'ExpenditurePayout', tokenAddress: string, amount: string, isClaimed: boolean, networkFee?: string | null }> | null }>, motions?: { __typename?: 'ModelColonyMotionConnection', items: Array<{ __typename?: 'ColonyMotion', transactionHash: string, action?: { __typename?: 'ColonyAction', type: ColonyActionType } | null } | null> } | null, balances?: Array<{ __typename?: 'ExpenditureBalance', tokenAddress: string, amount: string }> | null } | null> } | null };
->>>>>>> 01b6f83 (Feat: Added changelog to streaming payment and streaming payment metadata)
-=======
-    } | null>;
-  } | null;
-};
->>>>>>> 0e735b0 (Chore: fix rebase issues)
 
 export type GetStreamingPaymentQueryVariables = Exact<{
   id: Scalars['ID'];
@@ -12621,15 +11916,10 @@ export type GetColonyUnclaimedFundsQueryVariables = Exact<{
   upToBlock?: InputMaybe<Scalars['Int']>;
 }>;
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 0e735b0 (Chore: fix rebase issues)
 export type GetColonyUnclaimedFundsQuery = {
   __typename?: 'Query';
   listColonyFundsClaims?: {
     __typename?: 'ModelColonyFundsClaimConnection';
-<<<<<<< HEAD
     items: Array<{
       __typename?: 'ColonyFundsClaim';
       id: string;
@@ -12638,15 +11928,6 @@ export type GetColonyUnclaimedFundsQuery = {
     } | null>;
   } | null;
 };
-=======
-
-export type GetColonyUnclaimedFundsQuery = { __typename?: 'Query', listColonyFundsClaims?: { __typename?: 'ModelColonyFundsClaimConnection', items: Array<{ __typename?: 'ColonyFundsClaim', id: string } | null> } | null };
->>>>>>> 01b6f83 (Feat: Added changelog to streaming payment and streaming payment metadata)
-=======
-    items: Array<{ __typename?: 'ColonyFundsClaim'; id: string } | null>;
-  } | null;
-};
->>>>>>> 0e735b0 (Chore: fix rebase issues)
 
 export type GetColonyUnclaimedFundQueryVariables = Exact<{
   claimId: Scalars['ID'];
@@ -12677,10 +11958,6 @@ export type GetColonyActionByMotionIdQueryVariables = Exact<{
   motionId: Scalars['ID'];
 }>;
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 0e735b0 (Chore: fix rebase issues)
 export type GetColonyActionByMotionIdQuery = {
   __typename?: 'Query';
   getColonyActionByMotionId?: {
@@ -12692,14 +11969,11 @@ export type GetColonyActionByMotionIdQuery = {
       amount?: string | null;
       networkFee?: string | null;
       type: ColonyActionType;
-<<<<<<< HEAD
       showInActionsList: boolean;
       colonyId: string;
       initiatorAddress: string;
       recipientAddress?: string | null;
       members?: Array<string> | null;
-=======
->>>>>>> 0e735b0 (Chore: fix rebase issues)
       pendingDomainMetadata?: {
         __typename?: 'DomainMetadata';
         name: string;
@@ -12728,21 +12002,12 @@ export type GetColonyActionByMotionIdQuery = {
           name: ExternalLinks;
           link: string;
         }> | null;
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 0e735b0 (Chore: fix rebase issues)
         objective?: {
           __typename?: 'ColonyObjective';
           title: string;
           description: string;
           progress: number;
         } | null;
-<<<<<<< HEAD
-=======
->>>>>>> 8442a344 (Feat: Refactor editStreamingPayment handlers and ensure colony action is created)
-=======
->>>>>>> 0e735b0 (Chore: fix rebase issues)
         changelog?: Array<{
           __typename?: 'ColonyMetadataChangelog';
           transactionHash: string;
@@ -12751,11 +12016,7 @@ export type GetColonyActionByMotionIdQuery = {
           hasAvatarChanged: boolean;
           hasDescriptionChanged?: boolean | null;
           haveExternalLinksChanged?: boolean | null;
-<<<<<<< HEAD
-<<<<<<< HEAD
           hasObjectiveChanged?: boolean | null;
-=======
->>>>>>> 8442a344 (Feat: Refactor editStreamingPayment handlers and ensure colony action is created)
         }> | null;
       } | null;
       payments?: Array<{
@@ -12765,31 +12026,11 @@ export type GetColonyActionByMotionIdQuery = {
     } | null>;
   } | null;
 };
-=======
-
-export type GetColonyActionByMotionIdQuery = { __typename?: 'Query', getColonyActionByMotionId?: { __typename?: 'ModelColonyActionConnection', items: Array<{ __typename?: 'ColonyAction', id: string, colonyDecisionId?: string | null, amount?: string | null, networkFee?: string | null, type: ColonyActionType, pendingDomainMetadata?: { __typename?: 'DomainMetadata', name: string, color: DomainColor, description?: string | null, changelog?: Array<{ __typename?: 'DomainMetadataChangelog', transactionHash: string, oldName: string, newName: string, oldColor: DomainColor, newColor: DomainColor, oldDescription?: string | null, newDescription?: string | null }> | null } | null, pendingColonyMetadata?: { __typename?: 'ColonyMetadata', id: string, displayName: string, avatar?: string | null, thumbnail?: string | null, description?: string | null, externalLinks?: Array<{ __typename?: 'ExternalLink', name: ExternalLinks, link: string }> | null, objective?: { __typename?: 'ColonyObjective', title: string, description: string, progress: number } | null, changelog?: Array<{ __typename?: 'ColonyMetadataChangelog', transactionHash: string, oldDisplayName: string, newDisplayName: string, hasAvatarChanged: boolean, hasDescriptionChanged?: boolean | null, haveExternalLinksChanged?: boolean | null, hasObjectiveChanged?: boolean | null }> | null } | null } | null> } | null };
->>>>>>> 01b6f83 (Feat: Added changelog to streaming payment and streaming payment metadata)
-=======
-          hasObjectiveChanged?: boolean | null;
-        }> | null;
-      } | null;
-    } | null>;
-  } | null;
-};
->>>>>>> 0e735b0 (Chore: fix rebase issues)
 
 export type GetColonyMotionQueryVariables = Exact<{
   id: Scalars['ID'];
 }>;
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 8442a344 (Feat: Refactor editStreamingPayment handlers and ensure colony action is created)
-=======
->>>>>>> 0e735b0 (Chore: fix rebase issues)
 export type GetColonyMotionQuery = {
   __typename?: 'Query';
   getColonyMotion?: {
@@ -12808,20 +12049,9 @@ export type GetColonyMotionQuery = {
     motionDomainId: string;
     isDecision: boolean;
     transactionHash: string;
-<<<<<<< HEAD
-<<<<<<< HEAD
     expenditureId?: string | null;
-=======
-<<<<<<< HEAD
-=======
     streamingPaymentId?: string | null;
     pendingStreamingPaymentMetadataId?: string | null;
->>>>>>> 8442a344 (Feat: Refactor editStreamingPayment handlers and ensure colony action is created)
->>>>>>> 7ebe3a9 (Feat: Refactor editStreamingPayment handlers and ensure colony action is created)
-=======
-    streamingPaymentId?: string | null;
-    pendingStreamingPaymentMetadataId?: string | null;
->>>>>>> 0e735b0 (Chore: fix rebase issues)
     motionStakes: {
       __typename?: 'MotionStakes';
       raw: { __typename?: 'MotionStakeValues'; nay: string; yay: string };
@@ -12881,15 +12111,6 @@ export type GetColonyMotionQuery = {
     };
   } | null;
 };
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> 01b6f83 (Feat: Added changelog to streaming payment and streaming payment metadata)
-
-export type GetColonyMotionQuery = { __typename?: 'Query', getColonyMotion?: { __typename?: 'ColonyMotion', id: string, nativeMotionId: string, requiredStake: string, remainingStakes: Array<string>, userMinStake: string, nativeMotionDomainId: string, isFinalized: boolean, createdBy: string, repSubmitted: string, skillRep: string, hasObjection: boolean, motionDomainId: string, isDecision: boolean, transactionHash: string, streamingPaymentId?: string | null, pendingStreamingPaymentMetadataId?: string | null, motionStakes: { __typename?: 'MotionStakes', raw: { __typename?: 'MotionStakeValues', nay: string, yay: string }, percentage: { __typename?: 'MotionStakeValues', nay: string, yay: string } }, usersStakes: Array<{ __typename?: 'UserMotionStakes', address: string, stakes: { __typename?: 'MotionStakes', raw: { __typename?: 'MotionStakeValues', yay: string, nay: string }, percentage: { __typename?: 'MotionStakeValues', yay: string, nay: string } } }>, stakerRewards: Array<{ __typename?: 'StakerRewards', address: string, isClaimed: boolean, rewards: { __typename?: 'MotionStakeValues', yay: string, nay: string } }>, voterRecord: Array<{ __typename?: 'VoterRecord', address: string, voteCount: string, vote?: number | null }>, revealedVotes: { __typename?: 'MotionStakes', raw: { __typename?: 'MotionStakeValues', yay: string, nay: string }, percentage: { __typename?: 'MotionStakeValues', yay: string, nay: string } }, motionStateHistory: { __typename?: 'MotionStateHistory', hasVoted: boolean, hasPassed: boolean, hasFailed: boolean, hasFailedNotFinalizable: boolean, inRevealPhase: boolean, yaySideFullyStakedAt?: string | null, naySideFullyStakedAt?: string | null, allVotesSubmittedAt?: string | null, allVotesRevealedAt?: string | null, endedAt?: string | null, finalizedAt?: string | null } } | null };
-=======
->>>>>>> 0e735b0 (Chore: fix rebase issues)
 
 export type GetVoterRewardsQueryVariables = Exact<{
   input: GetVoterRewardsInput;
@@ -12909,10 +12130,6 @@ export type GetColonyActionByMultiSigIdQueryVariables = Exact<{
   multiSigId: Scalars['ID'];
 }>;
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 0e735b0 (Chore: fix rebase issues)
 export type GetColonyActionByMultiSigIdQuery = {
   __typename?: 'Query';
   getColonyActionByMultiSigId?: {
@@ -12924,14 +12141,11 @@ export type GetColonyActionByMultiSigIdQuery = {
       amount?: string | null;
       networkFee?: string | null;
       type: ColonyActionType;
-<<<<<<< HEAD
       showInActionsList: boolean;
       colonyId: string;
       initiatorAddress: string;
       recipientAddress?: string | null;
       members?: Array<string> | null;
-=======
->>>>>>> 0e735b0 (Chore: fix rebase issues)
       pendingDomainMetadata?: {
         __typename?: 'DomainMetadata';
         name: string;
@@ -12977,7 +12191,6 @@ export type GetColonyActionByMultiSigIdQuery = {
           hasObjectiveChanged?: boolean | null;
         }> | null;
       } | null;
-<<<<<<< HEAD
       payments?: Array<{
         __typename?: 'Payment';
         recipientAddress: string;
@@ -12985,24 +12198,11 @@ export type GetColonyActionByMultiSigIdQuery = {
     } | null>;
   } | null;
 };
-=======
-
-export type GetColonyActionByMultiSigIdQuery = { __typename?: 'Query', getColonyActionByMultiSigId?: { __typename?: 'ModelColonyActionConnection', items: Array<{ __typename?: 'ColonyAction', id: string, colonyDecisionId?: string | null, amount?: string | null, networkFee?: string | null, type: ColonyActionType, pendingDomainMetadata?: { __typename?: 'DomainMetadata', name: string, color: DomainColor, description?: string | null, changelog?: Array<{ __typename?: 'DomainMetadataChangelog', transactionHash: string, oldName: string, newName: string, oldColor: DomainColor, newColor: DomainColor, oldDescription?: string | null, newDescription?: string | null }> | null } | null, pendingColonyMetadata?: { __typename?: 'ColonyMetadata', id: string, displayName: string, avatar?: string | null, thumbnail?: string | null, description?: string | null, externalLinks?: Array<{ __typename?: 'ExternalLink', name: ExternalLinks, link: string }> | null, objective?: { __typename?: 'ColonyObjective', title: string, description: string, progress: number } | null, changelog?: Array<{ __typename?: 'ColonyMetadataChangelog', transactionHash: string, oldDisplayName: string, newDisplayName: string, hasAvatarChanged: boolean, hasDescriptionChanged?: boolean | null, haveExternalLinksChanged?: boolean | null, hasObjectiveChanged?: boolean | null }> | null } | null } | null> } | null };
->>>>>>> 01b6f83 (Feat: Added changelog to streaming payment and streaming payment metadata)
-=======
-    } | null>;
-  } | null;
-};
->>>>>>> 0e735b0 (Chore: fix rebase issues)
 
 export type GetColonyMultiSigQueryVariables = Exact<{
   id: Scalars['ID'];
 }>;
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 0e735b0 (Chore: fix rebase issues)
 export type GetColonyMultiSigQuery = {
   __typename?: 'Query';
   getColonyMultiSig?: {
@@ -13036,18 +12236,9 @@ export type GetColonyMultiSigQuery = {
         createdAt: string;
       } | null>;
     } | null;
-<<<<<<< HEAD
     action?: { __typename?: 'ColonyAction'; type: ColonyActionType } | null;
   } | null;
 };
-=======
-
-export type GetColonyMultiSigQuery = { __typename?: 'Query', getColonyMultiSig?: { __typename?: 'ColonyMultiSig', id: string, colonyAddress: string, nativeMultiSigId: string, multiSigDomainId: string, nativeMultiSigDomainId: string, requiredPermissions: number, transactionHash: string, isExecuted: boolean, isRejected: boolean, isDecision: boolean, hasActionCompleted: boolean, executedAt?: string | null, executedBy?: string | null, rejectedAt?: string | null, rejectedBy?: string | null, createdAt: string, signatures?: { __typename?: 'ModelMultiSigUserSignatureConnection', items: Array<{ __typename?: 'MultiSigUserSignature', id: string, multiSigId: string, role: number, colonyAddress: string, userAddress: string, vote: MultiSigVote, createdAt: string } | null> } | null } | null };
->>>>>>> 01b6f83 (Feat: Added changelog to streaming payment and streaming payment metadata)
-=======
-  } | null;
-};
->>>>>>> 0e735b0 (Chore: fix rebase issues)
 
 export type GetUserMultiSigSignatureQueryVariables = Exact<{
   multiSigId: Scalars['ID'];
@@ -13195,24 +12386,11 @@ export type GetTokenFromEverywhereQueryVariables = Exact<{
   input: TokenFromEverywhereArguments;
 }>;
 
-<<<<<<< HEAD
-
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-export type GetTokenByAddressQueryVariables = Exact<{
-  address: Scalars['ID'];
-}>;
-
-export type GetTokenByAddressQuery = {
+export type GetTokenFromEverywhereQuery = {
   __typename?: 'Query';
-  getTokenByAddress?: {
-    __typename?: 'ModelTokenConnection';
-    items: Array<{
-      __typename?: 'Token';
-      decimals: number;
-      tokenAddress: string;
-    } | null>;
+  getTokenFromEverywhere?: {
+    __typename?: 'TokenFromEverywhereReturn';
+    items?: Array<{ __typename?: 'Token'; id: string } | null> | null;
   } | null;
 };
 
@@ -13240,149 +12418,11 @@ export type GetNotificationUsersQuery = {
   } | null;
 };
 
-=======
->>>>>>> 28a498d (Feat: Remove limitAmount from streamingPaymentMetadata)
-=======
->>>>>>> 7ebe3a9 (Feat: Refactor editStreamingPayment handlers and ensure colony action is created)
-=======
-export type GetTokenFromEverywhereQuery = { __typename?: 'Query', getTokenFromEverywhere?: { __typename?: 'TokenFromEverywhereReturn', items?: Array<{ __typename?: 'Token', id: string } | null> | null } | null };
-=======
-export type GetTokenFromEverywhereQuery = {
-  __typename?: 'Query';
-  getTokenFromEverywhere?: {
-    __typename?: 'TokenFromEverywhereReturn';
-    items?: Array<{ __typename?: 'Token'; id: string } | null> | null;
-  } | null;
-};
->>>>>>> 0e735b0 (Chore: fix rebase issues)
-
->>>>>>> 01b6f83 (Feat: Added changelog to streaming payment and streaming payment metadata)
 export const DomainMetadata = gql`
   fragment DomainMetadata on DomainMetadata {
     name
     color
     description
-<<<<<<< HEAD
-    progress
-  }
-  changelog {
-    transactionHash
-    oldDisplayName
-    newDisplayName
-    hasAvatarChanged
-    hasDescriptionChanged
-    haveExternalLinksChanged
-    hasObjectiveChanged
-  }
-}
-    `;
-export const ActionMetadataInfo = gql`
-<<<<<<< HEAD
-  fragment ActionMetadataInfo on ColonyAction {
-    id
-    pendingDomainMetadata {
-      ...DomainMetadata
-    }
-    pendingColonyMetadata {
-      ...ColonyMetadata
-    }
-    colonyDecisionId
-    amount
-    networkFee
-    type
-    showInActionsList
-    colonyId
-    initiatorAddress
-    recipientAddress
-    payments {
-      recipientAddress
-    }
-    members
-=======
-    fragment ActionMetadataInfo on ColonyAction {
-  id
-  pendingDomainMetadata {
-    ...DomainMetadata
->>>>>>> 01b6f83 (Feat: Added changelog to streaming payment and streaming payment metadata)
-  }
-  pendingColonyMetadata {
-    ...ColonyMetadata
-  }
-  colonyDecisionId
-  amount
-  networkFee
-  type
-}
-    ${DomainMetadata}
-${ColonyMetadata}`;
-export const Token = gql`
-<<<<<<< HEAD
-  fragment Token on Token {
-    tokenAddress: id
-    symbol
-  }
-`;
-=======
-    fragment Token on Token {
-  tokenAddress: id
-}
-    `;
->>>>>>> 01b6f83 (Feat: Added changelog to streaming payment and streaming payment metadata)
-export const Colony = gql`
-    fragment Colony on Colony {
-  colonyAddress: id
-  nativeToken {
-    ...Token
-  }
-  tokens {
-    items {
-      id
-      tokenAddress: tokenID
-    }
-  }
-<<<<<<< HEAD
-  ${Token}
-`;
-<<<<<<< HEAD
-export const NotificationsData = gql`
-  fragment NotificationsData on NotificationsData {
-    magicbellUserId
-    notificationsDisabled
-    mutedColonyAddresses
-    paymentNotificationsDisabled
-    mentionNotificationsDisabled
-    adminNotificationsDisabled
-  }
-`;
-export const ColonyWithRootRoles = gql`
-  fragment ColonyWithRootRoles on Colony {
-    id
-    roles(filter: { role_1: { eq: true } }, limit: 1000) {
-      items {
-        id
-        targetUser {
-          id
-          profile {
-            displayName
-            id
-          }
-          notificationsData {
-            ...NotificationsData
-          }
-        }
-      }
-    }
-  }
-  ${NotificationsData}
-`;
-=======
-=======
-    }
-  }
-`;
->>>>>>> 8442a344 (Feat: Refactor editStreamingPayment handlers and ensure colony action is created)
->>>>>>> 7ebe3a9 (Feat: Refactor editStreamingPayment handlers and ensure colony action is created)
-=======
     changelog {
       transactionHash
       oldName
@@ -13434,6 +12474,14 @@ export const ActionMetadataInfo = gql`
     amount
     networkFee
     type
+    showInActionsList
+    colonyId
+    initiatorAddress
+    recipientAddress
+    payments {
+      recipientAddress
+    }
+    members
   }
   ${DomainMetadata}
   ${ColonyMetadata}
@@ -13441,6 +12489,7 @@ export const ActionMetadataInfo = gql`
 export const Token = gql`
   fragment Token on Token {
     tokenAddress: id
+    symbol
   }
 `;
 export const Colony = gql`
@@ -13476,7 +12525,37 @@ export const Colony = gql`
   }
   ${Token}
 `;
->>>>>>> 0e735b0 (Chore: fix rebase issues)
+export const NotificationsData = gql`
+  fragment NotificationsData on NotificationsData {
+    magicbellUserId
+    notificationsDisabled
+    mutedColonyAddresses
+    paymentNotificationsDisabled
+    mentionNotificationsDisabled
+    adminNotificationsDisabled
+  }
+`;
+export const ColonyWithRootRoles = gql`
+  fragment ColonyWithRootRoles on Colony {
+    id
+    roles(filter: { role_1: { eq: true } }, limit: 1000) {
+      items {
+        id
+        targetUser {
+          id
+          profile {
+            displayName
+            id
+          }
+          notificationsData {
+            ...NotificationsData
+          }
+        }
+      }
+    }
+  }
+  ${NotificationsData}
+`;
 export const ExpenditureSlot = gql`
   fragment ExpenditureSlot on ExpenditureSlot {
     id
@@ -13486,175 +12565,6 @@ export const ExpenditureSlot = gql`
     payouts {
       tokenAddress
       amount
-<<<<<<< HEAD
-=======
-  motionsWithUnclaimedStakes {
-    motionId
-    unclaimedRewards {
-      address
-      rewards {
-        yay
-        nay
-      }
->>>>>>> 01b6f83 (Feat: Added changelog to streaming payment and streaming payment metadata)
-      isClaimed
-    }
-  }
-  domains(limit: 1000, nextToken: $nextToken) {
-    items {
-      id
-      nativeSkillId
-    }
-    nextToken
-  }
-}
-    ${Token}`;
-export const ExpenditureSlot = gql`
-    fragment ExpenditureSlot on ExpenditureSlot {
-  id
-  recipientAddress
-  claimDelay
-  payoutModifier
-  payouts {
-    tokenAddress
-    amount
-    isClaimed
-    networkFee
-  }
-}
-    `;
-export const ExpenditureBalance = gql`
-    fragment ExpenditureBalance on ExpenditureBalance {
-  tokenAddress
-  amount
-}
-    `;
-export const Expenditure = gql`
-    fragment Expenditure on Expenditure {
-  id
-  slots {
-    ...ExpenditureSlot
-  }
-  motions {
-    items {
-      transactionHash
-      action {
-        type
-      }
-    }
-  }
-  balances {
-    ...ExpenditureBalance
-  }
-  status
-  ownerAddress
-  userStakeId
-  createdAt
-  firstEditTransactionHash
-  type
-}
-    ${ExpenditureSlot}
-${ExpenditureBalance}`;
-export const StreamingPaymentMetadata = gql`
-    fragment StreamingPaymentMetadata on StreamingPaymentMetadata {
-  id
-  endCondition
-  changelog {
-    transactionHash
-    oldEndCondition
-    newEndCondition
-  }
-}
-    `;
-export const StreamingPayment = gql`
-    fragment StreamingPayment on StreamingPayment {
-  id
-  startTime
-  endTime
-  tokenAddress
-  amount
-  interval
-  metadata {
-    ...StreamingPaymentMetadata
-  }
-  claims {
-    amount
-    timestamp
-  }
-<<<<<<< HEAD
-  changelog {
-    transactionHash
-    oldValues {
-      ...StreamingPaymentChanges
-    }
-    newValues {
-      ...StreamingPaymentChanges
-    }
-<<<<<<< HEAD
-    status
-    ownerAddress
-    userStakeId
-    createdAt
-    firstEditTransactionHash
-    type
-    actions {
-      items {
-        type
-        id
-      }
-    }
-=======
->>>>>>> 01b6f83 (Feat: Added changelog to streaming payment and streaming payment metadata)
-  }
-=======
->>>>>>> fc7f8af (Fix: Store streaming payment changelog on colony action, and use streamingPaymentsInterface)
-}
-    ${StreamingPaymentMetadata}`;
-export const StreamingPaymentChanges = gql`
-    fragment StreamingPaymentChanges on StreamingPaymentChanges {
-  startTime
-  endTime
-  interval
-  amount
-}
-    `;
-export const Extension = gql`
-    fragment Extension on ColonyExtension {
-  id
-  hash
-  colonyId
-  isInitialized
-  version
-}
-    `;
-export const MotionStakes = gql`
-    fragment MotionStakes on MotionStakes {
-  raw {
-    nay
-    yay
-  }
-  percentage {
-    nay
-    yay
-  }
-}
-    `;
-export const UserMotionStakes = gql`
-    fragment UserMotionStakes on UserMotionStakes {
-  address
-  stakes {
-    raw {
-      yay
-      nay
-    }
-    percentage {
-      yay
-      nay
-    }
-  }
-}
-    `;
-=======
       isClaimed
       networkFee
     }
@@ -13689,6 +12599,12 @@ export const Expenditure = gql`
     createdAt
     firstEditTransactionHash
     type
+    actions {
+      items {
+        type
+        id
+      }
+    }
   }
   ${ExpenditureSlot}
   ${ExpenditureBalance}
@@ -13766,7 +12682,6 @@ export const UserMotionStakes = gql`
     }
   }
 `;
->>>>>>> 0e735b0 (Chore: fix rebase issues)
 export const StakerReward = gql`
   fragment StakerReward on StakerRewards {
     address
@@ -13836,60 +12751,15 @@ export const ColonyMotion = gql`
     }
     isDecision
     transactionHash
+    expenditureId
     streamingPaymentId
     pendingStreamingPaymentMetadataId
   }
-<<<<<<< HEAD
-  repSubmitted
-  skillRep
-  hasObjection
-  motionDomainId
-  nativeMotionDomainId
-  motionStateHistory {
-    hasVoted
-    hasPassed
-    hasFailed
-    hasFailedNotFinalizable
-    inRevealPhase
-    yaySideFullyStakedAt
-    naySideFullyStakedAt
-    allVotesSubmittedAt
-    allVotesRevealedAt
-    endedAt
-    finalizedAt
-  }
-  isDecision
-  transactionHash
-  streamingPaymentId
-  pendingStreamingPaymentMetadataId
-}
-    ${MotionStakes}
-${UserMotionStakes}
-${StakerReward}
-${VoterRecord}`;
-<<<<<<< HEAD
-export const DomainMetadata = gql`
-    fragment DomainMetadata on DomainMetadata {
-  name
-  color
-  description
-  changelog {
->>>>>>> 2309a795 (Feat: Link pendingStreamingPaymentMetadata when a motion is finalized)
-    transactionHash
-    expenditureId
-  }
-=======
->>>>>>> 0e735b0 (Chore: fix rebase issues)
   ${MotionStakes}
   ${UserMotionStakes}
   ${StakerReward}
   ${VoterRecord}
 `;
-<<<<<<< HEAD
-=======
->>>>>>> 01b6f83 (Feat: Added changelog to streaming payment and streaming payment metadata)
-=======
->>>>>>> 0e735b0 (Chore: fix rebase issues)
 export const MultiSigUserSignature = gql`
   fragment MultiSigUserSignature on MultiSigUserSignature {
     id
@@ -13919,16 +12789,11 @@ export const ColonyMultiSig = gql`
         ...MultiSigUserSignature
       }
     }
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 0e735b0 (Chore: fix rebase issues)
     executedAt
     executedBy
     rejectedAt
     rejectedBy
     createdAt
-<<<<<<< HEAD
     action {
       type
     }
@@ -13945,21 +12810,6 @@ export const NotificationUser = gql`
   }
   ${NotificationsData}
 `;
-=======
-  }
-  executedAt
-  executedBy
-  rejectedAt
-  rejectedBy
-  createdAt
-}
-    ${MultiSigUserSignature}`;
->>>>>>> 01b6f83 (Feat: Added changelog to streaming payment and streaming payment metadata)
-=======
-  }
-  ${MultiSigUserSignature}
-`;
->>>>>>> 0e735b0 (Chore: fix rebase issues)
 export const CreateColonyActionDocument = gql`
   mutation CreateColonyAction($input: CreateColonyActionInput!) {
     createColonyAction(input: $input) {
@@ -14376,348 +13226,9 @@ export const GetColonyActionDocument = gql`
   }
 `;
 export const GetMotionIdFromActionDocument = gql`
-<<<<<<< HEAD
-    query GetMotionIdFromAction($id: ID!) {
-  getColonyAction(id: $id) {
-    motionData {
-      id
-    }
-  }
-}
-    `;
-export const GetActionIdFromAnnotationDocument = gql`
-    query GetActionIdFromAnnotation($id: ID!) {
-  getAnnotation(id: $id) {
-    actionId
-  }
-}
-    `;
-export const GetActionByIdDocument = gql`
-    query GetActionById($id: ID!) {
-  getColonyAction(id: $id) {
-    id
-    type
-    expenditureSlotChanges {
-      oldSlots {
-        ...ExpenditureSlot
-      }
-      newSlots {
-        ...ExpenditureSlot
-      }
-    }
-  }
-}
-    ${ExpenditureSlot}`;
-export const GetColonyMetadataDocument = gql`
-    query GetColonyMetadata($id: ID!) {
-  getColonyMetadata(id: $id) {
-    ...ColonyMetadata
-    etherealData {
-      colonyAvatar
-      colonyDisplayName
-      colonyName
-      colonyThumbnail
-      initiatorAddress
-      tokenAvatar
-      tokenThumbnail
-    }
-  }
-}
-    ${ColonyMetadata}`;
-export const GetColonyDocument = gql`
-    query GetColony($id: ID!, $nextToken: String) {
-  getColony(id: $id) {
-    ...Colony
-  }
-<<<<<<< HEAD
-  ${Colony}
-`;
-export const GetColonyByNameDocument = gql`
-  query GetColonyByName($name: String!) {
-    getColonyByName(name: $name) {
-      items {
-        id
-        name
-      }
-    }
-  }
-`;
-export const GetColonyByNativeTokenIdDocument = gql`
-  query GetColonyByNativeTokenId(
-    $nativeTokenId: ID!
-    $limit: Int
-    $nextToken: String
-  ) {
-    getColoniesByNativeTokenId(
-      nativeTokenId: $nativeTokenId
-      limit: $limit
-      nextToken: $nextToken
-    ) {
-      items {
-        id
-        status {
-          nativeToken {
-            unlocked
-            unlockable
-            mintable
-          }
-          recovery
-        }
-      }
-      nextToken
-    }
-  }
-`;
-export const ListColoniesDocument = gql`
-  query ListColonies($nextToken: String) {
-    listColonies(limit: 1000, nextToken: $nextToken) {
-      nextToken
-      items {
-        id
-        nativeTokenId
-      }
-    }
-  }
-`;
-export const ListColoniesWithRootPermissionHoldersDocument = gql`
-  query ListColoniesWithRootPermissionHolders($nextToken: String) {
-    listColonies(limit: 1000, nextToken: $nextToken) {
-      nextToken
-      items {
-        ...ColonyWithRootRoles
-      }
-    }
-  }
-  ${ColonyWithRootRoles}
-`;
-export const GetColonyContributorDocument = gql`
-  query GetColonyContributor($id: ID!) {
-    getColonyContributor(id: $id) {
-      id
-      isVerified
-    }
-  }
-`;
-export const GetColonyContributorsNotificationDataDocument = gql`
-  query GetColonyContributorsNotificationData(
-    $colonyAddress: ID!
-    $sortDirection: ModelSortDirection = ASC
-    $limit: Int = 100
-    $nextToken: String
-  ) {
-    getContributorsByColony(
-      colonyAddress: $colonyAddress
-      sortDirection: $sortDirection
-      limit: $limit
-      nextToken: $nextToken
-    ) {
-      items {
-        user {
-          notificationsData {
-            ...NotificationsData
-          }
-        }
-      }
-      nextToken
-    }
-  }
-  ${NotificationsData}
-`;
-export const GetCurrentVersionDocument = gql`
-  query GetCurrentVersion($key: String!) {
-    getCurrentVersionByKey(key: $key) {
-      items {
-        id
-        version
-      }
-    }
-  }
-`;
-export const GetColonyDecisionByActionIdDocument = gql`
-  query GetColonyDecisionByActionId($actionId: ID!) {
-    getColonyDecisionByActionId(actionId: $actionId) {
-      items {
-        id
-      }
-    }
-  }
-`;
-export const GetDomainMetadataDocument = gql`
-  query GetDomainMetadata($id: ID!) {
-    getDomainMetadata(id: $id) {
-      color
-      description
-=======
-  getColonyByAddress(id: $id) {
-    items {
->>>>>>> 01b6f83 (Feat: Added changelog to streaming payment and streaming payment metadata)
-      id
-      name
-    }
-  }
-  getColonyByType(type: METACOLONY) {
-    items {
-      id
-      name
-    }
-  }
-}
-    ${Colony}`;
-export const GetColonyByNameDocument = gql`
-    query GetColonyByName($name: String!) {
-  getColonyByName(name: $name) {
-    items {
-      id
-      name
-    }
-  }
-}
-    `;
-export const GetColonyByNativeTokenIdDocument = gql`
-    query GetColonyByNativeTokenId($nativeTokenId: ID!, $limit: Int, $nextToken: String) {
-  getColoniesByNativeTokenId(
-    nativeTokenId: $nativeTokenId
-    limit: $limit
-    nextToken: $nextToken
-  ) {
-    items {
-      id
-      status {
-        nativeToken {
-          unlocked
-          unlockable
-          mintable
-        }
-<<<<<<< HEAD
-      }
-      colonyId
-    }
-  }
-`;
-export const GetColonyUnclaimedFundsDocument = gql`
-  query GetColonyUnclaimedFunds(
-    $colonyAddress: ID!
-    $tokenAddress: ID!
-    $upToBlock: Int = 1
-  ) {
-    listColonyFundsClaims(
-      filter: {
-        colonyFundsClaimsId: { eq: $colonyAddress }
-        colonyFundsClaimTokenId: { eq: $tokenAddress }
-        createdAtBlock: { le: $upToBlock }
-        isClaimed: { ne: true }
-      }
-    ) {
-      items {
-        id
-        token {
-          ...Token
-        }
-        amount
-=======
-        recovery
->>>>>>> 01b6f83 (Feat: Added changelog to streaming payment and streaming payment metadata)
-      }
-    }
-    nextToken
-  }
-<<<<<<< HEAD
-  ${Token}
-`;
-export const GetColonyUnclaimedFundDocument = gql`
-  query GetColonyUnclaimedFund($claimId: ID!) {
-    getColonyFundsClaim(id: $claimId) {
-=======
-}
-    `;
-export const ListColoniesDocument = gql`
-    query ListColonies($nextToken: String) {
-  listColonies(limit: 1000, nextToken: $nextToken) {
-    nextToken
-    items {
-      id
-      nativeTokenId
-    }
-  }
-}
-    `;
-export const GetColonyContributorDocument = gql`
-    query GetColonyContributor($id: ID!) {
-  getColonyContributor(id: $id) {
-    id
-    isVerified
-  }
-}
-    `;
-export const GetCurrentVersionDocument = gql`
-    query GetCurrentVersion($key: String!) {
-  getCurrentVersionByKey(key: $key) {
-    items {
-      id
-      version
-    }
-  }
-}
-    `;
-export const GetColonyDecisionByActionIdDocument = gql`
-    query GetColonyDecisionByActionId($actionId: ID!) {
-  getColonyDecisionByActionId(actionId: $actionId) {
-    items {
->>>>>>> 01b6f83 (Feat: Added changelog to streaming payment and streaming payment metadata)
-      id
-    }
-  }
-}
-    `;
-export const GetDomainMetadataDocument = gql`
-    query GetDomainMetadata($id: ID!) {
-  getDomainMetadata(id: $id) {
-    color
-    description
-    id
-    name
-    changelog {
-      newColor
-      newDescription
-      newName
-      oldColor
-      oldDescription
-      oldName
-      transactionHash
-    }
-  }
-}
-    `;
-export const GetDomainByNativeSkillIdDocument = gql`
-    query GetDomainByNativeSkillId($nativeSkillId: String!, $colonyAddress: ID!) {
-  getDomainByNativeSkillId(
-    nativeSkillId: $nativeSkillId
-    filter: {colonyId: {eq: $colonyAddress}}
-  ) {
-    items {
-      id
-      nativeSkillId
-      nativeId
-    }
-  }
-}
-    `;
-export const GetDomainsByExtensionAddressDocument = gql`
-    query GetDomainsByExtensionAddress($extensionAddress: ID!) {
-  listColonyExtensions(filter: {id: {eq: $extensionAddress}}) {
-    items {
-      colony {
-        domains {
-          items {
-            nativeSkillId
-            nativeId
-          }
-        }
-=======
   query GetMotionIdFromAction($id: ID!) {
     getColonyAction(id: $id) {
       motionData {
->>>>>>> 0e735b0 (Chore: fix rebase issues)
         id
       }
     }
@@ -14831,6 +13342,17 @@ export const ListColoniesDocument = gql`
     }
   }
 `;
+export const ListColoniesWithRootPermissionHoldersDocument = gql`
+  query ListColoniesWithRootPermissionHolders($nextToken: String) {
+    listColonies(limit: 1000, nextToken: $nextToken) {
+      nextToken
+      items {
+        ...ColonyWithRootRoles
+      }
+    }
+  }
+  ${ColonyWithRootRoles}
+`;
 export const GetColonyContributorDocument = gql`
   query GetColonyContributor($id: ID!) {
     getColonyContributor(id: $id) {
@@ -14838,6 +13360,31 @@ export const GetColonyContributorDocument = gql`
       isVerified
     }
   }
+`;
+export const GetColonyContributorsNotificationDataDocument = gql`
+  query GetColonyContributorsNotificationData(
+    $colonyAddress: ID!
+    $sortDirection: ModelSortDirection = ASC
+    $limit: Int = 100
+    $nextToken: String
+  ) {
+    getContributorsByColony(
+      colonyAddress: $colonyAddress
+      sortDirection: $sortDirection
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        user {
+          notificationsData {
+            ...NotificationsData
+          }
+        }
+      }
+      nextToken
+    }
+  }
+  ${NotificationsData}
 `;
 export const GetCurrentVersionDocument = gql`
   query GetCurrentVersion($key: String!) {
@@ -15049,9 +13596,14 @@ export const GetColonyUnclaimedFundsDocument = gql`
     ) {
       items {
         id
+        token {
+          ...Token
+        }
+        amount
       }
     }
   }
+  ${Token}
 `;
 export const GetColonyUnclaimedFundDocument = gql`
   query GetColonyUnclaimedFund($claimId: ID!) {
@@ -15201,17 +13753,6 @@ export const GetColonyHistoricRoleDocument = gql`
       id
     }
   }
-<<<<<<< HEAD
-<<<<<<< HEAD
-`;
-<<<<<<< HEAD
-export const GetTokenByAddressDocument = gql`
-  query GetTokenByAddress($address: ID!) {
-    getTokenByAddress(id: $address) {
-      items {
-        decimals
-        tokenAddress: id
-=======
 `;
 export const GetReputationMiningCycleMetadataDocument = gql`
   query GetReputationMiningCycleMetadata($id: ID!) {
@@ -15247,12 +13788,10 @@ export const GetTokenFromEverywhereDocument = gql`
     getTokenFromEverywhere(input: $input) {
       items {
         id
->>>>>>> 0e735b0 (Chore: fix rebase issues)
       }
     }
   }
 `;
-<<<<<<< HEAD
 export const GetNotificationUsersDocument = gql`
   query GetNotificationUsers($filter: ModelUserFilterInput, $limit: Int) {
     listUsers(filter: $filter, limit: $limit) {
@@ -15265,11 +13804,3 @@ export const GetNotificationUsersDocument = gql`
   }
   ${NotificationsData}
 `;
-=======
->>>>>>> 28a498d (Feat: Remove limitAmount from streamingPaymentMetadata)
-=======
-}
-    `;
->>>>>>> 01b6f83 (Feat: Added changelog to streaming payment and streaming payment metadata)
-=======
->>>>>>> 0e735b0 (Chore: fix rebase issues)
