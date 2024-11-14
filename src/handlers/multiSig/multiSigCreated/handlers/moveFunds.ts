@@ -77,6 +77,14 @@ export const handleMoveFundsMultiSig = async (
       colonyAddress,
       decodedFunctions: [parsedAction],
     });
+    await sendMultisigActionNotifications({
+      colonyAddress,
+      creator: initiatorAddress,
+      notificationCategory: NotificationCategory.Payment,
+      notificationType: NotificationType.MultisigActionCreated,
+      transactionHash,
+      expenditureID: targetExpenditure.id,
+    });
   } else {
     await createMultiSigInDB(colonyAddress, event, {
       type: multiSigNameMapping[name],

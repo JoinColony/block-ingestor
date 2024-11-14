@@ -112,6 +112,7 @@ export const handleMultiSigApprovalChanged: EventHandler = async (
         notificationCategory,
         notificationType: NotificationType.MultisigActionApproved,
         transactionHash: multiSigFromDB?.transactionHash,
+        expenditureID: multiSigFromDB?.expenditureId ?? undefined,
       });
     }
   }

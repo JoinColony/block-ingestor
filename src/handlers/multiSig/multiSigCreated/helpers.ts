@@ -110,7 +110,7 @@ type MultiSigFields = Omit<
   | 'blockNumber'
   | 'rootHash'
 > &
-  Pick<CreateColonyMultiSigInput, 'expenditureFunding'>;
+  Pick<CreateColonyMultiSigInput, 'expenditureFunding' | 'expenditureId'>;
 
 export const createMultiSigInDB = async (
   colonyAddress: string,
@@ -158,6 +158,12 @@ export const createMultiSigInDB = async (
     timestamp,
   });
 
+  const multiSigInput: CreateColonyMultiSigInput = {
+    ...multiSigData,
+    expenditureFunding,
+    expenditureId: input.expenditureId,
+  };
+
   const rootHash = await networkClient.getReputationRootHash({
     blockTag: blockNumber,
   });
@@ -176,7 +182,7 @@ export const createMultiSigInDB = async (
   };
 
   await Promise.all([
-    createColonyMultiSig({ ...multiSigData, expenditureFunding }),
+    createColonyMultiSig(multiSigInput),
     createColonyAction(actionData, timestamp),
   ]);
 };

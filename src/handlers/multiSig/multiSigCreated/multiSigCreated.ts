@@ -79,7 +79,6 @@ export const handleMultiSigMotionCreated: EventHandler = async (
     return;
   }
 
-  console.log('hendlamo single function a');
   // the motion data and targets are the same length as it's enforced on the contracts so we can check whichever
   if (actions.length === 1) {
     const actionData = actions[0];

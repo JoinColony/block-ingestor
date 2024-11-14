@@ -193,6 +193,7 @@ export const sendMultisigActionNotifications = async ({
   transactionHash,
   notificationType,
   notificationCategory,
+  expenditureID,
 }: MultisigActionNotificationVariables): Promise<void> => {
   // Get the recipients of the colony wide notifications.
   const recipients = await getRecipientsOfColonyWideNotification(
@@ -211,6 +212,7 @@ export const sendMultisigActionNotifications = async ({
     creator,
     colonyAddress,
     transactionHash,
+    expenditureID,
   });
 };
 
