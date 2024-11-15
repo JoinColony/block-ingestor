@@ -41,6 +41,7 @@ import {
 } from '~graphql';
 import { getChainId } from '~provider';
 import { getCachedColonyClient } from '~utils/clients/colony';
+import { RESERVED_ROUTES } from '~constants';
 
 export const createUniqueColony = async ({
   colonyAddress,
@@ -152,6 +153,12 @@ export const createUniqueColony = async ({
   if (existingColonyName === colonyName) {
     throw new Error(
       `Colony with name "${colonyName}" already exists. Cannot create another one.`,
+    );
+  }
+
+  if (RESERVED_ROUTES.has(colonyName)) {
+    throw new Error(
+      `${colonyName} is a reserved route. Cannot create a colony with this name.`,
     );
   }
 
