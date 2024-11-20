@@ -114,6 +114,9 @@ export enum ContractEventsSignatures {
   ReputationMiningCycleComplete = 'ReputationMiningCycleComplete(bytes32,uint256)',
   // Metadata delta
   ColonyMetadataDelta = 'ColonyMetadataDelta(address,string)',
+  // Proxy colonies
+  ProxyColonyRequested = 'ProxyColonyRequested(uint256,bytes32)',
+  ProxyColonyDeployed = 'ProxyColonyDeployed(address)',
 }
 
 /*

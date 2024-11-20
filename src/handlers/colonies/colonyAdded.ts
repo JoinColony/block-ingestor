@@ -21,7 +21,7 @@ import { tryFetchGraphqlQuery } from '~utils/graphql';
 import { createUniqueColony } from './helpers/createUniqueColony';
 
 export default async (event: ContractEvent): Promise<void> => {
-  const { transactionHash, args } = event;
+  const { transactionHash, args, blockNumber } = event;
   const { colonyAddress, token: tokenAddress } = args ?? {};
 
   /*
@@ -85,6 +85,7 @@ export default async (event: ContractEvent): Promise<void> => {
       tokenAddress: utils.getAddress(tokenAddress),
       transactionHash,
       initiatorAddress: utils.getAddress(colonyFounderAddress),
+      createdAtBlock: blockNumber,
     });
   } catch (error) {
     console.error(error);
