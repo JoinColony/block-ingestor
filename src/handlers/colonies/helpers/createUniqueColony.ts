@@ -48,11 +48,13 @@ export const createUniqueColony = async ({
   tokenAddress,
   transactionHash,
   initiatorAddress,
+  createdAtBlock,
 }: {
   colonyAddress: string;
   tokenAddress: string;
   transactionHash: string;
   initiatorAddress: string;
+  createdAtBlock: number;
 }): Promise<void> => {
   /*
    * Validate Colony and Token addresses
@@ -219,6 +221,7 @@ export const createUniqueColony = async ({
       chainMetadata: {
         chainId,
       },
+      createdAtBlock,
       version: version.toNumber(),
       status: {
         nativeToken: {
