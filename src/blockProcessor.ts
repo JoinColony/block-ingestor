@@ -72,6 +72,7 @@ export const processNextBlock = async (): Promise<void> => {
         fromBlock: currentBlockNumber,
         toBlock: currentBlockNumber + nMoreBlocks,
       });
+      console.log('got laaaags', logs);
 
       verbose(
         `Fetched ${logs.length} logs`,

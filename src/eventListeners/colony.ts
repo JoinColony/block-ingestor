@@ -47,6 +47,10 @@ import {
   handleTokenUnlockedAction,
   handleTransfer,
 } from '~handlers';
+import {
+  handleProxyColonyDeployed,
+  handleProxyColonyRequested,
+} from '~handlers/proxyColonies';
 import setTokenAuthority from '~handlers/tokens/setTokenAuthority';
 
 const addColonyEventListener = (
@@ -108,6 +112,14 @@ export const setupListenersForColonies = async (): Promise<void> => {
   addNetworkEventListener(
     ContractEventsSignatures.ReputationMiningCycleComplete,
     handleReputationMiningCycleComplete,
+  );
+  addNetworkEventListener(
+    ContractEventsSignatures.ProxyColonyDeployed,
+    handleProxyColonyDeployed,
+  );
+  addNetworkEventListener(
+    ContractEventsSignatures.ProxyColonyRequested,
+    handleProxyColonyRequested,
   );
 };
 
