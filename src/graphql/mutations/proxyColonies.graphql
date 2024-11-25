@@ -1,0 +1,5 @@
+mutation CreateProxyColony($input: CreateProxyColonyInput!) {
+  createProxyColony(input: $input) {
+    id
+  }
+}

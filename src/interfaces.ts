@@ -20,6 +20,11 @@ import { colonyAbi } from '~constants/abis';
 // @NOTE: Temporary interface for development until a proper colonyJS release
 const _tempColonyInterface = new Interface(colonyAbi);
 
+// @TODO @chmanie is gonna make this better, for now let's just hardcode the proxy colony events
+const ProxyColonyEvents = new utils.Interface([
+  'event ProxyColonyRequested(uint256 destinationChainId, bytes32 salt)',
+]);
+
 /**
  * Function returning ABI-derived interface for a given event listener type,
  * which is later used for parsing event logs
@@ -32,6 +37,9 @@ export const getInterfaceByListener = (
   switch (listenerType) {
     case EventListenerType.Network: {
       return networkClient.interface;
+    }
+    case EventListenerType.ProxyColonies: {
+      return ProxyColonyEvents;
     }
     case EventListenerType.Colony: {
       return _tempColonyInterface;
