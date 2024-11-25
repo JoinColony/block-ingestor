@@ -116,7 +116,6 @@ export enum ContractEventsSignatures {
   ColonyMetadataDelta = 'ColonyMetadataDelta(address,string)',
   // Proxy colonies
   ProxyColonyRequested = 'ProxyColonyRequested(uint256,bytes32)',
-  ProxyColonyDeployed = 'ProxyColonyDeployed(address)',
 }
 
 /*

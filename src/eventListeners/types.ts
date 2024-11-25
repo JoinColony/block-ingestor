@@ -14,6 +14,7 @@ export enum EventListenerType {
   Extension = 'Extension',
   Token = 'Token',
   MultisigPermissions = 'MultisigPermissions',
+  ProxyColonies = 'ProxyColonies',
 }
 
 export interface ColonyEventListener extends BaseEventListener {
@@ -38,6 +39,11 @@ export interface TokenEventListener extends BaseEventListener {
   address: string;
 }
 
+export interface ProxyColoniesListener extends BaseEventListener {
+  type: EventListenerType.ProxyColonies;
+  address: string;
+}
+
 export interface ExtensionEventListener extends BaseEventListener {
   type: EventListenerType.Extension;
   address: string;
@@ -51,4 +57,5 @@ export type EventListener =
   | NetworkEventListener
   | TokenEventListener
   | TokenTransferEventListener
+  | ProxyColoniesListener
   | ExtensionEventListener;
