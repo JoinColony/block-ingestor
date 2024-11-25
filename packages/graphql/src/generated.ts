@@ -13003,6 +13003,14 @@ export const ProxyColony = gql`
     isActive
   }
 `;
+export const ProxyColony = gql`
+  fragment ProxyColony on ProxyColony {
+    id
+    colonyAddress
+    chainId
+    isActive
+  }
+`;
 export const NotificationUser = gql`
   fragment NotificationUser on ColonyContributor {
     user {
@@ -13360,6 +13368,13 @@ export const CreateColonyHistoricRoleDocument = gql`
   }
 }
     `;
+export const CreateProxyColonyDocument = gql`
+  mutation CreateProxyColony($input: CreateProxyColonyInput!) {
+    createProxyColony(input: $input) {
+      id
+    }
+  }
+`;
 export const CreateProxyColonyDocument = gql`
   mutation CreateProxyColony($input: CreateProxyColonyInput!) {
     createProxyColony(input: $input) {

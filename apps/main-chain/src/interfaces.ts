@@ -28,6 +28,11 @@ const ProxyColonyEvents = new utils.Interface([
   'event ProxyColonyRequested(uint256 destinationChainId, bytes32 salt)',
 ]);
 
+// @TODO @chmanie is gonna make this better, for now let's just hardcode the proxy colony events
+const ProxyColonyEvents = new utils.Interface([
+  'event ProxyColonyRequested(uint256 destinationChainId, bytes32 salt)',
+]);
+
 /**
  * Function returning ABI-derived interface for a given event listener type,
  * which is later used for parsing event logs
