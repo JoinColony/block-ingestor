@@ -1,36 +1,15 @@
 import { utils } from 'ethers';
-import { TransactionDescription } from 'ethers/lib/utils';
 import { ContractEvent } from '~types';
 import {
+  decodeFunctions,
   getCachedColonyClient,
   getMultiSigClient,
   getOneTxPaymentClient,
   getStagedExpenditureClient,
   getStakedExpenditureClient,
   output,
-  parseFunctionData,
 } from '~utils';
 import { multipleFunctionsHandlers } from './handlers/multipleFunctionsHandlers';
-
-const decodeFunctions = (
-  encodedFunctions: string[],
-  interfaces: utils.Interface[],
-): TransactionDescription[] => {
-  const decodedFunctions: TransactionDescription[] = [];
-  for (const functionCall of encodedFunctions) {
-    const parsedFunction = parseFunctionData(functionCall, interfaces);
-    if (!parsedFunction) {
-      output(
-        `Failed to parse multiple function multisig function: ${functionCall}`,
-      );
-      continue;
-    }
-
-    decodedFunctions.push(parsedFunction);
-  }
-
-  return decodedFunctions;
-};
 
 interface HandleMultisigMultipleFunctionsParams {
   event: ContractEvent;

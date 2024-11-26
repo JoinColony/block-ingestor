@@ -1,7 +1,7 @@
+import { BigNumber } from 'ethers';
 import { ColonyActionType, ExpenditureFundingItem } from '~graphql';
 import { ContractMethodSignatures } from '~types';
 import { getExpenditureByFundingPot } from '~utils/expenditures';
-import { toNumber } from '~utils/numbers';
 import { createMultiSigInDB } from '../../helpers';
 import { MultipleFunctionsHandler, MultipleFunctionsValidator } from './types';
 
@@ -21,11 +21,11 @@ export const fundExpenditureMultisigHandler: MultipleFunctionsHandler = async ({
   event,
   decodedFunctions,
 }) => {
-  const targetPotId = decodedFunctions[0]?.args._toPot;
+  const targetPotId = BigNumber.from(decodedFunctions[0]?.args._toPot);
 
   const expenditure = await getExpenditureByFundingPot(
     colonyAddress,
-    toNumber(targetPotId),
+    targetPotId.toNumber(),
   );
   if (!expenditure) {
     return;
@@ -34,10 +34,12 @@ export const fundExpenditureMultisigHandler: MultipleFunctionsHandler = async ({
   const fundingItems: ExpenditureFundingItem[] = [];
 
   for (const decodedFunction of decodedFunctions) {
+    const toPot = BigNumber.from(decodedFunction.args._toPot);
+
     if (
       decodedFunction.signature !==
         ContractMethodSignatures.MoveFundsBetweenPots ||
-      decodedFunction.args._toPot !== targetPotId
+      !targetPotId.eq(toPot)
     ) {
       continue;
     }
