@@ -1,32 +1,8 @@
 import { TransactionDescription } from 'ethers/lib/utils';
 import { utils } from 'ethers';
-import { getCachedColonyClient, output, parseFunctionData } from '~utils';
+import { decodeFunctions, getCachedColonyClient, output } from '~utils';
 import { ContractEvent } from '~types';
 import { multicallHandlers } from './multicallHandlers';
-
-/**
- * @NOTE: This is a rather rudimentary way of handling multicall motions
- * which only works for multicalls created by UI sagas.
- * It should be refactored as part of https://github.com/JoinColony/colonyCDapp/issues/2317
- */
-
-const decodeFunctions = (
-  encodedFunctions: string[],
-  interfaces: utils.Interface[],
-): TransactionDescription[] => {
-  const decodedFunctions: TransactionDescription[] = [];
-  for (const functionCall of encodedFunctions) {
-    const parsedFunction = parseFunctionData(functionCall, interfaces);
-    if (!parsedFunction) {
-      output(`Failed to parse multicall function: ${functionCall}`);
-      continue;
-    }
-
-    decodedFunctions.push(parsedFunction);
-  }
-
-  return decodedFunctions;
-};
 
 export const handleMulticallMotion = async (
   colonyAddress: string,

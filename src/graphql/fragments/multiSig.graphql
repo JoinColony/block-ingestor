@@ -33,4 +33,5 @@ fragment ColonyMultiSig on ColonyMultiSig {
   action {
     type
   }
+  expenditureId
 }

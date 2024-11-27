@@ -64,6 +64,7 @@ export const handleMultiSigMotionCancelled: EventHandler = async (
       notificationCategory,
       notificationType: NotificationType.MultisigActionRejected,
       transactionHash: multiSigFromDB?.transactionHash,
+      expenditureID: multiSigFromDB?.expenditureId ?? undefined,
     });
   }
 };

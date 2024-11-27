@@ -66,6 +66,8 @@ export const handleMultiSigMotionExecuted: EventHandler = async (
       true,
     );
 
+    const multiSigData = await getMultiSigFromDB(multiSigDatabaseId);
+
     // @NOTE failing execution is allowed only after 1 week so the motion doesn't end up floating around
     const updatedMultiSigData = {
       id: multiSigDatabaseId,
@@ -88,6 +90,7 @@ export const handleMultiSigMotionExecuted: EventHandler = async (
         notificationCategory,
         notificationType: NotificationType.MultisigActionFinalized,
         transactionHash: finalizedMultiSig.transactionHash,
+        expenditureID: multiSigData?.expenditureId ?? undefined,
       });
     }
   }

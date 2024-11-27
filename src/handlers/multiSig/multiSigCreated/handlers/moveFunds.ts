@@ -9,13 +9,21 @@ import {
 } from '~utils';
 import { createMultiSigInDB } from '../helpers';
 import { BigNumber } from 'ethers';
+import { sendMultisigActionNotifications } from '~utils/notifications';
+import { NotificationCategory } from '~types/notifications';
+import { NotificationType } from '~graphql';
+import { fundExpenditureMultisigHandler } from './multipleFunctionsHandlers/fundExpenditure';
 
 export const handleMoveFundsMultiSig = async (
   colonyAddress: string,
   event: ContractEvent,
   parsedAction: TransactionDescription,
 ): Promise<void> => {
-  const { blockNumber } = event;
+  const {
+    args: { agent: initiatorAddress },
+    blockNumber,
+    transactionHash,
+  } = event;
   if (!colonyAddress) {
     return;
   }
@@ -61,16 +69,41 @@ export const handleMoveFundsMultiSig = async (
     toNumber(toPot),
   );
 
-  await createMultiSigInDB(colonyAddress, event, {
-    type: multiSigNameMapping[name],
-    tokenAddress,
-    amount: amount.toString(),
-    fromDomainId: fromDomainId
-      ? getDomainDatabaseId(colonyAddress, toNumber(fromDomainId))
-      : undefined,
-    toDomainId: toDomainId
-      ? getDomainDatabaseId(colonyAddress, toNumber(toDomainId))
-      : undefined,
-    expenditureId: targetExpenditure?.id,
-  });
+  // This is an edge case, if we send over just 1 recipient when making an advanced payment, the fund expenditure multisig will end up here
+  // therefor, if we have an expenditure, we assume we are processing a fundExpenditure multisig
+  if (targetExpenditure) {
+    await fundExpenditureMultisigHandler({
+      event,
+      colonyAddress,
+      decodedFunctions: [parsedAction],
+    });
+    await sendMultisigActionNotifications({
+      colonyAddress,
+      creator: initiatorAddress,
+      notificationCategory: NotificationCategory.Payment,
+      notificationType: NotificationType.MultisigActionCreated,
+      transactionHash,
+      expenditureID: targetExpenditure.id,
+    });
+  } else {
+    await createMultiSigInDB(colonyAddress, event, {
+      type: multiSigNameMapping[name],
+      tokenAddress,
+      amount: amount.toString(),
+      fromDomainId: fromDomainId
+        ? getDomainDatabaseId(colonyAddress, toNumber(fromDomainId))
+        : undefined,
+      toDomainId: toDomainId
+        ? getDomainDatabaseId(colonyAddress, toNumber(toDomainId))
+        : undefined,
+    });
+
+    await sendMultisigActionNotifications({
+      colonyAddress,
+      creator: initiatorAddress,
+      notificationCategory: NotificationCategory.Payment,
+      notificationType: NotificationType.MultisigActionCreated,
+      transactionHash,
+    });
+  }
 };

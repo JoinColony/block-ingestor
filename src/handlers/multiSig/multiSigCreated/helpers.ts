@@ -99,29 +99,28 @@ const getDomainIdByNativeSkillId = async (
   return null;
 };
 
+type MultiSigFields = Omit<
+  CreateColonyActionInput,
+  | 'id'
+  | 'colonyId'
+  | 'showInActionsList'
+  | 'isMotion'
+  | 'motionId'
+  | 'initiatorAddress'
+  | 'blockNumber'
+  | 'rootHash'
+> &
+  Pick<CreateColonyMultiSigInput, 'expenditureFunding' | 'expenditureId'>;
+
 export const createMultiSigInDB = async (
   colonyAddress: string,
   {
     transactionHash,
     blockNumber,
-    logIndex,
     args: { motionId: multiSigId },
     timestamp,
   }: ContractEvent,
-  {
-    fromDomainId,
-    ...input
-  }: Omit<
-    CreateColonyActionInput,
-    | 'id'
-    | 'colonyId'
-    | 'showInActionsList'
-    | 'isMultiSig'
-    | 'multiSigId'
-    | 'initiatorAddress'
-    | 'blockNumber'
-    | 'rootHash'
-  >,
+  { fromDomainId, expenditureFunding, ...input }: MultiSigFields,
 ): Promise<GraphQLFnReturn<CreateColonyMultiSigInput> | undefined> => {
   if (!colonyAddress) {
     return;
@@ -159,6 +158,12 @@ export const createMultiSigInDB = async (
     timestamp,
   });
 
+  const multiSigInput: CreateColonyMultiSigInput = {
+    ...multiSigData,
+    expenditureFunding,
+    expenditureId: input.expenditureId,
+  };
+
   const rootHash = await networkClient.getReputationRootHash({
     blockTag: blockNumber,
   });
@@ -177,7 +182,7 @@ export const createMultiSigInDB = async (
   };
 
   await Promise.all([
-    createColonyMultiSig(multiSigData),
+    createColonyMultiSig(multiSigInput),
     createColonyAction(actionData, timestamp),
   ]);
 };
