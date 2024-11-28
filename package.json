@@ -1,5 +1,5 @@
 {
-  "name": "block-ingestor",
+  "name": "@joincolony/block-ingestor",
   "version": "1.0.0",
   "description": "Microservice that ingests ERC20 transactions for Colony Network Contracts",
   "main": "index.ts",
@@ -8,12 +8,13 @@
     "start": "node -r ts-node/register/transpile-only -r tsconfig-paths/register dist/index.js",
     "dev": "NODE_ENV=development ts-node-dev -r tsconfig-paths/register src/index.ts",
     "prod": "npm run build && NODE_ENV=production npm run start",
-    "typecheck": "tsc --noEmit",
+    "dev:main-chain": "pnpm --filter main-chain run dev",
+    "typecheck": "pnpm -r run typecheck",
     "lint": "eslint src/ --ext .ts",
     "preinstall": "bash scripts/generate-temp-files.sh",
     "prepare": "husky install",
-    "codegen": "graphql-codegen -w \"src/**/*.graphql\"",
-    "generate-abis": "wagmi generate"
+    "generate-abis": "wagmi generate",
+    "codegen": "pnpm --filter graphql run codegen"
   },
   "repository": {
     "type": "git",
