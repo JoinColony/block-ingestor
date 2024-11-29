@@ -14,6 +14,10 @@ import { setupNotificationsClient } from '~utils/notifications';
 
 utils.Logger.setLogLevel(utils.Logger.levels.ERROR);
 
+//@TODO remove these after testing
+console.log(`Magicbell dev key var`, process.env.MAGICBELL_DEV_KEY)
+console.log(`RPC endpoint var`, process.env.CHAIN_RPC_ENDPOINT)
+
 const start = async (): Promise<void> => {
   amplifyClientSetup();
 
