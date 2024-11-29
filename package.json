@@ -9,6 +9,7 @@
     "dev": "NODE_ENV=development ts-node-dev -r tsconfig-paths/register src/index.ts",
     "prod": "npm run build && NODE_ENV=production npm run start",
     "dev:main-chain": "pnpm --filter @joincolony/main-chain run dev",
+    "start:main-chain": "pnpm --filter @joincolony/main-chain run start",
     "typecheck": "pnpm -r run typecheck",
     "lint": "eslint src/ --ext .ts",
     "preinstall": "bash scripts/generate-temp-files.sh",
