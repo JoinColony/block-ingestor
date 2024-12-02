@@ -1,8 +1,9 @@
 import express from 'express';
 
-import { getLastBlockNumber, getStats, initStats, output } from '~utils';
+import { getLastBlockNumber, getStats, initStats } from '~utils';
 import { getListenersStats } from '~eventListeners';
 import rpcProvider from '~provider';
+import { output } from '@joincolony/utils';
 
 export const coloniesSet = new Set<string>();
 

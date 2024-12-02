@@ -6,10 +6,10 @@ import {
   isManageTokensOperation,
   isRemoveVerifiedMembersOperation,
   parseMetadataDeltaOperation,
-  verbose,
 } from '~utils';
 import { createMultiSigInDB } from '../helpers';
 import { manageTokensMultisigHandler } from './metadataDeltaHandlers/manageTokens';
+import { verbose } from '@joincolony/utils';
 
 export const handleMetadataDeltaMultiSig = async (
   colonyAddress: string,

@@ -1,7 +1,7 @@
 import { Amplify, API, graphqlOperation } from 'aws-amplify';
 import { GraphQLQuery } from '@aws-amplify/api';
 import { DocumentNode, isExecutableDefinitionNode } from 'graphql';
-import { verbose } from '~utils';
+import { verbose } from '@joincolony/utils';
 
 export default (): void => {
   Amplify.configure({

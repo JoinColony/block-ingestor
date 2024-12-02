@@ -11,7 +11,8 @@
     },
     "dependencies": {
       "@joincolony/graphql": "workspace:*",
-      "@joincolony/clients": "workspace:*"
+      "@joincolony/clients": "workspace:*",
+      "@joincolony/utils": "workspace:*"
     }
   }
   

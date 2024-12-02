@@ -13,9 +13,10 @@ import {
   UserStakeType,
 } from '@joincolony/graphql';
 import { EventHandler } from '~types';
-import { getExpenditureDatabaseId, output, toNumber, verbose } from '~utils';
+import { getExpenditureDatabaseId, toNumber } from '~utils';
 import { getUserStakeDatabaseId } from '~utils/stakes';
 import { getExpenditureFromDB } from './helpers';
+import { output, verbose } from '@joincolony/utils';
 
 export const handleExpenditureMadeViaStake: EventHandler = async (
   event,

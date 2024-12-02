@@ -1,12 +1,7 @@
 import { BigNumber } from 'ethers';
 
 import { ContractEvent, ContractEventsSignatures } from '~types';
-import {
-  writeActionFromEvent,
-  verbose,
-  notNull,
-  transactionHasEvent,
-} from '~utils';
+import { writeActionFromEvent, notNull, transactionHasEvent } from '~utils';
 import {
   ColonyActionType,
   GetColonyDocument,
@@ -16,6 +11,7 @@ import {
 import { query } from '~amplifyClient';
 import { sendPermissionsActionNotifications } from '~utils/notifications';
 import { NotificationCategory } from '~types/notifications';
+import { verbose } from '@joincolony/utils';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { contractAddress: colonyAddress, transactionHash } = event;

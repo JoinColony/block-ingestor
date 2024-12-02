@@ -10,8 +10,7 @@ import {
   UpdateStatsMutation,
   UpdateStatsMutationVariables,
 } from '@joincolony/graphql';
-
-import { output, verbose } from './logger';
+import { output, verbose } from '@joincolony/utils';
 
 let stats: Record<string, unknown> = {};
 

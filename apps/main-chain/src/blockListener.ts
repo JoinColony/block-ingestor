@@ -1,8 +1,9 @@
-import { output, getLastBlockNumber } from '~utils';
+import { getLastBlockNumber } from '~utils';
 import { Block, BlockWithTransactions, EthersObserverEvents } from '~types';
 import rpcProvider from '~provider';
 
 import { processNextBlock } from '~blockProcessor';
+import { output } from '@joincolony/utils';
 
 /**
  * Map storing blocks that have been either picked up by the block listener

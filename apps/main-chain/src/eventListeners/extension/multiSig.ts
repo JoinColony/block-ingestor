@@ -25,7 +25,7 @@ import {
 import { ContractEventsSignatures } from '~types';
 import { notNull } from '~utils';
 import { addMultiSigParamsToDB } from '~utils/extensions/multiSig';
-import { output } from '~utils/logger';
+import { output } from '@joincolony/utils';
 
 import { addExtensionEventListener, fetchExistingExtensions } from './index';
 import { updateMultiSigInDB } from '~handlers/multiSig/helpers';

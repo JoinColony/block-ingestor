@@ -6,7 +6,7 @@ import {
   UpdateUserStakeInput,
 } from '@joincolony/graphql';
 import { getExpenditureFromDB } from './getExpenditure';
-import { output, verbose } from '~utils';
+import { output, verbose } from '@joincolony/utils';
 
 export const updateExpenditureStake = async (
   expenditureDatabaseId: string,

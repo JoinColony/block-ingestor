@@ -117,6 +117,9 @@ importers:
       '@joincolony/graphql':
         specifier: workspace:*
         version: link:../../packages/graphql
+      '@joincolony/utils':
+        specifier: workspace:*
+        version: link:../../packages/utils
 
   apps/proxy-chain:
     dependencies:
@@ -127,6 +130,8 @@ importers:
   packages/clients: {}
 
   packages/graphql: {}
+
+  packages/utils: {}
 
 packages:
 

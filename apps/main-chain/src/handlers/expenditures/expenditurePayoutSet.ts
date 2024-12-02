@@ -2,9 +2,7 @@ import { ContractEvent } from '~types';
 import {
   getCachedColonyClient,
   getExpenditureDatabaseId,
-  output,
   toNumber,
-  verbose,
 } from '~utils';
 import {
   ExpenditurePayout,
@@ -21,6 +19,7 @@ import {
   createEditExpenditureAction,
   NotEditActionError,
 } from './helpers';
+import { output, verbose } from '@joincolony/utils';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { contractAddress: colonyAddress } = event;

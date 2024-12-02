@@ -17,11 +17,11 @@ import { ContractEvent } from '~types';
 import {
   getDomainDatabaseId,
   getMultiSigClient,
-  output,
   createColonyAction,
 } from '~utils';
 import { getBlockChainTimestampISODate } from '~utils/dates';
 import { getMultiSigDatabaseId } from '../helpers';
+import { output } from '@joincolony/utils';
 
 const createColonyMultiSig = async (
   motionData: CreateColonyMultiSigInput,

@@ -7,10 +7,9 @@ import rpcProvider from '~provider';
 import {
   getLastBlockNumber,
   mapLogToContractEvent,
-  output,
-  verbose,
   setLastBlockNumber,
 } from '~utils';
+import { output, verbose } from '@joincolony/utils';
 import { BLOCK_PAGING_SIZE } from '~constants';
 
 let isProcessing = false;

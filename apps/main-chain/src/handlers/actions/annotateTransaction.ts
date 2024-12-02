@@ -14,7 +14,7 @@ import {
   UpdateColonyMotionMutationVariables,
 } from '@joincolony/graphql';
 import { ContractEvent } from '~types';
-import { verbose } from '~utils';
+import { verbose } from '@joincolony/utils';
 
 export default async ({ args }: ContractEvent): Promise<void> => {
   const [, txHash] = args;

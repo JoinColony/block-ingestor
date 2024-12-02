@@ -7,8 +7,6 @@ import {
   getStagedExpenditureClient,
   getOneTxPaymentClient,
   getVotingClient,
-  verbose,
-  output,
   SimpleTransactionDescription,
   parseMotionAction,
 } from '~utils';
@@ -33,6 +31,7 @@ import {
   handleReleaseStagedPaymentViaArbitration,
 } from './handlers';
 import { ExtensionEventListener } from '~eventListeners';
+import { output, verbose } from '@joincolony/utils';
 
 export const handleMotionCreated: EventHandler = async (
   event,

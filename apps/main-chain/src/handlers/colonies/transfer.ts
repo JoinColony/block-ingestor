@@ -10,7 +10,8 @@ import {
   GetTokenFromEverywhereQuery,
   GetTokenFromEverywhereQueryVariables,
 } from '@joincolony/graphql';
-import { output, createFundsClaim } from '~utils';
+import { createFundsClaim } from '~utils';
+import { output } from '@joincolony/utils';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { contractAddress: tokenAddress, logIndex, transactionHash } = event;

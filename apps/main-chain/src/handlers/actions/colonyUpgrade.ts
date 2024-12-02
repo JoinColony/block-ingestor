@@ -7,8 +7,9 @@ import {
 } from '@joincolony/graphql';
 import { ContractEvent } from '~types';
 import { NotificationCategory } from '~types/notifications';
-import { toNumber, verbose, writeActionFromEvent } from '~utils';
+import { toNumber, writeActionFromEvent } from '~utils';
 import { sendPermissionsActionNotifications } from '~utils/notifications';
+import { verbose } from '@joincolony/utils';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { contractAddress: colonyAddress, transactionHash } = event;

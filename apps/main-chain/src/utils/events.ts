@@ -15,8 +15,7 @@ import {
   ChainMetadata,
 } from '@joincolony/graphql';
 import { blocksMap } from '~blockListener';
-
-import { verbose } from './logger';
+import { verbose } from '@joincolony/utils';
 
 export const mapLogToContractEvent = async (
   log: Log,

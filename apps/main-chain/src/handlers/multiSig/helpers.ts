@@ -20,7 +20,7 @@ import {
   CreateMultiSigVoteDocument,
 } from '@joincolony/graphql';
 import { getBlockChainTimestampISODate } from '~utils/dates';
-import { output } from '~utils/logger';
+import { output } from '@joincolony/utils';
 
 export const getMultiSigDatabaseId = (
   chainId: string,

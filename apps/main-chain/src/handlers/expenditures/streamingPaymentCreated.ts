@@ -10,8 +10,8 @@ import {
   getExpenditureDatabaseId,
   getStreamingPaymentsClient,
   toNumber,
-  verbose,
 } from '~utils';
+import { verbose } from '@joincolony/utils';
 
 export const handleStreamingPaymentCreated: EventHandler = async (
   event,

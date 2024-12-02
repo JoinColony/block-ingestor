@@ -9,7 +9,6 @@ import {
   createColonyHistoricRoleDatabaseEntry,
   getAllRoleEventsFromTransaction,
   getRolesMapFromEvents,
-  verbose,
   writeActionFromEvent,
   isAddressExtension,
   getAllMultiSigRoleEventsFromTransaction,
@@ -31,6 +30,7 @@ import { updateColonyContributor } from '~utils/contributors';
 import { ExtensionEventListener } from '~eventListeners';
 import { sendPermissionsActionNotifications } from '~utils/notifications';
 import { NotificationCategory } from '~types/notifications';
+import { verbose } from '@joincolony/utils';
 
 export const handleManagePermissionsAction: EventHandler = async (
   event,
