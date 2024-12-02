@@ -1,4 +1,3 @@
-export * from './eventListeners';
 export * from './types';
 export * from './colony';
 export * from './network';

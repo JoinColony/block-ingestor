@@ -4,12 +4,10 @@ import { Extension, getExtensionHash } from '@colony/colony-js';
 import { ContractEventsSignatures, EventHandler } from '~types';
 import {
   EventListenerType,
-  addEventListener,
-  getEventListeners,
-  setEventListeners,
   setupListenerForOneTxPaymentExtensions,
   setupListenersForStagedExpenditureExtensions,
 } from '~eventListeners';
+import eventManager from '~eventManager';
 import {
   ExtensionFragment,
   ListExtensionsDocument,
@@ -44,7 +42,7 @@ export const addExtensionEventListener = (
   colonyAddress: string,
   handler: EventHandler,
 ): void => {
-  addEventListener({
+  eventManager.addEventListener({
     type: EventListenerType.Extension,
     eventSignature,
     address: extensionAddress,
@@ -58,8 +56,8 @@ export const addExtensionEventListener = (
 export const removeExtensionEventListeners = (
   extensionAddress: string,
 ): void => {
-  const existingListeners = getEventListeners();
-  setEventListeners(
+  const existingListeners = eventManager.getEventListeners();
+  eventManager.setEventListeners(
     existingListeners.filter((listener) => {
       if (listener.type !== EventListenerType.Extension) {
         return true;

@@ -9,7 +9,6 @@ export type GraphQLFnReturn<T> = Promise<
 
 export class AmplifyClient {
   constructor(appSyncEndpoint: string, appSyncApiKey: string) {
-    console.log('getting created');
     Amplify.configure({
       aws_appsync_graphqlEndpoint: appSyncEndpoint,
       aws_appsync_authenticationType: 'API_KEY',
@@ -40,7 +39,6 @@ export class AmplifyClient {
     mutationDocument: DocumentNode,
     variables?: TVariables,
   ): GraphQLFnReturn<T> {
-    console.log('this111', this);
     try {
       const result = await API.graphql<GraphQLQuery<T>>(
         graphqlOperation(mutationDocument, variables),

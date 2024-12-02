@@ -9,7 +9,6 @@ import {
 import { ContractEventsSignatures, EventHandler } from '~types';
 import { notNull } from '~utils';
 import {
-  addEventListener,
   addNetworkEventListener,
   addTokenEventListener,
 } from '~eventListeners';
@@ -51,13 +50,14 @@ import { handleProxyColonyRequested } from '~handlers/proxyColonies';
 import setTokenAuthority from '~handlers/tokens/setTokenAuthority';
 import { addProxyColoniesEventListener } from './proxyColonies';
 import { output } from '@joincolony/utils';
+import eventManager from '~eventManager';
 
 const addColonyEventListener = (
   eventSignature: ContractEventsSignatures,
   address: string,
   handler: EventHandler,
 ): void => {
-  addEventListener({
+  eventManager.addEventListener({
     type: EventListenerType.Colony,
     address,
     eventSignature,

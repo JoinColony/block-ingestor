@@ -1,6 +1,6 @@
 import { Log } from '@ethersproject/abstract-provider';
 import { blocksMap, getLatestSeenBlockNumber } from '~blockListener';
-import { getMatchingListeners } from '~eventListeners';
+import eventManager from '~eventManager';
 import { getInterfaceByListener } from '~interfaces';
 import rpcProvider from '~provider';
 
@@ -182,7 +182,10 @@ export const processNextBlock = async (): Promise<void> => {
 
     for (const log of logs) {
       // Find listeners that match the log
-      const listeners = getMatchingListeners(log.topics, log.address);
+      const listeners = eventManager.getMatchingListeners(
+        log.topics,
+        log.address,
+      );
       if (!listeners.length) {
         continue;
       }

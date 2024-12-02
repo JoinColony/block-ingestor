@@ -111,6 +111,9 @@ importers:
 
   apps/main-chain:
     dependencies:
+      '@joincolony/blocks':
+        specifier: workspace:*
+        version: link:../../packages/blocks
       '@joincolony/clients':
         specifier: workspace:*
         version: link:../../packages/clients
@@ -126,6 +129,12 @@ importers:
       '@joincolony/graphql':
         specifier: workspace:*
         version: link:../../packages/graphql
+
+  packages/blocks:
+    dependencies:
+      '@joincolony/utils':
+        specifier: workspace:*
+        version: link:../utils
 
   packages/clients:
     dependencies:

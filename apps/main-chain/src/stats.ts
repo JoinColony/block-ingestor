@@ -1,7 +1,7 @@
 import express from 'express';
 
 import { getLastBlockNumber, getStats, initStats } from '~utils';
-import { getListenersStats } from '~eventListeners';
+import eventManager from '~eventManager';
 import rpcProvider from '~provider';
 import { output } from '@joincolony/utils';
 
@@ -33,7 +33,7 @@ app.get('/stats', async (_, res) => {
  * Use to check currently active listeners
  */
 app.get('/listeners', async (_, res) => {
-  res.type('json').send(getListenersStats());
+  res.type('json').send(eventManager.getListenersStats());
 });
 
 export const startStatsServer = async (): Promise<void> => {

@@ -3,6 +3,7 @@ import { utils } from 'ethers';
 
 import { startBlockListener } from '~blockListener';
 import '~amplifyClient';
+import '~eventManager';
 import { startStatsServer } from '~stats';
 import {
   setupListenersForColonies,
