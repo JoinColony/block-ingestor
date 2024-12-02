@@ -132,6 +132,9 @@ importers:
 
   packages/blocks:
     dependencies:
+      '@joincolony/clients':
+        specifier: workspace:*
+        version: link:../clients
       '@joincolony/utils':
         specifier: workspace:*
         version: link:../utils
