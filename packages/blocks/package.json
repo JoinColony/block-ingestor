@@ -1,0 +1,9 @@
+{
+  "name": "@joincolony/blocks",
+  "main": "src/index.ts",
+  "version": "1.0.0",
+  "dependencies": {  
+    "@joincolony/clients": "workspace:*",
+    "@joincolony/utils": "workspace:*"
+  }
+}

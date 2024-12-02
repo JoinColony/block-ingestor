@@ -6,10 +6,10 @@ import {
   isManageTokensOperation,
   isRemoveVerifiedMembersOperation,
   parseMetadataDeltaOperation,
-  verbose,
 } from '~utils';
 import { createMotionInDB } from '../helpers';
 import { manageTokensMotionHandler } from './metadataDeltaHandlers/manageTokens';
+import { verbose } from '@joincolony/utils';
 
 export const handleMetadataDeltaMotion = async (
   colonyAddress: string,

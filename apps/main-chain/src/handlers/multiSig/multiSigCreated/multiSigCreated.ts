@@ -8,7 +8,6 @@ import {
   getStagedExpenditureClient,
   getStakedExpenditureClient,
   parseMotionAction,
-  verbose,
 } from '~utils';
 import {
   handleEditColonyMultiSig,
@@ -25,6 +24,7 @@ import { handlePaymentMultiSig } from './handlers/payment';
 import { sendMultisigActionNotifications } from '~utils/notifications';
 import { NotificationCategory } from '~types/notifications';
 import { NotificationType } from '@joincolony/graphql';
+import { verbose } from '@joincolony/utils';
 
 export const handleMultiSigMotionCreated: EventHandler = async (
   event,

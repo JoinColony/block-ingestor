@@ -6,9 +6,9 @@ import {
   UpdateColonyMultiSigMutationVariables,
 } from '@joincolony/graphql';
 import { EventHandler } from '~types';
-import { verbose } from '~utils';
+import { verbose } from '@joincolony/utils';
 import { getMultiSigDatabaseId, getMultiSigFromDB } from './helpers';
-import { getChainId } from '~provider';
+import rpcProvider from '~provider';
 import { getBlockChainTimestampISODate } from '~utils/dates';
 import {
   getNotificationCategory,
@@ -28,7 +28,7 @@ export const handleMultiSigMotionCancelled: EventHandler = async (
 
   const { colonyAddress } = listener as ExtensionEventListener;
 
-  const chainId = getChainId();
+  const chainId = rpcProvider.getChainId();
 
   const multiSigDatabaseId = getMultiSigDatabaseId(
     chainId,

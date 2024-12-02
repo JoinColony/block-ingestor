@@ -11,7 +11,6 @@ import {
 import { coloniesSet } from '~stats';
 import { ContractEvent, ContractEventsSignatures } from '~types';
 import {
-  output,
   updateStats,
   createColonyFounderInitialRoleEntry,
   getAllRoleEventsFromTransaction,
@@ -19,6 +18,7 @@ import {
 import { getColonyContributorId } from '~utils/contributors';
 import { tryFetchGraphqlQuery } from '~utils/graphql';
 import { createUniqueColony } from './helpers/createUniqueColony';
+import { output } from '@joincolony/utils';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { transactionHash, args, blockNumber } = event;

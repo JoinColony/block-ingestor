@@ -1,4 +1,4 @@
-import { getExpenditureDatabaseId, toNumber, verbose } from '~utils';
+import { getExpenditureDatabaseId, toNumber } from '~utils';
 import { mutate } from '~amplifyClient';
 import {
   UpdateStreamingPaymentDocument,
@@ -9,6 +9,7 @@ import {
 import { getStreamingPaymentFromDB } from './helpers';
 import { EventHandler } from '~types';
 import { ExtensionEventListener } from '~eventListeners';
+import { verbose } from '@joincolony/utils';
 
 export const handlePaymentTokenUpdated: EventHandler = async (
   event,

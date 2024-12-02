@@ -5,7 +5,7 @@ import {
   GetColonyQuery,
   GetColonyQueryVariables,
 } from '@joincolony/graphql';
-import { output } from './logger';
+import { output } from '@joincolony/utils';
 
 // @TODO: Consider refactoring this as it doesn't feel like it's in the right place
 export const getColonyFromDB = async (

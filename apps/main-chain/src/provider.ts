@@ -1,21 +1,4 @@
-import { providers } from 'ethers';
+import { RpcProvider } from '@joincolony/clients';
 
-import { ChainID } from './types';
-
-let chainId: ChainID;
-
-export const setChainId = (newChainId: ChainID): void => {
-  chainId = newChainId;
-};
-export const getChainId = (): ChainID => chainId;
-
-const provider = new providers.StaticJsonRpcProvider(
-  process.env.CHAIN_RPC_ENDPOINT,
-);
-
-export const initialiseProvider = async (): Promise<void> => {
-  const { chainId } = await provider.getNetwork();
-  setChainId(String(chainId));
-};
-
-export default provider;
+const rpcProvider = new RpcProvider(process.env.CHAIN_RPC_ENDPOINT);
+export default rpcProvider;

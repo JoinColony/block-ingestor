@@ -12,10 +12,10 @@ import {
   getExpenditureDatabaseId,
   toNumber,
   transactionHasEvent,
-  verbose,
   writeActionFromEvent,
 } from '~utils';
 import { sendExpenditureUpdateNotifications } from '~utils/notifications';
+import { verbose } from '@joincolony/utils';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { contractAddress: colonyAddress } = event;

@@ -5,8 +5,9 @@ import {
   GetColonyExtensionByHashAndColonyQueryVariables,
 } from '@joincolony/graphql';
 import { ContractEvent } from '~types';
-import { toNumber, verbose } from '~utils';
+import { toNumber } from '~utils';
 import { updateExtension } from '~utils/extensions/updateExtension';
+import { verbose } from '@joincolony/utils';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { extensionId: extensionHash, colony, version } = event.args;

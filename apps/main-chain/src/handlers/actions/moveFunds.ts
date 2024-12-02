@@ -10,7 +10,6 @@ import {
   getUpdatedExpenditureBalances,
   transactionHasEvent,
   getExpenditureByFundingPot,
-  verbose,
 } from '~utils';
 import {
   ColonyActionType,
@@ -27,6 +26,7 @@ import {
   sendPermissionsActionNotifications,
 } from '~utils/notifications';
 import { NotificationCategory } from '~types/notifications';
+import { verbose } from '@joincolony/utils';
 
 export default async (event: ContractEvent): Promise<void> => {
   const {

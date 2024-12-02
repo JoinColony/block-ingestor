@@ -8,9 +8,7 @@ import { EventHandler } from '~types';
 import {
   getCachedColonyClient,
   getExpenditureDatabaseId,
-  output,
   toNumber,
-  verbose,
 } from '~utils';
 import {
   getExpenditureFromDB,
@@ -20,6 +18,7 @@ import {
   createEditExpenditureAction,
   NotEditActionError,
 } from './helpers';
+import { output, verbose } from '@joincolony/utils';
 
 export const handleExpenditureStateChanged: EventHandler = async (event) => {
   const { contractAddress: colonyAddress } = event;

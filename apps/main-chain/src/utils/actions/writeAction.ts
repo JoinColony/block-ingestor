@@ -11,10 +11,11 @@ import {
   GetExpenditureByNativeFundingPotIdAndColonyQuery,
   GetExpenditureByNativeFundingPotIdAndColonyQueryVariables,
 } from '@joincolony/graphql';
-import { toNumber, verbose, getColonyExtensions } from '~utils';
+import { toNumber, getColonyExtensions } from '~utils';
 import { ContractEvent } from '~types';
 import networkClient from '~networkClient';
 import { getBlockChainTimestampISODate } from '~utils/dates';
+import { verbose } from '@joincolony/utils';
 
 export type ActionFields = Omit<
   CreateColonyActionInput,

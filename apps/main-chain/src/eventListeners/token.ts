@@ -1,6 +1,6 @@
 import { ContractEventsSignatures, EventHandler } from '~types';
-import { addEventListener, getEventListeners } from '~eventListeners';
-import { EventListenerType, EventListener } from './types';
+import eventManager from '~eventManager';
+import { EventListenerType, EventListener } from '@joincolony/blocks';
 import { utils } from 'ethers';
 import isEqual from 'lodash/isEqual';
 
@@ -32,12 +32,12 @@ export const addTokenEventListener = (
    * As a general rule, this will only *NOT* apply to the token Transfer event
    * as that's the only one treated differently.
    */
-  const listenerExists = getEventListeners().some((existingListener) =>
-    isEqual(existingListener, tokenListener),
-  );
+  const listenerExists = eventManager
+    .getEventListeners()
+    .some((existingListener) => isEqual(existingListener, tokenListener));
   if (listenerExists) {
     return;
   }
 
-  return addEventListener(tokenListener);
+  return eventManager.addEventListener(tokenListener);
 };

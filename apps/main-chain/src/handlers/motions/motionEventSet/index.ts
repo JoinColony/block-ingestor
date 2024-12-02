@@ -1,6 +1,6 @@
 import { ExtensionEventListener } from '~eventListeners';
 import { EventHandler } from '~types';
-import { verbose, getVotingClient } from '~utils';
+import { getVotingClient } from '~utils';
 import { getBlockChainTimestampISODate } from '~utils/dates';
 
 import {
@@ -8,6 +8,7 @@ import {
   getMotionFromDB,
   updateMotionInDB,
 } from '../helpers';
+import { verbose } from '@joincolony/utils';
 
 export const handleMotionEventSet: EventHandler = async (event, listener) => {
   const {

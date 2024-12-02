@@ -4,7 +4,7 @@ import { Log } from '@ethersproject/providers';
 import networkClient from '~networkClient';
 import { ContractEvent, ContractEventsSignatures } from '~types';
 import { mutate, query } from '~amplifyClient';
-import { getChainId } from '~provider';
+import rpcProvider from '~provider';
 import {
   CreateContractEventDocument,
   CreateContractEventMutation,
@@ -15,8 +15,7 @@ import {
   ChainMetadata,
 } from '@joincolony/graphql';
 import { blocksMap } from '~blockListener';
-
-import { verbose } from './logger';
+import { verbose } from '@joincolony/utils';
 
 export const mapLogToContractEvent = async (
   log: Log,
@@ -68,7 +67,7 @@ export const saveEvent = async (event: ContractEvent): Promise<void> => {
       'Event does not have a signature. Possibly bad event data. Refusing the save to database!',
     );
   }
-  const chainId = getChainId();
+  const chainId = rpcProvider.getChainId();
 
   const {
     name,

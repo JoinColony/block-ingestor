@@ -10,7 +10,10 @@
       "typecheck": "tsc --noEmit"
     },
     "dependencies": {
-      "@joincolony/graphql": "workspace:*"
+      "@joincolony/graphql": "workspace:*",
+      "@joincolony/clients": "workspace:*",
+      "@joincolony/blocks": "workspace:*",
+      "@joincolony/utils": "workspace:*"
     }
   }
   

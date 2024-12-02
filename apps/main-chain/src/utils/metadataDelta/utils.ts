@@ -1,4 +1,4 @@
-import { verbose } from '~utils';
+import { verbose } from '@joincolony/utils';
 import {
   AddVerifiedMembersOperation,
   RemoveVerifiedMembersOperation,

@@ -6,7 +6,6 @@ import { hexStripZeros } from 'ethers/lib/utils';
 import { mutate, query } from '~amplifyClient';
 import { ContractEvent, ContractEventsSignatures } from '~types';
 import {
-  verbose,
   getCachedColonyClient,
   getDomainDatabaseId,
   mapLogToContractEvent,
@@ -33,6 +32,7 @@ import {
 import { createColonyContributor, isAlreadyContributor } from './contributors';
 import { sendPermissionsActionNotifications } from './notifications';
 import { NotificationCategory } from '~types/notifications';
+import { verbose } from '@joincolony/utils';
 
 export const BASE_ROLES_MAP = {
   [`role_${ColonyRole.Recovery}`]: null,

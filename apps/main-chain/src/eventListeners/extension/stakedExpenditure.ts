@@ -9,7 +9,7 @@ import {
 } from '~handlers';
 
 import { ContractEventsSignatures } from '~types';
-import { output } from '~utils';
+import { output } from '@joincolony/utils';
 
 import { addExtensionEventListener, fetchExistingExtensions } from './index';
 

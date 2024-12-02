@@ -1,5 +1,5 @@
 import { ExtensionEventListener } from '~eventListeners';
-import { getChainId } from '~provider';
+import rpcProvider from '~provider';
 
 import { EventHandler } from '~types';
 // import { linkPendingMetadata } from '~utils/colonyMetadata';
@@ -9,7 +9,7 @@ import {
   getMultiSigFromDB,
   updateMultiSigInDB,
 } from '../helpers';
-import { getMultiSigClient, verbose } from '~utils';
+import { getMultiSigClient } from '~utils';
 import { linkPendingMetadata } from '~utils/colonyMetadata';
 import { getBlockChainTimestampISODate } from '~utils/dates';
 import {
@@ -17,6 +17,7 @@ import {
   sendMultisigActionNotifications,
 } from '~utils/notifications';
 import { NotificationType } from '@joincolony/graphql';
+import { verbose } from '@joincolony/utils';
 
 export const handleMultiSigMotionExecuted: EventHandler = async (
   event,
@@ -34,7 +35,7 @@ export const handleMultiSigMotionExecuted: EventHandler = async (
     return;
   }
 
-  const chainId = getChainId();
+  const chainId = rpcProvider.getChainId();
   const multiSigDatabaseId = getMultiSigDatabaseId(
     chainId,
     multiSigExtensionAddress,

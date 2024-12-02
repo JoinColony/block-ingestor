@@ -8,7 +8,7 @@ import {
 } from '@joincolony/graphql';
 import networkClient from '~networkClient';
 import { ContractEvent } from '~types';
-import { verbose } from '~utils';
+import { verbose } from '@joincolony/utils';
 import { updateExtension } from '~utils/extensions/updateExtension';
 import { sendExtensionUpdateNotifications } from '~utils/notifications';
 

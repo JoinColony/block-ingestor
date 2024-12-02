@@ -6,7 +6,6 @@ import { ColonyOperations, MotionVote } from '~types';
 import {
   getCachedColonyClient,
   getColonyFromDB,
-  output,
   parseFunctionData,
 } from '~utils';
 import { mutate, query } from '~amplifyClient';
@@ -23,6 +22,7 @@ import {
   UpdateColonyDocument,
 } from '@joincolony/graphql';
 import { getAmountLessFee, getNetworkInverseFee } from '~utils/networkFee';
+import { output } from '@joincolony/utils';
 
 export const getStakerReward = async (
   motionId: string,

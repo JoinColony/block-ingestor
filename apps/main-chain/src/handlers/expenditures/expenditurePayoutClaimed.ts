@@ -3,10 +3,8 @@ import {
   getExpenditureDatabaseId,
   getUpdatedExpenditureBalances,
   insertAtIndex,
-  output,
   toNumber,
   transactionHasEvent,
-  verbose,
 } from '~utils';
 import {
   ExpenditurePayout,
@@ -20,6 +18,7 @@ import { getAmountWithFee, getNetworkInverseFee } from '~utils/networkFee';
 
 import { getExpenditureFromDB } from './helpers';
 import { sendExpenditureUpdateNotifications } from '~utils/notifications';
+import { output, verbose } from '@joincolony/utils';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { contractAddress: colonyAddress } = event;

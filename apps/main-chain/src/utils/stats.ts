@@ -10,8 +10,7 @@ import {
   UpdateStatsMutation,
   UpdateStatsMutationVariables,
 } from '@joincolony/graphql';
-
-import { output, verbose } from './logger';
+import { output, verbose } from '@joincolony/utils';
 
 let stats: Record<string, unknown> = {};
 
@@ -75,6 +74,7 @@ export const setLastBlockNumber = (lastBlockNumber: number): void => {
  * Function fetching the last stored stats from the DB
  * If no stats entry is found, it will create one
  */
+// @TODO make stats work with chainId
 export const initStats = async (): Promise<void> => {
   const { value: jsonStats } =
     (await query<GetStatsQuery, GetStatsQueryVariables>(GetStatsDocument, {}))

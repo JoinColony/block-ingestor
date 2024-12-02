@@ -16,7 +16,7 @@ import {
   UpdateDomainMetadataDocument,
 } from '@joincolony/graphql';
 import { getDomainDatabaseId } from './domains';
-import { output } from './logger';
+import { output } from '@joincolony/utils';
 import { getCachedColonyClient } from './clients';
 import { getActionByMotionId, getActionByMultiSigId } from './actions';
 import { parseFunctionData } from './parseFunction';

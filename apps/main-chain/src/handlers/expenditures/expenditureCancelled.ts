@@ -2,7 +2,6 @@ import { EventHandler } from '~types';
 import {
   getExpenditureDatabaseId,
   toNumber,
-  verbose,
   writeActionFromEvent,
 } from '~utils';
 import { mutate } from '~amplifyClient';
@@ -16,6 +15,7 @@ import {
 } from '@joincolony/graphql';
 import { EventListenerType } from '~eventListeners';
 import { sendExpenditureUpdateNotifications } from '~utils/notifications';
+import { verbose } from '@joincolony/utils';
 
 export const handleExpenditureCancelled: EventHandler = async (
   event,

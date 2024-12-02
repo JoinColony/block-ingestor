@@ -1,7 +1,9 @@
-import { output, getLastBlockNumber } from '~utils';
+import { getLastBlockNumber } from '~utils';
 import { Block, BlockWithTransactions, EthersObserverEvents } from '~types';
-import provider from '~provider';
+import rpcProvider from '~provider';
+
 import { processNextBlock } from '~blockProcessor';
+import { output } from '@joincolony/utils';
 
 /**
  * Map storing blocks that have been either picked up by the block listener
@@ -15,20 +17,22 @@ export const getLatestSeenBlockNumber = (): number => latestSeenBlockNumber;
 // export const blocksMap = new Map<number, boolean|Block>();
 
 export const startBlockListener = (): void => {
-  provider.on(EthersObserverEvents.Block, async (blockNumber: number) => {
-    try {
-      // For now, we just track that this block exists.
-      latestSeenBlockNumber = Math.max(latestSeenBlockNumber, blockNumber);
+  rpcProvider
+    .getProviderInstance()
+    .on(EthersObserverEvents.Block, async (blockNumber: number) => {
+      try {
+        // For now, we just track that this block exists.
+        latestSeenBlockNumber = Math.max(latestSeenBlockNumber, blockNumber);
 
-      output(`Block ${blockNumber} added to the queue`);
+        output(`Block ${blockNumber} added to the queue`);
 
-      processNextBlock();
-    } catch (error) {
-      throw new Error(
-        `Observed block ${blockNumber} but failed to get its data: ${error}`,
-      );
-    }
-  });
+        processNextBlock();
+      } catch (error) {
+        throw new Error(
+          `Observed block ${blockNumber} but failed to get its data: ${error}`,
+        );
+      }
+    });
 
   output('Block listener started');
 
@@ -41,7 +45,9 @@ export const startBlockListener = (): void => {
  */
 const trackMissedBlocks = async (): Promise<void> => {
   const lastBlockNumber = getLastBlockNumber();
-  const currentBlockNumber = await provider.getBlockNumber();
+  const currentBlockNumber = await rpcProvider
+    .getProviderInstance()
+    .getBlockNumber();
 
   if (lastBlockNumber >= currentBlockNumber) {
     return;

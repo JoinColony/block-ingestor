@@ -1,7 +1,7 @@
 import { BigNumber } from 'ethers';
 import { ExtensionEventListener } from '~eventListeners';
 import { MultiSigVote, NotificationType } from '@joincolony/graphql';
-import { getChainId } from '~provider';
+import rpcProvider from '~provider';
 import { EventHandler } from '~types';
 import {
   addMultiSigVote,
@@ -24,7 +24,7 @@ export const handleMultiSigApprovalChanged: EventHandler = async (
 
   const { colonyAddress } = listener as ExtensionEventListener;
 
-  const chainId = getChainId();
+  const chainId = rpcProvider.getChainId();
   const { agent: userAddress, motionId, role, approval } = event.args;
 
   const multiSigClient = await getMultiSigClient(colonyAddress);

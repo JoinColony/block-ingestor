@@ -2,7 +2,7 @@ import { constants } from 'ethers';
 
 import { mutate, query } from '~amplifyClient';
 import { ContractEvent } from '~types';
-import { output, saveEvent, notNull } from '~utils';
+import { saveEvent, notNull } from '~utils';
 import {
   UpdateColonyFundsClaimDocument,
   UpdateColonyFundsClaimMutation,
@@ -12,6 +12,7 @@ import {
   GetColonyUnclaimedFundsQueryVariables,
 } from '@joincolony/graphql';
 import { sendFundsClaimedNotifications } from '~utils/notifications';
+import { output } from '@joincolony/utils';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { contractAddress: colonyAddress, blockNumber } = event;

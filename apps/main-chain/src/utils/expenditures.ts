@@ -9,7 +9,7 @@ import {
   GetExpenditureByNativeFundingPotIdAndColonyQueryVariables,
 } from '@joincolony/graphql';
 
-import { output } from './logger';
+import { output } from '@joincolony/utils';
 import { insertAtIndex } from './arrays';
 
 export const getExpenditureDatabaseId = (

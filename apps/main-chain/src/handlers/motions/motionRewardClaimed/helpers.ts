@@ -8,8 +8,9 @@ import {
   UpdateUserStakeMutation,
   UpdateUserStakeMutationVariables,
 } from '@joincolony/graphql';
-import { getColonyFromDB, output } from '~utils';
+import { getColonyFromDB } from '~utils';
 import { getUserStakeDatabaseId } from '~utils/stakes';
+import { output } from '@joincolony/utils';
 
 export const getUpdatedStakerRewards = (
   stakerRewards: StakerReward[],

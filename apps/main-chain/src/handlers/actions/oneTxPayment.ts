@@ -7,7 +7,7 @@ import {
   GetColonyExtensionQuery,
   GetColonyExtensionQueryVariables,
 } from '@joincolony/graphql';
-import provider from '~provider';
+import rpcProvider from '~provider';
 import { ContractEvent, ContractEventsSignatures } from '~types';
 import { NotificationCategory } from '~types/notifications';
 import {
@@ -123,7 +123,9 @@ const handlerV1ToV5 = async (
 ): Promise<void> => {
   const { blockNumber } = event;
   const [initiatorAddress, paymentOrExpenditureId, nPayments] = event.args;
-  const receipt = await provider.getTransactionReceipt(event.transactionHash);
+  const receipt = await rpcProvider
+    .getProviderInstance()
+    .getTransactionReceipt(event.transactionHash);
 
   if ((nPayments as BigNumber).eq(1)) {
     const [payoutClaimedLog] = receipt.logs.filter(
@@ -228,7 +230,9 @@ const handlerV6 = async (
 ): Promise<void> => {
   const { blockNumber, transactionHash } = event;
   const [initiatorAddress, expenditureId] = event.args;
-  const receipt = await provider.getTransactionReceipt(event.transactionHash);
+  const receipt = await rpcProvider
+    .getProviderInstance()
+    .getTransactionReceipt(event.transactionHash);
 
   // multiple OneTxPayments use expenditures at the contract level
   const expenditure: Expenditure = await colonyClient.getExpenditure(

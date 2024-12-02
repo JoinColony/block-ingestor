@@ -7,7 +7,8 @@ import {
   UpdateExpenditureMutationVariables,
 } from '@joincolony/graphql';
 import { EventHandler } from '~types';
-import { getExpenditureDatabaseId, toNumber, verbose } from '~utils';
+import { getExpenditureDatabaseId, toNumber } from '~utils';
+import { verbose } from '@joincolony/utils';
 
 export const handleExpenditureMadeStaged: EventHandler = async (
   event,

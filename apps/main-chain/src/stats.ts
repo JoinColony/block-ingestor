@@ -1,8 +1,9 @@
 import express from 'express';
 
-import { getLastBlockNumber, getStats, initStats, output } from '~utils';
-import { getChainId } from '~provider';
-import { getListenersStats } from '~eventListeners';
+import { getLastBlockNumber, getStats, initStats } from '~utils';
+import eventManager from '~eventManager';
+import rpcProvider from '~provider';
+import { output } from '@joincolony/utils';
 
 export const coloniesSet = new Set<string>();
 
@@ -32,7 +33,7 @@ app.get('/stats', async (_, res) => {
  * Use to check currently active listeners
  */
 app.get('/listeners', async (_, res) => {
-  res.type('json').send(getListenersStats());
+  res.type('json').send(eventManager.getListenersStats());
 });
 
 export const startStatsServer = async (): Promise<void> => {
@@ -44,7 +45,7 @@ export const startStatsServer = async (): Promise<void> => {
   const lastBlockNumber = getLastBlockNumber();
 
   app.listen(port, async () => {
-    output('Block Ingestor started on chain', getChainId());
+    output('Block Ingestor started on chain', rpcProvider.getChainId());
     output(`Stats available at http://localhost:${port}/stats`);
     output(`Liveness check available at http://localhost:${port}/liveness`);
     output(`Last processed block number: ${lastBlockNumber}`);

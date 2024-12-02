@@ -1,13 +1,14 @@
 import { utils } from 'ethers';
 
-import { EventListenerType, addEventListener } from '~eventListeners';
 import { ContractEventsSignatures, EventHandler } from '~types';
+import eventManager from '~eventManager';
+import { EventListenerType } from '@joincolony/blocks';
 
 export const addProxyColoniesEventListener = (
   eventSignature: ContractEventsSignatures,
   handler: EventHandler,
 ): void =>
-  addEventListener({
+  eventManager.addEventListener({
     type: EventListenerType.ProxyColonies,
     eventSignature,
     topics: [utils.id(eventSignature)],

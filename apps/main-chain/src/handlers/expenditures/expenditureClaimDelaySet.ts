@@ -6,9 +6,10 @@ import {
   UpdateExpenditureMutationVariables,
 } from '@joincolony/graphql';
 import { ContractEvent } from '~types';
-import { getExpenditureDatabaseId, output, toNumber, verbose } from '~utils';
+import { getExpenditureDatabaseId, toNumber } from '~utils';
 
 import { getExpenditureFromDB, getUpdatedExpenditureSlots } from './helpers';
+import { output, verbose } from '@joincolony/utils';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { contractAddress: colonyAddress } = event;

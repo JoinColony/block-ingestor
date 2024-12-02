@@ -1,6 +1,6 @@
 import { query } from '~amplifyClient';
 import networkClient from '~networkClient';
-import { getChainId } from '~provider';
+import rpcProvider from '~provider';
 import { ContractEvent } from '~types';
 import {
   GetColonyUnclaimedFundDocument,
@@ -10,11 +10,12 @@ import {
   GetTokenFromEverywhereQuery,
   GetTokenFromEverywhereQueryVariables,
 } from '@joincolony/graphql';
-import { output, createFundsClaim } from '~utils';
+import { createFundsClaim } from '~utils';
+import { output } from '@joincolony/utils';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { contractAddress: tokenAddress, logIndex, transactionHash } = event;
-  const chainId = getChainId();
+  const chainId = rpcProvider.getChainId();
   /*
    * @NOTE Take the values from the "array" rather than from the named properties
    * This is because our native tokens differ in abi from ERC20 or SAI tokens

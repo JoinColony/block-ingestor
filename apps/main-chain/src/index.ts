@@ -2,21 +2,20 @@ import 'cross-fetch/polyfill';
 import { utils } from 'ethers';
 
 import { startBlockListener } from '~blockListener';
-import amplifyClientSetup from '~amplifyClient';
-import { initialiseProvider } from '~provider';
+import '~amplifyClient';
+import '~eventManager';
 import { startStatsServer } from '~stats';
 import {
   setupListenersForColonies,
   setupListenersForExtensions,
 } from '~eventListeners';
 import { seedDB } from '~utils';
+import rpcProvider from './provider';
 import { setupNotificationsClient } from '~utils/notifications';
 
 utils.Logger.setLogLevel(utils.Logger.levels.ERROR);
 
 const start = async (): Promise<void> => {
-  amplifyClientSetup();
-
   /**
    * Setup the notifications provider so that notifications can be sent when needed
    */
@@ -39,7 +38,7 @@ const start = async (): Promise<void> => {
    */
   startBlockListener();
 
-  await initialiseProvider();
+  await rpcProvider.initialiseProvider();
 
   /**
    * In development, where both the chain and the DB gets reset everytime,

@@ -13,7 +13,7 @@ import {
   UpdateColonyMotionDocument,
 } from '@joincolony/graphql';
 import { MotionSide, MotionVote } from '~types';
-import { verbose, output } from '~utils';
+import { output, verbose } from '@joincolony/utils';
 import { getActionByMotionId } from '~utils/actions';
 import { updateDecisionInDB } from '~utils/decisions';
 import {

@@ -3,7 +3,7 @@ import { constants } from 'ethers';
 import networkClient from '~networkClient';
 import { mutate, query } from '~amplifyClient';
 import { ContractEvent } from '~types';
-import { verbose, toNumber } from '~utils';
+import { toNumber } from '~utils';
 import {
   CreateColonyExtensionDocument,
   CreateColonyExtensionMutation,
@@ -24,6 +24,7 @@ import {
 } from '~utils/notifications';
 import { updateExtension } from './updateExtension';
 import { Extension, getExtensionHash } from '@colony/colony-js';
+import { verbose } from '@joincolony/utils';
 
 const EXTENSION_SUPPORTING_NOTIFICATIONS = [
   Extension.OneTxPayment,

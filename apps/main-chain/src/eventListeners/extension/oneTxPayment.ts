@@ -1,5 +1,5 @@
 import { Extension, getExtensionHash } from '@colony/colony-js';
-import { output } from '~utils';
+import { output } from '@joincolony/utils';
 import { ContractEventsSignatures } from '~types';
 
 import { addExtensionEventListener, fetchExistingExtensions } from '.';
