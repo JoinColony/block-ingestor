@@ -1,5 +1,5 @@
 import MagicBellClient, { Notification } from '@magicbell/core';
-import { query } from '~amplifyClient';
+import amplifyClient from '~amplifyClient';
 import {
   ColonyActionType,
   GetColonyContributorsNotificationDataDocument,
@@ -70,7 +70,7 @@ const getMembersData: GetDataFn<
   NotificationUserFragment,
   { colonyAddress: string }
 > = async ({ colonyAddress }, nextToken) => {
-  const response = await query<
+  const response = await amplifyClient.query<
     GetColonyContributorsNotificationDataQuery,
     GetColonyContributorsNotificationDataQueryVariables
   >(GetColonyContributorsNotificationDataDocument, {
@@ -291,7 +291,7 @@ export const sendMentionNotifications = async ({
     return;
   }
 
-  const response = await query<
+  const response = await amplifyClient.query<
     GetNotificationUsersQuery,
     GetNotificationUsersQueryVariables
   >(GetNotificationUsersDocument, {

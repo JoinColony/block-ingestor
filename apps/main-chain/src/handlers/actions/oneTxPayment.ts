@@ -1,14 +1,14 @@
 import { AnyColonyClient } from '@colony/colony-js';
 import { BigNumber, utils } from 'ethers';
-import { query } from '~amplifyClient';
+import amplifyClient from '~amplifyClient';
 import {
   ColonyActionType,
   GetColonyExtensionDocument,
   GetColonyExtensionQuery,
   GetColonyExtensionQueryVariables,
 } from '@joincolony/graphql';
-import provider from '~provider';
-import { ContractEvent, ContractEventsSignatures } from '~types';
+import rpcProvider from '~provider';
+import { ContractEvent, ContractEventsSignatures } from '@joincolony/blocks';
 import { NotificationCategory } from '~types/notifications';
 import {
   getCachedColonyClient,
@@ -66,10 +66,10 @@ export default async (oneTxPaymentEvent: ContractEvent): Promise<void> => {
   const { contractAddress: extensionAddress } = oneTxPaymentEvent;
 
   const { data } =
-    (await query<GetColonyExtensionQuery, GetColonyExtensionQueryVariables>(
-      GetColonyExtensionDocument,
-      { id: extensionAddress },
-    )) ?? {};
+    (await amplifyClient.query<
+      GetColonyExtensionQuery,
+      GetColonyExtensionQueryVariables
+    >(GetColonyExtensionDocument, { id: extensionAddress })) ?? {};
   const { colonyId: colonyAddress = '', version } =
     data?.getColonyExtension ?? {};
 
@@ -123,7 +123,9 @@ const handlerV1ToV5 = async (
 ): Promise<void> => {
   const { blockNumber } = event;
   const [initiatorAddress, paymentOrExpenditureId, nPayments] = event.args;
-  const receipt = await provider.getTransactionReceipt(event.transactionHash);
+  const receipt = await rpcProvider
+    .getProviderInstance()
+    .getTransactionReceipt(event.transactionHash);
 
   if ((nPayments as BigNumber).eq(1)) {
     const [payoutClaimedLog] = receipt.logs.filter(
@@ -228,7 +230,9 @@ const handlerV6 = async (
 ): Promise<void> => {
   const { blockNumber, transactionHash } = event;
   const [initiatorAddress, expenditureId] = event.args;
-  const receipt = await provider.getTransactionReceipt(event.transactionHash);
+  const receipt = await rpcProvider
+    .getProviderInstance()
+    .getTransactionReceipt(event.transactionHash);
 
   // multiple OneTxPayments use expenditures at the contract level
   const expenditure: Expenditure = await colonyClient.getExpenditure(

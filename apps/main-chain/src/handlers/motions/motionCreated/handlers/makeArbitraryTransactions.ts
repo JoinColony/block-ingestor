@@ -1,9 +1,10 @@
 import { TransactionDescription } from 'ethers/lib/utils';
 import { Id } from '@colony/colony-js';
-import { ContractEvent, motionNameMapping } from '~types';
+import { motionNameMapping } from '~types';
 import { generateArbitraryTxsFromArrays, getDomainDatabaseId } from '~utils';
 
 import { createMotionInDB } from '../helpers';
+import { ContractEvent } from '@joincolony/blocks';
 
 export const handleMakeArbitraryTransactionsMotion = async (
   colonyAddress: string,

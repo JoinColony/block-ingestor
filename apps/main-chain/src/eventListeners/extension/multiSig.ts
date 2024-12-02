@@ -9,7 +9,7 @@ import {
   handleMultiSigMotionCreated,
   handleMultiSigMotionExecuted,
 } from '~handlers/multiSig';
-import { mutate, query } from '~amplifyClient';
+import amplifyClient from '~amplifyClient';
 import {
   GetActiveColonyMultisigsDocument,
   GetActiveColonyMultisigsQuery,
@@ -22,10 +22,10 @@ import {
   RemoveMultiSigRoleMutationVariables,
 } from '@joincolony/graphql';
 
-import { ContractEventsSignatures } from '~types';
+import { ContractEventsSignatures } from '@joincolony/blocks';
 import { notNull } from '~utils';
 import { addMultiSigParamsToDB } from '~utils/extensions/multiSig';
-import { output } from '~utils/logger';
+import { output } from '@joincolony/utils';
 
 import { addExtensionEventListener, fetchExistingExtensions } from './index';
 import { updateMultiSigInDB } from '~handlers/multiSig/helpers';
@@ -51,7 +51,7 @@ export const handleMultiSigInstalled = async (
 export const handleMultiSigUninstalled = async (
   colonyAddress: string,
 ): Promise<void> => {
-  const multiSigRolesQuery = await query<
+  const multiSigRolesQuery = await amplifyClient.query<
     GetAllMultiSigRolesQuery,
     GetAllMultiSigRolesQueryVariables
   >(GetAllMultiSigRolesDocument, {
@@ -62,7 +62,7 @@ export const handleMultiSigUninstalled = async (
 
   await Promise.all(
     roleEntries.filter(notNull).map(async (entry) => {
-      await mutate<
+      await amplifyClient.mutate<
         RemoveMultiSigRoleMutation,
         RemoveMultiSigRoleMutationVariables
       >(RemoveMultiSigRoleDocument, {
@@ -71,7 +71,7 @@ export const handleMultiSigUninstalled = async (
     }),
   );
 
-  const activeMultiSigsQuery = await query<
+  const activeMultiSigsQuery = await amplifyClient.query<
     GetActiveColonyMultisigsQuery,
     GetActiveColonyMultisigsQueryVariables
   >(GetActiveColonyMultisigsDocument, {

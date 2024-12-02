@@ -1,12 +1,10 @@
-import { ContractEvent, ContractEventsSignatures } from '~types';
+import { ContractEvent, ContractEventsSignatures } from '@joincolony/blocks';
 import {
   getExpenditureDatabaseId,
   getUpdatedExpenditureBalances,
   insertAtIndex,
-  output,
   toNumber,
   transactionHasEvent,
-  verbose,
 } from '~utils';
 import {
   ExpenditurePayout,
@@ -15,11 +13,12 @@ import {
   UpdateExpenditureMutation,
   UpdateExpenditureMutationVariables,
 } from '@joincolony/graphql';
-import { mutate } from '~amplifyClient';
+import amplifyClient from '~amplifyClient';
 import { getAmountWithFee, getNetworkInverseFee } from '~utils/networkFee';
 
 import { getExpenditureFromDB } from './helpers';
 import { sendExpenditureUpdateNotifications } from '~utils/notifications';
+import { output, verbose } from '@joincolony/utils';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { contractAddress: colonyAddress } = event;
@@ -92,18 +91,18 @@ export default async (event: ContractEvent): Promise<void> => {
 
   const isSplitPayment = !!expenditure.metadata?.distributionType;
 
-  await mutate<UpdateExpenditureMutation, UpdateExpenditureMutationVariables>(
-    UpdateExpenditureDocument,
-    {
-      input: {
-        id: databaseId,
-        slots: updatedSlots,
-        balances: updatedBalances,
-        // Assume the send notification function will succeed to avoid extra mutations
-        splitPaymentPayoutClaimedNotificationSent: isSplitPayment || undefined,
-      },
+  await amplifyClient.mutate<
+    UpdateExpenditureMutation,
+    UpdateExpenditureMutationVariables
+  >(UpdateExpenditureDocument, {
+    input: {
+      id: databaseId,
+      slots: updatedSlots,
+      balances: updatedBalances,
+      // Assume the send notification function will succeed to avoid extra mutations
+      splitPaymentPayoutClaimedNotificationSent: isSplitPayment || undefined,
     },
-  );
+  });
 
   const hasOneTxPaymentEvent = await transactionHasEvent(
     event.transactionHash,

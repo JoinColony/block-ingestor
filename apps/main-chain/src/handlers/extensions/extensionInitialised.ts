@@ -1,7 +1,7 @@
 import { Extension, getExtensionHash } from '@colony/colony-js';
 
-import { ContractEvent } from '~types';
-import { verbose, addVotingReputationParamsToDB } from '~utils';
+import { ContractEvent } from '@joincolony/blocks';
+import { addVotingReputationParamsToDB } from '~utils';
 import {
   setupListenersForStakedExpenditure,
   setupMotionsListeners,
@@ -11,6 +11,7 @@ import networkClient from '~networkClient';
 import { constants } from 'ethers';
 import { updateExtension } from '~utils/extensions/updateExtension';
 import { NotificationType } from '@joincolony/graphql';
+import { verbose } from '@joincolony/utils';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { contractAddress: extensionAddress, transactionHash } = event;

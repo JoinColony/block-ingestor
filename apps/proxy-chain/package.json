@@ -1,0 +1,18 @@
+{
+  "name": "@joincolony/proxy-chain",
+  "version": "1.0.0",
+  "main": "src/index.ts",
+  "scripts": {
+    "build": "rm -rf dist/* && npx tsc",
+    "start": "node -r ts-node/register/transpile-only -r tsconfig-paths/register -r ./dist/env.js dist/index.js",
+    "dev": "NODE_ENV=development ts-node-dev -r tsconfig-paths/register -r ./src/env.ts src/index.ts",
+    "prod": "pnpm run build && NODE_ENV=production pnpm run start",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@joincolony/blocks": "workspace:^",
+    "@joincolony/clients": "workspace:^",
+    "@joincolony/graphql": "workspace:*",
+    "@joincolony/utils": "workspace:^"
+  }
+}

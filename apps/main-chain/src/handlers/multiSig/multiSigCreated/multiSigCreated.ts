@@ -1,5 +1,4 @@
-import { ExtensionEventListener } from '~eventListeners';
-import { ColonyOperations, EventHandler } from '~types';
+import { ColonyOperations } from '~types';
 import {
   getCachedColonyClient,
   getMultiSigClient,
@@ -7,7 +6,6 @@ import {
   getStagedExpenditureClient,
   getStakedExpenditureClient,
   parseMotionAction,
-  verbose,
 } from '~utils';
 import { handleMultisigMultipleFunctions } from './multipleFunctions';
 import {
@@ -27,6 +25,8 @@ import { sendMultisigActionNotifications } from '~utils/notifications';
 import { NotificationCategory } from '~types/notifications';
 import { utils } from 'ethers';
 import { NotificationType } from '@joincolony/graphql';
+import { verbose } from '@joincolony/utils';
+import { EventHandler, ExtensionEventListener } from '@joincolony/blocks';
 
 export const handleMultiSigMotionCreated: EventHandler = async (
   event,

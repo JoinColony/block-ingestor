@@ -1,11 +1,11 @@
-import { mutate } from '~amplifyClient';
+import amplifyClient from '~amplifyClient';
 import {
   CreateColonyFundsClaimDocument,
   CreateColonyFundsClaimMutation,
   CreateColonyFundsClaimMutationVariables,
 } from '@joincolony/graphql';
-import { getChainId } from '~provider';
-import { ContractEvent } from '~types';
+import { ContractEvent } from '@joincolony/blocks';
+import rpcProvider from '~provider';
 
 interface CreateFundsClaimsParams {
   event: ContractEvent;
@@ -20,9 +20,9 @@ export const createFundsClaim = async ({
   amount,
   event: { transactionHash, logIndex, blockNumber },
 }: CreateFundsClaimsParams): Promise<void> => {
-  const chainId = getChainId();
+  const chainId = rpcProvider.getChainId();
 
-  await mutate<
+  await amplifyClient.mutate<
     CreateColonyFundsClaimMutation,
     CreateColonyFundsClaimMutationVariables
   >(CreateColonyFundsClaimDocument, {

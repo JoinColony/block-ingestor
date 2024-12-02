@@ -1,11 +1,11 @@
-mutation CreateStats($value: String!) {
-  createIngestorStats(input: { id: "STATS", value: $value }) {
+mutation CreateStats($chainId: String!, $value: String!) {
+  createIngestorStats(input: { chainId: $chainId, value: $value }) {
     id
   }
 }
 
-mutation UpdateStats($value: String!) {
-  updateIngestorStats(input: { id: "STATS", value: $value }) {
+mutation UpdateStats($id: ID!, $chainId: String!, $value: String!) {
+  updateIngestorStats(input: { id: $id, chainId: $chainId, value: $value }) {
     id
   }
 }
