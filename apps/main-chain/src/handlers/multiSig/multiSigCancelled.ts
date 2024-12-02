@@ -1,20 +1,19 @@
-import { mutate } from '~amplifyClient';
+import amplifyClient from '~amplifyClient';
 import {
   NotificationType,
   UpdateColonyMultiSigDocument,
   UpdateColonyMultiSigInput,
   UpdateColonyMultiSigMutationVariables,
 } from '@joincolony/graphql';
-import { EventHandler } from '~types';
-import { verbose } from '~utils';
+import { EventHandler, ExtensionEventListener } from '@joincolony/blocks';
+import { verbose } from '@joincolony/utils';
 import { getMultiSigDatabaseId, getMultiSigFromDB } from './helpers';
-import { getChainId } from '~provider';
+import rpcProvider from '~provider';
 import { getBlockChainTimestampISODate } from '~utils/dates';
 import {
   getNotificationCategory,
   sendMultisigActionNotifications,
 } from '~utils/notifications';
-import { ExtensionEventListener } from '~eventListeners';
 
 export const handleMultiSigMotionCancelled: EventHandler = async (
   event,
@@ -28,7 +27,7 @@ export const handleMultiSigMotionCancelled: EventHandler = async (
 
   const { colonyAddress } = listener as ExtensionEventListener;
 
-  const chainId = getChainId();
+  const chainId = rpcProvider.getChainId();
 
   const multiSigDatabaseId = getMultiSigDatabaseId(
     chainId,
@@ -38,7 +37,7 @@ export const handleMultiSigMotionCancelled: EventHandler = async (
 
   verbose(`MultiSig motion: ${motionId} has been rejected`);
 
-  await mutate<
+  await amplifyClient.mutate<
     UpdateColonyMultiSigInput,
     UpdateColonyMultiSigMutationVariables
   >(UpdateColonyMultiSigDocument, {

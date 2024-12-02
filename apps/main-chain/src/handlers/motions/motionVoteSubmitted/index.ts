@@ -1,6 +1,5 @@
-import { ExtensionEventListener } from '~eventListeners';
-import { EventHandler } from '~types';
-import { getActionByMotionId, getVotingClient, verbose } from '~utils';
+import { ExtensionEventListener, EventHandler } from '@joincolony/blocks';
+import { getActionByMotionId, getVotingClient } from '~utils';
 import {
   getMotionDatabaseId,
   getMotionFromDB,
@@ -13,6 +12,7 @@ import {
   sendMotionNotifications,
 } from '~utils/notifications';
 import { NotificationType } from '@joincolony/graphql';
+import { verbose } from '@joincolony/utils';
 
 export const handleMotionVoteSubmitted: EventHandler = async (
   event,

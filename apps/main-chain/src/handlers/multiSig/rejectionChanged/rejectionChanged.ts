@@ -1,13 +1,12 @@
 import { MultiSigVote } from '@joincolony/graphql';
-import { getChainId } from '~provider';
-import { EventHandler } from '~types';
+import rpcProvider from '~provider';
 import {
   addMultiSigVote,
   getMultiSigDatabaseId,
   getUserMultiSigSignature,
   removeMultiSigVote,
 } from '../helpers';
-import { ExtensionEventListener } from '~eventListeners';
+import { EventHandler, ExtensionEventListener } from '@joincolony/blocks';
 
 export const handleMultiSigRejectionChanged: EventHandler = async (
   event,
@@ -21,7 +20,7 @@ export const handleMultiSigRejectionChanged: EventHandler = async (
     return;
   }
 
-  const chainId = getChainId();
+  const chainId = rpcProvider.getChainId();
   const { agent: userAddress, motionId, role, approval } = event.args;
 
   const multiSigId = getMultiSigDatabaseId(

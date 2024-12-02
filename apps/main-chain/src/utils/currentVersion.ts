@@ -1,4 +1,4 @@
-import { mutate, query } from '~amplifyClient';
+import amplifyClient from '~amplifyClient';
 import {
   CreateCurrentVersionDocument,
   CreateCurrentVersionMutation,
@@ -19,7 +19,7 @@ export const updateCurrentVersion = async (
   version: number,
   onVersionUpdated?: () => Promise<void>,
 ): Promise<void> => {
-  const response = await query<
+  const response = await amplifyClient.query<
     GetCurrentVersionQuery,
     GetCurrentVersionQueryVariables
   >(GetCurrentVersionDocument, {
@@ -30,7 +30,7 @@ export const updateCurrentVersion = async (
 
   if (!currentVersion) {
     // If there is no DB entry for the key, create one
-    await mutate<
+    await amplifyClient.mutate<
       CreateCurrentVersionMutation,
       CreateCurrentVersionMutationVariables
     >(CreateCurrentVersionDocument, {
@@ -44,7 +44,7 @@ export const updateCurrentVersion = async (
     const databaseId =
       response.data?.getCurrentVersionByKey?.items[0]?.id ?? '';
 
-    await mutate<
+    await amplifyClient.mutate<
       UpdateCurrentVersionMutation,
       UpdateCurrentVersionMutationVariables
     >(UpdateCurrentVersionDocument, {

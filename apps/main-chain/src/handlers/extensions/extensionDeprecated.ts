@@ -1,5 +1,5 @@
 import { constants } from 'ethers';
-import { query } from '~amplifyClient';
+import amplifyClient from '~amplifyClient';
 import {
   GetColonyExtensionByHashAndColonyDocument,
   GetColonyExtensionByHashAndColonyQuery,
@@ -7,8 +7,8 @@ import {
   NotificationType,
 } from '@joincolony/graphql';
 import networkClient from '~networkClient';
-import { ContractEvent } from '~types';
-import { verbose } from '~utils';
+import { ContractEvent } from '@joincolony/blocks';
+import { verbose } from '@joincolony/utils';
 import { updateExtension } from '~utils/extensions/updateExtension';
 import { sendExtensionUpdateNotifications } from '~utils/notifications';
 
@@ -38,7 +38,7 @@ export default async (event: ContractEvent): Promise<void> => {
   });
 
   const { data } =
-    (await query<
+    (await amplifyClient.query<
       GetColonyExtensionByHashAndColonyQuery,
       GetColonyExtensionByHashAndColonyQueryVariables
     >(GetColonyExtensionByHashAndColonyDocument, {

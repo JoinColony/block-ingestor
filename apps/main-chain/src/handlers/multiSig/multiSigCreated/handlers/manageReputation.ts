@@ -1,8 +1,9 @@
 import { TransactionDescription } from 'ethers/lib/utils';
-import { ContractEvent, multiSigNameMapping } from '~types';
+import { multiSigNameMapping } from '~types';
 import { createMultiSigInDB } from '../helpers';
 import { getDomainDatabaseId } from '~utils';
 import { sendMentionNotifications } from '~utils/notifications';
+import { ContractEvent } from '@joincolony/blocks';
 
 export const handleManageReputationMultiSig = async (
   colonyAddress: string,

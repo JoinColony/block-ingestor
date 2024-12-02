@@ -1,4 +1,4 @@
-import { mutate } from '~amplifyClient';
+import amplifyClient from '~amplifyClient';
 import {
   UpdateUserStakeDocument,
   UpdateUserStakeMutation,
@@ -6,7 +6,7 @@ import {
   UpdateUserStakeInput,
 } from '@joincolony/graphql';
 import { getExpenditureFromDB } from './getExpenditure';
-import { output, verbose } from '~utils';
+import { output, verbose } from '@joincolony/utils';
 
 export const updateExpenditureStake = async (
   expenditureDatabaseId: string,
@@ -21,15 +21,15 @@ export const updateExpenditureStake = async (
     return;
   }
 
-  await mutate<UpdateUserStakeMutation, UpdateUserStakeMutationVariables>(
-    UpdateUserStakeDocument,
-    {
-      input: {
-        id: expenditure.userStakeId,
-        ...fieldsToUpdate,
-      },
+  await amplifyClient.mutate<
+    UpdateUserStakeMutation,
+    UpdateUserStakeMutationVariables
+  >(UpdateUserStakeDocument, {
+    input: {
+      id: expenditure.userStakeId,
+      ...fieldsToUpdate,
     },
-  );
+  });
 
   verbose(
     `Updated stake with ID ${expenditure.userStakeId} for expenditure ${expenditureDatabaseId}`,

@@ -3,10 +3,10 @@ import {
   GetColonyExtensionQuery,
   GetColonyExtensionQueryVariables,
 } from '@joincolony/graphql';
-import { query } from '~amplifyClient';
+import amplifyClient from '~amplifyClient';
 
 export const isAddressExtension = async (address: string): Promise<boolean> => {
-  const response = await query<
+  const response = await amplifyClient.query<
     GetColonyExtensionQuery,
     GetColonyExtensionQueryVariables
   >(GetColonyExtensionDocument, {

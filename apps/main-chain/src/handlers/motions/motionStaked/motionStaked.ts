@@ -1,6 +1,5 @@
-import { ExtensionEventListener } from '~eventListeners';
-import { EventHandler, MotionSide } from '~types';
-import { verbose, getVotingClient, getActionByMotionId } from '~utils';
+import { MotionSide } from '~types';
+import { getVotingClient, getActionByMotionId } from '~utils';
 import { getBlockChainTimestampISODate } from '~utils/dates';
 import {
   getMotionDatabaseId,
@@ -21,6 +20,8 @@ import {
 } from '~utils/notifications';
 import { MotionNotificationVariables } from '~types/notifications';
 import { NotificationType } from '@joincolony/graphql';
+import { verbose } from '@joincolony/utils';
+import { EventHandler, ExtensionEventListener } from '@joincolony/blocks';
 
 export const handleMotionStaked: EventHandler = async (
   event,

@@ -1,7 +1,7 @@
 import { AnyColonyClient } from '@colony/colony-js';
 import { utils } from 'ethers';
 import { isEqual, omit } from 'lodash';
-import { mutate } from '~amplifyClient';
+import amplifyClient from '~amplifyClient';
 import {
   ColonyActionType,
   ExpenditureFragment,
@@ -13,8 +13,8 @@ import {
   UpdateExpenditureMutation,
   UpdateExpenditureMutationVariables,
 } from '@joincolony/graphql';
-import provider from '~provider';
-import { ContractEvent, ContractEventsSignatures } from '~types';
+import rpcProvider from '~provider';
+import { ContractEvent, ContractEventsSignatures } from '@joincolony/blocks';
 import {
   checkActionExists,
   getExpenditureDatabaseId,
@@ -84,7 +84,7 @@ export const createEditExpenditureAction = async (
     convertedExpenditureId,
   );
 
-  const logs = await provider.getLogs({
+  const logs = await rpcProvider.getProviderInstance().getLogs({
     fromBlock: blockNumber,
     toBlock: blockNumber,
     topics: [
@@ -198,16 +198,16 @@ export const createEditExpenditureAction = async (
     }
   }
 
-  await mutate<UpdateExpenditureMutation, UpdateExpenditureMutationVariables>(
-    UpdateExpenditureDocument,
-    {
-      input: {
-        id: databaseId,
-        slots: updatedSlots,
-        status: updatedStatus,
-      },
+  await amplifyClient.mutate<
+    UpdateExpenditureMutation,
+    UpdateExpenditureMutationVariables
+  >(UpdateExpenditureDocument, {
+    input: {
+      id: databaseId,
+      slots: updatedSlots,
+      status: updatedStatus,
     },
-  );
+  });
 
   if (shouldCreateAction) {
     const { agent: initiatorAddress } = event.args;

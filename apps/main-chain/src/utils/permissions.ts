@@ -3,10 +3,9 @@
 import { ColonyRole, Id } from '@colony/colony-js';
 import { hexStripZeros } from 'ethers/lib/utils';
 
-import { mutate, query } from '~amplifyClient';
-import { ContractEvent, ContractEventsSignatures } from '~types';
+import amplifyClient from '~amplifyClient';
+import { ContractEvent, ContractEventsSignatures } from '@joincolony/blocks';
 import {
-  verbose,
   getCachedColonyClient,
   getDomainDatabaseId,
   mapLogToContractEvent,
@@ -33,6 +32,7 @@ import {
 import { createColonyContributor, isAlreadyContributor } from './contributors';
 import { sendPermissionsActionNotifications } from './notifications';
 import { NotificationCategory } from '~types/notifications';
+import { verbose } from '@joincolony/utils';
 
 export const BASE_ROLES_MAP = {
   [`role_${ColonyRole.Recovery}`]: null,
@@ -221,10 +221,10 @@ export const getRolesMapFromHexString = async (
 
   const getColonyRoleData =
     (
-      await query<GetColonyRoleQuery, GetColonyRoleQueryVariables>(
-        GetColonyRoleDocument,
-        { id: colonyRolesDatabaseId },
-      )
+      await amplifyClient.query<
+        GetColonyRoleQuery,
+        GetColonyRoleQueryVariables
+      >(GetColonyRoleDocument, { id: colonyRolesDatabaseId })
     )?.data?.getColonyRole ?? {};
 
   Object.keys(BASE_ROLES_MAP).forEach((role) => {
@@ -312,44 +312,44 @@ export const createInitialColonyRolesDatabaseEntry = async (
   );
   const blockNumber = firstRoleSetEvent?.blockNumber ?? 0;
 
-  await mutate<CreateColonyRoleMutation, CreateColonyRoleMutationVariables>(
-    CreateColonyRoleDocument,
-    {
-      input: {
-        id: rolesDatabaseId,
-        latestBlock: blockNumber,
-        // Link the Domain Model
-        domainId: domainDatabaseId,
-        // Link the Colony Model
-        colonyRolesId: colonyAddress,
-        colonyAddress,
-        /*
-         * @NOTE Link the target
-         *
-         * Note that this handler will fire even for events where the target
-         * is something or someone not in the database.
-         *
-         * We try to account for this, by linking address to either a user, colony, or
-         * extension via the target address, but it can happen regardless as the
-         * address can be totally random
-         *
-         * Make sure to be aware of that when fetching the query (you can still fetch
-         * the "targetAddress" value manually, and linking it yourself to the
-         * appropriate entity)
-         */
-        targetAddress,
+  await amplifyClient.mutate<
+    CreateColonyRoleMutation,
+    CreateColonyRoleMutationVariables
+  >(CreateColonyRoleDocument, {
+    input: {
+      id: rolesDatabaseId,
+      latestBlock: blockNumber,
+      // Link the Domain Model
+      domainId: domainDatabaseId,
+      // Link the Colony Model
+      colonyRolesId: colonyAddress,
+      colonyAddress,
+      /*
+       * @NOTE Link the target
+       *
+       * Note that this handler will fire even for events where the target
+       * is something or someone not in the database.
+       *
+       * We try to account for this, by linking address to either a user, colony, or
+       * extension via the target address, but it can happen regardless as the
+       * address can be totally random
+       *
+       * Make sure to be aware of that when fetching the query (you can still fetch
+       * the "targetAddress" value manually, and linking it yourself to the
+       * appropriate entity)
+       */
+      targetAddress,
 
-        // Set the permissions
-        ...BASE_ROLES_MAP,
-        role_0,
-        role_1,
-        role_2,
-        role_3,
-        role_5,
-        role_6,
-      },
+      // Set the permissions
+      ...BASE_ROLES_MAP,
+      role_0,
+      role_1,
+      role_2,
+      role_3,
+      role_5,
+      role_6,
     },
-  );
+  });
 
   verbose(
     `Create new Roles entry for ${targetAddress} in colony ${colonyAddress}, under domain ${nativeDomainId}`,
@@ -503,45 +503,45 @@ export const createInitialMultiSigRolesDatabaseEntry = async (
   );
   const blockNumber = firstRoleSetEvent?.blockNumber ?? 0;
 
-  await mutate<CreateColonyRoleMutation, CreateColonyRoleMutationVariables>(
-    CreateColonyRoleDocument,
-    {
-      input: {
-        id: rolesDatabaseId,
-        latestBlock: blockNumber,
-        // Link the Domain Model
-        domainId: domainDatabaseId,
-        // Link the Colony Model
-        colonyRolesId: colonyAddress,
-        colonyAddress,
-        /*
-         * @NOTE Link the target
-         *
-         * Note that this handler will fire even for events where the target
-         * is something or someone not in the database.
-         *
-         * We try to account for this, by linking address to either a user, colony, or
-         * extension via the target address, but it can happen regardless as the
-         * address can be totally random
-         *
-         * Make sure to be aware of that when fetching the query (you can still fetch
-         * the "targetAddress" value manually, and linking it yourself to the
-         * appropriate entity)
-         */
-        targetAddress,
+  await amplifyClient.mutate<
+    CreateColonyRoleMutation,
+    CreateColonyRoleMutationVariables
+  >(CreateColonyRoleDocument, {
+    input: {
+      id: rolesDatabaseId,
+      latestBlock: blockNumber,
+      // Link the Domain Model
+      domainId: domainDatabaseId,
+      // Link the Colony Model
+      colonyRolesId: colonyAddress,
+      colonyAddress,
+      /*
+       * @NOTE Link the target
+       *
+       * Note that this handler will fire even for events where the target
+       * is something or someone not in the database.
+       *
+       * We try to account for this, by linking address to either a user, colony, or
+       * extension via the target address, but it can happen regardless as the
+       * address can be totally random
+       *
+       * Make sure to be aware of that when fetching the query (you can still fetch
+       * the "targetAddress" value manually, and linking it yourself to the
+       * appropriate entity)
+       */
+      targetAddress,
 
-        // Set the permissions
-        ...BASE_ROLES_MAP,
-        role_0,
-        role_1,
-        role_2,
-        role_3,
-        role_5,
-        role_6,
-        isMultiSig: true,
-      },
+      // Set the permissions
+      ...BASE_ROLES_MAP,
+      role_0,
+      role_1,
+      role_2,
+      role_3,
+      role_5,
+      role_6,
+      isMultiSig: true,
     },
-  );
+  });
 
   verbose(
     `Create new multi sig Roles entry for ${targetAddress} in colony ${colonyAddress}, under domain ${nativeDomainId}`,
@@ -690,14 +690,14 @@ export const createColonyHistoricRoleDatabaseEntry = async (
 
   const { id: existingColonyRoleId } =
     (
-      await query<
+      await amplifyClient.query<
         GetColonyHistoricRoleQuery,
         GetColonyHistoricRoleQueryVariables
       >(GetColonyHistoricRoleDocument, { id })
     )?.data?.getColonyHistoricRole ?? {};
 
   if (!existingColonyRoleId) {
-    await mutate<
+    await amplifyClient.mutate<
       CreateColonyHistoricRoleMutation,
       CreateColonyHistoricRoleMutationVariables
     >(CreateColonyHistoricRoleDocument, {

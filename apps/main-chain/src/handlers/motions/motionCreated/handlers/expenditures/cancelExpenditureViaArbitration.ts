@@ -1,11 +1,12 @@
 import { TransactionDescription } from 'ethers/lib/utils';
-import { ContractEvent, motionNameMapping } from '~types';
+import { motionNameMapping } from '~types';
 import { createMotionInDB } from '../../helpers';
 import {
   getDomainDatabaseId,
   getExpenditureDatabaseId,
   toNumber,
 } from '~utils';
+import { ContractEvent } from '@joincolony/blocks';
 
 export default async (
   colonyAddress: string,

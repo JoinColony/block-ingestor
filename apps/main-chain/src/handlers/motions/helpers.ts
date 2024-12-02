@@ -1,5 +1,4 @@
 import { BigNumber } from 'ethers';
-import { mutate, query } from '~amplifyClient';
 import {
   ColonyActionType,
   ColonyMotion,
@@ -13,7 +12,7 @@ import {
   UpdateColonyMotionDocument,
 } from '@joincolony/graphql';
 import { MotionSide, MotionVote } from '~types';
-import { verbose, output } from '~utils';
+import { output, verbose } from '@joincolony/utils';
 import { getActionByMotionId } from '~utils/actions';
 import { updateDecisionInDB } from '~utils/decisions';
 import {
@@ -21,6 +20,7 @@ import {
   sendMentionNotifications,
   sendMotionNotifications,
 } from '~utils/notifications';
+import amplifyClient from '~amplifyClient';
 
 export * from './motionStaked/helpers';
 
@@ -32,7 +32,7 @@ export const updateMotionInDB = async (
   newMotionMessages?: CreateMotionMessageInput[],
   showInActionsList?: boolean,
 ): Promise<void> => {
-  await mutate(UpdateColonyMotionDocument, {
+  await amplifyClient.mutate(UpdateColonyMotionDocument, {
     input: {
       ...motionData,
     },
@@ -40,7 +40,7 @@ export const updateMotionInDB = async (
 
   if (newMotionMessages?.length) {
     for (const message of newMotionMessages) {
-      await mutate(CreateMotionMessageDocument, {
+      await amplifyClient.mutate(CreateMotionMessageDocument, {
         input: {
           ...message,
         },
@@ -56,7 +56,7 @@ export const updateMotionInDB = async (
         'Could not find the action in the db. This is a bug and needs investigating.',
       );
     } else {
-      await mutate(UpdateColonyActionDocument, {
+      await amplifyClient.mutate(UpdateColonyActionDocument, {
         input: {
           id: colonyAction.id,
           showInActionsList,
@@ -151,12 +151,12 @@ export const getMotionFromDB = async (
   databaseMotionId: string,
 ): Promise<ColonyMotion | null | undefined> => {
   const { data } =
-    (await query<GetColonyMotionQuery, GetColonyMotionQueryVariables>(
-      GetColonyMotionDocument,
-      {
-        id: databaseMotionId,
-      },
-    )) ?? {};
+    (await amplifyClient.query<
+      GetColonyMotionQuery,
+      GetColonyMotionQueryVariables
+    >(GetColonyMotionDocument, {
+      id: databaseMotionId,
+    })) ?? {};
 
   const motion = data?.getColonyMotion;
 
