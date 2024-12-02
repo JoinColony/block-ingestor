@@ -13,7 +13,7 @@ import {
   UpdateExpenditureMutation,
   UpdateExpenditureMutationVariables,
 } from '@joincolony/graphql';
-import provider from '~provider';
+import rpcProvider from '~provider';
 import { ContractEvent, ContractEventsSignatures } from '~types';
 import {
   checkActionExists,
@@ -84,7 +84,7 @@ export const createEditExpenditureAction = async (
     convertedExpenditureId,
   );
 
-  const logs = await provider.getLogs({
+  const logs = await rpcProvider.getProviderInstance().getLogs({
     fromBlock: blockNumber,
     toBlock: blockNumber,
     topics: [

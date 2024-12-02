@@ -2,7 +2,8 @@ import { Log } from '@ethersproject/abstract-provider';
 import { blocksMap, getLatestSeenBlockNumber } from '~blockListener';
 import { getMatchingListeners } from '~eventListeners';
 import { getInterfaceByListener } from '~interfaces';
-import provider from '~provider';
+import rpcProvider from '~provider';
+
 import {
   getLastBlockNumber,
   mapLogToContractEvent,
@@ -68,7 +69,7 @@ export const processNextBlock = async (): Promise<void> => {
         currentBlockNumber + nMoreBlocks,
       );
 
-      const logs = await provider.getLogs({
+      const logs = await rpcProvider.getProviderInstance().getLogs({
         fromBlock: currentBlockNumber,
         toBlock: currentBlockNumber + nMoreBlocks,
       });
@@ -146,7 +147,9 @@ export const processNextBlock = async (): Promise<void> => {
         !block ||
         (block.transactions as string[]).every((tx) => typeof tx === 'string')
       ) {
-        block = await provider.getBlockWithTransactions(currentBlockNumber);
+        block = await rpcProvider
+          .getProviderInstance()
+          .getBlockWithTransactions(currentBlockNumber);
         // May as well save this block in the blocksMap in case it turns out we need it in mapLogToContractEvent
         blocksMap.set(currentBlockNumber, block);
       }
@@ -156,7 +159,9 @@ export const processNextBlock = async (): Promise<void> => {
         if (typeof tx === 'string') {
           throw Error('tx was a string, but should have been a TxResponse');
         }
-        const txReceipt = await provider.getTransactionReceipt(tx.hash);
+        const txReceipt = await rpcProvider
+          .getProviderInstance()
+          .getTransactionReceipt(tx.hash);
         if (txReceipt.logs.length > 0) {
           verbose(
             `Proved ${currentBlockNumber} has logs, but weren't given any, will reindex`,

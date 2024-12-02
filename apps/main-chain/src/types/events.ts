@@ -5,7 +5,8 @@ import {
   TokenClient,
 } from '@colony/colony-js';
 import { LogDescription } from '@ethersproject/abi';
-import provider from '~provider';
+import rpcProvider from '~provider';
+
 import { EventListener } from '~eventListeners';
 
 /*
@@ -127,6 +128,8 @@ export enum EthersObserverEvents {
 }
 
 export type ChainID = string;
+
+const provider = rpcProvider.getProviderInstance();
 
 export type Block = Awaited<ReturnType<typeof provider.getBlock>>;
 export type BlockWithTransactions = Awaited<

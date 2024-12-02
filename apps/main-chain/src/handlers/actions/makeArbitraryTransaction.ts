@@ -7,13 +7,15 @@ import {
   GetColonyActionQueryVariables,
 } from '@joincolony/graphql';
 import { ContractEvent } from '~types';
-import provider from '~provider';
+import rpcProvider from '~provider';
 import { getDomainDatabaseId, writeActionFromEvent } from '~utils';
 import { query } from '~amplifyClient';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { contractAddress: colonyAddress, transactionHash } = event;
-  const receipt = await provider.getTransactionReceipt(event.transactionHash);
+  const receipt = await rpcProvider
+    .getProviderInstance()
+    .getTransactionReceipt(event.transactionHash);
 
   const { data } =
     (await query<GetColonyActionQuery, GetColonyActionQueryVariables>(

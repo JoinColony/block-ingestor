@@ -11,7 +11,7 @@ import {
   UpdateExtensionInstallationsCountMutation,
   UpdateExtensionInstallationsCountMutationVariables,
 } from '@joincolony/graphql';
-import provider from '~provider';
+import rpcProvider from '~provider';
 
 const extensionHashDBKeyMap = {
   [getExtensionHash(Extension.VotingReputation)]: 'reputationWeighted',
@@ -23,6 +23,8 @@ const extensionHashDBKeyMap = {
 };
 
 const getExtensionCount = async (extensionHash: string): Promise<number> => {
+  const provider = rpcProvider.getProviderInstance();
+
   const { data } =
     (await query<
       GetExtensionInstallationsCountQuery,
@@ -81,7 +83,7 @@ export const updateExtensionCount = async (
     UpdateExtensionInstallationsCountMutationVariables
   >(UpdateExtensionInstallationsCountDocument, {
     input: {
-      id: provider.network.chainId.toString(),
+      id: rpcProvider.getProviderInstance().network.chainId.toString(),
       [key]: count + 1,
     },
   });

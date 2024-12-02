@@ -12,7 +12,8 @@ import {
 import { Extension, getExtensionHash } from '@colony/colony-js';
 
 import networkClient from '~networkClient';
-import provider from '~provider';
+import rpcProvider from '~provider';
+
 import { EventListener, EventListenerType } from '~eventListeners';
 
 // @TODO @chmanie is gonna make this better, for now let's just hardcode the proxy colony events
@@ -27,6 +28,7 @@ const ProxyColonyEvents = new utils.Interface([
 export const getInterfaceByListener = (
   listener: EventListener,
 ): utils.Interface | null => {
+  const provider = rpcProvider.getProviderInstance();
   const { type: listenerType } = listener;
 
   switch (listenerType) {
@@ -56,6 +58,8 @@ export const getInterfaceByListener = (
 const getInterfaceByExtensionHash = (
   extensionHash: string,
 ): utils.Interface | null => {
+  const provider = rpcProvider.getProviderInstance();
+
   switch (extensionHash) {
     case getExtensionHash(Extension.OneTxPayment): {
       return OneTxPaymentEventsFactory.connect(constants.AddressZero, provider)

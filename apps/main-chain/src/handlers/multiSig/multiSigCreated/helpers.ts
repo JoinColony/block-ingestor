@@ -12,7 +12,7 @@ import {
   GetDomainByNativeSkillIdQueryVariables,
 } from '@joincolony/graphql';
 import networkClient from '~networkClient';
-import { getChainId } from '~provider';
+import rpcProvider from '~provider';
 import { ContractEvent } from '~types';
 import {
   getDomainDatabaseId,
@@ -57,7 +57,7 @@ export const getMultiSigData = async ({
   isDecision = false,
   timestamp,
 }: GetMultiSigDataArgs): Promise<ColonyMultiSig> => {
-  const chainId = getChainId();
+  const chainId = rpcProvider.getChainId();
   const multiSigDatabaseId = getMultiSigDatabaseId(
     chainId,
     multiSigClient.address,

@@ -1,5 +1,5 @@
 import { ExtensionEventListener } from '~eventListeners';
-import { getChainId } from '~provider';
+import rpcProvider from '~provider';
 
 import { EventHandler } from '~types';
 // import { linkPendingMetadata } from '~utils/colonyMetadata';
@@ -34,7 +34,7 @@ export const handleMultiSigMotionExecuted: EventHandler = async (
     return;
   }
 
-  const chainId = getChainId();
+  const chainId = rpcProvider.getChainId();
   const multiSigDatabaseId = getMultiSigDatabaseId(
     chainId,
     multiSigExtensionAddress,

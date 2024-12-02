@@ -2,7 +2,7 @@ import { utils } from 'ethers';
 import { ExtensionEventListener } from '~eventListeners';
 import { ColonyActionType } from '@joincolony/graphql';
 import { getInterfaceByListener } from '~interfaces';
-import provider from '~provider';
+import rpcProvider from '~provider';
 import { ContractEventsSignatures, EventHandler } from '~types';
 import {
   checkActionExists,
@@ -41,7 +41,7 @@ export const handleStagedPaymentReleased: EventHandler = async (
 
   const releasedSlotIds = [];
 
-  const logs = await provider.getLogs({
+  const logs = await rpcProvider.getProviderInstance().getLogs({
     fromBlock: blockNumber,
     toBlock: blockNumber,
     topics: [utils.id(ContractEventsSignatures.StagedPaymentReleased)],

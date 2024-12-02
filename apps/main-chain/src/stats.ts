@@ -1,8 +1,8 @@
 import express from 'express';
 
 import { getLastBlockNumber, getStats, initStats, output } from '~utils';
-import { getChainId } from '~provider';
 import { getListenersStats } from '~eventListeners';
+import rpcProvider from '~provider';
 
 export const coloniesSet = new Set<string>();
 
@@ -44,7 +44,7 @@ export const startStatsServer = async (): Promise<void> => {
   const lastBlockNumber = getLastBlockNumber();
 
   app.listen(port, async () => {
-    output('Block Ingestor started on chain', getChainId());
+    output('Block Ingestor started on chain', rpcProvider.getChainId());
     output(`Stats available at http://localhost:${port}/stats`);
     output(`Liveness check available at http://localhost:${port}/liveness`);
     output(`Last processed block number: ${lastBlockNumber}`);

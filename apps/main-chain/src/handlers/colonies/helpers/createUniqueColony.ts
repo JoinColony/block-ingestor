@@ -39,7 +39,7 @@ import {
   GetTokenFromEverywhereQuery,
   GetTokenFromEverywhereQueryVariables,
 } from '@joincolony/graphql';
-import { getChainId } from '~provider';
+import rpcProvider from '~provider';
 import { getCachedColonyClient } from '~utils/clients/colony';
 
 export const createUniqueColony = async ({
@@ -194,7 +194,7 @@ export const createUniqueColony = async ({
 
   const memberInviteCode = randomUUID();
 
-  const chainId = getChainId();
+  const chainId = rpcProvider.getChainId();
   const version = await colonyClient.version();
 
   let isTokenLocked;

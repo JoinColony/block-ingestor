@@ -1,6 +1,7 @@
 import { utils } from 'ethers';
 
-import provider from '~provider';
+import rpcProvider from '~provider';
+
 import { ContractEventsSignatures } from '~types';
 
 /**
@@ -10,7 +11,9 @@ export const transactionHasEvent = async (
   transactionHash: string,
   eventSignature: ContractEventsSignatures,
 ): Promise<boolean> => {
-  const receipt = await provider.getTransactionReceipt(transactionHash);
+  const receipt = await rpcProvider
+    .getProviderInstance()
+    .getTransactionReceipt(transactionHash);
   return receipt.logs.some((log) =>
     log.topics.includes(utils.id(eventSignature)),
   );
