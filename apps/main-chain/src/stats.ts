@@ -1,12 +1,14 @@
 import express from 'express';
 
-import { getLastBlockNumber, getStats, initStats } from '~utils';
 import eventManager from '~eventManager';
 import rpcProvider from '~provider';
 import { output } from '@joincolony/utils';
+import statsManager from '~statsManager';
 
+// @NOTE this can probably be moved to the colonyAdded handler
 export const coloniesSet = new Set<string>();
 
+// @NOTE just copy this entire file later on for now
 const app = express();
 const port = process.env.STATS_PORT;
 
@@ -25,7 +27,7 @@ app.get('/liveness', (_, res) => res.sendStatus(200));
  * Use to check various service stats
  */
 app.get('/stats', async (_, res) => {
-  const stats = getStats();
+  const stats = statsManager.getStats();
   res.type('json').send(stats);
 });
 
@@ -41,8 +43,8 @@ export const startStatsServer = async (): Promise<void> => {
     return;
   }
 
-  await initStats();
-  const lastBlockNumber = getLastBlockNumber();
+  await statsManager.initStats();
+  const lastBlockNumber = statsManager.getLastBlockNumber();
 
   app.listen(port, async () => {
     output('Block Ingestor started on chain', rpcProvider.getChainId());

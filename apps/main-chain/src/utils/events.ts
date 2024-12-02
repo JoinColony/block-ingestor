@@ -14,7 +14,7 @@ import {
   GetContractEventQueryVariables,
   ChainMetadata,
 } from '@joincolony/graphql';
-import { blocksMap } from '~blockListener';
+import blockManager from '~blockManager';
 import { verbose } from '@joincolony/utils';
 
 export const mapLogToContractEvent = async (
@@ -31,10 +31,10 @@ export const mapLogToContractEvent = async (
 
   try {
     // Attempt to first get a block from the map as we might have already fetched its info
-    let block = blocksMap.get(blockNumber);
+    let block = blockManager.getBlock(blockNumber);
     if (!block) {
       block = await provider.getBlock(blockNumber);
-      blocksMap.set(blockNumber, block);
+      blockManager.updateBlocksMap(blockNumber, block);
     }
 
     const { hash: blockHash, timestamp } = block;

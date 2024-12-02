@@ -11,10 +11,10 @@ import {
 import { coloniesSet } from '~stats';
 import { ContractEvent, ContractEventsSignatures } from '~types';
 import {
-  updateStats,
   createColonyFounderInitialRoleEntry,
   getAllRoleEventsFromTransaction,
 } from '~utils';
+import statsManager from '~statsManager';
 import { getColonyContributorId } from '~utils/contributors';
 import { tryFetchGraphqlQuery } from '~utils/graphql';
 import { createUniqueColony } from './helpers/createUniqueColony';
@@ -50,8 +50,9 @@ export default async (event: ContractEvent): Promise<void> => {
   /*
    * Add it to the Set
    */
+  // @NOTE seems to not be working, is it borken on master too?
   coloniesSet.add(JSON.stringify({ colonyAddress, tokenAddress }));
-  await updateStats({ trackedColonies: coloniesSet.size });
+  await statsManager.updateStats({ trackedColonies: coloniesSet.size });
 
   output(
     'Found new Colony:',

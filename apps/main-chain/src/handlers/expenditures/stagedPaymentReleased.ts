@@ -1,7 +1,6 @@
 import { utils } from 'ethers';
 import { ExtensionEventListener } from '~eventListeners';
 import { ColonyActionType } from '@joincolony/graphql';
-import { getInterfaceByListener } from '~interfaces';
 import rpcProvider from '~provider';
 import { ContractEventsSignatures, EventHandler } from '~types';
 import {
@@ -12,6 +11,7 @@ import {
   toNumber,
   writeActionFromEvent,
 } from '~utils';
+import eventManager from '~eventManager';
 
 export const handleStagedPaymentReleased: EventHandler = async (
   event,
@@ -47,7 +47,7 @@ export const handleStagedPaymentReleased: EventHandler = async (
     topics: [utils.id(ContractEventsSignatures.StagedPaymentReleased)],
   });
 
-  const iface = getInterfaceByListener(listener);
+  const iface = eventManager.getInterfaceByListener(listener);
   if (!iface) {
     return;
   }
