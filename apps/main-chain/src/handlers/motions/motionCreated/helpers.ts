@@ -7,7 +7,7 @@ import {
   getDomainDatabaseId,
   getVotingClient,
 } from '~utils';
-import { GraphQLFnReturn, mutate } from '~amplifyClient';
+import { mutate } from '~amplifyClient';
 import {
   ColonyMotion,
   CreateColonyActionInput,
@@ -28,6 +28,7 @@ import {
   getUserMinStake,
   getMessageKey,
 } from '../helpers';
+import { type GraphQLFnReturn } from '@joincolony/clients';
 
 interface GetMotionDataArgs {
   transactionHash: string;

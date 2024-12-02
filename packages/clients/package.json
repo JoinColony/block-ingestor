@@ -2,5 +2,7 @@
   "name": "@joincolony/clients",
   "main": "src/index.ts",
   "version": "1.0.0",
-  "dependencies": {}
+  "dependencies": {
+    "@joincolony/utils": "workspace:*"
+  }
 }

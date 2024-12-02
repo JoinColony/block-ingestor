@@ -1,6 +1,6 @@
 import { AnyMultisigPermissionsClient } from '@colony/colony-js';
 import { BigNumber } from 'ethers';
-import { GraphQLFnReturn, mutate, query } from '~amplifyClient';
+import { mutate, query } from '~amplifyClient';
 import {
   ColonyMultiSig,
   CreateColonyActionInput,
@@ -22,6 +22,7 @@ import {
 import { getBlockChainTimestampISODate } from '~utils/dates';
 import { getMultiSigDatabaseId } from '../helpers';
 import { output } from '@joincolony/utils';
+import { type GraphQLFnReturn } from '@joincolony/clients';
 
 const createColonyMultiSig = async (
   motionData: CreateColonyMultiSigInput,

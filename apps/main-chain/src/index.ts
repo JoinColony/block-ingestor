@@ -2,7 +2,7 @@ import 'cross-fetch/polyfill';
 import { utils } from 'ethers';
 
 import { startBlockListener } from '~blockListener';
-import amplifyClientSetup from '~amplifyClient';
+import '~amplifyClient';
 import { startStatsServer } from '~stats';
 import {
   setupListenersForColonies,
@@ -15,8 +15,6 @@ import { setupNotificationsClient } from '~utils/notifications';
 utils.Logger.setLogLevel(utils.Logger.levels.ERROR);
 
 const start = async (): Promise<void> => {
-  amplifyClientSetup();
-
   /**
    * Setup the notifications provider so that notifications can be sent when needed
    */
