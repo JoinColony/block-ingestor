@@ -1,4 +1,4 @@
-import { query } from '~amplifyClient';
+import amplifyClient from '~amplifyClient';
 import {
   ExtensionFragment,
   GetColonyExtensionsByColonyAddressDocument,
@@ -10,7 +10,7 @@ import { notNull } from '~utils/arrays';
 export const getColonyExtensions = async (
   colonyAddress: string,
 ): Promise<ExtensionFragment[]> => {
-  const response = await query<
+  const response = await amplifyClient.query<
     GetColonyExtensionsByColonyAddressQuery,
     GetColonyExtensionsByColonyAddressQueryVariables
   >(GetColonyExtensionsByColonyAddressDocument, {

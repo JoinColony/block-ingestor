@@ -1,4 +1,4 @@
-import { query } from '~amplifyClient';
+import amplifyClient from '~amplifyClient';
 import {
   GetActionByIdDocument,
   GetActionByIdQuery,
@@ -8,7 +8,7 @@ import {
 export const checkActionExists = async (
   transactionHash: string,
 ): Promise<boolean> => {
-  const existingActionQuery = await query<
+  const existingActionQuery = await amplifyClient.query<
     GetActionByIdQuery,
     GetActionByIdQueryVariables
   >(GetActionByIdDocument, {

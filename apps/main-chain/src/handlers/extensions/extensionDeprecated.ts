@@ -1,5 +1,5 @@
 import { constants } from 'ethers';
-import { query } from '~amplifyClient';
+import amplifyClient from '~amplifyClient';
 import {
   GetColonyExtensionByHashAndColonyDocument,
   GetColonyExtensionByHashAndColonyQuery,
@@ -7,8 +7,8 @@ import {
   NotificationType,
 } from '@joincolony/graphql';
 import provider from '~provider';
-import { ContractEvent } from '~types';
-import { verbose } from '~utils';
+import { ContractEvent } from '@joincolony/blocks';
+import { verbose } from '@joincolony/utils';
 import { updateExtension } from '~utils/extensions/updateExtension';
 import { sendExtensionUpdateNotifications } from '~utils/notifications';
 import { getTransactionSignerAddress } from '~utils/transactions';
@@ -25,7 +25,9 @@ export default async (event: ContractEvent): Promise<void> => {
     colony,
   );
 
-  const transaction = await provider.getTransaction(transactionHash);
+  const transaction = await provider
+    .getProviderInstance()
+    .getTransaction(transactionHash);
 
   const deprecatedBy =
     getTransactionSignerAddress(transaction) ?? constants.AddressZero;
@@ -40,7 +42,7 @@ export default async (event: ContractEvent): Promise<void> => {
   });
 
   const { data } =
-    (await query<
+    (await amplifyClient.query<
       GetColonyExtensionByHashAndColonyQuery,
       GetColonyExtensionByHashAndColonyQueryVariables
     >(GetColonyExtensionByHashAndColonyDocument, {

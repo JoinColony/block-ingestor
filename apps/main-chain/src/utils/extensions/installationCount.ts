@@ -1,5 +1,5 @@
 import { Extension, getExtensionHash } from '@colony/colony-js';
-import { mutate, query } from '~amplifyClient';
+import amplifyClient from '~amplifyClient';
 import {
   CreateExtensionInstallationsCountDocument,
   CreateExtensionInstallationsCountMutation,
@@ -11,7 +11,7 @@ import {
   UpdateExtensionInstallationsCountMutation,
   UpdateExtensionInstallationsCountMutationVariables,
 } from '@joincolony/graphql';
-import provider from '~provider';
+import rpcProvider from '~provider';
 
 const extensionHashDBKeyMap = {
   [getExtensionHash(Extension.VotingReputation)]: 'reputationWeighted',
@@ -23,8 +23,10 @@ const extensionHashDBKeyMap = {
 };
 
 const getExtensionCount = async (extensionHash: string): Promise<number> => {
+  const provider = rpcProvider.getProviderInstance();
+
   const { data } =
-    (await query<
+    (await amplifyClient.query<
       GetExtensionInstallationsCountQuery,
       GetExtensionInstallationsCountQueryVariables
     >(GetExtensionInstallationsCountDocument, {
@@ -32,7 +34,7 @@ const getExtensionCount = async (extensionHash: string): Promise<number> => {
     })) ?? {};
 
   if (!data?.getExtensionInstallationsCount) {
-    await mutate<
+    await amplifyClient.mutate<
       CreateExtensionInstallationsCountMutation,
       CreateExtensionInstallationsCountMutationVariables
     >(CreateExtensionInstallationsCountDocument, {
@@ -76,12 +78,12 @@ export const updateExtensionCount = async (
 
   const key = extensionHashDBKeyMap[extensionHash];
 
-  await mutate<
+  await amplifyClient.mutate<
     UpdateExtensionInstallationsCountMutation,
     UpdateExtensionInstallationsCountMutationVariables
   >(UpdateExtensionInstallationsCountDocument, {
     input: {
-      id: provider.network.chainId.toString(),
+      id: rpcProvider.getProviderInstance().network.chainId.toString(),
       [key]: count + 1,
     },
   });

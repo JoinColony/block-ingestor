@@ -1,6 +1,6 @@
 import { AnyColonyClient } from '@colony/colony-js';
 
-import { query } from '~amplifyClient';
+import amplifyClient from '~amplifyClient';
 import {
   GetExpenditureDocument,
   GetExpenditureQuery,
@@ -14,7 +14,7 @@ import { getCachedColonyClient } from '~utils';
 export const getExpenditureFromDB = async (
   expenditureDatabaseId: string,
 ): Promise<GetExpenditureQuery['getExpenditure']> => {
-  const response = await query<
+  const response = await amplifyClient.query<
     GetExpenditureQuery,
     GetExpenditureQueryVariables
   >(GetExpenditureDocument, {
@@ -52,7 +52,7 @@ export const getExpenditure = async (
 export const getStreamingPaymentFromDB = async (
   paymentDatabaseId: string,
 ): Promise<GetStreamingPaymentQuery['getStreamingPayment']> => {
-  const response = await query<
+  const response = await amplifyClient.query<
     GetStreamingPaymentQuery,
     GetStreamingPaymentQueryVariables
   >(GetStreamingPaymentDocument, {

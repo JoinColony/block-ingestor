@@ -1,5 +1,5 @@
 import { getExtensionHash, getLogs } from '@colony/colony-js';
-import { mutate } from '~amplifyClient';
+import amplifyClient from '~amplifyClient';
 import {
   COLONY_CURRENT_VERSION_KEY,
   NETWORK_INVERSE_FEE_DATABASE_ID,
@@ -22,7 +22,7 @@ const seedNetworkFee = async (): Promise<void> => {
   const networkInverseFee = await networkClient.getFeeInverse();
   const convertedFee = networkInverseFee.toString();
 
-  await mutate<
+  await amplifyClient.mutate<
     CreateCurrentNetworkInverseFeeMutation,
     CreateCurrentNetworkInverseFeeMutationVariables
   >(CreateCurrentNetworkInverseFeeDocument, {

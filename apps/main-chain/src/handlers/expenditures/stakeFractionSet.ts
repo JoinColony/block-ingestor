@@ -1,11 +1,11 @@
 import { constants } from 'ethers';
 import { NotificationType } from '@joincolony/graphql';
 import networkClient from '~networkClient';
-import { EventHandler } from '~types';
 import { updateExtension } from '~utils/extensions/updateExtension';
 import { sendExtensionUpdateNotifications } from '~utils/notifications';
 import { getTransactionSignerAddress } from '~utils/transactions';
 import provider from '~provider';
+import { EventHandler } from '@joincolony/blocks';
 
 export const handleStakeFractionSet: EventHandler = async (
   event,
@@ -28,7 +28,9 @@ export const handleStakeFractionSet: EventHandler = async (
     return;
   }
 
-  const transaction = await provider.getTransaction(transactionHash);
+  const transaction = await provider
+    .getProviderInstance()
+    .getTransaction(transactionHash);
 
   const installedBy =
     getTransactionSignerAddress(transaction) ?? constants.AddressZero;

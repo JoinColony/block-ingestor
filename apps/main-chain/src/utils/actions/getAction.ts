@@ -1,4 +1,4 @@
-import { query } from '~amplifyClient';
+import amplifyClient from '~amplifyClient';
 import {
   ActionMetadataInfoFragment,
   GetColonyActionByMotionIdDocument,
@@ -12,7 +12,7 @@ import {
 export const getActionByMotionId = async (
   motionId: string,
 ): Promise<ActionMetadataInfoFragment | null> => {
-  const response = await query<
+  const response = await amplifyClient.query<
     GetColonyActionByMotionIdQuery,
     GetColonyActionByMotionIdQueryVariables
   >(GetColonyActionByMotionIdDocument, {
@@ -27,7 +27,7 @@ export const getActionByMotionId = async (
 export const getActionByMultiSigId = async (
   multiSigId: string,
 ): Promise<ActionMetadataInfoFragment | null> => {
-  const response = await query<
+  const response = await amplifyClient.query<
     GetColonyActionByMultiSigIdQuery,
     GetColonyActionByMultiSigIdQueryVariables
   >(GetColonyActionByMultiSigIdDocument, {

@@ -1,21 +1,17 @@
 import { BigNumber } from 'ethers';
 
-import { ContractEvent, ContractEventsSignatures } from '~types';
-import {
-  writeActionFromEvent,
-  verbose,
-  notNull,
-  transactionHasEvent,
-} from '~utils';
+import { ContractEvent, ContractEventsSignatures } from '@joincolony/blocks';
+import { writeActionFromEvent, notNull, transactionHasEvent } from '~utils';
 import {
   ColonyActionType,
   GetColonyDocument,
   GetColonyQuery,
   GetColonyQueryVariables,
 } from '@joincolony/graphql';
-import { query } from '~amplifyClient';
+import amplifyClient from '~amplifyClient';
 import { sendPermissionsActionNotifications } from '~utils/notifications';
 import { NotificationCategory } from '~types/notifications';
+import { verbose } from '@joincolony/utils';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { contractAddress: colonyAddress, transactionHash } = event;
@@ -56,10 +52,13 @@ export default async (event: ContractEvent): Promise<void> => {
    */
   do {
     const { data } =
-      (await query<GetColonyQuery, GetColonyQueryVariables>(GetColonyDocument, {
-        id: colonyAddress,
-        nextToken,
-      })) ?? {};
+      (await amplifyClient.query<GetColonyQuery, GetColonyQueryVariables>(
+        GetColonyDocument,
+        {
+          id: colonyAddress,
+          nextToken,
+        },
+      )) ?? {};
     domain = data?.getColony?.domains?.items
       .filter(notNull)
       .find(

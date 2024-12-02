@@ -1,6 +1,6 @@
 import { DocumentNode, Kind, isExecutableDefinitionNode } from 'graphql';
 
-import { query } from '~amplifyClient';
+import amplifyClient from '~amplifyClient';
 
 interface GetDataResponse<TItem> {
   items: Array<TItem | null> | undefined;
@@ -52,10 +52,10 @@ export const tryFetchGraphqlQuery = async <
   let currentTry = 0;
 
   while (true) {
-    const result = await query<Record<string, unknown>, TVariables>(
-      queryString,
-      variables,
-    );
+    const result = await amplifyClient.query<
+      Record<string, unknown>,
+      TVariables
+    >(queryString, variables);
 
     /*
      * @NOTE That this limits to only fetching one operation at a time

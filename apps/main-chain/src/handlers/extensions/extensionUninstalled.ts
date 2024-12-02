@@ -4,7 +4,7 @@ import { removeExtensionEventListeners } from '~eventListeners';
 import { handleMultiSigUninstalled } from '~eventListeners/extension/multiSig';
 import { NotificationType } from '@joincolony/graphql';
 import provider from '~provider';
-import { ContractEvent } from '~types';
+import { ContractEvent } from '@joincolony/blocks';
 import { deleteExtensionFromEvent } from '~utils';
 import { sendExtensionUpdateNotifications } from '~utils/notifications';
 import { getTransactionSignerAddress } from '~utils/transactions';
@@ -16,7 +16,9 @@ export default async (event: ContractEvent): Promise<void> => {
   await deleteExtensionFromEvent(event);
   removeExtensionEventListeners(extensionAddress);
 
-  const transaction = await provider.getTransaction(transactionHash);
+  const transaction = await provider
+    .getProviderInstance()
+    .getTransaction(transactionHash);
 
   const uninstalledBy =
     getTransactionSignerAddress(transaction) ?? constants.AddressZero;

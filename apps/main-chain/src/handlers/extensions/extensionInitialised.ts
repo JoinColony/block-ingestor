@@ -1,7 +1,7 @@
 import { Extension, getExtensionHash } from '@colony/colony-js';
 
-import { ContractEvent } from '~types';
-import { verbose, addVotingReputationParamsToDB } from '~utils';
+import { ContractEvent } from '@joincolony/blocks';
+import { addVotingReputationParamsToDB } from '~utils';
 import {
   setupListenersForStakedExpenditure,
   setupMotionsListeners,
@@ -12,6 +12,7 @@ import { updateExtension } from '~utils/extensions/updateExtension';
 import { NotificationType } from '@joincolony/graphql';
 import provider from '~provider';
 import { getTransactionSignerAddress } from '~utils/transactions';
+import { verbose } from '@joincolony/utils';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { contractAddress: extensionAddress, transactionHash } = event;
@@ -29,7 +30,9 @@ export default async (event: ContractEvent): Promise<void> => {
     return;
   }
 
-  const transaction = await provider.getTransaction(transactionHash);
+  const transaction = await provider
+    .getProviderInstance()
+    .getTransaction(transactionHash);
 
   const initialisedBy =
     getTransactionSignerAddress(transaction) ?? constants.AddressZero;

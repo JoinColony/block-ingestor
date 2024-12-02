@@ -1,8 +1,9 @@
-import { ContractEvent, motionNameMapping } from '~types';
+import { motionNameMapping } from '~types';
 import { SimpleTransactionDescription } from '~utils';
 import { getColonyDecisionId } from '~utils/decisions';
 
 import { createMotionInDB } from '../helpers';
+import { ContractEvent } from '@joincolony/blocks';
 
 export const handleSimpleDecisionMotion = async (
   colonyAddress: string,

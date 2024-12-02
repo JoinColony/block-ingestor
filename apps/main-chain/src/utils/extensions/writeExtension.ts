@@ -1,8 +1,9 @@
 import { constants } from 'ethers';
 
-import { mutate, query } from '~amplifyClient';
-import { ContractEvent } from '~types';
-import { verbose, toNumber } from '~utils';
+import networkClient from '~networkClient';
+import amplifyClient from '~amplifyClient';
+import { ContractEvent } from '@joincolony/blocks';
+import { toNumber } from '~utils';
 import {
   CreateColonyExtensionDocument,
   CreateColonyExtensionMutation,
@@ -23,8 +24,9 @@ import {
 } from '~utils/notifications';
 import { updateExtension } from './updateExtension';
 import { Extension, getExtensionHash } from '@colony/colony-js';
-import { getTransactionSignerAddress } from '~utils/transactions';
+import { verbose } from '@joincolony/utils';
 import provider from '~provider';
+import { getTransactionSignerAddress } from '~utils/transactions';
 
 const EXTENSION_SUPPORTING_NOTIFICATIONS = [
   Extension.OneTxPayment,
@@ -86,7 +88,9 @@ export const writeExtensionFromEvent = async (
   const { extensionId: extensionHash, colony, version } = event.args;
   const convertedVersion = toNumber(version);
 
-  const transaction = await provider.getTransaction(transactionHash);
+  const transaction = await provider
+    .getProviderInstance()
+    .getTransaction(transactionHash);
 
   const installedBy =
     getTransactionSignerAddress(transaction) ?? constants.AddressZero;
@@ -121,7 +125,7 @@ export const deleteExtensionFromEvent = async (
   verbose('Extension:', extensionHash, 'uninstalled in Colony:', colony);
 
   const { data } =
-    (await query<
+    (await amplifyClient.query<
       GetColonyExtensionByHashAndColonyQuery,
       GetColonyExtensionByHashAndColonyQueryVariables
     >(GetColonyExtensionByHashAndColonyDocument, {
@@ -145,12 +149,12 @@ const createOrUpdateColonyExtension = async (
   const { isDeprecated, isDeleted, isInitialized, version } = input;
 
   const { data } =
-    (await query<GetColonyExtensionQuery, GetColonyExtensionQueryVariables>(
-      GetColonyExtensionDocument,
-      {
-        id: extensionAddress,
-      },
-    )) ?? {};
+    (await amplifyClient.query<
+      GetColonyExtensionQuery,
+      GetColonyExtensionQueryVariables
+    >(GetColonyExtensionDocument, {
+      id: extensionAddress,
+    })) ?? {};
 
   const extension = data?.getColonyExtension?.colonyId;
 
@@ -163,7 +167,7 @@ const createOrUpdateColonyExtension = async (
       extensionHash: input.hash,
     });
 
-    await mutate<
+    await amplifyClient.mutate<
       CreateColonyExtensionMutation,
       CreateColonyExtensionMutationVariables
     >(CreateColonyExtensionDocument, {

@@ -1,6 +1,7 @@
 import { TransactionDescription } from 'ethers/lib/utils';
 
-import { ContractEvent, multiSigNameMapping } from '~types';
+import { multiSigNameMapping } from '~types';
+import { ContractEvent } from '@joincolony/blocks';
 import { getDomainDatabaseId, getRolesMapFromHexString } from '~utils';
 import { createMultiSigInDB } from '../helpers';
 import { sendMentionNotifications } from '~utils/notifications';

@@ -9,15 +9,15 @@ import {
   UpdateColonyActionMutation,
   UpdateColonyActionMutationVariables,
 } from '@joincolony/graphql';
-import { ContractEvent } from '~types';
+import { ContractEvent } from '@joincolony/blocks';
 import {
   ArbitraryTransaction,
   getDomainDatabaseId,
   writeActionFromEvent,
 } from '~utils';
-import { mutate, query } from '~amplifyClient';
 import { sendPermissionsActionNotifications } from '../../utils/notifications';
 import { NotificationCategory } from '../../types/notifications';
+import amplifyClient from '~amplifyClient';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { contractAddress: colonyAddress, transactionHash } = event;
@@ -32,7 +32,7 @@ export default async (event: ContractEvent): Promise<void> => {
     encodedFunction,
   };
   const { data } =
-    (await query<
+    (await amplifyClient.query<
       GetColonyArbitraryTransactionActionQuery,
       GetColonyArbitraryTransactionActionQueryVariables
     >(GetColonyArbitraryTransactionActionDocument, { transactionHash })) ?? {};
@@ -41,7 +41,7 @@ export default async (event: ContractEvent): Promise<void> => {
   if (data?.getColonyAction?.id) {
     const prevArbitraryTransactions =
       data.getColonyAction.arbitraryTransactions ?? [];
-    await mutate<
+    await amplifyClient.mutate<
       UpdateColonyActionMutation,
       UpdateColonyActionMutationVariables
     >(UpdateColonyActionDocument, {

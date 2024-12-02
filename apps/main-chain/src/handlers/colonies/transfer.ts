@@ -1,7 +1,7 @@
-import { query } from '~amplifyClient';
+import amplifyClient from '~amplifyClient';
 import networkClient from '~networkClient';
-import { getChainId } from '~provider';
-import { ContractEvent } from '~types';
+import rpcProvider from '~provider';
+import { ContractEvent } from '@joincolony/blocks';
 import {
   GetColonyUnclaimedFundDocument,
   GetColonyUnclaimedFundQuery,
@@ -10,11 +10,12 @@ import {
   GetTokenFromEverywhereQuery,
   GetTokenFromEverywhereQueryVariables,
 } from '@joincolony/graphql';
-import { output, createFundsClaim } from '~utils';
+import { createFundsClaim } from '~utils';
+import { output } from '@joincolony/utils';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { contractAddress: tokenAddress, logIndex, transactionHash } = event;
-  const chainId = getChainId();
+  const chainId = rpcProvider.getChainId();
   /*
    * @NOTE Take the values from the "array" rather than from the named properties
    * This is because our native tokens differ in abi from ERC20 or SAI tokens
@@ -62,7 +63,7 @@ export default async (event: ContractEvent): Promise<void> => {
     if (process.env.NODE_ENV !== 'production') {
       const { id: existingClaimId } =
         (
-          await query<
+          await amplifyClient.query<
             GetColonyUnclaimedFundQuery,
             GetColonyUnclaimedFundQueryVariables
           >(GetColonyUnclaimedFundDocument, { claimId })
@@ -89,7 +90,7 @@ export default async (event: ContractEvent): Promise<void> => {
      * gets added to the DB if it doesn't already exist
      */
     try {
-      const dbTokenQuery = await query<
+      const dbTokenQuery = await amplifyClient.query<
         GetTokenFromEverywhereQuery,
         GetTokenFromEverywhereQueryVariables
       >(GetTokenFromEverywhereDocument, {
