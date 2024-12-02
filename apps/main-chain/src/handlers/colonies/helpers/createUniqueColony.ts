@@ -1,7 +1,7 @@
 import { Id } from '@colony/colony-js';
 import { utils } from 'ethers';
 import { randomUUID } from 'crypto';
-import { mutate, query } from '~amplifyClient';
+import amplifyClient from '~amplifyClient';
 import {
   ColonyType,
   CreateColonyDocument,
@@ -39,7 +39,7 @@ import {
   GetTokenFromEverywhereQuery,
   GetTokenFromEverywhereQueryVariables,
 } from '@joincolony/graphql';
-import { getChainId } from '~provider';
+import rpcProvider from '~provider';
 import { getCachedColonyClient } from '~utils/clients/colony';
 import { RESERVED_ROUTES } from '~constants';
 
@@ -87,9 +87,12 @@ export const createUniqueColony = async ({
    * Via it's address
    */
   const colonyQuery =
-    (await query<GetColonyQuery, GetColonyQueryVariables>(GetColonyDocument, {
-      id: checksummedAddress,
-    })) ?? {};
+    (await amplifyClient.query<GetColonyQuery, GetColonyQueryVariables>(
+      GetColonyDocument,
+      {
+        id: checksummedAddress,
+      },
+    )) ?? {};
 
   if (!colonyQuery.data) {
     throw new Error('Could not fetch colony data');
@@ -108,12 +111,12 @@ export const createUniqueColony = async ({
    * Get metadata, determine if it's the correct one, and if we should proceed
    */
   const metadataQuery =
-    (await query<GetColonyMetadataQuery, GetColonyMetadataQueryVariables>(
-      GetColonyMetadataDocument,
-      {
-        id: `etherealcolonymetadata-${transactionHash}`,
-      },
-    )) ?? {};
+    (await amplifyClient.query<
+      GetColonyMetadataQuery,
+      GetColonyMetadataQueryVariables
+    >(GetColonyMetadataDocument, {
+      id: `etherealcolonymetadata-${transactionHash}`,
+    })) ?? {};
 
   if (!metadataQuery.data) {
     throw new Error('Could not fetch metadata data');
@@ -140,10 +143,10 @@ export const createUniqueColony = async ({
    * Ensure the colony name doesn't already exist in the database
    */
   const colonyNameQuery =
-    (await query<GetColonyByNameQuery, GetColonyByNameQueryVariables>(
-      GetColonyByNameDocument,
-      { name: colonyName },
-    )) ?? {};
+    (await amplifyClient.query<
+      GetColonyByNameQuery,
+      GetColonyByNameQueryVariables
+    >(GetColonyByNameDocument, { name: colonyName })) ?? {};
 
   if (!colonyNameQuery) {
     throw new Error();
@@ -176,7 +179,7 @@ export const createUniqueColony = async ({
   /*
    * Create token in the database
    */
-  const tokenQuery = await query<
+  const tokenQuery = await amplifyClient.query<
     GetTokenFromEverywhereQuery,
     GetTokenFromEverywhereQueryVariables
   >(GetTokenFromEverywhereDocument, {
@@ -201,7 +204,7 @@ export const createUniqueColony = async ({
 
   const memberInviteCode = randomUUID();
 
-  const chainId = getChainId();
+  const chainId = rpcProvider.getChainId();
   const version = await colonyClient.version();
 
   let isTokenLocked;
@@ -209,7 +212,7 @@ export const createUniqueColony = async ({
     isTokenLocked = await colonyClient.tokenClient.locked();
   }
 
-  const colonyMutation = await mutate<
+  const colonyMutation = await amplifyClient.mutate<
     CreateColonyMutation,
     CreateColonyMutationVariables
   >(CreateColonyDocument, {
@@ -246,7 +249,7 @@ export const createUniqueColony = async ({
   /*
    * Set the actual colony metadata object
    */
-  const colonyMetadataMutation = await mutate<
+  const colonyMetadataMutation = await amplifyClient.mutate<
     CreateColonyMetadataMutation,
     CreateColonyMetadataMutationVariables
   >(CreateColonyMetadataDocument, {
@@ -265,7 +268,7 @@ export const createUniqueColony = async ({
   /*
    * Delete the ethereal metadata entry
    */
-  await mutate<
+  await amplifyClient.mutate<
     DeleteColonyMetadataMutation,
     DeleteColonyMetadataMutationVariables
   >(DeleteColonyMetadataDocument, {
@@ -275,7 +278,7 @@ export const createUniqueColony = async ({
   /*
    * Create the member invite
    */
-  const inviteMutation = await mutate<
+  const inviteMutation = await amplifyClient.mutate<
     CreateColonyMemberInviteMutation,
     CreateColonyMemberInviteMutationVariables
   >(CreateColonyMemberInviteDocument, {
@@ -293,20 +296,20 @@ export const createUniqueColony = async ({
   /*
    * Add token to the colony's token list
    */
-  await mutate<CreateColonyTokensMutation, CreateColonyTokensMutationVariables>(
-    CreateColonyTokensDocument,
-    {
-      input: {
-        colonyID: checksummedAddress,
-        tokenID: checksummedToken,
-      },
+  await amplifyClient.mutate<
+    CreateColonyTokensMutation,
+    CreateColonyTokensMutationVariables
+  >(CreateColonyTokensDocument, {
+    input: {
+      colonyID: checksummedAddress,
+      tokenID: checksummedToken,
     },
-  );
+  });
 
   /*
    * Create the root domain metadata
    */
-  await mutate<
+  await amplifyClient.mutate<
     CreateDomainMetadataMutation,
     CreateDomainMetadataMutationVariables
   >(CreateDomainMetadataDocument, {
@@ -323,17 +326,17 @@ export const createUniqueColony = async ({
   /*
    * Create the root domain
    */
-  await mutate<CreateDomainMutation, CreateDomainMutationVariables>(
-    CreateDomainDocument,
-    {
-      input: {
-        id: `${checksummedAddress}_${Id.RootDomain}`,
-        colonyId: checksummedAddress,
-        isRoot: true,
-        nativeId: Id.RootDomain,
-        nativeSkillId: skillId.toString(),
-        nativeFundingPotId: fundingPotId.toNumber(),
-      },
+  await amplifyClient.mutate<
+    CreateDomainMutation,
+    CreateDomainMutationVariables
+  >(CreateDomainDocument, {
+    input: {
+      id: `${checksummedAddress}_${Id.RootDomain}`,
+      colonyId: checksummedAddress,
+      isRoot: true,
+      nativeId: Id.RootDomain,
+      nativeSkillId: skillId.toString(),
+      nativeFundingPotId: fundingPotId.toNumber(),
     },
-  );
+  });
 };

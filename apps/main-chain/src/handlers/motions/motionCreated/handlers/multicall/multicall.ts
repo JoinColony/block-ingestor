@@ -1,8 +1,9 @@
 import { TransactionDescription } from 'ethers/lib/utils';
 import { utils } from 'ethers';
-import { decodeFunctions, getCachedColonyClient, output } from '~utils';
-import { ContractEvent } from '~types';
+import { decodeFunctions, getCachedColonyClient } from '~utils';
+import { ContractEvent } from '@joincolony/blocks';
 import { multicallHandlers } from './multicallHandlers';
+import { output } from '@joincolony/utils';
 
 export const handleMulticallMotion = async (
   colonyAddress: string,

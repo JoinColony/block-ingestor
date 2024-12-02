@@ -1,6 +1,6 @@
 import { BigNumber } from 'ethers';
 
-import { ContractEvent, ContractEventsSignatures } from '~types';
+import { ContractEvent, ContractEventsSignatures } from '@joincolony/blocks';
 import {
   toNumber,
   writeActionFromEvent,
@@ -10,7 +10,6 @@ import {
   getUpdatedExpenditureBalances,
   transactionHasEvent,
   getExpenditureByFundingPot,
-  verbose,
 } from '~utils';
 import {
   ColonyActionType,
@@ -21,12 +20,13 @@ import {
   UpdateExpenditureMutation,
   UpdateExpenditureMutationVariables,
 } from '@joincolony/graphql';
-import { mutate } from '~amplifyClient';
+import amplifyClient from '~amplifyClient';
 import {
   sendExpenditureUpdateNotifications,
   sendPermissionsActionNotifications,
 } from '~utils/notifications';
 import { NotificationCategory } from '~types/notifications';
+import { verbose } from '@joincolony/utils';
 
 export default async (event: ContractEvent): Promise<void> => {
   const {
@@ -140,15 +140,15 @@ const updateExpenditureBalances = async ({
     amount,
   );
 
-  await mutate<UpdateExpenditureMutation, UpdateExpenditureMutationVariables>(
-    UpdateExpenditureDocument,
-    {
-      input: {
-        id: expenditure.id,
-        balances: updatedBalances,
-      },
+  await amplifyClient.mutate<
+    UpdateExpenditureMutation,
+    UpdateExpenditureMutationVariables
+  >(UpdateExpenditureDocument, {
+    input: {
+      id: expenditure.id,
+      balances: updatedBalances,
     },
-  );
+  });
 
   if (
     !isPartOfOneTxPayment &&

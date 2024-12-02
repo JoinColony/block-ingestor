@@ -1,4 +1,4 @@
-import { EventHandler, MotionEvents } from '~types';
+import { MotionEvents } from '~types';
 import { getVotingClient } from '~utils';
 import {
   getMotionDatabaseId,
@@ -12,7 +12,7 @@ import {
   getUpdatedStakerRewards,
 } from './helpers';
 import { ColonyMotion } from '@joincolony/graphql';
-import { ExtensionEventListener } from '~eventListeners';
+import { EventHandler, ExtensionEventListener } from '@joincolony/blocks';
 
 export const handleMotionRewardClaimed: EventHandler = async (
   event,

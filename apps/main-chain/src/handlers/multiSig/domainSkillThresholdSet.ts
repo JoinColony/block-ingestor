@@ -1,4 +1,4 @@
-import { query } from '~amplifyClient';
+import amplifyClient from '~amplifyClient';
 import {
   GetColonyExtensionByAddressDocument,
   GetColonyExtensionByAddressQuery,
@@ -7,7 +7,7 @@ import {
   GetDomainsByExtensionAddressQuery,
   GetDomainsByExtensionAddressQueryVariables,
 } from '@joincolony/graphql';
-import { ContractEvent, EventHandler } from '~types';
+import { ContractEvent, EventHandler } from '@joincolony/blocks';
 import { getCachedColonyClient, toNumber } from '~utils';
 import { updateExtension } from '~utils/extensions/updateExtension';
 
@@ -17,7 +17,7 @@ export const handleMultiSigDomainSkillThresholdSet: EventHandler = async (
   const { contractAddress: multiSigAddress } = event;
   const { domainSkillId, threshold } = event.args;
 
-  const colonyExtensionsResponse = await query<
+  const colonyExtensionsResponse = await amplifyClient.query<
     GetColonyExtensionByAddressQuery,
     GetColonyExtensionByAddressQueryVariables
   >(GetColonyExtensionByAddressDocument, {
@@ -28,7 +28,7 @@ export const handleMultiSigDomainSkillThresholdSet: EventHandler = async (
     colonyExtensionsResponse?.data?.getColonyExtension?.params ?? {};
 
   if (multiSig) {
-    const domainsResponse = await query<
+    const domainsResponse = await amplifyClient.query<
       GetDomainsByExtensionAddressQuery,
       GetDomainsByExtensionAddressQueryVariables
     >(GetDomainsByExtensionAddressDocument, {

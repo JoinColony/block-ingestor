@@ -1,7 +1,11 @@
 import { BigNumber } from 'ethers';
 import { Id } from '@colony/colony-js';
-import { mutate, query } from '~amplifyClient';
-import { ContractEventsSignatures, EventHandler } from '~types';
+import amplifyClient from '~amplifyClient';
+import {
+  ContractEventsSignatures,
+  EventHandler,
+  ExtensionEventListener,
+} from '@joincolony/blocks';
 import {
   getColonyRolesDatabaseId,
   getDomainDatabaseId,
@@ -9,7 +13,6 @@ import {
   createColonyHistoricRoleDatabaseEntry,
   getAllRoleEventsFromTransaction,
   getRolesMapFromEvents,
-  verbose,
   writeActionFromEvent,
   isAddressExtension,
   getAllMultiSigRoleEventsFromTransaction,
@@ -26,11 +29,11 @@ import {
   UpdateColonyRoleDocument,
   ColonyActionType,
 } from '@joincolony/graphql';
-import provider from '~provider';
+import rpcProvider from '~provider';
 import { updateColonyContributor } from '~utils/contributors';
-import { ExtensionEventListener } from '~eventListeners';
 import { sendPermissionsActionNotifications } from '~utils/notifications';
 import { NotificationCategory } from '~types/notifications';
+import { verbose } from '@joincolony/utils';
 
 export const handleManagePermissionsAction: EventHandler = async (
   event,
@@ -83,7 +86,7 @@ export const handleManagePermissionsAction: EventHandler = async (
     __typename,
     ...existingRoles
   } = (
-    await query<GetColonyRoleQuery, GetColonyRoleQueryVariables>(
+    await amplifyClient.query<GetColonyRoleQuery, GetColonyRoleQueryVariables>(
       GetColonyRoleDocument,
       { id },
     )
@@ -110,9 +113,9 @@ export const handleManagePermissionsAction: EventHandler = async (
       // We can get the msg.sender from the transaction receipt.
 
       if (!agent) {
-        const { from = '' } = await provider.getTransactionReceipt(
-          transactionHash,
-        );
+        const { from = '' } = await rpcProvider
+          .getProviderInstance()
+          .getTransactionReceipt(transactionHash);
         agent = from;
       }
       const allRoleEventsUpdates = isMultiSig
@@ -130,16 +133,16 @@ export const handleManagePermissionsAction: EventHandler = async (
         ? getMultiSigRolesMapFromEvents(allRoleEventsUpdates, false)
         : getRolesMapFromEvents(allRoleEventsUpdates, false);
 
-      await mutate<UpdateColonyRoleMutation, UpdateColonyRoleMutationVariables>(
-        UpdateColonyRoleDocument,
-        {
-          input: {
-            id,
-            latestBlock: blockNumber,
-            ...rolesFromAllUpdateEvents,
-          },
+      await amplifyClient.mutate<
+        UpdateColonyRoleMutation,
+        UpdateColonyRoleMutationVariables
+      >(UpdateColonyRoleDocument, {
+        input: {
+          id,
+          latestBlock: blockNumber,
+          ...rolesFromAllUpdateEvents,
         },
-      );
+      });
 
       verbose(
         `Update the${

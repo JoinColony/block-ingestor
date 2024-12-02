@@ -1,4 +1,4 @@
-import { mutate, query } from '~amplifyClient';
+import amplifyClient from '~amplifyClient';
 import {
   CreateReputationMiningCycleMetadataDocument,
   CreateReputationMiningCycleMetadataMutation,
@@ -10,7 +10,7 @@ import {
   UpdateReputationMiningCycleMetadataMutation,
   UpdateReputationMiningCycleMetadataMutationVariables,
 } from '@joincolony/graphql';
-import { ContractEvent } from '~types';
+import { ContractEvent } from '@joincolony/blocks';
 import { reputationMiningCycleMetadataId } from './utils';
 
 export default async (event: ContractEvent): Promise<void> => {
@@ -33,7 +33,7 @@ export default async (event: ContractEvent): Promise<void> => {
   // for it, basically the time it got to process it, meaning the UI will "lie" at that point
 
   const { data } =
-    (await query<
+    (await amplifyClient.query<
       GetReputationMiningCycleMetadataQuery,
       GetReputationMiningCycleMetadataQueryVariables
     >(GetReputationMiningCycleMetadataDocument, {
@@ -43,7 +43,7 @@ export default async (event: ContractEvent): Promise<void> => {
   const dbEntryExists = !!data?.getReputationMiningCycleMetadata;
 
   if (dbEntryExists) {
-    await mutate<
+    await amplifyClient.mutate<
       UpdateReputationMiningCycleMetadataMutation,
       UpdateReputationMiningCycleMetadataMutationVariables
     >(UpdateReputationMiningCycleMetadataDocument, {
@@ -53,7 +53,7 @@ export default async (event: ContractEvent): Promise<void> => {
       },
     });
   } else {
-    await mutate<
+    await amplifyClient.mutate<
       CreateReputationMiningCycleMetadataMutation,
       CreateReputationMiningCycleMetadataMutationVariables
     >(CreateReputationMiningCycleMetadataDocument, {

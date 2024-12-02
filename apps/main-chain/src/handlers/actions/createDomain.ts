@@ -1,11 +1,11 @@
-import { mutate } from '~amplifyClient';
+import amplifyClient from '~amplifyClient';
 import {
   ColonyActionType,
   CreateDomainDocument,
   CreateDomainMutation,
   CreateDomainMutationVariables,
 } from '@joincolony/graphql';
-import { ContractEvent } from '~types';
+import { ContractEvent } from '@joincolony/blocks';
 import { NotificationCategory } from '~types/notifications';
 import {
   toNumber,
@@ -35,19 +35,19 @@ export default async (event: ContractEvent): Promise<void> => {
     blockTag: blockNumber,
   });
 
-  await mutate<CreateDomainMutation, CreateDomainMutationVariables>(
-    CreateDomainDocument,
-    {
-      input: {
-        id: databaseDomainId,
-        colonyId: colonyAddress,
-        nativeId: nativeDomainId,
-        isRoot: false,
-        nativeFundingPotId: toNumber(fundingPotId),
-        nativeSkillId: skillId.toString(),
-      },
+  await amplifyClient.mutate<
+    CreateDomainMutation,
+    CreateDomainMutationVariables
+  >(CreateDomainDocument, {
+    input: {
+      id: databaseDomainId,
+      colonyId: colonyAddress,
+      nativeId: nativeDomainId,
+      isRoot: false,
+      nativeFundingPotId: toNumber(fundingPotId),
+      nativeSkillId: skillId.toString(),
     },
-  );
+  });
 
   await writeActionFromEvent(event, colonyAddress, {
     type: ColonyActionType.CreateDomain,

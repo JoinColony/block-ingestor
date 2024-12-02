@@ -1,9 +1,9 @@
 import { constants } from 'ethers';
 import { NotificationType } from '@joincolony/graphql';
 import networkClient from '~networkClient';
-import { EventHandler } from '~types';
 import { updateExtension } from '~utils/extensions/updateExtension';
 import { sendExtensionUpdateNotifications } from '~utils/notifications';
+import { EventHandler } from '@joincolony/blocks';
 
 export const handleStakeFractionSet: EventHandler = async (
   event,

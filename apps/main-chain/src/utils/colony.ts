@@ -1,4 +1,4 @@
-import { query } from '~amplifyClient';
+import amplifyClient from '~amplifyClient';
 import {
   ColonyWithRootRolesFragment,
   ListColoniesWithRootPermissionHoldersDocument,
@@ -12,7 +12,7 @@ const getColoniesData: GetDataFn<
   ColonyWithRootRolesFragment,
   undefined
 > = async (_params, nextToken) => {
-  const response = await query<
+  const response = await amplifyClient.query<
     ListColoniesWithRootPermissionHoldersQuery,
     ListColoniesWithRootPermissionHoldersQueryVariables
   >(ListColoniesWithRootPermissionHoldersDocument, {

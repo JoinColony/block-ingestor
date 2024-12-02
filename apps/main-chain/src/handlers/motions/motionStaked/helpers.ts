@@ -16,7 +16,7 @@ import {
   UserMotionStakes,
   UserStakeType,
 } from '@joincolony/graphql';
-import { mutate, query } from '~amplifyClient';
+import amplifyClient from '~amplifyClient';
 import { getUserStakeDatabaseId } from '~utils/stakes';
 import { getMotionSide } from '../helpers';
 import { getBlockChainTimestampISODate } from '~utils/dates';
@@ -302,7 +302,7 @@ export const updateUserStake = async (
 ): Promise<void> => {
   const userStakeId = getUserStakeDatabaseId(userAddress, transactionHash);
   const { data } =
-    (await query<GetUserStakeQuery, GetUserStakeQueryVariables>(
+    (await amplifyClient.query<GetUserStakeQuery, GetUserStakeQueryVariables>(
       GetUserStakeDocument,
       {
         id: userStakeId,
@@ -313,30 +313,30 @@ export const updateUserStake = async (
   if (existingUserStake) {
     const { amount: existingAmount } = existingUserStake;
 
-    await mutate<UpdateUserStakeMutation, UpdateUserStakeMutationVariables>(
-      UpdateUserStakeDocument,
-      {
-        input: {
-          id: userStakeId,
-          amount: BigNumber.from(existingAmount).add(amount).toString(),
-        },
+    await amplifyClient.mutate<
+      UpdateUserStakeMutation,
+      UpdateUserStakeMutationVariables
+    >(UpdateUserStakeDocument, {
+      input: {
+        id: userStakeId,
+        amount: BigNumber.from(existingAmount).add(amount).toString(),
       },
-    );
+    });
   } else {
-    await mutate<CreateUserStakeMutation, CreateUserStakeMutationVariables>(
-      CreateUserStakeDocument,
-      {
-        input: {
-          id: userStakeId,
-          userAddress,
-          colonyAddress,
-          actionId: transactionHash,
-          amount: amount.toString(),
-          isClaimed: false,
-          createdAt: getBlockChainTimestampISODate(timestamp),
-          type: UserStakeType.Motion,
-        },
+    await amplifyClient.mutate<
+      CreateUserStakeMutation,
+      CreateUserStakeMutationVariables
+    >(CreateUserStakeDocument, {
+      input: {
+        id: userStakeId,
+        userAddress,
+        colonyAddress,
+        actionId: transactionHash,
+        amount: amount.toString(),
+        isClaimed: false,
+        createdAt: getBlockChainTimestampISODate(timestamp),
+        type: UserStakeType.Motion,
       },
-    );
+    });
   }
 };

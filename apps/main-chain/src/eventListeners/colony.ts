@@ -1,20 +1,22 @@
 import { utils } from 'ethers';
 
-import { query } from '~amplifyClient';
+import amplifyClient from '~amplifyClient';
 import {
   ListColoniesDocument,
   ListColoniesQuery,
   ListColoniesQueryVariables,
 } from '@joincolony/graphql';
-import { ContractEventsSignatures, EventHandler } from '~types';
-import { notNull, output } from '~utils';
 import {
-  addEventListener,
+  ContractEventsSignatures,
+  EventHandler,
+  EventListenerType,
+} from '@joincolony/blocks';
+import { notNull } from '~utils';
+import {
   addNetworkEventListener,
   addTokenEventListener,
 } from '~eventListeners';
 
-import { EventListenerType } from './types';
 import {
   handleAnnotateTransaction,
   handleColonyAdded,
@@ -50,13 +52,15 @@ import {
 import { handleProxyColonyRequested } from '~handlers/proxyColonies';
 import setTokenAuthority from '~handlers/tokens/setTokenAuthority';
 import { addProxyColoniesEventListener } from './proxyColonies';
+import { output } from '@joincolony/utils';
+import eventManager from '~eventManager';
 
 const addColonyEventListener = (
   eventSignature: ContractEventsSignatures,
   address: string,
   handler: EventHandler,
 ): void => {
-  addEventListener({
+  eventManager.addEventListener({
     type: EventListenerType.Colony,
     address,
     eventSignature,
@@ -76,7 +80,7 @@ const fetchColoniesAddresses = async (): Promise<
 
   do {
     const { data } =
-      (await query<ListColoniesQuery, ListColoniesQueryVariables>(
+      (await amplifyClient.query<ListColoniesQuery, ListColoniesQueryVariables>(
         ListColoniesDocument,
         { nextToken },
       )) ?? {};

@@ -1,14 +1,14 @@
-import { ContractEvent } from '~types';
+import { ContractEvent } from '@joincolony/blocks';
 import {
   isAddVerifiedMembersOperation,
   isManageTokensOperation,
   isRemoveVerifiedMembersOperation,
   parseMetadataDeltaOperation,
-  verbose,
 } from '~utils';
 import { handleAddVerifiedMembers } from './handlers/addVerifiedMembers';
 import { handleRemoveVerifiedMembers } from './handlers/removeVerifiedMembers';
 import { handleManageTokens } from './handlers/manageTokens';
+import { verbose } from '@joincolony/utils';
 
 export default async (event: ContractEvent): Promise<void> => {
   const operationString = event.args.metadata;
