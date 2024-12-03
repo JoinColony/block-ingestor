@@ -1,15 +1,13 @@
 import { Log } from '@ethersproject/abstract-provider';
 import { output, verbose } from '@joincolony/utils';
-import { EventManager } from './eventManager';
+import { EventManager, ContractEvent, EthersObserverEvents } from '../events';
 import {
   Block,
   BlockWithTransactions,
-  ContractEvent,
-  EthersObserverEvents,
 } from './types';
 import { RpcProvider } from '@joincolony/clients';
 import { utils } from 'ethers';
-import { StatsManager } from './statsManager';
+import { StatsManager } from '../stats/statsManager';
 
 export const BLOCK_PAGING_SIZE = process.env.BLOCK_PAGING_SIZE
   ? parseInt(process.env.BLOCK_PAGING_SIZE, 10)

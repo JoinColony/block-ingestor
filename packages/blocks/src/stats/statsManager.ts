@@ -11,10 +11,7 @@ import {
 } from '@joincolony/graphql';
 import { output, verbose } from '@joincolony/utils';
 import { AmplifyClient } from '@joincolony/clients';
-
-type ObjectOrFunction =
-  | Record<string, unknown>
-  | ((jsonFile: Record<string, unknown>) => Record<string, unknown>);
+import { ObjectOrFunction } from './types';
 
 export class StatsManager {
   private stats: Record<string, unknown> = {};

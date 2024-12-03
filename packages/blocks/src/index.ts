@@ -1,4 +1,3 @@
-export * from './eventManager';
-export * from './statsManager';
-export * from './blockManager';
-export * from './types';
+export * from './events';
+export * from './stats';
+export * from './blocks';
