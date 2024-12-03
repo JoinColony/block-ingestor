@@ -1,5 +1,5 @@
 import { Extension, getExtensionHash } from '@colony/colony-js';
-import { mutate, query } from '~amplifyClient';
+import amplifyClient from '~amplifyClient';
 import {
   ColonyActionType,
   CreateColonyActionDocument,
@@ -55,21 +55,21 @@ export const writeActionFromEvent = async (
 
   verbose('Action', actionType, 'took place in Colony:', colonyAddress);
 
-  await mutate<CreateColonyActionMutation, CreateColonyActionMutationVariables>(
-    CreateColonyActionDocument,
-    {
-      input: {
-        id: transactionHash,
-        colonyId: colonyAddress,
-        blockNumber,
-        createdAt: getBlockChainTimestampISODate(timestamp),
-        showInActionsList,
-        rootHash,
-        isMotionFinalization,
-        ...actionFields,
-      },
+  await amplifyClient.mutate<
+    CreateColonyActionMutation,
+    CreateColonyActionMutationVariables
+  >(CreateColonyActionDocument, {
+    input: {
+      id: transactionHash,
+      colonyId: colonyAddress,
+      blockNumber,
+      createdAt: getBlockChainTimestampISODate(timestamp),
+      showInActionsList,
+      rootHash,
+      isMotionFinalization,
+      ...actionFields,
     },
-  );
+  });
 };
 
 const showActionInActionsList = async (
@@ -82,7 +82,7 @@ const showActionInActionsList = async (
     const [, , toPot] = args;
 
     const { data } =
-      (await query<
+      (await amplifyClient.query<
         GetExpenditureByNativeFundingPotIdAndColonyQuery,
         GetExpenditureByNativeFundingPotIdAndColonyQueryVariables
       >(GetExpenditureByNativeFundingPotIdAndColonyDocument, {
@@ -136,13 +136,13 @@ export const createColonyAction = async (
   actionData: CreateColonyActionInput,
   blockTimestamp: number,
 ): Promise<void> => {
-  await mutate<CreateColonyActionMutation, CreateColonyActionMutationVariables>(
-    CreateColonyActionDocument,
-    {
-      input: {
-        ...actionData,
-        createdAt: getBlockChainTimestampISODate(blockTimestamp),
-      },
+  await amplifyClient.mutate<
+    CreateColonyActionMutation,
+    CreateColonyActionMutationVariables
+  >(CreateColonyActionDocument, {
+    input: {
+      ...actionData,
+      createdAt: getBlockChainTimestampISODate(blockTimestamp),
     },
-  );
+  });
 };

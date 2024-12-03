@@ -1,4 +1,4 @@
-import { mutate } from '~amplifyClient';
+import amplifyClient from '~amplifyClient';
 import {
   ExpenditureType,
   UpdateExpenditureDocument,
@@ -23,14 +23,14 @@ export const handleExpenditureMadeStaged: EventHandler = async (
     } as staged`,
   );
 
-  await mutate<UpdateExpenditureMutation, UpdateExpenditureMutationVariables>(
-    UpdateExpenditureDocument,
-    {
-      input: {
-        id: getExpenditureDatabaseId(colonyAddress, convertedExpenditureId),
-        type: ExpenditureType.Staged,
-        stagedExpenditureAddress: event.contractAddress,
-      },
+  await amplifyClient.mutate<
+    UpdateExpenditureMutation,
+    UpdateExpenditureMutationVariables
+  >(UpdateExpenditureDocument, {
+    input: {
+      id: getExpenditureDatabaseId(colonyAddress, convertedExpenditureId),
+      type: ExpenditureType.Staged,
+      stagedExpenditureAddress: event.contractAddress,
     },
-  );
+  });
 };

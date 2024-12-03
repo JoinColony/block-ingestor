@@ -1,4 +1,4 @@
-import { mutate, query } from '~amplifyClient';
+import amplifyClient from '~amplifyClient';
 import {
   GetActionIdFromAnnotationDocument,
   GetActionIdFromAnnotationQuery,
@@ -20,7 +20,7 @@ export default async ({ args }: ContractEvent): Promise<void> => {
   const [, txHash] = args;
 
   const { data } =
-    (await query<
+    (await amplifyClient.query<
       GetActionIdFromAnnotationQuery,
       GetActionIdFromAnnotationQueryVariables
     >(GetActionIdFromAnnotationDocument, { id: txHash })) ?? {};
@@ -45,7 +45,7 @@ export default async ({ args }: ContractEvent): Promise<void> => {
 
   if (isMotionObjection) {
     const { data } =
-      (await query<
+      (await amplifyClient.query<
         GetMotionIdFromActionQuery,
         GetMotionIdFromActionQueryVariables
       >(GetMotionIdFromActionDocument, { id: actionId })) ?? {};
@@ -60,7 +60,7 @@ export default async ({ args }: ContractEvent): Promise<void> => {
       return;
     }
 
-    await mutate<
+    await amplifyClient.mutate<
       UpdateColonyMotionMutation,
       UpdateColonyMotionMutationVariables
     >(UpdateColonyMotionDocument, {
@@ -70,7 +70,7 @@ export default async ({ args }: ContractEvent): Promise<void> => {
       },
     });
   } else {
-    await mutate<
+    await amplifyClient.mutate<
       UpdateColonyActionMutation,
       UpdateColonyActionMutationVariables
     >(UpdateColonyActionDocument, {

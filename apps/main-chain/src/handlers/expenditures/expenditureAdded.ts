@@ -1,4 +1,4 @@
-import { mutate } from '~amplifyClient';
+import amplifyClient from '~amplifyClient';
 import {
   ColonyActionType,
   CreateExpenditureDocument,
@@ -52,24 +52,24 @@ export default async (event: ContractEvent): Promise<void> => {
     convertedExpenditureId,
   );
 
-  await mutate<CreateExpenditureMutation, CreateExpenditureMutationVariables>(
-    CreateExpenditureDocument,
-    {
-      input: {
-        id: databaseId,
-        type: ExpenditureType.PaymentBuilder,
-        colonyId: colonyAddress,
-        nativeId: convertedExpenditureId,
-        ownerAddress,
-        status: ExpenditureStatus.Draft,
-        slots: [],
-        nativeFundingPotId: fundingPotId,
-        nativeDomainId: domainId,
-        isStaked: false,
-        balances: [],
-      },
+  await amplifyClient.mutate<
+    CreateExpenditureMutation,
+    CreateExpenditureMutationVariables
+  >(CreateExpenditureDocument, {
+    input: {
+      id: databaseId,
+      type: ExpenditureType.PaymentBuilder,
+      colonyId: colonyAddress,
+      nativeId: convertedExpenditureId,
+      ownerAddress,
+      status: ExpenditureStatus.Draft,
+      slots: [],
+      nativeFundingPotId: fundingPotId,
+      nativeDomainId: domainId,
+      isStaked: false,
+      balances: [],
     },
-  );
+  });
 
   /**
    * @NOTE: Only create a `CREATE_EXPENDITURE` action if the expenditure was not created as part of a OneTxPayment

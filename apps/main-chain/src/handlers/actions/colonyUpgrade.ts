@@ -1,4 +1,4 @@
-import { mutate } from '~amplifyClient';
+import amplifyClient from '~amplifyClient';
 import {
   ColonyActionType,
   UpdateColonyDocument,
@@ -19,15 +19,15 @@ export default async (event: ContractEvent): Promise<void> => {
   verbose('Colony:', colonyAddress, `upgraded to version ${convertedVersion}`);
 
   // Update colony version in the db
-  await mutate<UpdateColonyMutation, UpdateColonyMutationVariables>(
-    UpdateColonyDocument,
-    {
-      input: {
-        id: event.contractAddress,
-        version: convertedVersion,
-      },
+  await amplifyClient.mutate<
+    UpdateColonyMutation,
+    UpdateColonyMutationVariables
+  >(UpdateColonyDocument, {
+    input: {
+      id: event.contractAddress,
+      version: convertedVersion,
     },
-  );
+  });
 
   await writeActionFromEvent(event, colonyAddress, {
     type: ColonyActionType.VersionUpgrade,

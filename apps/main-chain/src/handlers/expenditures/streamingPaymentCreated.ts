@@ -1,4 +1,4 @@
-import { mutate } from '~amplifyClient';
+import amplifyClient from '~amplifyClient';
 import {
   CreateStreamingPaymentDocument,
   CreateStreamingPaymentMutation,
@@ -48,7 +48,7 @@ export const handleStreamingPaymentCreated: EventHandler = async (
 
   verbose(`Streaming payment with ID ${databaseId} created`);
 
-  await mutate<
+  await amplifyClient.mutate<
     CreateStreamingPaymentMutation,
     CreateStreamingPaymentMutationVariables
   >(CreateStreamingPaymentDocument, {

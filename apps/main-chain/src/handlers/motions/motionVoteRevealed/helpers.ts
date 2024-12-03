@@ -1,5 +1,5 @@
 import { BigNumber } from 'ethers';
-import { mutate, query } from '~amplifyClient';
+import amplifyClient from '~amplifyClient';
 import {
   CreateUserVoterRewardDocument,
   CreateUserVoterRewardMutation,
@@ -27,18 +27,18 @@ export const createUserReward = async ({
   // Get rewards for voters on the winning side
 
   const { data } =
-    (await query<GetVoterRewardsQuery, GetVoterRewardsQueryVariables>(
-      GetVoterRewardsDocument,
-      {
-        input: {
-          rootHash,
-          motionId,
-          colonyAddress,
-          nativeMotionDomainId,
-          voterAddress: userAddress,
-        },
+    (await amplifyClient.query<
+      GetVoterRewardsQuery,
+      GetVoterRewardsQueryVariables
+    >(GetVoterRewardsDocument, {
+      input: {
+        rootHash,
+        motionId,
+        colonyAddress,
+        nativeMotionDomainId,
+        voterAddress: userAddress,
       },
-    )) ?? {};
+    })) ?? {};
 
   const { reward: voterReward } = data?.getVoterRewards ?? {};
 
@@ -46,7 +46,7 @@ export const createUserReward = async ({
     return;
   }
 
-  await mutate<
+  await amplifyClient.mutate<
     CreateUserVoterRewardMutation,
     CreateUserVoterRewardMutationVariables
   >(CreateUserVoterRewardDocument, {

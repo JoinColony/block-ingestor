@@ -3,7 +3,7 @@ import {
   toNumber,
   writeActionFromEvent,
 } from '~utils';
-import { mutate } from '~amplifyClient';
+import amplifyClient from '~amplifyClient';
 import {
   ColonyActionType,
   ExpenditureStatus,
@@ -44,15 +44,15 @@ export const handleExpenditureCancelled: EventHandler = async (
     colonyAddress,
   );
 
-  await mutate<UpdateExpenditureMutation, UpdateExpenditureMutationVariables>(
-    UpdateExpenditureDocument,
-    {
-      input: {
-        id: databaseId,
-        status: ExpenditureStatus.Cancelled,
-      },
+  await amplifyClient.mutate<
+    UpdateExpenditureMutation,
+    UpdateExpenditureMutationVariables
+  >(UpdateExpenditureDocument, {
+    input: {
+      id: databaseId,
+      status: ExpenditureStatus.Cancelled,
     },
-  );
+  });
 
   await writeActionFromEvent(event, colonyAddress, {
     type: ColonyActionType.CancelExpenditure,

@@ -1,4 +1,4 @@
-import { mutate } from '~amplifyClient';
+import amplifyClient from '~amplifyClient';
 import {
   UpdateColonyExtensionByAddressDocument,
   UpdateColonyExtensionByAddressMutation,
@@ -10,7 +10,7 @@ export const updateExtension = async (
   extensionAddress: string,
   fieldsToUpdate: Omit<UpdateColonyExtensionInput, 'id'>,
 ): Promise<UpdateColonyExtensionByAddressMutation | undefined> => {
-  const result = await mutate<
+  const result = await amplifyClient.mutate<
     UpdateColonyExtensionByAddressMutation,
     UpdateColonyExtensionByAddressMutationVariables
   >(UpdateColonyExtensionByAddressDocument, {

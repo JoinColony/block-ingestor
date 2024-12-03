@@ -1,4 +1,4 @@
-import { query } from '~amplifyClient';
+import amplifyClient from '~amplifyClient';
 import {
   Colony,
   GetColonyDocument,
@@ -12,9 +12,12 @@ export const getColonyFromDB = async (
   colonyAddress: string,
 ): Promise<Colony | undefined> => {
   const { data } =
-    (await query<GetColonyQuery, GetColonyQueryVariables>(GetColonyDocument, {
-      id: colonyAddress,
-    })) ?? {};
+    (await amplifyClient.query<GetColonyQuery, GetColonyQueryVariables>(
+      GetColonyDocument,
+      {
+        id: colonyAddress,
+      },
+    )) ?? {};
 
   const colony = data?.getColony;
 

@@ -8,7 +8,7 @@ import {
   GetColonyQuery,
   GetColonyQueryVariables,
 } from '@joincolony/graphql';
-import { query } from '~amplifyClient';
+import amplifyClient from '~amplifyClient';
 import { sendPermissionsActionNotifications } from '~utils/notifications';
 import { NotificationCategory } from '~types/notifications';
 import { verbose } from '@joincolony/utils';
@@ -52,10 +52,13 @@ export default async (event: ContractEvent): Promise<void> => {
    */
   do {
     const { data } =
-      (await query<GetColonyQuery, GetColonyQueryVariables>(GetColonyDocument, {
-        id: colonyAddress,
-        nextToken,
-      })) ?? {};
+      (await amplifyClient.query<GetColonyQuery, GetColonyQueryVariables>(
+        GetColonyDocument,
+        {
+          id: colonyAddress,
+          nextToken,
+        },
+      )) ?? {};
     domain = data?.getColony?.domains?.items
       .filter(notNull)
       .find(

@@ -1,4 +1,4 @@
-import { mutate } from '~amplifyClient';
+import amplifyClient from '~amplifyClient';
 import {
   UpdateExpenditureDocument,
   UpdateExpenditureMutation,
@@ -69,7 +69,7 @@ export const handleExpenditureStateChanged: EventHandler = async (event) => {
       verbose(`State of expenditure with ID ${databaseId} changed`);
 
       if (!!updatedSlots || !!updatedStatus) {
-        await mutate<
+        await amplifyClient.mutate<
           UpdateExpenditureMutation,
           UpdateExpenditureMutationVariables
         >(UpdateExpenditureDocument, {

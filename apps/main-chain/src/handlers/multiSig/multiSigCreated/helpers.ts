@@ -1,6 +1,6 @@
 import { AnyMultisigPermissionsClient } from '@colony/colony-js';
 import { BigNumber } from 'ethers';
-import { mutate, query } from '~amplifyClient';
+import amplifyClient from '~amplifyClient';
 import {
   ColonyMultiSig,
   CreateColonyActionInput,
@@ -27,7 +27,7 @@ import { type GraphQLFnReturn } from '@joincolony/clients';
 const createColonyMultiSig = async (
   motionData: CreateColonyMultiSigInput,
 ): Promise<void> => {
-  await mutate<
+  await amplifyClient.mutate<
     CreateColonyMultiSigInput,
     CreateColonyMultiSigMutationVariables
   >(CreateColonyMultiSigDocument, {
@@ -85,7 +85,7 @@ const getDomainIdByNativeSkillId = async (
   colonyAddress: string,
   nativeSkillId: string,
 ): Promise<number | null> => {
-  const result = await query<
+  const result = await amplifyClient.query<
     GetDomainByNativeSkillIdQuery,
     GetDomainByNativeSkillIdQueryVariables
   >(GetDomainByNativeSkillIdDocument, {

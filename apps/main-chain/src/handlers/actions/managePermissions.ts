@@ -1,6 +1,6 @@
 import { BigNumber } from 'ethers';
 import { Id } from '@colony/colony-js';
-import { mutate, query } from '~amplifyClient';
+import amplifyClient from '~amplifyClient';
 import {
   ContractEventsSignatures,
   EventHandler,
@@ -86,7 +86,7 @@ export const handleManagePermissionsAction: EventHandler = async (
     __typename,
     ...existingRoles
   } = (
-    await query<GetColonyRoleQuery, GetColonyRoleQueryVariables>(
+    await amplifyClient.query<GetColonyRoleQuery, GetColonyRoleQueryVariables>(
       GetColonyRoleDocument,
       { id },
     )
@@ -133,16 +133,16 @@ export const handleManagePermissionsAction: EventHandler = async (
         ? getMultiSigRolesMapFromEvents(allRoleEventsUpdates, false)
         : getRolesMapFromEvents(allRoleEventsUpdates, false);
 
-      await mutate<UpdateColonyRoleMutation, UpdateColonyRoleMutationVariables>(
-        UpdateColonyRoleDocument,
-        {
-          input: {
-            id,
-            latestBlock: blockNumber,
-            ...rolesFromAllUpdateEvents,
-          },
+      await amplifyClient.mutate<
+        UpdateColonyRoleMutation,
+        UpdateColonyRoleMutationVariables
+      >(UpdateColonyRoleDocument, {
+        input: {
+          id,
+          latestBlock: blockNumber,
+          ...rolesFromAllUpdateEvents,
         },
-      );
+      });
 
       verbose(
         `Update the${

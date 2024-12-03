@@ -1,6 +1,6 @@
 import { utils } from 'ethers';
 
-import { mutate } from '~amplifyClient';
+import amplifyClient from '~amplifyClient';
 import { setupListenersForColony } from '~eventListeners';
 import {
   UpdateColonyContributorDocument,
@@ -121,7 +121,7 @@ export default async (event: ContractEvent): Promise<void> => {
    * check whether the contributor has already been created in the front end, and perform an update or a create mutation
    * accordingly.
    */
-  await mutate<
+  await amplifyClient.mutate<
     UpdateColonyContributorMutation,
     UpdateColonyContributorMutationVariables
   >(UpdateColonyContributorDocument, {

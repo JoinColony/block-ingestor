@@ -1,5 +1,5 @@
 import { BigNumber } from 'ethers';
-import { mutate } from '~amplifyClient';
+import amplifyClient from '~amplifyClient';
 import {
   UpdateExpenditureDocument,
   UpdateExpenditureMutation,
@@ -43,13 +43,13 @@ export default async (event: ContractEvent): Promise<void> => {
     `Claim delay set for expenditure with ID ${convertedExpenditureId} in colony ${colonyAddress}`,
   );
 
-  await mutate<UpdateExpenditureMutation, UpdateExpenditureMutationVariables>(
-    UpdateExpenditureDocument,
-    {
-      input: {
-        id: databaseId,
-        slots: updatedSlots,
-      },
+  await amplifyClient.mutate<
+    UpdateExpenditureMutation,
+    UpdateExpenditureMutationVariables
+  >(UpdateExpenditureDocument, {
+    input: {
+      id: databaseId,
+      slots: updatedSlots,
     },
-  );
+  });
 };

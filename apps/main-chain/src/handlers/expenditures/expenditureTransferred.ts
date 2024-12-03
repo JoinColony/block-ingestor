@@ -1,4 +1,4 @@
-import { mutate } from '~amplifyClient';
+import amplifyClient from '~amplifyClient';
 import {
   UpdateExpenditureDocument,
   UpdateExpenditureMutation,
@@ -22,13 +22,13 @@ export default async (event: ContractEvent): Promise<void> => {
     colonyAddress,
   );
 
-  await mutate<UpdateExpenditureMutation, UpdateExpenditureMutationVariables>(
-    UpdateExpenditureDocument,
-    {
-      input: {
-        id: getExpenditureDatabaseId(colonyAddress, convertedExpenditureId),
-        ownerAddress: newOwnerAddress,
-      },
+  await amplifyClient.mutate<
+    UpdateExpenditureMutation,
+    UpdateExpenditureMutationVariables
+  >(UpdateExpenditureDocument, {
+    input: {
+      id: getExpenditureDatabaseId(colonyAddress, convertedExpenditureId),
+      ownerAddress: newOwnerAddress,
     },
-  );
+  });
 };

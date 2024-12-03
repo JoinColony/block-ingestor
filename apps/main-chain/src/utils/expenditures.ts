@@ -1,5 +1,5 @@
 import { BigNumber, utils } from 'ethers';
-import { query } from '~amplifyClient';
+import amplifyClient from '~amplifyClient';
 
 import {
   ExpenditureBalance,
@@ -85,7 +85,7 @@ export const getExpenditureByFundingPot = async (
   colonyAddress: string,
   fundingPotId: number,
 ): Promise<ExpenditureFragment | null> => {
-  const response = await query<
+  const response = await amplifyClient.query<
     GetExpenditureByNativeFundingPotIdAndColonyQuery,
     GetExpenditureByNativeFundingPotIdAndColonyQueryVariables
   >(GetExpenditureByNativeFundingPotIdAndColonyDocument, {

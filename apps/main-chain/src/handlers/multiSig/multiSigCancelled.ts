@@ -1,4 +1,4 @@
-import { mutate } from '~amplifyClient';
+import amplifyClient from '~amplifyClient';
 import {
   NotificationType,
   UpdateColonyMultiSigDocument,
@@ -37,7 +37,7 @@ export const handleMultiSigMotionCancelled: EventHandler = async (
 
   verbose(`MultiSig motion: ${motionId} has been rejected`);
 
-  await mutate<
+  await amplifyClient.mutate<
     UpdateColonyMultiSigInput,
     UpdateColonyMultiSigMutationVariables
   >(UpdateColonyMultiSigDocument, {

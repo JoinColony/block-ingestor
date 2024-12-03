@@ -1,5 +1,5 @@
 import { AnyMultisigPermissionsClient } from '@colony/colony-js';
-import { mutate } from '~amplifyClient';
+import amplifyClient from '~amplifyClient';
 import {
   ExtensionParams,
   UpdateColonyExtensionByAddressDocument,
@@ -31,7 +31,7 @@ export const addMultiSigParamsToDB = async (
   }
 
   const params = await getInitialMultiSigParams(multiSigClient);
-  await mutate<
+  await amplifyClient.mutate<
     UpdateColonyExtensionByAddressMutation,
     UpdateColonyExtensionByAddressMutationVariables
   >(UpdateColonyExtensionByAddressDocument, {

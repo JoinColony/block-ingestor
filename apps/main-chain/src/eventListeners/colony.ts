@@ -1,6 +1,6 @@
 import { utils } from 'ethers';
 
-import { query } from '~amplifyClient';
+import amplifyClient from '~amplifyClient';
 import {
   ListColoniesDocument,
   ListColoniesQuery,
@@ -80,7 +80,7 @@ const fetchColoniesAddresses = async (): Promise<
 
   do {
     const { data } =
-      (await query<ListColoniesQuery, ListColoniesQueryVariables>(
+      (await amplifyClient.query<ListColoniesQuery, ListColoniesQueryVariables>(
         ListColoniesDocument,
         { nextToken },
       )) ?? {};

@@ -1,4 +1,4 @@
-import { mutate } from '~amplifyClient';
+import amplifyClient from '~amplifyClient';
 import {
   ColonyActionType,
   ExpenditureStatus,
@@ -34,15 +34,15 @@ export default async (event: ContractEvent): Promise<void> => {
     colonyAddress,
   );
 
-  await mutate<UpdateExpenditureMutation, UpdateExpenditureMutationVariables>(
-    UpdateExpenditureDocument,
-    {
-      input: {
-        id: databaseId,
-        status: ExpenditureStatus.Locked,
-      },
+  await amplifyClient.mutate<
+    UpdateExpenditureMutation,
+    UpdateExpenditureMutationVariables
+  >(UpdateExpenditureDocument, {
+    input: {
+      id: databaseId,
+      status: ExpenditureStatus.Locked,
     },
-  );
+  });
 
   /**
    * @NOTE: Only create a `LOCK_EXPENDITURE` action if the expenditure was not created as part of a OneTxPayment

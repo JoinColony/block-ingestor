@@ -1,5 +1,5 @@
 import { getExpenditureDatabaseId, toNumber } from '~utils';
-import { mutate } from '~amplifyClient';
+import amplifyClient from '~amplifyClient';
 import {
   UpdateStreamingPaymentDocument,
   UpdateStreamingPaymentMutation,
@@ -39,7 +39,7 @@ export const handlePaymentTokenUpdated: EventHandler = async (
 
   verbose(`Payment token updated for streaming payment with ID ${databaseId}`);
 
-  await mutate<
+  await amplifyClient.mutate<
     UpdateStreamingPaymentMutation,
     UpdateStreamingPaymentMutationVariables
   >(UpdateStreamingPaymentDocument, {

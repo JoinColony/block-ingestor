@@ -1,4 +1,4 @@
-import { mutate } from '~amplifyClient';
+import amplifyClient from '~amplifyClient';
 import {
   CreateUserStakeDocument,
   CreateUserStakeMutation,
@@ -45,41 +45,41 @@ export const handleExpenditureMadeViaStake: EventHandler = async (
 
   const stakeDatabaseId = getUserStakeDatabaseId(creator, transactionHash);
 
-  await mutate<UpdateExpenditureMutation, UpdateExpenditureMutationVariables>(
-    UpdateExpenditureDocument,
-    {
-      input: {
-        id: databaseId,
-        isStaked: true,
-        userStakeId: stakeDatabaseId,
-        stakedExpenditureAddress: contractAddress,
-      },
+  await amplifyClient.mutate<
+    UpdateExpenditureMutation,
+    UpdateExpenditureMutationVariables
+  >(UpdateExpenditureDocument, {
+    input: {
+      id: databaseId,
+      isStaked: true,
+      userStakeId: stakeDatabaseId,
+      stakedExpenditureAddress: contractAddress,
     },
-  );
+  });
 
-  await mutate<CreateUserStakeMutation, CreateUserStakeMutationVariables>(
-    CreateUserStakeDocument,
-    {
-      input: {
-        id: stakeDatabaseId,
-        actionId: transactionHash,
-        amount: stake.toString(),
-        userAddress: creator,
-        colonyAddress,
-        isClaimed: false,
-        type: UserStakeType.StakedExpenditure,
-      },
+  await amplifyClient.mutate<
+    CreateUserStakeMutation,
+    CreateUserStakeMutationVariables
+  >(CreateUserStakeDocument, {
+    input: {
+      id: stakeDatabaseId,
+      actionId: transactionHash,
+      amount: stake.toString(),
+      userAddress: creator,
+      colonyAddress,
+      isClaimed: false,
+      type: UserStakeType.StakedExpenditure,
     },
-  );
+  });
 
-  await mutate<UpdateColonyActionMutation, UpdateColonyActionMutationVariables>(
-    UpdateColonyActionDocument,
-    {
-      input: {
-        id: transactionHash,
-        showInActionsList: true,
-        initiatorAddress: creator,
-      },
+  await amplifyClient.mutate<
+    UpdateColonyActionMutation,
+    UpdateColonyActionMutationVariables
+  >(UpdateColonyActionDocument, {
+    input: {
+      id: transactionHash,
+      showInActionsList: true,
+      initiatorAddress: creator,
     },
-  );
+  });
 };

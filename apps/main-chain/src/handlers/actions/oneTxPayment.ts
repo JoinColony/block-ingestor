@@ -1,6 +1,6 @@
 import { AnyColonyClient } from '@colony/colony-js';
 import { BigNumber, utils } from 'ethers';
-import { query } from '~amplifyClient';
+import amplifyClient from '~amplifyClient';
 import {
   ColonyActionType,
   GetColonyExtensionDocument,
@@ -66,10 +66,10 @@ export default async (oneTxPaymentEvent: ContractEvent): Promise<void> => {
   const { contractAddress: extensionAddress } = oneTxPaymentEvent;
 
   const { data } =
-    (await query<GetColonyExtensionQuery, GetColonyExtensionQueryVariables>(
-      GetColonyExtensionDocument,
-      { id: extensionAddress },
-    )) ?? {};
+    (await amplifyClient.query<
+      GetColonyExtensionQuery,
+      GetColonyExtensionQueryVariables
+    >(GetColonyExtensionDocument, { id: extensionAddress })) ?? {};
   const { colonyId: colonyAddress = '', version } =
     data?.getColonyExtension ?? {};
 

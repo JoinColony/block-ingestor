@@ -1,4 +1,4 @@
-import { mutate } from '~amplifyClient';
+import amplifyClient from '~amplifyClient';
 import {
   CreateColonyFundsClaimDocument,
   CreateColonyFundsClaimMutation,
@@ -22,7 +22,7 @@ export const createFundsClaim = async ({
 }: CreateFundsClaimsParams): Promise<void> => {
   const chainId = rpcProvider.getChainId();
 
-  await mutate<
+  await amplifyClient.mutate<
     CreateColonyFundsClaimMutation,
     CreateColonyFundsClaimMutationVariables
   >(CreateColonyFundsClaimDocument, {

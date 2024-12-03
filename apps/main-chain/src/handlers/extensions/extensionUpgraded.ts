@@ -1,4 +1,4 @@
-import { query } from '~amplifyClient';
+import amplifyClient from '~amplifyClient';
 import {
   GetColonyExtensionByHashAndColonyDocument,
   GetColonyExtensionByHashAndColonyQuery,
@@ -23,7 +23,7 @@ export default async (event: ContractEvent): Promise<void> => {
   );
 
   const { data } =
-    (await query<
+    (await amplifyClient.query<
       GetColonyExtensionByHashAndColonyQuery,
       GetColonyExtensionByHashAndColonyQueryVariables
     >(GetColonyExtensionByHashAndColonyDocument, {

@@ -1,5 +1,5 @@
 import { Extension, getExtensionHash } from '@colony/colony-js';
-import { mutate, query } from '~amplifyClient';
+import amplifyClient from '~amplifyClient';
 import {
   CreateExtensionInstallationsCountDocument,
   CreateExtensionInstallationsCountMutation,
@@ -26,7 +26,7 @@ const getExtensionCount = async (extensionHash: string): Promise<number> => {
   const provider = rpcProvider.getProviderInstance();
 
   const { data } =
-    (await query<
+    (await amplifyClient.query<
       GetExtensionInstallationsCountQuery,
       GetExtensionInstallationsCountQueryVariables
     >(GetExtensionInstallationsCountDocument, {
@@ -34,7 +34,7 @@ const getExtensionCount = async (extensionHash: string): Promise<number> => {
     })) ?? {};
 
   if (!data?.getExtensionInstallationsCount) {
-    await mutate<
+    await amplifyClient.mutate<
       CreateExtensionInstallationsCountMutation,
       CreateExtensionInstallationsCountMutationVariables
     >(CreateExtensionInstallationsCountDocument, {
@@ -78,7 +78,7 @@ export const updateExtensionCount = async (
 
   const key = extensionHashDBKeyMap[extensionHash];
 
-  await mutate<
+  await amplifyClient.mutate<
     UpdateExtensionInstallationsCountMutation,
     UpdateExtensionInstallationsCountMutationVariables
   >(UpdateExtensionInstallationsCountDocument, {

@@ -7,7 +7,7 @@ import {
   getDomainDatabaseId,
   getVotingClient,
 } from '~utils';
-import { mutate } from '~amplifyClient';
+import amplifyClient from '~amplifyClient';
 import {
   ColonyMotion,
   CreateColonyActionInput,
@@ -142,20 +142,20 @@ const getInitialMotionMessage = async (
 const createColonyMotion = async (
   motionData: CreateColonyMotionInput,
 ): Promise<void> => {
-  await mutate<CreateColonyMotionMutation, CreateColonyMotionMutationVariables>(
-    CreateColonyMotionDocument,
-    {
-      input: {
-        ...motionData,
-      },
+  await amplifyClient.mutate<
+    CreateColonyMotionMutation,
+    CreateColonyMotionMutationVariables
+  >(CreateColonyMotionDocument, {
+    input: {
+      ...motionData,
     },
-  );
+  });
 };
 
 const createMotionMessage = async (
   initialMotionMessage: CreateMotionMessageInput,
 ): Promise<void> => {
-  await mutate<
+  await amplifyClient.mutate<
     CreateMotionMessageMutation,
     CreateMotionMessageMutationVariables
   >(CreateMotionMessageDocument, {

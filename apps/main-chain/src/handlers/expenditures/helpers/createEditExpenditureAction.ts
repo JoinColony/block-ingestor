@@ -1,7 +1,7 @@
 import { AnyColonyClient } from '@colony/colony-js';
 import { utils } from 'ethers';
 import { isEqual, omit } from 'lodash';
-import { mutate } from '~amplifyClient';
+import amplifyClient from '~amplifyClient';
 import {
   ColonyActionType,
   ExpenditureFragment,
@@ -198,16 +198,16 @@ export const createEditExpenditureAction = async (
     }
   }
 
-  await mutate<UpdateExpenditureMutation, UpdateExpenditureMutationVariables>(
-    UpdateExpenditureDocument,
-    {
-      input: {
-        id: databaseId,
-        slots: updatedSlots,
-        status: updatedStatus,
-      },
+  await amplifyClient.mutate<
+    UpdateExpenditureMutation,
+    UpdateExpenditureMutationVariables
+  >(UpdateExpenditureDocument, {
+    input: {
+      id: databaseId,
+      slots: updatedSlots,
+      status: updatedStatus,
     },
-  );
+  });
 
   if (shouldCreateAction) {
     const { agent: initiatorAddress } = event.args;

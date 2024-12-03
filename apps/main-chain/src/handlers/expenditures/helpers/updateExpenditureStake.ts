@@ -1,4 +1,4 @@
-import { mutate } from '~amplifyClient';
+import amplifyClient from '~amplifyClient';
 import {
   UpdateUserStakeDocument,
   UpdateUserStakeMutation,
@@ -21,15 +21,15 @@ export const updateExpenditureStake = async (
     return;
   }
 
-  await mutate<UpdateUserStakeMutation, UpdateUserStakeMutationVariables>(
-    UpdateUserStakeDocument,
-    {
-      input: {
-        id: expenditure.userStakeId,
-        ...fieldsToUpdate,
-      },
+  await amplifyClient.mutate<
+    UpdateUserStakeMutation,
+    UpdateUserStakeMutationVariables
+  >(UpdateUserStakeDocument, {
+    input: {
+      id: expenditure.userStakeId,
+      ...fieldsToUpdate,
     },
-  );
+  });
 
   verbose(
     `Updated stake with ID ${expenditure.userStakeId} for expenditure ${expenditureDatabaseId}`,

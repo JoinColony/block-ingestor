@@ -1,4 +1,4 @@
-import { query } from '~amplifyClient';
+import amplifyClient from '~amplifyClient';
 import networkClient from '~networkClient';
 import rpcProvider from '~provider';
 import { ContractEvent } from '@joincolony/blocks';
@@ -63,7 +63,7 @@ export default async (event: ContractEvent): Promise<void> => {
     if (process.env.NODE_ENV !== 'production') {
       const { id: existingClaimId } =
         (
-          await query<
+          await amplifyClient.query<
             GetColonyUnclaimedFundQuery,
             GetColonyUnclaimedFundQueryVariables
           >(GetColonyUnclaimedFundDocument, { claimId })
@@ -90,7 +90,7 @@ export default async (event: ContractEvent): Promise<void> => {
      * gets added to the DB if it doesn't already exist
      */
     try {
-      const dbTokenQuery = await query<
+      const dbTokenQuery = await amplifyClient.query<
         GetTokenFromEverywhereQuery,
         GetTokenFromEverywhereQueryVariables
       >(GetTokenFromEverywhereDocument, {

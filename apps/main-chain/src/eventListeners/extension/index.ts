@@ -17,7 +17,7 @@ import {
   ListExtensionsQuery,
   ListExtensionsQueryVariables,
 } from '@joincolony/graphql';
-import { query } from '~amplifyClient';
+import amplifyClient from '~amplifyClient';
 import { notNull } from '~utils';
 
 import { addNetworkEventListener } from '../network';
@@ -104,13 +104,13 @@ export const fetchExistingExtensions = async (
 
   do {
     const { data } =
-      (await query<ListExtensionsQuery, ListExtensionsQueryVariables>(
-        ListExtensionsDocument,
-        {
-          nextToken,
-          hash: extensionHash,
-        },
-      )) ?? {};
+      (await amplifyClient.query<
+        ListExtensionsQuery,
+        ListExtensionsQueryVariables
+      >(ListExtensionsDocument, {
+        nextToken,
+        hash: extensionHash,
+      })) ?? {};
 
     const { items } = data?.getExtensionsByHash ?? {};
     extensions.push(...(items ?? []));

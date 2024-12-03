@@ -1,5 +1,6 @@
 import { providers } from 'ethers';
 import { ChainID } from './types';
+import { output } from '@joincolony/utils';
 
 export class RpcProvider {
   private provider: providers.StaticJsonRpcProvider;
@@ -21,8 +22,7 @@ export class RpcProvider {
 
   public getChainId(): ChainID {
     if (!this.chainId) {
-      // @TODO get logger from utils
-      console.error(
+      output(
         'Chain ID has not been initialized. Call initialiseProvider() first!',
       );
     }

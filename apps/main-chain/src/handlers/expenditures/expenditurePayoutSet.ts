@@ -10,7 +10,7 @@ import {
   UpdateExpenditureMutation,
   UpdateExpenditureMutationVariables,
 } from '@joincolony/graphql';
-import { mutate } from '~amplifyClient';
+import amplifyClient from '~amplifyClient';
 import { splitAmountAndFee } from '~utils/networkFee';
 
 import {
@@ -80,7 +80,7 @@ export default async (event: ContractEvent): Promise<void> => {
         `Payout set for expenditure with ID ${convertedExpenditureId} in colony ${colonyAddress}`,
       );
 
-      await mutate<
+      await amplifyClient.mutate<
         UpdateExpenditureMutation,
         UpdateExpenditureMutationVariables
       >(UpdateExpenditureDocument, {

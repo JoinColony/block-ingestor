@@ -1,4 +1,4 @@
-import { mutate } from '~amplifyClient';
+import amplifyClient from '~amplifyClient';
 import {
   ColonyActionType,
   UpdateExpenditureDocument,
@@ -43,15 +43,15 @@ export default async (event: ContractEvent): Promise<void> => {
     `Recipient set for expenditure with ID ${convertedExpenditureId} in colony ${colonyAddress}`,
   );
 
-  await mutate<UpdateExpenditureMutation, UpdateExpenditureMutationVariables>(
-    UpdateExpenditureDocument,
-    {
-      input: {
-        id: databaseId,
-        slots: updatedSlots,
-      },
+  await amplifyClient.mutate<
+    UpdateExpenditureMutation,
+    UpdateExpenditureMutationVariables
+  >(UpdateExpenditureDocument, {
+    input: {
+      id: databaseId,
+      slots: updatedSlots,
     },
-  );
+  });
 
   const mentionRecipients: string[] = [];
   updatedSlots.forEach((updatedSlot) => {

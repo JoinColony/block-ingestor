@@ -1,4 +1,4 @@
-import { mutate } from '~amplifyClient';
+import amplifyClient from '~amplifyClient';
 import { NETWORK_INVERSE_FEE_DATABASE_ID } from '~constants';
 import {
   UpdateCurrentNetworkInverseFeeDocument,
@@ -12,7 +12,7 @@ export default async (event: ContractEvent): Promise<void> => {
   const { feeInverse } = event.args;
   const convertedFee = feeInverse.toString();
 
-  await mutate<
+  await amplifyClient.mutate<
     UpdateCurrentNetworkInverseFeeMutation,
     UpdateCurrentNetworkInverseFeeMutationVariables
   >(UpdateCurrentNetworkInverseFeeDocument, {

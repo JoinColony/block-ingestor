@@ -13,7 +13,7 @@ import {
   UpdateExpenditureMutation,
   UpdateExpenditureMutationVariables,
 } from '@joincolony/graphql';
-import { mutate } from '~amplifyClient';
+import amplifyClient from '~amplifyClient';
 import { getAmountWithFee, getNetworkInverseFee } from '~utils/networkFee';
 
 import { getExpenditureFromDB } from './helpers';
@@ -89,16 +89,16 @@ export default async (event: ContractEvent): Promise<void> => {
 
   verbose(`Payout claimed in expenditure with ID ${databaseId}`);
 
-  await mutate<UpdateExpenditureMutation, UpdateExpenditureMutationVariables>(
-    UpdateExpenditureDocument,
-    {
-      input: {
-        id: databaseId,
-        slots: updatedSlots,
-        balances: updatedBalances,
-      },
+  await amplifyClient.mutate<
+    UpdateExpenditureMutation,
+    UpdateExpenditureMutationVariables
+  >(UpdateExpenditureDocument, {
+    input: {
+      id: databaseId,
+      slots: updatedSlots,
+      balances: updatedBalances,
     },
-  );
+  });
 
   const hasOneTxPaymentEvent = await transactionHasEvent(
     event.transactionHash,

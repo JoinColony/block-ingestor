@@ -2,7 +2,7 @@ import { BigNumber, utils } from 'ethers';
 import { Log } from '@ethersproject/providers';
 
 import networkClient from '~networkClient';
-import { mutate, query } from '~amplifyClient';
+import amplifyClient from '~amplifyClient';
 import rpcProvider from '~provider';
 import {
   CreateContractEventDocument,
@@ -152,17 +152,17 @@ export const saveEvent = async (event: ContractEvent): Promise<void> => {
   if (process.env.NODE_ENV !== 'production') {
     const { id: existingContractEventId } =
       (
-        await query<GetContractEventQuery, GetContractEventQueryVariables>(
-          GetContractEventDocument,
-          {
-            id: contractEvent.id,
-          },
-        )
+        await amplifyClient.query<
+          GetContractEventQuery,
+          GetContractEventQueryVariables
+        >(GetContractEventDocument, {
+          id: contractEvent.id,
+        })
       )?.data?.getContractEvent ?? {};
     existingContractEvent = existingContractEventId;
   }
   if (!existingContractEvent) {
-    await mutate<
+    await amplifyClient.mutate<
       CreateContractEventMutation,
       CreateContractEventMutationVariables
     >(CreateContractEventDocument, { input: contractEvent });

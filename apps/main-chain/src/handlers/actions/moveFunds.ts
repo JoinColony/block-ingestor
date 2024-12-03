@@ -20,7 +20,7 @@ import {
   UpdateExpenditureMutation,
   UpdateExpenditureMutationVariables,
 } from '@joincolony/graphql';
-import { mutate } from '~amplifyClient';
+import amplifyClient from '~amplifyClient';
 import {
   sendExpenditureUpdateNotifications,
   sendPermissionsActionNotifications,
@@ -140,15 +140,15 @@ const updateExpenditureBalances = async ({
     amount,
   );
 
-  await mutate<UpdateExpenditureMutation, UpdateExpenditureMutationVariables>(
-    UpdateExpenditureDocument,
-    {
-      input: {
-        id: expenditure.id,
-        balances: updatedBalances,
-      },
+  await amplifyClient.mutate<
+    UpdateExpenditureMutation,
+    UpdateExpenditureMutationVariables
+  >(UpdateExpenditureDocument, {
+    input: {
+      id: expenditure.id,
+      balances: updatedBalances,
     },
-  );
+  });
 
   if (
     !isPartOfOneTxPayment &&

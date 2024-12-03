@@ -1,4 +1,4 @@
-import { mutate } from '~amplifyClient';
+import amplifyClient from '~amplifyClient';
 import {
   ColonyActionType,
   ExpenditureStatus,
@@ -34,16 +34,16 @@ export default async (event: ContractEvent): Promise<void> => {
     colonyAddress,
   );
 
-  await mutate<UpdateExpenditureMutation, UpdateExpenditureMutationVariables>(
-    UpdateExpenditureDocument,
-    {
-      input: {
-        id: databaseId,
-        status: ExpenditureStatus.Finalized,
-        finalizedAt: event.timestamp,
-      },
+  await amplifyClient.mutate<
+    UpdateExpenditureMutation,
+    UpdateExpenditureMutationVariables
+  >(UpdateExpenditureDocument, {
+    input: {
+      id: databaseId,
+      status: ExpenditureStatus.Finalized,
+      finalizedAt: event.timestamp,
     },
-  );
+  });
 
   /**
    * @NOTE: Only create a `FINALIZE_EXPENDITURE` action if the expenditure was not created as part of a OneTxPayment

@@ -5,7 +5,7 @@ import {
   UpdateExpenditureMutation,
   UpdateExpenditureMutationVariables,
 } from '@joincolony/graphql';
-import { mutate } from '~amplifyClient';
+import amplifyClient from '~amplifyClient';
 
 import { getExpenditureFromDB, getUpdatedExpenditureSlots } from './helpers';
 import { output, verbose } from '@joincolony/utils';
@@ -39,13 +39,13 @@ export default async (event: ContractEvent): Promise<void> => {
     `Payout modifier set for expenditure with ID ${convertedExpenditureId} in colony ${colonyAddress}`,
   );
 
-  await mutate<UpdateExpenditureMutation, UpdateExpenditureMutationVariables>(
-    UpdateExpenditureDocument,
-    {
-      input: {
-        id: databaseId,
-        slots: updatedSlots,
-      },
+  await amplifyClient.mutate<
+    UpdateExpenditureMutation,
+    UpdateExpenditureMutationVariables
+  >(UpdateExpenditureDocument, {
+    input: {
+      id: databaseId,
+      slots: updatedSlots,
     },
-  );
+  });
 };

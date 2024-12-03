@@ -9,7 +9,7 @@ import {
 import { ContractEvent } from '@joincolony/blocks';
 import rpcProvider from '~provider';
 import { getDomainDatabaseId, writeActionFromEvent } from '~utils';
-import { query } from '~amplifyClient';
+import amplifyClient from '~amplifyClient';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { contractAddress: colonyAddress, transactionHash } = event;
@@ -18,10 +18,10 @@ export default async (event: ContractEvent): Promise<void> => {
     .getTransactionReceipt(event.transactionHash);
 
   const { data } =
-    (await query<GetColonyActionQuery, GetColonyActionQueryVariables>(
-      GetColonyActionDocument,
-      { transactionHash },
-    )) ?? {};
+    (await amplifyClient.query<
+      GetColonyActionQuery,
+      GetColonyActionQueryVariables
+    >(GetColonyActionDocument, { transactionHash })) ?? {};
 
   // @NOTE: Filter out the event if it's already been processed (It can happen with multi-transactions)
   if (data?.getColonyAction?.id) {

@@ -1,6 +1,6 @@
 import { Id } from '@colony/colony-js';
 import { utils } from 'ethers';
-import { mutate, query } from '~amplifyClient';
+import amplifyClient from '~amplifyClient';
 import {
   ColonyActionType,
   GetColonyContributorDocument,
@@ -41,7 +41,7 @@ export const handleAddVerifiedMembers = async (
         return;
       }
 
-      const item = await query<
+      const item = await amplifyClient.query<
         GetColonyContributorQuery,
         GetColonyContributorQueryVariables
       >(GetColonyContributorDocument, {
@@ -67,7 +67,7 @@ export const handleAddVerifiedMembers = async (
         return;
       }
 
-      await mutate<
+      await amplifyClient.mutate<
         UpdateColonyContributorMutation,
         UpdateColonyContributorMutationVariables
       >(UpdateColonyContributorDocument, {

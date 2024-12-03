@@ -1,6 +1,6 @@
 import { constants } from 'ethers';
 
-import { mutate, query } from '~amplifyClient';
+import amplifyClient from '~amplifyClient';
 import { ContractEvent } from '@joincolony/blocks';
 import { saveEvent, notNull } from '~utils';
 import {
@@ -25,7 +25,7 @@ export default async (event: ContractEvent): Promise<void> => {
   if (tokenAddress !== constants.AddressZero) {
     const { items: unclaimedFunds } =
       (
-        await query<
+        await amplifyClient.query<
           GetColonyUnclaimedFundsQuery,
           GetColonyUnclaimedFundsQueryVariables
         >(GetColonyUnclaimedFundsDocument, {
@@ -56,7 +56,7 @@ export default async (event: ContractEvent): Promise<void> => {
     if (colonyHasUnclaimedFunds) {
       await Promise.all(
         unclaimedFunds.filter(notNull).map(async ({ id, token, amount }) => {
-          await mutate<
+          await amplifyClient.mutate<
             UpdateColonyFundsClaimMutation,
             UpdateColonyFundsClaimMutationVariables
           >(UpdateColonyFundsClaimDocument, {
