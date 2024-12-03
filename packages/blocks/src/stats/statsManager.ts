@@ -15,7 +15,7 @@ import { ObjectOrFunction } from './types';
 
 export class StatsManager {
   private stats: Record<string, unknown> = {};
-  private amplifyClient: AmplifyClient;
+  private readonly amplifyClient: AmplifyClient;
 
   constructor(amplifyClient: AmplifyClient) {
     this.amplifyClient = amplifyClient;

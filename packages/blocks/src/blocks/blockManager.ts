@@ -14,13 +14,13 @@ export const BLOCK_PAGING_SIZE = process.env.BLOCK_PAGING_SIZE
   : 1000;
 
 export class BlockManager {
-  private blocksMap = new Map<number, Block | BlockWithTransactions>();
-  private blockLogs = new Map<number, Log[]>();
+  private readonly blocksMap = new Map<number, Block | BlockWithTransactions>();
+  private readonly blockLogs = new Map<number, Log[]>();
   private latestSeenBlockNumber = 0;
   private isProcessing = false;
-  private eventManager: EventManager;
-  private rpcProvider: RpcProvider;
-  private statsManager: StatsManager;
+  private readonly eventManager: EventManager;
+  private readonly rpcProvider: RpcProvider;
+  private readonly statsManager: StatsManager;
   private timeNow = Date.now();
   private timePrev = 0;
 
@@ -33,15 +33,18 @@ export class BlockManager {
     this.rpcProvider = rpcProvider;
     this.statsManager = statsManager;
   }
-  public getBlock(blockNumber: number) {
+
+  public getBlock(blockNumber: number): Block | BlockWithTransactions {
     return this.blocksMap.get(blockNumber);
   }
+
   public updateBlocksMap(
     blockNumber: number,
     block: Block | BlockWithTransactions,
-  ) {
+  ): void {
     this.blocksMap.set(blockNumber, block);
   }
+
   public getLatestSeenBlockNumber(): number {
     return this.latestSeenBlockNumber;
   }

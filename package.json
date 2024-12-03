@@ -12,7 +12,7 @@
     "start:main-chain": "pnpm --filter @joincolony/main-chain run start",
     "dev:proxy-chain": "pnpm --filter @joincolony/proxy-chain run dev",
     "typecheck": "pnpm -r run typecheck",
-    "lint": "eslint src/ --ext .ts",
+    "lint": "eslint . --ext .ts",
     "preinstall": "bash scripts/generate-temp-files.sh",
     "prepare": "husky install",
     "codegen": "pnpm --filter graphql run codegen"

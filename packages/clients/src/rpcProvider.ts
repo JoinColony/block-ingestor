@@ -3,7 +3,7 @@ import { ChainID } from './types';
 import { output } from '@joincolony/utils';
 
 export class RpcProvider {
-  private provider: providers.StaticJsonRpcProvider;
+  private readonly provider: providers.StaticJsonRpcProvider;
   private chainId: ChainID | null;
 
   constructor(rpcEndpoint?: string) {

@@ -1,4 +1,4 @@
-import { Network, getColonyNetworkClient } from '@colony/colony-js';
+import { ColonyNetworkClient, Network, getColonyNetworkClient } from '@colony/colony-js';
 
 import { RpcProvider } from './rpcProvider';
 
@@ -14,7 +14,7 @@ export class NetworkClient {
     }
 
     // @TODO maybe add here an options object
-    public getInstance() {
+    public getInstance(): ColonyNetworkClient {
         return getColonyNetworkClient(this.network, this.rpcProvider.getProviderInstance(), {
             networkAddress: this.networkAddress,
             disableVersionCheck: true,

@@ -22,7 +22,7 @@ const ProxyColonyEvents = new utils.Interface([
 
 export class EventManager {
   private listeners: EventListener[] = [];
-  private rpcProvider: RpcProvider;
+  private readonly rpcProvider: RpcProvider;
 
   constructor(rpcProvider: RpcProvider) {
     this.rpcProvider = rpcProvider;
@@ -69,6 +69,7 @@ export class EventManager {
   public getListenersStats(): string {
     return JSON.stringify(this.listeners);
   }
+
   /**
    * Function returning ABI-derived interface for a given event listener type,
    * which is later used for parsing event logs
@@ -105,6 +106,7 @@ export class EventManager {
       }
     }
   }
+
   private getInterfaceByExtensionHash(
     extensionHash: string,
   ): utils.Interface | null {

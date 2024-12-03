@@ -1,6 +1,5 @@
-import { ContractEventsSignatures, EventHandler } from '@joincolony/blocks';
+import { ContractEventsSignatures, EventHandler , EventListenerType, EventListener } from '@joincolony/blocks';
 import eventManager from '~eventManager';
-import { EventListenerType, EventListener } from '@joincolony/blocks';
 import { utils } from 'ethers';
 import isEqual from 'lodash/isEqual';
 

@@ -1,4 +1,4 @@
-import { Network, getColonyNetworkClient } from '@colony/colony-js';
+import { Network } from '@colony/colony-js';
 
 import rpcProvider from '~provider';
 
