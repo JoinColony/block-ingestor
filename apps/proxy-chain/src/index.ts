@@ -1,20 +1,26 @@
 import 'cross-fetch/polyfill';
 import { utils } from 'ethers';
 
-/*
-import { startBlockListener } from '~blockListener';
-import amplifyClientSetup from '~amplifyClient';
-import { initialiseProvider } from '@joincolony/clients';
-*/
+import '~amplifyClient';
+import '~eventManager';
+import blockManager from '~blockManager';
+import rpcProvider from '~provider';
+import { startStatsServer } from '~stats';
 
 utils.Logger.setLogLevel(utils.Logger.levels.ERROR);
 
 const start = async (): Promise<void> => {
-  /*
-  amplifyClientSetup();
-  startBlockListener();
-  await initialiseProvider();
-  */
+  await rpcProvider.initialiseProvider();
+  /**
+   * Start express server providing stats and fetch existing stats from the DB
+   */
+  await startStatsServer();
+
+  /**
+   * Start the main block listener
+   */
+  blockManager.startBlockListener();
+  
   console.log('started');
 };
 
