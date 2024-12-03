@@ -13,7 +13,7 @@ export const lookupSignature = async (
 
   do {
     response = await fetch(
-      `https://www.4byte.directory/api/v1/signatures/?hex_signature=${hexSignature}&page=${page}`,
+      `${process.env.FOUR_BYTE_API_URL}/signatures/?hex_signature=${hexSignature}&page=${page}`,
     );
 
     data = await response.json();
