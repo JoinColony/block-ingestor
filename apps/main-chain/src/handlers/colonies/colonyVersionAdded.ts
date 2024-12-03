@@ -1,6 +1,6 @@
 import { verbose } from '@joincolony/utils';
 import { COLONY_CURRENT_VERSION_KEY } from '~constants';
-import { ContractEvent } from '~types';
+import { ContractEvent } from '@joincolony/blocks';
 import { toNumber } from '~utils';
 import { updateCurrentVersion } from '~utils/currentVersion';
 import { sendColonyVersionAddedNotifications } from '~utils/notifications';

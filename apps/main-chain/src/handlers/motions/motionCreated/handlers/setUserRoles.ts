@@ -1,7 +1,7 @@
 import { TransactionDescription } from 'ethers/lib/utils';
 import { constants } from 'ethers';
 
-import { ContractEvent, motionNameMapping } from '~types';
+import { motionNameMapping } from '~types';
 import {
   getColonyRolesDatabaseId,
   getDomainDatabaseId,
@@ -9,6 +9,7 @@ import {
 } from '~utils';
 
 import { createMotionInDB } from '../helpers';
+import { ContractEvent } from '@joincolony/blocks';
 
 export const handleSetUserRolesMotion = async (
   colonyAddress: string,

@@ -1,6 +1,6 @@
 import { ColonyActionType } from '@joincolony/graphql';
 import { verbose } from '@joincolony/utils';
-import { ContractEvent, ContractEventsSignatures } from '~types';
+import { ContractEvent, ContractEventsSignatures } from '@joincolony/blocks';
 import { NotificationCategory } from '~types/notifications';
 import {
   toNumber,

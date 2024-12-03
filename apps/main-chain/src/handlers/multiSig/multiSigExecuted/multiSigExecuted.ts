@@ -1,7 +1,5 @@
-import { ExtensionEventListener } from '~eventListeners';
 import rpcProvider from '~provider';
-
-import { EventHandler } from '~types';
+import { EventHandler, ExtensionEventListener } from '@joincolony/blocks';
 // import { linkPendingMetadata } from '~utils/colonyMetadata';
 
 import {

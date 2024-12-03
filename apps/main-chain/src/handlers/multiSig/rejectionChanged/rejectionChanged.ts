@@ -1,13 +1,12 @@
 import { MultiSigVote } from '@joincolony/graphql';
 import rpcProvider from '~provider';
-import { EventHandler } from '~types';
 import {
   addMultiSigVote,
   getMultiSigDatabaseId,
   getUserMultiSigSignature,
   removeMultiSigVote,
 } from '../helpers';
-import { ExtensionEventListener } from '~eventListeners';
+import { EventHandler, ExtensionEventListener } from '@joincolony/blocks';
 
 export const handleMultiSigRejectionChanged: EventHandler = async (
   event,

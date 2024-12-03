@@ -1,5 +1,4 @@
-import { ExtensionEventListener } from '~eventListeners';
-import { EventHandler } from '~types';
+import { ExtensionEventListener, EventHandler } from '@joincolony/blocks';
 import { getActionByMotionId, getVotingClient } from '~utils';
 import {
   getMotionDatabaseId,

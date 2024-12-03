@@ -5,7 +5,7 @@ import {
   UpdateColonyMutation,
   UpdateColonyMutationVariables,
 } from '@joincolony/graphql';
-import { ContractEvent } from '~types';
+import { ContractEvent } from '@joincolony/blocks';
 import { NotificationCategory } from '~types/notifications';
 import { toNumber, writeActionFromEvent } from '~utils';
 import { sendPermissionsActionNotifications } from '~utils/notifications';

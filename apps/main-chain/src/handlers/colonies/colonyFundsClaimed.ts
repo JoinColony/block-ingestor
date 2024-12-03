@@ -1,7 +1,7 @@
 import { constants } from 'ethers';
 
 import { mutate, query } from '~amplifyClient';
-import { ContractEvent } from '~types';
+import { ContractEvent } from '@joincolony/blocks';
 import { saveEvent, notNull } from '~utils';
 import {
   UpdateColonyFundsClaimDocument,

@@ -4,7 +4,7 @@ import { ColonyRole, Id } from '@colony/colony-js';
 import { hexStripZeros } from 'ethers/lib/utils';
 
 import { mutate, query } from '~amplifyClient';
-import { ContractEvent, ContractEventsSignatures } from '~types';
+import { ContractEvent, ContractEventsSignatures } from '@joincolony/blocks';
 import {
   getCachedColonyClient,
   getDomainDatabaseId,

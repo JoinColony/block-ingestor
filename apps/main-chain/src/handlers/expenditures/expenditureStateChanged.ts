@@ -4,7 +4,6 @@ import {
   UpdateExpenditureMutation,
   UpdateExpenditureMutationVariables,
 } from '@joincolony/graphql';
-import { EventHandler } from '~types';
 import {
   getCachedColonyClient,
   getExpenditureDatabaseId,
@@ -19,6 +18,7 @@ import {
   NotEditActionError,
 } from './helpers';
 import { output, verbose } from '@joincolony/utils';
+import { EventHandler } from '@joincolony/blocks';
 
 export const handleExpenditureStateChanged: EventHandler = async (event) => {
   const { contractAddress: colonyAddress } = event;

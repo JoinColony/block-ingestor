@@ -1,4 +1,4 @@
-import { ContractEventsSignatures, EventHandler } from '~types';
+import { ContractEventsSignatures, EventHandler } from '@joincolony/blocks';
 import eventManager from '~eventManager';
 import { EventListenerType, EventListener } from '@joincolony/blocks';
 import { utils } from 'ethers';

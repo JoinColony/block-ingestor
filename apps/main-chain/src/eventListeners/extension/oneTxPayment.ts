@@ -1,6 +1,6 @@
 import { Extension, getExtensionHash } from '@colony/colony-js';
 import { output } from '@joincolony/utils';
-import { ContractEventsSignatures } from '~types';
+import { ContractEventsSignatures } from '@joincolony/blocks';
 
 import { addExtensionEventListener, fetchExistingExtensions } from '.';
 import { handleOneTxPaymentAction } from '~handlers';

@@ -12,7 +12,7 @@ import {
   GetExpenditureByNativeFundingPotIdAndColonyQueryVariables,
 } from '@joincolony/graphql';
 import { toNumber, getColonyExtensions } from '~utils';
-import { ContractEvent } from '~types';
+import { ContractEvent } from '@joincolony/blocks';
 import networkClient from '~networkClient';
 import { getBlockChainTimestampISODate } from '~utils/dates';
 import { verbose } from '@joincolony/utils';

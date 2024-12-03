@@ -6,7 +6,7 @@ import {
   GetColonyActionQuery,
   GetColonyActionQueryVariables,
 } from '@joincolony/graphql';
-import { ContractEvent } from '~types';
+import { ContractEvent } from '@joincolony/blocks';
 import rpcProvider from '~provider';
 import { getDomainDatabaseId, writeActionFromEvent } from '~utils';
 import { query } from '~amplifyClient';

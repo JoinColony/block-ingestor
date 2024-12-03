@@ -1,7 +1,7 @@
 import { TransactionDescription } from 'ethers/lib/utils';
 import { BigNumber } from 'ethers';
 
-import { ContractEvent, motionNameMapping } from '~types';
+import { motionNameMapping } from '~types';
 import {
   getCachedColonyClient,
   getDomainDatabaseId,
@@ -11,6 +11,7 @@ import {
 } from '~utils';
 
 import { createMotionInDB } from '../helpers';
+import { ContractEvent } from '@joincolony/blocks';
 
 export const handleMoveFundsMotion = async (
   colonyAddress: string,

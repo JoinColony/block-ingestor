@@ -1,6 +1,6 @@
 import { TokenClientType } from '@colony/colony-js';
 
-import { ContractEvent } from '~types';
+import { ContractEvent } from '@joincolony/blocks';
 import {
   getCachedTokenClient,
   fetchColoniesByNativeToken,

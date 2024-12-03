@@ -22,7 +22,7 @@ import {
   RemoveMultiSigRoleMutationVariables,
 } from '@joincolony/graphql';
 
-import { ContractEventsSignatures } from '~types';
+import { ContractEventsSignatures } from '@joincolony/blocks';
 import { notNull } from '~utils';
 import { addMultiSigParamsToDB } from '~utils/extensions/multiSig';
 import { output } from '@joincolony/utils';

@@ -13,7 +13,7 @@ import {
 } from '@joincolony/graphql';
 import networkClient from '~networkClient';
 import rpcProvider from '~provider';
-import { ContractEvent } from '~types';
+import { ContractEvent } from '@joincolony/blocks';
 import {
   getDomainDatabaseId,
   getMultiSigClient,

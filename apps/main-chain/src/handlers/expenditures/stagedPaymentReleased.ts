@@ -1,8 +1,11 @@
 import { utils } from 'ethers';
-import { ExtensionEventListener } from '~eventListeners';
 import { ColonyActionType } from '@joincolony/graphql';
 import rpcProvider from '~provider';
-import { ContractEventsSignatures, EventHandler } from '~types';
+import {
+  ContractEventsSignatures,
+  EventHandler,
+  ExtensionEventListener,
+} from '@joincolony/blocks';
 import {
   checkActionExists,
   getCachedColonyClient,

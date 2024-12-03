@@ -2,7 +2,7 @@ import { utils } from 'ethers';
 
 import rpcProvider from '~provider';
 
-import { ContractEventsSignatures } from '~types';
+import { ContractEventsSignatures } from '@joincolony/blocks';
 
 /**
  * For a given tx hash, checks whether the transaction contains a matching event

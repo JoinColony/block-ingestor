@@ -7,7 +7,7 @@ import {
   NotificationType,
 } from '@joincolony/graphql';
 import networkClient from '~networkClient';
-import { EventHandler } from '~types';
+import { EventHandler } from '@joincolony/blocks';
 import { updateExtension } from '~utils/extensions/updateExtension';
 import { sendExtensionUpdateNotifications } from '~utils/notifications';
 

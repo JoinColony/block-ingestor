@@ -1,5 +1,4 @@
 import { mutate } from '~amplifyClient';
-import { ExtensionEventListener } from '~eventListeners';
 import {
   CreateUserStakeDocument,
   CreateUserStakeMutation,
@@ -12,11 +11,11 @@ import {
   UpdateExpenditureMutationVariables,
   UserStakeType,
 } from '@joincolony/graphql';
-import { EventHandler } from '~types';
 import { getExpenditureDatabaseId, toNumber } from '~utils';
 import { getUserStakeDatabaseId } from '~utils/stakes';
 import { getExpenditureFromDB } from './helpers';
 import { output, verbose } from '@joincolony/utils';
+import { EventHandler, ExtensionEventListener } from '@joincolony/blocks';
 
 export const handleExpenditureMadeViaStake: EventHandler = async (
   event,

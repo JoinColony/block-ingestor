@@ -2,7 +2,6 @@ import { BigNumber, utils } from 'ethers';
 import { Log } from '@ethersproject/providers';
 
 import networkClient from '~networkClient';
-import { ContractEvent, ContractEventsSignatures } from '~types';
 import { mutate, query } from '~amplifyClient';
 import rpcProvider from '~provider';
 import {
@@ -16,6 +15,7 @@ import {
 } from '@joincolony/graphql';
 import blockManager from '~blockManager';
 import { verbose } from '@joincolony/utils';
+import { ContractEvent, ContractEventsSignatures } from '@joincolony/blocks';
 
 export const mapLogToContractEvent = async (
   log: Log,

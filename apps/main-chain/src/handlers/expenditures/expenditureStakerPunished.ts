@@ -1,9 +1,8 @@
-import { ExtensionEventListener } from '~eventListeners';
-import { EventHandler } from '~types';
 import { getExpenditureDatabaseId, toNumber } from '~utils';
 
 import { updateExpenditureStake } from './helpers';
 import { verbose } from '@joincolony/utils';
+import { EventHandler, ExtensionEventListener } from '@joincolony/blocks';
 
 export const handleExpenditureStakerPunished: EventHandler = async (
   event,

@@ -9,7 +9,7 @@ import {
 import { handleMultiSigInstalled } from '~eventListeners/extension/multiSig';
 import { setupListenersForStreamingPayments } from '~eventListeners/extension/streamingPayments';
 import networkClient from '~networkClient';
-import { ContractEvent } from '~types';
+import { ContractEvent } from '@joincolony/blocks';
 import { writeExtensionFromEvent } from '~utils';
 import { updateExtensionCount } from '~utils/extensions';
 

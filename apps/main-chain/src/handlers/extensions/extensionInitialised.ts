@@ -1,6 +1,6 @@
 import { Extension, getExtensionHash } from '@colony/colony-js';
 
-import { ContractEvent } from '~types';
+import { ContractEvent } from '@joincolony/blocks';
 import { addVotingReputationParamsToDB } from '~utils';
 import {
   setupListenersForStakedExpenditure,

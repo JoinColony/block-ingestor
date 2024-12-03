@@ -1,8 +1,6 @@
 import { BigNumber } from 'ethers';
-import { ExtensionEventListener } from '~eventListeners';
 import { MultiSigVote, NotificationType } from '@joincolony/graphql';
 import rpcProvider from '~provider';
-import { EventHandler } from '~types';
 import {
   addMultiSigVote,
   getMultiSigDatabaseId,
@@ -15,6 +13,7 @@ import {
   getNotificationCategory,
   sendMultisigActionNotifications,
 } from '~utils/notifications';
+import { EventHandler, ExtensionEventListener } from '@joincolony/blocks';
 
 export const handleMultiSigApprovalChanged: EventHandler = async (
   event,

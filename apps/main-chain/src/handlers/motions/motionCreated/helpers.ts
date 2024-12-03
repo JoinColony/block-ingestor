@@ -1,7 +1,7 @@
 import { BigNumber } from 'ethers';
 import { AnyVotingReputationClient } from '@colony/colony-js';
 
-import { ContractEvent, MotionEvents } from '~types';
+import { MotionEvents } from '~types';
 import {
   createColonyAction,
   getDomainDatabaseId,
@@ -29,6 +29,7 @@ import {
   getMessageKey,
 } from '../helpers';
 import { type GraphQLFnReturn } from '@joincolony/clients';
+import { ContractEvent } from '@joincolony/blocks';
 
 interface GetMotionDataArgs {
   transactionHash: string;

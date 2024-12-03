@@ -4,7 +4,7 @@ import {
   GetColonyExtensionByHashAndColonyQuery,
   GetColonyExtensionByHashAndColonyQueryVariables,
 } from '@joincolony/graphql';
-import { ContractEvent } from '~types';
+import { ContractEvent } from '@joincolony/blocks';
 import { toNumber } from '~utils';
 import { updateExtension } from '~utils/extensions/updateExtension';
 import { verbose } from '@joincolony/utils';

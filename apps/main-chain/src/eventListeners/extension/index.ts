@@ -1,9 +1,12 @@
 import { utils } from 'ethers';
 import { Extension, getExtensionHash } from '@colony/colony-js';
 
-import { ContractEventsSignatures, EventHandler } from '~types';
 import {
+  ContractEventsSignatures,
+  EventHandler,
   EventListenerType,
+} from '@joincolony/blocks';
+import {
   setupListenerForOneTxPaymentExtensions,
   setupListenersForStagedExpenditureExtensions,
 } from '~eventListeners';

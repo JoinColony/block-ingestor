@@ -1,6 +1,6 @@
 import { utils } from 'ethers';
 
-import { ColonyOperations, EventHandler } from '~types';
+import { ColonyOperations } from '~types';
 import {
   getCachedColonyClient,
   getStakedExpenditureClient,
@@ -30,8 +30,8 @@ import {
   handleFinalizeExpenditureViaArbitrationMotion,
   handleReleaseStagedPaymentViaArbitration,
 } from './handlers';
-import { ExtensionEventListener } from '~eventListeners';
 import { output, verbose } from '@joincolony/utils';
+import { EventHandler, ExtensionEventListener } from '@joincolony/blocks';
 
 export const handleMotionCreated: EventHandler = async (
   event,

@@ -1,4 +1,4 @@
-import { EventHandler, MotionSide } from '~types';
+import { MotionSide } from '~types';
 import { getVotingClient } from '~utils';
 import {
   getMotionDatabaseId,
@@ -6,11 +6,11 @@ import {
   updateMotionInDB,
 } from '../helpers';
 import { VoterRecord } from '@joincolony/graphql';
-import { ExtensionEventListener } from '~eventListeners';
 import { createUserReward } from './helpers';
 import networkClient from '~networkClient';
 import { BigNumber } from 'ethers';
 import { verbose } from '@joincolony/utils';
+import { EventHandler, ExtensionEventListener } from '@joincolony/blocks';
 
 export const handleMotionVoteRevealed: EventHandler = async (
   event,

@@ -4,7 +4,7 @@ import {
   handleStagedPaymentReleased,
 } from '~handlers';
 
-import { ContractEventsSignatures } from '~types';
+import { ContractEventsSignatures } from '@joincolony/blocks';
 import { output } from '@joincolony/utils';
 
 import { addExtensionEventListener, fetchExistingExtensions } from './index';

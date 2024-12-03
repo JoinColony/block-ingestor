@@ -1,5 +1,4 @@
-import { ExtensionEventListener } from '~eventListeners';
-import { EventHandler } from '~types';
+import { ExtensionEventListener, EventHandler } from '@joincolony/blocks';
 import { getVotingClient } from '~utils';
 import { getBlockChainTimestampISODate } from '~utils/dates';
 

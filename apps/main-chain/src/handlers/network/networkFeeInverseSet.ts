@@ -5,7 +5,7 @@ import {
   UpdateCurrentNetworkInverseFeeMutation,
   UpdateCurrentNetworkInverseFeeMutationVariables,
 } from '@joincolony/graphql';
-import { ContractEvent } from '~types';
+import { ContractEvent } from '@joincolony/blocks';
 import { output } from '@joincolony/utils';
 
 export default async (event: ContractEvent): Promise<void> => {

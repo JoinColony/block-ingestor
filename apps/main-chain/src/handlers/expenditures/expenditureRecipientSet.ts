@@ -5,7 +5,7 @@ import {
   UpdateExpenditureMutation,
   UpdateExpenditureMutationVariables,
 } from '@joincolony/graphql';
-import { ContractEvent } from '~types';
+import { ContractEvent } from '@joincolony/blocks';
 import { getExpenditureDatabaseId, toNumber } from '~utils';
 
 import { getExpenditureFromDB, getUpdatedExpenditureSlots } from './helpers';

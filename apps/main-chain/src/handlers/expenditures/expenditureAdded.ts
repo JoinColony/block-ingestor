@@ -8,7 +8,7 @@ import {
   ExpenditureType,
   NotificationType,
 } from '@joincolony/graphql';
-import { ContractEvent, ContractEventsSignatures } from '~types';
+import { ContractEvent, ContractEventsSignatures } from '@joincolony/blocks';
 import {
   transactionHasEvent,
   getDomainDatabaseId,

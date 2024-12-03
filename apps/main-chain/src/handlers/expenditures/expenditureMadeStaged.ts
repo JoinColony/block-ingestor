@@ -1,14 +1,13 @@
 import { mutate } from '~amplifyClient';
-import { ExtensionEventListener } from '~eventListeners';
 import {
   ExpenditureType,
   UpdateExpenditureDocument,
   UpdateExpenditureMutation,
   UpdateExpenditureMutationVariables,
 } from '@joincolony/graphql';
-import { EventHandler } from '~types';
 import { getExpenditureDatabaseId, toNumber } from '~utils';
 import { verbose } from '@joincolony/utils';
+import { EventHandler, ExtensionEventListener } from '@joincolony/blocks';
 
 export const handleExpenditureMadeStaged: EventHandler = async (
   event,

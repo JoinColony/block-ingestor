@@ -7,7 +7,7 @@ import {
   GetDomainsByExtensionAddressQuery,
   GetDomainsByExtensionAddressQueryVariables,
 } from '@joincolony/graphql';
-import { ContractEvent, EventHandler } from '~types';
+import { ContractEvent, EventHandler } from '@joincolony/blocks';
 import { getCachedColonyClient, toNumber } from '~utils';
 import { updateExtension } from '~utils/extensions/updateExtension';
 

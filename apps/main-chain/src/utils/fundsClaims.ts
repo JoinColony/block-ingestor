@@ -4,7 +4,7 @@ import {
   CreateColonyFundsClaimMutation,
   CreateColonyFundsClaimMutationVariables,
 } from '@joincolony/graphql';
-import { ContractEvent } from '~types';
+import { ContractEvent } from '@joincolony/blocks';
 import rpcProvider from '~provider';
 
 interface CreateFundsClaimsParams {

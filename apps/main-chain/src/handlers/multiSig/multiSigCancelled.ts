@@ -5,7 +5,7 @@ import {
   UpdateColonyMultiSigInput,
   UpdateColonyMultiSigMutationVariables,
 } from '@joincolony/graphql';
-import { EventHandler } from '~types';
+import { EventHandler, ExtensionEventListener } from '@joincolony/blocks';
 import { verbose } from '@joincolony/utils';
 import { getMultiSigDatabaseId, getMultiSigFromDB } from './helpers';
 import rpcProvider from '~provider';
@@ -14,7 +14,6 @@ import {
   getNotificationCategory,
   sendMultisigActionNotifications,
 } from '~utils/notifications';
-import { ExtensionEventListener } from '~eventListeners';
 
 export const handleMultiSigMotionCancelled: EventHandler = async (
   event,

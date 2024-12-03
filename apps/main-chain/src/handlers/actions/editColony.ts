@@ -1,7 +1,7 @@
 import { Id } from '@colony/colony-js';
 
 import { ColonyActionType } from '@joincolony/graphql';
-import { ContractEvent } from '~types';
+import { ContractEvent } from '@joincolony/blocks';
 import { NotificationCategory } from '~types/notifications';
 import { getDomainDatabaseId, writeActionFromEvent } from '~utils';
 import { sendPermissionsActionNotifications } from '~utils/notifications';

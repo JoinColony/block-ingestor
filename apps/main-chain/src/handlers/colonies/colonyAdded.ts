@@ -9,7 +9,7 @@ import {
   GetColonyMetadataDocument,
 } from '@joincolony/graphql';
 import { coloniesSet } from '~stats';
-import { ContractEvent, ContractEventsSignatures } from '~types';
+import { ContractEvent, ContractEventsSignatures } from '@joincolony/blocks';
 import {
   createColonyFounderInitialRoleEntry,
   getAllRoleEventsFromTransaction,

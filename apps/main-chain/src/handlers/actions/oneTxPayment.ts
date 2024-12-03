@@ -8,7 +8,7 @@ import {
   GetColonyExtensionQueryVariables,
 } from '@joincolony/graphql';
 import rpcProvider from '~provider';
-import { ContractEvent, ContractEventsSignatures } from '~types';
+import { ContractEvent, ContractEventsSignatures } from '@joincolony/blocks';
 import { NotificationCategory } from '~types/notifications';
 import {
   getCachedColonyClient,

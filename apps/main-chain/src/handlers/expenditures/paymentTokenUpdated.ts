@@ -7,9 +7,8 @@ import {
 } from '@joincolony/graphql';
 
 import { getStreamingPaymentFromDB } from './helpers';
-import { EventHandler } from '~types';
-import { ExtensionEventListener } from '~eventListeners';
 import { verbose } from '@joincolony/utils';
+import { EventHandler, ExtensionEventListener } from '@joincolony/blocks';
 
 export const handlePaymentTokenUpdated: EventHandler = async (
   event,

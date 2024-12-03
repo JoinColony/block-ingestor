@@ -1,4 +1,3 @@
-import { EventHandler } from '~types';
 import {
   getExpenditureDatabaseId,
   toNumber,
@@ -13,7 +12,7 @@ import {
   UpdateExpenditureMutation,
   UpdateExpenditureMutationVariables,
 } from '@joincolony/graphql';
-import { EventListenerType } from '~eventListeners';
+import { EventListenerType, EventHandler } from '@joincolony/blocks';
 import { sendExpenditureUpdateNotifications } from '~utils/notifications';
 import { verbose } from '@joincolony/utils';
 

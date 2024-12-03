@@ -13,7 +13,7 @@ import {
   UpdateColonyMotionMutation,
   UpdateColonyMotionMutationVariables,
 } from '@joincolony/graphql';
-import { ContractEvent } from '~types';
+import { ContractEvent } from '@joincolony/blocks';
 import { verbose } from '@joincolony/utils';
 
 export default async ({ args }: ContractEvent): Promise<void> => {

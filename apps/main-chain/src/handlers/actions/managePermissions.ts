@@ -1,7 +1,11 @@
 import { BigNumber } from 'ethers';
 import { Id } from '@colony/colony-js';
 import { mutate, query } from '~amplifyClient';
-import { ContractEventsSignatures, EventHandler } from '~types';
+import {
+  ContractEventsSignatures,
+  EventHandler,
+  ExtensionEventListener,
+} from '@joincolony/blocks';
 import {
   getColonyRolesDatabaseId,
   getDomainDatabaseId,
@@ -27,7 +31,6 @@ import {
 } from '@joincolony/graphql';
 import rpcProvider from '~provider';
 import { updateColonyContributor } from '~utils/contributors';
-import { ExtensionEventListener } from '~eventListeners';
 import { sendPermissionsActionNotifications } from '~utils/notifications';
 import { NotificationCategory } from '~types/notifications';
 import { verbose } from '@joincolony/utils';

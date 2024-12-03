@@ -1,9 +1,3 @@
-import {
-  AnyColonyClient,
-  AnyVotingReputationClient,
-  ColonyNetworkClient,
-  TokenClient,
-} from '@colony/colony-js';
 import { LogDescription } from '@ethersproject/abi';
 /*
  * Custom contract event, since we need some log values as well
@@ -129,12 +123,6 @@ export type Block = Awaited<any>;
 // @TODO ReturnType<typeof provider.getBlock>
 export type BlockWithTransactions = Awaited<any>;
 // @TODO ReturnType<typeof provider.getBlockWithTransactions>
-
-export type NetworkClients =
-  | ColonyNetworkClient
-  | TokenClient
-  | AnyColonyClient
-  | AnyVotingReputationClient;
 
 export type EventHandler = (
   event: ContractEvent,

@@ -2,7 +2,7 @@ import { Id } from '@colony/colony-js';
 
 import { ColonyActionType } from '@joincolony/graphql';
 import { verbose } from '@joincolony/utils';
-import { ContractEvent } from '~types';
+import { ContractEvent } from '@joincolony/blocks';
 import { NotificationCategory } from '~types/notifications';
 import {
   writeActionFromEvent,

@@ -2,7 +2,7 @@ import { constants } from 'ethers';
 
 import networkClient from '~networkClient';
 import { mutate, query } from '~amplifyClient';
-import { ContractEvent } from '~types';
+import { ContractEvent } from '@joincolony/blocks';
 import { toNumber } from '~utils';
 import {
   CreateColonyExtensionDocument,

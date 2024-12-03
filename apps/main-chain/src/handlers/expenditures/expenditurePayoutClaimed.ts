@@ -1,4 +1,4 @@
-import { ContractEvent, ContractEventsSignatures } from '~types';
+import { ContractEvent, ContractEventsSignatures } from '@joincolony/blocks';
 import {
   getExpenditureDatabaseId,
   getUpdatedExpenditureBalances,

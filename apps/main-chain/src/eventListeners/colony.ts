@@ -6,14 +6,17 @@ import {
   ListColoniesQuery,
   ListColoniesQueryVariables,
 } from '@joincolony/graphql';
-import { ContractEventsSignatures, EventHandler } from '~types';
+import {
+  ContractEventsSignatures,
+  EventHandler,
+  EventListenerType,
+} from '@joincolony/blocks';
 import { notNull } from '~utils';
 import {
   addNetworkEventListener,
   addTokenEventListener,
 } from '~eventListeners';
 
-import { EventListenerType } from './types';
 import {
   handleAnnotateTransaction,
   handleColonyAdded,

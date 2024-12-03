@@ -1,7 +1,7 @@
 import { TransactionDescription } from 'ethers/lib/utils';
 import { utils } from 'ethers';
 import { getCachedColonyClient, parseFunctionData } from '~utils';
-import { ContractEvent } from '~types';
+import { ContractEvent } from '@joincolony/blocks';
 import { multicallHandlers } from './multicallHandlers';
 import { output } from '@joincolony/utils';
 

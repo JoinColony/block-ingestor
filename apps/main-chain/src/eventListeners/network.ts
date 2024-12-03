@@ -2,7 +2,7 @@ import { EventListenerType } from '@joincolony/blocks';
 import { utils } from 'ethers';
 
 import eventManager from '~eventManager';
-import { ContractEventsSignatures, EventHandler } from '~types';
+import { ContractEventsSignatures, EventHandler } from '@joincolony/blocks';
 
 export const addNetworkEventListener = (
   eventSignature: ContractEventsSignatures,

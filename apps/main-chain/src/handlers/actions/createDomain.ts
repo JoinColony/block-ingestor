@@ -5,7 +5,7 @@ import {
   CreateDomainMutation,
   CreateDomainMutationVariables,
 } from '@joincolony/graphql';
-import { ContractEvent } from '~types';
+import { ContractEvent } from '@joincolony/blocks';
 import { NotificationCategory } from '~types/notifications';
 import {
   toNumber,

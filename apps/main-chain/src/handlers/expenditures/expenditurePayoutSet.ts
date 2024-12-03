@@ -1,4 +1,4 @@
-import { ContractEvent } from '~types';
+import { ContractEvent } from '@joincolony/blocks';
 import {
   getCachedColonyClient,
   getExpenditureDatabaseId,
