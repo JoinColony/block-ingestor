@@ -10,7 +10,7 @@ import {
   UpdateStatsMutationVariables,
 } from '@joincolony/graphql';
 import { output, verbose } from '@joincolony/utils';
-import { AmplifyClient, RpcProvider } from '@joincolony/clients';
+import { type AmplifyClient, type RpcProvider } from '@joincolony/clients';
 import { ObjectOrFunction } from './types';
 
 export class StatsManager {
@@ -75,8 +75,12 @@ export class StatsManager {
    * Fetch the last stored stats from the DB.
    * If no stats entry is found, it will create one.
    */
-  // @TODO make stats work with chainId
   public async initStats(): Promise<void> {
+    // @TODO need to find a better way for this as something is messed up with the instances
+    if (!this.rpcProvider.isInitialised) {
+      output('Force RPC provider initialisation');
+      await this.rpcProvider.initialiseProvider();
+    }
     const { value: jsonStats, id: statsId } =
       (
         await this.amplifyClient.query<GetStatsQuery, GetStatsQueryVariables>(

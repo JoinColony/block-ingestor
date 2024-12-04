@@ -3,6 +3,7 @@ import { ChainID } from './types';
 import { output } from '@joincolony/utils';
 
 export class RpcProvider {
+  public isInitialised = false;
   private readonly provider: providers.StaticJsonRpcProvider;
   private chainId: ChainID | null;
 
@@ -14,6 +15,7 @@ export class RpcProvider {
   public async initialiseProvider(): Promise<void> {
     const { chainId } = await this.provider.getNetwork();
     this.setChainId(String(chainId));
+    this.isInitialised = true;
   }
 
   public setChainId(newChainId: ChainID): void {
