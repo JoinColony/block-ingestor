@@ -18,6 +18,7 @@ import { Extension, getExtensionHash } from '@colony/colony-js';
 // @TODO @chmanie is gonna make this better, for now let's just hardcode the proxy colony events
 const ProxyColonyEvents = new utils.Interface([
   'event ProxyColonyRequested(uint256 destinationChainId, bytes32 salt)',
+  'event ProxyColonyDeployed(address proxyColony)',
 ]);
 
 export class EventManager {
