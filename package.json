@@ -11,6 +11,7 @@
     "dev:main-chain": "pnpm --filter @joincolony/main-chain run dev",
     "start:main-chain": "pnpm --filter @joincolony/main-chain run start",
     "dev:proxy-chain": "pnpm --filter @joincolony/proxy-chain run dev",
+    "start:proxy-chain": "pnpm --filter @joincolony/proxy-chain run start",
     "typecheck": "pnpm -r run typecheck",
     "lint": "eslint . --ext .ts",
     "preinstall": "bash scripts/generate-temp-files.sh",
