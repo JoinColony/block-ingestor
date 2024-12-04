@@ -52,7 +52,8 @@ export const decodeFunctions = (
 export const decodeArbitraryFunction = async (
   encodedFunction: string,
 ): Promise<TransactionDescription | null> => {
-  const hexSignature = encodedFunction.slice(0, 8);
+  const startIndex = encodedFunction.startsWith('0x') ? 2 : 0;
+  const hexSignature = encodedFunction.slice(startIndex, startIndex + 8);
   const potentialSignatures = await lookupSignature(hexSignature);
 
   // Create interfaces based on potential signatures
@@ -61,13 +62,10 @@ export const decodeArbitraryFunction = async (
       try {
         return new utils.Interface([`function ${signature}`]);
       } catch (e) {
-        console.error(e);
         return null;
       }
     })
     .filter(Boolean) as utils.Interface[];
-
-  console.log({ interfaces });
 
   return parseFunctionData(encodedFunction, interfaces);
 };
