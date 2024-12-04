@@ -9,4 +9,4 @@ export const setupListenersForColonies = async (): Promise<void> => {
     handleProxyColonyDeployed,
   );
 
-}
+};

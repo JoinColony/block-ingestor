@@ -82,7 +82,7 @@ export class StatsManager {
         await this.amplifyClient.query<GetStatsQuery, GetStatsQueryVariables>(
           GetStatsDocument,
           {
-            chainId: this.rpcProvider.getChainId()
+            chainId: this.rpcProvider.getChainId(),
           },
         )
       )?.data?.getIngestorStatsByChainId?.items?.[0] ?? {};
@@ -103,7 +103,7 @@ export class StatsManager {
       });
 
       if (statsResponse?.data?.createIngestorStats?.id) {
-        this.statsId = statsResponse?.data?.createIngestorStats?.id
+        this.statsId = statsResponse?.data?.createIngestorStats?.id;
       }
     
     } else {
