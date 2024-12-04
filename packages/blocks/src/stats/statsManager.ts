@@ -10,15 +10,19 @@ import {
   UpdateStatsMutationVariables,
 } from '@joincolony/graphql';
 import { output, verbose } from '@joincolony/utils';
-import { AmplifyClient } from '@joincolony/clients';
+import { AmplifyClient, RpcProvider } from '@joincolony/clients';
 import { ObjectOrFunction } from './types';
 
 export class StatsManager {
   private stats: Record<string, unknown> = {};
+  private readonly rpcProvider: RpcProvider;
   private readonly amplifyClient: AmplifyClient;
+  private statsId: string;
 
-  constructor(amplifyClient: AmplifyClient) {
+  constructor(amplifyClient: AmplifyClient, rpcProvider: RpcProvider) {
     this.amplifyClient = amplifyClient;
+    this.rpcProvider = rpcProvider;
+    this.statsId = '';
   }
 
   /**
@@ -43,6 +47,8 @@ export class StatsManager {
       UpdateStatsMutation,
       UpdateStatsMutationVariables
     >(UpdateStatsDocument, {
+      id: this.statsId,
+      chainId: this.rpcProvider.getChainId(),
       value: JSON.stringify(this.stats),
     });
 
@@ -71,23 +77,35 @@ export class StatsManager {
    */
   // @TODO make stats work with chainId
   public async initStats(): Promise<void> {
-    const { value: jsonStats } =
+    const { value: jsonStats, id: statsId } =
       (
         await this.amplifyClient.query<GetStatsQuery, GetStatsQueryVariables>(
           GetStatsDocument,
-          {},
+          {
+            chainId: this.rpcProvider.getChainId()
+          },
         )
-      )?.data?.getIngestorStats ?? {};
+      )?.data?.getIngestorStatsByChainId?.items?.[0] ?? {};
+
+    if (statsId) {
+      this.statsId = statsId;
+    }
 
     if (!jsonStats) {
       this.stats = { lastBlockNumber: 0 };
 
-      await this.amplifyClient.mutate<
+      const statsResponse = await this.amplifyClient.mutate<
         CreateStatsMutation,
         CreateStatsMutationVariables
       >(CreateStatsDocument, {
+        chainId: this.rpcProvider.getChainId(),
         value: JSON.stringify(this.stats),
       });
+
+      if (statsResponse?.data?.createIngestorStats?.id) {
+        this.statsId = statsResponse?.data?.createIngestorStats?.id
+      }
+    
     } else {
       try {
         this.stats = JSON.parse(jsonStats);
