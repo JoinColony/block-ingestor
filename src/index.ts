@@ -1,6 +1,9 @@
+/* eslint-disable import/first */
+import dotenv from 'dotenv';
+dotenv.config();
+
 import 'cross-fetch/polyfill';
 
-import dotenv from 'dotenv';
 import { utils } from 'ethers';
 
 import { startBlockListener } from '~blockListener';
@@ -14,7 +17,6 @@ import {
 import { seedDB } from '~utils';
 import { setupNotificationsClient } from '~utils/notifications';
 
-dotenv.config();
 utils.Logger.setLogLevel(utils.Logger.levels.ERROR);
 
 const start = async (): Promise<void> => {
