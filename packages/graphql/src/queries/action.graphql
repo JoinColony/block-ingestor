@@ -3,3 +3,9 @@ query GetColonyAction($transactionHash: ID!) {
     id
   }
 }
+
+query GetActionInfo($transactionHash: ID!) {
+  getColonyAction(id: $transactionHash) {
+    ...ActionMetadataInfo
+  }
+}
