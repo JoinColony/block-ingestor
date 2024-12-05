@@ -3,3 +3,19 @@ query GetColonyAction($transactionHash: ID!) {
     id
   }
 }
+
+query GetColonyArbitraryTransactionAction($transactionHash: ID!) {
+  getColonyAction(id: $transactionHash) {
+    id
+    arbitraryTransactions {
+      contractAddress
+      method
+      methodSignature
+      args {
+        name
+        type
+        value
+      }
+    }
+  }
+}

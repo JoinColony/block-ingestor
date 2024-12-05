@@ -57,6 +57,19 @@ export type ApprovedTokenChangesInput = {
   unaffected: Array<Scalars['ID']>;
 };
 
+export type ArbitraryTransactionMethodArg = {
+  __typename?: 'ArbitraryTransactionMethodArg';
+  name?: Maybe<Scalars['String']>;
+  type?: Maybe<Scalars['String']>;
+  value?: Maybe<Scalars['String']>;
+};
+
+export type ArbitraryTransactionMethodArgInput = {
+  name?: InputMaybe<Scalars['String']>;
+  type?: InputMaybe<Scalars['String']>;
+  value?: InputMaybe<Scalars['String']>;
+};
+
 export type BridgeBankAccount = {
   __typename?: 'BridgeBankAccount';
   accountOwner: Scalars['String'];
@@ -406,6 +419,7 @@ export type ColonyAction = {
   annotationId?: Maybe<Scalars['ID']>;
   /** Approved tokens impacted by the action (used for manage tokens) */
   approvedTokenChanges?: Maybe<ApprovedTokenChanges>;
+  arbitraryTransactions?: Maybe<Array<Maybe<ColonyActionArbitraryTransaction>>>;
   /** The block number where the action was recorded */
   blockNumber: Scalars['Int'];
   /** The Colony that the action belongs to */
@@ -529,6 +543,22 @@ export type ColonyAction = {
   updatedAt: Scalars['AWSDateTime'];
 };
 
+/** Colony Arbitrary transaction that can be involved in an action */
+export type ColonyActionArbitraryTransaction = {
+  __typename?: 'ColonyActionArbitraryTransaction';
+  args?: Maybe<Array<Maybe<ArbitraryTransactionMethodArg>>>;
+  contractAddress?: Maybe<Scalars['String']>;
+  method?: Maybe<Scalars['String']>;
+  methodSignature?: Maybe<Scalars['String']>;
+};
+
+export type ColonyActionArbitraryTransactionInput = {
+  args?: InputMaybe<Array<InputMaybe<ArbitraryTransactionMethodArgInput>>>;
+  contractAddress?: InputMaybe<Scalars['String']>;
+  method?: InputMaybe<Scalars['String']>;
+  methodSignature?: InputMaybe<Scalars['String']>;
+};
+
 export type ColonyActionMetadata = {
   __typename?: 'ColonyActionMetadata';
   createdAt: Scalars['AWSDateTime'];
@@ -573,6 +603,8 @@ export enum ColonyActionType {
   AddVerifiedMembers = 'ADD_VERIFIED_MEMBERS',
   AddVerifiedMembersMotion = 'ADD_VERIFIED_MEMBERS_MOTION',
   AddVerifiedMembersMultisig = 'ADD_VERIFIED_MEMBERS_MULTISIG',
+  /** An action related to arbitrary transaction */
+  ArbitraryTx = 'ARBITRARY_TX',
   /** An action related to canceling an expenditure */
   CancelExpenditure = 'CANCEL_EXPENDITURE',
   /** An action related to a motion to cancel an expenditure */
@@ -1397,6 +1429,9 @@ export type CreateColonyActionInput = {
   amount?: InputMaybe<Scalars['String']>;
   annotationId?: InputMaybe<Scalars['ID']>;
   approvedTokenChanges?: InputMaybe<ApprovedTokenChangesInput>;
+  arbitraryTransactions?: InputMaybe<
+    Array<InputMaybe<ColonyActionArbitraryTransactionInput>>
+  >;
   blockNumber: Scalars['Int'];
   colonyActionsId?: InputMaybe<Scalars['ID']>;
   colonyDecisionId?: InputMaybe<Scalars['ID']>;
@@ -9185,6 +9220,9 @@ export type UpdateColonyActionInput = {
   amount?: InputMaybe<Scalars['String']>;
   annotationId?: InputMaybe<Scalars['ID']>;
   approvedTokenChanges?: InputMaybe<ApprovedTokenChangesInput>;
+  arbitraryTransactions?: InputMaybe<
+    Array<InputMaybe<ColonyActionArbitraryTransactionInput>>
+  >;
   blockNumber?: InputMaybe<Scalars['Int']>;
   colonyActionsId?: InputMaybe<Scalars['ID']>;
   colonyDecisionId?: InputMaybe<Scalars['ID']>;
@@ -10905,6 +10943,30 @@ export type GetColonyActionQueryVariables = Exact<{
 export type GetColonyActionQuery = {
   __typename?: 'Query';
   getColonyAction?: { __typename?: 'ColonyAction'; id: string } | null;
+};
+
+export type GetColonyArbitraryTransactionActionQueryVariables = Exact<{
+  transactionHash: Scalars['ID'];
+}>;
+
+export type GetColonyArbitraryTransactionActionQuery = {
+  __typename?: 'Query';
+  getColonyAction?: {
+    __typename?: 'ColonyAction';
+    id: string;
+    arbitraryTransactions?: Array<{
+      __typename?: 'ColonyActionArbitraryTransaction';
+      contractAddress?: string | null;
+      method?: string | null;
+      methodSignature?: string | null;
+      args?: Array<{
+        __typename?: 'ArbitraryTransactionMethodArg';
+        name?: string | null;
+        type?: string | null;
+        value?: string | null;
+      } | null> | null;
+    } | null> | null;
+  } | null;
 };
 
 export type GetMotionIdFromActionQueryVariables = Exact<{
@@ -12834,6 +12896,23 @@ export const GetColonyActionDocument = gql`
   query GetColonyAction($transactionHash: ID!) {
     getColonyAction(id: $transactionHash) {
       id
+    }
+  }
+`;
+export const GetColonyArbitraryTransactionActionDocument = gql`
+  query GetColonyArbitraryTransactionAction($transactionHash: ID!) {
+    getColonyAction(id: $transactionHash) {
+      id
+      arbitraryTransactions {
+        contractAddress
+        method
+        methodSignature
+        args {
+          name
+          type
+          value
+        }
+      }
     }
   }
 `;
