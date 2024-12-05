@@ -27,7 +27,7 @@ const start = async (): Promise<void> => {
    * Start the main block listener
    */
   blockManager.startBlockListener();
-  
+
   console.log('started');
 };
 

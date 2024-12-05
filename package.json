@@ -11,6 +11,8 @@
     "dev:main-chain": "pnpm --filter @joincolony/main-chain run dev",
     "start:main-chain": "pnpm --filter @joincolony/main-chain run start",
     "dev:proxy-chain": "pnpm --filter @joincolony/proxy-chain run dev",
+    "dev:proxy-chain-2": "ENV_FILE=.env.proxy-2 pnpm --filter @joincolony/proxy-chain run dev",
+    "dev:all-proxies": "pnpm run dev:proxy-chain & pnpm run dev:proxy-chain-2",
     "start:proxy-chain": "pnpm --filter @joincolony/proxy-chain run start",
     "typecheck": "pnpm -r run typecheck",
     "lint": "eslint . --ext .ts",
