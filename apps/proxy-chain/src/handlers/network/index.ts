@@ -1,0 +1,1 @@
+export { handleWormholeMessageReceived } from './wormholeMessageReceived';

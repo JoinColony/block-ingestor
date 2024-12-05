@@ -108,6 +108,8 @@ export enum ContractEventsSignatures {
   // Proxy colonies
   ProxyColonyRequested = 'ProxyColonyRequested(uint256,bytes32)',
   ProxyColonyDeployed = 'ProxyColonyDeployed(address)',
+  LogMessagePublished = 'LogMessagePublished(address,uint64,uint32,bytes,uint8)',
+  WormholeMessageReceived = 'WormholeMessageReceived(uint16,bytes32,uint64)',
 }
 
 /*

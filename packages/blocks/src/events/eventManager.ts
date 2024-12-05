@@ -19,6 +19,9 @@ import { Extension, getExtensionHash } from '@colony/colony-js';
 const ProxyColonyEvents = new utils.Interface([
   'event ProxyColonyRequested(uint256 destinationChainId, bytes32 salt)',
   'event ProxyColonyDeployed(address proxyColony)',
+  // @TODO decouple these into MultiChainBridgeEvents
+  'event WormholeMessageReceived(uint16 emitterChainId, bytes32 emitterAddress, uint64 sequence)',
+  'event LogMessagePublished(address indexed sender,uint64 sequence,uint32 nonce,bytes payload,uint8 consistencyLevel)',
 ]);
 
 export class EventManager {
