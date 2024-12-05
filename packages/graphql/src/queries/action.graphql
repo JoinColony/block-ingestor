@@ -4,6 +4,7 @@ query GetColonyAction($transactionHash: ID!) {
   }
 }
 
+<<<<<<< HEAD
 query GetColonyArbitraryTransactionAction($transactionHash: ID!) {
   getColonyAction(id: $transactionHash) {
     id
@@ -11,5 +12,10 @@ query GetColonyArbitraryTransactionAction($transactionHash: ID!) {
       contractAddress
       encodedFunction
     }
+=======
+query GetActionInfo($transactionHash: ID!) {
+  getColonyAction(id: $transactionHash) {
+    ...ActionMetadataInfo
+>>>>>>> 6b1d83eb (Feat: Add multi-chain info to colony action and update multi-chain handlers)
   }
 }

@@ -28,6 +28,19 @@ export type Scalars = {
   AWSURL: string;
 };
 
+export type ActionWormholeInfo = {
+  __typename?: 'ActionWormholeInfo';
+  emitterAddress: Scalars['String'];
+  emitterChainId?: Maybe<Scalars['Int']>;
+  sequence: Scalars['String'];
+};
+
+export type ActionWormholeInfoInput = {
+  emitterAddress: Scalars['String'];
+  emitterChainId?: InputMaybe<Scalars['Int']>;
+  sequence: Scalars['String'];
+};
+
 /** Defines an annotation for actions, motions and decisions */
 export type Annotation = {
   __typename?: 'Annotation';
@@ -483,6 +496,8 @@ export type ColonyAction = {
   motionDomainId?: Maybe<Scalars['Int']>;
   /** The internal database id of the motion */
   motionId?: Maybe<Scalars['ID']>;
+  /** Multichain info if the action is bridged" */
+  multiChainInfo?: Maybe<MultiChainInfo>;
   /** Expanded `ColonyMultiSig` for the corresponding `multiSigId` */
   multiSigData?: Maybe<ColonyMultiSig>;
   /** The internal database id of the multiSig */
@@ -597,6 +612,8 @@ export type ColonyActionRolesInput = {
  * These can all happen in a Colony and will be interpreted by the dApp according to their types
  */
 export enum ColonyActionType {
+  /** An action related to creating a proxy colony */
+  AddProxyColony = 'ADD_PROXY_COLONY',
   /** An action related to adding verified members */
   AddVerifiedMembers = 'ADD_VERIFIED_MEMBERS',
   AddVerifiedMembersMotion = 'ADD_VERIFIED_MEMBERS_MOTION',
@@ -1449,6 +1466,7 @@ export type CreateColonyActionInput = {
   members?: InputMaybe<Array<Scalars['ID']>>;
   motionDomainId?: InputMaybe<Scalars['Int']>;
   motionId?: InputMaybe<Scalars['ID']>;
+  multiChainInfo?: InputMaybe<MultiChainInfoInput>;
   multiSigId?: InputMaybe<Scalars['ID']>;
   networkFee?: InputMaybe<Scalars['String']>;
   newColonyVersion?: InputMaybe<Scalars['Int']>;
@@ -5387,6 +5405,19 @@ export type MotionStateHistoryInput = {
   yaySideFullyStakedAt?: InputMaybe<Scalars['AWSDateTime']>;
 };
 
+export type MultiChainInfo = {
+  __typename?: 'MultiChainInfo';
+  completed: Scalars['Boolean'];
+  targetChainId: Scalars['Int'];
+  wormholeInfo?: Maybe<ActionWormholeInfo>;
+};
+
+export type MultiChainInfoInput = {
+  completed: Scalars['Boolean'];
+  targetChainId: Scalars['Int'];
+  wormholeInfo?: InputMaybe<ActionWormholeInfoInput>;
+};
+
 export type MultiSigDomainConfig = {
   __typename?: 'MultiSigDomainConfig';
   domainId: Scalars['ID'];
@@ -6791,6 +6822,7 @@ export type Query = {
   getProfile?: Maybe<Profile>;
   getProfileByEmail?: Maybe<ModelProfileConnection>;
   getProfileByUsername?: Maybe<ModelProfileConnection>;
+  getProxyColoniesByColonyAddress?: Maybe<ModelProxyColonyConnection>;
   getProxyColony?: Maybe<ProxyColony>;
   getReputationMiningCycleMetadata?: Maybe<ReputationMiningCycleMetadata>;
   getRoleByColony?: Maybe<ModelColonyRoleConnection>;
@@ -7373,6 +7405,15 @@ export type QueryGetProfileByEmailArgs = {
 export type QueryGetProfileByUsernameArgs = {
   displayName: Scalars['String'];
   filter?: InputMaybe<ModelProfileFilterInput>;
+  limit?: InputMaybe<Scalars['Int']>;
+  nextToken?: InputMaybe<Scalars['String']>;
+  sortDirection?: InputMaybe<ModelSortDirection>;
+};
+
+/** Root query type */
+export type QueryGetProxyColoniesByColonyAddressArgs = {
+  colonyAddress: Scalars['ID'];
+  filter?: InputMaybe<ModelProxyColonyFilterInput>;
   limit?: InputMaybe<Scalars['Int']>;
   nextToken?: InputMaybe<Scalars['String']>;
   sortDirection?: InputMaybe<ModelSortDirection>;
@@ -9369,6 +9410,7 @@ export type UpdateColonyActionInput = {
   members?: InputMaybe<Array<Scalars['ID']>>;
   motionDomainId?: InputMaybe<Scalars['Int']>;
   motionId?: InputMaybe<Scalars['ID']>;
+  multiChainInfo?: InputMaybe<MultiChainInfoInput>;
   multiSigId?: InputMaybe<Scalars['ID']>;
   networkFee?: InputMaybe<Scalars['String']>;
   newColonyVersion?: InputMaybe<Scalars['Int']>;
@@ -10102,6 +10144,18 @@ export type VotingReputationParamsInput = {
   voterRewardFraction: Scalars['String'];
 };
 
+export type MultiChainInfoFragment = {
+  __typename?: 'MultiChainInfo';
+  targetChainId: number;
+  completed: boolean;
+  wormholeInfo?: {
+    __typename?: 'ActionWormholeInfo';
+    emitterChainId?: number | null;
+    emitterAddress: string;
+    sequence: string;
+  } | null;
+};
+
 export type ActionMetadataInfoFragment = {
   __typename?: 'ColonyAction';
   id: string;
@@ -10160,6 +10214,17 @@ export type ActionMetadataInfoFragment = {
     }> | null;
   } | null;
   payments?: Array<{ __typename?: 'Payment'; recipientAddress: string }> | null;
+  multiChainInfo?: {
+    __typename?: 'MultiChainInfo';
+    targetChainId: number;
+    completed: boolean;
+    wormholeInfo?: {
+      __typename?: 'ActionWormholeInfo';
+      emitterChainId?: number | null;
+      emitterAddress: string;
+      sequence: string;
+    } | null;
+  } | null;
 };
 
 export type ColonyFragment = {
@@ -11891,6 +11956,17 @@ export type GetColonyActionByMotionIdQuery = {
         __typename?: 'Payment';
         recipientAddress: string;
       }> | null;
+      multiChainInfo?: {
+        __typename?: 'MultiChainInfo';
+        targetChainId: number;
+        completed: boolean;
+        wormholeInfo?: {
+          __typename?: 'ActionWormholeInfo';
+          emitterChainId?: number | null;
+          emitterAddress: string;
+          sequence: string;
+        } | null;
+      } | null;
     } | null>;
   } | null;
 };
@@ -12061,6 +12137,17 @@ export type GetColonyActionByMultiSigIdQuery = {
         __typename?: 'Payment';
         recipientAddress: string;
       }> | null;
+      multiChainInfo?: {
+        __typename?: 'MultiChainInfo';
+        targetChainId: number;
+        completed: boolean;
+        wormholeInfo?: {
+          __typename?: 'ActionWormholeInfo';
+          emitterChainId?: number | null;
+          emitterAddress: string;
+          sequence: string;
+        } | null;
+      } | null;
     } | null>;
   } | null;
 };
@@ -12337,6 +12424,17 @@ export const ColonyMetadata = gql`
     }
   }
 `;
+export const MultiChainInfo = gql`
+  fragment MultiChainInfo on MultiChainInfo {
+    targetChainId
+    completed
+    wormholeInfo {
+      emitterChainId
+      emitterAddress
+      sequence
+    }
+  }
+`;
 export const ActionMetadataInfo = gql`
   fragment ActionMetadataInfo on ColonyAction {
     id
@@ -12358,9 +12456,13 @@ export const ActionMetadataInfo = gql`
       recipientAddress
     }
     members
+    multiChainInfo {
+      ...MultiChainInfo
+    }
   }
   ${DomainMetadata}
   ${ColonyMetadata}
+  ${MultiChainInfo}
 `;
 export const Token = gql`
   fragment Token on Token {
@@ -13174,6 +13276,14 @@ export const GetColonyArbitraryTransactionActionDocument = gql`
       }
     }
   }
+`;
+export const GetActionInfoDocument = gql`
+  query GetActionInfo($transactionHash: ID!) {
+    getColonyAction(id: $transactionHash) {
+      ...ActionMetadataInfo
+    }
+  }
+  ${ActionMetadataInfo}
 `;
 export const GetMotionIdFromActionDocument = gql`
   query GetMotionIdFromAction($id: ID!) {
