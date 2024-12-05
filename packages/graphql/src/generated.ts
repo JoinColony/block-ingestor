@@ -12592,6 +12592,17 @@ export const ColonyMetadata = gql`
     }
   }
 `;
+export const MultiChainInfo = gql`
+  fragment MultiChainInfo on MultiChainInfo {
+    targetChainId
+    completed
+    wormholeInfo {
+      emitterChainId
+      emitterAddress
+      sequence
+    }
+  }
+`;
 export const ActionMetadataInfo = gql`
   fragment ActionMetadataInfo on ColonyAction {
     id
@@ -12613,9 +12624,13 @@ export const ActionMetadataInfo = gql`
       recipientAddress
     }
     members
+    multiChainInfo {
+      ...MultiChainInfo
+    }
   }
   ${DomainMetadata}
   ${ColonyMetadata}
+  ${MultiChainInfo}
 `;
 export const Token = gql`
   fragment Token on Token {
@@ -13451,6 +13466,14 @@ export const GetColonyArbitraryTransactionActionDocument = gql`
       }
     }
   }
+`;
+export const GetActionInfoDocument = gql`
+  query GetActionInfo($transactionHash: ID!) {
+    getColonyAction(id: $transactionHash) {
+      ...ActionMetadataInfo
+    }
+  }
+  ${ActionMetadataInfo}
 `;
 export const GetActionInfoDocument = gql`
   query GetActionInfo($transactionHash: ID!) {

@@ -1527,30 +1527,48 @@ packages:
     resolution: {integrity: sha512-Z/yiTPj+lDVnF7lWeKCIJzaIkI0vYO87dMpZ4bg4TDrFe4XXLFWL1TbXU27gBP3QccxV9mZICCrnjnYlJjXHOA==}
     engines: {node: '>=6.9.0'}
 
+<<<<<<< HEAD
   '@colony/abis@1.8.3':
     resolution: {integrity: sha512-jszQfcHxTVEG4cGjyoXGtGfk9A2SnNvM9KHBunSaYdDTgN23SNmOd/LVRWd+QkRRPSEb8H78YRY4Y+vKtEeLKA==}
     engines: {node: ^18 || ^20 || ^22, npm: ^10}
 
+=======
+>>>>>>> 6b1d83eb (Feat: Add multi-chain info to colony action and update multi-chain handlers)
   '@colony/colony-js@8.0.0-next.1':
     resolution: {integrity: sha512-up/4KT2vrpPxy1dBTIccQVCAKmoCwPvpFzQ2+NWsp69hY+WV+jHxhFpynFuOfhEOgMzqiESwicwDimQLHDXr5Q==}
     engines: {node: ^16 || ^18 || ^20, pnpm: ^8}
     peerDependencies:
       ethers: ^5.1.3
 
+<<<<<<< HEAD
   '@colony/core@3.0.0':
     resolution: {integrity: sha512-NtjA4HtMl1uA9jrjcRpMItJVotJsFqgOngZ7Z7l/8S/kRWA1yMY17VsjkohEkRvnyAeoBgD0mdtTEZwGeqXvng==}
-    engines: {node: ^16 || ^18 || ^20, pnpm: ^8}
-    peerDependencies:
-      ethers: ^5.1.3
-
+=======
   '@colony/core@3.0.0-next.1':
     resolution: {integrity: sha512-40F2Ok9FFKVHpAfUK8qJ/leOqUU7u79pKOjHZFDjL6FPIl5gHokLeDuZBlyHA8MOHxHaefxDRgXUZ1fbqyWh0Q==}
+>>>>>>> 6b1d83eb (Feat: Add multi-chain info to colony action and update multi-chain handlers)
     engines: {node: ^16 || ^18 || ^20, pnpm: ^8}
     peerDependencies:
       ethers: ^5.1.3
 
+<<<<<<< HEAD
+  '@colony/core@3.0.0-next.1':
+    resolution: {integrity: sha512-40F2Ok9FFKVHpAfUK8qJ/leOqUU7u79pKOjHZFDjL6FPIl5gHokLeDuZBlyHA8MOHxHaefxDRgXUZ1fbqyWh0Q==}
+=======
   '@colony/events@4.0.0-next.1':
     resolution: {integrity: sha512-Mcy8YMKzyFxH5QHBTPlPMmP3lm5S8ITNr2vv2UUy9iQNT7wGMqc2kqZtwtuN5KA0nW1HwvBkgfaFmiKjR5hlIg==}
+>>>>>>> 6b1d83eb (Feat: Add multi-chain info to colony action and update multi-chain handlers)
+    engines: {node: ^16 || ^18 || ^20, pnpm: ^8}
+    peerDependencies:
+      ethers: ^5.1.3
+
+<<<<<<< HEAD
+  '@colony/events@4.0.0-next.1':
+    resolution: {integrity: sha512-Mcy8YMKzyFxH5QHBTPlPMmP3lm5S8ITNr2vv2UUy9iQNT7wGMqc2kqZtwtuN5KA0nW1HwvBkgfaFmiKjR5hlIg==}
+=======
+  '@colony/tokens@1.0.0-next.1':
+    resolution: {integrity: sha512-vP4SD4lv4o3H160uE1PgWKt1d1zCd7H9W5lAu+XzKNJvd+OVVL5OSxu7XxVpo978tqQW1EgzWLNTbtP/Vl2oJQ==}
+>>>>>>> 6b1d83eb (Feat: Add multi-chain info to colony action and update multi-chain handlers)
     engines: {node: ^16 || ^18 || ^20, pnpm: ^8}
     peerDependencies:
       ethers: ^5.1.3
@@ -8537,6 +8555,7 @@ snapshots:
       '@babel/helper-string-parser': 7.25.9
       '@babel/helper-validator-identifier': 7.25.9
 
+<<<<<<< HEAD
   '@colony/abis@1.8.3(typescript@5.7.3)(zod@3.24.1)':
     dependencies:
       abitype: 1.0.8(typescript@5.7.3)(zod@3.24.1)
@@ -8549,11 +8568,18 @@ snapshots:
     dependencies:
       '@colony/core': 3.0.0-next.1(ethers@5.7.2)
       '@colony/events': 4.0.0-next.1(ethers@5.7.2)(typescript@5.7.3)
+=======
+  '@colony/colony-js@8.0.0-next.1(ethers@5.7.2)(typescript@4.9.5)':
+    dependencies:
+      '@colony/core': 3.0.0-next.1(ethers@5.7.2)
+      '@colony/events': 4.0.0-next.1(ethers@5.7.2)(typescript@4.9.5)
+>>>>>>> 6b1d83eb (Feat: Add multi-chain info to colony action and update multi-chain handlers)
       '@colony/tokens': 1.0.0-next.1(ethers@5.7.2)
       ethers: 5.7.2
     transitivePeerDependencies:
       - typescript
 
+<<<<<<< HEAD
   '@colony/core@3.0.0(ethers@5.7.2)':
     dependencies:
       ethers: 5.7.2
@@ -8564,6 +8590,14 @@ snapshots:
 
   '@colony/events@4.0.0-next.1(ethers@5.7.2)(typescript@5.7.3)':
     dependencies:
+=======
+  '@colony/core@3.0.0-next.1(ethers@5.7.2)':
+    dependencies:
+      ethers: 5.7.2
+
+  '@colony/events@4.0.0-next.1(ethers@5.7.2)(typescript@4.9.5)':
+    dependencies:
+>>>>>>> 6b1d83eb (Feat: Add multi-chain info to colony action and update multi-chain handlers)
       '@colony/core': 3.0.0-next.1(ethers@5.7.2)
       ethers: 5.7.2
       fetch-retry: 5.0.6
