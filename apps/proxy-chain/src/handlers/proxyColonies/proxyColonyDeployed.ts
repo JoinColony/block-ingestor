@@ -2,8 +2,18 @@ import {
   CreateProxyColonyDocument,
   CreateProxyColonyMutation,
   CreateProxyColonyMutationVariables,
+  GetActionInfoDocument,
+  GetActionInfoQuery,
+  GetActionInfoQueryVariables,
+  UpdateColonyActionDocument,
+  UpdateColonyActionMutation,
+  UpdateColonyActionMutationVariables,
 } from '@joincolony/graphql';
-import { ContractEvent, ContractEventsSignatures, ProxyColonyEvents } from '@joincolony/blocks';
+import {
+  ContractEvent,
+  ContractEventsSignatures,
+  ProxyColonyEvents,
+} from '@joincolony/blocks';
 import amplifyClient from '~amplifyClient';
 import rpcProvider from '~provider';
 import { output } from '@joincolony/utils';
@@ -14,8 +24,15 @@ import multiChainBridgeClient from '~multiChainBridgeClient';
 export const handleProxyColonyDeployed = async (
   event: ContractEvent,
 ): Promise<void> => {
-  console.log('proxy colony deployed event', event);
-  const { blockNumber, args: { proxyColony: proxyColonyAddress } } = event;
+  const {
+    blockNumber,
+    args: { proxyColony: proxyColonyAddress },
+  } = event;
+
+  if (!proxyColonyAddress) {
+    output('No proxyColony emitted!');
+    return;
+  }
 
   const logs = await rpcProvider.getProviderInstance().getLogs({
     fromBlock: blockNumber,
@@ -29,17 +46,24 @@ export const handleProxyColonyDeployed = async (
   });
 
   const events = await Promise.all(
-    logs.map((log) => blockManager.mapLogToContractEvent(
-      log,
-      ProxyColonyEvents,
-    )),
+    logs.map((log) =>
+      blockManager.mapLogToContractEvent(log, ProxyColonyEvents),
+    ),
   );
 
-  const wormholeEvent = events.find(event => ContractEventsSignatures.WormholeMessageReceived === event?.signature);
-  const proxyDeployedEvent = events.find(event => ContractEventsSignatures.ProxyColonyDeployed === event?.signature);
+  const wormholeEvent = events.find(
+    (event) =>
+      ContractEventsSignatures.WormholeMessageReceived === event?.signature,
+  );
+  const proxyDeployedEvent = events.find(
+    (event) =>
+      ContractEventsSignatures.ProxyColonyDeployed === event?.signature,
+  );
 
   if (!wormholeEvent || !proxyDeployedEvent) {
-    output(`ProxyColonyDeployed or WormholeMessageReceived are not present in the same block`);
+    output(
+      `ProxyColonyDeployed or WormholeMessageReceived are not present in the same block`,
+    );
 
     return;
   }
@@ -47,41 +71,69 @@ export const handleProxyColonyDeployed = async (
   console.log(wormholeEvent, proxyDeployedEvent);
 
   console.log(`RPC provider chain id`, rpcProvider.getChainId());
-  console.log(`Mapped wormhole chain id`, multiChainBridgeClient.getWormholeChainId(rpcProvider.getChainId()));
+  console.log(
+    `Mapped wormhole chain id`,
+    multiChainBridgeClient.getWormholeChainId(rpcProvider.getChainId()),
+  );
 
   const { emitterChainId, emitterAddress, sequence } = wormholeEvent.args;
+  const chainId = rpcProvider.getChainId();
 
-  const multiChainBridgeOperationsResponse = await multiChainBridgeClient.fetchOperationDetails({
-    emitterAddress,
-    emitterChainId,
-    sequence,
-  });
+  const multiChainBridgeOperationsResponse =
+    await multiChainBridgeClient.fetchOperationDetails({
+      emitterAddress,
+      emitterChainId,
+      sequence,
+    });
 
-  const multiChainBridgeOperationsData = await multiChainBridgeOperationsResponse.json();
-  const multiChainTxHash = multiChainBridgeOperationsData?.sourceChain?.transaction?.txHash;
+  const multiChainBridgeOperationsData =
+    await multiChainBridgeOperationsResponse.json();
+  const sourceChainTxHash =
+    multiChainBridgeOperationsData?.sourceChain?.transaction?.txHash;
 
-  console.log(`The action tx hash`, multiChainTxHash)
-
-  // get the transaction hash from the response.data.sourceChain
-  // get the action based on txHash
-  // set pending to false
-
-  if (!proxyColonyAddress) {
-    output('No proxyColony emitted!');
+  if (!sourceChainTxHash) {
+    output(`Missing source chain txHash`);
     return;
   }
 
-  const chainId = rpcProvider.getChainId();
-
+  // if this event was fired we NEED to save it in the database, even if the action doesn't exist
   await amplifyClient.mutate<
     CreateProxyColonyMutation,
     CreateProxyColonyMutationVariables
-      >(CreateProxyColonyDocument, {
-        input: {
-          id: `${proxyColonyAddress}_${chainId}`,
-        colonyAddress: proxyColonyAddress,
-        chainId,
-        isActive: true,
-        },
-      });
+  >(CreateProxyColonyDocument, {
+    input: {
+      id: `${proxyColonyAddress}_${chainId}`,
+      colonyAddress: proxyColonyAddress,
+      chainId,
+      isActive: true,
+    },
+  });
+
+  const actionResponse = await amplifyClient.query<
+    GetActionInfoQuery,
+    GetActionInfoQueryVariables
+  >(GetActionInfoDocument, { transactionHash: sourceChainTxHash });
+  const actionData = actionResponse?.data?.getColonyAction;
+
+  if (!actionData) {
+    output(
+      `The txHash: ${sourceChainTxHash} is not an action on the main chain.`,
+    );
+    return;
+  }
+
+  if (!actionData.multiChainInfo) {
+    output(`The action: ${sourceChainTxHash} doesn't have multi chain data.`);
+    return;
+  }
+
+  await amplifyClient.mutate<
+    UpdateColonyActionMutation,
+    UpdateColonyActionMutationVariables
+  >(UpdateColonyActionDocument, {
+    input: {
+      id: sourceChainTxHash,
+      multiChainInfo: { ...actionData.multiChainInfo, completed: true },
+    },
+  });
 };

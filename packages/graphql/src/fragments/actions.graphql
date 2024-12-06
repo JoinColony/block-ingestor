@@ -1,3 +1,13 @@
+fragment MultiChainInfo on MultiChainInfo {
+  targetChainId
+  completed
+  wormholeInfo {
+    emitterChainId
+    emitterAddress
+    sequence
+  }
+}
+
 fragment ActionMetadataInfo on ColonyAction {
   id
   pendingDomainMetadata {
@@ -18,4 +28,7 @@ fragment ActionMetadataInfo on ColonyAction {
     recipientAddress
   }
   members
+  multiChainInfo {
+    ...MultiChainInfo
+  }
 }
