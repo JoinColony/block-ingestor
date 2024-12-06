@@ -42,6 +42,7 @@ export default async (event: ContractEvent): Promise<void> => {
     method: decodedFunction?.name,
     methodSignature: decodedFunction?.signature,
     args: mappedArgs,
+    encodedFunction,
   };
   const { data } =
     (await query<

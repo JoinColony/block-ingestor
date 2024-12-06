@@ -11,6 +11,7 @@ query GetColonyArbitraryTransactionAction($transactionHash: ID!) {
       contractAddress
       method
       methodSignature
+      encodedFunction
       args {
         name
         type

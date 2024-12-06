@@ -60,14 +60,14 @@ export type ApprovedTokenChangesInput = {
 export type ArbitraryTransactionMethodArg = {
   __typename?: 'ArbitraryTransactionMethodArg';
   name?: Maybe<Scalars['String']>;
-  type?: Maybe<Scalars['String']>;
-  value?: Maybe<Scalars['String']>;
+  type: Scalars['String'];
+  value: Scalars['String'];
 };
 
 export type ArbitraryTransactionMethodArgInput = {
   name?: InputMaybe<Scalars['String']>;
-  type?: InputMaybe<Scalars['String']>;
-  value?: InputMaybe<Scalars['String']>;
+  type: Scalars['String'];
+  value: Scalars['String'];
 };
 
 export type BridgeBankAccount = {
@@ -419,7 +419,7 @@ export type ColonyAction = {
   annotationId?: Maybe<Scalars['ID']>;
   /** Approved tokens impacted by the action (used for manage tokens) */
   approvedTokenChanges?: Maybe<ApprovedTokenChanges>;
-  arbitraryTransactions?: Maybe<Array<Maybe<ColonyActionArbitraryTransaction>>>;
+  arbitraryTransactions?: Maybe<Array<ColonyActionArbitraryTransaction>>;
   /** The block number where the action was recorded */
   blockNumber: Scalars['Int'];
   /** The Colony that the action belongs to */
@@ -546,15 +546,17 @@ export type ColonyAction = {
 /** Colony Arbitrary transaction that can be involved in an action */
 export type ColonyActionArbitraryTransaction = {
   __typename?: 'ColonyActionArbitraryTransaction';
-  args?: Maybe<Array<Maybe<ArbitraryTransactionMethodArg>>>;
-  contractAddress?: Maybe<Scalars['String']>;
+  args?: Maybe<Array<ArbitraryTransactionMethodArg>>;
+  contractAddress: Scalars['String'];
+  encodedFunction: Scalars['String'];
   method?: Maybe<Scalars['String']>;
   methodSignature?: Maybe<Scalars['String']>;
 };
 
 export type ColonyActionArbitraryTransactionInput = {
-  args?: InputMaybe<Array<InputMaybe<ArbitraryTransactionMethodArgInput>>>;
-  contractAddress?: InputMaybe<Scalars['String']>;
+  args?: InputMaybe<Array<ArbitraryTransactionMethodArgInput>>;
+  contractAddress: Scalars['String'];
+  encodedFunction: Scalars['String'];
   method?: InputMaybe<Scalars['String']>;
   methodSignature?: InputMaybe<Scalars['String']>;
 };
@@ -1430,7 +1432,7 @@ export type CreateColonyActionInput = {
   annotationId?: InputMaybe<Scalars['ID']>;
   approvedTokenChanges?: InputMaybe<ApprovedTokenChangesInput>;
   arbitraryTransactions?: InputMaybe<
-    Array<InputMaybe<ColonyActionArbitraryTransactionInput>>
+    Array<ColonyActionArbitraryTransactionInput>
   >;
   blockNumber: Scalars['Int'];
   colonyActionsId?: InputMaybe<Scalars['ID']>;
@@ -9221,7 +9223,7 @@ export type UpdateColonyActionInput = {
   annotationId?: InputMaybe<Scalars['ID']>;
   approvedTokenChanges?: InputMaybe<ApprovedTokenChangesInput>;
   arbitraryTransactions?: InputMaybe<
-    Array<InputMaybe<ColonyActionArbitraryTransactionInput>>
+    Array<ColonyActionArbitraryTransactionInput>
   >;
   blockNumber?: InputMaybe<Scalars['Int']>;
   colonyActionsId?: InputMaybe<Scalars['ID']>;
@@ -10956,16 +10958,17 @@ export type GetColonyArbitraryTransactionActionQuery = {
     id: string;
     arbitraryTransactions?: Array<{
       __typename?: 'ColonyActionArbitraryTransaction';
-      contractAddress?: string | null;
+      contractAddress: string;
       method?: string | null;
       methodSignature?: string | null;
+      encodedFunction: string;
       args?: Array<{
         __typename?: 'ArbitraryTransactionMethodArg';
         name?: string | null;
-        type?: string | null;
-        value?: string | null;
-      } | null> | null;
-    } | null> | null;
+        type: string;
+        value: string;
+      }> | null;
+    }> | null;
   } | null;
 };
 
@@ -12907,6 +12910,7 @@ export const GetColonyArbitraryTransactionActionDocument = gql`
         contractAddress
         method
         methodSignature
+        encodedFunction
         args {
           name
           type
