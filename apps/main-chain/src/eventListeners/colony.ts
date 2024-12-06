@@ -48,7 +48,6 @@ import {
   handleSetTokenAuthority,
   handleTokenUnlockedAction,
   handleTransfer,
-  handleWormholeLogMessagePublished,
 } from '~handlers';
 import { handleProxyColonyRequested } from '~handlers/proxyColonies';
 import setTokenAuthority from '~handlers/tokens/setTokenAuthority';
@@ -115,10 +114,6 @@ export const setupListenersForColonies = async (): Promise<void> => {
   addNetworkEventListener(
     ContractEventsSignatures.ReputationMiningCycleComplete,
     handleReputationMiningCycleComplete,
-  );
-  addProxyColoniesEventListener(
-    ContractEventsSignatures.LogMessagePublished,
-    handleWormholeLogMessagePublished,
   );
   addProxyColoniesEventListener(
     ContractEventsSignatures.ProxyColonyRequested,
