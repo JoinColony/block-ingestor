@@ -78,18 +78,31 @@ export const handleProxyColonyDeployed = async (
 
   const { emitterChainId, emitterAddress, sequence } = wormholeEvent.args;
   const chainId = rpcProvider.getChainId();
+  let sourceChainTxHash;
+  let isDeploymentCompleted = false;
 
-  const multiChainBridgeOperationsResponse =
+  try {
+
+    const multiChainBridgeOperationsResponse =
     await multiChainBridgeClient.fetchOperationDetails({
       emitterAddress,
       emitterChainId,
       sequence,
     });
 
-  const multiChainBridgeOperationsData =
-    await multiChainBridgeOperationsResponse.json();
-  const sourceChainTxHash =
-    multiChainBridgeOperationsData?.sourceChain?.transaction?.txHash;
+    const multiChainBridgeOperationsData =
+      await multiChainBridgeOperationsResponse.json();
+    sourceChainTxHash =
+      multiChainBridgeOperationsData?.sourceChain?.transaction?.txHash;
+    const sourceChainOperationStatus =
+      multiChainBridgeOperationsData?.sourceChain?.status;
+    isDeploymentCompleted = sourceChainOperationStatus === 'confirmed'; // @TODO need to check what values are available
+
+  } catch (error) {
+    output(
+      `Error while fetching multi-chain bridge operations details: ${(error as Error).message}.`,
+    );
+  }
 
   if (!sourceChainTxHash) {
     output(`Missing source chain txHash`);
@@ -133,7 +146,7 @@ export const handleProxyColonyDeployed = async (
   >(UpdateColonyActionDocument, {
     input: {
       id: sourceChainTxHash,
-      multiChainInfo: { ...actionData.multiChainInfo, completed: true },
+      multiChainInfo: { ...actionData.multiChainInfo, completed: isDeploymentCompleted },
     },
   });
 };

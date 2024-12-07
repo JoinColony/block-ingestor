@@ -4,7 +4,7 @@ import {
   ProxyColonyEvents,
 } from '@joincolony/blocks';
 import { output } from '@joincolony/utils';
-import { utils } from 'ethers';
+import { constants, utils } from 'ethers';
 import blockManager from '~blockManager';
 import rpcProvider from '~provider';
 import { writeActionFromEvent } from '~utils/actions/writeAction';
@@ -15,7 +15,7 @@ export const handleProxyColonyRequested = async (
 ): Promise<void> => {
   const { blockNumber, contractAddress: colonyAddress } = event;
 
-  const { agent: initiatorAddress, destinationChainId } = event.args;
+  const { destinationChainId } = event.args;
 
   const logs = await rpcProvider.getProviderInstance().getLogs({
     fromBlock: blockNumber,
@@ -51,22 +51,25 @@ export const handleProxyColonyRequested = async (
     return;
   }
 
-  const { emitterChainId, emitterAddress, sequence } = wormholeEvent.args;
+  const { sender, sequence } = wormholeEvent.args;
+  const emitterAddress = sender.toString();
+  const emitterSequence = sequence.toString();
+  const emitterChainId = destinationChainId.toNumber(); // @TODO this needs to be updated to the correct value
 
   if (!emitterChainId || !emitterAddress || !sequence) {
-    output('Missing arguments on the LogMessagePublished event');
+    output('Missing arguments on the ProxyColonyRequested and the LogMessagePublished events');
     return;
   }
 
   await writeActionFromEvent(event, colonyAddress, {
     type: ColonyActionType.AddProxyColony,
-    initiatorAddress,
+    initiatorAddress: constants.AddressZero,
     multiChainInfo: {
       completed: false,
-      targetChainId: destinationChainId,
+      targetChainId: destinationChainId.toNumber(),
       wormholeInfo: {
         emitterChainId,
-        sequence,
+        sequence: emitterSequence,
         emitterAddress,
       },
     },
