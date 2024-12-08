@@ -40,7 +40,6 @@ import {
   handleExpenditureTransferred,
   handleMakeAbitraryTransactionAction,
   handleManagePermissionsAction,
-  handleMintTokensAction,
   handleMoveFundsAction,
   handleReputationMiningCycleComplete,
   handleSetTokenAuthority,
@@ -52,7 +51,7 @@ import setTokenAuthority from '~handlers/tokens/setTokenAuthority';
 const addColonyEventListener = (
   eventSignature: ContractEventsSignatures,
   address: string,
-  handler: EventHandler,
+  handler?: EventHandler,
 ): void => {
   addEventListener({
     type: EventListenerType.Colony,
@@ -120,7 +119,6 @@ export const setupListenersForColony = (
   const colonyEventHandlers = {
     [ContractEventsSignatures.ColonyFundsClaimed]: handleColonyFundsClaimed,
     [ContractEventsSignatures.ColonyUpgraded]: handleColonyUpgradeAction,
-    [ContractEventsSignatures.TokensMinted]: handleMintTokensAction,
     [ContractEventsSignatures.DomainAdded]: handleCreateDomainAction,
     [ContractEventsSignatures.DomainMetadata]: handleEditDomainAction,
     [ContractEventsSignatures.TokenUnlocked]: handleTokenUnlockedAction,
@@ -164,6 +162,8 @@ export const setupListenersForColony = (
       handler,
     ),
   );
+
+  addColonyEventListener(ContractEventsSignatures.TokensMinted, colonyAddress);
 
   /*
    * @NOTE Setup both token event listners

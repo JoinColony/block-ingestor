@@ -1,4 +1,4 @@
-import { ContractEvent } from '~graphql';
+import { ContractEvent } from '~types';
 
 interface BaseActionMatcher {
   handler: (events: ContractEvent[]) => Promise<void>;
