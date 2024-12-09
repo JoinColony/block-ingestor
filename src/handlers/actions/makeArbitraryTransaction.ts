@@ -20,8 +20,7 @@ import {
 import { mutate, query } from '~amplifyClient';
 
 export default async (event: ContractEvent): Promise<void> => {
-  const contractAddress = event.args[0];
-  const encodedFunction = event.args[1];
+  const { target: contractAddress, data: encodedFunction } = event.args;
   const decodedFunction = await decodeArbitraryFunction(encodedFunction);
   const functionInputs = decodedFunction?.functionFragment.inputs;
   const functionArgs = decodedFunction?.args;
@@ -50,7 +49,7 @@ export default async (event: ContractEvent): Promise<void> => {
       GetColonyArbitraryTransactionActionQueryVariables
     >(GetColonyArbitraryTransactionActionDocument, { transactionHash })) ?? {};
 
-  // @NOTE: Filter out the event if it's already been processed (It can happen with multi-transactions)
+  // @NOTE: If it's already been processed, just push an arbitrary transaction to this action
   if (data?.getColonyAction?.id) {
     const prevArbitraryTransactions =
       data.getColonyAction.arbitraryTransactions ?? [];
