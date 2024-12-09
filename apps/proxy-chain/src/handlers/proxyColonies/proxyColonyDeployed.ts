@@ -68,6 +68,7 @@ export const handleProxyColonyDeployed = async (
     return;
   }
 
+  // @NOTE remove these logs once we know for sure which data we need from the events
   console.log(wormholeEvent, proxyDeployedEvent);
 
   console.log(`RPC provider chain id`, rpcProvider.getChainId());
@@ -82,13 +83,12 @@ export const handleProxyColonyDeployed = async (
   let isDeploymentCompleted = false;
 
   try {
-
     const multiChainBridgeOperationsResponse =
-    await multiChainBridgeClient.fetchOperationDetails({
-      emitterAddress,
-      emitterChainId,
-      sequence,
-    });
+      await multiChainBridgeClient.fetchOperationDetails({
+        emitterAddress,
+        emitterChainId,
+        sequence,
+      });
 
     const multiChainBridgeOperationsData =
       await multiChainBridgeOperationsResponse.json();
@@ -97,10 +97,11 @@ export const handleProxyColonyDeployed = async (
     const sourceChainOperationStatus =
       multiChainBridgeOperationsData?.sourceChain?.status;
     isDeploymentCompleted = sourceChainOperationStatus === 'confirmed'; // @TODO need to check what values are available
-
   } catch (error) {
     output(
-      `Error while fetching multi-chain bridge operations details: ${(error as Error).message}.`,
+      `Error while fetching multi-chain bridge operations details: ${
+        (error as Error).message
+      }.`,
     );
   }
 
@@ -146,7 +147,10 @@ export const handleProxyColonyDeployed = async (
   >(UpdateColonyActionDocument, {
     input: {
       id: sourceChainTxHash,
-      multiChainInfo: { ...actionData.multiChainInfo, completed: isDeploymentCompleted },
+      multiChainInfo: {
+        ...actionData.multiChainInfo,
+        completed: isDeploymentCompleted,
+      },
     },
   });
 };

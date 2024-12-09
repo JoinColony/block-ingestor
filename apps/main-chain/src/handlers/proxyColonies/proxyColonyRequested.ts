@@ -43,6 +43,9 @@ export const handleProxyColonyRequested = async (
       ContractEventsSignatures.ProxyColonyRequested === event?.signature,
   );
 
+  // @NOTE remove this log once we know for sure which data we need from the events
+  console.log(wormholeEvent, proxyRequestedEvent);
+
   if (!wormholeEvent || !proxyRequestedEvent) {
     output(
       `ProxyColonyRequested or LogMessagePublished are not present in the same block`,
@@ -54,10 +57,13 @@ export const handleProxyColonyRequested = async (
   const { sender, sequence } = wormholeEvent.args;
   const emitterAddress = sender.toString();
   const emitterSequence = sequence.toString();
-  const emitterChainId = destinationChainId.toNumber(); // @TODO this needs to be updated to the correct value
+  // @TODO this needs to be updated to the correct value
+  const emitterChainId = destinationChainId.toNumber();
 
   if (!emitterChainId || !emitterAddress || !sequence) {
-    output('Missing arguments on the ProxyColonyRequested and the LogMessagePublished events');
+    output(
+      'Missing arguments on the ProxyColonyRequested and the LogMessagePublished events',
+    );
     return;
   }
 
