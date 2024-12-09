@@ -26,7 +26,6 @@ import {
   handleEditColonyAction,
   handleEditDomainAction,
   handleEmitDomainReputationAction,
-  handleExpenditureAdded,
   handleExpenditureCancelled,
   handleExpenditureClaimDelaySet,
   handleExpenditureFinalized,
@@ -132,7 +131,6 @@ export const setupListenersForColony = (
     [ContractEventsSignatures.ColonyRoleSet_OLD]: handleManagePermissionsAction,
     [ContractEventsSignatures.ExpenditureGlobalClaimDelaySet]:
       handleExpenditureGlobalClaimDelaySet,
-    [ContractEventsSignatures.ExpenditureAdded]: handleExpenditureAdded,
     [ContractEventsSignatures.ExpenditureRecipientSet]:
       handleExpenditureRecipientSet,
     [ContractEventsSignatures.ExpenditurePayoutSet]: handleExpenditurePayoutSet,
@@ -164,6 +162,10 @@ export const setupListenersForColony = (
   );
 
   addColonyEventListener(ContractEventsSignatures.TokensMinted, colonyAddress);
+  addColonyEventListener(
+    ContractEventsSignatures.ExpenditureAdded,
+    colonyAddress,
+  );
 
   /*
    * @NOTE Setup both token event listners

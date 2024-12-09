@@ -9,7 +9,7 @@ import {
   verbose,
 } from '~utils';
 import { sendPermissionsActionNotifications } from '~utils/notifications';
-import { ActionHandler } from './types';
+import { ActionHandler } from '../types';
 
 export const handleMintTokensAction: ActionHandler = async (events) => {
   const { contractAddress: colonyAddress, transactionHash } = events[0];
