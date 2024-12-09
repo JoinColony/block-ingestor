@@ -11,10 +11,14 @@ import {
   setLastBlockNumber,
 } from '~utils';
 import { BLOCK_PAGING_SIZE } from '~constants';
-import { ContractEvent, ContractEventsSignatures } from '~types';
-import { handleMintTokensAction } from '~actions/actionHandlers';
+import { ContractEvent } from '~types';
 import { isEqual } from 'lodash';
-import { ActionMatcher } from '~actions/types';
+import {
+  ActionMatcher,
+  isFunctionActionMatcher,
+  isSimpleActionMatcher,
+} from '~actions/types';
+import { actionMatchers } from '~actions/actionMatchers';
 
 let isProcessing = false;
 const blockLogs = new Map<number, Log[]>();
@@ -216,26 +220,32 @@ export const processNextBlock = async (): Promise<void> => {
 
     console.log({ blockEvents });
 
+    const hasMatch = (
+      actionMatcher: ActionMatcher,
+      potentialMatch: ContractEvent[],
+    ): boolean => {
+      if (isSimpleActionMatcher(actionMatcher)) {
+        if (actionMatcher.eventSignatures.length !== potentialMatch.length) {
+          return false;
+        }
+
+        return isEqual(
+          actionMatcher.eventSignatures,
+          potentialMatch.map((event) => event.signature),
+        );
+      }
+
+      if (isFunctionActionMatcher(actionMatcher)) {
+        return actionMatcher.matcherFn(potentialMatch);
+      }
+
+      return false;
+    };
+
     interface ActionMatch {
       events: ContractEvent[];
       matcher: ActionMatcher;
     }
-
-    const actionMatchers = [
-      {
-        eventSignatures: [ContractEventsSignatures.TokensMinted],
-        handler: handleMintTokensAction,
-      },
-      {
-        eventSignatures: [
-          ContractEventsSignatures.ExpenditurePayoutClaimed,
-          ContractEventsSignatures.OneTxPaymentMade,
-        ],
-        handler: async () => {
-          console.log('\n\n\nSIMPLE PAYMENT\n\n');
-        },
-      },
-    ];
 
     const matches: ActionMatch[] = [];
 
@@ -251,12 +261,7 @@ export const processNextBlock = async (): Promise<void> => {
 
       let matchFound = false;
       for (const actionMatcher of actionMatchers) {
-        if (
-          isEqual(
-            actionMatcher.eventSignatures,
-            potentialMatch.map((event) => event.signature),
-          )
-        ) {
+        if (hasMatch(actionMatcher, potentialMatch)) {
           matches.push({
             events: potentialMatch,
             matcher: actionMatcher,
