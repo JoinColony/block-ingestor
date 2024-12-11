@@ -1,10 +1,7 @@
 import { Log } from '@ethersproject/abstract-provider';
 import { output, verbose } from '@joincolony/utils';
 import { EventManager, ContractEvent, EthersObserverEvents } from '../events';
-import {
-  Block,
-  BlockWithTransactions,
-} from './types';
+import { Block, BlockWithTransactions } from './types';
 import { RpcProvider } from '@joincolony/clients';
 import { utils } from 'ethers';
 import { StatsManager } from '../stats/statsManager';
