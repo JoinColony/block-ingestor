@@ -1,4 +1,4 @@
-import { mutate, query } from '~amplifyClient';
+import amplifyClient from '~amplifyClient';
 import {
   GetColonyDecisionByActionIdDocument,
   GetColonyDecisionByActionIdQuery,
@@ -18,7 +18,7 @@ export const updateDecisionInDB = async (
   decisionData: Omit<UpdateColonyDecisionMutationVariables, 'id'>,
 ): Promise<void> => {
   const { data } =
-    (await query<
+    (await amplifyClient.query<
       GetColonyDecisionByActionIdQuery,
       GetColonyDecisionByActionIdQueryVariables
     >(GetColonyDecisionByActionIdDocument, {
@@ -28,7 +28,7 @@ export const updateDecisionInDB = async (
   const decision = data?.getColonyDecisionByActionId?.items[0];
 
   if (decision)
-    await mutate<
+    await amplifyClient.mutate<
       UpdateColonyDecisionMutation,
       UpdateColonyDecisionMutationVariables
     >(UpdateColonyDecisionDocument, {

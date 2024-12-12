@@ -1,8 +1,9 @@
 import { TransactionDescription } from 'ethers/lib/utils';
 import { utils } from 'ethers';
-import { getCachedColonyClient, output, parseFunctionData } from '~utils';
-import { ContractEvent } from '~types';
+import { getCachedColonyClient, parseFunctionData } from '~utils';
+import { ContractEvent } from '@joincolony/blocks';
 import { multicallHandlers } from './multicallHandlers';
+import { output } from '@joincolony/utils';
 
 /**
  * @NOTE: This is a rather rudimentary way of handling multicall motions

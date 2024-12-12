@@ -1,5 +1,8 @@
-query GetStats {
-  getIngestorStats(id: "STATS") {
-    value
+query GetStats($chainId: String!) {
+  getIngestorStatsByChainId(chainId: $chainId) {
+    items {
+      id
+      value
+    }
   }
 }

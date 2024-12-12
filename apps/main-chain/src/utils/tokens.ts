@@ -1,7 +1,7 @@
 import { constants } from 'ethers';
 import { BlockTag } from '@ethersproject/abstract-provider';
 
-import { mutate, query } from '~amplifyClient';
+import amplifyClient from '~amplifyClient';
 
 import { getCachedColonyClient } from './clients';
 import { notNull } from './arrays';
@@ -136,7 +136,7 @@ export const updateColonyTokens = async (
          * Call the GetTokenFromEverywhere query to ensure the token
          * gets added to the DB if it doesn't already exist
          */
-        await query<
+        await amplifyClient.query<
           GetTokenFromEverywhereQuery,
           GetTokenFromEverywhereQueryVariables
         >(GetTokenFromEverywhereDocument, {
@@ -149,7 +149,7 @@ export const updateColonyTokens = async (
          * Only create colony/token entry in the DB if the token data was returned by the GetTokenFromEverywhereQuery.
          * Otherwise, it will cause any query referencing it to fail
          */
-        await mutate<
+        await amplifyClient.mutate<
           CreateColonyTokensMutation,
           CreateColonyTokensMutationVariables
         >(CreateColonyTokensDocument, {
@@ -171,7 +171,7 @@ export const updateColonyTokens = async (
 
     // If we can't find it, e.g. because it has already been removed by another motion, do nothing.
     if (colonyTokenId) {
-      await mutate<
+      await amplifyClient.mutate<
         DeleteColonyTokensMutation,
         DeleteColonyTokensMutationVariables
       >(DeleteColonyTokensDocument, {
@@ -201,7 +201,7 @@ export const fetchColoniesByNativeToken = async (
   };
 
   const { data } =
-    (await query<
+    (await amplifyClient.query<
       GetColonyByNativeTokenIdQuery,
       GetColonyByNativeTokenIdQueryVariables
     >(GetColonyByNativeTokenIdDocument, queryVariables)) ?? {};
@@ -212,7 +212,7 @@ export const fetchColoniesByNativeToken = async (
 
   while (queryVariables.nextToken) {
     const { data: nextData } =
-      (await query<
+      (await amplifyClient.query<
         GetColonyByNativeTokenIdQuery,
         GetColonyByNativeTokenIdQueryVariables
       >(GetColonyByNativeTokenIdDocument, queryVariables)) ?? {};
@@ -232,21 +232,21 @@ export const updateSingleColonyNativeTokenStatuses = async (
   colony: Pick<FullColony, 'id' | 'status'>,
   nativeTokenStatus: Omit<NativeTokenStatus, '__typename'>,
 ): Promise<void> => {
-  await mutate<UpdateColonyMutation, UpdateColonyMutationVariables>(
-    UpdateColonyDocument,
-    {
-      input: {
-        id: colony.id,
-        status: {
-          ...colony.status,
-          nativeToken: {
-            ...colony.status?.nativeToken,
-            ...nativeTokenStatus,
-          },
+  await amplifyClient.mutate<
+    UpdateColonyMutation,
+    UpdateColonyMutationVariables
+  >(UpdateColonyDocument, {
+    input: {
+      id: colony.id,
+      status: {
+        ...colony.status,
+        nativeToken: {
+          ...colony.status?.nativeToken,
+          ...nativeTokenStatus,
         },
       },
     },
-  );
+  });
 };
 
 /*

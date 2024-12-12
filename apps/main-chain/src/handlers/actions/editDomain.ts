@@ -1,9 +1,9 @@
 import { ColonyActionType } from '@joincolony/graphql';
-import { ContractEvent, ContractEventsSignatures } from '~types';
+import { verbose } from '@joincolony/utils';
+import { ContractEvent, ContractEventsSignatures } from '@joincolony/blocks';
 import { NotificationCategory } from '~types/notifications';
 import {
   toNumber,
-  verbose,
   writeActionFromEvent,
   getDomainDatabaseId,
   transactionHasEvent,

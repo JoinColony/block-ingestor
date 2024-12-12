@@ -1,8 +1,9 @@
 import { TransactionDescription } from 'ethers/lib/utils';
-import { ContractEvent, motionNameMapping } from '~types';
+import { motionNameMapping } from '~types';
 import { getDomainDatabaseId } from '~utils';
 
 import { createMotionInDB } from '../helpers';
+import { ContractEvent } from '@joincolony/blocks';
 
 export const handleDomainEditReputationMotion = async (
   colonyAddress: string,

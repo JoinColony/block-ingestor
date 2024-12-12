@@ -1,22 +1,23 @@
 import { utils } from 'ethers';
 import { Extension, getExtensionHash } from '@colony/colony-js';
 
-import { ContractEventsSignatures, EventHandler } from '~types';
 import {
+  ContractEventsSignatures,
+  EventHandler,
   EventListenerType,
-  addEventListener,
-  getEventListeners,
-  setEventListeners,
+} from '@joincolony/blocks';
+import {
   setupListenerForOneTxPaymentExtensions,
   setupListenersForStagedExpenditureExtensions,
 } from '~eventListeners';
+import eventManager from '~eventManager';
 import {
   ExtensionFragment,
   ListExtensionsDocument,
   ListExtensionsQuery,
   ListExtensionsQueryVariables,
 } from '@joincolony/graphql';
-import { query } from '~amplifyClient';
+import amplifyClient from '~amplifyClient';
 import { notNull } from '~utils';
 
 import { addNetworkEventListener } from '../network';
@@ -44,7 +45,7 @@ export const addExtensionEventListener = (
   colonyAddress: string,
   handler: EventHandler,
 ): void => {
-  addEventListener({
+  eventManager.addEventListener({
     type: EventListenerType.Extension,
     eventSignature,
     address: extensionAddress,
@@ -58,8 +59,8 @@ export const addExtensionEventListener = (
 export const removeExtensionEventListeners = (
   extensionAddress: string,
 ): void => {
-  const existingListeners = getEventListeners();
-  setEventListeners(
+  const existingListeners = eventManager.getEventListeners();
+  eventManager.setEventListeners(
     existingListeners.filter((listener) => {
       if (listener.type !== EventListenerType.Extension) {
         return true;
@@ -103,13 +104,13 @@ export const fetchExistingExtensions = async (
 
   do {
     const { data } =
-      (await query<ListExtensionsQuery, ListExtensionsQueryVariables>(
-        ListExtensionsDocument,
-        {
-          nextToken,
-          hash: extensionHash,
-        },
-      )) ?? {};
+      (await amplifyClient.query<
+        ListExtensionsQuery,
+        ListExtensionsQueryVariables
+      >(ListExtensionsDocument, {
+        nextToken,
+        hash: extensionHash,
+      })) ?? {};
 
     const { items } = data?.getExtensionsByHash ?? {};
     extensions.push(...(items ?? []));

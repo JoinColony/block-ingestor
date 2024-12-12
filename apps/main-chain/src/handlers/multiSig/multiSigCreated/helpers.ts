@@ -1,6 +1,6 @@
 import { AnyMultisigPermissionsClient } from '@colony/colony-js';
 import { BigNumber } from 'ethers';
-import { GraphQLFnReturn, mutate, query } from '~amplifyClient';
+import amplifyClient from '~amplifyClient';
 import {
   ColonyMultiSig,
   CreateColonyActionInput,
@@ -12,21 +12,22 @@ import {
   GetDomainByNativeSkillIdQueryVariables,
 } from '@joincolony/graphql';
 import networkClient from '~networkClient';
-import { getChainId } from '~provider';
-import { ContractEvent } from '~types';
+import rpcProvider from '~provider';
+import { ContractEvent } from '@joincolony/blocks';
 import {
   getDomainDatabaseId,
   getMultiSigClient,
-  output,
   createColonyAction,
 } from '~utils';
 import { getBlockChainTimestampISODate } from '~utils/dates';
 import { getMultiSigDatabaseId } from '../helpers';
+import { output } from '@joincolony/utils';
+import { type GraphQLFnReturn } from '@joincolony/clients';
 
 const createColonyMultiSig = async (
   motionData: CreateColonyMultiSigInput,
 ): Promise<void> => {
-  await mutate<
+  await amplifyClient.mutate<
     CreateColonyMultiSigInput,
     CreateColonyMultiSigMutationVariables
   >(CreateColonyMultiSigDocument, {
@@ -57,7 +58,7 @@ export const getMultiSigData = async ({
   isDecision = false,
   timestamp,
 }: GetMultiSigDataArgs): Promise<ColonyMultiSig> => {
-  const chainId = getChainId();
+  const chainId = rpcProvider.getChainId();
   const multiSigDatabaseId = getMultiSigDatabaseId(
     chainId,
     multiSigClient.address,
@@ -84,7 +85,7 @@ const getDomainIdByNativeSkillId = async (
   colonyAddress: string,
   nativeSkillId: string,
 ): Promise<number | null> => {
-  const result = await query<
+  const result = await amplifyClient.query<
     GetDomainByNativeSkillIdQuery,
     GetDomainByNativeSkillIdQueryVariables
   >(GetDomainByNativeSkillIdDocument, {

@@ -1,4 +1,4 @@
-import { query, mutate } from '~amplifyClient';
+import amplifyClient from '~amplifyClient';
 import {
   CreateColonyContributorDocument,
   CreateColonyContributorInput,
@@ -44,10 +44,13 @@ const getColonyContributor = async ({
   contributorAddress: string;
 }): Promise<
   ReturnType<
-    typeof query<GetColonyContributorQuery, GetColonyContributorQueryVariables>
+    typeof amplifyClient.query<
+      GetColonyContributorQuery,
+      GetColonyContributorQueryVariables
+    >
   >
 > => {
-  return await query<
+  return await amplifyClient.query<
     GetColonyContributorQuery,
     GetColonyContributorQueryVariables
   >(GetColonyContributorDocument, {
@@ -60,7 +63,7 @@ export const createColonyContributor = async ({
   contributorAddress,
   ...rest
 }: CreateColonyContributorInput): Promise<void> => {
-  await mutate<
+  await amplifyClient.mutate<
     CreateColonyContributorMutation,
     CreateColonyContributorMutationVariables
   >(CreateColonyContributorDocument, {
@@ -81,13 +84,13 @@ export const updateColonyContributor = async ({
   contributorAddress: string;
 }): Promise<void> => {
   const { data } =
-    (await query<GetAllColonyRolesQuery, GetAllColonyRolesQueryVariables>(
-      GetAllColonyRolesDocument,
-      {
-        colonyAddress,
-        targetAddress: contributorAddress,
-      },
-    )) ?? {};
+    (await amplifyClient.query<
+      GetAllColonyRolesQuery,
+      GetAllColonyRolesQueryVariables
+    >(GetAllColonyRolesDocument, {
+      colonyAddress,
+      targetAddress: contributorAddress,
+    })) ?? {};
 
   // Is there at least one role for which user has at least one permission?
   const hasAtLeastOnePermissionInColony =
@@ -101,7 +104,7 @@ export const updateColonyContributor = async ({
         ),
       );
 
-  await mutate<
+  await amplifyClient.mutate<
     UpdateColonyContributorMutation,
     UpdateColonyContributorMutationVariables
   >(UpdateColonyContributorDocument, {

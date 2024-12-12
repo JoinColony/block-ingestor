@@ -18,3 +18,10 @@ COPY --from=build /workspace /workspace
 WORKDIR /workspace/apps/main-chain
 CMD ["pnpm", "--filter", "@joincolony/main-chain", "prod"]
 
+# Proxy Chain Stage
+FROM base AS proxy-chain
+WORKDIR /workspace
+COPY --from=build /workspace /workspace
+WORKDIR /workspace/apps/proxy-chain
+CMD ["pnpm", "--filter", "@joincolony/proxy-chain", "prod"]
+

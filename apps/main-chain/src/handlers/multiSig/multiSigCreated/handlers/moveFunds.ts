@@ -1,5 +1,5 @@
 import { TransactionDescription } from 'ethers/lib/utils';
-import { ContractEvent, multiSigNameMapping } from '~types';
+import { multiSigNameMapping } from '~types';
 import {
   getCachedColonyClient,
   getDomainDatabaseId,
@@ -8,6 +8,7 @@ import {
   toNumber,
 } from '~utils';
 import { createMultiSigInDB } from '../helpers';
+import { ContractEvent } from '@joincolony/blocks';
 import { BigNumber } from 'ethers';
 
 export const handleMoveFundsMultiSig = async (

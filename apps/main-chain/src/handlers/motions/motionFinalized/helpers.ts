@@ -6,10 +6,9 @@ import { ColonyOperations, MotionVote } from '~types';
 import {
   getCachedColonyClient,
   getColonyFromDB,
-  output,
   parseFunctionData,
 } from '~utils';
-import { mutate, query } from '~amplifyClient';
+import amplifyClient from '~amplifyClient';
 import {
   ColonyActionType,
   ColonyMotion,
@@ -23,6 +22,7 @@ import {
   UpdateColonyDocument,
 } from '@joincolony/graphql';
 import { getAmountLessFee, getNetworkInverseFee } from '~utils/networkFee';
+import { output } from '@joincolony/utils';
 
 export const getStakerReward = async (
   motionId: string,
@@ -99,7 +99,7 @@ export const updateColonyUnclaimedStakes = async (
       motionsWithUnclaimedStakes = [unclaimedMotionStake];
     }
 
-    await mutate(UpdateColonyDocument, {
+    await amplifyClient.mutate(UpdateColonyDocument, {
       input: {
         id: colonyAddress,
         motionsWithUnclaimedStakes,
@@ -137,7 +137,7 @@ export const updateAmountToExcludeNetworkFee = async (
   }
 
   const { data } =
-    (await query<
+    (await amplifyClient.query<
       GetColonyActionByMotionIdQuery,
       GetColonyActionByMotionIdQueryVariables
     >(GetColonyActionByMotionIdDocument, {
@@ -172,7 +172,7 @@ export const updateAmountToExcludeNetworkFee = async (
     const amountLessFee = getAmountLessFee(amountWithFee, networkInverseFee);
     const networkFee = BigNumber.from(amountWithFee).sub(amountLessFee);
 
-    await mutate<
+    await amplifyClient.mutate<
       UpdateColonyActionMutation,
       UpdateColonyActionMutationVariables
     >(UpdateColonyActionDocument, {

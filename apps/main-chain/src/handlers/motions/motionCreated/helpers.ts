@@ -1,13 +1,13 @@
 import { BigNumber } from 'ethers';
 import { AnyVotingReputationClient } from '@colony/colony-js';
 
-import { ContractEvent, MotionEvents } from '~types';
+import { MotionEvents } from '~types';
 import {
   createColonyAction,
   getDomainDatabaseId,
   getVotingClient,
 } from '~utils';
-import { GraphQLFnReturn, mutate } from '~amplifyClient';
+import amplifyClient from '~amplifyClient';
 import {
   ColonyMotion,
   CreateColonyActionInput,
@@ -28,6 +28,8 @@ import {
   getUserMinStake,
   getMessageKey,
 } from '../helpers';
+import { type GraphQLFnReturn } from '@joincolony/clients';
+import { ContractEvent } from '@joincolony/blocks';
 
 interface GetMotionDataArgs {
   transactionHash: string;
@@ -140,20 +142,20 @@ const getInitialMotionMessage = async (
 const createColonyMotion = async (
   motionData: CreateColonyMotionInput,
 ): Promise<void> => {
-  await mutate<CreateColonyMotionMutation, CreateColonyMotionMutationVariables>(
-    CreateColonyMotionDocument,
-    {
-      input: {
-        ...motionData,
-      },
+  await amplifyClient.mutate<
+    CreateColonyMotionMutation,
+    CreateColonyMotionMutationVariables
+  >(CreateColonyMotionDocument, {
+    input: {
+      ...motionData,
     },
-  );
+  });
 };
 
 const createMotionMessage = async (
   initialMotionMessage: CreateMotionMessageInput,
 ): Promise<void> => {
-  await mutate<
+  await amplifyClient.mutate<
     CreateMotionMessageMutation,
     CreateMotionMessageMutationVariables
   >(CreateMotionMessageDocument, {

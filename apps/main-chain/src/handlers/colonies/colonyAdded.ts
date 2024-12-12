@@ -1,6 +1,6 @@
 import { utils } from 'ethers';
 
-import { mutate } from '~amplifyClient';
+import amplifyClient from '~amplifyClient';
 import { setupListenersForColony } from '~eventListeners';
 import {
   UpdateColonyContributorDocument,
@@ -9,16 +9,16 @@ import {
   GetColonyMetadataDocument,
 } from '@joincolony/graphql';
 import { coloniesSet } from '~stats';
-import { ContractEvent, ContractEventsSignatures } from '~types';
+import { ContractEvent, ContractEventsSignatures } from '@joincolony/blocks';
 import {
-  output,
-  updateStats,
   createColonyFounderInitialRoleEntry,
   getAllRoleEventsFromTransaction,
 } from '~utils';
+import statsManager from '~statsManager';
 import { getColonyContributorId } from '~utils/contributors';
 import { tryFetchGraphqlQuery } from '~utils/graphql';
 import { createUniqueColony } from './helpers/createUniqueColony';
+import { output } from '@joincolony/utils';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { transactionHash, args, blockNumber } = event;
@@ -50,8 +50,9 @@ export default async (event: ContractEvent): Promise<void> => {
   /*
    * Add it to the Set
    */
+  // @NOTE seems to not be working, is it borken on master too?
   coloniesSet.add(JSON.stringify({ colonyAddress, tokenAddress }));
-  await updateStats({ trackedColonies: coloniesSet.size });
+  await statsManager.updateStats({ trackedColonies: coloniesSet.size });
 
   output(
     'Found new Colony:',
@@ -120,7 +121,7 @@ export default async (event: ContractEvent): Promise<void> => {
    * check whether the contributor has already been created in the front end, and perform an update or a create mutation
    * accordingly.
    */
-  await mutate<
+  await amplifyClient.mutate<
     UpdateColonyContributorMutation,
     UpdateColonyContributorMutationVariables
   >(UpdateColonyContributorDocument, {

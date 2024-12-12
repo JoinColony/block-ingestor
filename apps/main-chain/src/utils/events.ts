@@ -2,9 +2,8 @@ import { BigNumber, utils } from 'ethers';
 import { Log } from '@ethersproject/providers';
 
 import networkClient from '~networkClient';
-import { ContractEvent, ContractEventsSignatures } from '~types';
-import { mutate, query } from '~amplifyClient';
-import { getChainId } from '~provider';
+import amplifyClient from '~amplifyClient';
+import rpcProvider from '~provider';
 import {
   CreateContractEventDocument,
   CreateContractEventMutation,
@@ -14,9 +13,9 @@ import {
   GetContractEventQueryVariables,
   ChainMetadata,
 } from '@joincolony/graphql';
-import { blocksMap } from '~blockListener';
-
-import { verbose } from './logger';
+import blockManager from '~blockManager';
+import { verbose } from '@joincolony/utils';
+import { ContractEvent, ContractEventsSignatures } from '@joincolony/blocks';
 
 export const mapLogToContractEvent = async (
   log: Log,
@@ -32,10 +31,10 @@ export const mapLogToContractEvent = async (
 
   try {
     // Attempt to first get a block from the map as we might have already fetched its info
-    let block = blocksMap.get(blockNumber);
+    let block = blockManager.getBlock(blockNumber);
     if (!block) {
       block = await provider.getBlock(blockNumber);
-      blocksMap.set(blockNumber, block);
+      blockManager.updateBlocksMap(blockNumber, block);
     }
 
     const { hash: blockHash, timestamp } = block;
@@ -68,7 +67,7 @@ export const saveEvent = async (event: ContractEvent): Promise<void> => {
       'Event does not have a signature. Possibly bad event data. Refusing the save to database!',
     );
   }
-  const chainId = getChainId();
+  const chainId = rpcProvider.getChainId();
 
   const {
     name,
@@ -153,17 +152,17 @@ export const saveEvent = async (event: ContractEvent): Promise<void> => {
   if (process.env.NODE_ENV !== 'production') {
     const { id: existingContractEventId } =
       (
-        await query<GetContractEventQuery, GetContractEventQueryVariables>(
-          GetContractEventDocument,
-          {
-            id: contractEvent.id,
-          },
-        )
+        await amplifyClient.query<
+          GetContractEventQuery,
+          GetContractEventQueryVariables
+        >(GetContractEventDocument, {
+          id: contractEvent.id,
+        })
       )?.data?.getContractEvent ?? {};
     existingContractEvent = existingContractEventId;
   }
   if (!existingContractEvent) {
-    await mutate<
+    await amplifyClient.mutate<
       CreateContractEventMutation,
       CreateContractEventMutationVariables
     >(CreateContractEventDocument, { input: contractEvent });

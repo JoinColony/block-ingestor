@@ -8,13 +8,19 @@ module.exports = {
   parserOptions: {
     ecmaVersion: 'latest',
     sourceType: 'module',
-    project: ['./tsconfig.json'],
+    project: [
+      './tsconfig.base.json',
+      './packages/*/tsconfig.json',
+      './apps/*/tsconfig.json'
+    ],
+    tsconfigRootDir: __dirname, 
   },
   rules: {
     semi: 'off',
     '@typescript-eslint/semi': ['error', 'always'],
     '@typescript-eslint/strict-boolean-expressions': 'off',
     '@typescript-eslint/restrict-template-expressions': 'off',
+    '@typescript-eslint/consistent-type-definitions': 'off',
     'comma-dangle': 'off',
     '@typescript-eslint/comma-dangle': ['error', 'always-multiline'],
     '@typescript-eslint/no-misused-promises': 'off',
@@ -25,6 +31,10 @@ module.exports = {
     'no-useless-return': 'off',
     '@typescript-eslint/member-delimiter-style': 'off',
     '@typescript-eslint/indent': 'off',
+    '@typescript-eslint/array-type': 'off',
+    '@typescript-eslint/prefer-nullish-coalescing': 'off',
+    '@typescript-eslint/prefer-optional-chain': 'off',
+    '@typescript-eslint/return-await': 'off',
     '@typescript-eslint/space-before-function-paren': [
       'error',
       {
@@ -34,5 +44,5 @@ module.exports = {
       },
     ],
   },
-  ignorePatterns: ['codegen.ts', 'src/graphql/generated.ts'],
+  ignorePatterns: ['packages/graphql/codegen.ts', 'packages/graphql/src/generated.ts'],
 };

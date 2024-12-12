@@ -1721,6 +1721,7 @@ export type CreateExtensionInstallationsCountInput = {
 };
 
 export type CreateIngestorStatsInput = {
+  chainId: Scalars['String'];
   id?: InputMaybe<Scalars['ID']>;
   value: Scalars['String'];
 };
@@ -2704,6 +2705,8 @@ export type GetVoterRewardsInput = {
 /** Model storing block ingestor stats, as key-value entries */
 export type IngestorStats = {
   __typename?: 'IngestorStats';
+  /** The chain id the stats are generated on */
+  chainId: Scalars['String'];
   createdAt: Scalars['AWSDateTime'];
   /** Unique identifier of the ingestor stats */
   id: Scalars['ID'];
@@ -3756,6 +3759,7 @@ export type ModelIdKeyConditionInput = {
 
 export type ModelIngestorStatsConditionInput = {
   and?: InputMaybe<Array<InputMaybe<ModelIngestorStatsConditionInput>>>;
+  chainId?: InputMaybe<ModelStringInput>;
   not?: InputMaybe<ModelIngestorStatsConditionInput>;
   or?: InputMaybe<Array<InputMaybe<ModelIngestorStatsConditionInput>>>;
   value?: InputMaybe<ModelStringInput>;
@@ -3769,6 +3773,7 @@ export type ModelIngestorStatsConnection = {
 
 export type ModelIngestorStatsFilterInput = {
   and?: InputMaybe<Array<InputMaybe<ModelIngestorStatsFilterInput>>>;
+  chainId?: InputMaybe<ModelStringInput>;
   id?: InputMaybe<ModelIdInput>;
   not?: InputMaybe<ModelIngestorStatsFilterInput>;
   or?: InputMaybe<Array<InputMaybe<ModelIngestorStatsFilterInput>>>;
@@ -4654,6 +4659,7 @@ export type ModelSubscriptionIngestorStatsFilterInput = {
   and?: InputMaybe<
     Array<InputMaybe<ModelSubscriptionIngestorStatsFilterInput>>
   >;
+  chainId?: InputMaybe<ModelSubscriptionStringInput>;
   id?: InputMaybe<ModelSubscriptionIdInput>;
   or?: InputMaybe<Array<InputMaybe<ModelSubscriptionIngestorStatsFilterInput>>>;
   value?: InputMaybe<ModelSubscriptionStringInput>;
@@ -6721,6 +6727,7 @@ export type Query = {
   getExtensionsByHash?: Maybe<ModelColonyExtensionConnection>;
   getFundsClaimsByColony?: Maybe<ModelColonyFundsClaimConnection>;
   getIngestorStats?: Maybe<IngestorStats>;
+  getIngestorStatsByChainId?: Maybe<ModelIngestorStatsConnection>;
   getLiquidationAddress?: Maybe<LiquidationAddress>;
   getLiquidationAddressesByUserAddress?: Maybe<ModelLiquidationAddressConnection>;
   getMotionByExpenditureId?: Maybe<ModelColonyMotionConnection>;
@@ -7176,6 +7183,15 @@ export type QueryGetFundsClaimsByColonyArgs = {
 /** Root query type */
 export type QueryGetIngestorStatsArgs = {
   id: Scalars['ID'];
+};
+
+/** Root query type */
+export type QueryGetIngestorStatsByChainIdArgs = {
+  chainId: Scalars['String'];
+  filter?: InputMaybe<ModelIngestorStatsFilterInput>;
+  limit?: InputMaybe<Scalars['Int']>;
+  nextToken?: InputMaybe<Scalars['String']>;
+  sortDirection?: InputMaybe<ModelSortDirection>;
 };
 
 /** Root query type */
@@ -9614,6 +9630,7 @@ export type UpdateExtensionInstallationsCountInput = {
 };
 
 export type UpdateIngestorStatsInput = {
+  chainId?: InputMaybe<Scalars['String']>;
   id: Scalars['ID'];
   value?: InputMaybe<Scalars['String']>;
 };
@@ -10983,6 +11000,7 @@ export type UpdateUserStakeMutation = {
 };
 
 export type CreateStatsMutationVariables = Exact<{
+  chainId: Scalars['String'];
   value: Scalars['String'];
 }>;
 
@@ -10992,6 +11010,8 @@ export type CreateStatsMutation = {
 };
 
 export type UpdateStatsMutationVariables = Exact<{
+  id: Scalars['ID'];
+  chainId: Scalars['String'];
   value: Scalars['String'];
 }>;
 
@@ -12130,11 +12150,20 @@ export type GetUserStakeQuery = {
   } | null;
 };
 
-export type GetStatsQueryVariables = Exact<{ [key: string]: never }>;
+export type GetStatsQueryVariables = Exact<{
+  chainId: Scalars['String'];
+}>;
 
 export type GetStatsQuery = {
   __typename?: 'Query';
-  getIngestorStats?: { __typename?: 'IngestorStats'; value: string } | null;
+  getIngestorStatsByChainId?: {
+    __typename?: 'ModelIngestorStatsConnection';
+    items: Array<{
+      __typename?: 'IngestorStats';
+      id: string;
+      value: string;
+    } | null>;
+  } | null;
 };
 
 export type GetTokenFromEverywhereQueryVariables = Exact<{
@@ -12920,15 +12949,15 @@ export const UpdateUserStakeDocument = gql`
   }
 `;
 export const CreateStatsDocument = gql`
-  mutation CreateStats($value: String!) {
-    createIngestorStats(input: { id: "STATS", value: $value }) {
+  mutation CreateStats($chainId: String!, $value: String!) {
+    createIngestorStats(input: { chainId: $chainId, value: $value }) {
       id
     }
   }
 `;
 export const UpdateStatsDocument = gql`
-  mutation UpdateStats($value: String!) {
-    updateIngestorStats(input: { id: "STATS", value: $value }) {
+  mutation UpdateStats($id: ID!, $chainId: String!, $value: String!) {
+    updateIngestorStats(input: { id: $id, chainId: $chainId, value: $value }) {
       id
     }
   }
@@ -13495,9 +13524,12 @@ export const GetUserStakeDocument = gql`
   }
 `;
 export const GetStatsDocument = gql`
-  query GetStats {
-    getIngestorStats(id: "STATS") {
-      value
+  query GetStats($chainId: String!) {
+    getIngestorStatsByChainId(chainId: $chainId) {
+      items {
+        id
+        value
+      }
     }
   }
 `;

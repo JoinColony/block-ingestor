@@ -14,7 +14,7 @@ import {
   EXPENDITURES_SLOT,
   EXPENDITURE_OWNER_AND_STATUS,
 } from '~constants';
-import { ContractEvent } from '~types';
+import { ContractEvent } from '@joincolony/blocks';
 
 interface SetExpenditureStateParams {
   storageSlot: BigNumberish;

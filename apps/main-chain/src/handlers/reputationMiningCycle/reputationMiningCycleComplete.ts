@@ -1,4 +1,4 @@
-import { mutate, query } from '~amplifyClient';
+import amplifyClient from '~amplifyClient';
 import {
   CreateReputationMiningCycleMetadataDocument,
   CreateReputationMiningCycleMetadataMutation,
@@ -10,7 +10,7 @@ import {
   UpdateReputationMiningCycleMetadataMutation,
   UpdateReputationMiningCycleMetadataMutationVariables,
 } from '@joincolony/graphql';
-import { ContractEvent } from '~types';
+import { ContractEvent } from '@joincolony/blocks';
 import { reputationMiningCycleMetadataId } from './utils';
 
 export default async (event: ContractEvent): Promise<void> => {
@@ -18,7 +18,7 @@ export default async (event: ContractEvent): Promise<void> => {
   // However, for current purposes (updating colony-wide contributor reputation), we don't care. We just need a timestamp.
 
   const { data } =
-    (await query<
+    (await amplifyClient.query<
       GetReputationMiningCycleMetadataQuery,
       GetReputationMiningCycleMetadataQueryVariables
     >(GetReputationMiningCycleMetadataDocument, {
@@ -28,7 +28,7 @@ export default async (event: ContractEvent): Promise<void> => {
   const dbEntryExists = !!data?.getReputationMiningCycleMetadata;
 
   if (dbEntryExists) {
-    await mutate<
+    await amplifyClient.mutate<
       UpdateReputationMiningCycleMetadataMutation,
       UpdateReputationMiningCycleMetadataMutationVariables
     >(UpdateReputationMiningCycleMetadataDocument, {
@@ -38,7 +38,7 @@ export default async (event: ContractEvent): Promise<void> => {
       },
     });
   } else {
-    await mutate<
+    await amplifyClient.mutate<
       CreateReputationMiningCycleMetadataMutation,
       CreateReputationMiningCycleMetadataMutationVariables
     >(CreateReputationMiningCycleMetadataDocument, {
