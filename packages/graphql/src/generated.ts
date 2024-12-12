@@ -312,6 +312,8 @@ export type Colony = {
   chainFundsClaim?: Maybe<ColonyChainFundsClaim>;
   /** Metadata related to the chain of the Colony */
   chainMetadata: ChainMetadata;
+  /** Colony creation data */
+  colonyCreateEvent?: Maybe<ColonyCreateEvent>;
   /**
    * The main member invite object
    * It is possible to create multiple member invites for a given colony
@@ -321,8 +323,6 @@ export type Colony = {
   /** ID of the main member invite object */
   colonyMemberInviteCode?: Maybe<Scalars['ID']>;
   createdAt: Scalars['AWSDateTime'];
-  /** The block number the colony was created attached */
-  createdAtBlock?: Maybe<Scalars['Int']>;
   domains?: Maybe<ModelDomainConnection>;
   expenditures?: Maybe<ModelExpenditureConnection>;
   /** Global claim delay for expenditures (in seconds) */
@@ -861,6 +861,19 @@ export type ColonyContributorRolesArgs = {
   limit?: InputMaybe<Scalars['Int']>;
   nextToken?: InputMaybe<Scalars['String']>;
   sortDirection?: InputMaybe<ModelSortDirection>;
+};
+
+export type ColonyCreateEvent = {
+  __typename?: 'ColonyCreateEvent';
+  /** The block number the colony was created at */
+  blockNumber: Scalars['Int'];
+  /** The address that signed the transaction */
+  signerAddress: Scalars['String'];
+};
+
+export type ColonyCreateEventInput = {
+  blockNumber: Scalars['Int'];
+  signerAddress: Scalars['String'];
 };
 
 export type ColonyDecision = {
@@ -1581,8 +1594,8 @@ export type CreateColonyInput = {
   balances?: InputMaybe<ColonyBalancesInput>;
   chainFundsClaim?: InputMaybe<ColonyChainFundsClaimInput>;
   chainMetadata: ChainMetadataInput;
+  colonyCreateEvent?: InputMaybe<ColonyCreateEventInput>;
   colonyMemberInviteCode?: InputMaybe<Scalars['ID']>;
-  createdAtBlock?: InputMaybe<Scalars['Int']>;
   expendituresGlobalClaimDelay?: InputMaybe<Scalars['String']>;
   id?: InputMaybe<Scalars['ID']>;
   lastUpdatedContributorsWithReputation?: InputMaybe<Scalars['AWSDateTime']>;
@@ -3022,7 +3035,6 @@ export type ModelColonyActionTypeInput = {
 export type ModelColonyConditionInput = {
   and?: InputMaybe<Array<InputMaybe<ModelColonyConditionInput>>>;
   colonyMemberInviteCode?: InputMaybe<ModelIdInput>;
-  createdAtBlock?: InputMaybe<ModelIntInput>;
   expendituresGlobalClaimDelay?: InputMaybe<ModelStringInput>;
   lastUpdatedContributorsWithReputation?: InputMaybe<ModelStringInput>;
   name?: InputMaybe<ModelStringInput>;
@@ -3149,7 +3161,6 @@ export type ModelColonyExtensionFilterInput = {
 export type ModelColonyFilterInput = {
   and?: InputMaybe<Array<InputMaybe<ModelColonyFilterInput>>>;
   colonyMemberInviteCode?: InputMaybe<ModelIdInput>;
-  createdAtBlock?: InputMaybe<ModelIntInput>;
   expendituresGlobalClaimDelay?: InputMaybe<ModelStringInput>;
   id?: InputMaybe<ModelIdInput>;
   lastUpdatedContributorsWithReputation?: InputMaybe<ModelStringInput>;
@@ -4410,7 +4421,6 @@ export type ModelSubscriptionColonyExtensionFilterInput = {
 export type ModelSubscriptionColonyFilterInput = {
   and?: InputMaybe<Array<InputMaybe<ModelSubscriptionColonyFilterInput>>>;
   colonyMemberInviteCode?: InputMaybe<ModelSubscriptionIdInput>;
-  createdAtBlock?: InputMaybe<ModelSubscriptionIntInput>;
   expendituresGlobalClaimDelay?: InputMaybe<ModelSubscriptionStringInput>;
   id?: InputMaybe<ModelSubscriptionIdInput>;
   lastUpdatedContributorsWithReputation?: InputMaybe<ModelSubscriptionStringInput>;
@@ -9503,8 +9513,8 @@ export type UpdateColonyInput = {
   balances?: InputMaybe<ColonyBalancesInput>;
   chainFundsClaim?: InputMaybe<ColonyChainFundsClaimInput>;
   chainMetadata?: InputMaybe<ChainMetadataInput>;
+  colonyCreateEvent?: InputMaybe<ColonyCreateEventInput>;
   colonyMemberInviteCode?: InputMaybe<Scalars['ID']>;
-  createdAtBlock?: InputMaybe<Scalars['Int']>;
   expendituresGlobalClaimDelay?: InputMaybe<Scalars['String']>;
   id: Scalars['ID'];
   lastUpdatedContributorsWithReputation?: InputMaybe<Scalars['AWSDateTime']>;
