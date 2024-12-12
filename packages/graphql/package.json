@@ -1,0 +1,9 @@
+{
+  "name": "@joincolony/graphql",
+  "version": "1.0.0",
+  "main": "src/index.ts",
+  "scripts": {
+    "codegen": "graphql-codegen -w \"src/**/*.graphql\""
+  },
+  "dependencies": {}
+}
