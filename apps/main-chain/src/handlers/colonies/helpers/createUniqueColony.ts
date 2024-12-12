@@ -38,6 +38,7 @@ import {
   GetTokenFromEverywhereDocument,
   GetTokenFromEverywhereQuery,
   GetTokenFromEverywhereQueryVariables,
+  ColonyCreateEvent,
 } from '@joincolony/graphql';
 import rpcProvider from '~provider';
 import { getCachedColonyClient } from '~utils/clients/colony';
@@ -48,13 +49,13 @@ export const createUniqueColony = async ({
   tokenAddress,
   transactionHash,
   initiatorAddress,
-  createdAtBlock,
+  colonyCreateEvent,
 }: {
   colonyAddress: string;
   tokenAddress: string;
   transactionHash: string;
   initiatorAddress: string;
-  createdAtBlock: number;
+  colonyCreateEvent: ColonyCreateEvent;
 }): Promise<void> => {
   /*
    * Validate Colony and Token addresses
@@ -224,7 +225,7 @@ export const createUniqueColony = async ({
       chainMetadata: {
         chainId,
       },
-      createdAtBlock,
+      colonyCreateEvent,
       version: version.toNumber(),
       status: {
         nativeToken: {
