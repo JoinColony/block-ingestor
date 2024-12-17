@@ -9,14 +9,7 @@ query GetColonyArbitraryTransactionAction($transactionHash: ID!) {
     id
     arbitraryTransactions {
       contractAddress
-      method
-      methodSignature
       encodedFunction
-      args {
-        name
-        type
-        value
-      }
     }
   }
 }
