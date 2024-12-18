@@ -21,6 +21,7 @@ import {
   handleAddOrEditDomainMultiSig,
   handleColonyVersionUpgrade,
   handlePaymentMultiSig,
+  handleMakeArbitraryTxsMultiSig,
 } from './handlers/index';
 import { sendMultisigActionNotifications } from '~utils/notifications';
 import { NotificationCategory } from '~types/notifications';
@@ -170,6 +171,15 @@ export const handleMultiSigMotionCreated: EventHandler = async (
       }
       case ColonyOperations.Upgrade: {
         await handleColonyVersionUpgrade(colonyAddress, event, parsedOperation);
+        notificationCategory = NotificationCategory.Admin;
+        break;
+      }
+      case ColonyOperations.MakeArbitraryTransactions: {
+        await handleMakeArbitraryTxsMultiSig(
+          colonyAddress,
+          event,
+          parsedOperation,
+        );
         notificationCategory = NotificationCategory.Admin;
         break;
       }

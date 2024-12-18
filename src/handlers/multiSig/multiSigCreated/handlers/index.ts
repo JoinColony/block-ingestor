@@ -8,3 +8,4 @@ export { handleMetadataDeltaMultiSig } from './metadataDelta';
 export { handleSetUserRolesMultiSig } from './setUserRoles';
 export { handleColonyVersionUpgrade } from './colonyVersionUpgrade';
 export { handlePaymentMultiSig } from './payment';
+export { handleMakeArbitraryTxsMultiSig } from './makeArbitraryTransactions';
