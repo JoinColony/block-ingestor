@@ -20,6 +20,7 @@ import { tryFetchGraphqlQuery } from '~utils/graphql';
 import { createUniqueColony } from './helpers/createUniqueColony';
 import { output } from '@joincolony/utils';
 import rpcProvider from '~provider';
+import networkClient from '~networkClient';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { transactionHash, args, blockNumber } = event;
@@ -79,11 +80,16 @@ export default async (event: ContractEvent): Promise<void> => {
   };
 
   let signerAddress = '';
+  let generatedColonySalt = '';
   try {
     const transaction = await rpcProvider
       .getProviderInstance()
       .getTransaction(transactionHash);
     signerAddress = transaction.from;
+    generatedColonySalt = await networkClient.getColonyCreationSalt({
+      blockTag: blockNumber,
+      from: signerAddress,
+    });
   } catch (error) {
     // Most likely there was an error retrieving this transaction
   }
@@ -99,7 +105,7 @@ export default async (event: ContractEvent): Promise<void> => {
       initiatorAddress: utils.getAddress(colonyFounderAddress),
       colonyCreateEvent: {
         blockNumber,
-        signerAddress,
+        creationSalt: generatedColonySalt,
       },
     });
   } catch (error) {
