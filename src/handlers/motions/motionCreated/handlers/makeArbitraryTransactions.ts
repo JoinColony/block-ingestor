@@ -10,12 +10,25 @@ export const handleMakeArbitraryTransactionsMotion = async (
   event: ContractEvent,
   parsedAction: TransactionDescription,
 ): Promise<void> => {
-  const { name, args: actionArgs } = parsedAction;
-  const [recipients] = actionArgs;
+  const { name } = parsedAction;
+
+  const { _targets: contractAddresses, _actions: encodedFunctions } =
+    parsedAction.args;
+
+  const currentArbitraryTransactions = await Promise.all(
+    contractAddresses.map(async (contractAddress: string, index: number) => {
+      const currentEncodedFunction = encodedFunctions[index];
+
+      return {
+        contractAddress,
+        encodedFunction: currentEncodedFunction,
+      };
+    }),
+  );
 
   await createMotionInDB(colonyAddress, event, {
     type: motionNameMapping[name],
-    recipientAddress: recipients[0],
     fromDomainId: getDomainDatabaseId(colonyAddress, Id.RootDomain),
+    arbitraryTransactions: currentArbitraryTransactions,
   });
 };
