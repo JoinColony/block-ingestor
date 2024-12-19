@@ -42,7 +42,7 @@ export const addExtensionEventListener = (
   extensionId: Extension,
   extensionAddress: string,
   colonyAddress: string,
-  handler: EventHandler,
+  handler?: EventHandler,
 ): void => {
   addEventListener({
     type: EventListenerType.Extension,
