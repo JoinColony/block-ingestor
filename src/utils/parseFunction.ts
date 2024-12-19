@@ -1,7 +1,6 @@
 import { utils } from 'ethers';
 import { TransactionDescription } from 'ethers/lib/utils';
 import { output } from './logger';
-import { lookupSignature } from './lookupSignature';
 
 /**
  * Helper attempting to decode function data by trying to parse it with different contract ABIs
@@ -43,29 +42,4 @@ export const decodeFunctions = (
   }
 
   return decodedFunctions;
-};
-
-/**
- * Given encoded function data, attempts to decode function data
- * by looking up the signature
- */
-export const decodeArbitraryFunction = async (
-  encodedFunction: string,
-): Promise<TransactionDescription | null> => {
-  const startIndex = encodedFunction.startsWith('0x') ? 2 : 0;
-  const hexSignature = encodedFunction.slice(startIndex, startIndex + 8);
-  const potentialSignatures = await lookupSignature(hexSignature);
-
-  // Create interfaces based on potential signatures
-  const interfaces = potentialSignatures
-    .map((signature) => {
-      try {
-        return new utils.Interface([`function ${signature}`]);
-      } catch (e) {
-        return null;
-      }
-    })
-    .filter(Boolean) as utils.Interface[];
-
-  return parseFunctionData(encodedFunction, interfaces);
 };
