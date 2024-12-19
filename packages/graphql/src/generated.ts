@@ -12553,15 +12553,16 @@ export const Token = gql`
   }
 `;
 export const Colony = gql`
-    fragment Colony on Colony {
-  colonyAddress: id
-  nativeToken {
-    ...Token
-  }
-  tokens {
-    items {
-      id
-      tokenAddress: tokenID
+  fragment Colony on Colony {
+    colonyAddress: id
+    nativeToken {
+      ...Token
+    }
+    tokens {
+      items {
+        id
+        tokenAddress: tokenID
+      }
     }
   }
 `;
@@ -12773,6 +12774,20 @@ export const MotionStakes = gql`
     percentage {
       nay
       yay
+    }
+  }
+`;
+export const UserMotionStakes = gql`
+    fragment UserMotionStakes on UserMotionStakes {
+  address
+  stakes {
+    raw {
+      yay
+      nay
+    }
+    percentage {
+      yay
+      nay
     }
   }
 `;
@@ -12998,18 +13013,10 @@ export const ColonyMultiSig = gql`
     action {
       type
     }
+    expenditureId
   }
-  executedAt
-  executedBy
-  rejectedAt
-  rejectedBy
-  createdAt
-  action {
-    type
-  }
-  expenditureId
-}
-    ${MultiSigUserSignature}`;
+  ${MultiSigUserSignature}
+`;
 export const ProxyColony = gql`
   fragment ProxyColony on ProxyColony {
     id
@@ -13381,8 +13388,7 @@ export const CreateColonyHistoricRoleDocument = gql`
       id
     }
   }
-}
-    `;
+`;
 export const CreateProxyColonyDocument = gql`
   mutation CreateProxyColony($input: CreateProxyColonyInput!) {
     createProxyColony(input: $input) {
@@ -13430,15 +13436,17 @@ export const UpdateUserStakeDocument = gql`
   }
 `;
 export const CreateStatsDocument = gql`
-    mutation CreateStats($chainId: String!, $value: String!) {
-  createIngestorStats(input: {chainId: $chainId, value: $value}) {
-    id
+  mutation CreateStats($chainId: String!, $value: String!) {
+    createIngestorStats(input: { chainId: $chainId, value: $value }) {
+      id
+    }
   }
 `;
 export const UpdateStatsDocument = gql`
-    mutation UpdateStats($id: ID!, $chainId: String!, $value: String!) {
-  updateIngestorStats(input: {id: $id, chainId: $chainId, value: $value}) {
-    id
+  mutation UpdateStats($id: ID!, $chainId: String!, $value: String!) {
+    updateIngestorStats(input: { id: $id, chainId: $chainId, value: $value }) {
+      id
+    }
   }
 `;
 export const DeleteColonyTokensDocument = gql`
@@ -13454,8 +13462,7 @@ export const GetColonyActionDocument = gql`
       id
     }
   }
-}
-    `;
+`;
 export const GetColonyArbitraryTransactionActionDocument = gql`
   query GetColonyArbitraryTransactionAction($transactionHash: ID!) {
     getColonyAction(id: $transactionHash) {
@@ -13982,8 +13989,25 @@ export const GetColonyRoleDocument = gql`
       role_6
     }
   }
-}
-    `;
+`;
+export const GetAllColonyRolesDocument = gql`
+  query GetAllColonyRoles($targetAddress: ID!, $colonyAddress: ID!) {
+    getRoleByTargetAddressAndColony(
+      targetAddress: $targetAddress
+      colonyAddress: { eq: $colonyAddress }
+    ) {
+      items {
+        id
+        role_0
+        role_1
+        role_2
+        role_3
+        role_5
+        role_6
+      }
+    }
+  }
+`;
 export const GetColonyHistoricRoleDocument = gql`
   query GetColonyHistoricRole($id: ID!) {
     getColonyHistoricRole(id: $id) {
@@ -14097,5 +14121,5 @@ export const GetNotificationUsersDocument = gql`
       }
     }
   }
-  ${NotificationsData}
-`;
+}
+    ${NotificationsData}`;
