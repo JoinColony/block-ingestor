@@ -11,7 +11,11 @@ import {
 } from '~graphql';
 import { ContractEvent } from '~types';
 import provider from '~provider';
-import { getDomainDatabaseId, writeActionFromEvent } from '~utils';
+import {
+  ArbitraryTransaction,
+  getDomainDatabaseId,
+  writeActionFromEvent,
+} from '~utils';
 import { mutate, query } from '~amplifyClient';
 
 export default async (event: ContractEvent): Promise<void> => {
@@ -20,7 +24,7 @@ export default async (event: ContractEvent): Promise<void> => {
   const { contractAddress: colonyAddress, transactionHash } = event;
   const receipt = await provider.getTransactionReceipt(event.transactionHash);
 
-  const currentArbitraryTransaction = {
+  const currentArbitraryTransaction: ArbitraryTransaction = {
     contractAddress,
     encodedFunction,
   };
