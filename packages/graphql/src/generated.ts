@@ -867,13 +867,13 @@ export type ColonyCreateEvent = {
   __typename?: 'ColonyCreateEvent';
   /** The block number the colony was created at */
   blockNumber: Scalars['Int'];
-  /** The address that signed the transaction */
-  signerAddress: Scalars['String'];
+  /** The salt used during creation */
+  creationSalt: Scalars['String'];
 };
 
 export type ColonyCreateEventInput = {
   blockNumber: Scalars['Int'];
-  signerAddress: Scalars['String'];
+  creationSalt: Scalars['String'];
 };
 
 export type ColonyDecision = {
@@ -12619,6 +12619,20 @@ export const MotionStakes = gql`
   }
 `;
 export const UserMotionStakes = gql`
+    fragment UserMotionStakes on UserMotionStakes {
+  address
+  stakes {
+    raw {
+      yay
+      nay
+    }
+    percentage {
+      yay
+      nay
+    }
+  }
+`;
+export const UserMotionStakes = gql`
   fragment UserMotionStakes on UserMotionStakes {
     address
     stakes {
@@ -12840,18 +12854,10 @@ export const ColonyMultiSig = gql`
     action {
       type
     }
+    expenditureId
   }
-  executedAt
-  executedBy
-  rejectedAt
-  rejectedBy
-  createdAt
-  action {
-    type
-  }
-  expenditureId
-}
-    ${MultiSigUserSignature}`;
+  ${MultiSigUserSignature}
+`;
 export const NotificationUser = gql`
   fragment NotificationUser on ColonyContributor {
     user {
@@ -13274,8 +13280,7 @@ export const GetColonyActionDocument = gql`
       id
     }
   }
-}
-    `;
+`;
 export const GetColonyArbitraryTransactionActionDocument = gql`
   query GetColonyArbitraryTransactionAction($transactionHash: ID!) {
     getColonyAction(id: $transactionHash) {
