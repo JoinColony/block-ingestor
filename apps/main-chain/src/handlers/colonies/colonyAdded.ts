@@ -20,6 +20,9 @@ import { tryFetchGraphqlQuery } from '~utils/graphql';
 import { createUniqueColony } from './helpers/createUniqueColony';
 import { output } from '@joincolony/utils';
 import rpcProvider from '~provider';
+import networkClient from '~networkClient';
+import { getTransactionSignerAddress } from '~utils/transactions';
+import { getColonyCreationSalt } from './helpers/validateCreationSalt';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { transactionHash, args, blockNumber } = event;
@@ -71,19 +74,18 @@ export default async (event: ContractEvent): Promise<void> => {
     0,
     ContractEventsSignatures.ColonyRoleSet.indexOf('('),
   );
-
   const {
     args: { user: colonyFounderAddress },
   } = events.find((event) => event?.name === ColonyRoleSetEventName) ?? {
     args: { user: '' },
   };
 
-  let signerAddress = '';
+  let generatedColonySalt = '';
+
+  // We don't really want to block colony creation if there's something wrong with salt calculation
   try {
-    const transaction = await rpcProvider
-      .getProviderInstance()
-      .getTransaction(transactionHash);
-    signerAddress = transaction.from;
+    generatedColonySalt =
+      (await getColonyCreationSalt(blockNumber, transactionHash)) || '';
   } catch (error) {
     // Most likely there was an error retrieving this transaction
   }
@@ -99,7 +101,7 @@ export default async (event: ContractEvent): Promise<void> => {
       initiatorAddress: utils.getAddress(colonyFounderAddress),
       colonyCreateEvent: {
         blockNumber,
-        signerAddress,
+        creationSalt: generatedColonySalt,
       },
     });
   } catch (error) {
