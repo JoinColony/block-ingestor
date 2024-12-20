@@ -1,15 +1,15 @@
 import { TransactionDescription } from 'ethers/lib/utils';
 import { ColonyActionType } from '@joincolony/graphql';
-import { ContractEvent } from '~types';
+import { ContractEvent } from '@joincolony/blocks';
 import {
   isAddVerifiedMembersOperation,
   isManageTokensOperation,
   isRemoveVerifiedMembersOperation,
   parseMetadataDeltaOperation,
-  verbose,
 } from '~utils';
 import { createMotionInDB } from '../helpers';
 import { manageTokensMotionHandler } from './metadataDeltaHandlers/manageTokens';
+import { verbose } from '@joincolony/utils';
 
 export const handleMetadataDeltaMotion = async (
   colonyAddress: string,

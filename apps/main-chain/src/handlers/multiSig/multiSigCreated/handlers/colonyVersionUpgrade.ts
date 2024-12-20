@@ -1,7 +1,8 @@
 import { TransactionDescription } from 'ethers/lib/utils';
-import { ContractEvent, multiSigNameMapping } from '~types';
+import { multiSigNameMapping } from '~types';
 import { createMultiSigInDB } from '../helpers';
 import { toNumber } from '~utils';
+import { ContractEvent } from '@joincolony/blocks';
 
 export const handleColonyVersionUpgrade = async (
   colonyAddress: string,

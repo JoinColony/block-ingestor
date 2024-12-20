@@ -1,5 +1,5 @@
 import { BigNumber } from 'ethers';
-import { mutate, query } from '~amplifyClient';
+import amplifyClient from '~amplifyClient';
 import {
   GetUserMultiSigSignatureDocument,
   GetUserMultiSigSignatureQuery,
@@ -20,7 +20,7 @@ import {
   CreateMultiSigVoteDocument,
 } from '@joincolony/graphql';
 import { getBlockChainTimestampISODate } from '~utils/dates';
-import { output } from '~utils/logger';
+import { output } from '@joincolony/utils';
 
 export const getMultiSigDatabaseId = (
   chainId: string,
@@ -40,7 +40,7 @@ export const getUserMultiSigSignature = async ({
   vote,
   role,
 }: GetUserMultiSigSignatureParams): Promise<MultiSigUserSignatureFragment | null> => {
-  const response = await query<
+  const response = await amplifyClient.query<
     GetUserMultiSigSignatureQuery,
     GetUserMultiSigSignatureQueryVariables
   >(GetUserMultiSigSignatureDocument, {
@@ -64,12 +64,12 @@ export const getMultiSigFromDB = async (
   databaseMultiSigId: string,
 ): Promise<ColonyMultiSig | null | undefined> => {
   const { data } =
-    (await query<GetColonyMultiSigQuery, GetColonyMultiSigQueryVariables>(
-      GetColonyMultiSigDocument,
-      {
-        id: databaseMultiSigId,
-      },
-    )) ?? {};
+    (await amplifyClient.query<
+      GetColonyMultiSigQuery,
+      GetColonyMultiSigQueryVariables
+    >(GetColonyMultiSigDocument, {
+      id: databaseMultiSigId,
+    })) ?? {};
 
   const multiSig = data?.getColonyMultiSig;
 
@@ -85,7 +85,7 @@ export const getMultiSigFromDB = async (
 export const updateMultiSigInDB = async (
   multiSigData: UpdateColonyMultiSigInput,
 ): Promise<void> => {
-  await mutate(UpdateColonyMultiSigDocument, {
+  await amplifyClient.mutate(UpdateColonyMultiSigDocument, {
     input: {
       ...multiSigData,
     },
@@ -109,24 +109,24 @@ export const addMultiSigVote = async ({
   vote,
   timestamp,
 }: addMultiSigVoteParams): Promise<void> => {
-  await mutate<CreateMultiSigVoteMutation, CreateMultiSigVoteMutationVariables>(
-    CreateMultiSigVoteDocument,
-    {
-      input: {
-        colonyAddress,
-        multiSigId,
-        userAddress,
-        role,
-        vote,
-        createdAt: getBlockChainTimestampISODate(timestamp),
-      },
+  await amplifyClient.mutate<
+    CreateMultiSigVoteMutation,
+    CreateMultiSigVoteMutationVariables
+  >(CreateMultiSigVoteDocument, {
+    input: {
+      colonyAddress,
+      multiSigId,
+      userAddress,
+      role,
+      vote,
+      createdAt: getBlockChainTimestampISODate(timestamp),
     },
-  );
+  });
 };
 
 export const removeMultiSigVote = async (id: string): Promise<void> => {
-  await mutate<RemoveMultiSigVoteMutation, RemoveMultiSigVoteMutationVariables>(
-    RemoveMultiSigVoteDocument,
-    { id },
-  );
+  await amplifyClient.mutate<
+    RemoveMultiSigVoteMutation,
+    RemoveMultiSigVoteMutationVariables
+  >(RemoveMultiSigVoteDocument, { id });
 };

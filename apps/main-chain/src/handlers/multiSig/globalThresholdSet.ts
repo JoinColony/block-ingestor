@@ -1,5 +1,5 @@
 import { constants } from 'ethers';
-import { query } from '~amplifyClient';
+import amplifyClient from '~amplifyClient';
 import {
   GetColonyExtensionByAddressDocument,
   GetColonyExtensionByAddressQuery,
@@ -7,7 +7,7 @@ import {
   NotificationType,
 } from '@joincolony/graphql';
 import networkClient from '~networkClient';
-import { EventHandler } from '~types';
+import { EventHandler } from '@joincolony/blocks';
 import { updateExtension } from '~utils/extensions/updateExtension';
 import { sendExtensionUpdateNotifications } from '~utils/notifications';
 
@@ -15,7 +15,7 @@ export const handleMultiSigGlobalThresholdSet: EventHandler = async (event) => {
   const { contractAddress: multiSigAddress, transactionHash } = event;
   const { globalThreshold } = event.args;
 
-  const colonyExtensionsResponse = await query<
+  const colonyExtensionsResponse = await amplifyClient.query<
     GetColonyExtensionByAddressQuery,
     GetColonyExtensionByAddressQueryVariables
   >(GetColonyExtensionByAddressDocument, {

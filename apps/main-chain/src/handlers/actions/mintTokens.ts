@@ -1,13 +1,13 @@
 import { Id } from '@colony/colony-js';
 
 import { ColonyActionType } from '@joincolony/graphql';
-import { ContractEvent } from '~types';
+import { verbose } from '@joincolony/utils';
+import { ContractEvent } from '@joincolony/blocks';
 import { NotificationCategory } from '~types/notifications';
 import {
   writeActionFromEvent,
   getColonyTokenAddress,
   getDomainDatabaseId,
-  verbose,
 } from '~utils';
 import { sendPermissionsActionNotifications } from '~utils/notifications';
 

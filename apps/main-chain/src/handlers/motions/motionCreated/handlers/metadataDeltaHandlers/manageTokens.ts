@@ -5,7 +5,7 @@ import {
 } from '~utils';
 import { createMotionInDB } from '../../helpers';
 import { ColonyActionType } from '@joincolony/graphql';
-import { ContractEvent } from '~types';
+import { ContractEvent } from '@joincolony/blocks';
 
 export const manageTokensMotionHandler = async ({
   colonyAddress,

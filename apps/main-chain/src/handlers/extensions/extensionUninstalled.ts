@@ -4,7 +4,7 @@ import { removeExtensionEventListeners } from '~eventListeners';
 import { handleMultiSigUninstalled } from '~eventListeners/extension/multiSig';
 import { NotificationType } from '@joincolony/graphql';
 import networkClient from '~networkClient';
-import { ContractEvent } from '~types';
+import { ContractEvent } from '@joincolony/blocks';
 import { deleteExtensionFromEvent } from '~utils';
 import { sendExtensionUpdateNotifications } from '~utils/notifications';
 

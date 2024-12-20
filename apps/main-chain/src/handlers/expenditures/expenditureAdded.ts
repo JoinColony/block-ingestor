@@ -1,4 +1,4 @@
-import { mutate } from '~amplifyClient';
+import amplifyClient from '~amplifyClient';
 import {
   ColonyActionType,
   CreateExpenditureDocument,
@@ -8,19 +8,18 @@ import {
   ExpenditureType,
   NotificationType,
 } from '@joincolony/graphql';
-import { ContractEvent, ContractEventsSignatures } from '~types';
+import { ContractEvent, ContractEventsSignatures } from '@joincolony/blocks';
 import {
   transactionHasEvent,
   getDomainDatabaseId,
   getExpenditureDatabaseId,
-  output,
   toNumber,
-  verbose,
   writeActionFromEvent,
 } from '~utils';
 
 import { getExpenditure } from './helpers';
 import { sendExpenditureUpdateNotifications } from '~utils/notifications';
+import { output, verbose } from '@joincolony/utils';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { contractAddress: colonyAddress, transactionHash } = event;
@@ -53,24 +52,24 @@ export default async (event: ContractEvent): Promise<void> => {
     convertedExpenditureId,
   );
 
-  await mutate<CreateExpenditureMutation, CreateExpenditureMutationVariables>(
-    CreateExpenditureDocument,
-    {
-      input: {
-        id: databaseId,
-        type: ExpenditureType.PaymentBuilder,
-        colonyId: colonyAddress,
-        nativeId: convertedExpenditureId,
-        ownerAddress,
-        status: ExpenditureStatus.Draft,
-        slots: [],
-        nativeFundingPotId: fundingPotId,
-        nativeDomainId: domainId,
-        isStaked: false,
-        balances: [],
-      },
+  await amplifyClient.mutate<
+    CreateExpenditureMutation,
+    CreateExpenditureMutationVariables
+  >(CreateExpenditureDocument, {
+    input: {
+      id: databaseId,
+      type: ExpenditureType.PaymentBuilder,
+      colonyId: colonyAddress,
+      nativeId: convertedExpenditureId,
+      ownerAddress,
+      status: ExpenditureStatus.Draft,
+      slots: [],
+      nativeFundingPotId: fundingPotId,
+      nativeDomainId: domainId,
+      isStaked: false,
+      balances: [],
     },
-  );
+  });
 
   /**
    * @NOTE: Only create a `CREATE_EXPENDITURE` action if the expenditure was not created as part of a OneTxPayment

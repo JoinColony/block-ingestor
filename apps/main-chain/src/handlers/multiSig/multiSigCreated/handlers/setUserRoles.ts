@@ -1,6 +1,6 @@
 import { TransactionDescription } from 'ethers/lib/utils';
 
-import { ContractEvent, multiSigNameMapping } from '~types';
+import { multiSigNameMapping } from '~types';
 import {
   getColonyRolesDatabaseId,
   getDomainDatabaseId,
@@ -8,6 +8,7 @@ import {
 } from '~utils';
 import { createMultiSigInDB } from '../helpers';
 import { sendMentionNotifications } from '~utils/notifications';
+import { ContractEvent } from '@joincolony/blocks';
 
 export const handleSetUserRolesMultiSig = async (
   colonyAddress: string,

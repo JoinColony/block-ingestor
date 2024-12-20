@@ -1,6 +1,6 @@
 import { TransactionDescription } from 'ethers/lib/utils';
 
-import { ContractEvent, multiSigNameMapping } from '~types';
+import { multiSigNameMapping } from '~types';
 import { getDomainDatabaseId, toNumber } from '~utils';
 
 import { ColonyActionType } from '@joincolony/graphql';
@@ -8,6 +8,7 @@ import { MultiPayment } from '~handlers/actions/oneTxPayment';
 
 import { createMultiSigInDB } from '../helpers';
 import { sendMentionNotifications } from '~utils/notifications';
+import { ContractEvent } from '@joincolony/blocks';
 
 export const handlePaymentMultiSig = async (
   colonyAddress: string,

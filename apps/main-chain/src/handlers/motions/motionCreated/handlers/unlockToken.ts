@@ -1,8 +1,9 @@
 import { Id } from '@colony/colony-js';
 import { TransactionDescription } from 'ethers/lib/utils';
-import { ContractEvent, motionNameMapping } from '~types';
+import { motionNameMapping } from '~types';
 import { getColonyTokenAddress, getDomainDatabaseId } from '~utils';
 import { createMotionInDB } from '../helpers';
+import { ContractEvent } from '@joincolony/blocks';
 
 export const handleUnlockTokenMotion = async (
   colonyAddress: string,

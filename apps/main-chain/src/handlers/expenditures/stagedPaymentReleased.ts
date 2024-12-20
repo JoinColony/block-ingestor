@@ -1,9 +1,11 @@
 import { utils } from 'ethers';
-import { ExtensionEventListener } from '~eventListeners';
 import { ColonyActionType } from '@joincolony/graphql';
-import { getInterfaceByListener } from '~interfaces';
-import provider from '~provider';
-import { ContractEventsSignatures, EventHandler } from '~types';
+import rpcProvider from '~provider';
+import {
+  ContractEventsSignatures,
+  EventHandler,
+  ExtensionEventListener,
+} from '@joincolony/blocks';
 import {
   checkActionExists,
   getCachedColonyClient,
@@ -12,6 +14,7 @@ import {
   toNumber,
   writeActionFromEvent,
 } from '~utils';
+import eventManager from '~eventManager';
 
 export const handleStagedPaymentReleased: EventHandler = async (
   event,
@@ -41,13 +44,13 @@ export const handleStagedPaymentReleased: EventHandler = async (
 
   const releasedSlotIds = [];
 
-  const logs = await provider.getLogs({
+  const logs = await rpcProvider.getProviderInstance().getLogs({
     fromBlock: blockNumber,
     toBlock: blockNumber,
     topics: [utils.id(ContractEventsSignatures.StagedPaymentReleased)],
   });
 
-  const iface = getInterfaceByListener(listener);
+  const iface = eventManager.getInterfaceByListener(listener);
   if (!iface) {
     return;
   }

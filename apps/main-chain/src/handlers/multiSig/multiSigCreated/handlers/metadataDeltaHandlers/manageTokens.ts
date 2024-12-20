@@ -5,7 +5,7 @@ import {
 } from '~utils';
 import { createMultiSigInDB } from '../../helpers';
 import { ColonyActionType } from '@joincolony/graphql';
-import { ContractEvent } from '~types';
+import { ContractEvent } from '@joincolony/blocks';
 
 export const manageTokensMultisigHandler = async ({
   colonyAddress,

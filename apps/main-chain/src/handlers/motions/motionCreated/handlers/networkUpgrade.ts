@@ -1,9 +1,10 @@
 import { TransactionDescription } from 'ethers/lib/utils';
 
-import { ContractEvent, motionNameMapping } from '~types';
+import { motionNameMapping } from '~types';
 import { toNumber } from '~utils';
 
 import { createMotionInDB } from '../helpers';
+import { ContractEvent } from '@joincolony/blocks';
 
 export const handleNetworkUpgradeMotion = async (
   colonyAddress: string,

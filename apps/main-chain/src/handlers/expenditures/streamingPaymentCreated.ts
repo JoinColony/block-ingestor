@@ -1,17 +1,16 @@
-import { mutate } from '~amplifyClient';
-import { ExtensionEventListener } from '~eventListeners';
+import amplifyClient from '~amplifyClient';
 import {
   CreateStreamingPaymentDocument,
   CreateStreamingPaymentMutation,
   CreateStreamingPaymentMutationVariables,
 } from '@joincolony/graphql';
-import { EventHandler } from '~types';
 import {
   getExpenditureDatabaseId,
   getStreamingPaymentsClient,
   toNumber,
-  verbose,
 } from '~utils';
+import { verbose } from '@joincolony/utils';
+import { EventHandler, ExtensionEventListener } from '@joincolony/blocks';
 
 export const handleStreamingPaymentCreated: EventHandler = async (
   event,
@@ -49,7 +48,7 @@ export const handleStreamingPaymentCreated: EventHandler = async (
 
   verbose(`Streaming payment with ID ${databaseId} created`);
 
-  await mutate<
+  await amplifyClient.mutate<
     CreateStreamingPaymentMutation,
     CreateStreamingPaymentMutationVariables
   >(CreateStreamingPaymentDocument, {

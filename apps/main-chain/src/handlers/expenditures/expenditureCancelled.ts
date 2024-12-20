@@ -1,11 +1,9 @@
-import { EventHandler } from '~types';
 import {
   getExpenditureDatabaseId,
   toNumber,
-  verbose,
   writeActionFromEvent,
 } from '~utils';
-import { mutate } from '~amplifyClient';
+import amplifyClient from '~amplifyClient';
 import {
   ColonyActionType,
   ExpenditureStatus,
@@ -14,8 +12,9 @@ import {
   UpdateExpenditureMutation,
   UpdateExpenditureMutationVariables,
 } from '@joincolony/graphql';
-import { EventListenerType } from '~eventListeners';
+import { EventListenerType, EventHandler } from '@joincolony/blocks';
 import { sendExpenditureUpdateNotifications } from '~utils/notifications';
+import { verbose } from '@joincolony/utils';
 
 export const handleExpenditureCancelled: EventHandler = async (
   event,
@@ -45,15 +44,15 @@ export const handleExpenditureCancelled: EventHandler = async (
     colonyAddress,
   );
 
-  await mutate<UpdateExpenditureMutation, UpdateExpenditureMutationVariables>(
-    UpdateExpenditureDocument,
-    {
-      input: {
-        id: databaseId,
-        status: ExpenditureStatus.Cancelled,
-      },
+  await amplifyClient.mutate<
+    UpdateExpenditureMutation,
+    UpdateExpenditureMutationVariables
+  >(UpdateExpenditureDocument, {
+    input: {
+      id: databaseId,
+      status: ExpenditureStatus.Cancelled,
     },
-  );
+  });
 
   await writeActionFromEvent(event, colonyAddress, {
     type: ColonyActionType.CancelExpenditure,

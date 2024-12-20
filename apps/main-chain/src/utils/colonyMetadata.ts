@@ -1,7 +1,7 @@
 import { TransactionDescription } from 'ethers/lib/utils';
 
 import { ColonyOperations } from '~types';
-import { query, mutate } from '~amplifyClient';
+import amplifyClient from '~amplifyClient';
 import {
   ColonyMetadata,
   CreateDomainMetadataDocument,
@@ -16,7 +16,7 @@ import {
   UpdateDomainMetadataDocument,
 } from '@joincolony/graphql';
 import { getDomainDatabaseId } from './domains';
-import { output } from './logger';
+import { output } from '@joincolony/utils';
 import { getCachedColonyClient } from './clients';
 import { getActionByMotionId, getActionByMultiSigId } from './actions';
 import { parseFunctionData } from './parseFunction';
@@ -39,7 +39,7 @@ const linkPendingDomainMetadataWithDomain = async (
     // and use that as an id to link the pending metadata.
     const nativeDomainId = domainCount.toNumber();
 
-    await mutate(CreateDomainMetadataDocument, {
+    await amplifyClient.mutate(CreateDomainMetadataDocument, {
       input: {
         ...pendingDomainMetadata,
         id: getDomainDatabaseId(colonyAddress, nativeDomainId),
@@ -50,12 +50,12 @@ const linkPendingDomainMetadataWithDomain = async (
     const databaseDomainId = getDomainDatabaseId(colonyAddress, nativeDomainId);
 
     const { data } =
-      (await query<GetDomainMetadataQuery, GetDomainMetadataQueryVariables>(
-        GetDomainMetadataDocument,
-        {
-          id: databaseDomainId,
-        },
-      )) ?? {};
+      (await amplifyClient.query<
+        GetDomainMetadataQuery,
+        GetDomainMetadataQueryVariables
+      >(GetDomainMetadataDocument, {
+        id: databaseDomainId,
+      })) ?? {};
 
     const currentDomainMetadata = data?.getDomainMetadata;
 
@@ -104,7 +104,7 @@ const linkPendingDomainMetadataWithDomain = async (
       updatedMetadata.name = newName;
     }
 
-    await mutate(UpdateDomainMetadataDocument, {
+    await amplifyClient.mutate(UpdateDomainMetadataDocument, {
       input: {
         ...updatedMetadata,
         id: databaseDomainId,
@@ -118,12 +118,12 @@ const linkPendingColonyMetadataWithColony = async (
   colonyAddress: string,
 ): Promise<void> => {
   const { data } =
-    (await query<GetColonyMetadataQuery, GetColonyMetadataQueryVariables>(
-      GetColonyMetadataDocument,
-      {
-        id: colonyAddress,
-      },
-    )) ?? {};
+    (await amplifyClient.query<
+      GetColonyMetadataQuery,
+      GetColonyMetadataQueryVariables
+    >(GetColonyMetadataDocument, {
+      id: colonyAddress,
+    })) ?? {};
 
   const currentColonyMetadata = data?.getColonyMetadata;
 
@@ -175,7 +175,7 @@ const linkPendingColonyMetadataWithColony = async (
     updatedMetadata.objective = pendingColonyMetadata.objective;
   }
 
-  await mutate(UpdateColonyMetadataDocument, {
+  await amplifyClient.mutate(UpdateColonyMetadataDocument, {
     input: {
       ...updatedMetadata,
       changelog: [

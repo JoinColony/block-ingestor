@@ -1,12 +1,13 @@
 import { TransactionDescription } from 'ethers/lib/utils';
 
-import { ContractEvent, motionNameMapping } from '~types';
+import { motionNameMapping } from '~types';
 import { getDomainDatabaseId, toNumber } from '~utils';
 
 import { ColonyActionType } from '@joincolony/graphql';
 import { MultiPayment } from '~handlers/actions/oneTxPayment';
 
 import { createMotionInDB } from '../helpers';
+import { ContractEvent } from '@joincolony/blocks';
 
 export const handlePaymentMotion = async (
   colonyAddress: string,

@@ -1,18 +1,18 @@
-import { mutate } from '~amplifyClient';
+import amplifyClient from '~amplifyClient';
 import { NETWORK_INVERSE_FEE_DATABASE_ID } from '~constants';
 import {
   UpdateCurrentNetworkInverseFeeDocument,
   UpdateCurrentNetworkInverseFeeMutation,
   UpdateCurrentNetworkInverseFeeMutationVariables,
 } from '@joincolony/graphql';
-import { ContractEvent } from '~types';
-import { output } from '~utils';
+import { ContractEvent } from '@joincolony/blocks';
+import { output } from '@joincolony/utils';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { feeInverse } = event.args;
   const convertedFee = feeInverse.toString();
 
-  await mutate<
+  await amplifyClient.mutate<
     UpdateCurrentNetworkInverseFeeMutation,
     UpdateCurrentNetworkInverseFeeMutationVariables
   >(UpdateCurrentNetworkInverseFeeDocument, {

@@ -1,13 +1,4 @@
-import {
-  AnyColonyClient,
-  AnyVotingReputationClient,
-  ColonyNetworkClient,
-  TokenClient,
-} from '@colony/colony-js';
 import { LogDescription } from '@ethersproject/abi';
-import provider from '~provider';
-import { EventListener } from '~eventListeners';
-
 /*
  * Custom contract event, since we need some log values as well
  */
@@ -116,6 +107,7 @@ export enum ContractEventsSignatures {
   ColonyMetadataDelta = 'ColonyMetadataDelta(address,string)',
   // Proxy colonies
   ProxyColonyRequested = 'ProxyColonyRequested(uint256,bytes32)',
+  ProxyColonyDeployed = 'ProxyColonyDeployed(address)',
 }
 
 /*
@@ -126,20 +118,67 @@ export enum EthersObserverEvents {
   Block = 'block',
 }
 
-export type ChainID = string;
-
-export type Block = Awaited<ReturnType<typeof provider.getBlock>>;
-export type BlockWithTransactions = Awaited<
-  ReturnType<typeof provider.getBlockWithTransactions>
->;
-
-export type NetworkClients =
-  | ColonyNetworkClient
-  | TokenClient
-  | AnyColonyClient
-  | AnyVotingReputationClient;
-
 export type EventHandler = (
   event: ContractEvent,
   listener: EventListener,
 ) => Promise<void>;
+
+export interface BaseEventListener {
+  type: EventListenerType;
+  eventSignature: ContractEventsSignatures;
+  topics: Array<string | null>;
+  handler: EventHandler;
+  address?: string;
+}
+
+export enum EventListenerType {
+  Colony = 'Colony',
+  Network = 'Network',
+  Extension = 'Extension',
+  Token = 'Token',
+  MultisigPermissions = 'MultisigPermissions',
+  ProxyColonies = 'ProxyColonies',
+}
+
+export interface ColonyEventListener extends BaseEventListener {
+  type: EventListenerType.Colony;
+  address: string;
+}
+
+export interface NetworkEventListener extends BaseEventListener {
+  type: EventListenerType.Network;
+  address: string;
+}
+
+// Special listener just for Token transfers
+// Due to the volume of these events, we can't process them in the same way
+// as the normal events
+export interface TokenTransferEventListener extends BaseEventListener {
+  type: EventListenerType.Token;
+}
+
+export interface TokenEventListener extends BaseEventListener {
+  type: EventListenerType.Token;
+  address: string;
+}
+
+export interface ProxyColoniesListener extends BaseEventListener {
+  type: EventListenerType.ProxyColonies;
+  address: string;
+}
+
+export interface ExtensionEventListener extends BaseEventListener {
+  type: EventListenerType.Extension;
+  address: string;
+  colonyAddress: string;
+  extensionHash: string;
+  handler: EventHandler;
+}
+
+export type EventListener =
+  | ColonyEventListener
+  | NetworkEventListener
+  | TokenEventListener
+  | TokenTransferEventListener
+  | ProxyColoniesListener
+  | ExtensionEventListener;

@@ -1,12 +1,13 @@
-import { query } from '~amplifyClient';
+import amplifyClient from '~amplifyClient';
 import {
   GetColonyExtensionByHashAndColonyDocument,
   GetColonyExtensionByHashAndColonyQuery,
   GetColonyExtensionByHashAndColonyQueryVariables,
 } from '@joincolony/graphql';
-import { ContractEvent } from '~types';
-import { toNumber, verbose } from '~utils';
+import { ContractEvent } from '@joincolony/blocks';
+import { toNumber } from '~utils';
 import { updateExtension } from '~utils/extensions/updateExtension';
+import { verbose } from '@joincolony/utils';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { extensionId: extensionHash, colony, version } = event.args;
@@ -22,7 +23,7 @@ export default async (event: ContractEvent): Promise<void> => {
   );
 
   const { data } =
-    (await query<
+    (await amplifyClient.query<
       GetColonyExtensionByHashAndColonyQuery,
       GetColonyExtensionByHashAndColonyQueryVariables
     >(GetColonyExtensionByHashAndColonyDocument, {

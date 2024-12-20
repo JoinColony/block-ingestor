@@ -1,7 +1,7 @@
 import { BigNumber, constants } from 'ethers';
-import { ExtensionEventListener } from '~eventListeners';
+import { EventHandler, ExtensionEventListener } from '@joincolony/blocks';
 
-import { EventHandler, MotionEvents } from '~types';
+import { MotionEvents } from '~types';
 import { getActionByMotionId, getVotingClient } from '~utils';
 import { linkPendingMetadata } from '~utils/colonyMetadata';
 import { getBlockChainTimestampISODate } from '~utils/dates';

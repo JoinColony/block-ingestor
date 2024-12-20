@@ -1,4 +1,4 @@
-import { mutate } from '~amplifyClient';
+import amplifyClient from '~amplifyClient';
 import {
   StakerReward,
   UpdateColonyDocument,
@@ -8,8 +8,9 @@ import {
   UpdateUserStakeMutation,
   UpdateUserStakeMutationVariables,
 } from '@joincolony/graphql';
-import { getColonyFromDB, output } from '~utils';
+import { getColonyFromDB } from '~utils';
 import { getUserStakeDatabaseId } from '~utils/stakes';
+import { output } from '@joincolony/utils';
 
 export const getUpdatedStakerRewards = (
   stakerRewards: StakerReward[],
@@ -54,15 +55,15 @@ export const updateColonyUnclaimedStakes = async (
       /* If we still have some unclaimed stakes, update the array */
       if (unclaimedRewards.length) {
         motionWithUnclaimedStakes.unclaimedRewards = unclaimedRewards;
-        await mutate<UpdateColonyMutation, UpdateColonyMutationVariables>(
-          UpdateColonyDocument,
-          {
-            input: {
-              id: colonyAddress,
-              motionsWithUnclaimedStakes,
-            },
+        await amplifyClient.mutate<
+          UpdateColonyMutation,
+          UpdateColonyMutationVariables
+        >(UpdateColonyDocument, {
+          input: {
+            id: colonyAddress,
+            motionsWithUnclaimedStakes,
           },
-        );
+        });
       } else {
         /* If there are no more unclaimed stakes, remove this motion from the array of
            motions with unclaimed stakes */
@@ -70,15 +71,15 @@ export const updateColonyUnclaimedStakes = async (
           motionsWithUnclaimedStakes?.filter(
             ({ motionId }) => motionDatabaseId !== motionId,
           );
-        await mutate<UpdateColonyMutation, UpdateColonyMutationVariables>(
-          UpdateColonyDocument,
-          {
-            input: {
-              id: colonyAddress,
-              motionsWithUnclaimedStakes: updatedMotionsWithUnclaimedStakes,
-            },
+        await amplifyClient.mutate<
+          UpdateColonyMutation,
+          UpdateColonyMutationVariables
+        >(UpdateColonyDocument, {
+          input: {
+            id: colonyAddress,
+            motionsWithUnclaimedStakes: updatedMotionsWithUnclaimedStakes,
           },
-        );
+        });
       }
     } else {
       output(
@@ -99,13 +100,13 @@ export const reclaimUserStake = async (
   motionTransactionHash: string,
 ): Promise<void> => {
   // Update user stake status
-  await mutate<UpdateUserStakeMutation, UpdateUserStakeMutationVariables>(
-    UpdateUserStakeDocument,
-    {
-      input: {
-        id: getUserStakeDatabaseId(userAddress, motionTransactionHash),
-        isClaimed: true,
-      },
+  await amplifyClient.mutate<
+    UpdateUserStakeMutation,
+    UpdateUserStakeMutationVariables
+  >(UpdateUserStakeDocument, {
+    input: {
+      id: getUserStakeDatabaseId(userAddress, motionTransactionHash),
+      isClaimed: true,
     },
-  );
+  });
 };

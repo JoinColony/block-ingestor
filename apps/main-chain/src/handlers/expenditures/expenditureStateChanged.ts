@@ -1,16 +1,13 @@
-import { mutate } from '~amplifyClient';
+import amplifyClient from '~amplifyClient';
 import {
   UpdateExpenditureDocument,
   UpdateExpenditureMutation,
   UpdateExpenditureMutationVariables,
 } from '@joincolony/graphql';
-import { EventHandler } from '~types';
 import {
   getCachedColonyClient,
   getExpenditureDatabaseId,
-  output,
   toNumber,
-  verbose,
 } from '~utils';
 import {
   getExpenditureFromDB,
@@ -20,6 +17,8 @@ import {
   createEditExpenditureAction,
   NotEditActionError,
 } from './helpers';
+import { output, verbose } from '@joincolony/utils';
+import { EventHandler } from '@joincolony/blocks';
 
 export const handleExpenditureStateChanged: EventHandler = async (event) => {
   const { contractAddress: colonyAddress } = event;
@@ -70,7 +69,7 @@ export const handleExpenditureStateChanged: EventHandler = async (event) => {
       verbose(`State of expenditure with ID ${databaseId} changed`);
 
       if (!!updatedSlots || !!updatedStatus) {
-        await mutate<
+        await amplifyClient.mutate<
           UpdateExpenditureMutation,
           UpdateExpenditureMutationVariables
         >(UpdateExpenditureDocument, {

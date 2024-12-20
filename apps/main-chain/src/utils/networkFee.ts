@@ -1,5 +1,5 @@
 import { BigNumber, BigNumberish } from 'ethers';
-import { query } from '~amplifyClient';
+import amplifyClient from '~amplifyClient';
 import {
   GetCurrentNetworkInverseFeeDocument,
   GetCurrentNetworkInverseFeeQuery,
@@ -41,7 +41,7 @@ export const getAmountWithFee = (
 
 export const getNetworkInverseFee = async (): Promise<string | null> => {
   const { data: networkFeeData } =
-    (await query<
+    (await amplifyClient.query<
       GetCurrentNetworkInverseFeeQuery,
       GetCurrentNetworkInverseFeeQueryVariables
     >(GetCurrentNetworkInverseFeeDocument)) ?? {};

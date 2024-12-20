@@ -1,4 +1,4 @@
-import { query } from '~amplifyClient';
+import amplifyClient from '~amplifyClient';
 import {
   ColonyActionType,
   ExpenditureFundingItem,
@@ -30,7 +30,7 @@ export const fundExpenditureMotionHandler: MulticallHandler = async ({
   // This means if the multicall funds multiple expenditures, we will only create a motion for the first one
   const targetPotId = decodedFunctions[0]?.args._toPot;
 
-  const response = await query<
+  const response = await amplifyClient.query<
     GetExpenditureByNativeFundingPotIdAndColonyQuery,
     GetExpenditureByNativeFundingPotIdAndColonyQueryVariables
   >(GetExpenditureByNativeFundingPotIdAndColonyDocument, {
