@@ -3,3 +3,9 @@ mutation CreateProxyColony($input: CreateProxyColonyInput!) {
     id
   }
 }
+
+mutation UpdateProxyColony($input: UpdateProxyColonyInput!) {
+  updateProxyColony(input: $input) {
+    id
+  }
+}
