@@ -720,6 +720,8 @@ export enum ColonyActionType {
   ReleaseStagedPayments = 'RELEASE_STAGED_PAYMENTS',
   /** An action related to a motion to release a staged payment */
   ReleaseStagedPaymentsMotion = 'RELEASE_STAGED_PAYMENTS_MOTION',
+  /** An action related to disabling a proxy colony */
+  RemoveProxyColony = 'REMOVE_PROXY_COLONY',
   /** An action related to removing verified members */
   RemoveVerifiedMembers = 'REMOVE_VERIFIED_MEMBERS',
   RemoveVerifiedMembersMotion = 'REMOVE_VERIFIED_MEMBERS_MOTION',
@@ -13047,6 +13049,11 @@ export const CreateColonyActionDocument = gql`
   mutation CreateColonyAction($input: CreateColonyActionInput!) {
     createColonyAction(input: $input) {
       id
+      payouts {
+        amount
+        tokenAddress
+        isClaimed
+      }
     }
   }
 `;
@@ -13519,6 +13526,7 @@ export const GetActionByIdDocument = gql`
           ...ExpenditureSlot
         }
       }
+      colonyId
     }
   }
   ${ExpenditureSlot}
