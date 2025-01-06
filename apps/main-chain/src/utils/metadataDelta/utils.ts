@@ -6,6 +6,7 @@ import {
   MetadataDeltaOperationType,
   ManageTokensOperation,
   DisableProxyColonyOperation,
+  EnableProxyColonyOperation,
 } from './types';
 
 export const isAddVerifiedMembersOperation = (
@@ -46,6 +47,17 @@ export const isDisableProxyColonyOperation = (
 ): operation is DisableProxyColonyOperation => {
   return (
     operation.type === MetadataDeltaOperationType.DISABLE_PROXY_COLONY &&
+    operation.payload !== undefined &&
+    Array.isArray(operation.payload) &&
+    operation.payload.every((item) => typeof item === 'string')
+  );
+};
+
+export const isEnableProxyColonyOperation = (
+  operation: MetadataDeltaOperation,
+): operation is EnableProxyColonyOperation => {
+  return (
+    operation.type === MetadataDeltaOperationType.ENABLE_PROXY_COLONY &&
     operation.payload !== undefined &&
     Array.isArray(operation.payload) &&
     operation.payload.every((item) => typeof item === 'string')

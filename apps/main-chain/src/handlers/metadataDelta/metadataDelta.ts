@@ -2,6 +2,7 @@ import { ContractEvent } from '@joincolony/blocks';
 import {
   isAddVerifiedMembersOperation,
   isDisableProxyColonyOperation,
+  isEnableProxyColonyOperation,
   isManageTokensOperation,
   isRemoveVerifiedMembersOperation,
   parseMetadataDeltaOperation,
@@ -11,6 +12,7 @@ import { handleRemoveVerifiedMembers } from './handlers/removeVerifiedMembers';
 import { handleManageTokens } from './handlers/manageTokens';
 import { verbose } from '@joincolony/utils';
 import { handleDisableProxyColony } from './handlers/disableProxyColony';
+import { handleEnableProxyColony } from './handlers/enableProxyColony';
 
 export default async (event: ContractEvent): Promise<void> => {
   const operationString = event.args.metadata;
@@ -37,6 +39,10 @@ export default async (event: ContractEvent): Promise<void> => {
 
   if (isDisableProxyColonyOperation(operation)) {
     await handleDisableProxyColony(event, operation);
+  }
+
+  if (isEnableProxyColonyOperation(operation)) {
+    await handleEnableProxyColony(event, operation);
   }
 
   verbose('Unknown operation type: ', operation);
