@@ -1,6 +1,7 @@
 import {
   ContractEvent,
   ContractEventsSignatures,
+  EventHandler,
   ProxyColonyEvents,
 } from '@joincolony/blocks';
 import { output } from '@joincolony/utils';
@@ -9,13 +10,18 @@ import blockManager from '~blockManager';
 import rpcProvider from '~provider';
 import { writeActionFromEvent } from '~utils/actions/writeAction';
 import { ColonyActionType } from '@joincolony/graphql';
+import networkClient from '~networkClient';
 
-export const handleProxyColonyRequested = async (
+export const handleProxyColonyRequested: EventHandler = async (
   event: ContractEvent,
-): Promise<void> => {
-  const { blockNumber, contractAddress: colonyAddress } = event;
+) => {
+  const { blockNumber, transactionHash } = event;
 
-  const { destinationChainId } = event.args;
+  const { colony: colonyAddress, destinationChainId } = event.args;
+
+  const receipt =
+    await networkClient.provider.getTransactionReceipt(transactionHash);
+  const initiatorAddress = receipt.from || constants.AddressZero;
 
   const logs = await rpcProvider.getProviderInstance().getLogs({
     fromBlock: blockNumber,
@@ -62,7 +68,7 @@ export const handleProxyColonyRequested = async (
 
   await writeActionFromEvent(event, colonyAddress, {
     type: ColonyActionType.AddProxyColony,
-    initiatorAddress: constants.AddressZero,
+    initiatorAddress,
     multiChainInfo: {
       completed: false,
       targetChainId: destinationChainId.toNumber(),
