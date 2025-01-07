@@ -31,7 +31,13 @@ import {
   handleReleaseStagedPaymentViaArbitration,
 } from './handlers';
 import { output, verbose } from '@joincolony/utils';
-import { EventHandler, ExtensionEventListener } from '@joincolony/blocks';
+import {
+  EventHandler,
+  ExtensionEventListener,
+  ProxyColonyEvents,
+} from '@joincolony/blocks';
+import networkClient from '~networkClient';
+import { handleCreateProxyColonyMotion } from './handlers/proxyColonies/createProxyColony';
 
 export const handleMotionCreated: EventHandler = async (
   event,
@@ -73,6 +79,8 @@ export const handleMotionCreated: EventHandler = async (
     oneTxPaymentClient?.interface,
     stakedExpenditureClient?.interface,
     stagedExpenditureClient?.interface,
+    networkClient.interface,
+    ProxyColonyEvents,
   ].filter(Boolean) as utils.Interface[]; // Casting seems necessary as TS does not pick up the .filter()
 
   const parsedAction = parseMotionAction(motion.action, interfaces);
@@ -212,6 +220,10 @@ export const handleMotionCreated: EventHandler = async (
           event,
           parsedAction,
         );
+        break;
+      }
+      case ColonyOperations.CreateProxyColony: {
+        await handleCreateProxyColonyMotion(colonyAddress, event, parsedAction);
         break;
       }
 
