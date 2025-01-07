@@ -19,8 +19,9 @@ export const handleProxyColonyRequested: EventHandler = async (
 
   const { colony: colonyAddress, destinationChainId } = event.args;
 
-  const receipt =
-    await networkClient.provider.getTransactionReceipt(transactionHash);
+  const receipt = await networkClient.provider.getTransactionReceipt(
+    transactionHash,
+  );
   const initiatorAddress = receipt.from || constants.AddressZero;
 
   const logs = await rpcProvider.getProviderInstance().getLogs({
