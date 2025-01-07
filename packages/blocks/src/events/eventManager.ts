@@ -22,6 +22,7 @@ export const ProxyColonyEvents = new utils.Interface([
   // @TODO decouple these into MultiChainBridgeEvents
   'event WormholeMessageReceived(uint16 emitterChainId, bytes32 emitterAddress, uint64 sequence)',
   'event LogMessagePublished(address indexed sender,uint64 sequence,uint32 nonce,bytes payload,uint8 consistencyLevel)',
+  'function createProxyColony(uint256 _destinationChainId, bytes32 _salt)',
 ]);
 
 export class EventManager {
