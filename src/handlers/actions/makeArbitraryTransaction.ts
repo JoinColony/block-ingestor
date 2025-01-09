@@ -56,6 +56,7 @@ export default async (event: ContractEvent): Promise<void> => {
   await writeActionFromEvent(event, colonyAddress, {
     type: ColonyActionType.MakeArbitraryTransaction,
     initiatorAddress: receipt.from,
+    recipientAddress: receipt.to,
     fromDomainId: getDomainDatabaseId(colonyAddress, Id.RootDomain),
     arbitraryTransactions: [currentArbitraryTransaction],
   });
