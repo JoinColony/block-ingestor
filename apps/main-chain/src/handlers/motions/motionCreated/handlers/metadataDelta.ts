@@ -3,6 +3,8 @@ import { ColonyActionType } from '@joincolony/graphql';
 import { ContractEvent } from '@joincolony/blocks';
 import {
   isAddVerifiedMembersOperation,
+  isDisableProxyColonyOperation,
+  isEnableProxyColonyOperation,
   isManageTokensOperation,
   isRemoveVerifiedMembersOperation,
   parseMetadataDeltaOperation,
@@ -49,6 +51,27 @@ export const handleMetadataDeltaMotion = async (
         colonyAddress,
         event,
         operation,
+      });
+    }
+
+    if (
+      isDisableProxyColonyOperation(operation) ||
+      isEnableProxyColonyOperation(operation)
+    ) {
+      const targetChainId = JSON.parse(desc.args[0]).payload[0];
+
+      if (!targetChainId) {
+        return;
+      }
+
+      await createMotionInDB(colonyAddress, event, {
+        type: isDisableProxyColonyOperation(operation)
+          ? ColonyActionType.RemoveProxyColonyMotion
+          : ColonyActionType.AddProxyColonyMotion,
+        multiChainInfo: {
+          completed: false,
+          targetChainId: Number(targetChainId),
+        },
       });
     }
   } catch (error) {
