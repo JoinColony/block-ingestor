@@ -39,10 +39,12 @@ export default async (event: ContractEvent): Promise<void> => {
 
   if (isDisableProxyColonyOperation(operation)) {
     await handleDisableProxyColony(event, operation);
+    return;
   }
 
   if (isEnableProxyColonyOperation(operation)) {
     await handleEnableProxyColony(event, operation);
+    return;
   }
 
   verbose('Unknown operation type: ', operation);
