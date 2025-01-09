@@ -222,6 +222,7 @@ export const handleMotionCreated: EventHandler = async (
         );
         break;
       }
+
       case ColonyOperations.CreateProxyColony: {
         await handleCreateProxyColonyMotion(colonyAddress, event, parsedAction);
         break;
