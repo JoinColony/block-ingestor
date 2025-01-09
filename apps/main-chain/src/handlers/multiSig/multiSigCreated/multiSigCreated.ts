@@ -26,7 +26,13 @@ import { NotificationCategory } from '~types/notifications';
 import { utils } from 'ethers';
 import { NotificationType } from '@joincolony/graphql';
 import { verbose } from '@joincolony/utils';
-import { EventHandler, ExtensionEventListener } from '@joincolony/blocks';
+import {
+  EventHandler,
+  ExtensionEventListener,
+  ProxyColonyEvents,
+} from '@joincolony/blocks';
+import networkClient from '~networkClient';
+import { handleCreateProxyColonyMultiSig } from './handlers/proxyColonies/createProxyColony';
 
 export const handleMultiSigMotionCreated: EventHandler = async (
   event,
@@ -66,6 +72,8 @@ export const handleMultiSigMotionCreated: EventHandler = async (
     oneTxPaymentClient?.interface,
     stakedExpenditureClient?.interface,
     stagedExpenditureClient?.interface,
+    networkClient.interface,
+    ProxyColonyEvents,
   ].filter(Boolean) as utils.Interface[]; // Casting seems necessary as TS does not pick up the .filter()
 
   const motion = await multiSigClient.getMotion(motionId, {
@@ -80,6 +88,7 @@ export const handleMultiSigMotionCreated: EventHandler = async (
     return;
   }
 
+  let notificationCategory: NotificationCategory | null;
   // the motion data and targets are the same length as it's enforced on the contracts so we can check whichever
   if (actions.length === 1) {
     const actionData = actions[0];
@@ -89,8 +98,6 @@ export const handleMultiSigMotionCreated: EventHandler = async (
     if (!parsedOperation) {
       return;
     }
-
-    let notificationCategory: NotificationCategory | null;
 
     const contractOperation = parsedOperation.name;
     /* Handle the action type-specific mutation here */
@@ -176,6 +183,14 @@ export const handleMultiSigMotionCreated: EventHandler = async (
       }
       case ColonyOperations.MakeArbitraryTransactions: {
         await handleMakeArbitraryTxsMultiSig(
+          colonyAddress,
+          event,
+          parsedOperation,
+        );
+        break;
+      }
+      case ColonyOperations.CreateProxyColony: {
+        await handleCreateProxyColonyMultiSig(
           colonyAddress,
           event,
           parsedOperation,
