@@ -105,4 +105,5 @@ export const multiSigNameMapping: { [key: string]: ColonyActionType } = {
     ColonyActionType.CancelStakedExpenditureMultisig,
   [ColonyOperations.SetExpenditureState]:
     ColonyActionType.SetExpenditureStateMultisig,
+  [ColonyOperations.CreateProxyColony]: ColonyActionType.AddProxyColonyMultisig,
 };
