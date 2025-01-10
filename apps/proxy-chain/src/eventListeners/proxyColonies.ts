@@ -7,7 +7,7 @@ import {
 } from '@joincolony/blocks';
 import eventManager from '~eventManager';
 
-export const addProxyColoniesEventListener = (
+export const addProxyColoniesNetworkEventListener = (
   eventSignature: ContractEventsSignatures,
   handler: EventHandler,
 ): void =>

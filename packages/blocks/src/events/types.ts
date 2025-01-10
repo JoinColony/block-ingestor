@@ -167,6 +167,7 @@ export interface TokenEventListener extends BaseEventListener {
 export interface ProxyColoniesListener extends BaseEventListener {
   type: EventListenerType.ProxyColonies;
   address: string;
+  colonyAddress?: string;
 }
 
 export interface ExtensionEventListener extends BaseEventListener {
