@@ -8,7 +8,6 @@ export const handleCreateProxyColonyMotion = async (
   event: ContractEvent,
   parsedAction: TransactionDescription,
 ): Promise<void> => {
-  console.log('such a parsed action', parsedAction);
   const { _destinationChainId: destinationChainId } = parsedAction.args;
   if (!destinationChainId) {
     return;

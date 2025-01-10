@@ -10,12 +10,18 @@ import {
   GetExpenditureByNativeFundingPotIdAndColonyDocument,
   GetExpenditureByNativeFundingPotIdAndColonyQuery,
   GetExpenditureByNativeFundingPotIdAndColonyQueryVariables,
+  UpdateColonyMotionDocument,
+  UpdateColonyMotionMutation,
+  UpdateColonyMotionMutationVariables,
 } from '@joincolony/graphql';
 import { toNumber, getColonyExtensions } from '~utils';
 import { ContractEvent } from '@joincolony/blocks';
 import networkClient from '~networkClient';
 import { getBlockChainTimestampISODate } from '~utils/dates';
 import { verbose } from '@joincolony/utils';
+import { getFinalizationMotionId, getFinalizationMultiSigId } from './motions';
+import { getMotionFromDB } from '~handlers/motions/helpers';
+import { getMultiSigFromDB } from '~handlers/multiSig/helpers';
 
 export type ActionFields = Omit<
   CreateColonyActionInput,
@@ -41,6 +47,56 @@ export const writeActionFromEvent = async (
     actionFields.initiatorAddress,
     colonyExtensions,
   );
+  const isMultiSigFinalization = await isActionMultiSigFinalization(
+    actionFields.initiatorAddress,
+    colonyExtensions,
+  );
+
+  let finalizedActionId = null;
+
+  if (isMotionFinalization) {
+    const motionDatabaseId = await getFinalizationMotionId(
+      transactionHash,
+      actionFields.initiatorAddress,
+    );
+
+    if (motionDatabaseId) {
+      const finalizedMotion = await getMotionFromDB(motionDatabaseId);
+      finalizedActionId = finalizedMotion?.transactionHash;
+
+      await amplifyClient.mutate<
+        UpdateColonyMotionMutation,
+        UpdateColonyMotionMutationVariables
+      >(UpdateColonyMotionDocument, {
+        input: {
+          id: motionDatabaseId,
+          finalizationActionId: transactionHash,
+        },
+      });
+    }
+  }
+
+  if (isMultiSigFinalization) {
+    const multisigDatabaseId = await getFinalizationMultiSigId(
+      transactionHash,
+      actionFields.initiatorAddress,
+    );
+
+    if (multisigDatabaseId) {
+      const finalizedMultiSig = await getMultiSigFromDB(multisigDatabaseId);
+      finalizedActionId = finalizedMultiSig?.transactionHash;
+
+      await amplifyClient.mutate<
+        UpdateColonyMotionMutation,
+        UpdateColonyMotionMutationVariables
+      >(UpdateColonyMotionDocument, {
+        input: {
+          id: multisigDatabaseId,
+          finalizationActionId: transactionHash,
+        },
+      });
+    }
+  }
 
   const showInActionsList = await showActionInActionsList(
     event,
@@ -66,7 +122,8 @@ export const writeActionFromEvent = async (
       createdAt: getBlockChainTimestampISODate(timestamp),
       showInActionsList,
       rootHash,
-      isMotionFinalization,
+      isMotionFinalization: isMotionFinalization || isMultiSigFinalization,
+      finalizedActionId,
       ...actionFields,
     },
   });
@@ -139,6 +196,23 @@ const isActionMotionFinalization = async (
     (initiatorExtension.hash === getExtensionHash(Extension.VotingReputation) ||
       initiatorExtension.hash ===
         getExtensionHash(Extension.MultisigPermissions))
+  );
+};
+/**
+ * Determines whether the action is a result of a multisig being finalized
+ * by checking if its initiator was the MultiSig extension
+ */
+const isActionMultiSigFinalization = async (
+  initiatorAddress: string,
+  extensions: ExtensionFragment[],
+): Promise<boolean> => {
+  const initiatorExtension = extensions.find(
+    (extension) => extension.id === initiatorAddress,
+  );
+
+  return (
+    !!initiatorExtension &&
+    initiatorExtension.hash === getExtensionHash(Extension.MultisigPermissions)
   );
 };
 
