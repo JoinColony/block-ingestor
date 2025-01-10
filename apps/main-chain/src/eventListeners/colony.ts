@@ -115,10 +115,6 @@ export const setupListenersForColonies = async (): Promise<void> => {
     ContractEventsSignatures.ReputationMiningCycleComplete,
     handleReputationMiningCycleComplete,
   );
-  addProxyColoniesEventListener(
-    ContractEventsSignatures.ProxyColonyRequested,
-    handleProxyColonyRequested,
-  );
 };
 
 export const setupListenersForColony = (
@@ -173,6 +169,12 @@ export const setupListenersForColony = (
       colonyAddress,
       handler,
     ),
+  );
+
+  addProxyColoniesEventListener(
+    ContractEventsSignatures.ProxyColonyRequested,
+    colonyAddress,
+    handleProxyColonyRequested,
   );
 
   /*
