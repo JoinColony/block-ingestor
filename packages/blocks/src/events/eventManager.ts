@@ -17,7 +17,7 @@ import { Extension, getExtensionHash } from '@colony/colony-js';
 
 // @TODO @chmanie is gonna make this better, for now let's just hardcode the proxy colony events
 export const ProxyColonyEvents = new utils.Interface([
-  'event ProxyColonyRequested(address colony,uint256 destinationChainId, bytes32 salt)',
+  'event ProxyColonyRequested(address agent,uint256 destinationChainId, bytes32 salt)',
   'event ProxyColonyDeployed(address proxyColony)',
   // @TODO decouple these into MultiChainBridgeEvents
   'event WormholeMessageReceived(uint16 emitterChainId, bytes32 emitterAddress, uint64 sequence)',
@@ -112,7 +112,7 @@ export class EventManager {
     }
   }
 
-  private getInterfaceByExtensionHash(
+  public getInterfaceByExtensionHash(
     extensionHash: string,
   ): utils.Interface | null {
     const provider = this.rpcProvider.getProviderInstance();
