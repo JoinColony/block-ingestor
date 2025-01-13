@@ -1,55 +1,39 @@
 import { defineConfig } from '@wagmi/cli';
-import { fetch } from '@wagmi/cli/plugins';
-import { type Address } from 'viem';
-
-interface Contract {
-  name: string;
-  address: Address;
-  path: string;
-}
-
-const contracts: Contract[] = [
-  // {
-  //   name: 'ColonyNetwork',
-  //   // This is a little weird as the fetch plugin really requires an address, which is a bit too limiting
-  //   // Just change this to something unique for every contract ABI we need (made up or actual address)
-  //   address: '0x777760996135F0791E2e1a74aFAa060711197777',
-  //   path: 'colonyNetwork/ColonyNetwork.sol/ColonyNetwork.json',
-  // },
-  {
-    name: 'Colony',
-    address: '0x469e1A3df995b1bf57581c71Bb4f3a4d0f3eCBD2',
-    path: 'colony/Colony.sol/Colony.json',
-  },
-];
+import colony from '@colony/wagmi-plugin';
 
 export default defineConfig({
   out: 'src/constants/abis.ts',
   contracts: [],
   plugins: [
-    fetch({
-      contracts,
-      async parse({ response }) {
-        const { abi } = await response.json();
-        return abi;
-      },
-      request(contract) {
-        if (!contract.address) {
-          throw new Error('Contract address is required');
-        }
-        const contractDefinition = contracts.find(
-          ({ address }) => address === contract.address,
-        );
-        if (!contractDefinition) {
-          throw new Error(
-            `Could not find contract with address ${contract.address}`,
-          );
-        }
-        return {
-          // Anyone remember trufflepig?
-          url: `http://localhost:3006/artifacts/contracts/${contractDefinition.path}`,
-        };
-      },
+    colony({
+      baseUrl: 'http://localhost:3006/artifacts/contracts',
+      contracts: [
+        {
+          name: 'ColonyNetwork',
+          path: 'colonyNetwork/ColonyNetwork.sol/ColonyNetwork.json',
+        },
+        // Here we define a special type, an "artificial" ABI, that combines events of _all_ versions of this contract
+        {
+          name: 'ColonyNetwork',
+          path: 'colonyNetwork/ColonyNetwork.sol/ColonyNetwork.json',
+          merge: 'event',
+        },
+
+        {
+          name: 'Colony',
+          path: 'colony/Colony.sol/Colony.json',
+        },
+        {
+          name: 'Colony',
+          path: 'colony/Colony.sol/Colony.json',
+          merge: 'event',
+        },
+        {
+          name: 'Colony',
+          path: 'colony/Colony.sol/Colony.json',
+          merge: 'function',
+        },
+      ],
     }),
   ],
 });
