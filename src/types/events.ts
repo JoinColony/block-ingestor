@@ -58,7 +58,7 @@ export enum ContractEventsSignatures {
   ColonyRoleSet = 'ColonyRoleSet(address,address,uint256,uint8,bool)',
   ColonyRoleSet_OLD = 'ColonyRoleSet(address,uint256,uint8,bool)',
   RecoveryRoleSet = 'RecoveryRoleSet(address,bool)',
-  ArbitraryTransaction = 'ArbitraryTransaction(address,bytes,bool)',
+  ArbitraryTransaction = 'ArbitraryTransaction(address,address,bytes,bool)',
 
   // Motions
   MotionCreated = 'MotionCreated(uint256,address,uint256)',

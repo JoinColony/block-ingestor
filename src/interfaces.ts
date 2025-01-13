@@ -17,7 +17,8 @@ import { EventListener, EventListenerType } from '~eventListeners';
 import { Interface } from 'ethers/lib/utils';
 import { colonyAbi } from '~constants/abis';
 
-const _colonyInterface = new Interface(colonyAbi);
+// @NOTE: Temporary interface for development until a proper colonyJS release
+const _tempColonyInterface = new Interface(colonyAbi);
 
 /**
  * Function returning ABI-derived interface for a given event listener type,
@@ -33,7 +34,7 @@ export const getInterfaceByListener = (
       return networkClient.interface;
     }
     case EventListenerType.Colony: {
-      return _colonyInterface;
+      return _tempColonyInterface;
     }
     case EventListenerType.Extension: {
       return getInterfaceByExtensionHash(listener.extensionHash);
