@@ -16,7 +16,6 @@ export default defineConfig({
         {
           name: 'ColonyNetwork',
           path: 'colonyNetwork/ColonyNetwork.sol/ColonyNetwork.json',
-          // @ts-expect-error - @TODO: fix once new version of plugin is released
           merge: 'events',
         },
 
@@ -27,13 +26,11 @@ export default defineConfig({
         {
           name: 'Colony',
           path: 'colony/Colony.sol/Colony.json',
-          // @ts-expect-error - @TODO: fix once new version of plugin is released
           merge: 'events',
         },
         {
           name: 'Colony',
           path: 'colony/Colony.sol/Colony.json',
-          // @ts-expect-error - @TODO: fix once new version of plugin is released
           merge: 'functions',
         },
       ],
