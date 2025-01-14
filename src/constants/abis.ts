@@ -64,6 +64,12 @@ export const colonyAbi = [
     anonymous: false,
     inputs: [
       {
+        name: 'agent',
+        internalType: 'address',
+        type: 'address',
+        indexed: false,
+      },
+      {
         name: 'target',
         internalType: 'address',
         type: 'address',
@@ -1019,7 +1025,7 @@ export const colonyAbi = [
     anonymous: false,
     inputs: [
       {
-        name: 'user',
+        name: 'userAddress',
         internalType: 'address',
         type: 'address',
         indexed: false,
@@ -1030,12 +1036,7 @@ export const colonyAbi = [
         type: 'address',
         indexed: false,
       },
-      {
-        name: 'functionSignature',
-        internalType: 'bytes',
-        type: 'bytes',
-        indexed: false,
-      },
+      { name: 'payload', internalType: 'bytes', type: 'bytes', indexed: false },
     ],
     name: 'MetaTransactionExecuted',
   },
@@ -2065,6 +2066,7 @@ export const colonyAbi = [
     outputs: [
       { name: 'skillId', internalType: 'uint256', type: 'uint256' },
       { name: 'fundingPotId', internalType: 'uint256', type: 'uint256' },
+      { name: 'deprecated', internalType: 'bool', type: 'bool' },
     ],
     stateMutability: 'view',
   },
@@ -2140,7 +2142,7 @@ export const colonyAbi = [
       { name: '_sigV', internalType: 'uint8', type: 'uint8' },
     ],
     name: 'executeMetaTransaction',
-    outputs: [{ name: '', internalType: 'bytes', type: 'bytes' }],
+    outputs: [{ name: 'returnData', internalType: 'bytes', type: 'bytes' }],
     stateMutability: 'payable',
   },
   {
@@ -2166,6 +2168,25 @@ export const colonyAbi = [
     inputs: [],
     name: 'getColonyNetwork',
     outputs: [{ name: '', internalType: 'address', type: 'address' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: '_localSkillId', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'getLocalSkill',
+    outputs: [
+      {
+        name: 'localSkill',
+        internalType: 'struct ColonyDataTypes.LocalSkill',
+        type: 'tuple',
+        components: [
+          { name: 'exists', internalType: 'bool', type: 'bool' },
+          { name: 'deprecated', internalType: 'bool', type: 'bool' },
+        ],
+      },
+    ],
     stateMutability: 'view',
   },
   {
@@ -5774,7 +5795,7 @@ export const colonyNetworkAbi = [
     anonymous: false,
     inputs: [
       {
-        name: 'user',
+        name: 'userAddress',
         internalType: 'address',
         type: 'address',
         indexed: false,
@@ -5785,12 +5806,7 @@ export const colonyNetworkAbi = [
         type: 'address',
         indexed: false,
       },
-      {
-        name: 'functionSignature',
-        internalType: 'bytes',
-        type: 'bytes',
-        indexed: false,
-      },
+      { name: 'payload', internalType: 'bytes', type: 'bytes', indexed: false },
     ],
     name: 'MetaTransactionExecuted',
   },
@@ -6178,7 +6194,7 @@ export const colonyNetworkAbi = [
       { name: '_sigV', internalType: 'uint8', type: 'uint8' },
     ],
     name: 'executeMetaTransaction',
-    outputs: [{ name: '', internalType: 'bytes', type: 'bytes' }],
+    outputs: [{ name: 'returnData', internalType: 'bytes', type: 'bytes' }],
     stateMutability: 'payable',
   },
   {
@@ -6293,7 +6309,7 @@ export const colonyNetworkAbi = [
             internalType: 'bool',
             type: 'bool',
           },
-          { name: 'deprecated', internalType: 'bool', type: 'bool' },
+          { name: 'DEPRECATED_deprecated', internalType: 'bool', type: 'bool' },
         ],
       },
     ],
