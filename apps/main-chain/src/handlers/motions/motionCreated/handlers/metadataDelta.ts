@@ -58,7 +58,7 @@ export const handleMetadataDeltaMotion = async (
       isDisableProxyColonyOperation(operation) ||
       isEnableProxyColonyOperation(operation)
     ) {
-      const targetChainId = JSON.parse(desc.args[0]).payload[0];
+      const targetChainId = operation.payload[0];
 
       if (!targetChainId) {
         return;
