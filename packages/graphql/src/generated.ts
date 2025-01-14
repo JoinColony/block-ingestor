@@ -323,8 +323,6 @@ export type Colony = {
   /** ID of the main member invite object */
   colonyMemberInviteCode?: Maybe<Scalars['ID']>;
   createdAt: Scalars['AWSDateTime'];
-  /** The block number the colony was created attached */
-  createdAtBlock?: Maybe<Scalars['Int']>;
   domains?: Maybe<ModelDomainConnection>;
   expenditures?: Maybe<ModelExpenditureConnection>;
   /** Global claim delay for expenditures (in seconds) */
@@ -1223,6 +1221,10 @@ export type ColonyMultiSig = {
   expenditureFunding?: Maybe<Array<ExpenditureFundingItem>>;
   /** Expenditure associated with the motion, if any */
   expenditureId?: Maybe<Scalars['ID']>;
+  /** Expanded `ColonyAction` */
+  finalizationActionData?: Maybe<ColonyAction>;
+  /** The action txHash that was triggered upon motion finalization */
+  finalizationActionId?: Maybe<Scalars['ID']>;
   /** Whether the underlying action completed */
   hasActionCompleted: Scalars['Boolean'];
   /**
@@ -1613,7 +1615,6 @@ export type CreateColonyInput = {
   chainMetadata: ChainMetadataInput;
   colonyCreateEvent?: InputMaybe<ColonyCreateEventInput>;
   colonyMemberInviteCode?: InputMaybe<Scalars['ID']>;
-  createdAtBlock?: InputMaybe<Scalars['Int']>;
   expendituresGlobalClaimDelay?: InputMaybe<Scalars['String']>;
   id?: InputMaybe<Scalars['ID']>;
   lastUpdatedContributorsWithReputation?: InputMaybe<Scalars['AWSDateTime']>;
@@ -1682,6 +1683,7 @@ export type CreateColonyMultiSigInput = {
   executedBy?: InputMaybe<Scalars['ID']>;
   expenditureFunding?: InputMaybe<Array<ExpenditureFundingItemInput>>;
   expenditureId?: InputMaybe<Scalars['ID']>;
+  finalizationActionId?: InputMaybe<Scalars['ID']>;
   hasActionCompleted: Scalars['Boolean'];
   id?: InputMaybe<Scalars['ID']>;
   isDecision: Scalars['Boolean'];
@@ -3057,7 +3059,6 @@ export type ModelColonyActionTypeInput = {
 export type ModelColonyConditionInput = {
   and?: InputMaybe<Array<InputMaybe<ModelColonyConditionInput>>>;
   colonyMemberInviteCode?: InputMaybe<ModelIdInput>;
-  createdAtBlock?: InputMaybe<ModelIntInput>;
   expendituresGlobalClaimDelay?: InputMaybe<ModelStringInput>;
   lastUpdatedContributorsWithReputation?: InputMaybe<ModelStringInput>;
   name?: InputMaybe<ModelStringInput>;
@@ -3184,7 +3185,6 @@ export type ModelColonyExtensionFilterInput = {
 export type ModelColonyFilterInput = {
   and?: InputMaybe<Array<InputMaybe<ModelColonyFilterInput>>>;
   colonyMemberInviteCode?: InputMaybe<ModelIdInput>;
-  createdAtBlock?: InputMaybe<ModelIntInput>;
   expendituresGlobalClaimDelay?: InputMaybe<ModelStringInput>;
   id?: InputMaybe<ModelIdInput>;
   lastUpdatedContributorsWithReputation?: InputMaybe<ModelStringInput>;
@@ -3384,6 +3384,7 @@ export type ModelColonyMultiSigConditionInput = {
   executedAt?: InputMaybe<ModelStringInput>;
   executedBy?: InputMaybe<ModelIdInput>;
   expenditureId?: InputMaybe<ModelIdInput>;
+  finalizationActionId?: InputMaybe<ModelIdInput>;
   hasActionCompleted?: InputMaybe<ModelBooleanInput>;
   isDecision?: InputMaybe<ModelBooleanInput>;
   isExecuted?: InputMaybe<ModelBooleanInput>;
@@ -3412,6 +3413,7 @@ export type ModelColonyMultiSigFilterInput = {
   executedAt?: InputMaybe<ModelStringInput>;
   executedBy?: InputMaybe<ModelIdInput>;
   expenditureId?: InputMaybe<ModelIdInput>;
+  finalizationActionId?: InputMaybe<ModelIdInput>;
   hasActionCompleted?: InputMaybe<ModelBooleanInput>;
   id?: InputMaybe<ModelIdInput>;
   isDecision?: InputMaybe<ModelBooleanInput>;
@@ -4448,7 +4450,6 @@ export type ModelSubscriptionColonyExtensionFilterInput = {
 export type ModelSubscriptionColonyFilterInput = {
   and?: InputMaybe<Array<InputMaybe<ModelSubscriptionColonyFilterInput>>>;
   colonyMemberInviteCode?: InputMaybe<ModelSubscriptionIdInput>;
-  createdAtBlock?: InputMaybe<ModelSubscriptionIntInput>;
   expendituresGlobalClaimDelay?: InputMaybe<ModelSubscriptionStringInput>;
   id?: InputMaybe<ModelSubscriptionIdInput>;
   lastUpdatedContributorsWithReputation?: InputMaybe<ModelSubscriptionStringInput>;
@@ -4557,6 +4558,7 @@ export type ModelSubscriptionColonyMultiSigFilterInput = {
   executedAt?: InputMaybe<ModelSubscriptionStringInput>;
   executedBy?: InputMaybe<ModelSubscriptionIdInput>;
   expenditureId?: InputMaybe<ModelSubscriptionIdInput>;
+  finalizationActionId?: InputMaybe<ModelSubscriptionIdInput>;
   hasActionCompleted?: InputMaybe<ModelSubscriptionBooleanInput>;
   id?: InputMaybe<ModelSubscriptionIdInput>;
   isDecision?: InputMaybe<ModelSubscriptionBooleanInput>;
@@ -9573,7 +9575,6 @@ export type UpdateColonyInput = {
   chainMetadata?: InputMaybe<ChainMetadataInput>;
   colonyCreateEvent?: InputMaybe<ColonyCreateEventInput>;
   colonyMemberInviteCode?: InputMaybe<Scalars['ID']>;
-  createdAtBlock?: InputMaybe<Scalars['Int']>;
   expendituresGlobalClaimDelay?: InputMaybe<Scalars['String']>;
   id: Scalars['ID'];
   lastUpdatedContributorsWithReputation?: InputMaybe<Scalars['AWSDateTime']>;
@@ -9642,6 +9643,7 @@ export type UpdateColonyMultiSigInput = {
   executedBy?: InputMaybe<Scalars['ID']>;
   expenditureFunding?: InputMaybe<Array<ExpenditureFundingItemInput>>;
   expenditureId?: InputMaybe<Scalars['ID']>;
+  finalizationActionId?: InputMaybe<Scalars['ID']>;
   hasActionCompleted?: InputMaybe<Scalars['Boolean']>;
   id: Scalars['ID'];
   isDecision?: InputMaybe<Scalars['Boolean']>;
@@ -11157,6 +11159,15 @@ export type CreateProxyColonyMutation = {
   createProxyColony?: { __typename?: 'ProxyColony'; id: string } | null;
 };
 
+export type UpdateProxyColonyMutationVariables = Exact<{
+  input: UpdateProxyColonyInput;
+}>;
+
+export type UpdateProxyColonyMutation = {
+  __typename?: 'Mutation';
+  updateProxyColony?: { __typename?: 'ProxyColony'; id: string } | null;
+};
+
 export type UpdateReputationMiningCycleMetadataMutationVariables = Exact<{
   input: UpdateReputationMiningCycleMetadataInput;
 }>;
@@ -12447,6 +12458,21 @@ export type GetColonyHistoricRoleQuery = {
   } | null;
 };
 
+export type GetProxyColonyQueryVariables = Exact<{
+  id: Scalars['ID'];
+}>;
+
+export type GetProxyColonyQuery = {
+  __typename?: 'Query';
+  getProxyColony?: {
+    __typename?: 'ProxyColony';
+    chainId: string;
+    colonyAddress: string;
+    id: string;
+    isActive: boolean;
+  } | null;
+};
+
 export type GetReputationMiningCycleMetadataQueryVariables = Exact<{
   id: Scalars['ID'];
 }>;
@@ -12480,8 +12506,6 @@ export type GetUserStakeQuery = {
     amount: string;
   } | null;
 };
-
-export type GetStatsQueryVariables = Exact<{ [key: string]: never }>;
 
 export type GetStatsQueryVariables = Exact<{
   chainId: Scalars['String'];
@@ -12540,76 +12564,14 @@ export const DomainMetadata = gql`
     name
     color
     description
-    progress
-  }
-  changelog {
-    transactionHash
-    oldDisplayName
-    newDisplayName
-    hasAvatarChanged
-    hasDescriptionChanged
-    haveExternalLinksChanged
-    hasObjectiveChanged
-  }
-}
-    `;
-export const MultiChainInfo = gql`
-  fragment MultiChainInfo on MultiChainInfo {
-    targetChainId
-    completed
-    wormholeInfo {
-      emitterChainId
-      emitterAddress
-      sequence
-    }
-  }
-`;
-export const ActionMetadataInfo = gql`
-  fragment ActionMetadataInfo on ColonyAction {
-    id
-    pendingDomainMetadata {
-      ...DomainMetadata
-    }
-    pendingColonyMetadata {
-      ...ColonyMetadata
-    }
-    colonyDecisionId
-    amount
-    networkFee
-    type
-    showInActionsList
-    colonyId
-    initiatorAddress
-    recipientAddress
-    payments {
-      recipientAddress
-    }
-    members
-    multiChainInfo {
-      ...MultiChainInfo
-    }
-  }
-  ${DomainMetadata}
-  ${ColonyMetadata}
-  ${MultiChainInfo}
-`;
-export const Token = gql`
-  fragment Token on Token {
-    tokenAddress: id
-    symbol
-  }
-`;
-export const Colony = gql`
-  fragment Colony on Colony {
-    colonyAddress: id
-    nativeToken {
-      ...Token
-    }
-    tokens {
-      items {
-        id
-        tokenAddress: tokenID
-      }
+    changelog {
+      transactionHash
+      oldName
+      newName
+      oldColor
+      newColor
+      oldDescription
+      newDescription
     }
   }
 `;
@@ -12750,110 +12712,6 @@ export const ColonyWithRootRoles = gql`
   }
   ${NotificationsData}
 `;
-export const ExpenditureSlot = gql`
-  fragment ExpenditureSlot on ExpenditureSlot {
-    id
-    recipientAddress
-    claimDelay
-    payoutModifier
-    payouts {
-      tokenAddress
-      amount
-      isClaimed
-      networkFee
-    }
-  }
-`;
-export const ExpenditureBalance = gql`
-  fragment ExpenditureBalance on ExpenditureBalance {
-    tokenAddress
-    amount
-  }
-`;
-export const Expenditure = gql`
-  fragment Expenditure on Expenditure {
-    id
-    slots {
-      ...ExpenditureSlot
-    }
-    motions {
-      items {
-        transactionHash
-        action {
-          type
-        }
-      }
-    }
-    balances {
-      ...ExpenditureBalance
-    }
-    status
-    ownerAddress
-    userStakeId
-    createdAt
-    firstEditTransactionHash
-    type
-    actions {
-      items {
-        type
-        id
-      }
-    }
-  }
-  ${ExpenditureSlot}
-  ${ExpenditureBalance}
-`;
-export const Extension = gql`
-  fragment Extension on ColonyExtension {
-    id
-    hash
-    colonyId
-    isInitialized
-    version
-  }
-`;
-export const MotionStakes = gql`
-  fragment MotionStakes on MotionStakes {
-    raw {
-      nay
-      yay
-    }
-    percentage {
-      nay
-      yay
-    }
-  }
-`;
-export const UserMotionStakes = gql`
-    fragment UserMotionStakes on UserMotionStakes {
-  address
-  stakes {
-    raw {
-      yay
-      nay
-    }
-    percentage {
-      yay
-      nay
-    }
-  }
-`;
-export const UserMotionStakes = gql`
-  fragment UserMotionStakes on UserMotionStakes {
-    address
-    stakes {
-      raw {
-        yay
-        nay
-      }
-      percentage {
-        yay
-        nay
-      }
-    }
-  }
-}
-    ${NotificationsData}`;
 export const ExpenditureSlot = gql`
   fragment ExpenditureSlot on ExpenditureSlot {
     id
@@ -13072,14 +12930,6 @@ export const ProxyColony = gql`
     isActive
   }
 `;
-export const ProxyColony = gql`
-  fragment ProxyColony on ProxyColony {
-    id
-    colonyAddress
-    chainId
-    isActive
-  }
-`;
 export const NotificationUser = gql`
   fragment NotificationUser on ColonyContributor {
     user {
@@ -13094,11 +12944,6 @@ export const CreateColonyActionDocument = gql`
   mutation CreateColonyAction($input: CreateColonyActionInput!) {
     createColonyAction(input: $input) {
       id
-      payouts {
-        amount
-        tokenAddress
-        isClaimed
-      }
     }
   }
 `;
@@ -13448,9 +13293,9 @@ export const CreateProxyColonyDocument = gql`
     }
   }
 `;
-export const CreateProxyColonyDocument = gql`
-  mutation CreateProxyColony($input: CreateProxyColonyInput!) {
-    createProxyColony(input: $input) {
+export const UpdateProxyColonyDocument = gql`
+  mutation UpdateProxyColony($input: UpdateProxyColonyInput!) {
+    updateProxyColony(input: $input) {
       id
     }
   }
@@ -13534,14 +13379,6 @@ export const GetActionInfoDocument = gql`
   }
   ${ActionMetadataInfo}
 `;
-export const GetActionInfoDocument = gql`
-  query GetActionInfo($transactionHash: ID!) {
-    getColonyAction(id: $transactionHash) {
-      ...ActionMetadataInfo
-    }
-  }
-  ${ActionMetadataInfo}
-`;
 export const GetMotionIdFromActionDocument = gql`
   query GetMotionIdFromAction($id: ID!) {
     getColonyAction(id: $id) {
@@ -13571,7 +13408,6 @@ export const GetActionByIdDocument = gql`
           ...ExpenditureSlot
         }
       }
-      colonyId
     }
   }
   ${ExpenditureSlot}
@@ -14068,6 +13904,16 @@ export const GetColonyHistoricRoleDocument = gql`
     }
   }
 `;
+export const GetProxyColonyDocument = gql`
+  query GetProxyColony($id: ID!) {
+    getProxyColony(id: $id) {
+      chainId
+      colonyAddress
+      id
+      isActive
+    }
+  }
+`;
 export const GetReputationMiningCycleMetadataDocument = gql`
   query GetReputationMiningCycleMetadata($id: ID!) {
     getReputationMiningCycleMetadata(id: $id) {
@@ -14110,61 +13956,6 @@ export const GetTokenFromEverywhereDocument = gql`
   }
 `;
 export const GetNotificationUsersDocument = gql`
-    query GetNotificationUsers($filter: ModelUserFilterInput, $limit: Int) {
-  listUsers(filter: $filter, limit: $limit) {
-    items {
-      notificationsData {
-        ...NotificationsData
-      }
-    }
-  }
-`;
-export const GetColonyHistoricRoleDocument = gql`
-  query GetColonyHistoricRole($id: ID!) {
-    getColonyHistoricRole(id: $id) {
-      id
-    }
-  }
-`;
-export const GetReputationMiningCycleMetadataDocument = gql`
-  query GetReputationMiningCycleMetadata($id: ID!) {
-    getReputationMiningCycleMetadata(id: $id) {
-      id
-    }
-  }
-`;
-export const GetSafeTransactionByTransactionHashDocument = gql`
-  query GetSafeTransactionByTransactionHash($transactionHash: ID!) {
-    getSafeTransaction(id: $transactionHash) {
-      id
-    }
-  }
-`;
-export const GetUserStakeDocument = gql`
-  query GetUserStake($id: ID!) {
-    getUserStake(id: $id) {
-      id
-      amount
-    }
-  }
-`;
-export const GetStatsDocument = gql`
-  query GetStats {
-    getIngestorStats(id: "STATS") {
-      value
-    }
-  }
-`;
-export const GetTokenFromEverywhereDocument = gql`
-  query GetTokenFromEverywhere($input: TokenFromEverywhereArguments!) {
-    getTokenFromEverywhere(input: $input) {
-      items {
-        id
-      }
-    }
-  }
-`;
-export const GetNotificationUsersDocument = gql`
   query GetNotificationUsers($filter: ModelUserFilterInput, $limit: Int) {
     listUsers(filter: $filter, limit: $limit) {
       items {
@@ -14174,5 +13965,5 @@ export const GetNotificationUsersDocument = gql`
       }
     }
   }
-}
-    ${NotificationsData}`;
+  ${NotificationsData}
+`;

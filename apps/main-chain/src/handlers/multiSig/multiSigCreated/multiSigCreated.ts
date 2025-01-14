@@ -88,7 +88,6 @@ export const handleMultiSigMotionCreated: EventHandler = async (
     return;
   }
 
-  let notificationCategory: NotificationCategory | null;
   // the motion data and targets are the same length as it's enforced on the contracts so we can check whichever
   if (actions.length === 1) {
     const actionData = actions[0];
@@ -98,6 +97,7 @@ export const handleMultiSigMotionCreated: EventHandler = async (
     if (!parsedOperation) {
       return;
     }
+    let notificationCategory: NotificationCategory | null = null;
 
     const contractOperation = parsedOperation.name;
     /* Handle the action type-specific mutation here */
