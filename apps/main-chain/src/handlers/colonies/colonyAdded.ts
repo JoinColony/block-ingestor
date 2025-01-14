@@ -19,9 +19,6 @@ import { getColonyContributorId } from '~utils/contributors';
 import { tryFetchGraphqlQuery } from '~utils/graphql';
 import { createUniqueColony } from './helpers/createUniqueColony';
 import { output } from '@joincolony/utils';
-import rpcProvider from '~provider';
-import networkClient from '~networkClient';
-import { getTransactionSignerAddress } from '~utils/transactions';
 import { getColonyCreationSalt } from './helpers/validateCreationSalt';
 
 export default async (event: ContractEvent): Promise<void> => {

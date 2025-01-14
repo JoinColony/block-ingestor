@@ -1221,6 +1221,10 @@ export type ColonyMultiSig = {
   expenditureFunding?: Maybe<Array<ExpenditureFundingItem>>;
   /** Expenditure associated with the motion, if any */
   expenditureId?: Maybe<Scalars['ID']>;
+  /** Expanded `ColonyAction` */
+  finalizationActionData?: Maybe<ColonyAction>;
+  /** The action txHash that was triggered upon motion finalization */
+  finalizationActionId?: Maybe<Scalars['ID']>;
   /** Whether the underlying action completed */
   hasActionCompleted: Scalars['Boolean'];
   /**
@@ -1679,6 +1683,7 @@ export type CreateColonyMultiSigInput = {
   executedBy?: InputMaybe<Scalars['ID']>;
   expenditureFunding?: InputMaybe<Array<ExpenditureFundingItemInput>>;
   expenditureId?: InputMaybe<Scalars['ID']>;
+  finalizationActionId?: InputMaybe<Scalars['ID']>;
   hasActionCompleted: Scalars['Boolean'];
   id?: InputMaybe<Scalars['ID']>;
   isDecision: Scalars['Boolean'];
@@ -3379,6 +3384,7 @@ export type ModelColonyMultiSigConditionInput = {
   executedAt?: InputMaybe<ModelStringInput>;
   executedBy?: InputMaybe<ModelIdInput>;
   expenditureId?: InputMaybe<ModelIdInput>;
+  finalizationActionId?: InputMaybe<ModelIdInput>;
   hasActionCompleted?: InputMaybe<ModelBooleanInput>;
   isDecision?: InputMaybe<ModelBooleanInput>;
   isExecuted?: InputMaybe<ModelBooleanInput>;
@@ -3407,6 +3413,7 @@ export type ModelColonyMultiSigFilterInput = {
   executedAt?: InputMaybe<ModelStringInput>;
   executedBy?: InputMaybe<ModelIdInput>;
   expenditureId?: InputMaybe<ModelIdInput>;
+  finalizationActionId?: InputMaybe<ModelIdInput>;
   hasActionCompleted?: InputMaybe<ModelBooleanInput>;
   id?: InputMaybe<ModelIdInput>;
   isDecision?: InputMaybe<ModelBooleanInput>;
@@ -4551,6 +4558,7 @@ export type ModelSubscriptionColonyMultiSigFilterInput = {
   executedAt?: InputMaybe<ModelSubscriptionStringInput>;
   executedBy?: InputMaybe<ModelSubscriptionIdInput>;
   expenditureId?: InputMaybe<ModelSubscriptionIdInput>;
+  finalizationActionId?: InputMaybe<ModelSubscriptionIdInput>;
   hasActionCompleted?: InputMaybe<ModelSubscriptionBooleanInput>;
   id?: InputMaybe<ModelSubscriptionIdInput>;
   isDecision?: InputMaybe<ModelSubscriptionBooleanInput>;
@@ -9635,6 +9643,7 @@ export type UpdateColonyMultiSigInput = {
   executedBy?: InputMaybe<Scalars['ID']>;
   expenditureFunding?: InputMaybe<Array<ExpenditureFundingItemInput>>;
   expenditureId?: InputMaybe<Scalars['ID']>;
+  finalizationActionId?: InputMaybe<Scalars['ID']>;
   hasActionCompleted?: InputMaybe<Scalars['Boolean']>;
   id: Scalars['ID'];
   isDecision?: InputMaybe<Scalars['Boolean']>;
@@ -11150,6 +11159,15 @@ export type CreateProxyColonyMutation = {
   createProxyColony?: { __typename?: 'ProxyColony'; id: string } | null;
 };
 
+export type UpdateProxyColonyMutationVariables = Exact<{
+  input: UpdateProxyColonyInput;
+}>;
+
+export type UpdateProxyColonyMutation = {
+  __typename?: 'Mutation';
+  updateProxyColony?: { __typename?: 'ProxyColony'; id: string } | null;
+};
+
 export type UpdateReputationMiningCycleMetadataMutationVariables = Exact<{
   input: UpdateReputationMiningCycleMetadataInput;
 }>;
@@ -12440,6 +12458,21 @@ export type GetColonyHistoricRoleQuery = {
   } | null;
 };
 
+export type GetProxyColonyQueryVariables = Exact<{
+  id: Scalars['ID'];
+}>;
+
+export type GetProxyColonyQuery = {
+  __typename?: 'Query';
+  getProxyColony?: {
+    __typename?: 'ProxyColony';
+    chainId: string;
+    colonyAddress: string;
+    id: string;
+    isActive: boolean;
+  } | null;
+};
+
 export type GetReputationMiningCycleMetadataQueryVariables = Exact<{
   id: Scalars['ID'];
 }>;
@@ -13260,6 +13293,13 @@ export const CreateProxyColonyDocument = gql`
     }
   }
 `;
+export const CreateProxyColonyDocument = gql`
+  mutation CreateProxyColony($input: CreateProxyColonyInput!) {
+    createProxyColony(input: $input) {
+      id
+    }
+  }
+`;
 export const UpdateReputationMiningCycleMetadataDocument = gql`
   mutation UpdateReputationMiningCycleMetadata(
     $input: UpdateReputationMiningCycleMetadataInput!
@@ -13861,6 +13901,16 @@ export const GetColonyHistoricRoleDocument = gql`
   query GetColonyHistoricRole($id: ID!) {
     getColonyHistoricRole(id: $id) {
       id
+    }
+  }
+`;
+export const GetProxyColonyDocument = gql`
+  query GetProxyColony($id: ID!) {
+    getProxyColony(id: $id) {
+      chainId
+      colonyAddress
+      id
+      isActive
     }
   }
 `;
