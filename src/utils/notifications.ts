@@ -461,6 +461,19 @@ export const sendNotification = async (
   recipients: Recipient[],
   customAttributes: NotificationVariables,
 ): Promise<void> => {
+  // Notifications are turned off by default in development to save space in magicbell and avoid unnecessary notifications.
+  // If you need notifications on in your local, restart your dev env and run `npm run dev --notifications` instead of just `npm run dev`.
+  // Alternatively, you can of course run the block ingestor locally and uncomment this if statement, but you need to remember to set a random unique
+  // value for MAGICBELL_DEV_KEY in the .env of both the block ingestor and the cdapp (must be the same in both) to ensure you only see notifications from your local.
+  if (
+    process.env.NODE_ENV === 'development' &&
+    process.env.MAGICBELL_DEV_KEY === 'OFF'
+  ) {
+    console.log(
+      "A notification was triggered, but they are disabled in development. To turn them on see the 'sendNotification' function in src/utils/notifications.ts",
+    );
+    return;
+  }
   try {
     await Notification.create({
       title,
@@ -470,7 +483,7 @@ export const sendNotification = async (
       },
       ...(process.env.NODE_ENV === 'development'
         ? {
-            category: process.env.MAGICBELL_DEV_KEY,
+            topic: process.env.MAGICBELL_DEV_KEY,
           }
         : {}),
     });
