@@ -1,27 +1,29 @@
 import {
-  ContractEvent,
   ContractEventsSignatures,
   EventHandler,
+  ProxyColoniesListener,
   ProxyColonyEvents,
 } from '@joincolony/blocks';
 import { output } from '@joincolony/utils';
-import { constants, utils } from 'ethers';
+import { utils } from 'ethers';
 import blockManager from '~blockManager';
 import rpcProvider from '~provider';
 import { writeActionFromEvent } from '~utils/actions/writeAction';
 import { ColonyActionType } from '@joincolony/graphql';
-import networkClient from '~networkClient';
 
+// @NOTE this one listens to the ProxyColonyRequested event on the colony, not the network!
 export const handleProxyColonyRequested: EventHandler = async (
-  event: ContractEvent,
+  event,
+  listener,
 ) => {
-  const { blockNumber, transactionHash } = event;
+  const { colonyAddress } = listener as ProxyColoniesListener;
+  if (!colonyAddress) {
+    output(`No colony address passed to handleProxyColonyRequested listener.`);
+    return;
+  }
+  const { blockNumber } = event;
 
-  const { colony: colonyAddress, destinationChainId } = event.args;
-
-  const receipt =
-    await networkClient.provider.getTransactionReceipt(transactionHash);
-  const initiatorAddress = receipt.from || constants.AddressZero;
+  const { agent, destinationChainId } = event.args;
 
   const logs = await rpcProvider.getProviderInstance().getLogs({
     fromBlock: blockNumber,
@@ -68,7 +70,7 @@ export const handleProxyColonyRequested: EventHandler = async (
 
   await writeActionFromEvent(event, colonyAddress, {
     type: ColonyActionType.AddProxyColony,
-    initiatorAddress,
+    initiatorAddress: agent,
     multiChainInfo: {
       completed: false,
       targetChainId: destinationChainId.toNumber(),
