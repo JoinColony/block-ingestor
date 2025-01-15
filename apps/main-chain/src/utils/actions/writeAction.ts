@@ -13,6 +13,9 @@ import {
   UpdateColonyMotionDocument,
   UpdateColonyMotionMutation,
   UpdateColonyMotionMutationVariables,
+  UpdateColonyMultiSigDocument,
+  UpdateColonyMultiSigMutation,
+  UpdateColonyMultiSigMutationVariables,
 } from '@joincolony/graphql';
 import { toNumber, getColonyExtensions } from '~utils';
 import { ContractEvent } from '@joincolony/blocks';
@@ -47,6 +50,7 @@ export const writeActionFromEvent = async (
     actionFields.initiatorAddress,
     colonyExtensions,
   );
+
   const isMultiSigFinalization = await isActionMultiSigFinalization(
     actionFields.initiatorAddress,
     colonyExtensions,
@@ -87,9 +91,9 @@ export const writeActionFromEvent = async (
       finalizedActionId = finalizedMultiSig?.transactionHash;
 
       await amplifyClient.mutate<
-        UpdateColonyMotionMutation,
-        UpdateColonyMotionMutationVariables
-      >(UpdateColonyMotionDocument, {
+        UpdateColonyMultiSigMutation,
+        UpdateColonyMultiSigMutationVariables
+      >(UpdateColonyMultiSigDocument, {
         input: {
           id: multisigDatabaseId,
           finalizationActionId: transactionHash,
