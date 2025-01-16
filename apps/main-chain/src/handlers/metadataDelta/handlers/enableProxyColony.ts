@@ -58,8 +58,8 @@ export const handleEnableProxyColony = async (
   await writeActionFromEvent(event, colonyAddress, {
     type: ColonyActionType.AddProxyColony,
     initiatorAddress,
+    targetChainId: Number(foreignChainId),
     multiChainInfo: {
-      targetChainId: Number(foreignChainId),
       completed: true,
     },
     fromDomainId: getDomainDatabaseId(colonyAddress, Id.RootDomain),
