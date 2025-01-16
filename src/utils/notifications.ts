@@ -467,7 +467,8 @@ export const sendNotification = async (
   // value for MAGICBELL_DEV_KEY in the .env of both the block ingestor and the cdapp (must be the same in both) to ensure you only see notifications from your local.
   if (
     process.env.NODE_ENV === 'development' &&
-    process.env.MAGICBELL_DEV_KEY === 'OFF'
+    (process.env.MAGICBELL_DEV_KEY === 'OFF' ||
+      process.env.MAGICBELL_DEV_KEY === undefined)
   ) {
     console.log(
       "A notification was triggered, but they are disabled in development. To turn them on see the 'sendNotification' function in src/utils/notifications.ts",
