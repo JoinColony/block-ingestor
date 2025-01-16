@@ -1,4 +1,8 @@
-import { EventListenerType , ContractEventsSignatures, EventHandler } from '@joincolony/blocks';
+import {
+  EventListenerType,
+  ContractEventsSignatures,
+  EventHandler,
+} from '@joincolony/blocks';
 import { utils } from 'ethers';
 
 import eventManager from '~eventManager';
@@ -11,6 +15,6 @@ export const addNetworkEventListener = (
     type: EventListenerType.Network,
     eventSignature,
     topics: [utils.id(eventSignature)],
-    address: process.env.CHAIN_CONTRACT_ADDRESS ?? '',
+    address: process.env.CHAIN_NETWORK_CONTRACT ?? '',
     handler,
   });
