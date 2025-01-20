@@ -24,6 +24,7 @@ export enum ColonyOperations {
   CancelExpenditureViaArbitration = 'cancelExpenditureViaArbitration',
   FinalizeExpenditureViaArbitration = 'finalizeExpenditureViaArbitration',
   ReleaseStagedPaymentViaArbitration = 'releaseStagedPaymentViaArbitration',
+  CreateProxyColony = 'createProxyColony',
 }
 
 export enum MotionEvents {
@@ -69,6 +70,7 @@ export const motionNameMapping: { [key: string]: ColonyActionType } = {
     ColonyActionType.SetExpenditureStateMotion,
   [ColonyOperations.ReleaseStagedPaymentViaArbitration]:
     ColonyActionType.ReleaseStagedPaymentsMotion,
+  [ColonyOperations.CreateProxyColony]: ColonyActionType.AddProxyColonyMotion,
 };
 
 export enum MotionSide {
@@ -103,4 +105,5 @@ export const multiSigNameMapping: { [key: string]: ColonyActionType } = {
     ColonyActionType.CancelStakedExpenditureMultisig,
   [ColonyOperations.SetExpenditureState]:
     ColonyActionType.SetExpenditureStateMultisig,
+  [ColonyOperations.CreateProxyColony]: ColonyActionType.AddProxyColonyMultisig,
 };

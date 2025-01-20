@@ -1,0 +1,8 @@
+query GetProxyColony($id: ID!) {
+  getProxyColony(id: $id) {
+    chainId
+    colonyAddress
+    id
+    isActive
+  }
+}
