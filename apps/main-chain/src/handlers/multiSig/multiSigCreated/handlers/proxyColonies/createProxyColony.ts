@@ -22,9 +22,9 @@ export const handleCreateProxyColonyMultiSig = async (
 
   await createMultiSigInDB(colonyAddress, event, {
     type: multiSigNameMapping[name],
+    targetChainId: destinationChainId.toNumber(),
     multiChainInfo: {
       completed: false,
-      targetChainId: destinationChainId.toNumber(),
     },
   });
 };

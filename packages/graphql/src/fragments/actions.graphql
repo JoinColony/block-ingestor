@@ -1,5 +1,4 @@
 fragment MultiChainInfo on MultiChainInfo {
-  targetChainId
   completed
   wormholeInfo {
     emitterChainId
@@ -31,4 +30,5 @@ fragment ActionMetadataInfo on ColonyAction {
   multiChainInfo {
     ...MultiChainInfo
   }
+  targetChainId
 }

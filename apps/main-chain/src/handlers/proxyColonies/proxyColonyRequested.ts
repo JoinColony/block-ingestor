@@ -71,9 +71,9 @@ export const handleProxyColonyRequested: EventHandler = async (
   await writeActionFromEvent(event, colonyAddress, {
     type: ColonyActionType.AddProxyColony,
     initiatorAddress: agent,
+    targetChainId: destinationChainId.toNumber(),
     multiChainInfo: {
       completed: false,
-      targetChainId: destinationChainId.toNumber(),
       wormholeInfo: {
         sequence: emitterSequence,
         emitterAddress,
