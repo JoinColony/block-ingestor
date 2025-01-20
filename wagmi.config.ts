@@ -2,7 +2,7 @@ import { defineConfig } from '@wagmi/cli';
 import colony from '@colony/wagmi-plugin';
 
 export default defineConfig({
-  out: 'src/constants/abis.ts',
+  out: 'packages/blocks/src/constants/abis.ts',
   contracts: [],
   plugins: [
     colony({

@@ -1,6 +1,6 @@
+import { output } from '@joincolony/utils';
 import { utils } from 'ethers';
 import { TransactionDescription } from 'ethers/lib/utils';
-import { output } from './logger';
 
 /**
  * Helper attempting to decode function data by trying to parse it with different contract ABIs

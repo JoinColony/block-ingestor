@@ -12,8 +12,8 @@ import { ContractEvent } from '@joincolony/blocks';
 import { BigNumber } from 'ethers';
 import { sendMultisigActionNotifications } from '~utils/notifications';
 import { NotificationCategory } from '~types/notifications';
-import { NotificationType } from '~graphql';
 import { fundExpenditureMultisigHandler } from './multipleFunctionsHandlers/fundExpenditure';
+import { NotificationType } from '@joincolony/graphql';
 
 export const handleMoveFundsMultiSig = async (
   colonyAddress: string,
