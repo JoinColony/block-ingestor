@@ -1,6 +1,6 @@
 import { utils, constants } from 'ethers';
 import {
-  IColonyEvents__factory as ColonyEventsFactory,
+  // IColonyEvents__factory as ColonyEventsFactory,
   VotingReputationEvents__factory as VotingReputationEventsFactory,
   StakedExpenditureEvents__factory as StakedExpenditureEventsFactory,
   TokenEvents__factory as TokenEventsFactory,
@@ -14,6 +14,11 @@ import { Extension, getExtensionHash } from '@colony/colony-js';
 import networkClient from '~networkClient';
 import provider from '~provider';
 import { EventListener, EventListenerType } from '~eventListeners';
+import { Interface } from 'ethers/lib/utils';
+import { colonyAbi } from '~constants/abis';
+
+// @NOTE: Temporary interface for development until a proper colonyJS release
+const _tempColonyInterface = new Interface(colonyAbi);
 
 /**
  * Function returning ABI-derived interface for a given event listener type,
@@ -29,8 +34,7 @@ export const getInterfaceByListener = (
       return networkClient.interface;
     }
     case EventListenerType.Colony: {
-      return ColonyEventsFactory.connect(constants.AddressZero, provider)
-        .interface;
+      return _tempColonyInterface;
     }
     case EventListenerType.Extension: {
       return getInterfaceByExtensionHash(listener.extensionHash);

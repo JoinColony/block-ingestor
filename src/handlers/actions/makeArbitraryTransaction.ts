@@ -10,7 +10,6 @@ import {
   UpdateColonyActionMutationVariables,
 } from '~graphql';
 import { ContractEvent } from '~types';
-import provider from '~provider';
 import {
   ArbitraryTransaction,
   getDomainDatabaseId,
@@ -19,10 +18,12 @@ import {
 import { mutate, query } from '~amplifyClient';
 
 export default async (event: ContractEvent): Promise<void> => {
-  const { target: contractAddress, data: encodedFunction } = event.args;
-
   const { contractAddress: colonyAddress, transactionHash } = event;
-  const receipt = await provider.getTransactionReceipt(event.transactionHash);
+  const {
+    target: contractAddress,
+    data: encodedFunction,
+    agent: initiatorAddress,
+  } = event.args;
 
   const currentArbitraryTransaction: ArbitraryTransaction = {
     contractAddress,
@@ -55,8 +56,7 @@ export default async (event: ContractEvent): Promise<void> => {
 
   await writeActionFromEvent(event, colonyAddress, {
     type: ColonyActionType.MakeArbitraryTransaction,
-    initiatorAddress: receipt.from,
-    recipientAddress: receipt.to,
+    initiatorAddress,
     fromDomainId: getDomainDatabaseId(colonyAddress, Id.RootDomain),
     arbitraryTransactions: [currentArbitraryTransaction],
   });

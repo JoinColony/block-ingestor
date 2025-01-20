@@ -12,7 +12,8 @@
     "lint": "eslint src/ --ext .ts",
     "preinstall": "bash scripts/generate-temp-files.sh",
     "prepare": "husky install",
-    "codegen": "graphql-codegen -w \"src/**/*.graphql\""
+    "codegen": "graphql-codegen -w \"src/**/*.graphql\"",
+    "generate-abis": "wagmi generate"
   },
   "repository": {
     "type": "git",
@@ -25,9 +26,11 @@
   },
   "homepage": "https://github.com/JoinColony/tx-ingestor",
   "dependencies": {
+    "@colony/abis": "^1.6.0",
     "@colony/colony-js": "^8.0.0-next.0",
-    "@colony/events": "3.0.0",
+    "@colony/events": "^4.0.0-next.0",
     "@magicbell/core": "^5.0.16",
+    "@wagmi/cli": "^2.1.17",
     "aws-amplify": "^4.3.43",
     "cross-fetch": "^4.0.0",
     "dotenv": "^16.0.3",
@@ -38,6 +41,7 @@
     "lodash": "^4.17.21"
   },
   "devDependencies": {
+    "@colony/wagmi-plugin": "^0.1.1",
     "@graphql-codegen/cli": "^3.3.1",
     "@graphql-codegen/typescript": "^3.0.4",
     "@graphql-codegen/typescript-document-nodes": "^3.0.4",
@@ -59,6 +63,6 @@
     "prettier": "^2.8.8",
     "ts-node-dev": "^2.0.0",
     "tsconfig-paths": "^4.1.2",
-    "typescript": "^4.8.4"
+    "typescript": "^5.0.4"
   }
 }
