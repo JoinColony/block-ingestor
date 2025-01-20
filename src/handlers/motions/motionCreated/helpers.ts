@@ -176,7 +176,10 @@ type MotionFields = Omit<
 > &
   Pick<
     CreateColonyMotionInput,
-    'expenditureSlotIds' | 'editedExpenditureSlots' | 'expenditureFunding'
+    | 'expenditureSlotIds'
+    | 'editedExpenditureSlots'
+    | 'expenditureFunding'
+    | 'willPunishExpenditureStaker'
   >;
 
 export const createMotionInDB = async (
@@ -195,6 +198,7 @@ export const createMotionInDB = async (
     expenditureSlotIds,
     editedExpenditureSlots,
     expenditureFunding,
+    willPunishExpenditureStaker,
     ...actionFields
   } = motionFields;
 
@@ -245,6 +249,7 @@ export const createMotionInDB = async (
       expenditureSlotIds,
       editedExpenditureSlots,
       expenditureFunding,
+      willPunishExpenditureStaker,
     }),
     createMotionMessage(initialMotionMessage),
     createColonyAction(actionData, timestamp),
