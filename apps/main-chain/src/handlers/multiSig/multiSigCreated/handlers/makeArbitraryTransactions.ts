@@ -1,7 +1,8 @@
 import { TransactionDescription } from 'ethers/lib/utils';
-import { ContractEvent, multiSigNameMapping } from '~types';
+import { multiSigNameMapping } from '~types';
 import { generateArbitraryTxsFromArrays } from '~utils';
 import { createMultiSigInDB } from '../helpers';
+import { ContractEvent } from '@joincolony/blocks';
 
 export const handleMakeArbitraryTxsMultiSig = async (
   colonyAddress: string,

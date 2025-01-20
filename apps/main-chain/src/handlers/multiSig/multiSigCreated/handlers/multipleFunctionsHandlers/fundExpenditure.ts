@@ -1,5 +1,5 @@
 import { BigNumber } from 'ethers';
-import { ColonyActionType, ExpenditureFundingItem } from '~graphql';
+import { ColonyActionType, ExpenditureFundingItem } from '@joincolony/graphql';
 import { ContractMethodSignatures } from '~types';
 import { getExpenditureByFundingPot } from '~utils/expenditures';
 import { createMultiSigInDB } from '../../helpers';

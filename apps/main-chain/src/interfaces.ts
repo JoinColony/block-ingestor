@@ -13,9 +13,12 @@ import { Extension, getExtensionHash } from '@colony/colony-js';
 
 import networkClient from '~networkClient';
 import provider from '~provider';
-import { EventListener, EventListenerType } from '~eventListeners';
+import {
+  EventListener,
+  EventListenerType,
+  colonyAbi,
+} from '@joincolony/blocks';
 import { Interface } from 'ethers/lib/utils';
-import { colonyAbi } from '~constants/abis';
 
 // @NOTE: Temporary interface for development until a proper colonyJS release
 const _tempColonyInterface = new Interface(colonyAbi);
@@ -33,6 +36,7 @@ export const getInterfaceByListener = (
   listener: EventListener,
 ): utils.Interface | null => {
   const { type: listenerType } = listener;
+  const providerInstance = provider.getProviderInstance();
 
   switch (listenerType) {
     case EventListenerType.Network: {
@@ -48,7 +52,7 @@ export const getInterfaceByListener = (
       return getInterfaceByExtensionHash(listener.extensionHash);
     }
     case EventListenerType.Token: {
-      return TokenEventsFactory.connect(constants.AddressZero, provider)
+      return TokenEventsFactory.connect(constants.AddressZero, providerInstance)
         .interface;
     }
     default: {
@@ -60,39 +64,43 @@ export const getInterfaceByListener = (
 const getInterfaceByExtensionHash = (
   extensionHash: string,
 ): utils.Interface | null => {
+  const providerInstance = provider.getProviderInstance();
+
   switch (extensionHash) {
     case getExtensionHash(Extension.OneTxPayment): {
-      return OneTxPaymentEventsFactory.connect(constants.AddressZero, provider)
-        .interface;
+      return OneTxPaymentEventsFactory.connect(
+        constants.AddressZero,
+        providerInstance,
+      ).interface;
     }
     case getExtensionHash(Extension.VotingReputation): {
       return VotingReputationEventsFactory.connect(
         constants.AddressZero,
-        provider,
+        providerInstance,
       ).interface;
     }
     case getExtensionHash(Extension.MultisigPermissions): {
       return MultisigPermissionsEventsFactory.connect(
         constants.AddressZero,
-        provider,
+        providerInstance,
       ).interface;
     }
     case getExtensionHash(Extension.StakedExpenditure): {
       return StakedExpenditureEventsFactory.connect(
         constants.AddressZero,
-        provider,
+        providerInstance,
       ).interface;
     }
     case getExtensionHash(Extension.StagedExpenditure): {
       return StagedExpenditureEventsFactory.connect(
         constants.AddressZero,
-        provider,
+        providerInstance,
       ).interface;
     }
     case getExtensionHash(Extension.StreamingPayments): {
       return StreamingPaymentsEventsFactory.connect(
         constants.AddressZero,
-        provider,
+        providerInstance,
       ).interface;
     }
     default: {

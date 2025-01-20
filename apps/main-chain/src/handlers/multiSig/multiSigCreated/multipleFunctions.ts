@@ -1,5 +1,5 @@
 import { utils } from 'ethers';
-import { ContractEvent } from '~types';
+import { ContractEvent } from '@joincolony/blocks';
 import {
   decodeFunctions,
   getCachedColonyClient,
@@ -7,9 +7,9 @@ import {
   getOneTxPaymentClient,
   getStagedExpenditureClient,
   getStakedExpenditureClient,
-  output,
 } from '~utils';
 import { multipleFunctionsHandlers } from './handlers/multipleFunctionsHandlers';
+import { output } from '@joincolony/utils';
 
 interface HandleMultisigMultipleFunctionsParams {
   event: ContractEvent;

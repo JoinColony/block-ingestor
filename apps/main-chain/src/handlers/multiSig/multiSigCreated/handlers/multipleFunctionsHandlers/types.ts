@@ -1,5 +1,5 @@
+import { ContractEvent } from '@joincolony/blocks';
 import { TransactionDescription } from 'ethers/lib/utils';
-import { ContractEvent } from '~types';
 
 interface MultipleFunctionsHandlerParams {
   colonyAddress: string;

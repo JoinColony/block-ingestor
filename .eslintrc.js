@@ -44,14 +44,11 @@ module.exports = {
       },
     ],
   },
-<<<<<<< HEAD
   ignorePatterns: [
     'codegen.ts',
-    'src/graphql/generated.ts',
+    'packages/graphql/codegen.ts',
+    'packages/graphql/src/generated.ts',
     'wagmi.config.ts',
-    'src/constants/abis.ts',
+    'packages/blocks/src/constants/abis.ts',
   ],
-=======
-  ignorePatterns: ['packages/graphql/codegen.ts', 'packages/graphql/src/generated.ts'],
->>>>>>> d5c077a3 (Feat: Create proxy chain app)
 };
