@@ -69,8 +69,8 @@ export const handleMetadataDeltaMultiSig = async (
           : ColonyActionType.AddProxyColonyMultisig,
         multiChainInfo: {
           completed: false,
-          targetChainId: Number(targetChainId),
         },
+        targetChainId: Number(targetChainId),
       });
     }
   } catch (error) {

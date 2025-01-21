@@ -70,8 +70,8 @@ export const handleMetadataDeltaMotion = async (
           : ColonyActionType.AddProxyColonyMotion,
         multiChainInfo: {
           completed: false,
-          targetChainId: Number(targetChainId),
         },
+        targetChainId: Number(targetChainId),
       });
     }
   } catch (error) {
