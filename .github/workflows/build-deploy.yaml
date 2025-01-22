@@ -65,6 +65,8 @@ jobs:
           context: ${{ github.workspace }}
           file: ./Dockerfile
           push: true
+          build-args: |
+            BUILD_TARGET=main-chain
           tags: |
             ${{ env.ECR_REPOSITORY }}:run-${{ github.run_number }}
             ${{ env.ECR_REPOSITORY }}:${{ env.COMMIT_HASH }}
