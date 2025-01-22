@@ -1,3 +1,4 @@
+import PQueue from 'p-queue';
 import MagicBellClient, { Notification } from '@magicbell/core';
 import { query } from '~amplifyClient';
 import {
@@ -456,6 +457,13 @@ export const sendExtensionVersionAddedNotifications = async ({
   );
 };
 
+// Queue the notifications so that we stay under the rate limit of
+// 60 API calls per minute for Magicbell.
+const notificationsQueue = new PQueue({
+  interval: 60_000, // One minute in milliseconds
+  intervalCap: 60, // Maximum 60 requests per minute
+});
+
 export const sendNotification = async (
   title: string,
   recipients: Recipient[],
@@ -474,22 +482,24 @@ export const sendNotification = async (
     );
     return;
   }
-  try {
-    await Notification.create({
-      title,
-      recipients,
-      custom_attributes: {
-        ...customAttributes,
-      },
-      ...(process.env.NODE_ENV === 'development'
-        ? {
-            topic: process.env.MAGICBELL_DEV_KEY,
-          }
-        : {}),
-    });
-  } catch (err) {
-    console.log(`Unable to create notification "${title}": `, err);
-  }
+  notificationsQueue.add(async () => {
+    try {
+      await Notification.create({
+        title,
+        recipients,
+        custom_attributes: {
+          ...customAttributes,
+        },
+        ...(process.env.NODE_ENV === 'development'
+          ? {
+              topic: process.env.MAGICBELL_DEV_KEY,
+            }
+          : {}),
+      });
+    } catch (err) {
+      console.log(`Unable to create notification "${title}": `, err);
+    }
+  });
 };
 
 export const getNotificationCategory = (
