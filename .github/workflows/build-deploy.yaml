@@ -1,4 +1,4 @@
-name: Build and deploy cdapp block-ingestor docker image
+name: Block ingestor main chain - Build and deploy
 
 on: 
 
