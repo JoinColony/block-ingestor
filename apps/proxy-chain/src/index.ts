@@ -1,6 +1,7 @@
 import 'cross-fetch/polyfill';
 import { utils } from 'ethers';
 
+import '~utils/cleanup';
 import '~amplifyClient';
 import '~eventManager';
 import blockManager from '~blockManager';
@@ -8,7 +9,6 @@ import rpcProvider from '~provider';
 import { startStatsServer } from '~stats';
 import { setupListenersForColonies } from '~eventListeners';
 import { addChainToDB } from '~utils/addChainToDB';
-import '~utils/cleanup';
 
 utils.Logger.setLogLevel(utils.Logger.levels.ERROR);
 
