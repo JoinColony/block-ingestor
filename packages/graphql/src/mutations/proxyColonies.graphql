@@ -9,3 +9,9 @@ mutation UpdateProxyColony($input: UpdateProxyColonyInput!) {
     id
   }
 }
+
+mutation CreateSupportedChain($input: CreateSupportedChainInput!) {
+  createSupportedChain(input: $input) {
+    id
+  }
+}
