@@ -7,11 +7,14 @@ import blockManager from '~blockManager';
 import rpcProvider from '~provider';
 import { startStatsServer } from '~stats';
 import { setupListenersForColonies } from '~eventListeners';
+import { addChainToDB } from '~utils/addChainToDB';
 
 utils.Logger.setLogLevel(utils.Logger.levels.ERROR);
 
 const start = async (): Promise<void> => {
   await rpcProvider.initialiseProvider();
+
+  await addChainToDB();
   /**
    * Start express server providing stats and fetch existing stats from the DB
    */

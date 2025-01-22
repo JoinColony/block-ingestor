@@ -6,3 +6,9 @@ query GetProxyColony($id: ID!) {
     isActive
   }
 }
+
+query GetSupportedChain($id: ID!) {
+  getSupportedChain(id: $id) {
+    id
+  }
+}
