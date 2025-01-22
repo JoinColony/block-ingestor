@@ -11290,6 +11290,15 @@ export type CreateSupportedChainMutation = {
   createSupportedChain?: { __typename?: 'SupportedChain'; id: string } | null;
 };
 
+export type UpdateSupportedChainMutationVariables = Exact<{
+  input: UpdateSupportedChainInput;
+}>;
+
+export type UpdateSupportedChainMutation = {
+  __typename?: 'Mutation';
+  updateSupportedChain?: { __typename?: 'SupportedChain'; id: string } | null;
+};
+
 export type UpdateReputationMiningCycleMetadataMutationVariables = Exact<{
   input: UpdateReputationMiningCycleMetadataInput;
 }>;
@@ -13434,6 +13443,13 @@ export const UpdateProxyColonyDocument = gql`
 export const CreateSupportedChainDocument = gql`
   mutation CreateSupportedChain($input: CreateSupportedChainInput!) {
     createSupportedChain(input: $input) {
+      id
+    }
+  }
+`;
+export const UpdateSupportedChainDocument = gql`
+  mutation UpdateSupportedChain($input: UpdateSupportedChainInput!) {
+    updateSupportedChain(input: $input) {
       id
     }
   }

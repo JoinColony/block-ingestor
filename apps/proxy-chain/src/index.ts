@@ -8,6 +8,7 @@ import rpcProvider from '~provider';
 import { startStatsServer } from '~stats';
 import { setupListenersForColonies } from '~eventListeners';
 import { addChainToDB } from '~utils/addChainToDB';
+import '~utils/cleanup';
 
 utils.Logger.setLogLevel(utils.Logger.levels.ERROR);
 
