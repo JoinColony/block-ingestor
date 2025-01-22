@@ -1,3 +1,6 @@
+# Declare the build argument at the top
+ARG BUILD_TARGET=main-chain
+
 FROM node:20-slim AS base
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
@@ -26,5 +29,12 @@ WORKDIR /workspace/apps/proxy-chain
 CMD ["pnpm", "--filter", "@joincolony/proxy-chain", "prod"]
 
 # Final stage that will be used
-FROM ${BUILD_TARGET:-main-chain} AS final
+FROM ${BUILD_TARGET} AS final
+
+# Add labels and echo build info
+LABEL build_type=${BUILD_TARGET}
+RUN echo "🏗️ Building ${BUILD_TARGET} version of block-ingestor" && \
+    echo "📦 Final build target: ${BUILD_TARGET}"
+
+# Keep existing CMD from the selected stage
 
