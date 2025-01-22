@@ -13300,9 +13300,9 @@ export const CreateProxyColonyDocument = gql`
     }
   }
 `;
-export const CreateProxyColonyDocument = gql`
-  mutation CreateProxyColony($input: CreateProxyColonyInput!) {
-    createProxyColony(input: $input) {
+export const UpdateProxyColonyDocument = gql`
+  mutation UpdateProxyColony($input: UpdateProxyColonyInput!) {
+    updateProxyColony(input: $input) {
       id
     }
   }
