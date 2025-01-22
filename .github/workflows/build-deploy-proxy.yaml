@@ -1,4 +1,4 @@
-name: Build and deploy cdapp block-ingestor proxy chain docker image
+name: Block ingestor proxy chain - Build and deploy
 
 on:
   workflow_dispatch: # Allows manual workflow trigger
@@ -82,7 +82,7 @@ jobs:
       NAMESPACE: cdapp
       CLUSTER_NAME: qa-cluster
       ENVIRONMENT_TAG: qa
-      REPOSITORY_NAME: cdapp/block-ingestor
+      REPOSITORY_NAME: cdapp/block-ingestor-proxy-chain
 
     steps:
       - name: Configure AWS credentials for ECR
@@ -152,7 +152,7 @@ jobs:
       NAMESPACE: cdapp
       CLUSTER_NAME: prod-cluster
       ENVIRONMENT_TAG: prod
-      REPOSITORY_NAME: cdapp/block-ingestor
+      REPOSITORY_NAME: cdapp/block-ingestor-proxy-chain
 
     steps:
       - name: Configure AWS credentials for ECR
