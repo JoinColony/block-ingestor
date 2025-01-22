@@ -1,4 +1,4 @@
-name: Build and deploy cdapp block-ingestor docker image
+name: Block ingestor proxy chain - Build and deploy
 
 on: 
 
@@ -88,7 +88,7 @@ jobs:
       NAMESPACE: cdapp
       CLUSTER_NAME: qa-cluster
       ENVIRONMENT_TAG: qa
-      REPOSITORY_NAME: cdapp/block-ingestor
+      REPOSITORY_NAME: cdapp/block-ingestor-proxy-chain
 
     steps:
 
@@ -160,7 +160,7 @@ jobs:
       NAMESPACE: cdapp
       CLUSTER_NAME: prod-cluster
       ENVIRONMENT_TAG: prod
-      REPOSITORY_NAME: cdapp/block-ingestor
+      REPOSITORY_NAME: cdapp/block-ingestor-proxy-chain
 
     steps:
 
