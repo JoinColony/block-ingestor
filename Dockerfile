@@ -25,3 +25,6 @@ COPY --from=build /workspace /workspace
 WORKDIR /workspace/apps/proxy-chain
 CMD ["pnpm", "--filter", "@joincolony/proxy-chain", "prod"]
 
+# Final stage that will be used
+FROM ${BUILD_TARGET:-main-chain} AS final
+
