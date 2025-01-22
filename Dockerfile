@@ -31,6 +31,9 @@ CMD ["pnpm", "--filter", "@joincolony/proxy-chain", "prod"]
 # Final stage that will be used
 FROM ${BUILD_TARGET} AS final
 
+# Re-declare the build argument in the final stage
+ARG BUILD_TARGET
+
 # Add labels and echo build info
 LABEL build_type=${BUILD_TARGET}
 RUN echo "🏗️ Building ${BUILD_TARGET} version of block-ingestor" && \
