@@ -457,17 +457,20 @@ export const sendExtensionVersionAddedNotifications = async ({
   );
 };
 
-// Queue the notifications so that we stay under the rate limit of
-// 60 API calls per minute for Magicbell.
+// Queue the notifications so that we stay under the rate limits of
+// 60 API calls per minute / 150 API calls per 10 seconds for Magicbell.
+// Here we only allow 30 per minute, since the front end might also make some calls
+// so we need to leave a buffer.
 const notificationsQueue = new PQueue({
-  interval: 60_000, // One minute in milliseconds
-  intervalCap: 60, // Maximum 60 requests per minute
+  interval: 60_000,
+  intervalCap: 30,
 });
 
 export const sendNotification = async (
   title: string,
   recipients: Recipient[],
   customAttributes: NotificationVariables,
+  retryNumber = 0,
 ): Promise<void> => {
   // Notifications are turned off by default in development to save space in magicbell and avoid unnecessary notifications.
   // If you need notifications on in your local, restart your dev env and run `npm run dev --notifications` instead of just `npm run dev`.
@@ -482,24 +485,47 @@ export const sendNotification = async (
     );
     return;
   }
-  notificationsQueue.add(async () => {
-    try {
-      await Notification.create({
-        title,
-        recipients,
-        custom_attributes: {
-          ...customAttributes,
-        },
-        ...(process.env.NODE_ENV === 'development'
-          ? {
-              topic: process.env.MAGICBELL_DEV_KEY,
-            }
-          : {}),
-      });
-    } catch (err) {
-      console.log(`Unable to create notification "${title}": `, err);
-    }
-  });
+  notificationsQueue.add(
+    async () => {
+      try {
+        await Notification.create({
+          title,
+          recipients,
+          custom_attributes: {
+            ...customAttributes,
+          },
+          ...(process.env.NODE_ENV === 'development'
+            ? {
+                topic: process.env.MAGICBELL_DEV_KEY,
+              }
+            : {}),
+        });
+      } catch (err: any) {
+        // If this was a 'too many requests' error, then just add it back to the queue.
+        // We will retry this 3 times before giving up, to avoid the notifications queue potentially being never ending.
+        if (err.response?.status === 429 && retryNumber < 3) {
+          console.log(
+            `Notifications rate limit exceeded, adding notification back to queue for retry number ${retryNumber}`,
+          );
+          sendNotification(
+            title,
+            recipients,
+            customAttributes,
+            retryNumber + 1,
+          );
+        } else {
+          console.log(
+            `Unable to create notification "${title}": `,
+            err.response,
+          );
+        }
+      }
+    },
+    {
+      // Attempts to retry a notification will be fired first, in order of the number of retries decreasing.
+      priority: retryNumber,
+    },
+  );
 };
 
 export const getNotificationCategory = (
