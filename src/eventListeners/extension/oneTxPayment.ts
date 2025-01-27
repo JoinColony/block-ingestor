@@ -3,7 +3,6 @@ import { output } from '~utils';
 import { ContractEventsSignatures } from '~types';
 
 import { addExtensionEventListener, fetchExistingExtensions } from '.';
-import { handleOneTxPaymentAction } from '~handlers';
 
 export const setupListenerForOneTxPayment = async (
   extensionAddress: string,
@@ -14,7 +13,6 @@ export const setupListenerForOneTxPayment = async (
     Extension.OneTxPayment,
     extensionAddress,
     colonyAddress,
-    handleOneTxPaymentAction,
   );
 };
 
