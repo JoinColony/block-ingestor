@@ -48,7 +48,9 @@ export const handleMultiSigGlobalThresholdSet: EventHandler = async (event) => {
     return;
   }
 
-  const transaction = await provider.getTransaction(transactionHash);
+  const transaction = await provider
+    .getProviderInstance()
+    .getTransaction(transactionHash);
 
   const updatedBy =
     getTransactionSignerAddress(transaction) ?? constants.AddressZero;
