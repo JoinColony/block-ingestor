@@ -4,8 +4,8 @@ import {
   handleProxyColonyDeployed,
   handleTransfer,
 } from '~handlers/proxyColonies';
-import { getAllColoniesOnCurrentChain } from '~utils/getAllColoniesOnCurrentChain';
 import { addTokenEventListener } from './token';
+import { getAllColoniesOnCurrentChain } from '~utils/getAllColoniesOnCurrentChain';
 
 export const setupListenersForColonies = async (): Promise<void> => {
   addProxyColoniesNetworkEventListener(

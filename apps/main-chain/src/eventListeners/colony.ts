@@ -49,7 +49,10 @@ import {
   handleTokenUnlockedAction,
   handleTransfer,
 } from '~handlers';
-import { handleProxyColonyRequested } from '~handlers/proxyColonies';
+import {
+  handleProxyColonyRequested,
+  handleProxyColonyFundsClaimed,
+} from '~handlers/proxyColonies';
 import setTokenAuthority from '~handlers/tokens/setTokenAuthority';
 import { addProxyColoniesEventListener } from './proxyColonies';
 import { output } from '@joincolony/utils';
@@ -175,6 +178,12 @@ export const setupListenersForColony = (
     ContractEventsSignatures.ProxyColonyRequested,
     colonyAddress,
     handleProxyColonyRequested,
+  );
+
+  addProxyColoniesEventListener(
+    ContractEventsSignatures.ProxyColonyFundsClaimed,
+    colonyAddress,
+    handleProxyColonyFundsClaimed,
   );
 
   /*

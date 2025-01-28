@@ -33,6 +33,24 @@ export default defineConfig({
           path: 'colony/Colony.sol/Colony.json',
           merge: 'functions',
         },
+        {
+          name: 'ColonyFunding',
+          path: 'colony/ColonyFunding.sol/ColonyFunding.json',
+        },
+        {
+          name: 'ColonyFunding',
+          path: 'colony/ColonyFunding.sol/ColonyFunding.json',
+          merge: 'events',
+        },
+        {
+          name: 'ColonyFunding',
+          path: 'colony/ColonyFunding.sol/ColonyFunding.json',
+          merge: 'functions',
+        },
+        {
+          name: 'ProxyColony',
+          path: 'bridging/ProxyColony.sol/ProxyColony.json',
+        },
       ],
     }),
   ],
