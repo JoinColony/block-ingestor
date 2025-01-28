@@ -20,6 +20,7 @@ import { output } from '@joincolony/utils';
 import { utils } from 'ethers';
 import blockManager from '~blockManager';
 import multiChainBridgeClient from '~multiChainBridgeClient';
+import { setupListenersForColony } from '~eventListeners';
 
 export const handleProxyColonyDeployed = async (
   event: ContractEvent,
@@ -155,4 +156,6 @@ export const handleProxyColonyDeployed = async (
       },
     },
   });
+
+  setupListenersForColony(proxyColonyAddress);
 };
