@@ -4,12 +4,21 @@ import {
   ProxyColoniesListener,
   ProxyColonyEvents,
 } from '@joincolony/blocks';
-import { output } from '@joincolony/utils';
+import {
+  getMultiChainInfoId,
+  output,
+  upsertMultiChainInfo,
+} from '@joincolony/utils';
 import { utils } from 'ethers';
 import blockManager from '~blockManager';
 import rpcProvider from '~provider';
 import { writeActionFromEvent } from '~utils/actions/writeAction';
-import { ColonyActionType } from '@joincolony/graphql';
+import {
+  ColonyActionType,
+  CreateMultiChainInfoInput,
+  UpdateMultiChainInfoInput,
+} from '@joincolony/graphql';
+import amplifyClient from '~amplifyClient';
 
 // @NOTE this one listens to the ProxyColonyRequested event on the colony, not the network!
 export const handleProxyColonyRequested: EventHandler = async (
@@ -21,7 +30,7 @@ export const handleProxyColonyRequested: EventHandler = async (
     output(`No colony address passed to handleProxyColonyRequested listener.`);
     return;
   }
-  const { blockNumber } = event;
+  const { blockNumber, transactionHash } = event;
 
   const { agent, destinationChainId } = event.args;
 
@@ -68,16 +77,42 @@ export const handleProxyColonyRequested: EventHandler = async (
     return;
   }
 
+  // we could technically use this one, but we should use the one of the created one, just so we have all the core logic in the upsertMultiChainInfo helper
+  const existingMultiChainInfoId = getMultiChainInfoId(
+    transactionHash,
+    destinationChainId.toNumber(),
+  );
+
+  const createMultiChainInfoInput: CreateMultiChainInfoInput = {
+    id: existingMultiChainInfoId,
+    completedOnMainChain: true,
+    completedOnProxyChain: false,
+    wormholeInfo: {
+      sequence: emitterSequence,
+      emitterAddress,
+    },
+  };
+
+  const updateMultiChainInfoInput: UpdateMultiChainInfoInput = {
+    id: existingMultiChainInfoId,
+    completedOnMainChain: true,
+    wormholeInfo: {
+      sequence: emitterSequence,
+      emitterAddress,
+    },
+  };
+
+  const multiChainInfoId = await upsertMultiChainInfo(
+    amplifyClient,
+    existingMultiChainInfoId,
+    createMultiChainInfoInput,
+    updateMultiChainInfoInput,
+  );
+
   await writeActionFromEvent(event, colonyAddress, {
     type: ColonyActionType.AddProxyColony,
     initiatorAddress: agent,
     targetChainId: destinationChainId.toNumber(),
-    multiChainInfo: {
-      completed: false,
-      wormholeInfo: {
-        sequence: emitterSequence,
-        emitterAddress,
-      },
-    },
+    multiChainInfoId,
   });
 };

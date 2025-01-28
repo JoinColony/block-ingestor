@@ -168,7 +168,14 @@ importers:
 
   packages/graphql: {}
 
-  packages/utils: {}
+  packages/utils:
+    dependencies:
+      '@joincolony/clients':
+        specifier: workspace:*
+        version: link:../clients
+      '@joincolony/graphql':
+        specifier: workspace:*
+        version: link:../graphql
 
 packages:
 

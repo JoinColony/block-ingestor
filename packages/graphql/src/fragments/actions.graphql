@@ -1,5 +1,7 @@
 fragment MultiChainInfo on MultiChainInfo {
-  completed
+  id
+  completedOnMainChain
+  completedOnProxyChain
   wormholeInfo {
     emitterChainId
     emitterAddress
@@ -27,6 +29,7 @@ fragment ActionMetadataInfo on ColonyAction {
     recipientAddress
   }
   members
+  multiChainInfoId
   multiChainInfo {
     ...MultiChainInfo
   }

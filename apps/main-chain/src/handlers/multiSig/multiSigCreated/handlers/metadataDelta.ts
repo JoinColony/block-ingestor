@@ -67,9 +67,6 @@ export const handleMetadataDeltaMultiSig = async (
         type: isDisableProxyColonyOperation(operation)
           ? ColonyActionType.RemoveProxyColonyMultisig
           : ColonyActionType.AddProxyColonyMultisig,
-        multiChainInfo: {
-          completed: false,
-        },
         targetChainId: Number(targetChainId),
       });
     }
