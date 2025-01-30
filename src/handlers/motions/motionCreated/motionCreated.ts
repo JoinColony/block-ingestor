@@ -236,6 +236,15 @@ export const handleMotionCreated: EventHandler = async (
         break;
       }
 
+      case StreamingPaymentsOperations.CreateStreamingPayment: {
+        await handleCancelStreamingPaymentsMotion(
+          colonyAddress,
+          event,
+          parsedAction,
+        );
+        break;
+      }
+
       default: {
         break;
       }
