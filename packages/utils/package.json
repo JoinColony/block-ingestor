@@ -2,5 +2,8 @@
   "name": "@joincolony/utils",
   "main": "src/index.ts",
   "version": "1.0.0",
-  "dependencies": {}
+  "dependencies": {
+    "@joincolony/clients": "workspace:*",
+    "@joincolony/graphql": "workspace:*"
+  }
 }

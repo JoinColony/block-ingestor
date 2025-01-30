@@ -59,9 +59,6 @@ export const handleEnableProxyColony = async (
     type: ColonyActionType.AddProxyColony,
     initiatorAddress,
     targetChainId: Number(foreignChainId),
-    multiChainInfo: {
-      completed: true,
-    },
     fromDomainId: getDomainDatabaseId(colonyAddress, Id.RootDomain),
   });
 };

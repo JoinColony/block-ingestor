@@ -68,9 +68,6 @@ export const handleMetadataDeltaMotion = async (
         type: isDisableProxyColonyOperation(operation)
           ? ColonyActionType.RemoveProxyColonyMotion
           : ColonyActionType.AddProxyColonyMotion,
-        multiChainInfo: {
-          completed: false,
-        },
         targetChainId: Number(targetChainId),
       });
     }

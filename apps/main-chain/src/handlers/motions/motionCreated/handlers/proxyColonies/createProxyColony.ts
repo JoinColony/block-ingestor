@@ -16,8 +16,5 @@ export const handleCreateProxyColonyMotion = async (
   await createMotionInDB(colonyAddress, event, {
     type: motionNameMapping[parsedAction.name],
     targetChainId: destinationChainId.toNumber(),
-    multiChainInfo: {
-      completed: false,
-    },
   });
 };

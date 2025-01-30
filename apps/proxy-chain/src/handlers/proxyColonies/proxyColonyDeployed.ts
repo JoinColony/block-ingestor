@@ -1,13 +1,9 @@
 import {
+  CreateMultiChainInfoInput,
   CreateProxyColonyDocument,
   CreateProxyColonyMutation,
   CreateProxyColonyMutationVariables,
-  GetActionInfoDocument,
-  GetActionInfoQuery,
-  GetActionInfoQueryVariables,
-  UpdateColonyActionDocument,
-  UpdateColonyActionMutation,
-  UpdateColonyActionMutationVariables,
+  UpdateMultiChainInfoInput,
 } from '@joincolony/graphql';
 import {
   ContractEvent,
@@ -16,7 +12,11 @@ import {
 } from '@joincolony/blocks';
 import amplifyClient from '~amplifyClient';
 import rpcProvider from '~provider';
-import { output } from '@joincolony/utils';
+import {
+  getMultiChainInfoId,
+  output,
+  upsertMultiChainInfo,
+} from '@joincolony/utils';
 import { utils } from 'ethers';
 import blockManager from '~blockManager';
 import multiChainBridgeClient from '~multiChainBridgeClient';
@@ -120,39 +120,37 @@ export const handleProxyColonyDeployed = async (
     },
   });
 
-  const actionResponse = await amplifyClient.query<
-    GetActionInfoQuery,
-    GetActionInfoQueryVariables
-  >(GetActionInfoDocument, { transactionHash: sourceChainTxHash });
-  const actionData = actionResponse?.data?.getColonyAction;
+  // we could technically use this one, but we should use the one of the created one, just so we have all the core logic in the upsertMultiChainInfo helper
+  const existingMultiChainInfoId = getMultiChainInfoId(
+    sourceChainTxHash,
+    Number(chainId),
+  );
 
-  if (!actionData) {
-    output(
-      `The txHash: ${sourceChainTxHash} is not an action on the main chain.`,
-    );
-    return;
-  }
-
-  if (!actionData.multiChainInfo) {
-    output(`The action: ${sourceChainTxHash} doesn't have multi chain data.`);
-    return;
-  }
-
-  await amplifyClient.mutate<
-    UpdateColonyActionMutation,
-    UpdateColonyActionMutationVariables
-  >(UpdateColonyActionDocument, {
-    input: {
-      id: sourceChainTxHash,
-      multiChainInfo: {
-        ...actionData.multiChainInfo,
-        completed: isDeploymentCompleted,
-        wormholeInfo: {
-          emitterAddress: emitterAddress.toString(),
-          emitterChainId,
-          sequence: sequence.toString(),
-        },
-      },
+  const createMultiChainInfoInput: CreateMultiChainInfoInput = {
+    id: existingMultiChainInfoId,
+    completedOnMainChain: false,
+    completedOnProxyChain: isDeploymentCompleted,
+    wormholeInfo: {
+      emitterAddress: emitterAddress.toString(),
+      emitterChainId,
+      sequence: sequence.toString(),
     },
-  });
+  };
+
+  const updateMultiChainInfoInput: UpdateMultiChainInfoInput = {
+    id: existingMultiChainInfoId,
+    completedOnProxyChain: isDeploymentCompleted,
+    wormholeInfo: {
+      emitterAddress: emitterAddress.toString(),
+      emitterChainId,
+      sequence: sequence.toString(),
+    },
+  };
+
+  await upsertMultiChainInfo(
+    amplifyClient,
+    existingMultiChainInfoId,
+    createMultiChainInfoInput,
+    updateMultiChainInfoInput,
+  );
 };

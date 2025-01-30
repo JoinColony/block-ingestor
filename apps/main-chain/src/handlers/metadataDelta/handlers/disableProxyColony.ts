@@ -59,9 +59,6 @@ export const handleDisableProxyColony = async (
     type: ColonyActionType.RemoveProxyColony,
     initiatorAddress,
     targetChainId: Number(foreignChainId),
-    multiChainInfo: {
-      completed: true,
-    },
     fromDomainId: getDomainDatabaseId(colonyAddress, Id.RootDomain),
   });
 };
