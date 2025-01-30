@@ -100,6 +100,13 @@ const showActionInActionsList = async (
     }
   }
 
+  // By default, don't show create expenditure actions in the action list.
+  // Once the saga completes successfully in the CDapp, it will change the showInActionList to true.
+  // This stops half formed expenditures from showing.
+  if (type === ColonyActionType.CreateExpenditure) {
+    return false;
+  }
+
   const extensionAddresses = colonyExtensions.map((extension) => extension.id);
 
   const isAddressInitiatorOrRecipient = (address: string): boolean =>
