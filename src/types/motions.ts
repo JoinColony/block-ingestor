@@ -27,6 +27,7 @@ export enum ColonyOperations {
 }
 
 export enum StreamingPaymentsOperations {
+  CreateStreamingPayment = 'create',
   CancelStreamingPayment = 'cancel',
 }
 
@@ -75,6 +76,8 @@ export const motionNameMapping: { [key: string]: ColonyActionType } = {
     ColonyActionType.ReleaseStagedPaymentsMotion,
   [StreamingPaymentsOperations.CancelStreamingPayment]:
     ColonyActionType.CancelStreamingPaymentMotion,
+  [StreamingPaymentsOperations.CreateStreamingPayment]:
+    ColonyActionType.CreateStreamingPaymentMotion,
 };
 
 export enum MotionSide {
