@@ -13,4 +13,4 @@ export { handleMulticallMotion } from './multicall';
 export { handleMakeArbitraryTransactionsMotion } from './makeArbitraryTransactions';
 export { handleMetadataDeltaMotion } from './metadataDelta';
 export * from './expenditures';
-export * from './streamingPayments.ts';
+export * from './streamingPayments';
