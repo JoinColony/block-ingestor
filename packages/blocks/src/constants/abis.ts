@@ -160,6 +160,12 @@ export const colonyAbi = [
         indexed: false,
       },
       {
+        name: 'chainId',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+      {
         name: 'token',
         internalType: 'address',
         type: 'address',
@@ -588,6 +594,12 @@ export const colonyAbi = [
       },
       { name: 'slot', internalType: 'uint256', type: 'uint256', indexed: true },
       {
+        name: 'chainId',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+      {
         name: 'token',
         internalType: 'address',
         type: 'address',
@@ -983,6 +995,12 @@ export const colonyAbi = [
       { name: 'id', internalType: 'uint256', type: 'uint256', indexed: false },
       {
         name: 'slot',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+      {
+        name: 'chainId',
         internalType: 'uint256',
         type: 'uint256',
         indexed: false,
@@ -5161,6 +5179,12 @@ export const colonyFundingAbi = [
         indexed: false,
       },
       {
+        name: 'chainId',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+      {
         name: 'token',
         internalType: 'address',
         type: 'address',
@@ -5589,6 +5613,12 @@ export const colonyFundingAbi = [
       },
       { name: 'slot', internalType: 'uint256', type: 'uint256', indexed: true },
       {
+        name: 'chainId',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+      {
         name: 'token',
         internalType: 'address',
         type: 'address',
@@ -5964,6 +5994,12 @@ export const colonyFundingAbi = [
       { name: 'id', internalType: 'uint256', type: 'uint256', indexed: false },
       {
         name: 'slot',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+      {
+        name: 'chainId',
         internalType: 'uint256',
         type: 'uint256',
         indexed: false,

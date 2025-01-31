@@ -90,7 +90,7 @@ export const createEditExpenditureAction = async (
     topics: [
       [
         utils.id(ContractEventsSignatures.ExpenditureStateChanged),
-        utils.id(ContractEventsSignatures.ExpenditurePayoutSet),
+        utils.id(ContractEventsSignatures.ExpenditurePayoutSetOld),
       ],
     ],
   });
@@ -163,7 +163,7 @@ export const createEditExpenditureAction = async (
         updatedStatus = decodedStatus;
       }
     } else if (
-      actionEvent.signature === ContractEventsSignatures.ExpenditurePayoutSet
+      actionEvent.signature === ContractEventsSignatures.ExpenditurePayoutSetOld
     ) {
       const {
         slot,
