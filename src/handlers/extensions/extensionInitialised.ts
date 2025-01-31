@@ -7,10 +7,11 @@ import {
   setupMotionsListeners,
 } from '~eventListeners';
 import { sendExtensionUpdateNotifications } from '~utils/notifications';
-import networkClient from '~networkClient';
 import { constants } from 'ethers';
 import { updateExtension } from '~utils/extensions/updateExtension';
 import { NotificationType } from '~graphql';
+import provider from '~provider';
+import { getTransactionSignerAddress } from '~utils/transactions';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { contractAddress: extensionAddress, transactionHash } = event;
@@ -28,13 +29,14 @@ export default async (event: ContractEvent): Promise<void> => {
     return;
   }
 
-  const receipt = await networkClient.provider.getTransactionReceipt(
-    transactionHash,
-  );
+  const transaction = await provider.getTransaction(transactionHash);
+
+  const installedBy =
+    getTransactionSignerAddress(transaction) ?? constants.AddressZero;
 
   sendExtensionUpdateNotifications({
     colonyAddress,
-    creator: receipt.from || constants.AddressZero,
+    creator: installedBy,
     notificationType: NotificationType.ExtensionEnabled,
     extensionHash,
   });

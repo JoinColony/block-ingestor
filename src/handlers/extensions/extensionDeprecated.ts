@@ -6,11 +6,12 @@ import {
   GetColonyExtensionByHashAndColonyQueryVariables,
   NotificationType,
 } from '~graphql';
-import networkClient from '~networkClient';
+import provider from '~provider';
 import { ContractEvent } from '~types';
 import { verbose } from '~utils';
 import { updateExtension } from '~utils/extensions/updateExtension';
 import { sendExtensionUpdateNotifications } from '~utils/notifications';
+import { getTransactionSignerAddress } from '~utils/transactions';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { transactionHash } = event;
@@ -24,13 +25,14 @@ export default async (event: ContractEvent): Promise<void> => {
     colony,
   );
 
-  const receipt = await networkClient.provider.getTransactionReceipt(
-    transactionHash,
-  );
+  const transaction = await provider.getTransaction(transactionHash);
+
+  const installedBy =
+    getTransactionSignerAddress(transaction) ?? constants.AddressZero;
 
   sendExtensionUpdateNotifications({
     colonyAddress: colony,
-    creator: receipt.from || constants.AddressZero,
+    creator: installedBy,
     notificationType: deprecated
       ? NotificationType.ExtensionDeprecated
       : NotificationType.ExtensionEnabled,

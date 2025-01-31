@@ -3,10 +3,11 @@ import { constants } from 'ethers';
 import { removeExtensionEventListeners } from '~eventListeners';
 import { handleMultiSigUninstalled } from '~eventListeners/extension/multiSig';
 import { NotificationType } from '~graphql';
-import networkClient from '~networkClient';
+import provider from '~provider';
 import { ContractEvent } from '~types';
 import { deleteExtensionFromEvent } from '~utils';
 import { sendExtensionUpdateNotifications } from '~utils/notifications';
+import { getTransactionSignerAddress } from '~utils/transactions';
 
 export default async (event: ContractEvent): Promise<void> => {
   const { contractAddress: extensionAddress, transactionHash } = event;
@@ -15,13 +16,14 @@ export default async (event: ContractEvent): Promise<void> => {
   await deleteExtensionFromEvent(event);
   removeExtensionEventListeners(extensionAddress);
 
-  const receipt = await networkClient.provider.getTransactionReceipt(
-    transactionHash,
-  );
+  const transaction = await provider.getTransaction(transactionHash);
+
+  const installedBy =
+    getTransactionSignerAddress(transaction) ?? constants.AddressZero;
 
   sendExtensionUpdateNotifications({
     colonyAddress,
-    creator: receipt.from || constants.AddressZero,
+    creator: installedBy,
     notificationType: NotificationType.ExtensionUninstalled,
     extensionHash,
   });

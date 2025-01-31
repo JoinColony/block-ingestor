@@ -1,6 +1,5 @@
 import { constants } from 'ethers';
 
-import networkClient from '~networkClient';
 import { mutate, query } from '~amplifyClient';
 import { ContractEvent } from '~types';
 import { verbose, toNumber } from '~utils';
@@ -24,6 +23,8 @@ import {
 } from '~utils/notifications';
 import { updateExtension } from './updateExtension';
 import { Extension, getExtensionHash } from '@colony/colony-js';
+import { getTransactionSignerAddress } from '~utils/transactions';
+import provider from '~provider';
 
 const EXTENSION_SUPPORTING_NOTIFICATIONS = [
   Extension.OneTxPayment,
@@ -85,10 +86,10 @@ export const writeExtensionFromEvent = async (
   const { extensionId: extensionHash, colony, version } = event.args;
   const convertedVersion = toNumber(version);
 
-  const receipt = await networkClient.provider.getTransactionReceipt(
-    transactionHash,
-  );
-  const installedBy = receipt.from || constants.AddressZero;
+  const transaction = await provider.getTransaction(transactionHash);
+
+  const installedBy =
+    getTransactionSignerAddress(transaction) ?? constants.AddressZero;
 
   verbose(
     'Extension:',
