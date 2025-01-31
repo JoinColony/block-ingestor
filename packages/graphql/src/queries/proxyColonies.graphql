@@ -7,6 +7,17 @@ query GetProxyColony($id: ID!) {
   }
 }
 
+query GetProxyColonies($chainId: String!) {
+  listProxyColonies(filter: { chainId: { eq: $chainId } }) {
+    items {
+      chainId
+      colonyAddress
+      id
+      isActive
+    }
+  }
+}
+
 query GetSupportedChain($id: ID!) {
   getSupportedChain(id: $id) {
     id

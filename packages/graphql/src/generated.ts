@@ -309,7 +309,7 @@ export type Colony = {
    * Native chain token claim (e.g., Token 0x0000...0000: ETH, xDAI, etc.)
    * This is not an array since only a single token type can be returned
    */
-  chainFundsClaim?: Maybe<ColonyChainFundsClaim>;
+  chainFundsClaim?: Maybe<Array<Maybe<ColonyChainFundsClaim>>>;
   /** Metadata related to the chain of the Colony */
   chainMetadata: ChainMetadata;
   /** Colony creation data */
@@ -345,6 +345,7 @@ export type Colony = {
   nativeTokenId: Scalars['ID'];
   /** A flag to indicate whether the colony is private */
   private?: Maybe<Scalars['Boolean']>;
+  proxyColonies?: Maybe<ModelProxyColonyConnection>;
   /** The total reputation amount in the colony */
   reputation?: Maybe<Scalars['String']>;
   roles?: Maybe<ModelColonyRoleConnection>;
@@ -397,6 +398,14 @@ export type ColonyExtensionsArgs = {
 export type ColonyFundsClaimDataArgs = {
   createdAt?: InputMaybe<ModelStringKeyConditionInput>;
   filter?: InputMaybe<ModelColonyFundsClaimFilterInput>;
+  limit?: InputMaybe<Scalars['Int']>;
+  nextToken?: InputMaybe<Scalars['String']>;
+  sortDirection?: InputMaybe<ModelSortDirection>;
+};
+
+/** Represents a Colony within the Colony Network */
+export type ColonyProxyColoniesArgs = {
+  filter?: InputMaybe<ModelProxyColonyFilterInput>;
   limit?: InputMaybe<Scalars['Int']>;
   nextToken?: InputMaybe<Scalars['String']>;
   sortDirection?: InputMaybe<ModelSortDirection>;
@@ -628,8 +637,6 @@ export enum ColonyActionType {
   AddVerifiedMembers = 'ADD_VERIFIED_MEMBERS',
   AddVerifiedMembersMotion = 'ADD_VERIFIED_MEMBERS_MOTION',
   AddVerifiedMembersMultisig = 'ADD_VERIFIED_MEMBERS_MULTISIG',
-  /** An action related to arbitrary transaction */
-  ArbitraryTx = 'ARBITRARY_TX',
   /** An action related to canceling an expenditure */
   CancelExpenditure = 'CANCEL_EXPENDITURE',
   /** An action related to a motion to cancel an expenditure */
@@ -1616,7 +1623,7 @@ export type CreateColonyHistoricRoleInput = {
 
 export type CreateColonyInput = {
   balances?: InputMaybe<ColonyBalancesInput>;
-  chainFundsClaim?: InputMaybe<ColonyChainFundsClaimInput>;
+  chainFundsClaim?: InputMaybe<Array<InputMaybe<ColonyChainFundsClaimInput>>>;
   chainMetadata: ChainMetadataInput;
   colonyCreateEvent?: InputMaybe<ColonyCreateEventInput>;
   colonyMemberInviteCode?: InputMaybe<Scalars['ID']>;
@@ -9784,7 +9791,7 @@ export type UpdateColonyHistoricRoleInput = {
 
 export type UpdateColonyInput = {
   balances?: InputMaybe<ColonyBalancesInput>;
-  chainFundsClaim?: InputMaybe<ColonyChainFundsClaimInput>;
+  chainFundsClaim?: InputMaybe<Array<InputMaybe<ColonyChainFundsClaimInput>>>;
   chainMetadata?: InputMaybe<ChainMetadataInput>;
   colonyCreateEvent?: InputMaybe<ColonyCreateEventInput>;
   colonyMemberInviteCode?: InputMaybe<Scalars['ID']>;
@@ -12789,6 +12796,24 @@ export type GetProxyColonyQuery = {
   } | null;
 };
 
+export type GetProxyColoniesQueryVariables = Exact<{
+  chainId: Scalars['String'];
+}>;
+
+export type GetProxyColoniesQuery = {
+  __typename?: 'Query';
+  listProxyColonies?: {
+    __typename?: 'ModelProxyColonyConnection';
+    items: Array<{
+      __typename?: 'ProxyColony';
+      chainId: string;
+      colonyAddress: string;
+      id: string;
+      isActive: boolean;
+    } | null>;
+  } | null;
+};
+
 export type GetSupportedChainQueryVariables = Exact<{
   id: Scalars['ID'];
 }>;
@@ -14277,6 +14302,18 @@ export const GetProxyColonyDocument = gql`
       colonyAddress
       id
       isActive
+    }
+  }
+`;
+export const GetProxyColoniesDocument = gql`
+  query GetProxyColonies($chainId: String!) {
+    listProxyColonies(filter: { chainId: { eq: $chainId } }) {
+      items {
+        chainId
+        colonyAddress
+        id
+        isActive
+      }
     }
   }
 `;
