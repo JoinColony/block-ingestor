@@ -1,9 +1,10 @@
 import { constants } from 'ethers';
 import { NotificationType } from '~graphql';
-import networkClient from '~networkClient';
+import provider from '~provider';
 import { EventHandler } from '~types';
 import { updateExtension } from '~utils/extensions/updateExtension';
 import { sendExtensionUpdateNotifications } from '~utils/notifications';
+import { getTransactionSignerAddress } from '~utils/transactions';
 
 export const handleStakeFractionSet: EventHandler = async (
   event,
@@ -26,13 +27,14 @@ export const handleStakeFractionSet: EventHandler = async (
     return;
   }
 
-  const receipt = await networkClient.provider.getTransactionReceipt(
-    transactionHash,
-  );
+  const transaction = await provider.getTransaction(transactionHash);
+
+  const installedBy =
+    getTransactionSignerAddress(transaction) ?? constants.AddressZero;
 
   sendExtensionUpdateNotifications({
     colonyAddress,
-    creator: receipt.from || constants.AddressZero,
+    creator: installedBy,
     notificationType: NotificationType.ExtensionSettingsChanged,
     extensionHash,
   });

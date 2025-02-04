@@ -6,10 +6,11 @@ import {
   GetColonyExtensionByAddressQueryVariables,
   NotificationType,
 } from '~graphql';
-import networkClient from '~networkClient';
+import provider from '~provider';
 import { EventHandler } from '~types';
 import { updateExtension } from '~utils/extensions/updateExtension';
 import { sendExtensionUpdateNotifications } from '~utils/notifications';
+import { getTransactionSignerAddress } from '~utils/transactions';
 
 export const handleMultiSigGlobalThresholdSet: EventHandler = async (event) => {
   const { contractAddress: multiSigAddress, transactionHash } = event;
@@ -47,13 +48,14 @@ export const handleMultiSigGlobalThresholdSet: EventHandler = async (event) => {
     return;
   }
 
-  const receipt = await networkClient.provider.getTransactionReceipt(
-    transactionHash,
-  );
+  const transaction = await provider.getTransaction(transactionHash);
+
+  const updatedBy =
+    getTransactionSignerAddress(transaction) ?? constants.AddressZero;
 
   sendExtensionUpdateNotifications({
     colonyAddress,
-    creator: receipt.from || constants.AddressZero,
+    creator: updatedBy,
     notificationType: NotificationType.ExtensionSettingsChanged,
     extensionHash,
   });
