@@ -31,12 +31,12 @@ export default async (event: ContractEvent): Promise<void> => {
 
   const transaction = await provider.getTransaction(transactionHash);
 
-  const installedBy =
+  const initialisedBy =
     getTransactionSignerAddress(transaction) ?? constants.AddressZero;
 
   sendExtensionUpdateNotifications({
     colonyAddress,
-    creator: installedBy,
+    creator: initialisedBy,
     notificationType: NotificationType.ExtensionEnabled,
     extensionHash,
   });

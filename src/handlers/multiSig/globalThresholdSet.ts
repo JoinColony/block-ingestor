@@ -50,12 +50,12 @@ export const handleMultiSigGlobalThresholdSet: EventHandler = async (event) => {
 
   const transaction = await provider.getTransaction(transactionHash);
 
-  const installedBy =
+  const updatedBy =
     getTransactionSignerAddress(transaction) ?? constants.AddressZero;
 
   sendExtensionUpdateNotifications({
     colonyAddress,
-    creator: installedBy,
+    creator: updatedBy,
     notificationType: NotificationType.ExtensionSettingsChanged,
     extensionHash,
   });

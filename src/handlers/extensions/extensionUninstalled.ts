@@ -18,12 +18,12 @@ export default async (event: ContractEvent): Promise<void> => {
 
   const transaction = await provider.getTransaction(transactionHash);
 
-  const installedBy =
+  const uninstalledBy =
     getTransactionSignerAddress(transaction) ?? constants.AddressZero;
 
   sendExtensionUpdateNotifications({
     colonyAddress,
-    creator: installedBy,
+    creator: uninstalledBy,
     notificationType: NotificationType.ExtensionUninstalled,
     extensionHash,
   });

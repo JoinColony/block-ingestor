@@ -27,12 +27,12 @@ export default async (event: ContractEvent): Promise<void> => {
 
   const transaction = await provider.getTransaction(transactionHash);
 
-  const installedBy =
+  const deprecatedBy =
     getTransactionSignerAddress(transaction) ?? constants.AddressZero;
 
   sendExtensionUpdateNotifications({
     colonyAddress: colony,
-    creator: installedBy,
+    creator: deprecatedBy,
     notificationType: deprecated
       ? NotificationType.ExtensionDeprecated
       : NotificationType.ExtensionEnabled,
