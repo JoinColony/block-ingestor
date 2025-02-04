@@ -20,11 +20,12 @@ query GetExpenditureByNativeFundingPotIdAndColony(
 
 query GetStreamingPayment($id: ID!) {
   getStreamingPayment(id: $id) {
-    id
-    payouts {
-      amount
-      tokenAddress
-      isClaimed
-    }
+    ...StreamingPayment
+  }
+}
+
+query GetStreamingPaymentMetadata($id: ID!) {
+  getStreamingPaymentMetadata(id: $id) {
+    ...StreamingPaymentMetadata
   }
 }
