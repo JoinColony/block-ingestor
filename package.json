@@ -33,7 +33,7 @@
   "homepage": "https://github.com/JoinColony/tx-ingestor",
   "dependencies": {
     "@colony/abis": "^1.6.0",
-    "@colony/colony-js": "^8.0.0-next.1",
+    "@colony/colony-js": "^8.1.0",
     "@colony/events": "^4.0.0-next.1",
     "@magicbell/core": "^5.0.16",
     "@wagmi/cli": "^2.1.17",
