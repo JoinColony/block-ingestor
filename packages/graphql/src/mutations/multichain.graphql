@@ -1,0 +1,11 @@
+mutation CreateMultiChainInfo($input: CreateMultiChainInfoInput!) {
+  createMultiChainInfo(input: $input) {
+    ...MultiChainInfo
+  }
+}
+
+mutation UpdateMultiChainInfo($input: UpdateMultiChainInfoInput!) {
+  updateMultiChainInfo(input: $input) {
+    ...MultiChainInfo
+  }
+}

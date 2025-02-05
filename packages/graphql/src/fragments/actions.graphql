@@ -1,0 +1,37 @@
+fragment MultiChainInfo on MultiChainInfo {
+  id
+  completedOnMainChain
+  completedOnProxyChain
+  wormholeInfo {
+    emitterChainId
+    emitterAddress
+    sequence
+  }
+}
+
+fragment ActionMetadataInfo on ColonyAction {
+  id
+  pendingDomainMetadata {
+    ...DomainMetadata
+  }
+  pendingColonyMetadata {
+    ...ColonyMetadata
+  }
+  colonyDecisionId
+  amount
+  networkFee
+  type
+  showInActionsList
+  colonyId
+  initiatorAddress
+  recipientAddress
+  payments {
+    recipientAddress
+  }
+  members
+  multiChainInfoId
+  multiChainInfo {
+    ...MultiChainInfo
+  }
+  targetChainId
+}

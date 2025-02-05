@@ -1,0 +1,76 @@
+import { TransactionDescription } from 'ethers/lib/utils';
+import { BigNumber } from 'ethers';
+
+import { motionNameMapping } from '~types';
+import {
+  getCachedColonyClient,
+  getDomainDatabaseId,
+  getExpenditureByFundingPot,
+  isDomainFromFundingPotSupported,
+  toNumber,
+} from '~utils';
+
+import { createMotionInDB } from '../helpers';
+import { ContractEvent } from '@joincolony/blocks';
+
+export const handleMoveFundsMotion = async (
+  colonyAddress: string,
+  event: ContractEvent,
+  parsedAction: TransactionDescription,
+): Promise<void> => {
+  const { blockNumber } = event;
+
+  const { name, args: actionArgs } = parsedAction;
+
+  const colonyClient = await getCachedColonyClient(colonyAddress);
+
+  if (!colonyClient) {
+    return;
+  }
+
+  const colonyVersion = await colonyClient.version({ blockTag: blockNumber });
+
+  // There are two moveFundsBetweenPots actions, one pre colony version 7 and one post.
+  let fromPot: BigNumber,
+    toPot: BigNumber,
+    amount: BigNumber,
+    tokenAddress: string;
+
+  const isOldVersion = colonyVersion.lte(6);
+  if (isOldVersion) {
+    [, , , fromPot, toPot, amount, tokenAddress] = actionArgs;
+  } else {
+    [, , , , , fromPot, toPot, amount, tokenAddress] = actionArgs;
+  }
+
+  let fromDomainId: BigNumber | undefined;
+  let toDomainId: BigNumber | undefined;
+
+  if (isDomainFromFundingPotSupported(colonyClient)) {
+    fromDomainId = await colonyClient.getDomainFromFundingPot(fromPot, {
+      blockTag: blockNumber,
+    });
+    toDomainId = await colonyClient.getDomainFromFundingPot(toPot, {
+      blockTag: blockNumber,
+    });
+  }
+
+  // Check if the target pot belongs to an expenditure
+  const targetExpenditure = await getExpenditureByFundingPot(
+    colonyAddress,
+    toNumber(toPot),
+  );
+
+  await createMotionInDB(colonyAddress, event, {
+    type: motionNameMapping[name],
+    tokenAddress,
+    amount: amount.toString(),
+    fromDomainId: fromDomainId
+      ? getDomainDatabaseId(colonyAddress, toNumber(fromDomainId))
+      : undefined,
+    toDomainId: toDomainId
+      ? getDomainDatabaseId(colonyAddress, toNumber(toDomainId))
+      : undefined,
+    expenditureId: targetExpenditure?.id,
+  });
+};

@@ -1,0 +1,21 @@
+query GetColonyAction($transactionHash: ID!) {
+  getColonyAction(id: $transactionHash) {
+    id
+  }
+}
+
+query GetColonyArbitraryTransactionAction($transactionHash: ID!) {
+  getColonyAction(id: $transactionHash) {
+    id
+    arbitraryTransactions {
+      contractAddress
+      encodedFunction
+    }
+  }
+}
+
+query GetActionInfo($transactionHash: ID!) {
+  getColonyAction(id: $transactionHash) {
+    ...ActionMetadataInfo
+  }
+}

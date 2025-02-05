@@ -1,4 +1,4 @@
-name: Build and deploy cdapp block-ingestor docker image
+name: Block ingestor main chain - Build and deploy
 
 on: 
 
@@ -65,6 +65,8 @@ jobs:
           context: ${{ github.workspace }}
           file: ./Dockerfile
           push: true
+          build-args: |
+            BUILD_TARGET=main-chain
           tags: |
             ${{ env.ECR_REPOSITORY }}:run-${{ github.run_number }}
             ${{ env.ECR_REPOSITORY }}:${{ env.COMMIT_HASH }}

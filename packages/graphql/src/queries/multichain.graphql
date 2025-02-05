@@ -1,0 +1,5 @@
+query GetMultiChainInfo($id: ID!) {
+  getMultiChainInfo(id: $id) {
+    ...MultiChainInfo 
+  }
+}

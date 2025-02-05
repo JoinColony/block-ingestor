@@ -1,5 +1,0 @@
-query GetStats {
-  getIngestorStats(id: "STATS") {
-    value
-  }
-}

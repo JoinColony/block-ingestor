@@ -1,0 +1,83 @@
+import amplifyClient from '~amplifyClient';
+import {
+  GetColonyExtensionByAddressDocument,
+  GetColonyExtensionByAddressQuery,
+  GetColonyExtensionByAddressQueryVariables,
+  GetDomainsByExtensionAddressDocument,
+  GetDomainsByExtensionAddressQuery,
+  GetDomainsByExtensionAddressQueryVariables,
+} from '@joincolony/graphql';
+import { ContractEvent, EventHandler } from '@joincolony/blocks';
+import { getCachedColonyClient, toNumber } from '~utils';
+import { updateExtension } from '~utils/extensions/updateExtension';
+
+export const handleMultiSigDomainSkillThresholdSet: EventHandler = async (
+  event: ContractEvent,
+) => {
+  const { contractAddress: multiSigAddress } = event;
+  const { domainSkillId, threshold } = event.args;
+
+  const colonyExtensionsResponse = await amplifyClient.query<
+    GetColonyExtensionByAddressQuery,
+    GetColonyExtensionByAddressQueryVariables
+  >(GetColonyExtensionByAddressDocument, {
+    extensionAddress: multiSigAddress,
+  });
+
+  const { multiSig } =
+    colonyExtensionsResponse?.data?.getColonyExtension?.params ?? {};
+
+  if (multiSig) {
+    const domainsResponse = await amplifyClient.query<
+      GetDomainsByExtensionAddressQuery,
+      GetDomainsByExtensionAddressQueryVariables
+    >(GetDomainsByExtensionAddressDocument, {
+      extensionAddress: multiSigAddress,
+    });
+    const colonyDomains =
+      domainsResponse?.data?.listColonyExtensions?.items[0]?.colony.domains
+        ?.items ?? [];
+    const colonyAddress =
+      domainsResponse?.data?.listColonyExtensions?.items[0]?.colony.id ?? '';
+    const colonyClient = await getCachedColonyClient(colonyAddress);
+
+    if (!colonyClient) {
+      return;
+    }
+
+    const updatedDomainThresholds = [...(multiSig.domainThresholds ?? [])];
+
+    const matchingDomain = colonyDomains.find((domain) =>
+      domainSkillId.eq(domain?.nativeSkillId),
+    );
+
+    if (matchingDomain) {
+      const domainId = matchingDomain.nativeId.toString();
+      const domainThresholdIndex =
+        multiSig.domainThresholds?.findIndex(
+          (domainThreshold) => (domainThreshold?.domainId ?? '') === domainId,
+        ) ?? -1;
+
+      if (domainThresholdIndex > -1) {
+        updatedDomainThresholds[domainThresholdIndex] = {
+          domainId,
+          domainThreshold: toNumber(threshold),
+        };
+      } else {
+        updatedDomainThresholds.push({
+          domainId,
+          domainThreshold: toNumber(threshold),
+        });
+      }
+    }
+
+    await updateExtension(multiSigAddress, {
+      params: {
+        multiSig: {
+          ...multiSig,
+          domainThresholds: updatedDomainThresholds,
+        },
+      },
+    });
+  }
+};
