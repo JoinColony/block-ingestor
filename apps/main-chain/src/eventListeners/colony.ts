@@ -146,7 +146,8 @@ export const setupListenersForColony = (
     [ContractEventsSignatures.ExpenditureAdded]: handleExpenditureAdded,
     [ContractEventsSignatures.ExpenditureRecipientSet]:
       handleExpenditureRecipientSet,
-    [ContractEventsSignatures.ExpenditurePayoutSet]: handleExpenditurePayoutSet,
+    [ContractEventsSignatures.ExpenditurePayoutSetOld]:
+      handleExpenditurePayoutSet,
     [ContractEventsSignatures.ExpenditureLocked]: handleExpenditureLocked,
     [ContractEventsSignatures.ExpenditureCancelled]: handleExpenditureCancelled,
     [ContractEventsSignatures.ExpenditureFinalized]: handleExpenditureFinalized,

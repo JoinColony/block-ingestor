@@ -23,6 +23,7 @@ export const ProxyColonyEvents = new utils.Interface([
   'event WormholeMessageReceived(uint16 emitterChainId, bytes32 emitterAddress, uint64 sequence)',
   'event LogMessagePublished(address indexed sender,uint64 sequence,uint32 nonce,bytes payload,uint8 consistencyLevel)',
   'event ProxyColonyFundsClaimed(uint256 _chainId, address _token, uint256 _amount)',
+  'event TransferMade(address token, address user, uint256 amount)',
   'function createProxyColony(uint256 _destinationChainId, bytes32 _salt)',
 ]);
 

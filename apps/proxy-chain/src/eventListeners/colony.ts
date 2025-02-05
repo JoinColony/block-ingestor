@@ -1,11 +1,15 @@
 import { ContractEventsSignatures } from '@joincolony/blocks';
-import { addProxyColoniesNetworkEventListener } from './proxyColonies';
+import {
+  addProxyColoniesEventListener,
+  addProxyColoniesNetworkEventListener,
+} from './proxyColonies';
 import {
   handleProxyColonyDeployed,
   handleTransfer,
 } from '~handlers/proxyColonies';
 import { addTokenEventListener } from './token';
 import { getAllColoniesOnCurrentChain } from '~utils/getAllColoniesOnCurrentChain';
+import { handleTransferMade } from '~handlers/transferMade';
 
 export const setupListenersForColonies = async (): Promise<void> => {
   addProxyColoniesNetworkEventListener(
@@ -29,5 +33,11 @@ export const setupListenersForColony = async (
     handleTransfer,
     undefined,
     colonyAddress,
+  );
+
+  addProxyColoniesEventListener(
+    ContractEventsSignatures.TransferMade,
+    colonyAddress,
+    handleTransferMade,
   );
 };
