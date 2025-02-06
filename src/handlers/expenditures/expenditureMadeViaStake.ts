@@ -16,12 +16,13 @@ import { EventHandler } from '~types';
 import { getExpenditureDatabaseId, output, toNumber, verbose } from '~utils';
 import { getUserStakeDatabaseId } from '~utils/stakes';
 import { getExpenditureFromDB } from './helpers';
+import { getBlockChainTimestampISODate } from '../../utils/dates';
 
 export const handleExpenditureMadeViaStake: EventHandler = async (
   event,
   listener,
 ) => {
-  const { transactionHash, contractAddress } = event;
+  const { transactionHash, contractAddress, timestamp } = event;
   const { expenditureId, stake, creator } = event.args;
   const convertedExpenditureId = toNumber(expenditureId);
   const { colonyAddress } = listener as ExtensionEventListener;
@@ -44,6 +45,8 @@ export const handleExpenditureMadeViaStake: EventHandler = async (
   }
 
   const stakeDatabaseId = getUserStakeDatabaseId(creator, transactionHash);
+
+  const currentBlockChainTime = getBlockChainTimestampISODate(timestamp);
 
   await mutate<UpdateExpenditureMutation, UpdateExpenditureMutationVariables>(
     UpdateExpenditureDocument,
@@ -68,6 +71,7 @@ export const handleExpenditureMadeViaStake: EventHandler = async (
         colonyAddress,
         isClaimed: false,
         type: UserStakeType.StakedExpenditure,
+        createdAt: currentBlockChainTime,
       },
     },
   );
