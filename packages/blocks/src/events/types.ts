@@ -79,10 +79,13 @@ export enum ContractEventsSignatures {
   ExpenditureLocked = 'ExpenditureLocked(address,uint256)',
   ExpenditureFinalized = 'ExpenditureFinalized(address,uint256)',
   ExpenditureRecipientSet = 'ExpenditureRecipientSet(address,uint256,uint256,address)',
-  ExpenditurePayoutSet = 'ExpenditurePayoutSet(address,uint256,uint256,address,uint256)',
+  ExpenditurePayoutSetOld = 'ExpenditurePayoutSet(address,uint256,uint256,address,uint256)',
+  ExpenditurePayoutSet = 'ExpenditurePayoutSet(address,uint256,uint256,uint256,address,uint256)', // the one with chainId
   ExpenditurePayoutModifierSet = 'ExpenditurePayoutModifierSet(address,uint256,uint256,int256)',
+  // TODO mvoe this one to old
   ExpenditurePayoutClaimed = 'PayoutClaimed(address,uint256,uint256,address,uint256)',
   ExpenditureStateChanged = 'ExpenditureStateChanged(address,uint256,uint256,bool[],bytes32[],bytes32)',
+  ExpenditurePayoutClaimedNew = 'PayoutClaimed(address,uint256,uint256,uint256,address,uint256)',
 
   // Staked Expenditures
   StakeReclaimed = 'StakeReclaimed(uint256)',
@@ -111,6 +114,7 @@ export enum ContractEventsSignatures {
   LogMessagePublished = 'LogMessagePublished(address,uint64,uint32,bytes,uint8)',
   WormholeMessageReceived = 'WormholeMessageReceived(uint16,bytes32,uint64)',
   ProxyColonyFundsClaimed = 'ProxyColonyFundsClaimed(uint256,address,uint256)',
+  TransferMade = 'TransferMade(address,address,uint256)',
 }
 
 /*

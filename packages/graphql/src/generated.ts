@@ -6802,6 +6802,7 @@ export type Payment = {
   __typename?: 'Payment';
   /** Payment amount, excluding network fee */
   amount: Scalars['String'];
+  chainId?: Maybe<Scalars['String']>;
   /** Network fee amount */
   networkFee?: Maybe<Scalars['String']>;
   recipientAddress: Scalars['String'];
@@ -6810,6 +6811,7 @@ export type Payment = {
 
 export type PaymentInput = {
   amount: Scalars['String'];
+  chainId?: InputMaybe<Scalars['String']>;
   networkFee?: InputMaybe<Scalars['String']>;
   recipientAddress: Scalars['String'];
   tokenAddress: Scalars['String'];

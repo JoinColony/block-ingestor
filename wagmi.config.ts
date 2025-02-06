@@ -51,6 +51,10 @@ export default defineConfig({
           name: 'ProxyColony',
           path: 'bridging/ProxyColony.sol/ProxyColony.json',
         },
+        {
+          name: 'OneTxPayment',
+          path: 'extension/OneTxPayment.sol/OneTxPayment.json',
+        },
       ],
     }),
   ],
