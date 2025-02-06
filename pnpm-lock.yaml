@@ -12,11 +12,11 @@ importers:
         specifier: ^1.6.0
         version: 1.8.3(typescript@5.7.3)(zod@3.24.1)
       '@colony/colony-js':
-        specifier: ^8.0.0-next.1
-        version: 8.0.0(ethers@5.7.2)(typescript@5.7.3)
+        specifier: ^8.1.0
+        version: 8.1.0(ethers@5.7.2)(typescript@5.7.3)
       '@colony/events':
-        specifier: ^4.0.0-next.1
-        version: 4.0.0(ethers@5.7.2)(typescript@5.7.3)
+        specifier: ^4.1.0
+        version: 4.1.0(ethers@5.7.2)(typescript@5.7.3)
       '@magicbell/core':
         specifier: ^5.0.16
         version: 5.1.0(react@18.3.1)
@@ -1516,9 +1516,9 @@ packages:
     resolution: {integrity: sha512-jszQfcHxTVEG4cGjyoXGtGfk9A2SnNvM9KHBunSaYdDTgN23SNmOd/LVRWd+QkRRPSEb8H78YRY4Y+vKtEeLKA==}
     engines: {node: ^18 || ^20 || ^22, npm: ^10}
 
-  '@colony/colony-js@8.0.0':
-    resolution: {integrity: sha512-FMJKgoxh+XzrFdEW+ChS/unH5wr3RtduBYz1Y4mRdC+TgkGqTii0sWug2vKZZJUsiSgjvfSGuKtLXk3IU9oORg==}
-    engines: {node: ^16 || ^18 || ^20, pnpm: ^8}
+  '@colony/colony-js@8.1.0':
+    resolution: {integrity: sha512-GYMVTS4GtS4w8IAKWhjMn8k3yjAvFmwndMk6Q9lFGiUJclB+YtMPpwfXs9D+U1vVwMG2ybf9LCF0K2JVLFZqtQ==}
+    engines: {node: ^18 || ^20 || ^22, pnpm: ^10}
     peerDependencies:
       ethers: ^5.1.3
 
@@ -1528,15 +1528,21 @@ packages:
     peerDependencies:
       ethers: ^5.1.3
 
-  '@colony/events@4.0.0':
-    resolution: {integrity: sha512-sPjL+1ayeyXC7qr++tmNBWdaxVmsNPnt4R4tL8ch/dz8Ni65f4cE95wiWSmh0Sefoa9J4gZwYeXFvvYqyMLCEA==}
-    engines: {node: ^16 || ^18 || ^20, pnpm: ^8}
+  '@colony/core@3.1.0':
+    resolution: {integrity: sha512-VcoXSFd6FGeL4yNAAnBS3gPmVhV4uiiJp5gKIMGAQf0Wt1iqM0k+1m/BWc+ydP58Rx7A2eOCaE8TghtJYiXsFQ==}
+    engines: {node: ^18 || ^20 || ^22, pnpm: ^10}
     peerDependencies:
       ethers: ^5.1.3
 
-  '@colony/tokens@1.0.0':
-    resolution: {integrity: sha512-veyUSixcToWGzPgcOb907QbnnJdyCixZTkz6q9U1YAtrUwpUNp7xyajF7ef+HuNbUDMA+owa4P2PLpJBaBoiMg==}
-    engines: {node: ^16 || ^18 || ^20, pnpm: ^8}
+  '@colony/events@4.1.0':
+    resolution: {integrity: sha512-9bIQUSIo/7o817ZpQ0H86Ar3Fxwdj05vfW0Jc3sUU6bhDC7c9MT7DHTRv1uN+kEcZVtJz4KabWcIUARZrq0AOA==}
+    engines: {node: ^18 || ^20 || ^22, pnpm: ^10}
+    peerDependencies:
+      ethers: ^5.1.3
+
+  '@colony/tokens@1.1.0':
+    resolution: {integrity: sha512-gIEX0fMbJv3HXWucqaS+beIPJf9YGz5GY0npy3+mTdCCxNkoQM1m9LT0gjP6T8NyaDxDvju3URDtB083qPLNaA==}
+    engines: {node: ^18 || ^20 || ^22, pnpm: ^10}
     peerDependencies:
       ethers: ^5.1.3
 
@@ -8505,11 +8511,11 @@ snapshots:
       - typescript
       - zod
 
-  '@colony/colony-js@8.0.0(ethers@5.7.2)(typescript@5.7.3)':
+  '@colony/colony-js@8.1.0(ethers@5.7.2)(typescript@5.7.3)':
     dependencies:
-      '@colony/core': 3.0.0(ethers@5.7.2)
-      '@colony/events': 4.0.0(ethers@5.7.2)(typescript@5.7.3)
-      '@colony/tokens': 1.0.0(ethers@5.7.2)
+      '@colony/core': 3.1.0(ethers@5.7.2)
+      '@colony/events': 4.1.0(ethers@5.7.2)(typescript@5.7.3)
+      '@colony/tokens': 1.1.0(ethers@5.7.2)
       ethers: 5.7.2
     transitivePeerDependencies:
       - typescript
@@ -8518,16 +8524,20 @@ snapshots:
     dependencies:
       ethers: 5.7.2
 
-  '@colony/events@4.0.0(ethers@5.7.2)(typescript@5.7.3)':
+  '@colony/core@3.1.0(ethers@5.7.2)':
     dependencies:
-      '@colony/core': 3.0.0(ethers@5.7.2)
+      ethers: 5.7.2
+
+  '@colony/events@4.1.0(ethers@5.7.2)(typescript@5.7.3)':
+    dependencies:
+      '@colony/core': 3.1.0(ethers@5.7.2)
       ethers: 5.7.2
       fetch-retry: 5.0.6
       typia: 3.8.9(typescript@5.7.3)
     transitivePeerDependencies:
       - typescript
 
-  '@colony/tokens@1.0.0(ethers@5.7.2)':
+  '@colony/tokens@1.1.0(ethers@5.7.2)':
     dependencies:
       ethers: 5.7.2
 
