@@ -1,6 +1,10 @@
 import { utils } from 'ethers';
 
-import { ColonyOperations, EventHandler } from '~types';
+import {
+  ColonyOperations,
+  EventHandler,
+  StreamingPaymentsOperations,
+} from '~types';
 import {
   getCachedColonyClient,
   getStakedExpenditureClient,
@@ -11,6 +15,7 @@ import {
   output,
   SimpleTransactionDescription,
   parseMotionAction,
+  getStreamingPaymentsClient,
 } from '~utils';
 import {
   handleEditDomainMotion,
@@ -31,6 +36,7 @@ import {
   handleCancelExpenditureViaArbitrationMotion,
   handleFinalizeExpenditureViaArbitrationMotion,
   handleReleaseStagedPaymentViaArbitration,
+  handleCancelStreamingPaymentsMotion,
 } from './handlers';
 import { ExtensionEventListener } from '~eventListeners';
 
@@ -61,6 +67,10 @@ export const handleMotionCreated: EventHandler = async (
     colonyAddress,
   );
 
+  const streamingPaymentsClient = await getStreamingPaymentsClient(
+    colonyAddress,
+  );
+
   const motion = await votingReputationClient.getMotion(motionId, {
     blockTag: blockNumber,
   });
@@ -74,6 +84,7 @@ export const handleMotionCreated: EventHandler = async (
     oneTxPaymentClient?.interface,
     stakedExpenditureClient?.interface,
     stagedExpenditureClient?.interface,
+    streamingPaymentsClient?.interface,
   ].filter(Boolean) as utils.Interface[]; // Casting seems necessary as TS does not pick up the .filter()
 
   const parsedAction = parseMotionAction(motion.action, interfaces);
@@ -209,6 +220,24 @@ export const handleMotionCreated: EventHandler = async (
 
       case ColonyOperations.ReleaseStagedPaymentViaArbitration: {
         await handleReleaseStagedPaymentViaArbitration(
+          colonyAddress,
+          event,
+          parsedAction,
+        );
+        break;
+      }
+
+      case StreamingPaymentsOperations.CancelStreamingPayment: {
+        await handleCancelStreamingPaymentsMotion(
+          colonyAddress,
+          event,
+          parsedAction,
+        );
+        break;
+      }
+
+      case StreamingPaymentsOperations.CreateStreamingPayment: {
+        await handleCancelStreamingPaymentsMotion(
           colonyAddress,
           event,
           parsedAction,

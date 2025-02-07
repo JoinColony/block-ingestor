@@ -16,11 +16,17 @@ import {
   GetColonyActionByMotionIdDocument,
   GetColonyActionByMotionIdQuery,
   GetColonyActionByMotionIdQueryVariables,
+  GetStreamingPaymentMetadataDocument,
+  GetStreamingPaymentMetadataQuery,
+  GetStreamingPaymentMetadataQueryVariables,
   StakerReward,
   UpdateColonyActionDocument,
   UpdateColonyActionMutation,
   UpdateColonyActionMutationVariables,
   UpdateColonyDocument,
+  UpdateStreamingPaymentMetadataDocument,
+  UpdateStreamingPaymentMetadataMutation,
+  UpdateStreamingPaymentMetadataMutationVariables,
 } from '~graphql';
 import { getAmountLessFee, getNetworkInverseFee } from '~utils/networkFee';
 
@@ -183,4 +189,76 @@ export const updateAmountToExcludeNetworkFee = async (
       },
     });
   }
+};
+
+export const linkPendingStreamingPaymentMetadata = async ({
+  pendingStreamingPaymentMetadataId,
+  streamingPaymentId,
+}: {
+  pendingStreamingPaymentMetadataId: string;
+  streamingPaymentId: string;
+}): Promise<void> => {
+  const { data: pendingStreamingPaymentMetadataQuery } =
+    (await query<
+      GetStreamingPaymentMetadataQuery,
+      GetStreamingPaymentMetadataQueryVariables
+    >(GetStreamingPaymentMetadataDocument, {
+      id: pendingStreamingPaymentMetadataId,
+    })) ?? {};
+
+  const pendingStreamingPaymentMetadata =
+    pendingStreamingPaymentMetadataQuery?.getStreamingPaymentMetadata;
+
+  if (!pendingStreamingPaymentMetadata) {
+    output(
+      `Could not find the pending streaming payment metadata with the id: ${pendingStreamingPaymentMetadataId}. This is a bug and should be investigated.`,
+    );
+    return;
+  }
+
+  if (!pendingStreamingPaymentMetadata.changelog) {
+    output(
+      `Could not find the pending streaming payment metadata changelog with the id: ${pendingStreamingPaymentMetadataId}. This is a bug and should be investigated.`,
+    );
+    return;
+  }
+
+  const { data } =
+    (await query<
+      GetStreamingPaymentMetadataQuery,
+      GetStreamingPaymentMetadataQueryVariables
+    >(GetStreamingPaymentMetadataDocument, {
+      id: streamingPaymentId,
+    })) ?? {};
+
+  const currentStreamingPaymentMetadata = data?.getStreamingPaymentMetadata;
+
+  if (!currentStreamingPaymentMetadata) {
+    output(
+      `Could not find the streaming payment metadata with the id: ${streamingPaymentId}. This is a bug and should be investigated.`,
+    );
+    return;
+  }
+
+  const hasEndConditionChanged =
+    currentStreamingPaymentMetadata.endCondition !==
+    pendingStreamingPaymentMetadata.endCondition;
+
+  if (!hasEndConditionChanged) {
+    return;
+  }
+
+  await mutate<
+    UpdateStreamingPaymentMetadataMutation,
+    UpdateStreamingPaymentMetadataMutationVariables
+  >(UpdateStreamingPaymentMetadataDocument, {
+    input: {
+      id: streamingPaymentId,
+      endCondition: pendingStreamingPaymentMetadata.endCondition,
+      changelog: [
+        ...(currentStreamingPaymentMetadata?.changelog ?? []),
+        pendingStreamingPaymentMetadata.changelog[0],
+      ],
+    },
+  });
 };

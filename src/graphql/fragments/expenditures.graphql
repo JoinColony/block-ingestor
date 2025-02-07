@@ -51,3 +51,36 @@ fragment ExpenditureSlot on ExpenditureSlot {
     networkFee
   }
 }
+
+fragment StreamingPayment on StreamingPayment {
+  id
+  startTime
+  endTime
+  tokenAddress
+  amount
+  interval
+  metadata {
+    ...StreamingPaymentMetadata
+  }
+  claims {
+    amount
+    timestamp
+  }
+}
+
+fragment StreamingPaymentMetadata on StreamingPaymentMetadata {
+  id
+  endCondition
+  changelog {
+    transactionHash
+    oldEndCondition
+    newEndCondition
+  }
+}
+
+fragment StreamingPaymentChanges on StreamingPaymentChanges {
+  startTime
+  endTime
+  interval
+  amount
+}
