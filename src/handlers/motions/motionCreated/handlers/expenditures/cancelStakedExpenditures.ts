@@ -13,7 +13,7 @@ export default async (
   { name, args: actionArgs }: TransactionDescription,
 ): Promise<void> => {
   const { args } = event;
-  const [, , , , expenditureId] = actionArgs;
+  const [, , , , expenditureId, willPunishExpenditureStaker] = actionArgs;
   const [, , domainId] = args;
 
   await createMotionInDB(colonyAddress, event, {
@@ -25,5 +25,6 @@ export default async (
       colonyAddress,
       toNumber(expenditureId),
     ),
+    willPunishExpenditureStaker,
   });
 };
