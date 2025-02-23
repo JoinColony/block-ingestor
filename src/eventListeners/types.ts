@@ -4,7 +4,7 @@ export interface BaseEventListener {
   type: EventListenerType;
   eventSignature: ContractEventsSignatures;
   topics: Array<string | null>;
-  handler: EventHandler;
+  handler?: EventHandler;
   address?: string;
 }
 
@@ -43,7 +43,6 @@ export interface ExtensionEventListener extends BaseEventListener {
   address: string;
   colonyAddress: string;
   extensionHash: string;
-  handler: EventHandler;
 }
 
 export type EventListener =

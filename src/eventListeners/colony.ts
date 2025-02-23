@@ -26,7 +26,6 @@ import {
   handleEditColonyAction,
   handleEditDomainAction,
   handleEmitDomainReputationAction,
-  handleExpenditureAdded,
   handleExpenditureCancelled,
   handleExpenditureClaimDelaySet,
   handleExpenditureFinalized,
@@ -40,7 +39,6 @@ import {
   handleExpenditureTransferred,
   handleMakeAbitraryTransactionAction,
   handleManagePermissionsAction,
-  handleMintTokensAction,
   handleMoveFundsAction,
   handleReputationMiningCycleComplete,
   handleSetTokenAuthority,
@@ -52,7 +50,7 @@ import setTokenAuthority from '~handlers/tokens/setTokenAuthority';
 const addColonyEventListener = (
   eventSignature: ContractEventsSignatures,
   address: string,
-  handler: EventHandler,
+  handler?: EventHandler,
 ): void => {
   addEventListener({
     type: EventListenerType.Colony,
@@ -120,7 +118,6 @@ export const setupListenersForColony = (
   const colonyEventHandlers = {
     [ContractEventsSignatures.ColonyFundsClaimed]: handleColonyFundsClaimed,
     [ContractEventsSignatures.ColonyUpgraded]: handleColonyUpgradeAction,
-    [ContractEventsSignatures.TokensMinted]: handleMintTokensAction,
     [ContractEventsSignatures.DomainAdded]: handleCreateDomainAction,
     [ContractEventsSignatures.DomainMetadata]: handleEditDomainAction,
     [ContractEventsSignatures.TokenUnlocked]: handleTokenUnlockedAction,
@@ -134,7 +131,6 @@ export const setupListenersForColony = (
     [ContractEventsSignatures.ColonyRoleSet_OLD]: handleManagePermissionsAction,
     [ContractEventsSignatures.ExpenditureGlobalClaimDelaySet]:
       handleExpenditureGlobalClaimDelaySet,
-    [ContractEventsSignatures.ExpenditureAdded]: handleExpenditureAdded,
     [ContractEventsSignatures.ExpenditureRecipientSet]:
       handleExpenditureRecipientSet,
     [ContractEventsSignatures.ExpenditurePayoutSet]: handleExpenditurePayoutSet,
@@ -163,6 +159,12 @@ export const setupListenersForColony = (
       colonyAddress,
       handler,
     ),
+  );
+
+  addColonyEventListener(ContractEventsSignatures.TokensMinted, colonyAddress);
+  addColonyEventListener(
+    ContractEventsSignatures.ExpenditureAdded,
+    colonyAddress,
   );
 
   /*

@@ -11,6 +11,14 @@ import {
   setLastBlockNumber,
 } from '~utils';
 import { BLOCK_PAGING_SIZE } from '~constants';
+import { ContractEvent } from '~types';
+import { isEqual } from 'lodash';
+import {
+  ActionMatcher,
+  isFunctionActionMatcher,
+  isSimpleActionMatcher,
+} from '~actions/types';
+import { actionMatchers } from '~actions/actionMatchers';
 
 let isProcessing = false;
 const blockLogs = new Map<number, Log[]>();
@@ -176,6 +184,8 @@ export const processNextBlock = async (): Promise<void> => {
       }
     }
 
+    const blockEvents = [];
+
     for (const log of logs) {
       // Find listeners that match the log
       const listeners = getMatchingListeners(log.topics, log.address);
@@ -201,9 +211,85 @@ export const processNextBlock = async (): Promise<void> => {
           continue;
         }
 
+        blockEvents.push(event);
+
         // Call the handler in a blocking way to ensure events get processed sequentially
-        await listener.handler(event, listener);
+        await listener.handler?.(event, listener);
       }
+    }
+
+    console.log({ blockEvents });
+
+    const hasMatch = (
+      actionMatcher: ActionMatcher,
+      potentialMatch: ContractEvent[],
+    ): boolean => {
+      if (isSimpleActionMatcher(actionMatcher)) {
+        if (actionMatcher.eventSignatures.length !== potentialMatch.length) {
+          return false;
+        }
+
+        return isEqual(
+          actionMatcher.eventSignatures,
+          potentialMatch.map((event) => event.signature),
+        );
+      }
+
+      if (isFunctionActionMatcher(actionMatcher)) {
+        return actionMatcher.matcherFn(potentialMatch);
+      }
+
+      return false;
+    };
+
+    interface ActionMatch {
+      events: ContractEvent[];
+      matcher: ActionMatcher;
+    }
+
+    const matches: ActionMatch[] = [];
+
+    let startIndex = 0;
+    let endIndex = blockEvents.length;
+
+    while (startIndex < blockEvents.length) {
+      const potentialMatch = blockEvents.slice(startIndex, endIndex);
+
+      console.log({
+        potentialMatch: potentialMatch.map((event) => event.signature),
+      });
+
+      let matchFound = false;
+      for (const actionMatcher of actionMatchers) {
+        if (hasMatch(actionMatcher, potentialMatch)) {
+          matches.push({
+            events: potentialMatch,
+            matcher: actionMatcher,
+          });
+          // Move startIndex past the matched events
+          startIndex += potentialMatch.length;
+          endIndex = blockEvents.length;
+          matchFound = true;
+          break; // Exit the actionMatcher loop since we found a match
+        }
+      }
+
+      // If no match was found, adjust the window
+      if (!matchFound) {
+        if (endIndex > startIndex + 1) {
+          endIndex--;
+        } else {
+          startIndex++;
+          endIndex = blockEvents.length;
+        }
+      }
+    }
+
+    console.log({ matches });
+
+    // process the matches
+    for (const match of matches) {
+      await match.matcher.handler(match.events);
     }
 
     verbose('processed block', currentBlockNumber);
