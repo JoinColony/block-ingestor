@@ -6606,8 +6606,6 @@ export type PendingStreamingPayment = {
   amount: Scalars['String'];
   /** End time in seconds since epoch */
   endTime: Scalars['String'];
-  /** Unique identifier for the pending streaming payment */
-  id: Scalars['ID'];
   /** Payment interval in seconds */
   interval: Scalars['String'];
   /** Native domain ID where the streaming payment will be created */
@@ -6623,7 +6621,6 @@ export type PendingStreamingPayment = {
 export type PendingStreamingPaymentInput = {
   amount: Scalars['String'];
   endTime: Scalars['String'];
-  id?: InputMaybe<Scalars['ID']>;
   interval: Scalars['String'];
   nativeDomainId: Scalars['Int'];
   recipientAddress: Scalars['String'];
@@ -11032,6 +11029,18 @@ export type UpdateStreamingPaymentMetadataMutation = {
   } | null;
 };
 
+export type CreateStreamingPaymentMetadataMutationVariables = Exact<{
+  input: CreateStreamingPaymentMetadataInput;
+}>;
+
+export type CreateStreamingPaymentMetadataMutation = {
+  __typename?: 'Mutation';
+  createStreamingPaymentMetadata?: {
+    __typename?: 'StreamingPaymentMetadata';
+    id: string;
+  } | null;
+};
+
 export type CreateColonyExtensionMutationVariables = Exact<{
   input: CreateColonyExtensionInput;
 }>;
@@ -13141,6 +13150,15 @@ export const UpdateStreamingPaymentMetadataDocument = gql`
     $input: UpdateStreamingPaymentMetadataInput!
   ) {
     updateStreamingPaymentMetadata(input: $input) {
+      id
+    }
+  }
+`;
+export const CreateStreamingPaymentMetadataDocument = gql`
+  mutation CreateStreamingPaymentMetadata(
+    $input: CreateStreamingPaymentMetadataInput!
+  ) {
+    createStreamingPaymentMetadata(input: $input) {
       id
     }
   }

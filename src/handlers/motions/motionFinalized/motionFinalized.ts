@@ -15,7 +15,6 @@ import {
 
 import {
   getStakerReward,
-  linkPendingStreamingPaymentMetadata,
   updateColonyUnclaimedStakes,
   updateAmountToExcludeNetworkFee,
 } from './helpers';
@@ -64,28 +63,16 @@ export const handleMotionFinalized: EventHandler = async (event, listener) => {
       Number(yayPercentage) > Number(nayPercentage);
 
     if (yayWon) {
-      await linkPendingMetadata(
+      await linkPendingMetadata({
         action,
         colonyAddress,
-        finalizedMotion.id,
-        false,
-      );
+        finalizedMotion,
+      });
       await updateAmountToExcludeNetworkFee(
         action,
         colonyAddress,
         finalizedMotion,
       );
-
-      if (
-        finalizedMotion.pendingStreamingPaymentMetadataId &&
-        finalizedMotion.streamingPaymentId
-      ) {
-        await linkPendingStreamingPaymentMetadata({
-          pendingStreamingPaymentMetadataId:
-            finalizedMotion.pendingStreamingPaymentMetadataId,
-          streamingPaymentId: finalizedMotion.streamingPaymentId,
-        });
-      }
     }
 
     const updatedStakerRewards = await Promise.all(

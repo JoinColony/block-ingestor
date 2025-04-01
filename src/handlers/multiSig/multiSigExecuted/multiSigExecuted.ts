@@ -59,12 +59,12 @@ export const handleMultiSigMotionExecuted: EventHandler = async (
       return;
     }
 
-    await linkPendingMetadata(
-      actionData,
+    await linkPendingMetadata({
+      action: actionData,
       colonyAddress,
-      finalizedMultiSig.id,
-      true,
-    );
+      finalizedMotion: finalizedMultiSig,
+      isMultiSig: true,
+    });
 
     const multiSigData = await getMultiSigFromDB(multiSigDatabaseId);
 

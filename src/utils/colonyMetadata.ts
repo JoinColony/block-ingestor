@@ -1,9 +1,11 @@
 import { TransactionDescription } from 'ethers/lib/utils';
 
-import { ColonyOperations } from '~types';
+import { ColonyOperations, StreamingPaymentsOperations } from '~types';
 import { query, mutate } from '~amplifyClient';
 import {
   ColonyMetadata,
+  ColonyMotionFragment,
+  ColonyMultiSigFragment,
   CreateDomainMetadataDocument,
   DomainMetadata,
   GetColonyMetadataDocument,
@@ -17,9 +19,11 @@ import {
 } from '~graphql';
 import { getDomainDatabaseId } from './domains';
 import { output } from './logger';
-import { getCachedColonyClient } from './clients';
+import { getCachedColonyClient, getStreamingPaymentsClient } from './clients';
 import { getActionByMotionId, getActionByMultiSigId } from './actions';
 import { parseFunctionData } from './parseFunction';
+import { utils } from 'ethers';
+import { linkPendingStreamingPaymentMetadata } from '~handlers/motions/motionFinalized/helpers';
 
 const linkPendingDomainMetadataWithDomain = async (
   pendingDomainMetadata: DomainMetadata,
@@ -186,20 +190,35 @@ const linkPendingColonyMetadataWithColony = async (
   });
 };
 
-export const linkPendingMetadata = async (
-  action: string,
-  colonyAddress: string,
-  motionId: string,
-  isMultiSig: boolean,
-): Promise<void> => {
+interface LinkPendingMetadataParams {
+  action: string;
+  colonyAddress: string;
+  isMultiSig?: boolean;
+  finalizedMotion: ColonyMotionFragment | ColonyMultiSigFragment;
+}
+
+export const linkPendingMetadata = async ({
+  action,
+  colonyAddress,
+  isMultiSig,
+  finalizedMotion,
+}: LinkPendingMetadataParams): Promise<void> => {
   const colonyClient = await getCachedColonyClient(colonyAddress);
+  const streamingPaymentsClient = await getStreamingPaymentsClient(
+    colonyAddress,
+  );
 
   if (!colonyClient) {
     return;
   }
 
   // @NOTE: We only care about handful of events from Colony contract so not passing all the interfaces
-  const parsedAction = parseFunctionData(action, [colonyClient.interface]);
+  const parsedAction = parseFunctionData(
+    action,
+    [colonyClient.interface, streamingPaymentsClient?.interface].filter(
+      Boolean,
+    ) as utils.Interface[],
+  );
   if (!parsedAction) {
     return;
   }
@@ -210,6 +229,13 @@ export const linkPendingMetadata = async (
     parsedAction.name === ColonyOperations.EditDomain;
   const isMotionEditingAColony =
     parsedAction.name === ColonyOperations.EditColony;
+  const isMotionCreatingStreamingPayment =
+    parsedAction.name === StreamingPaymentsOperations.CreateStreamingPayment;
+  const hasPendingStreamingPaymentMetadata =
+    'pendingStreamingPaymentMetadataId' in finalizedMotion &&
+    !!finalizedMotion.pendingStreamingPaymentMetadataId;
+  const isMotionEditingStreamingPayment =
+    ColonyOperations.Multicall && hasPendingStreamingPaymentMetadata;
 
   if (
     isMotionAddingADomain ||
@@ -219,9 +245,9 @@ export const linkPendingMetadata = async (
     let colonyAction;
 
     if (isMultiSig) {
-      colonyAction = await getActionByMultiSigId(motionId);
+      colonyAction = await getActionByMultiSigId(finalizedMotion.id);
     } else {
-      colonyAction = await getActionByMotionId(motionId);
+      colonyAction = await getActionByMotionId(finalizedMotion.id);
     }
     /*
      * pendingDomainMetadata is a motion data prop that we use to store the metadata of a Domain that COULD be created/edited
@@ -245,5 +271,19 @@ export const linkPendingMetadata = async (
         colonyAddress,
       );
     }
+  }
+
+  if (
+    (isMotionCreatingStreamingPayment || isMotionEditingStreamingPayment) &&
+    'pendingStreamingPaymentMetadataId' in finalizedMotion &&
+    finalizedMotion.pendingStreamingPaymentMetadataId
+  ) {
+    await linkPendingStreamingPaymentMetadata({
+      colonyAddress,
+      pendingStreamingPaymentMetadataId:
+        finalizedMotion.pendingStreamingPaymentMetadataId,
+      streamingPaymentId: finalizedMotion.streamingPaymentId,
+      streamingPaymentsClient,
+    });
   }
 };

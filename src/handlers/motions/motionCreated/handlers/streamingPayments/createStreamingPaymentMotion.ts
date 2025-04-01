@@ -1,14 +1,14 @@
 import { TransactionDescription } from 'ethers/lib/utils';
 import { ContractEvent, motionNameMapping } from '~types';
 import { createMotionInDB } from '../../helpers';
-import { getDomainDatabaseId } from '~utils';
+import { getDomainDatabaseId, getPendingMetadataDatabaseId } from '~utils';
 
 export default async (
   colonyAddress: string,
   event: ContractEvent,
   { name, args: actionArgs }: TransactionDescription,
 ): Promise<void> => {
-  const { args } = event;
+  const { args, transactionHash } = event;
   const [, , domainId] = args;
 
   const [
@@ -25,6 +25,11 @@ export default async (
     amount,
   ] = actionArgs;
 
+  const pendingStreamingPaymentMetadataId = getPendingMetadataDatabaseId(
+    colonyAddress,
+    transactionHash,
+  );
+
   await createMotionInDB(colonyAddress, event, {
     type: motionNameMapping[name],
     fromDomainId: getDomainDatabaseId(colonyAddress, domainId),
@@ -37,5 +42,6 @@ export default async (
       tokenAddress: token,
       nativeDomainId: Number(domainId),
     },
+    pendingStreamingPaymentMetadataId,
   });
 };

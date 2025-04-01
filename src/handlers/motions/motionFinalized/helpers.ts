@@ -1,11 +1,16 @@
 import { BigNumber } from 'ethers';
 import { BlockTag } from '@ethersproject/abstract-provider';
-import { AnyVotingReputationClient, Extension } from '@colony/colony-js';
+import {
+  AnyStreamingPaymentsClient,
+  AnyVotingReputationClient,
+  Extension,
+} from '@colony/colony-js';
 
 import { ColonyOperations, MotionVote } from '~types';
 import {
   getCachedColonyClient,
   getColonyFromDB,
+  getExpenditureDatabaseId,
   output,
   parseFunctionData,
 } from '~utils';
@@ -13,6 +18,9 @@ import { mutate, query } from '~amplifyClient';
 import {
   ColonyActionType,
   ColonyMotion,
+  CreateStreamingPaymentMetadataDocument,
+  CreateStreamingPaymentMetadataMutation,
+  CreateStreamingPaymentMetadataMutationVariables,
   GetColonyActionByMotionIdDocument,
   GetColonyActionByMotionIdQuery,
   GetColonyActionByMotionIdQueryVariables,
@@ -192,11 +200,15 @@ export const updateAmountToExcludeNetworkFee = async (
 };
 
 export const linkPendingStreamingPaymentMetadata = async ({
+  colonyAddress,
   pendingStreamingPaymentMetadataId,
   streamingPaymentId,
+  streamingPaymentsClient,
 }: {
+  colonyAddress: string;
   pendingStreamingPaymentMetadataId: string;
-  streamingPaymentId: string;
+  streamingPaymentId?: string | null;
+  streamingPaymentsClient?: AnyStreamingPaymentsClient | null;
 }): Promise<void> => {
   const { data: pendingStreamingPaymentMetadataQuery } =
     (await query<
@@ -216,49 +228,76 @@ export const linkPendingStreamingPaymentMetadata = async ({
     return;
   }
 
-  if (!pendingStreamingPaymentMetadata.changelog) {
-    output(
-      `Could not find the pending streaming payment metadata changelog with the id: ${pendingStreamingPaymentMetadataId}. This is a bug and should be investigated.`,
+  if (!streamingPaymentId) {
+    if (!streamingPaymentsClient) {
+      output(
+        `Attempting to link pending streaming payment metadata but no client was passed. This is a bug.`,
+      );
+      return;
+    }
+
+    const streamingPaymentsCount =
+      await streamingPaymentsClient.getNumStreamingPayments();
+    const nativeStreamingPaymentId = streamingPaymentsCount.toNumber();
+    const resolvedStreamingPaymentId = getExpenditureDatabaseId(
+      colonyAddress,
+      nativeStreamingPaymentId,
     );
-    return;
+
+    await mutate<
+      CreateStreamingPaymentMetadataMutation,
+      CreateStreamingPaymentMetadataMutationVariables
+    >(CreateStreamingPaymentMetadataDocument, {
+      input: {
+        ...pendingStreamingPaymentMetadata,
+        id: resolvedStreamingPaymentId,
+      },
+    });
+  } else {
+    if (!pendingStreamingPaymentMetadata.changelog) {
+      output(
+        `Could not find the pending streaming payment metadata changelog with the id: ${pendingStreamingPaymentMetadataId}. This is a bug and should be investigated.`,
+      );
+      return;
+    }
+
+    const { data } =
+      (await query<
+        GetStreamingPaymentMetadataQuery,
+        GetStreamingPaymentMetadataQueryVariables
+      >(GetStreamingPaymentMetadataDocument, {
+        id: streamingPaymentId,
+      })) ?? {};
+
+    const currentStreamingPaymentMetadata = data?.getStreamingPaymentMetadata;
+
+    if (!currentStreamingPaymentMetadata) {
+      output(
+        `Could not find the streaming payment metadata with the id: ${streamingPaymentId}. This is a bug and should be investigated.`,
+      );
+      return;
+    }
+
+    const hasEndConditionChanged =
+      currentStreamingPaymentMetadata.endCondition !==
+      pendingStreamingPaymentMetadata.endCondition;
+
+    if (!hasEndConditionChanged) {
+      return;
+    }
+
+    await mutate<
+      UpdateStreamingPaymentMetadataMutation,
+      UpdateStreamingPaymentMetadataMutationVariables
+    >(UpdateStreamingPaymentMetadataDocument, {
+      input: {
+        id: streamingPaymentId,
+        endCondition: pendingStreamingPaymentMetadata.endCondition,
+        changelog: [
+          ...(currentStreamingPaymentMetadata?.changelog ?? []),
+          pendingStreamingPaymentMetadata.changelog[0],
+        ],
+      },
+    });
   }
-
-  const { data } =
-    (await query<
-      GetStreamingPaymentMetadataQuery,
-      GetStreamingPaymentMetadataQueryVariables
-    >(GetStreamingPaymentMetadataDocument, {
-      id: streamingPaymentId,
-    })) ?? {};
-
-  const currentStreamingPaymentMetadata = data?.getStreamingPaymentMetadata;
-
-  if (!currentStreamingPaymentMetadata) {
-    output(
-      `Could not find the streaming payment metadata with the id: ${streamingPaymentId}. This is a bug and should be investigated.`,
-    );
-    return;
-  }
-
-  const hasEndConditionChanged =
-    currentStreamingPaymentMetadata.endCondition !==
-    pendingStreamingPaymentMetadata.endCondition;
-
-  if (!hasEndConditionChanged) {
-    return;
-  }
-
-  await mutate<
-    UpdateStreamingPaymentMetadataMutation,
-    UpdateStreamingPaymentMetadataMutationVariables
-  >(UpdateStreamingPaymentMetadataDocument, {
-    input: {
-      id: streamingPaymentId,
-      endCondition: pendingStreamingPaymentMetadata.endCondition,
-      changelog: [
-        ...(currentStreamingPaymentMetadata?.changelog ?? []),
-        pendingStreamingPaymentMetadata.changelog[0],
-      ],
-    },
-  });
 };
