@@ -181,6 +181,7 @@ type MotionFields = Omit<
     | 'expenditureFunding'
     | 'pendingStreamingPaymentChanges'
     | 'pendingStreamingPaymentMetadataId'
+    | 'pendingStreamingPayment'
   >;
 
 export const createMotionInDB = async (
@@ -201,6 +202,7 @@ export const createMotionInDB = async (
     expenditureFunding,
     pendingStreamingPaymentChanges,
     pendingStreamingPaymentMetadataId,
+    pendingStreamingPayment,
     ...actionFields
   } = motionFields;
 
@@ -254,6 +256,7 @@ export const createMotionInDB = async (
       streamingPaymentId: actionFields.streamingPaymentId,
       pendingStreamingPaymentChanges,
       pendingStreamingPaymentMetadataId,
+      pendingStreamingPayment,
     }),
     createMotionMessage(initialMotionMessage),
     createColonyAction(actionData, timestamp),

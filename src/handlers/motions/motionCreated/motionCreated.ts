@@ -37,6 +37,7 @@ import {
   handleFinalizeExpenditureViaArbitrationMotion,
   handleReleaseStagedPaymentViaArbitration,
   handleCancelStreamingPaymentsMotion,
+  handleCreateStreamingPaymentMotion,
 } from './handlers';
 import { ExtensionEventListener } from '~eventListeners';
 
@@ -237,7 +238,7 @@ export const handleMotionCreated: EventHandler = async (
       }
 
       case StreamingPaymentsOperations.CreateStreamingPayment: {
-        await handleCancelStreamingPaymentsMotion(
+        await handleCreateStreamingPaymentMotion(
           colonyAddress,
           event,
           parsedAction,

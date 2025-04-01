@@ -1,11 +1,7 @@
 import { TransactionDescription } from 'ethers/lib/utils';
 import { ContractEvent, motionNameMapping } from '~types';
 import { createMotionInDB } from '../../helpers';
-import {
-  getDomainDatabaseId,
-  getExpenditureDatabaseId,
-  toNumber,
-} from '~utils';
+import { getDomainDatabaseId } from '~utils';
 
 export default async (
   colonyAddress: string,
@@ -13,15 +9,33 @@ export default async (
   { name, args: actionArgs }: TransactionDescription,
 ): Promise<void> => {
   const { args } = event;
-  const [, , streamingPaymentId] = actionArgs;
   const [, , domainId] = args;
+
+  const [
+    ,
+    ,
+    ,
+    ,
+    ,
+    startTime,
+    endTimeOrDuration,
+    interval,
+    recipient,
+    token,
+    amount,
+  ] = actionArgs;
 
   await createMotionInDB(colonyAddress, event, {
     type: motionNameMapping[name],
     fromDomainId: getDomainDatabaseId(colonyAddress, domainId),
-    streamingPaymentId: getExpenditureDatabaseId(
-      colonyAddress,
-      toNumber(streamingPaymentId),
-    ),
+    pendingStreamingPayment: {
+      amount: amount.toString(),
+      startTime: startTime.toString(),
+      endTime: endTimeOrDuration.toString(),
+      interval: interval.toString(),
+      recipientAddress: recipient,
+      tokenAddress: token,
+      nativeDomainId: Number(domainId),
+    },
   });
 };

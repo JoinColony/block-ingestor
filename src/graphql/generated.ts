@@ -618,8 +618,6 @@ export enum ColonyActionType {
   AddVerifiedMembers = 'ADD_VERIFIED_MEMBERS',
   AddVerifiedMembersMotion = 'ADD_VERIFIED_MEMBERS_MOTION',
   AddVerifiedMembersMultisig = 'ADD_VERIFIED_MEMBERS_MULTISIG',
-  /** An action related to arbitrary transaction */
-  ArbitraryTx = 'ARBITRARY_TX',
   /** An action related to cancelling and waiving a streaming payment */
   CancelAndWaiveStreamingPayment = 'CANCEL_AND_WAIVE_STREAMING_PAYMENT',
   /** An action related to canceling an expenditure */
@@ -1142,6 +1140,8 @@ export type ColonyMotion = {
   objectionAnnotation?: Maybe<Annotation>;
   /** Id of the associated objection annotation, if any */
   objectionAnnotationId?: Maybe<Scalars['ID']>;
+  /** Pending streaming payment to be created by motion, if any */
+  pendingStreamingPayment?: Maybe<PendingStreamingPayment>;
   /** Streaming Payment changes by the action */
   pendingStreamingPaymentChanges?: Maybe<StreamingPaymentChanges>;
   /** Streaming payment metadata that is stored temporarily and committed to the database once the corresponding motion passes */
@@ -1655,6 +1655,7 @@ export type CreateColonyMotionInput = {
   nativeMotionDomainId: Scalars['String'];
   nativeMotionId: Scalars['String'];
   objectionAnnotationId?: InputMaybe<Scalars['ID']>;
+  pendingStreamingPayment?: InputMaybe<PendingStreamingPaymentInput>;
   pendingStreamingPaymentChanges?: InputMaybe<StreamingPaymentChangesInput>;
   pendingStreamingPaymentMetadataId?: InputMaybe<Scalars['ID']>;
   remainingStakes: Array<Scalars['String']>;
@@ -2001,7 +2002,7 @@ export type CreateUserStakeInput = {
   id?: InputMaybe<Scalars['ID']>;
   isClaimed: Scalars['Boolean'];
   isForfeited?: InputMaybe<Scalars['Boolean']>;
-  type?: InputMaybe<UserStakeType>;
+  type: UserStakeType;
   userAddress: Scalars['ID'];
 };
 
@@ -6599,6 +6600,37 @@ export type PaymentInput = {
   tokenAddress: Scalars['String'];
 };
 
+export type PendingStreamingPayment = {
+  __typename?: 'PendingStreamingPayment';
+  /** Amount per interval */
+  amount: Scalars['String'];
+  /** End time in seconds since epoch */
+  endTime: Scalars['String'];
+  /** Unique identifier for the pending streaming payment */
+  id: Scalars['ID'];
+  /** Payment interval in seconds */
+  interval: Scalars['String'];
+  /** Native domain ID where the streaming payment will be created */
+  nativeDomainId: Scalars['Int'];
+  /** Address of the recipient */
+  recipientAddress: Scalars['String'];
+  /** Start time in seconds since epoch */
+  startTime: Scalars['String'];
+  /** Token address used for payments */
+  tokenAddress: Scalars['ID'];
+};
+
+export type PendingStreamingPaymentInput = {
+  amount: Scalars['String'];
+  endTime: Scalars['String'];
+  id?: InputMaybe<Scalars['ID']>;
+  interval: Scalars['String'];
+  nativeDomainId: Scalars['Int'];
+  recipientAddress: Scalars['String'];
+  startTime: Scalars['String'];
+  tokenAddress: Scalars['ID'];
+};
+
 export type PrivateBetaInviteCode = {
   __typename?: 'PrivateBetaInviteCode';
   createdAt: Scalars['AWSDateTime'];
@@ -9674,6 +9706,7 @@ export type UpdateColonyMotionInput = {
   nativeMotionDomainId?: InputMaybe<Scalars['String']>;
   nativeMotionId?: InputMaybe<Scalars['String']>;
   objectionAnnotationId?: InputMaybe<Scalars['ID']>;
+  pendingStreamingPayment?: InputMaybe<PendingStreamingPaymentInput>;
   pendingStreamingPaymentChanges?: InputMaybe<StreamingPaymentChangesInput>;
   pendingStreamingPaymentMetadataId?: InputMaybe<Scalars['ID']>;
   remainingStakes?: InputMaybe<Array<Scalars['String']>>;
@@ -10140,7 +10173,7 @@ export type UserStake = {
   isClaimed: Scalars['Boolean'];
   /** Only applicable for expenditure stakes, indicates if the creator's stake was forfeited when expenditure was cancelled */
   isForfeited?: Maybe<Scalars['Boolean']>;
-  type?: Maybe<UserStakeType>;
+  type: UserStakeType;
   updatedAt: Scalars['AWSDateTime'];
   user: User;
   userAddress: Scalars['ID'];
